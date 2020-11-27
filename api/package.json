@@ -1,0 +1,35 @@
+{
+	"name": "petio-rest",
+	"version": "1.0.0",
+	"description": "Rest Api for Petio",
+	"main": "index.js",
+	"scripts": {
+		"start": "nodemon app.js"
+	},
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"cors": "^2.8.5",
+		"cron": "^1.8.2",
+		"express": "^4.17.1",
+		"follow-redirects": "^1.13.0",
+		"fs": "0.0.1-security",
+		"http": "0.0.1-security",
+		"https": "^1.0.0",
+		"mongoose": "^5.10.9",
+		"nodejs-nodemailer-outlook": "^1.2.3",
+		"nodemon": "^2.0.5",
+		"saslprep": "^1.0.3",
+		"xhr-request": "^1.1.0",
+		"xml2json": "^0.12.0"
+	},
+	"devDependencies": {
+		"dotenv": "^8.2.0"
+	},
+	"bin": "app.js",
+	"targets": [
+		"node14-linux-x64",
+		"node14-macos-x64",
+		"node14-win-x64"
+	]
+}

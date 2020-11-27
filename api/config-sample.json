@@ -1,0 +1,17 @@
+{
+	"DB_URL": "",
+	"tmdbApi": "",
+	"plexIp": "",
+	"plexPort": "",
+	"plexToken": "",
+	"emailUser": "",
+	"emailPass": "",
+	"adminUsername": "",
+	"adminEmail": "",
+	"adminPass": "",
+	"adminDisplayName": "",
+	"fanartApi": "",
+	"ssl_key": "",
+	"ssl_cert": "",
+	"ssl_chain": ""
+}

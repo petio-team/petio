@@ -1,0 +1,8 @@
+
+api/node_modules/
+admin/node_modules/
+frontend/node_modules/
+admin/src/
+admin/public/
+frontend/src/
+frontend/public/
