@@ -115,6 +115,6 @@ if (!user_config) {
 		} else {
 			console.log('Not running SSL');
 		}
-		// libraryUpdate();
+		libraryUpdate();
 	}
 }

@@ -13,6 +13,11 @@ const nodeoutlook = require('nodejs-nodemailer-outlook');
 function mail(subject, title, text, img, to = []) {
 	let admin = adminEmail;
 
+	if (!adminEmail || !emailPass || !emailUser) {
+		console.log('Email not configured, skipping sending emails');
+		return;
+	}
+
 	to.forEach((send, i) => {
 		let timeout = i * 2000;
 		i++;

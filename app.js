@@ -30,7 +30,7 @@ setTimeout(() => {
 function init() {
 	let project_folder = __dirname;
 	let adminDir = path.join(project_folder, './admin/build');
-	let frontendDir = path.join(project_folder, './admin/frontend');
+	let frontendDir = path.join(project_folder, './frontend/build');
 
 	admin.use(express.static(adminDir));
 	admin.get('/', function (req, res) {
