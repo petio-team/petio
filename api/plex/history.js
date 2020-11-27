@@ -26,7 +26,11 @@ function getHistory(id, type) {
 				if (err) {
 					reject(err);
 				}
-				resolve(parseHistory(data, type));
+				if (!data) {
+					resolve({});
+				} else {
+					resolve(parseHistory(data, type));
+				}
 			}
 		);
 	});

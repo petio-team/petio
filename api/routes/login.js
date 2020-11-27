@@ -166,7 +166,8 @@ async function getFriend(username, res) {
 
 async function adminAuth(user, pass) {
 	return new Promise((resolve, reject) => {
-		var auth = 'Basic ' + new Buffer(user + ':' + pass).toString('base64');
+		var auth =
+			'Basic ' + new Buffer.from(user + ':' + pass).toString('base64');
 		headers['Authorization'] = auth;
 		request(
 			plexAuthUrl,
