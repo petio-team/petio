@@ -10,3 +10,4 @@ node_modules/
 admin/.eslintcache
 .DS_Store
 api/config.json
+api/.DS_Store

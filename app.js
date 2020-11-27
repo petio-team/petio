@@ -5,27 +5,43 @@ const frontend = express();
 const open = require('open');
 const { exec } = require('child_process');
 
-const api = exec('npm start --prefix ./api/', function (err, stdout, stderr) {
-	if (err) {
-		throw err;
-	}
-});
+function installPackages() {
+	return new Promise(async (resolve) => {
+		exec('npm install --prefix ./api/', (err, stout, sterr) => {
+			resolve(err ? stout : sterr);
+		});
+	});
+}
 
-api.stdout.on('data', function (data) {
-	console.log('API Log: ' + data.toString());
-});
+start();
 
-api.stderr.on('data', function (data) {
-	console.log('API Err: ' + data.toString());
-});
+async function start() {
+	await installPackages();
+	const api = exec(
+		'npm start --prefix ./api/',
+		function (err, stdout, stderr) {
+			if (err) {
+				throw err;
+			}
+		}
+	);
 
-api.on('exit', function (code) {
-	console.log('API exited with code ' + code.toString());
-});
+	api.stdout.on('data', function (data) {
+		console.log('API Log: ' + data.toString());
+	});
 
-setTimeout(() => {
-	init();
-}, 2000);
+	api.stderr.on('data', function (data) {
+		console.log('API Err: ' + data.toString());
+	});
+
+	api.on('exit', function (code) {
+		console.log('API exited with code ' + code.toString());
+	});
+
+	setTimeout(() => {
+		init();
+	}, 2000);
+}
 
 function init() {
 	let project_folder = __dirname;
