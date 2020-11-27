@@ -7,3 +7,4 @@ admin/public/
 frontend/src/
 frontend/public/
 node_modules/
+admin/.eslintcache
