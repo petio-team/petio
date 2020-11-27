@@ -38,6 +38,9 @@ async function parseHistory(data, type) {
 	}
 	let history = data.MediaContainer.Metadata;
 	let output = {};
+	if (!history) {
+		return output;
+	}
 	let histArr = new Array();
 	for (let i = 0; i < history.length; i++) {
 		let item = history[i];
