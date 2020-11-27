@@ -2,7 +2,7 @@
 
 React / Redux
 
-Status: Development no initial ready build. v0.1.0
+Status: Alpha prototype released 0.1.7
 
 To run a build run yarn / npm build.
 

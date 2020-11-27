@@ -1,1 +1,4 @@
-{"config":"eb4ca4df46da75edde2863021bc72eba7ba952d2"}
+{
+	"PlexRequestApi": "http://localhost",
+	"PlexRequestApiPort": "32600"
+}
