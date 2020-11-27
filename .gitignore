@@ -6,3 +6,4 @@ admin/src/
 admin/public/
 frontend/src/
 frontend/public/
+node_modules/

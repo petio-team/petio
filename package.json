@@ -1,0 +1,12 @@
+{
+	"name": "petio",
+	"version": "0.0.1",
+	"description": "Request Platform for Plex",
+	"main": "app.js",
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"express": "^4.17.1",
+		"open": "^7.3.0"
+	}
+}
