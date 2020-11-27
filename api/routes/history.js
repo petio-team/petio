@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const getHistory = require('../plex/history');
 const getBandwidth = require('../plex/bandwidth');
 const getServerInfo = require('../plex/serverInfo');
 
