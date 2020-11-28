@@ -75,7 +75,7 @@ if (!user_config) {
 			start();
 		}
 	);
-	function start() {
+	async function start() {
 		console.log('Starting Server ');
 		app.listen(32600);
 		console.log('Listening on 32600');

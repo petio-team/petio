@@ -1,3 +1,24 @@
+---
+version: '2'
+networks:
+    backend:
+        driver: bridge
+    general:
+        driver: bridge
+services:
+    mongo:
+        image: mongo:latest
+        container_name: 'mongo'
+        hostname: mongo
+        environment:
+            - MONGO_DATA_DIR=/data/db
+            - MONGO_LOG_DIR=/dev/null
+            - MONGO_URL=mongodb://mongo:27017/
+        volumes:
+            - ${HOME}/docker/mongodb:/data/db:rw
+        networks:
+            - backend
+        command: mongod --smallfiles --bind_ip_all
 ports:
     - '32600:32600'
     - '32601:32601'

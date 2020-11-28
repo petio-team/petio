@@ -24,6 +24,7 @@ let headers = {
 };
 
 router.post('/', async (req, res) => {
+	console.log('login Attempt');
 	let admin = req.body.admin;
 	let authToken = req.body.authToken;
 	if (admin) {
@@ -165,6 +166,7 @@ async function getFriend(username, res) {
 }
 
 async function adminAuth(user, pass) {
+	console.log('Auth started');
 	return new Promise((resolve, reject) => {
 		var auth =
 			'Basic ' + new Buffer.from(user + ':' + pass).toString('base64');
@@ -177,6 +179,7 @@ async function adminAuth(user, pass) {
 				json: true,
 			},
 			function (err, data) {
+				console.log(data);
 				if (err) {
 					reject(err);
 				}
