@@ -2,8 +2,9 @@
 # FROM ${IMAGE_ARCH}/alpine:3.9
 
 
+
 # Use the official image as a parent image.
-FROM node:current
+FROM node:14.15.1-alpine3.12
 
 COPY ./ /app/
 WORKDIR /app

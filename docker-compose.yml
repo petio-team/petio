@@ -1,26 +1,32 @@
----
-version: '2'
-networks:
-    backend:
-        driver: bridge
-    general:
-        driver: bridge
+version: '3'
 services:
+    api-server:
+        image: petio
+        ports:
+            - '32600:32600'
+            - '32601:32601'
+            - '32650:32650'
+            - '32700:32700'
+        networks:
+            - mern-app
+        depends_on:
+            - mongo
+        environment:
+            - 'REACT_APP_DB_DEFAULT=mongodb://mongo:27017'
+
     mongo:
         image: mongo:latest
         container_name: 'mongo'
         hostname: mongo
-        environment:
-            - MONGO_DATA_DIR=/data/db
-            - MONGO_LOG_DIR=/dev/null
-            - MONGO_URL=mongodb://mongo:27017/
-        volumes:
-            - ${HOME}/docker/mongodb:/data/db:rw
+        ports:
+            - '27017:27017'
         networks:
-            - backend
-        command: mongod --smallfiles --bind_ip_all
-ports:
-    - '32600:32600'
-    - '32601:32601'
-    - '32650:32650'
-    - '32700:32700'
+            - mern-app
+        volumes:
+            - mongo-data:/data/db
+networks:
+    mern-app:
+        driver: bridge
+volumes:
+    mongo-data:
+        driver: local
