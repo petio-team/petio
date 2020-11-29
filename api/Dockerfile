@@ -6,8 +6,8 @@
 # Use the official image as a parent image.
 FROM node:current
 
-COPY ./ /app/
-WORKDIR /app
+COPY ./ /app/api
+WORKDIR /app/api
 
 LABEL maintainer="Petio"
 
@@ -17,7 +17,7 @@ RUN npm install
 VOLUME /config
 
 # Add metadata to the image to describe which port the container is listening on at runtime.
-EXPOSE 32650 32700
+EXPOSE 32600 32601
 
 # Run the specified command within the container.
 CMD [ "npm", "start" ]

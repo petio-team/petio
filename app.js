@@ -5,26 +5,28 @@ const frontend = express();
 const open = require('open');
 const { exec } = require('child_process');
 
-function installPackages() {
-	return new Promise(async (resolve) => {
-		exec('npm install --prefix ./api/', (err, stout, sterr) => {
-			resolve(err ? stout : sterr);
-		});
-	});
-}
+// function installPackages() {
+// 	console.log('Installing Packages: API');
+// 	return new Promise(async (resolve) => {
+// 		exec('npm install --prefix ./api/', (err, stout, sterr) => {
+// 			console.log('Installing Packages: API .... Complete');
+// 			resolve(err ? stout : sterr);
+// 		});
+// 	});
+// }
 
-start();
+init();
 
 async function start() {
-	await installPackages();
-	const api = exec(
-		'npm start --prefix ./api/',
-		function (err, stdout, stderr) {
-			if (err) {
-				throw err;
-			}
-		}
-	);
+	// await installPackages();
+	// const api = exec(
+	// 	'npm start --prefix ./api/',
+	// 	function (err, stdout, stderr) {
+	// 		if (err) {
+	// 			throw err;
+	// 		}
+	// 	}
+	// );
 
 	api.stdout.on('data', function (data) {
 		console.log('API Log: ' + data.toString());
@@ -53,7 +55,7 @@ function init() {
 		res.sendFile(adminDir);
 	});
 	admin.listen(32650);
-	open('http://localhost:32650');
+	// open('http://localhost:32650');
 
 	frontend.use(express.static(frontendDir));
 	frontend.get('/', function (req, res) {

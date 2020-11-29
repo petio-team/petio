@@ -1,12 +1,22 @@
 version: '3'
 services:
-    api-server:
+    petio:
         image: petio
+        container_name: 'petio'
+        ports:
+            - '32650:32650'
+            - '32700:32700'
+        networks:
+            - mern-app
+        depends_on:
+            - mongo
+
+    petio-api:
+        image: petio-api
+        container_name: 'petio-api'
         ports:
             - '32600:32600'
             - '32601:32601'
-            - '32650:32650'
-            - '32700:32700'
         networks:
             - mern-app
         depends_on:
