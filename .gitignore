@@ -11,3 +11,5 @@ node_modules/
 .DS_Store
 api/config.json
 api/.DS_Store
+frontend/build
+admin/build
