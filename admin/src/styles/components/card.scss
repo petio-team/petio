@@ -1,0 +1,280 @@
+.card {
+	margin-right: 5px;
+
+	@include media-breakpoint-up(lg) {
+		margin-right: 10px;
+	}
+
+	&--inner {
+		position: relative;
+		margin-top: 2px;
+		box-shadow: 0 0 0 0 $orange;
+		transition: box-shadow 0.3s ease;
+
+		@include media-breakpoint-up(lg) {
+			&:hover {
+				.image-wrap {
+					// border: solid 2px $orange;
+					filter: brightness(0.7);
+					box-shadow: 0 0 0 2px $orange,
+						0 5px 10px 0px rgba(black, 0.3);
+
+					&:before {
+						opacity: 0.4;
+					}
+				}
+			}
+		}
+	}
+
+	.full-link {
+		width: 100%;
+		height: 100%;
+		top: 0;
+		left: 0;
+	}
+
+	.image-wrap {
+		width: 100%;
+		padding-bottom: 150%;
+		position: relative;
+		border-radius: 4px;
+		transition: all 0.1s ease;
+		overflow: hidden;
+		background: $dark-grey;
+		box-shadow: none;
+
+		&:before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 100%;
+			width: 100%;
+			background: radial-gradient(
+				farthest-corner at 50% 50%,
+				rgba(50, 50, 50, 0.5) 50%,
+				#323232 100%
+			);
+			z-index: 3;
+			opacity: 0;
+			transition: opacity 0.3s ease;
+		}
+
+		&:after {
+			content: '';
+			position: absolute;
+			top: -10px;
+			right: -10px;
+			height: 20px;
+			width: 20px;
+			background: $good;
+			transform: rotate(45deg) translateY(-20px);
+			pointer-events: none;
+			transition: all 0.3s ease;
+
+			@include media-breakpoint-up(lg) {
+				top: -20px;
+				right: -20px;
+				height: 40px;
+				width: 40px;
+			}
+		}
+
+		span {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+		}
+
+		img {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+			pointer-events: none;
+		}
+
+		.no-poster {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: $grey-medium;
+		}
+
+		.request-users {
+			display: flex;
+			position: absolute;
+			bottom: 10px;
+			right: 10px;
+			z-index: 3;
+
+			.request-user {
+				width: 10px;
+				display: flex;
+				justify-content: flex-end;
+				transition: width 0.3s ease;
+			}
+
+			.user-thumb {
+				min-width: 30px;
+				min-height: 30px;
+				border-radius: 50%;
+				background: $grey-light;
+				position: relative;
+				overflow: hidden;
+
+				img {
+					width: 100%;
+					height: 100%;
+					position: absolute;
+					top: 0;
+					left: 0;
+				}
+			}
+		}
+	}
+
+	.text-wrap {
+		padding-top: 5px;
+		overflow: hidden;
+		color: white;
+
+		@include media-breakpoint-up(lg) {
+			padding-top: 10px;
+		}
+
+		.title {
+			font-weight: 700;
+			font-size: 9px;
+			line-height: 12px;
+			white-space: nowrap;
+
+			@include media-breakpoint-up(lg) {
+				font-size: 13px;
+				line-height: 20px;
+			}
+		}
+
+		.year {
+			display: block;
+			color: $grey-light;
+			font-weight: normal;
+		}
+
+		p {
+			margin: 0;
+			color: white;
+			line-height: 20px;
+			font-size: 13px;
+		}
+
+		.role {
+			color: $grey-light;
+		}
+	}
+
+	&.on-server {
+		.image-wrap {
+			&:after {
+				background: $good;
+				transform: rotate(45deg) translateY(0);
+			}
+		}
+	}
+
+	&.person-card {
+		.image-wrap {
+			transition: none;
+		}
+	}
+
+	.full-link {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 5;
+	}
+
+	&:hover {
+		.request-users .request-user {
+			width: 30px;
+		}
+	}
+}
+
+.person-card {
+	.image-wrap {
+		padding-bottom: 100%;
+		border-radius: 500px;
+		overflow: hidden;
+	}
+
+	.text-wrap {
+		text-align: center;
+
+		.known-for {
+			margin-top: 5px;
+
+			a {
+				margin: 2px 5px;
+				word-wrap: none;
+				display: inline-block;
+				position: relative;
+				z-index: 5;
+				color: white;
+				font-size: 13px;
+			}
+		}
+
+		.character {
+			font-size: 10px;
+			line-height: 14px;
+		}
+	}
+}
+
+.popular-card {
+	position: relative;
+
+	&--count {
+		z-index: 3;
+		position: absolute;
+		left: calc(50% - 30px);
+		top: 30%;
+		width: 50px;
+		height: 50px;
+		background: rgba($dark-grey, 0.9);
+		color: $orange;
+		font-size: 20px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		border-radius: 50px;
+		font-weight: bold;
+	}
+}
+
+.request-count {
+	position: absolute;
+	top: 4px;
+	left: 4px;
+	height: 20px;
+	width: 20px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: white;
+	background: rgba($blue, 0.8);
+	z-index: 3;
+	font-size: 12px;
+	border-radius: 20px;
+}

@@ -2,12 +2,12 @@
 api/node_modules/
 admin/node_modules/
 frontend/node_modules/
-admin/src/
-admin/public/
-frontend/src/
-frontend/public/
+#admin/src/
+#admin/public/
+#frontend/src/
+#frontend/public/
 node_modules/
-admin/.eslintcache
+#admin/.eslintcache
 .DS_Store
 api/config.json
 api/.DS_Store

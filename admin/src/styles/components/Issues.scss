@@ -1,0 +1,82 @@
+.issue-sidebar {
+	position: fixed;
+	top: 0;
+	right: 0;
+	z-index: 1000;
+	background: $black;
+	box-shadow: 0 0 0 rgba(black, 0.4);
+	height: 100vh;
+	max-height: 100vh;
+	width: 90%;
+	padding: 20px;
+	transform: translateX(100%);
+	transition: all 0.4s ease;
+	overflow-y: auto;
+
+	@include media-breakpoint-up(md) {
+		width: 500px;
+		padding: 50px;
+	}
+
+	&.open {
+		box-shadow: -10px 0 20px rgba(black, 0.4);
+		transform: translateX(0);
+	}
+
+	&--close {
+		appearance: none;
+		border: none;
+		position: absolute;
+		top: 0;
+		right: 0;
+		width: 50px;
+		height: 50px;
+		background: $orange;
+		cursor: pointer;
+
+		&:after,
+		&:before {
+			content: '';
+			width: 20px;
+			height: 2px;
+			background: white;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+		}
+
+		&:before {
+			transform: translate(-50%, -50%) rotate(45deg);
+		}
+
+		&:after {
+			transform: translate(-50%, -50%) rotate(-45deg);
+		}
+	}
+
+	input {
+		width: 100%;
+		outline: none !important;
+		border: none;
+		border-radius: 0 !important;
+		border-bottom: solid 2px $grey-medium;
+		background: white;
+		font-size: 16px;
+		padding: 10px;
+		margin-bottom: 10px;
+
+		&:focus {
+			border-bottom: solid 2px $orange;
+		}
+	}
+
+	select {
+		appearance: none;
+
+		@extend input;
+	}
+
+	textarea {
+		@extend input;
+	}
+}

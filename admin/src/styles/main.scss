@@ -1,0 +1,71 @@
+$black: #282a2d;
+$grey: #f2f3f4;
+$grey-light: #e0e3e6;
+$grey-medium: #868c96;
+$dark-grey: #343536;
+$bad: #f06464;
+$orange: #e5a00d;
+$orangeDark: #c78c0d;
+$green: #96c83c;
+$good: $green;
+$blue: #19a0d7;
+
+// breakpoints /////////////////////////////////////////////
+
+$xs: 0;
+$sm: 575px;
+$md: 768px;
+$lg: 992px;
+$xl: 1200px;
+$xxl: 1440px;
+$xxxl: 1920px;
+
+$breakpoints: (
+	xs: $xs,
+	sm: $sm,
+	md: $md,
+	lg: $lg,
+	xl: $xl,
+	xxl: $xxl,
+	xxxl: $xxxl,
+);
+
+$container-max-widths: (
+	sm: 100%,
+	md: 100%,
+	lg: calc(100% - 30px),
+	xl: calc(100% - 100px),
+	xxl: calc(100% - 100px),
+	xxxl: calc(100% - 100px),
+);
+
+$grid-breakpoints: $breakpoints;
+
+// dependencies
+@import 'pre/normalize';
+@import 'pre/mixins';
+@import 'pre/fonts';
+
+// globals
+@import 'globals/type';
+@import 'globals/margins';
+@import 'globals/body';
+@import 'globals/page';
+@import 'globals/sidebar';
+
+// components
+@import 'components/input';
+@import 'components/spinner';
+@import 'components/section';
+@import 'components/buttons';
+@import 'components/card';
+@import 'components/carousel';
+@import 'components/search-form';
+@import 'components/issues';
+@import 'components/review';
+@import 'components/sessions';
+
+// pages
+@import 'pages/login';
+@import 'pages/setup';
+@import 'pages/dashboard';

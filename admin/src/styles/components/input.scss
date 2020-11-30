@@ -1,0 +1,22 @@
+input {
+	display: block;
+	width: 300px;
+	margin-bottom: 20px;
+	// appearance: none;
+	border: none;
+	outline: none;
+	height: 40px;
+	font-size: 16px;
+	padding: 0 15px;
+	border-bottom: solid 2px transparent;
+
+	&:focus {
+		border-bottom: solid 2px $orange;
+	}
+
+	&.disabled,
+	&:read-only {
+		opacity: 0.5;
+		cursor: no-drop;
+	}
+}

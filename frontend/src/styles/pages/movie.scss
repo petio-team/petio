@@ -1,0 +1,61 @@
+.movie {
+	&-wrap {
+		@extend .series-wrap;
+	}
+
+	&-top {
+		@extend .series-top;
+	}
+
+	&-logo {
+		@extend .series-logo;
+	}
+
+	&-poster {
+		@extend .series-poster;
+
+		&--inner {
+			@extend .series-poster--inner;
+		}
+	}
+
+	&-details {
+		@extend .series-details;
+
+		.movie-title {
+			@extend .series-title;
+		}
+	}
+
+	&--actions {
+		@extend .series--actions;
+	}
+
+	&-backdrop {
+		@extend .series-backdrop;
+	}
+
+	&-cast {
+		@extend .series-cast;
+	}
+
+	&-crew {
+		@extend .series-crew;
+
+		&--item {
+			@extend .series-crew--item;
+		}
+	}
+
+	&-action {
+		@extend .series-action;
+
+		&__mobile {
+			@extend .series-action__mobile;
+		}
+	}
+
+	&-content {
+		@extend .series-content;
+	}
+}

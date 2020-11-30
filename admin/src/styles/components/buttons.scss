@@ -1,0 +1,177 @@
+button {
+	&:focus,
+	&:hover {
+		outline: none;
+	}
+}
+
+button {
+	appearance: none;
+}
+
+.btn {
+	appearance: none;
+	height: 35px;
+	line-height: 33px;
+	line-height: 1;
+	border: solid 2px $orange;
+	background: none;
+	color: $orange;
+	border-radius: 50px;
+	transition: all 0.3s ease;
+	text-transform: uppercase;
+	font-weight: 700;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	position: relative;
+	overflow: hidden;
+	text-align: center;
+	padding: 0 10px;
+	font-size: 12px;
+
+	@include media-breakpoint-up(lg) {
+		padding: 0 20px;
+		font-size: 14px;
+	}
+
+	svg {
+		margin-right: 5px;
+		height: 10px;
+
+		@include media-breakpoint-up(lg) {
+			height: 15px;
+			margin-right: 10px;
+		}
+	}
+
+	&:hover {
+		background: $orange;
+		color: black;
+	}
+
+	&__square {
+		border-radius: 4px;
+		font-size: 10px;
+		background: $orange;
+		color: black;
+		height: 25px;
+
+		@include media-breakpoint-up(lg) {
+			font-size: 12px;
+			height: 35px;
+		}
+
+		&:hover {
+			background: darken($orange, 10);
+			border-color: darken($orange, 10);
+		}
+	}
+
+	&.good {
+		border-color: $green;
+		color: $green;
+
+		&:hover {
+			background: none;
+			color: $green;
+		}
+
+		&.btn__square {
+			background: $green;
+			color: black;
+		}
+	}
+
+	&.bad {
+		border-color: $bad;
+		color: $bad;
+
+		&:hover {
+			background: none;
+			color: $bad;
+		}
+
+		&.btn__square {
+			background: $bad;
+			color: black;
+		}
+	}
+
+	&.blue {
+		border-color: $blue;
+		color: $blue;
+
+		&:hover {
+			background: $blue;
+			color: white;
+		}
+
+		&.btn__square {
+			background: $blue;
+			color: black;
+		}
+	}
+
+	&.updating {
+		pointer-events: none;
+		background: $orange;
+		color: $orange;
+
+		&:before {
+			content: '';
+			height: 20px;
+			width: 20px;
+			border: solid 3px transparent;
+			border-top: solid 3px black;
+			border-right: solid 3px black;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			z-index: 2;
+			border-radius: 20px;
+			animation: spinner1 2s infinite;
+		}
+
+		&:after {
+			content: '';
+			height: 0px;
+			width: 0px;
+			border: solid 15px transparent;
+			border-top: solid 15px $orange;
+			border-right: solid 15px $orange;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			z-index: 2;
+			animation: spinner1 2s infinite 0.8s;
+		}
+	}
+
+	&.placeholder {
+		background: rgba($grey-medium, 0.2);
+		border-color: rgba($grey-medium, 0);
+		width: 120px;
+	}
+
+	&.disabled {
+		opacity: 0.2;
+		pointer-events: none;
+	}
+}
+
+@keyframes spinner1 {
+	0% {
+		transform: translate(-50%, -50%) rotate(0deg);
+	}
+
+	50% {
+		transform: translate(-50%, -50%) rotate(180deg);
+	}
+
+	100% {
+		transform: translate(-50%, -50%) rotate(360deg);
+	}
+}

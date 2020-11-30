@@ -1,0 +1,157 @@
+import React from 'react';
+import { withRouter, Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { ReactComponent as SearchIcon } from '../assets/svg/search.svg';
+import { ReactComponent as MovieIcon } from '../assets/svg/movie.svg';
+import { ReactComponent as TvIcon } from '../assets/svg/tv.svg';
+import { ReactComponent as PersonIcon } from '../assets/svg/people.svg';
+import { ReactComponent as RequestIcon } from '../assets/svg/bookmark.svg';
+import { ReactComponent as SettingsIcon } from '../assets/svg/settings.svg';
+import User from '../data/User';
+
+class Sidebar extends React.Component {
+	// constructor(props) {
+	// 	super(props);
+
+	// }
+	render() {
+		let current = this.props.location.pathname;
+		let user = this.props.user.current;
+		return (
+			<div className="sidebar--inner">
+				<Link to="/" className="logo">
+					<p className="logo-text" title="Petio">
+						Pet<span>io</span>
+					</p>
+				</Link>
+				<div className="sidebar--scroll">
+					<Link
+						to="/user"
+						className={
+							'sidebar--item user-profile ' +
+							(current === '/user' || current.startsWith('/user/')
+								? 'active'
+								: '')
+						}
+					>
+						<p>{user.title}</p>
+						<div className="icon">
+							<div
+								className="thumb"
+								style={{
+									backgroundImage: 'url(' + user.thumb + ')',
+									color: 'red',
+								}}
+							></div>
+						</div>
+					</Link>
+					<Link
+						to="/"
+						className={
+							'sidebar--item ' +
+							(current === '/' || current.startsWith('/search/')
+								? 'active'
+								: '')
+						}
+					>
+						<p>Search</p>
+						<div className="icon">
+							<SearchIcon />
+						</div>
+					</Link>
+					<Link
+						to="/movies"
+						className={
+							'sidebar--item ' +
+							(current === '/movies' ||
+							current.startsWith('/movie/')
+								? 'active'
+								: '')
+						}
+					>
+						<p>Movies</p>
+						<div className="icon">
+							<MovieIcon />
+						</div>
+					</Link>
+					<Link
+						to="/tv"
+						className={
+							'sidebar--item ' +
+							(current === '/tv' || current.startsWith('/series/')
+								? 'active'
+								: '')
+						}
+					>
+						<p>TV Shows</p>
+						<div className="icon">
+							<TvIcon />
+						</div>
+					</Link>
+					<Link
+						to="/people"
+						className={
+							'sidebar--item ' +
+							(current === '/people' ||
+							current.startsWith('/person/')
+								? 'active'
+								: '')
+						}
+					>
+						<p>People</p>
+						<div className="icon">
+							<PersonIcon />
+						</div>
+					</Link>
+					<Link
+						to="/requests"
+						className={
+							'sidebar--item ' +
+							(current === '/requests' ||
+							current.startsWith('/requests/')
+								? 'active'
+								: '')
+						}
+					>
+						<p>Requests</p>
+						<div className="icon">
+							<RequestIcon />
+						</div>
+					</Link>
+					{user.is_admin ? (
+						<Link
+							to="/admin"
+							className={
+								'sidebar--item ' +
+								(current === '/admin' ||
+								current.startsWith('/admin/')
+									? 'active'
+									: '')
+							}
+						>
+							<p>Admin</p>
+							<div className="icon">
+								<SettingsIcon />
+							</div>
+						</Link>
+					) : null}
+				</div>
+			</div>
+		);
+	}
+}
+
+Sidebar = withRouter(Sidebar);
+
+function SidebarContainer(props) {
+	return <Sidebar mediabutler={props.mediabutler} user={props.user} />;
+}
+
+const mapStateToProps = function (state) {
+	return {
+		mediabutler: state.mediabutler,
+		user: state.user,
+	};
+};
+
+export default connect(mapStateToProps)(SidebarContainer);

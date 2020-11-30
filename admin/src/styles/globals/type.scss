@@ -1,0 +1,95 @@
+body {
+	font-family: 'Open Sans', sans-serif;
+	font-family: 'Lato', sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+a {
+	margin: 0;
+	text-decoration: none;
+	color: $black;
+	user-select: none;
+}
+
+.main-title {
+	font-size: 24px;
+	line-height: 28px;
+	font-weight: 700;
+	margin-bottom: 0;
+	color: white;
+}
+
+.single-title {
+	font-size: 24px;
+	line-height: 28px;
+	font-weight: 700;
+	margin-bottom: 0;
+	color: white;
+
+	@include media-breakpoint-up(lg) {
+		font-size: 44px;
+		line-height: 48px;
+	}
+}
+
+.sub-title {
+	font-size: 12px;
+	line-height: 16px;
+	font-weight: 700;
+	letter-spacing: 0;
+	margin-bottom: 0;
+	text-transform: uppercase;
+	color: white;
+
+	@include media-breakpoint-up(lg) {
+		font-size: 15px;
+		line-height: 24px;
+	}
+}
+
+.small {
+	font-size: 10px;
+	line-height: 14px;
+}
+
+.upper {
+	text-transform: uppercase;
+}
+
+p {
+	margin-bottom: 10px;
+	font-weight: 300;
+	color: white;
+	font-size: 12px;
+	line-height: 18px;
+
+	@include media-breakpoint-up(lg) {
+		font-size: 16px;
+		line-height: 22px;
+		margin-bottom: 20px;
+	}
+}
+
+.color {
+	&-green {
+		color: $good;
+	}
+
+	&-orange {
+		color: $orange;
+	}
+
+	&-blue {
+		color: $blue;
+	}
+
+	&-red {
+		color: $bad;
+	}
+}

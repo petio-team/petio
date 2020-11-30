@@ -1,0 +1,39 @@
+.setup--wrap {
+	width: 300px;
+	max-width: 100%;
+	margin: auto;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	min-height: 100vh;
+
+	.server-select-option {
+		background: rgba($grey-medium, 0.5);
+		color: $grey-light;
+		padding: 20px;
+		border-bottom: solid 1px $black;
+		transition: background 0.3s ease;
+		cursor: pointer;
+
+		p {
+			margin: 0;
+			text-transform: uppercase;
+			pointer-events: none;
+		}
+
+		&:hover {
+			background: rgba($grey-medium, 0.8);
+		}
+
+		&.selected {
+			background: $orange;
+		}
+	}
+
+	.loading {
+		svg {
+			width: 50px;
+			height: 50px;
+		}
+	}
+}

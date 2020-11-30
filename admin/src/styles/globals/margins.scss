@@ -1,0 +1,33 @@
+$margin: 10px;
+
+.m {
+	&b {
+		&--1 {
+			margin-bottom: #{$margin * 1};
+		}
+
+		&--2 {
+			margin-bottom: #{$margin * 2};
+		}
+	}
+
+	&t {
+		&--1 {
+			margin-top: #{$margin * 1};
+		}
+
+		&--2 {
+			margin-top: #{$margin * 2};
+		}
+	}
+
+	&r {
+		&--1 {
+			margin-right: #{$margin * 1};
+		}
+
+		&--2 {
+			margin-right: #{$margin * 2};
+		}
+	}
+}
