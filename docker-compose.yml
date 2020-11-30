@@ -1,4 +1,7 @@
 version: '3'
+networks:
+    mern-app:
+        driver: bridge
 services:
     petio:
         image: petio
@@ -34,9 +37,6 @@ services:
             - mern-app
         volumes:
             - mongo-data:/data/db
-networks:
-    mern-app:
-        driver: bridge
 volumes:
     mongo-data:
         driver: local
