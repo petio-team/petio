@@ -45,4 +45,22 @@ router.get('/thumb/:id', async (req, res) => {
 	}
 });
 
+router.get('/:id', async (req, res) => {
+	try {
+		userData = await User.findById(req.params.id);
+	} catch (err) {
+		res.json({ error: err });
+	}
+	if (!userData) {
+		try {
+			userData = await Admin.findById(req.params.id);
+		} catch (err) {
+			res.json({ error: err });
+		}
+	}
+	if (userData) {
+		res.json(userData);
+	}
+});
+
 module.exports = router;
