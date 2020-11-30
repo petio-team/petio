@@ -414,6 +414,7 @@ async function saveShow(showObj) {
 				tmdbId = await externalIdTv(externalId, idSource);
 			} catch (err) {
 				console.log(err);
+				tmdbId = false;
 			}
 		} else {
 			try {
@@ -481,6 +482,7 @@ async function saveShow(showObj) {
 			.split('://')[1]
 			.split('?')[0];
 		let externalIds = {};
+		let tmdbId = false;
 		if (idSource !== 'tmdb') {
 			try {
 				tmdbId = await externalIdTv(externalId, idSource);
@@ -586,7 +588,11 @@ function getFriends() {
 				} else {
 					let dataParse = JSON.parse(xmlParser.toJson(data));
 					// console.log(dataParse.MediaContainer.User);
-					resolve(dataParse.MediaContainer.User);
+					if (dataParse.MediaContainer.User) {
+						resolve(dataParse.MediaContainer.User);
+					} else {
+						reject('No User object returned');
+					}
 				}
 			}
 		);
