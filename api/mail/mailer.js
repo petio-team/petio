@@ -1,4 +1,4 @@
-// Config
+const nodemailer = require('nodemailer');
 const user_config = require('../util/config');
 if (!user_config) {
 	return;
@@ -8,11 +8,21 @@ const prefs = JSON.parse(user_config);
 const emailUser = prefs.emailUser;
 const emailPass = prefs.emailPass;
 const adminEmail = prefs.adminEmail;
-const nodeoutlook = require('nodejs-nodemailer-outlook');
+const smtpServer = prefs.emailServer;
+const smtpPort = parseInt(prefs.emailPort);
+const tls = prefs.tls ? true : false;
+
+const transporter = nodemailer.createTransport({
+	host: smtpServer,
+	port: smtpPort,
+	secure: false, // true for 465, false for other ports
+	auth: {
+		user: emailUser, // generated ethereal user
+		pass: emailPass, // generated ethereal password
+	},
+});
 
 function mail(subject, title, text, img, to = []) {
-	let admin = adminEmail;
-
 	if (!adminEmail || !emailPass || !emailUser) {
 		console.log('Email not configured, skipping sending emails');
 		return;
@@ -25,18 +35,18 @@ function mail(subject, title, text, img, to = []) {
 			console.log(
 				`Sending email from: ${emailUser} to ${send} with the subject ${subject}`
 			);
-			nodeoutlook.sendEmail({
+			transporter.sendMail({
 				auth: {
 					user: emailUser,
 					pass: emailPass,
 				},
-				from: emailUser,
-				to: [send, admin],
+				from: `"Petio" <${emailUser}>`,
+				to: [send, adminEmail],
 				subject: subject,
 				html: mailHtml(title, text, img),
 				text: text,
 				onError: (e) => console.log(e),
-				onSuccess: (i) => console.log(i),
+				onSuccess: (i) => console.log('Message sent: %s', i.messageId),
 			});
 		}, timeout); //timeout between emails
 	});
@@ -71,18 +81,8 @@ let mailHtml = (title, text, img) => {
 			}
 			@font-face {
 				font-family: 'Logo';
-				src: url('https://beta.request.ashdyson.co.uk/fonts/Khula-Bold.eot');
-				src: url('https://beta.request.ashdyson.co.uk/fonts/Khula-Bold.eot?#iefix')
-						format('embedded-opentype'),
-					url('https://beta.request.ashdyson.co.uk/fonts/Khula-Bold.woff2')
-						format('woff2'),
-					url('https://beta.request.ashdyson.co.uk/fonts/Khula-Bold.woff')
-						format('woff'),
-					url('https://beta.request.ashdyson.co.uk/fonts/Khula-Bold.ttf')
-						format('truetype');
-				font-weight: bold;
-				font-style: normal;
-				font-display: swap;
+				src: url(https://fonts.gstatic.com/s/khula/v7/OpNPnoEOns3V7G-1ixvSpi9fXBXC80c.woff2) format('woff2');
+                unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
 			}
 			:root {
 				color-scheme: light;

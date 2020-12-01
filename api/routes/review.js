@@ -4,7 +4,7 @@ const express = require('express');
 const router = express.Router();
 const Review = require('../models/review');
 const User = require('../models/user');
-const outlook = require('../mail/outlook');
+const outlook = require('../mail/mailer');
 const Admin = require('../models/admin');
 
 router.post('/add', async (req, res) => {

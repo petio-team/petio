@@ -8,6 +8,7 @@ router.post('/set', async (req, res) => {
 	let user = req.body.user;
 	let server = req.body.server;
 	let db = req.body.db;
+	let email = req.body.email;
 	if (!user || !server || !db) {
 		res.status(500).send('Missing Fields');
 	}
@@ -18,8 +19,8 @@ router.post('/set', async (req, res) => {
 		plexIp: server.host,
 		plexPort: server.port,
 		plexToken: user.token,
-		emailUser: '',
-		emailPass: '',
+		emailUser: email.emailUser,
+		emailPass: email.emailPass,
 		adminUsername: user.email,
 		adminEmail: user.email,
 		adminPass: user.password,
@@ -28,6 +29,9 @@ router.post('/set', async (req, res) => {
 		ssl_key: '',
 		ssl_cert: '',
 		ssl_chain: '',
+		emailServer: email.emailServer,
+		emailPort: email.emailPort,
+		tls: email.tls,
 	};
 	createConfig(JSON.stringify(configData, null, 2));
 });

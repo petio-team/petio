@@ -1,4 +1,4 @@
-input {
+input:not([type='checkbox']) {
 	display: block;
 	width: 300px;
 	margin-bottom: 20px;
@@ -18,5 +18,40 @@ input {
 	&:read-only {
 		opacity: 0.5;
 		cursor: no-drop;
+	}
+}
+
+input[type='checkbox'] {
+	appearance: none;
+	width: 20px;
+	height: 20px;
+	position: relative;
+	background: white;
+	outline: none !important;
+	border-radius: 0 !important;
+
+	&:checked {
+		&:after {
+			content: '';
+			position: absolute;
+			top: 3px;
+			left: 3px;
+			width: calc(100% - 6px);
+			height: calc(100% - 6px);
+			background: $orange;
+		}
+	}
+}
+
+.checkbox-wrap {
+	display: flex;
+	align-items: center;
+
+	input {
+		margin-right: 10px;
+	}
+
+	p {
+		margin: 0;
 	}
 }

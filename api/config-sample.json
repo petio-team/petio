@@ -13,5 +13,8 @@
 	"fanartApi": "",
 	"ssl_key": "",
 	"ssl_cert": "",
-	"ssl_chain": ""
+	"ssl_chain": "",
+	"emailServer": "",
+	"emailPort": "",
+	"tls": false
 }

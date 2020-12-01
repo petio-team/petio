@@ -37,7 +37,7 @@ const setupRoute = require('./routes/setup');
 app.use(cors());
 app.options('*', cors());
 app.use(express.json());
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true }));
 
 app.get('/config', async (req, res) => {
 	res.json(user_config ? { config: true } : { config: false });
@@ -65,6 +65,11 @@ if (!user_config) {
 	app.use('/user', userRoute);
 	app.use('/genie', genieRoute);
 	app.use('/sessions', sessionsRoute);
+
+	app.get('/mail-test', async (req, res) => {
+		testMail();
+		res.send(200);
+	});
 
 	console.log('Connecting to Database, please wait....');
 	mongoose.connect(

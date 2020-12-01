@@ -9,7 +9,7 @@ const express = require('express');
 const router = express.Router();
 const Request = require('../models/request');
 const User = require('../models/user');
-const outlook = require('../mail/outlook');
+const outlook = require('../mail/mailer');
 
 router.post('/add', async (req, res) => {
 	let user = req.body.user;

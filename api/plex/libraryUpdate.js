@@ -13,7 +13,7 @@ const Music = require('../models/artist');
 const Show = require('../models/show');
 const User = require('../models/user');
 const Request = require('../models/request');
-const outlook = require('../mail/outlook');
+const outlook = require('../mail/mailer');
 const tmdbApikey = prefs.tmdbApi;
 const tmdb = 'https://api.themoviedb.org/3/';
 

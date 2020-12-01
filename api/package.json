@@ -18,6 +18,7 @@
 		"https": "^1.0.0",
 		"mongoose": "^5.10.9",
 		"nodejs-nodemailer-outlook": "^1.2.3",
+		"nodemailer": "^6.4.16",
 		"nodemon": "^2.0.5",
 		"saslprep": "^1.0.3",
 		"xhr-request": "^1.1.0",
