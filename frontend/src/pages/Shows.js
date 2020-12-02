@@ -1,7 +1,7 @@
 import React from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import Mediabutler from '../data/Mediabutler';
+import Api from '../data/Api';
 import Popular from '../components/Popular';
 import History from '../components/History';
 import ShowCard from '../components/TvCard';
@@ -13,8 +13,8 @@ class Shows extends React.Component {
 		page.scrollTop = 0;
 		window.scrollTo(0, 0);
 
-		if (!Object.keys(this.props.mediabutler.popular).length > 0) {
-			Mediabutler.getPopular();
+		if (!Object.keys(this.props.api.popular).length > 0) {
+			Api.getPopular();
 		}
 	}
 	render() {
@@ -26,8 +26,8 @@ class Shows extends React.Component {
 				<section>
 					<h3 className="sub-title mb--1">Trending Shows</h3>
 					<Carousel>
-						{Object.keys(this.props.mediabutler.popular).length > 0
-							? this.props.mediabutler.popular.tv.map((tv) => {
+						{Object.keys(this.props.api.popular).length > 0
+							? this.props.api.popular.tv.map((tv) => {
 									return <ShowCard key={tv.id} series={tv} />;
 							  })
 							: null}
@@ -41,12 +41,12 @@ class Shows extends React.Component {
 Shows = withRouter(Shows);
 
 function MoviesContainer(props) {
-	return <Shows mediabutler={props.mediabutler} />;
+	return <Shows api={props.api} />;
 }
 
 const mapStateToProps = function (state) {
 	return {
-		mediabutler: state.mediabutler,
+		api: state.api,
 	};
 };
 

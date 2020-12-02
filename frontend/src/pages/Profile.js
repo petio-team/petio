@@ -111,7 +111,7 @@ class Profile extends React.Component {
 									: 'Friend'}
 							</p>
 						</div>
-						<div className="profile-access">
+						{/* <div className="profile-access">
 							<h3 className="sub-title">Content Access</h3>
 							<div className="a-wrap">
 								<div className="a-720 a-icon">
@@ -138,7 +138,7 @@ class Profile extends React.Component {
 									Request Access to UHD / 4K?
 								</div>
 							) : null}
-						</div>
+						</div> */}
 						<div className="profile-logout">
 							<p
 								className="logout sub-title"

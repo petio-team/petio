@@ -1,7 +1,7 @@
 import React from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import Mediabutler from '../data/Mediabutler';
+import Api from '../data/Api';
 
 class Season extends React.Component {
 	constructor(props) {
@@ -23,11 +23,11 @@ class Season extends React.Component {
 		let id = this.props.match.params.id;
 		let season = this.props.match.params.season;
 
-		if (!this.props.mediabutler.series_lookup[id]) {
+		if (!this.props.api.series_lookup[id]) {
 			// check for cached
-			Mediabutler.series(id);
-		} else if (this.props.mediabutler.series_lookup[id].isMinified) {
-			Mediabutler.series(id);
+			Api.series(id);
+		} else if (this.props.api.series_lookup[id].isMinified) {
+			Api.series(id);
 		}
 	}
 
@@ -55,9 +55,9 @@ class Season extends React.Component {
 	render() {
 		let id = this.props.match.params.id;
 		let season = this.props.match.params.season;
-		let seriesData = this.props.mediabutler.series_lookup[id];
-		let seasonData = this.props.mediabutler.series_lookup[id]
-			? this.props.mediabutler.series_lookup[id].seasonData[season]
+		let seriesData = this.props.api.series_lookup[id];
+		let seasonData = this.props.api.series_lookup[id]
+			? this.props.api.series_lookup[id].seasonData[season]
 			: false;
 		console.log(seasonData);
 		let now = new Date();
@@ -168,12 +168,12 @@ class Season extends React.Component {
 Season = withRouter(Season);
 
 function SeasonContainer(props) {
-	return <Season mediabutler={props.mediabutler} />;
+	return <Season api={props.api} />;
 }
 
 const mapStateToProps = function (state) {
 	return {
-		mediabutler: state.mediabutler,
+		api: state.api,
 	};
 };
 

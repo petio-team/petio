@@ -2,7 +2,7 @@ import React from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { ReactComponent as ServerIcon } from '../assets/svg/server.svg';
-import Mediabutler from '../data/Mediabutler';
+import Api from '../data/Api';
 
 class ConfigSetup extends React.Component {
 	constructor(props) {
@@ -35,7 +35,7 @@ class ConfigSetup extends React.Component {
 
 	saveConfig() {
 		if (!this.state.selectedServer) return;
-		Mediabutler.saveConfig(this.state.selectedServer).then(() => {
+		Api.saveConfig(this.state.selectedServer).then(() => {
 			this.setState({
 				configReady: true,
 			});
@@ -54,13 +54,12 @@ class ConfigSetup extends React.Component {
 			<>
 				<p>
 					Choose your server from the options below. This will lock
-					this install of Petio to a specific server running
-					Mediabutler. Servers not running Mediabutler will be greyed
-					out.
+					this install of Petio to a specific server running Api.
+					Servers not running Api will be greyed out.
 				</p>
 				<h3 className="sub-title">Servers</h3>
 				<div className="server-list">
-					{this.props.mediabutler.servers.map((server) => {
+					{this.props.api.servers.map((server) => {
 						return (
 							<div
 								className="server-list--item"
@@ -109,12 +108,12 @@ class ConfigSetup extends React.Component {
 }
 
 function ConfigSetupContainer(props) {
-	return <ConfigSetup mediabutler={props.mediabutler} />;
+	return <ConfigSetup api={props.api} />;
 }
 
 const mapStateToProps = function (state) {
 	return {
-		mediabutler: state.mediabutler,
+		api: state.api,
 	};
 };
 

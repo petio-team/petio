@@ -1,7 +1,7 @@
 import React from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import Mediabutler from '../data/Mediabutler';
+import Api from '../data/Api';
 import MovieCard from '../components/MovieCard';
 import TvCard from '../components/TvCard';
 import Carousel from '../components/Carousel';
@@ -24,9 +24,9 @@ class Actor extends React.Component {
 	}
 
 	getActor(id) {
-		if (!this.props.mediabutler.person_lookup[id]) {
+		if (!this.props.api.person_lookup[id]) {
 			// check for cached
-			Mediabutler.person(id);
+			Api.person(id);
 		}
 	}
 
@@ -47,7 +47,7 @@ class Actor extends React.Component {
 
 	render() {
 		let id = this.props.match.params.id;
-		let personData = this.props.mediabutler.person_lookup[id];
+		let personData = this.props.api.person_lookup[id];
 
 		if (!personData) {
 			return (
@@ -63,7 +63,7 @@ class Actor extends React.Component {
 		let bWidth = 0;
 
 		// Credits Movie
-		let movieCredits = this.props.mediabutler.actor_movie[id];
+		let movieCredits = this.props.api.actor_movie[id];
 		let movieActing = false;
 		let movieProduction = false;
 
@@ -73,7 +73,7 @@ class Actor extends React.Component {
 		}
 
 		// Credits TV
-		let tvCredits = this.props.mediabutler.actor_series[id];
+		let tvCredits = this.props.api.actor_series[id];
 		let tvActing = false;
 		let tvProduction = false;
 
@@ -220,12 +220,12 @@ class Actor extends React.Component {
 Actor = withRouter(Actor);
 
 function ActorContainer(props) {
-	return <Actor mediabutler={props.mediabutler} />;
+	return <Actor api={props.api} />;
 }
 
 const mapStateToProps = function (state) {
 	return {
-		mediabutler: state.mediabutler,
+		api: state.api,
 	};
 };
 

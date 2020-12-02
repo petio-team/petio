@@ -2,7 +2,7 @@ import React from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import Plex from '../data/Plex';
-import Mediabutler from '../data/Mediabutler';
+import Api from '../data/Api';
 // import User from '../data/User'
 import MovieCard from './MovieCard';
 import TvCard from './TvCard';
@@ -38,7 +38,7 @@ class Popular extends React.Component {
 	}
 
 	getTop() {
-		Mediabutler.top(this.props.type)
+		Api.top(this.props.type)
 			.then((res) => {
 				this.setState({
 					topData: res,

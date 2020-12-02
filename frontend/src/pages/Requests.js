@@ -1,7 +1,7 @@
 import React from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import Mediabutler from '../data/Mediabutler';
+import Api from '../data/Api';
 import RequestCard from '../components/RequestCard';
 import Carousel from '../components/Carousel';
 
@@ -42,9 +42,9 @@ class Requests extends React.Component {
 		Object.keys(requests).map((key) => {
 			let request = requests[key];
 			if (request.type === 'movie') {
-				Mediabutler.movie(key);
+				Api.movie(key);
 			} else {
-				Mediabutler.series(key);
+				Api.series(key);
 			}
 		});
 	}
@@ -62,9 +62,9 @@ class Requests extends React.Component {
 		}
 		let requests = this.props.user.requests;
 		let pending = Object.keys(requests).map((key) => {
-			let request = this.props.mediabutler.movie_lookup[key];
+			let request = this.props.api.movie_lookup[key];
 			if (requests[key].type === 'tv') {
-				request = this.props.mediabutler.series_lookup[key];
+				request = this.props.api.series_lookup[key];
 			}
 			if (!request) return null;
 			return <RequestCard key={key} request={request} />;
@@ -72,9 +72,9 @@ class Requests extends React.Component {
 		requests = this.props.user.requests;
 		console.log(requests);
 		let yourRequests = Object.keys(requests).map((key) => {
-			let request = this.props.mediabutler.movie_lookup[key];
+			let request = this.props.api.movie_lookup[key];
 			if (requests[key].type === 'tv') {
-				request = this.props.mediabutler.series_lookup[key];
+				request = this.props.api.series_lookup[key];
 			}
 			let user = this.props.user.current._id;
 
@@ -104,12 +104,12 @@ class Requests extends React.Component {
 Requests = withRouter(Requests);
 
 function RequestsContainer(props) {
-	return <Requests mediabutler={props.mediabutler} user={props.user} />;
+	return <Requests api={props.api} user={props.user} />;
 }
 
 const mapStateToProps = function (state) {
 	return {
-		mediabutler: state.mediabutler,
+		api: state.api,
 		user: state.user,
 	};
 };

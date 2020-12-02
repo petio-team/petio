@@ -1,11 +1,11 @@
 import { combineReducers } from 'redux';
-import mediabutler from './Mediabutler/reducer';
+import api from './Api/reducer';
 import plex from './Plex/reducer';
 import user from './User/reducer';
 
 const rootReducer = combineReducers({
 	plex,
-	mediabutler,
+	api,
 	user,
 });
 

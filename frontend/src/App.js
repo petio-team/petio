@@ -10,7 +10,7 @@ import {
 import { connect } from 'react-redux';
 import Plex from './data/Plex';
 import User from './data/User';
-import Mediabutler from './data/Mediabutler';
+import Api from './data/Api';
 import Sidebar from './components/Sidebar';
 import ConfigSetup from './components/ConfigSetup';
 import Search from './pages/Search';
@@ -128,23 +128,23 @@ class App extends React.Component {
 		// 	this.loginLocal();
 		// }
 		// if (
-		// 	!this.props.mediabutler.logged_in &&
+		// 	!this.props.api.logged_in &&
 		// 	this.props.plex.token &&
 		// 	!this.state.mb_login
 		// ) {
 		// 	this.loginMb();
 		// }
 		// if (
-		// 	this.props.mediabutler.servers &&
-		// 	this.props.mediabutler.config &&
+		// 	this.props.api.servers &&
+		// 	this.props.api.config &&
 		// 	!this.state.activeServerCheck
 		// ) {
 		// 	this.setState({
 		// 		activeServerCheck: true,
 		// 	});
-		// 	Mediabutler.activeServer(
-		// 		this.props.mediabutler.servers,
-		// 		this.props.mediabutler.config
+		// 	Api.activeServer(
+		// 		this.props.api.servers,
+		// 		this.props.api.config
 		// 	);
 		// }
 	}
@@ -190,7 +190,7 @@ class App extends React.Component {
 	}
 
 	render() {
-		let user = this.props.mediabutler.current_user;
+		let user = this.props.api.current_user;
 		if (!this.state.isLoggedIn) {
 			return (
 				<div className="login-wrap">
@@ -319,7 +319,7 @@ class App extends React.Component {
 							</Route>
 						</Switch>
 					</HashRouter>
-					{!this.props.mediabutler.config ? <ConfigSetup /> : null}
+					{!this.props.api.config ? <ConfigSetup /> : null}
 				</div>
 			);
 		}
@@ -327,19 +327,13 @@ class App extends React.Component {
 }
 
 function AppContainer(props) {
-	return (
-		<App
-			plex={props.plex}
-			mediabutler={props.mediabutler}
-			user={props.user}
-		/>
-	);
+	return <App plex={props.plex} api={props.api} user={props.user} />;
 }
 
 const mapStateToProps = function (state) {
 	return {
 		plex: state.plex,
-		mediabutler: state.mediabutler,
+		api: state.api,
 		user: state.user,
 	};
 };

@@ -1,7 +1,7 @@
 import React from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import Mediabutler from '../data/Mediabutler';
+import Api from '../data/Api';
 import Popular from '../components/Popular';
 import History from '../components/History';
 import MovieCard from '../components/MovieCard';
@@ -13,8 +13,8 @@ class Movies extends React.Component {
 		page.scrollTop = 0;
 		window.scrollTo(0, 0);
 
-		if (!Object.keys(this.props.mediabutler.popular).length > 0) {
-			Mediabutler.getPopular();
+		if (!Object.keys(this.props.api.popular).length > 0) {
+			Api.getPopular();
 		}
 	}
 	render() {
@@ -26,17 +26,15 @@ class Movies extends React.Component {
 				<section>
 					<h3 className="sub-title mb--1">Trending Movies</h3>
 					<Carousel>
-						{Object.keys(this.props.mediabutler.popular).length > 0
-							? this.props.mediabutler.popular.movies.map(
-									(movie) => {
-										return (
-											<MovieCard
-												key={movie.id}
-												movie={movie}
-											/>
-										);
-									}
-							  )
+						{Object.keys(this.props.api.popular).length > 0
+							? this.props.api.popular.movies.map((movie) => {
+									return (
+										<MovieCard
+											key={movie.id}
+											movie={movie}
+										/>
+									);
+							  })
 							: null}
 					</Carousel>
 				</section>
@@ -48,12 +46,12 @@ class Movies extends React.Component {
 Movies = withRouter(Movies);
 
 function MoviesContainer(props) {
-	return <Movies mediabutler={props.mediabutler} />;
+	return <Movies api={props.api} />;
 }
 
 const mapStateToProps = function (state) {
 	return {
-		mediabutler: state.mediabutler,
+		api: state.api,
 	};
 };
 

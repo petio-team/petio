@@ -3,7 +3,7 @@ import { withRouter, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PersonCard from '../components/PersonCard';
 import TvCard from '../components/TvCard';
-import Mediabutler from '../data/Mediabutler';
+import Api from '../data/Api';
 import Carousel from '../components/Carousel';
 import { ReactComponent as RequestIcon } from '../assets/svg/request.svg';
 import { ReactComponent as ReportIcon } from '../assets/svg/report.svg';
@@ -99,7 +99,7 @@ class Series extends React.Component {
 
 	request() {
 		let id = this.props.match.params.id;
-		let series = this.props.mediabutler.series_lookup[id];
+		let series = this.props.api.series_lookup[id];
 		let request = {
 			id: series.id,
 			tmdb_id: series.id,
@@ -122,11 +122,11 @@ class Series extends React.Component {
 	getSeries() {
 		let id = this.props.match.params.id;
 
-		if (!this.props.mediabutler.series_lookup[id]) {
+		if (!this.props.api.series_lookup[id]) {
 			// check for cached
-			Mediabutler.series(id);
-		} else if (this.props.mediabutler.series_lookup[id].isMinified) {
-			Mediabutler.series(id);
+			Api.series(id);
+		} else if (this.props.api.series_lookup[id].isMinified) {
+			Api.series(id);
 		}
 	}
 
@@ -178,7 +178,7 @@ class Series extends React.Component {
 
 	render() {
 		let id = this.state.id;
-		let seriesData = this.props.mediabutler.series_lookup[id];
+		let seriesData = this.props.api.series_lookup[id];
 
 		if (!seriesData) {
 			return <MovieShowLoading />;
@@ -192,7 +192,7 @@ class Series extends React.Component {
 		let relatedItems = null;
 		if (seriesData.recommendations) {
 			relatedItems = seriesData.recommendations.map((key) => {
-				// if (this.props.mediabutler.series_lookup[id]) {
+				// if (this.props.api.series_lookup[id]) {
 				return (
 					<div className="related--item" key={`related-${key}`}>
 						<TvCard series={{ id: key }} />
@@ -624,7 +624,7 @@ Series = withRouter(Series);
 function SeriesContainer(props) {
 	return (
 		<Series
-			mediabutler={props.mediabutler}
+			api={props.api}
 			user={props.user}
 			openIssues={props.openIssues}
 		/>
@@ -633,7 +633,7 @@ function SeriesContainer(props) {
 
 const mapStateToProps = function (state) {
 	return {
-		mediabutler: state.mediabutler,
+		api: state.api,
 		user: state.user,
 	};
 };

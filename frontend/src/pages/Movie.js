@@ -3,7 +3,7 @@ import { withRouter, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PersonCard from '../components/PersonCard';
 import MovieCard from '../components/MovieCard';
-import Mediabutler from '../data/Mediabutler';
+import Api from '../data/Api';
 import Carousel from '../components/Carousel';
 import { ReactComponent as RequestIcon } from '../assets/svg/request.svg';
 import { ReactComponent as ReportIcon } from '../assets/svg/report.svg';
@@ -94,7 +94,7 @@ class Movie extends React.Component {
 
 	request() {
 		let id = this.props.match.params.id;
-		let movie = this.props.mediabutler.movie_lookup[id];
+		let movie = this.props.api.movie_lookup[id];
 		let request = {
 			id: movie.id,
 			imdb_id: movie.imdb_id,
@@ -136,11 +136,11 @@ class Movie extends React.Component {
 		let id = this.props.match.params.id;
 
 		// this.getRelated();
-		if (!this.props.mediabutler.movie_lookup[id]) {
+		if (!this.props.api.movie_lookup[id]) {
 			// check for cached
-			Mediabutler.movie(id);
-		} else if (this.props.mediabutler.movie_lookup[id].isMinified) {
-			Mediabutler.movie(id);
+			Api.movie(id);
+		} else if (this.props.api.movie_lookup[id].isMinified) {
+			Api.movie(id);
 		}
 	}
 
@@ -181,8 +181,8 @@ class Movie extends React.Component {
 	render() {
 		let id = this.state.id;
 		let movieData = null;
-		if (this.props.mediabutler.movie_lookup[id])
-			movieData = this.props.mediabutler.movie_lookup[id];
+		if (this.props.api.movie_lookup[id])
+			movieData = this.props.api.movie_lookup[id];
 
 		if (!movieData) {
 			return <MovieShowLoading />;
@@ -196,7 +196,7 @@ class Movie extends React.Component {
 		let relatedItems = null;
 		if (movieData.recommendations) {
 			relatedItems = movieData.recommendations.map((key) => {
-				// if (this.props.mediabutler.movie_lookup[id]) {
+				// if (this.props.api.movie_lookup[id]) {
 				return (
 					<div className="related--item" key={`related-${key}`}>
 						<MovieCard movie={{ id: key }} />
@@ -603,7 +603,7 @@ Movie = withRouter(Movie);
 function MovieContainer(props) {
 	return (
 		<Movie
-			mediabutler={props.mediabutler}
+			api={props.api}
 			user={props.user}
 			openIssues={props.openIssues}
 		/>
@@ -612,7 +612,7 @@ function MovieContainer(props) {
 
 const mapStateToProps = function (state) {
 	return {
-		mediabutler: state.mediabutler,
+		api: state.api,
 		user: state.user,
 	};
 };

@@ -1,7 +1,7 @@
 import React from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import Mediabutler from '../data/Mediabutler';
+import Api from '../data/Api';
 import { ReactComponent as SearchIcon } from '../assets/svg/search.svg';
 import MovieCard from '../components/MovieCard';
 import TvCard from '../components/TvCard';
@@ -35,7 +35,7 @@ class Search extends React.Component {
 					this.setState({
 						isLoading: true,
 					});
-					Mediabutler.search(term)
+					Api.search(term)
 						.then(() => {
 							this.setState({
 								isLoading: false,
@@ -53,7 +53,7 @@ class Search extends React.Component {
 				searchActive: true,
 			});
 		} else {
-			Mediabutler.clearSearch();
+			Api.clearSearch();
 			this.setState({
 				searchTerm: e.currentTarget.value,
 				searchActive: false,
@@ -63,7 +63,7 @@ class Search extends React.Component {
 	}
 
 	componentDidMount() {
-		Mediabutler.getPopular();
+		Api.getPopular();
 
 		let page = document.querySelectorAll('.page-wrap')[0];
 		page.scrollTop = 0;
@@ -75,9 +75,9 @@ class Search extends React.Component {
 			<>
 				<section>
 					<h3 className="sub-title mb--1">Movies</h3>
-					{this.props.mediabutler.search_results.movies.length > 0 ? (
+					{this.props.api.search_results.movies.length > 0 ? (
 						<Carousel>
-							{this.props.mediabutler.search_results.movies.map(
+							{this.props.api.search_results.movies.map(
 								(movie) => {
 									return (
 										<MovieCard
@@ -96,9 +96,9 @@ class Search extends React.Component {
 				</section>
 				<section>
 					<h3 className="sub-title mb--1">Shows</h3>
-					{this.props.mediabutler.search_results.series.length > 0 ? (
+					{this.props.api.search_results.series.length > 0 ? (
 						<Carousel>
-							{this.props.mediabutler.search_results.series.map(
+							{this.props.api.search_results.series.map(
 								(series) => {
 									return (
 										<TvCard
@@ -117,9 +117,9 @@ class Search extends React.Component {
 				</section>
 				<section>
 					<h3 className="sub-title mb--1">People</h3>
-					{this.props.mediabutler.search_results.people.length > 0 ? (
+					{this.props.api.search_results.people.length > 0 ? (
 						<Carousel>
-							{this.props.mediabutler.search_results.people.map(
+							{this.props.api.search_results.people.map(
 								(person) => {
 									return (
 										<PersonCard
@@ -142,20 +142,17 @@ class Search extends React.Component {
 			<>
 				<section>
 					<h3 className="sub-title mb--1">Trending Movies</h3>
-					{Object.keys(this.props.mediabutler.popular).length > 0 ? (
+					{Object.keys(this.props.api.popular).length > 0 ? (
 						<Carousel>
-							{Object.keys(this.props.mediabutler.popular)
-								.length > 0
-								? this.props.mediabutler.popular.movies.map(
-										(movie) => {
-											return (
-												<MovieCard
-													key={movie.id}
-													movie={movie}
-												/>
-											);
-										}
-								  )
+							{Object.keys(this.props.api.popular).length > 0
+								? this.props.api.popular.movies.map((movie) => {
+										return (
+											<MovieCard
+												key={movie.id}
+												movie={movie}
+											/>
+										);
+								  })
 								: null}
 						</Carousel>
 					) : (
@@ -164,20 +161,17 @@ class Search extends React.Component {
 				</section>
 				<section>
 					<h3 className="sub-title mb--1">Trending Shows</h3>
-					{Object.keys(this.props.mediabutler.popular).length > 0 ? (
+					{Object.keys(this.props.api.popular).length > 0 ? (
 						<Carousel>
-							{Object.keys(this.props.mediabutler.popular)
-								.length > 0
-								? this.props.mediabutler.popular.tv.map(
-										(series) => {
-											return (
-												<TvCard
-													key={series.id}
-													series={series}
-												/>
-											);
-										}
-								  )
+							{Object.keys(this.props.api.popular).length > 0
+								? this.props.api.popular.tv.map((series) => {
+										return (
+											<TvCard
+												key={series.id}
+												series={series}
+											/>
+										);
+								  })
 								: null}
 						</Carousel>
 					) : (
@@ -187,17 +181,15 @@ class Search extends React.Component {
 				<section>
 					<h3 className="sub-title mb--1">Trending People</h3>
 					<Carousel>
-						{Object.keys(this.props.mediabutler.popular).length > 0
-							? this.props.mediabutler.popular.people.map(
-									(person) => {
-										return (
-											<PersonCard
-												key={person.id}
-												person={person}
-											/>
-										);
-									}
-							  )
+						{Object.keys(this.props.api.popular).length > 0
+							? this.props.api.popular.people.map((person) => {
+									return (
+										<PersonCard
+											key={person.id}
+											person={person}
+										/>
+									);
+							  })
 							: null}
 					</Carousel>
 				</section>
@@ -228,12 +220,12 @@ class Search extends React.Component {
 Search = withRouter(Search);
 
 function SearchContainer(props) {
-	return <Search mediabutler={props.mediabutler} />;
+	return <Search api={props.api} />;
 }
 
 const mapStateToProps = function (state) {
 	return {
-		mediabutler: state.mediabutler,
+		api: state.api,
 	};
 };
 

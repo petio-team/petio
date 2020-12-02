@@ -1,7 +1,7 @@
 import React from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import Mediabutler from '../data/Mediabutler';
+import Api from '../data/Api';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 
@@ -24,17 +24,17 @@ class MovieCard extends React.Component {
 	getMovie() {
 		let movie = this.props.movie;
 		let id = movie.id;
-		if (!this.props.mediabutler.movie_lookup[id]) {
+		if (!this.props.api.movie_lookup[id]) {
 			// check for cached
 
 			if (!id) return false;
-			Mediabutler.movie(id, true);
+			Api.movie(id, true);
 		}
 	}
 
 	render() {
 		let id = this.props.movie.id;
-		let movie = this.props.mediabutler.movie_lookup[id];
+		let movie = this.props.api.movie_lookup[id];
 		if (!id || id === 'false') {
 			return null;
 		}
@@ -108,7 +108,7 @@ MovieCard = withRouter(MovieCard);
 function MovieCardContainer(props) {
 	return (
 		<MovieCard
-			mediabutler={props.mediabutler}
+			api={props.api}
 			movie={props.movie}
 			character={props.character}
 		/>
@@ -117,7 +117,7 @@ function MovieCardContainer(props) {
 
 const mapStateToProps = function (state) {
 	return {
-		mediabutler: state.mediabutler,
+		api: state.api,
 	};
 };
 

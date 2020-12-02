@@ -1,7 +1,7 @@
 import React from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import Mediabutler from '../data/Mediabutler';
+import Api from '../data/Api';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 
@@ -24,11 +24,11 @@ class TvCard extends React.Component {
 	getSeries() {
 		let series = this.props.series;
 		let id = series.id;
-		if (!this.props.mediabutler.series_lookup[id]) {
+		if (!this.props.api.series_lookup[id]) {
 			// check for cached
 
 			if (!id) return false;
-			Mediabutler.series(id, true);
+			Api.series(id, true);
 		}
 	}
 
@@ -37,7 +37,7 @@ class TvCard extends React.Component {
 		if (!id || id === 'false') {
 			return null;
 		}
-		let series = this.props.mediabutler.series_lookup[id];
+		let series = this.props.api.series_lookup[id];
 		if (!series) {
 			return (
 				<div key={id} data-key={id} className={'card type--movie-tv '}>
@@ -106,7 +106,7 @@ TvCard = withRouter(TvCard);
 function TvCardContainer(props) {
 	return (
 		<TvCard
-			mediabutler={props.mediabutler}
+			api={props.api}
 			series={props.series}
 			character={props.character}
 		/>
@@ -115,7 +115,7 @@ function TvCardContainer(props) {
 
 const mapStateToProps = function (state) {
 	return {
-		mediabutler: state.mediabutler,
+		api: state.api,
 	};
 };
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import Mediabutler from '../data/Mediabutler';
+import Api from '../data/Api';
 // import User from '../data/User'
 import MovieCard from './MovieCard';
 import Carousel from './Carousel';
@@ -42,7 +42,7 @@ class History extends React.Component {
 		this.setState({
 			historyData: [],
 		});
-		Mediabutler.history(
+		Api.history(
 			this.props.user.current.admin ? 1 : this.props.user.current._id,
 			this.props.type
 		)

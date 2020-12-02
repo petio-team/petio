@@ -144,12 +144,12 @@ class Sidebar extends React.Component {
 Sidebar = withRouter(Sidebar);
 
 function SidebarContainer(props) {
-	return <Sidebar mediabutler={props.mediabutler} user={props.user} />;
+	return <Sidebar api={props.api} user={props.user} />;
 }
 
 const mapStateToProps = function (state) {
 	return {
-		mediabutler: state.mediabutler,
+		api: state.api,
 		user: state.user,
 	};
 };

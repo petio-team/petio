@@ -1,7 +1,7 @@
 import { store } from '../store';
 import * as types from '../actionTypes';
 
-const PlexRequestApi = 'http://localhost';
+const PlexRequestApi = `http://${window.location.hostname}`;
 const PlexRequestApiPort = '32600';
 
 export function initAuth() {
@@ -11,7 +11,12 @@ export function initAuth() {
 			finalise({
 				type: types.CREDENTIALS,
 				credentials: {
-					api: conf.PlexRequestApi + ':' + conf.PlexRequestApiPort,
+					api:
+						(conf.PlexRequestApi.length > 0
+							? conf.PlexRequestApi
+							: PlexRequestApi) +
+						':' +
+						conf.PlexRequestApiPort,
 				},
 			});
 		})

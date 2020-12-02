@@ -67,19 +67,28 @@ if (!user_config) {
 	app.use('/sessions', sessionsRoute);
 
 	app.get('/mail-test', async (req, res) => {
-		testMail();
+		// testMail();
 		res.send(200);
 	});
 
 	console.log('Connecting to Database, please wait....');
-	mongoose.connect(
-		prefs.DB_URL,
-		{ useNewUrlParser: true, useUnifiedTopology: true },
-		() => {
+	connectDb();
+
+	async function connectDb() {
+		try {
+			await mongoose.connect(prefs.DB_URL, {
+				useNewUrlParser: true,
+				useUnifiedTopology: true,
+			});
 			console.log('Connected to Database ');
 			start();
+		} catch (err) {
+			console.log('Fatal error - database misconfigured!');
+			console.log('Removing config please restart');
+			fs.unlinkSync('./config.json');
 		}
-	);
+	}
+
 	async function start() {
 		console.log('Starting Server ');
 		app.listen(32600);

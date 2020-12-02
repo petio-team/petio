@@ -1,3 +1,3 @@
-const Mediabutler = 'https://auth.mediabutler.app';
+const Api = 'https://auth.api.app';
 
-export default { Mediabutler };
+export default { Api };
