@@ -705,7 +705,7 @@ function externalIdTv(id, type) {
 				if (err) {
 					reject(err);
 				}
-				if (!data) {
+				if (!data || !data.tv_results) {
 					reject('Error no data returned from tmdb TV external');
 				} else if (data.tv_results.length === 0) {
 					reject('No matches');
