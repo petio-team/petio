@@ -9,10 +9,6 @@ jobs:
     name: Build Frontend
     runs-on: ubuntu-latest
     steps:
-      - id: owner
-        run: echo "::set-output name=owner::$(echo ${{ github.repository_owner }} | tr \"[:upper:]\" \"[:lower:]\""
-      - id: repo
-        run: echo "::set-output name=repo::$(echo ${{ github.repository }} | tr \"[:upper:]\" \"[:lower:]\""
       - uses: actions/checkout@v2
       - name: Build Docker image
         run: REPO=${GITHUB_REPOSITORY,,} docker build -t ghcr.io/${REPO}:fe-latest -t ghcr.io/${REPO}:fe-${GITHUB_SHA::8} .
@@ -24,10 +20,6 @@ jobs:
     name: Build Backend
     runs-on: ubuntu-latest
     steps:
-      - id: owner
-        run: echo "::set-output name=owner::$(echo ${{ github.repository_owner }} | tr \"[:upper:]\" \"[:lower:]\""
-      - id: repo
-        run: echo "::set-output name=repo::$(echo ${{ github.repository }} | tr \"[:upper:]\" \"[:lower:]\""
       - uses: actions/checkout@v2
       - name: Build Docker image
         run: REPO=${GITHUB_REPOSITORY,,} cd api && docker build -t ghcr.io/${REPO}:be-latest -t ghcr.io/${REPO}:be-${GITHUB_SHA::8} .
