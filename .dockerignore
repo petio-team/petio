@@ -2,9 +2,4 @@ node_modules
 api/node_modules
 api/config.json
 admin/node_modules
-admin/public
-admin/src
 frontend/node_modules
-frontend/public
-frontend/src
-api/
