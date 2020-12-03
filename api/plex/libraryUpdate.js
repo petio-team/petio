@@ -16,11 +16,13 @@ const Request = require('../models/request');
 const outlook = require('../mail/mailer');
 const tmdbApikey = prefs.tmdbApi;
 const tmdb = 'https://api.themoviedb.org/3/';
+const Sonarr = require('../services/sonarr');
 
 let mailer = [];
 
 async function libraryUpdate() {
 	let libraries = false;
+	let sonarr = new Sonarr();
 	try {
 		libraries = await getLibraries();
 	} catch (err) {
@@ -28,20 +30,15 @@ async function libraryUpdate() {
 	}
 
 	if (libraries) {
-		saveLibraries(libraries);
-		updateLibraryContent(libraries);
+		await saveLibraries(libraries);
+		await updateLibraryContent(libraries);
+		await updateFriends();
+		console.log('sending mail!');
+		execMail();
+		sonarr.getRequests();
 	} else {
 		console.log("Couldn't update libraries");
 	}
-
-	setTimeout(() => {
-		updateFriends();
-	}, 7000);
-
-	setTimeout(() => {
-		console.log('sending mail!');
-		execMail();
-	}, 20000);
 }
 
 // Create Library Index (Creates Libraries Collection)
@@ -70,9 +67,11 @@ function getLibraries() {
 }
 
 async function saveLibraries(libraries) {
-	libraries.Directory.forEach((lib) => {
-		saveLibrary(lib);
-	});
+	await Promise.all(
+		libraries.Directory.map(async (lib) => {
+			await saveLibrary(lib);
+		})
+	);
 }
 
 async function saveLibrary(lib) {
@@ -156,9 +155,10 @@ async function saveLibrary(lib) {
 // Create Library content (creates movies / tv collections)
 
 async function updateLibraryContent(libraries) {
-	libraries.Directory.forEach((lib) => {
-		getLibrary(lib.key)
-			.then((libContent) => {
+	await Promise.all(
+		libraries.Directory.map(async (lib) => {
+			try {
+				let libContent = await getLibrary(lib.key);
 				Object.keys(libContent.Metadata).map((item) => {
 					let obj = libContent.Metadata[item];
 					if (obj.type === 'movie') {
@@ -171,11 +171,31 @@ async function updateLibraryContent(libraries) {
 						console.log(obj.type);
 					}
 				});
-			})
-			.catch((err) => {
+			} catch (err) {
 				console.log(err);
-			});
-	});
+			}
+		})
+	);
+	// libraries.Directory.forEach((lib) => {
+	// 	getLibrary(lib.key)
+	// 		.then((libContent) => {
+	// 			Object.keys(libContent.Metadata).map((item) => {
+	// 				let obj = libContent.Metadata[item];
+	// 				if (obj.type === 'movie') {
+	// 					saveMovie(obj);
+	// 				} else if (obj.type === 'artist') {
+	// 					saveMusic(obj);
+	// 				} else if (obj.type === 'show') {
+	// 					saveShow(obj);
+	// 				} else {
+	// 					console.log(obj.type);
+	// 				}
+	// 			});
+	// 		})
+	// 		.catch((err) => {
+	// 			console.log(err);
+	// 		});
+	// });
 }
 
 function getLibrary(id) {

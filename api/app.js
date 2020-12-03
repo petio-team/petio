@@ -9,9 +9,6 @@ const fs = require('fs');
 
 // Config
 const user_config = require('./util/config');
-// if (!user_config) {
-// 	return;
-// }
 const prefs = JSON.parse(user_config);
 
 // Plex
