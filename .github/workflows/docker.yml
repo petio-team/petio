@@ -10,9 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: owner
-        run: echo "::set-output name=owner::$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]'"
+        run: echo "::set-output name=owner::$(echo ${{ github.repository_owner }} | tr \"[:upper:]\" \"[:lower:]\""
       - id: repo
-        run: echo "::set-output name=repo::$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]'"
+        run: echo "::set-output name=repo::$(echo ${{ github.repository }} | tr \"[:upper:]\" \"[:lower:]\""
       - uses: actions/checkout@v2
       - name: Build Docker image
         run: docker build -t ghcr.io/${{ steps.repo.outputs.repo }}:fe-latest -t ghcr.io/${{ steps.repo.outputs.repo }}:fe-${GITHUB_SHA::8} .
@@ -25,9 +25,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: owner
-        run: echo "::set-output name=owner::$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]'"
+        run: echo "::set-output name=owner::$(echo ${{ github.repository_owner }} | tr \"[:upper:]\" \"[:lower:]\""
       - id: repo
-        run: echo "::set-output name=repo::$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]'"
+        run: echo "::set-output name=repo::$(echo ${{ github.repository }} | tr \"[:upper:]\" \"[:lower:]\""
       - uses: actions/checkout@v2
       - name: Build Docker image
         run: cd api && docker build -t ghcr.io/${{ steps.repo.outputs.repo }}:be-latest -t ghcr.io/${{ steps.repo.outputs.repo }}:be-${GITHUB_SHA::8} .
