@@ -21,7 +21,7 @@ router.post('/set', async (req, res) => {
 		plexToken: user.token,
 		emailUser: email.emailUser,
 		emailPass: email.emailPass,
-		adminUsername: user.email,
+		adminUsername: user.username,
 		adminEmail: user.email,
 		adminPass: user.password,
 		adminDisplayName: user.username,
