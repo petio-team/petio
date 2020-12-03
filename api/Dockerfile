@@ -1,7 +1,7 @@
-FROM node:14.15.1-alpine3.12
+FROM node:current
 
-COPY ./ /app/api
-WORKDIR /app/api
+COPY ./ /app
+WORKDIR /app
 
 LABEL maintainer="Petio"
 
