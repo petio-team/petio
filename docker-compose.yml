@@ -4,8 +4,7 @@ networks:
         driver: bridge
 services:
     petio:
-        build: .
-        image: petio
+        image: ghcr.io/petio-team/petio:fe-latest
         container_name: 'petio'
         ports:
             - '3260:80'
@@ -13,8 +12,7 @@ services:
             - mern-app
 
     petio-api:
-        build: api
-        image: petio-api
+        image: ghcr.io/petio-team/petio:be-latest
         container_name: 'petio-api'
         ports:
             - '32600:32600'
