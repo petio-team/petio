@@ -4,7 +4,23 @@ updates:
       directory: '/'
       schedule:
           interval: 'daily'
+    - package-ecosystem: 'npm'
+      directory: '/admin'
+      schedule:
+          interval: 'daily'
+    - package-ecosystem: 'npm'
+      directory: '/api'
+      schedule:
+          interval: 'daily'
+    - package-ecosystem: 'npm'
+      directory: '/frontend'
+      schedule:
+          interval: 'daily'
     - package-ecosystem: 'docker'
       directory: '/'
+      schedule:
+          interval: 'daily'
+    - package-ecosystem: 'docker'
+      directory: '/api'
       schedule:
           interval: 'daily'
