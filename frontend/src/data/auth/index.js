@@ -2,7 +2,7 @@ import { store } from '../store';
 import * as types from '../actionTypes';
 
 const PlexRequestApi = `http://${window.location.hostname}`;
-const PlexRequestApiPort = '32600';
+const PlexRequestApiPort = '7778';
 
 export function initAuth() {
 	fetch('./config.json')

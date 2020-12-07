@@ -41,12 +41,9 @@ async function libraryUpdate() {
 	}
 }
 
-// Create Library Index (Creates Libraries Collection)
-
 function getLibraries() {
 	return new Promise((resolve, reject) => {
 		let url = `http://${prefs.plexIp}:${prefs.plexPort}/library/sections/?X-Plex-Token=${prefs.plexToken}`;
-		// console.log(url);
 		request(
 			url,
 			{
@@ -176,26 +173,6 @@ async function updateLibraryContent(libraries) {
 			}
 		})
 	);
-	// libraries.Directory.forEach((lib) => {
-	// 	getLibrary(lib.key)
-	// 		.then((libContent) => {
-	// 			Object.keys(libContent.Metadata).map((item) => {
-	// 				let obj = libContent.Metadata[item];
-	// 				if (obj.type === 'movie') {
-	// 					saveMovie(obj);
-	// 				} else if (obj.type === 'artist') {
-	// 					saveMusic(obj);
-	// 				} else if (obj.type === 'show') {
-	// 					saveShow(obj);
-	// 				} else {
-	// 					console.log(obj.type);
-	// 				}
-	// 			});
-	// 		})
-	// 		.catch((err) => {
-	// 			console.log(err);
-	// 		});
-	// });
 }
 
 function getLibrary(id) {
@@ -234,15 +211,22 @@ async function saveMovie(movieObj) {
 		if (idSource === 'themoviedb') {
 			idSource = 'tmdb';
 		}
-		let externalId = movieObj.guid
-			.replace('com.plexapp.agents.', '')
-			.split('://')[1]
-			.split('?')[0];
-		let externalIds = {};
+		let externalId = false;
 		try {
+			externalId = movieObj.guid
+				.replace('com.plexapp.agents.', '')
+				.split('://')[1]
+				.split('?')[0];
+			let externalIds = {};
 			externalIds = await externalIdMovie(externalId);
 		} catch (err) {
-			console.log(err);
+			if (!externalId) {
+				console.log(
+					`Error - unable to parse id source from: ${movieObj.guid} - Movie: ${movieObj.title}`
+				);
+			} else {
+				console.log(err);
+			}
 		}
 		try {
 			let newMovie = new Movie({

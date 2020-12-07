@@ -1,4 +1,4 @@
-const apiUrl = 'http://localhost:32600';
+const apiUrl = `http://${window.location.hostname}:7778`;
 
 export function login(username, password, admin = false, token = false) {
 	let request = `${apiUrl}/login`;
