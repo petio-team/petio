@@ -16,6 +16,7 @@ router.post('/set', async (req, res) => {
 	let configData = {
 		DB_URL: db + '/petio',
 		tmdbApi: 'a9a99e29e94d33f6a9a3bb78c7a450f7',
+		plexProtocol: server.protocol,
 		plexIp: server.host,
 		plexPort: server.port,
 		plexToken: user.token,
@@ -26,9 +27,6 @@ router.post('/set', async (req, res) => {
 		adminPass: user.password,
 		adminDisplayName: user.username,
 		fanartApi: '930d724053d35fcc01a1a6da58fbb80a',
-		ssl_key: '',
-		ssl_cert: '',
-		ssl_chain: '',
 		emailServer: email.emailServer,
 		emailPort: email.emailPort,
 		tls: email.tls,
@@ -55,15 +53,5 @@ function createConfig(data) {
 		console.log('Config Created');
 	});
 }
-
-// router.get('/', async (req, res) => {
-// 	try {
-// 		let data = await getBandwidth();
-// 		res.json(data.MediaContainer.StatisticsBandwidth);
-// 	} catch (err) {
-// 		console.log(err);
-// 		res.send(500);
-// 	}
-// });
 
 module.exports = router;

@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 // Config
 const user_config = require('../util/config');
 if (!user_config) {
@@ -13,6 +14,7 @@ const router = express.Router();
 const User = require('../models/user');
 const request = require('xhr-request');
 const Admin = require('../models/admin');
+const user = require('../models/user');
 const plexAuthUrl = 'https://plex.tv/users/sign_in.json';
 let headers = {
 	'X-Plex-Device': 'Petio-rest',
@@ -24,86 +26,72 @@ let headers = {
 };
 
 router.post('/', async (req, res) => {
-	console.log('login Attempt');
 	let admin = req.body.admin;
 	let authToken = req.body.authToken;
-	if (admin) {
-		if (authToken) {
-			let adminQuick = false;
-			adminQuick = await getAdmin(authToken);
+	let username = req.body.username;
+	let password = req.body.password;
 
-			if (adminQuick) {
-				res.json({
-					admin: true,
-					loggedIn: true,
-					user: adminQuick,
-					quick: true,
-				});
+	if (authToken) {
+		try {
+			let decoded = jwt.verify(authToken, prefs.plexToken);
+			let user = decoded;
+			if (user.admin) {
+				getAdmin(user.username, res);
 			} else {
-				res.json({
-					admin: false,
-					loggedIn: false,
-					error: 'invalid token',
-				});
+				getFriend(user.username, res);
 			}
-		} else {
-			let plexAuth = await adminAuth(
-				req.body.username,
-				req.body.password
-			);
-			if (plexAuth.error) {
-				res.json({
-					admin: false,
-					loggedIn: false,
-					user: plexAuth.error,
-				});
-			} else {
-				plexAuth = plexAuth.user;
-
-				let username = adminUser;
-				let email = adminEmail;
-				let pass = adminPass;
-				if (
-					(username === req.body.username ||
-						email === req.body.username) &&
-					pass === req.body.password
-				) {
-					try {
-						let adminData = await setAdmin(plexAuth);
-						res.json({
-							admin: true,
-							loggedIn: true,
-							user: adminData,
-							quick: false,
-						});
-						console.log('admin login');
-					} catch (err) {
-						res.json({
-							admin: false,
-							loggedIn: false,
-							error: err,
-						});
-					}
-				} else {
-					res.json({ admin: false, loggedIn: false });
-					console.log('admin login failed');
-					console.log(pass === req.body.password);
-				}
-			}
+		} catch {
+			res.json({
+				admin: false,
+				loggedIn: false,
+				user: false,
+				token: false,
+			});
+			return;
 		}
 	} else {
-		getFriend(req.body.username, res);
+		if (!username || !password) {
+			res.json({
+				admin: false,
+				loggedIn: false,
+				user: false,
+				token: false,
+			});
+			return;
+		}
+		if (admin) {
+			getAdmin(username, res);
+		} else {
+			getFriend(username, res);
+		}
 	}
 });
 
-async function getAdmin(token) {
+function createToken(user, admin = false) {
+	return jwt.sign(
+		{ username: user.username, admin: admin },
+		prefs.signingKey
+	);
+}
+
+async function getAdmin(username, res) {
 	let admin = await Admin.findOne({
-		$or: [{ authToken: token }],
+		$or: [{ username: username }, { email: username }],
 	});
 	if (admin) {
-		return admin;
+		res.json({
+			admin: true,
+			loggedIn: true,
+			user: admin,
+			token: createToken(admin, true),
+		});
 	} else {
-		return false;
+		res.json({
+			admin: false,
+			loggedIn: false,
+			user: admin,
+			token: false,
+		});
 	}
 }
 
@@ -159,35 +147,15 @@ async function getFriend(username, res) {
 		$or: [{ username: username }, { email: username }, { title: username }],
 	});
 	if (friend) {
-		res.json({ admin: false, loggedIn: true, user: friend });
+		res.json({
+			admin: false,
+			loggedIn: true,
+			user: friend,
+			token: createToken(friend, false),
+		});
 	} else {
-		res.json({ admin: false, loggedIn: false });
+		res.json({ admin: false, loggedIn: false, token: false });
 	}
-}
-
-async function adminAuth(user, pass) {
-	console.log('Auth started');
-	return new Promise((resolve, reject) => {
-		var auth =
-			'Basic ' + new Buffer.from(user + ':' + pass).toString('base64');
-		headers['Authorization'] = auth;
-		request(
-			plexAuthUrl,
-			{
-				headers: headers,
-				method: 'POST',
-				json: true,
-			},
-			function (err, data) {
-				console.log(data);
-				if (err) {
-					reject(err);
-				}
-
-				resolve(data);
-			}
-		);
-	});
 }
 
 module.exports = router;

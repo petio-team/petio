@@ -2,11 +2,11 @@ const plexHeaders = {
 	'Content-Type': 'application/json',
 	Accept: 'application/json',
 	'X-Plex-Device': 'API',
-	'X-Plex-Device-Name': 'DeviceName',
+	'X-Plex-Device-Name': 'Petio',
 	'X-Plex-Product': 'Petio',
-	'X-Plex-Version': 'v1.0',
-	'X-Plex-Platform-Version': 'v1.0',
-	'X-Plex-Client-Identifier': 'df9e71a5-a6cd-488e-8730-aaa9195f7435',
+	'X-Plex-Version': '0.1.8',
+	'X-Plex-Platform-Version': '0.1.8',
+	'X-Plex-Client-Identifier': '067e602b-1e86-4739-900d-1abdf8f6da71',
 };
 
 export function getPins() {
@@ -33,7 +33,7 @@ export function getUser(token) {
 }
 
 export function getServers(token) {
-	let url = `https://plex.tv/pms/servers?X-Plex-Token=${token}`;
+	let url = `https://plex.tv/pms/resources?X-Plex-Token=${token}`;
 	let method = 'get';
 	let headers = plexHeaders;
 	return process(url, headers, method)

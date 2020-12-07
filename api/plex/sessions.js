@@ -9,7 +9,7 @@ const prefs = JSON.parse(user_config);
 
 function getSessions() {
 	return new Promise((resolve, reject) => {
-		let url = `http://${prefs.plexIp}:${prefs.plexPort}/status/sessions?X-Plex-Token=${prefs.plexToken}`;
+		let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/status/sessions?X-Plex-Token=${prefs.plexToken}`;
 		request(
 			url,
 			{

@@ -2,6 +2,10 @@ import React from 'react';
 import Plex from '../data/Plex';
 import { connect } from 'react-redux';
 import { ReactComponent as Spinner } from '../assets/svg/spinner.svg';
+import { ReactComponent as Windows } from '../assets/svg/windows.svg';
+import { ReactComponent as OSX } from '../assets/svg/mac.svg';
+import { ReactComponent as Linux } from '../assets/svg/linux.svg';
+import { ReactComponent as Server } from '../assets/svg/server.svg';
 import Api from '../data/Api';
 
 /* eslint-disable */
@@ -62,6 +66,8 @@ class Setup extends React.Component {
 			step: 1,
 			db: 'mongodb://mongo:27017',
 			tls: false,
+			password: '',
+			selectedServer: false,
 		};
 
 		this.inputChange = this.inputChange.bind(this);
@@ -70,6 +76,22 @@ class Setup extends React.Component {
 		this.changeToDb = this.changeToDb.bind(this);
 		this.finalise = this.finalise.bind(this);
 		this.next = this.next.bind(this);
+	}
+
+	serverIcon(platform) {
+		switch (platform) {
+			case 'Linux':
+				return <Linux />;
+
+			case 'Windows':
+				return <Windows />;
+
+			case 'MacOSX':
+				return <OSX />;
+
+			default:
+				return <Server />;
+		}
 	}
 
 	inputChange(e) {
@@ -241,7 +263,13 @@ class Setup extends React.Component {
 										data-id={key}
 										onClick={this.selectServer}
 									>
-										<p>{server.name}</p>
+										<div className="server-icon">
+											{this.serverIcon(server.platform)}
+										</div>
+										<div className="server-name">
+											<p>{server.name}</p>
+											<p className="server-loc">{`${server.protocol}://${server.host}:${server.port}`}</p>
+										</div>
 									</div>
 								);
 							})

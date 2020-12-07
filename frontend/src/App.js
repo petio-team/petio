@@ -244,7 +244,7 @@ class App extends React.Component {
 								</form>
 							</div>
 							<p className="powered-by">
-								Petio build (alpha) 0.1.7
+								Petio build (alpha) 0.1.8
 							</p>
 						</>
 					) : (

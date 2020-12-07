@@ -43,7 +43,7 @@ async function libraryUpdate() {
 
 function getLibraries() {
 	return new Promise((resolve, reject) => {
-		let url = `http://${prefs.plexIp}:${prefs.plexPort}/library/sections/?X-Plex-Token=${prefs.plexToken}`;
+		let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/library/sections/?X-Plex-Token=${prefs.plexToken}`;
 		request(
 			url,
 			{
@@ -176,7 +176,7 @@ async function updateLibraryContent(libraries) {
 }
 
 function getLibrary(id) {
-	let url = `http://${prefs.plexIp}:${prefs.plexPort}/library/sections/${id}/all?X-Plex-Token=${prefs.plexToken}`;
+	let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/library/sections/${id}/all?X-Plex-Token=${prefs.plexToken}`;
 	// console.log(url);
 	return new Promise((resolve, reject) => {
 		request(
