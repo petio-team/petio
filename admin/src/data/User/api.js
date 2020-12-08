@@ -1,4 +1,4 @@
-const apiUrl = `/api`;
+const apiUrl = `http://localhost:7777/api`;
 
 export function login(username, password, admin = false, token = false) {
 	let request = `${apiUrl}/login`;
