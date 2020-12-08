@@ -6,13 +6,9 @@ if (!user_config) {
 }
 const prefs = JSON.parse(user_config);
 
-const adminUser = prefs.adminUsername;
-const adminEmail = prefs.adminEmail;
-const adminPass = prefs.adminPass;
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
-const request = require('xhr-request');
 const Admin = require('../models/admin');
 
 router.post('/', async (req, res) => {
@@ -21,16 +17,23 @@ router.post('/', async (req, res) => {
 	let username = req.body.username;
 	let password = req.body.password;
 
+	console.log(`LOGIN: New login attempted`);
+
 	if (authToken) {
+		console.log(`LOGIN: JWT Token Passed`);
 		try {
 			let decoded = jwt.verify(authToken, prefs.plexToken);
 			let user = decoded;
+			console.log(`LOGIN: Token fine`);
 			if (user.admin) {
+				console.log(`LOGIN: Token is admin`);
 				getAdmin(user.username, user.password, res);
 			} else {
+				console.log(`LOGIN: Token is user`);
 				getFriend(user.username, res);
 			}
 		} catch {
+			console.log(`LOGIN: Invalid token, rejected`);
 			res.json({
 				admin: false,
 				loggedIn: false,
@@ -40,6 +43,7 @@ router.post('/', async (req, res) => {
 			return;
 		}
 	} else {
+		console.log(`LOGIN: Standard auth`);
 		if (!username || (!password && admin)) {
 			res.json({
 				admin: false,
@@ -50,8 +54,10 @@ router.post('/', async (req, res) => {
 			return;
 		}
 		if (admin) {
+			console.log(`LOGIN: User is admin`);
 			getAdmin(username, password, res);
 		} else {
+			console.log(`LOGIN: User is standard`);
 			getFriend(username, res);
 		}
 	}
@@ -71,8 +77,9 @@ async function getAdmin(username, password, res) {
 			{ email: username, password: password },
 		],
 	});
-	// Need to validate PW here ^
+
 	if (admin) {
+		console.log(`LOGIN: Admin user found`);
 		res.json({
 			admin: true,
 			loggedIn: true,
@@ -80,6 +87,7 @@ async function getAdmin(username, password, res) {
 			token: createToken(admin, true),
 		});
 	} else {
+		console.log(`LOGIN: Admin user not found`);
 		res.json({
 			admin: false,
 			loggedIn: false,
@@ -89,58 +97,12 @@ async function getAdmin(username, password, res) {
 	}
 }
 
-// async function setAdmin(obj) {
-// 	let admin = await Admin.findOne({
-// 		username: obj.username,
-// 		uuid: obj.uuid,
-// 	});
-// 	let adminData = false;
-// 	if (admin) {
-// 		try {
-// 			adminData = await Admin.findOneAndUpdate(
-// 				{ _id: obj.id },
-// 				{
-// 					$set: {
-// 						authToken: obj.authToken,
-// 						authentication_token: obj.authentication_token,
-// 						email: obj.email,
-// 						thumb: obj.thumb,
-// 						title: obj.title,
-// 						username: obj.username,
-// 						uuid: obj.uuid,
-// 					},
-// 				},
-// 				{ new: true, useFindAndModify: false }
-// 			);
-// 		} catch (err) {
-// 			console.log(err);
-// 		}
-// 		return adminData;
-// 	} else {
-// 		try {
-// 			adminData = new Admin({
-// 				_id: obj.id,
-// 				authToken: obj.authToken,
-// 				authentication_token: obj.authentication_token,
-// 				email: obj.email,
-// 				thumb: obj.thumb,
-// 				title: obj.title,
-// 				username: obj.username,
-// 				uuid: obj.uuid,
-// 			});
-// 			await adminData.save();
-// 		} catch (err) {
-// 			console.log(err);
-// 		}
-// 		return adminData;
-// 	}
-// }
-
 async function getFriend(username, res) {
 	let friend = await User.findOne({
 		$or: [{ username: username }, { email: username }, { title: username }],
 	});
 	if (friend) {
+		console.log(`LOGIN: User found`);
 		res.json({
 			admin: false,
 			loggedIn: true,
@@ -148,22 +110,20 @@ async function getFriend(username, res) {
 			token: createToken(friend, false),
 		});
 	} else {
-		try {
-			let admin = await Admin.findOne({
-				$or: [{ username: username }, { email: username }],
+		let admin = await Admin.findOne({
+			$or: [{ username: username }, { email: username }],
+		});
+		if (admin) {
+			console.log(`LOGIN: User found, is admin, returned as standard`);
+			admin.password = '';
+			res.json({
+				admin: false,
+				loggedIn: true,
+				user: admin,
+				token: createToken(admin, false),
 			});
-			if (admin) {
-				admin.password = '';
-				res.json({
-					admin: false,
-					loggedIn: true,
-					user: admin,
-					token: createToken(admin, false),
-				});
-			} else {
-				res.json({ admin: false, loggedIn: false, token: false });
-			}
-		} catch (err) {
+		} else {
+			console.log(`LOGIN: No user found`);
 			res.json({ admin: false, loggedIn: false, token: false });
 		}
 	}
