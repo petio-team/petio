@@ -10,7 +10,7 @@ const prefs = JSON.parse(user_config);
 
 function getBandwidth() {
 	return new Promise((resolve, reject) => {
-		let url = `http://${prefs.plexIp}:${prefs.plexPort}/statistics/bandwidth?timespan=6&X-Plex-Token=${prefs.plexToken}`;
+		let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/statistics/bandwidth?timespan=6&X-Plex-Token=${prefs.plexToken}`;
 		request(
 			url,
 			{

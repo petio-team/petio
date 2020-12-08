@@ -100,6 +100,13 @@ class Series extends React.Component {
 	request() {
 		let id = this.props.match.params.id;
 		let series = this.props.api.series_lookup[id];
+		let requests = this.props.user.requests[id];
+		if (requests) {
+			if (requests.users.includes(this.props.user.current._id)) {
+				alert('Already Requested');
+				return;
+			}
+		}
 		let request = {
 			id: series.id,
 			tmdb_id: series.id,
@@ -241,6 +248,13 @@ class Series extends React.Component {
 
 		let reviewBtn = null;
 
+		let trailerBtn = (
+			<button onClick={this.showTrailer} className="btn btn__square">
+				<TrailerIcon />
+				Trailer
+			</button>
+		);
+
 		if (this.props.user.reviews) {
 			if (this.props.user.reviews[this.props.match.params.id]) {
 				var hasReviewed = false;
@@ -363,10 +377,11 @@ class Series extends React.Component {
 						{video && this.state.trailer ? (
 							<div className="series-trailer">
 								<iframe
+									style={{ pointerEvents: 'none' }}
 									frameBorder="0"
 									height="100%"
 									width="100%"
-									src={`https://youtube.com/embed/${video.key}?autoplay=1&controls=0&showinfo=0&autohide=1&loop=1&modestbranding=1&playsinline=1&playlist=${video.key}`}
+									src={`https://youtube.com/embed/${video.key}?autoplay=1&controls=0&showinfo=0&autohide=1&loop=1&modestbranding=1&playsinline=1&rel=0`}
 								></iframe>
 							</div>
 						) : null}
@@ -428,13 +443,7 @@ class Series extends React.Component {
 						<div className="quick-view">
 							<div className="side-content">
 								<div className="series-action">
-									<button
-										onClick={this.showTrailer}
-										className="btn btn__square"
-									>
-										<TrailerIcon />
-										Trailer
-									</button>
+									{trailerBtn}
 									{reviewBtn}
 								</div>
 							</div>

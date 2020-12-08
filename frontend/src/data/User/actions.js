@@ -3,33 +3,19 @@ import * as types from '../actionTypes';
 import * as api from './api';
 import { initAuth } from '../auth';
 
-export function login(user, pass = false, cookie = false, admin) {
+export function login(user, cookie = false) {
 	return new Promise((resolve, reject) => {
-		let username = user,
-			password = pass;
+		let username = user;
 		let authToken = false;
 		if (cookie) {
-			let ls_raw = localStorage.getItem('loggedin');
-			let parsed = window.atob(ls_raw);
-			if (admin) {
-				authToken = parsed;
-			} else {
-				username = parsed;
-			}
+			authToken = localStorage.getItem('loggedin');
 		}
 
-		api.login(username, password, admin, authToken)
+		api.login(username, authToken)
 			.then((data) => {
 				if (data.user) {
-					let ls_user = window.btoa(data.user.title);
-					if (data.admin) {
-						data.user.admin = true;
-						ls_user = window.btoa(data.user.authToken);
-						localStorage.setItem('adminloggedin', true);
-					} else {
-						localStorage.setItem('adminloggedin', false);
-					}
-					if (data.loggedIn || data.admin) {
+					let ls_user = data.token;
+					if (data.loggedIn) {
 						if (!cookie) {
 							localStorage.setItem('loggedin', ls_user);
 						}
@@ -39,17 +25,16 @@ export function login(user, pass = false, cookie = false, admin) {
 						});
 						resolve(data);
 					} else {
-						alert('Invalid Login');
-						resolve({ error: 'User not found' });
+						reject('User not found');
 						return;
 					}
 				} else {
-					resolve({ error: 'User not found' });
+					reject('User not found');
 				}
 			})
 			.catch((err) => {
-				alert(err);
-				reject('Error');
+				console.log(err);
+				reject('An error has occured');
 			});
 	});
 }

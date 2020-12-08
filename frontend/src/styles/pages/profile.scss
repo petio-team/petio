@@ -7,7 +7,7 @@
 	.profile {
 		&-overview {
 			display: flex;
-			flex-direction: column;
+			flex-direction: row;
 
 			@include media-breakpoint-up(lg) {
 				flex-direction: row;

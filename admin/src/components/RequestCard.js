@@ -48,7 +48,7 @@ class RequestCard extends React.Component {
 									<div className="request-user">
 										<div className="user-thumb">
 											<img
-												src={`http://localhost:32600/user/thumb/${user_id}`}
+												src={`/api/user/thumb/${user_id}`}
 											/>
 										</div>
 									</div>

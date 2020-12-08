@@ -54,6 +54,7 @@ $grid-breakpoints: $breakpoints;
 @import 'globals/sidebar';
 
 // components
+@import 'components/messages';
 @import 'components/spinner';
 @import 'components/section';
 @import 'components/buttons';

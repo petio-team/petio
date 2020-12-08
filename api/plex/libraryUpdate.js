@@ -5,6 +5,7 @@ if (!user_config) {
 }
 const prefs = JSON.parse(user_config);
 
+const Admin = require('../models/admin');
 const request = require('xhr-request');
 const xmlParser = require('xml2json');
 const Library = require('../models/library');
@@ -21,6 +22,7 @@ const Sonarr = require('../services/sonarr');
 let mailer = [];
 
 async function libraryUpdate() {
+	await createAdmin();
 	let libraries = false;
 	let sonarr = new Sonarr();
 	try {
@@ -41,12 +43,52 @@ async function libraryUpdate() {
 	}
 }
 
-// Create Library Index (Creates Libraries Collection)
+async function createAdmin() {
+	let adminFound = await Admin.findOne({
+		_id: prefs.adminId,
+	});
+	if (adminFound) {
+		console.log('Admin Already Created, updating');
+		try {
+			adminData = await Admin.findOneAndUpdate(
+				{ _id: prefs.adminId },
+				{
+					$set: {
+						email: prefs.adminEmail,
+						thumb: prefs.adminThumb,
+						title: prefs.adminDisplayName,
+						username: prefs.adminUsername,
+						password: prefs.adminPass,
+						altId: 1,
+					},
+				},
+				{ new: true, useFindAndModify: false }
+			);
+		} catch (err) {
+			console.log(err);
+		}
+	} else {
+		console.log('Creating admin user');
+		try {
+			adminData = new Admin({
+				_id: prefs.adminId,
+				email: prefs.adminUsername,
+				thumb: prefs.adminThumb,
+				title: prefs.adminDisplayName,
+				username: prefs.adminUsername,
+				password: prefs.adminPass,
+				altId: 1,
+			});
+			await adminData.save();
+		} catch (err) {
+			console.log(err);
+		}
+	}
+}
 
 function getLibraries() {
 	return new Promise((resolve, reject) => {
-		let url = `http://${prefs.plexIp}:${prefs.plexPort}/library/sections/?X-Plex-Token=${prefs.plexToken}`;
-		// console.log(url);
+		let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/library/sections/?X-Plex-Token=${prefs.plexToken}`;
 		request(
 			url,
 			{
@@ -176,30 +218,10 @@ async function updateLibraryContent(libraries) {
 			}
 		})
 	);
-	// libraries.Directory.forEach((lib) => {
-	// 	getLibrary(lib.key)
-	// 		.then((libContent) => {
-	// 			Object.keys(libContent.Metadata).map((item) => {
-	// 				let obj = libContent.Metadata[item];
-	// 				if (obj.type === 'movie') {
-	// 					saveMovie(obj);
-	// 				} else if (obj.type === 'artist') {
-	// 					saveMusic(obj);
-	// 				} else if (obj.type === 'show') {
-	// 					saveShow(obj);
-	// 				} else {
-	// 					console.log(obj.type);
-	// 				}
-	// 			});
-	// 		})
-	// 		.catch((err) => {
-	// 			console.log(err);
-	// 		});
-	// });
 }
 
 function getLibrary(id) {
-	let url = `http://${prefs.plexIp}:${prefs.plexPort}/library/sections/${id}/all?X-Plex-Token=${prefs.plexToken}`;
+	let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/library/sections/${id}/all?X-Plex-Token=${prefs.plexToken}`;
 	// console.log(url);
 	return new Promise((resolve, reject) => {
 		request(
@@ -234,15 +256,23 @@ async function saveMovie(movieObj) {
 		if (idSource === 'themoviedb') {
 			idSource = 'tmdb';
 		}
-		let externalId = movieObj.guid
-			.replace('com.plexapp.agents.', '')
-			.split('://')[1]
-			.split('?')[0];
+		let externalId = false;
 		let externalIds = {};
 		try {
+			externalId = movieObj.guid
+				.replace('com.plexapp.agents.', '')
+				.split('://')[1]
+				.split('?')[0];
+
 			externalIds = await externalIdMovie(externalId);
 		} catch (err) {
-			console.log(err);
+			if (!externalId) {
+				console.log(
+					`Error - unable to parse id source from: ${movieObj.guid} - Movie: ${movieObj.title}`
+				);
+			} else {
+				console.log(err);
+			}
 		}
 		try {
 			let newMovie = new Movie({

@@ -4,7 +4,7 @@ LABEL maintainer="Petio"
 
 COPY ./ /app/
 VOLUME /config
-EXPOSE 32600
+EXPOSE 7778
 
 WORKDIR /app/frontend
 RUN npm ci \

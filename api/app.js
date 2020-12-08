@@ -44,8 +44,8 @@ if (!user_config) {
 	console.log('Starting Server ');
 	console.log('No config, entering setup mode');
 	app.use('/setup', setupRoute);
-	app.listen(32600);
-	console.log('Listening on 32600');
+	app.listen(7778);
+	console.log('Listening on 7778');
 } else {
 	// Routing
 	app.use('/login', loginRoute);
@@ -88,44 +88,14 @@ if (!user_config) {
 
 	async function start() {
 		console.log('Starting Server ');
-		app.listen(32600);
-		console.log('Listening on 32600');
+		app.listen(7778);
+		console.log('Listening on 7778');
 		const libraryWatch = new CronJob('0 */30 * * * *', function () {
 			const d = new Date();
 			console.log('Library Watch Running:', d);
 			libraryUpdate();
 		});
 
-		let privateKey = false,
-			certificate = false,
-			ca = false;
-
-		try {
-			console.log(prefs.ssl_key);
-			privateKey = fs.readFileSync(prefs.ssl_key, 'utf8');
-			certificate = fs.readFileSync(prefs.ssl_cert, 'utf8');
-			ca = fs.readFileSync(prefs.ssl_chain, 'utf8');
-		} catch (err) {
-			console.log('Certificates Not Found, falling back to HTTP');
-		}
-
-		if (privateKey && certificate && ca) {
-			const cert = {
-				key: privateKey,
-				cert: certificate,
-				ca: ca,
-			};
-
-			const httpsServer = https.createServer(cert, app);
-			httpsServer.listen(32601, () => {
-				console.log(`HTTPS Server running on port ${32601}`);
-			});
-			console.log('Listening on SSL 32601');
-			libraryWatch.start();
-			console.log('Library Watch Started...');
-		} else {
-			console.log('Not running SSL');
-		}
 		libraryUpdate();
 	}
 }

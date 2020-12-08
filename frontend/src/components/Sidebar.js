@@ -1,5 +1,5 @@
 import React from 'react';
-import { withRouter, Link } from 'react-router-dom';
+import { withRouter, Link, Router } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { ReactComponent as SearchIcon } from '../assets/svg/search.svg';
 import { ReactComponent as MovieIcon } from '../assets/svg/movie.svg';
@@ -7,14 +7,21 @@ import { ReactComponent as TvIcon } from '../assets/svg/tv.svg';
 import { ReactComponent as PersonIcon } from '../assets/svg/people.svg';
 import { ReactComponent as RequestIcon } from '../assets/svg/bookmark.svg';
 import { ReactComponent as SettingsIcon } from '../assets/svg/settings.svg';
+import { ReactComponent as BackIcon } from '../assets/svg/back.svg';
 import User from '../data/User';
 
 class Sidebar extends React.Component {
-	// constructor(props) {
-	// 	super(props);
+	constructor(props) {
+		super(props);
+		this.goBack = this.goBack.bind(this);
+	}
 
-	// }
+	goBack() {
+		this.props.history.goBack();
+	}
+
 	render() {
+		console.log(this.props.history);
 		let current = this.props.location.pathname;
 		let user = this.props.user.current;
 		return (
@@ -23,6 +30,22 @@ class Sidebar extends React.Component {
 					<p className="logo-text" title="Petio">
 						Pet<span>io</span>
 					</p>
+				</Link>
+				{current === '/' || current.startsWith('/search/') ? null : (
+					<div className="back-btn" onClick={this.goBack}>
+						<BackIcon />
+					</div>
+				)}
+				<Link to="/user" className={'sidebar--user-mob '}>
+					<div className="icon">
+						<div
+							className="thumb"
+							style={{
+								backgroundImage: 'url(' + user.thumb + ')',
+								color: 'red',
+							}}
+						></div>
+					</div>
 				</Link>
 				<div className="sidebar--scroll">
 					<Link
