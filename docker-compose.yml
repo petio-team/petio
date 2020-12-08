@@ -10,12 +10,12 @@ services:
             - '3260:80'
         networks:
             - mern-app
+        depends_on:
+            - petio-api
 
     petio-api:
         image: ghcr.io/petio-team/petio:be-latest
         container_name: 'petio-api'
-        ports:
-            - '32600:32600'
         networks:
             - mern-app
         depends_on:
