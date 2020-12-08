@@ -9513,7 +9513,7 @@ react-is@^17.0.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.1.tgz#5b3531bd76a645a4c9fb6e693ed36419e3301339"
   integrity sha512-NAnt2iGDXohE5LI7uBnLnqvLQMtzhkiAOLXTmv+qnF9Ky7xAPcX8Up/xWIhxvLVGJvuLiNc4xQLtuqDRzb4fSA==
 
-react-lazy-load-image-component@^1.5.0:
+react-lazy-load-image-component@^1.5.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/react-lazy-load-image-component/-/react-lazy-load-image-component-1.5.1.tgz#59cc92326ba5604e9c4a86805a2cf1667fafbc71"
   integrity sha512-grTEZzURLHPkq7JoipcBBQU44ijdF4fH3Cb+eSD5eSAaMsjugbXqTaVWm5ruPUNLduoNR9KKQF6bOR9h2WphEg==
