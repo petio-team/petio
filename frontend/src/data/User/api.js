@@ -1,6 +1,6 @@
 import { getAuth } from '../auth';
 
-export function login(username, password, admin = false, token = false) {
+export function login(username, token = false) {
 	console.log(getAuth().api);
 	let request = `${getAuth().api}/login`;
 	let headers = {
@@ -8,8 +8,6 @@ export function login(username, password, admin = false, token = false) {
 	};
 	return process(request, 'post', headers, {
 		username: username,
-		password: password,
-		admin: admin,
 		authToken: token,
 	}).then((res) => res.json());
 }

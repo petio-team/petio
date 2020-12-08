@@ -125,9 +125,10 @@ class Setup extends React.Component {
 	saveUser() {
 		let password = this.state.password;
 		let username = this.props.plex.user.username;
-		let id = this.props.plex.user.username;
+		let id = this.props.plex.user.id;
 		let email = this.props.plex.user.email;
 		let token = this.props.plex.token;
+		let thumb = this.props.plex.user.thumb;
 
 		this.setState({
 			user: {
@@ -136,6 +137,7 @@ class Setup extends React.Component {
 				email: email,
 				password: password,
 				token: token,
+				thumb: thumb,
 			},
 			password: false,
 		});

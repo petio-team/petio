@@ -5,6 +5,7 @@ if (!user_config) {
 }
 const prefs = JSON.parse(user_config);
 
+const Admin = require('../models/admin');
 const request = require('xhr-request');
 const xmlParser = require('xml2json');
 const Library = require('../models/library');
@@ -21,6 +22,7 @@ const Sonarr = require('../services/sonarr');
 let mailer = [];
 
 async function libraryUpdate() {
+	await createAdmin();
 	let libraries = false;
 	let sonarr = new Sonarr();
 	try {
@@ -38,6 +40,49 @@ async function libraryUpdate() {
 		sonarr.getRequests();
 	} else {
 		console.log("Couldn't update libraries");
+	}
+}
+
+async function createAdmin() {
+	let adminFound = await Admin.findOne({
+		_id: prefs.adminId,
+	});
+	if (adminFound) {
+		console.log('Admin Already Created, updating');
+		try {
+			adminData = await Admin.findOneAndUpdate(
+				{ _id: prefs.adminId },
+				{
+					$set: {
+						email: prefs.adminEmail,
+						thumb: prefs.adminThumb,
+						title: prefs.adminDisplayName,
+						username: prefs.adminUsername,
+						password: prefs.adminPass,
+						altId: 1,
+					},
+				},
+				{ new: true, useFindAndModify: false }
+			);
+		} catch (err) {
+			console.log(err);
+		}
+	} else {
+		console.log('Creating admin user');
+		try {
+			adminData = new Admin({
+				_id: prefs.adminId,
+				email: prefs.adminUsername,
+				thumb: prefs.adminThumb,
+				title: prefs.adminDisplayName,
+				username: prefs.adminUsername,
+				password: prefs.adminPass,
+				altId: 1,
+			});
+			await adminData.save();
+		} catch (err) {
+			console.log(err);
+		}
 	}
 }
 
@@ -212,12 +257,13 @@ async function saveMovie(movieObj) {
 			idSource = 'tmdb';
 		}
 		let externalId = false;
+		let externalIds = {};
 		try {
 			externalId = movieObj.guid
 				.replace('com.plexapp.agents.', '')
 				.split('://')[1]
 				.split('?')[0];
-			let externalIds = {};
+
 			externalIds = await externalIdMovie(externalId);
 		} catch (err) {
 			if (!externalId) {

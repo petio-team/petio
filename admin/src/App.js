@@ -109,7 +109,7 @@ class App extends React.Component {
 			return (
 				<div className="app">
 					<HashRouter>
-						<Sidebar />
+						<Sidebar changeLogin={this.changeLogin} />
 						<div className="view">
 							<Switch>
 								<Route exact path="/">

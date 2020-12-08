@@ -97,6 +97,7 @@ async function getUser(token) {
 	setup.user.email = userData.getAttribute('email');
 	setup.user.id = userData.getAttribute('id');
 	setup.user.username = userData.getAttribute('title');
+	setup.user.thumb = userData.getAttribute('thumb');
 	for (let server of serverList) {
 		if (
 			server.getAttribute('owned') === '1' &&

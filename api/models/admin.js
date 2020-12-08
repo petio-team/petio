@@ -15,6 +15,8 @@ const AdminSchema = mongoose.Schema(
 		title: String,
 		username: String,
 		uuid: String,
+		password: String,
+		altId: String,
 	},
 	{ collection: 'admin' }
 );

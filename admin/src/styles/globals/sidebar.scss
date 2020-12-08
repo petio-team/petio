@@ -51,6 +51,7 @@
 		align-items: center;
 		justify-content: space-between;
 		border-top: solid 4px transparent;
+		cursor: pointer;
 
 		@include media-breakpoint-up(lg) {
 			padding-left: 20px;

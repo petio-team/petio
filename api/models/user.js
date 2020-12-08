@@ -15,6 +15,7 @@ const FriendSchema = mongoose.Schema(
 		recommendationsPlaylistId: String,
 		thumb: String,
 		Server: Array,
+		altId: String,
 	},
 	{ collection: 'friends' }
 );

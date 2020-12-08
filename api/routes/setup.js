@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
-// const getBandwidth = require('../plex/bandwidth');
 
 router.post('/set', async (req, res) => {
 	let user = req.body.user;
@@ -12,6 +11,7 @@ router.post('/set', async (req, res) => {
 	if (!user || !server || !db) {
 		res.status(500).send('Missing Fields');
 	}
+
 	res.status(200).send('Config being created');
 	let configData = {
 		DB_URL: db + '/petio',
@@ -25,6 +25,8 @@ router.post('/set', async (req, res) => {
 		adminUsername: user.username,
 		adminEmail: user.email,
 		adminPass: user.password,
+		adminId: user.id,
+		adminThumb: user.thumb,
 		adminDisplayName: user.username,
 		fanartApi: '930d724053d35fcc01a1a6da58fbb80a',
 		emailServer: email.emailServer,

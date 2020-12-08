@@ -8,27 +8,23 @@ import { ReactComponent as StreamIcon } from '../assets/svg/stream.svg';
 import { ReactComponent as TranscodeIcon } from '../assets/svg/transcode.svg';
 
 class Sessions extends React.Component {
-	constructor(props) {
-		super(props);
-	}
-
 	formatAudio(channels) {
 		switch (channels) {
 			case '1':
 				return '(Mono)';
-				break;
+
 			case '2':
 				return '(Stereo)';
-				break;
+
 			case '6':
 				return '(5.1)';
-				break;
+
 			case '7':
 				return '(6.1)';
-				break;
+
 			case '8':
 				return '(7.1)';
-				break;
+
 			default:
 				return `(${channels})`;
 		}
@@ -38,10 +34,10 @@ class Sessions extends React.Component {
 		switch (dec) {
 			case 'copy':
 				return 'Direct Stream';
-				break;
+
 			case 'transcode':
 				return 'Transcode';
-				break;
+
 			default:
 				return 'Direct Play';
 		}
@@ -55,14 +51,14 @@ class Sessions extends React.Component {
 						<StreamIcon />
 					</span>
 				);
-				break;
+
 			case 'transcode':
 				return (
 					<span className="session--decision-icon transcode">
 						<TranscodeIcon />
 					</span>
 				);
-				break;
+
 			default:
 				return (
 					<span className="session--decision-icon">
@@ -194,13 +190,13 @@ class Sessions extends React.Component {
 				<p>
 					{session.Player.local ? 'Local' : 'Remote'}{' '}
 					{session.Player.address}{' '}
-					<div
+					<span
 						className={
 							'session--secure secure-' + session.Player.secure
 						}
 					>
 						{session.Player.secure ? <LockIcon /> : <UnlockIcon />}
-					</div>
+					</span>
 				</p>
 			</>
 		);
@@ -217,11 +213,12 @@ class Sessions extends React.Component {
 						{sessions.map((session) => {
 							let media = null;
 							let selectedMedia = false;
-							session.Media.map((item) => {
+							for (let item of session.Media) {
 								if (item.selected) {
 									selectedMedia = item;
 								}
-							});
+							}
+
 							let playback = selectedMedia.Part
 								? selectedMedia.Part[0].decision
 								: 'unknown';
@@ -232,6 +229,8 @@ class Sessions extends React.Component {
 								case 'movie':
 									media = session.ratingKey;
 									break;
+								default:
+									return null;
 							}
 							return (
 								<div
