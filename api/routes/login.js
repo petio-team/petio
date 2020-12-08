@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 // Config
 const user_config = require('../util/config');
 if (!user_config) {
@@ -13,181 +14,156 @@ const router = express.Router();
 const User = require('../models/user');
 const request = require('xhr-request');
 const Admin = require('../models/admin');
-const plexAuthUrl = 'https://plex.tv/users/sign_in.json';
-let headers = {
-	'X-Plex-Device': 'Petio-rest',
-	'X-Plex-Device-Name': 'Web Browser',
-	'X-Plex-Product': 'Petio',
-	'X-Plex-Version': 'v1.0',
-	'X-Plex-Platform-Version': 'v1.0',
-	'X-Plex-Client-Identifier': 'ed3f4b64-1954-11eb-adc1-0242ac120002',
-};
 
 router.post('/', async (req, res) => {
-	console.log('login Attempt');
 	let admin = req.body.admin;
 	let authToken = req.body.authToken;
-	if (admin) {
-		if (authToken) {
-			let adminQuick = false;
-			adminQuick = await getAdmin(authToken);
+	let username = req.body.username;
+	let password = req.body.password;
 
-			if (adminQuick) {
-				res.json({
-					admin: true,
-					loggedIn: true,
-					user: adminQuick,
-					quick: true,
-				});
+	if (authToken) {
+		try {
+			let decoded = jwt.verify(authToken, prefs.plexToken);
+			let user = decoded;
+			if (user.admin) {
+				getAdmin(user.username, user.password, res);
 			} else {
-				res.json({
-					admin: false,
-					loggedIn: false,
-					error: 'invalid token',
-				});
+				getFriend(user.username, res);
 			}
-		} else {
-			let plexAuth = await adminAuth(
-				req.body.username,
-				req.body.password
-			);
-			if (plexAuth.error) {
-				res.json({
-					admin: false,
-					loggedIn: false,
-					user: plexAuth.error,
-				});
-			} else {
-				plexAuth = plexAuth.user;
-
-				let username = adminUser;
-				let email = adminEmail;
-				let pass = adminPass;
-				if (
-					(username === req.body.username ||
-						email === req.body.username) &&
-					pass === req.body.password
-				) {
-					try {
-						let adminData = await setAdmin(plexAuth);
-						res.json({
-							admin: true,
-							loggedIn: true,
-							user: adminData,
-							quick: false,
-						});
-						console.log('admin login');
-					} catch (err) {
-						res.json({
-							admin: false,
-							loggedIn: false,
-							error: err,
-						});
-					}
-				} else {
-					res.json({ admin: false, loggedIn: false });
-					console.log('admin login failed');
-					console.log(pass === req.body.password);
-				}
-			}
+		} catch {
+			res.json({
+				admin: false,
+				loggedIn: false,
+				user: false,
+				token: false,
+			});
+			return;
 		}
 	} else {
-		getFriend(req.body.username, res);
+		if (!username || (!password && admin)) {
+			res.json({
+				admin: false,
+				loggedIn: false,
+				user: false,
+				token: false,
+			});
+			return;
+		}
+		if (admin) {
+			getAdmin(username, password, res);
+		} else {
+			getFriend(username, res);
+		}
 	}
 });
 
-async function getAdmin(token) {
+function createToken(user, admin = false) {
+	return jwt.sign(
+		{ username: user.username, password: user.password, admin: admin },
+		prefs.plexToken
+	);
+}
+
+async function getAdmin(username, password, res) {
 	let admin = await Admin.findOne({
-		$or: [{ authToken: token }],
+		$or: [
+			{ username: username, password: password },
+			{ email: username, password: password },
+		],
 	});
+	// Need to validate PW here ^
 	if (admin) {
-		return admin;
+		res.json({
+			admin: true,
+			loggedIn: true,
+			user: admin,
+			token: createToken(admin, true),
+		});
 	} else {
-		return false;
+		res.json({
+			admin: false,
+			loggedIn: false,
+			user: admin,
+			token: false,
+		});
 	}
 }
 
-async function setAdmin(obj) {
-	let admin = await Admin.findOne({
-		username: obj.username,
-		uuid: obj.uuid,
-	});
-	let adminData = false;
-	if (admin) {
-		try {
-			adminData = await Admin.findOneAndUpdate(
-				{ _id: obj.id },
-				{
-					$set: {
-						authToken: obj.authToken,
-						authentication_token: obj.authentication_token,
-						email: obj.email,
-						thumb: obj.thumb,
-						title: obj.title,
-						username: obj.username,
-						uuid: obj.uuid,
-					},
-				},
-				{ new: true, useFindAndModify: false }
-			);
-		} catch (err) {
-			console.log(err);
-		}
-		return adminData;
-	} else {
-		try {
-			adminData = new Admin({
-				_id: obj.id,
-				authToken: obj.authToken,
-				authentication_token: obj.authentication_token,
-				email: obj.email,
-				thumb: obj.thumb,
-				title: obj.title,
-				username: obj.username,
-				uuid: obj.uuid,
-			});
-			await adminData.save();
-		} catch (err) {
-			console.log(err);
-		}
-		return adminData;
-	}
-}
+// async function setAdmin(obj) {
+// 	let admin = await Admin.findOne({
+// 		username: obj.username,
+// 		uuid: obj.uuid,
+// 	});
+// 	let adminData = false;
+// 	if (admin) {
+// 		try {
+// 			adminData = await Admin.findOneAndUpdate(
+// 				{ _id: obj.id },
+// 				{
+// 					$set: {
+// 						authToken: obj.authToken,
+// 						authentication_token: obj.authentication_token,
+// 						email: obj.email,
+// 						thumb: obj.thumb,
+// 						title: obj.title,
+// 						username: obj.username,
+// 						uuid: obj.uuid,
+// 					},
+// 				},
+// 				{ new: true, useFindAndModify: false }
+// 			);
+// 		} catch (err) {
+// 			console.log(err);
+// 		}
+// 		return adminData;
+// 	} else {
+// 		try {
+// 			adminData = new Admin({
+// 				_id: obj.id,
+// 				authToken: obj.authToken,
+// 				authentication_token: obj.authentication_token,
+// 				email: obj.email,
+// 				thumb: obj.thumb,
+// 				title: obj.title,
+// 				username: obj.username,
+// 				uuid: obj.uuid,
+// 			});
+// 			await adminData.save();
+// 		} catch (err) {
+// 			console.log(err);
+// 		}
+// 		return adminData;
+// 	}
+// }
 
 async function getFriend(username, res) {
 	let friend = await User.findOne({
 		$or: [{ username: username }, { email: username }, { title: username }],
 	});
 	if (friend) {
-		res.json({ admin: false, loggedIn: true, user: friend });
+		res.json({
+			admin: false,
+			loggedIn: true,
+			user: friend,
+			token: createToken(friend, false),
+		});
 	} else {
-		res.json({ admin: false, loggedIn: false });
+		try {
+			let admin = await Admin.findOne({
+				$or: [{ username: username }, { email: username }],
+			});
+			admin.password = '';
+			res.json({
+				admin: false,
+				loggedIn: true,
+				user: admin,
+				token: createToken(admin, false),
+			});
+		} catch (err) {
+			console.log(err);
+			res.json({ admin: false, loggedIn: false, token: false });
+		}
 	}
-}
-
-async function adminAuth(user, pass) {
-	console.log('Auth started');
-	return new Promise((resolve, reject) => {
-		var auth =
-			'Basic ' + new Buffer.from(user + ':' + pass).toString('base64');
-		headers['Authorization'] = auth;
-		request(
-			plexAuthUrl,
-			{
-				headers: headers,
-				method: 'POST',
-				json: true,
-			},
-			function (err, data) {
-				console.log(data);
-				if (err) {
-					reject(err);
-				}
-
-				resolve(data);
-			}
-		);
-	});
 }
 
 module.exports = router;

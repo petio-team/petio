@@ -100,6 +100,13 @@ class Series extends React.Component {
 	request() {
 		let id = this.props.match.params.id;
 		let series = this.props.api.series_lookup[id];
+		let requests = this.props.user.requests[id];
+		if (requests) {
+			if (requests.users.includes(this.props.user.current._id)) {
+				alert('Already Requested');
+				return;
+			}
+		}
 		let request = {
 			id: series.id,
 			tmdb_id: series.id,

@@ -33,18 +33,14 @@ class App extends React.Component {
 			mb_login: false,
 			activeServerCheck: false,
 			issuesOpen: false,
-			adminLogin: false,
 			isLoggedIn: this.props.user.logged_in,
-			isAdmin: false,
 			loading: false,
 		};
 
 		this.openIssues = this.openIssues.bind(this);
 		this.closeIssues = this.closeIssues.bind(this);
-		this.adminToggle = this.adminToggle.bind(this);
 		this.loginForm = this.loginForm.bind(this);
 		this.inputChange = this.inputChange.bind(this);
-		// this.getLibraries = this.getLibraries.bind(this);
 		this.logout = this.logout.bind(this);
 	}
 
@@ -61,23 +57,18 @@ class App extends React.Component {
 	loginForm(e) {
 		e.preventDefault();
 		let username = this.state.username;
-		let password = this.state.password;
-		let admin = this.state.adminLogin;
 
-		this.login(username, password);
+		this.login(username);
 	}
 
-	login(username, password, cookie = false, admin = false) {
+	login(username, cookie = false) {
 		if (!this.props.user.credentials) {
 			return;
-		}
-		if (this.state.adminLogin) {
-			admin = true;
 		}
 		this.setState({
 			loading: true,
 		});
-		User.login(username, password, cookie, admin)
+		User.login(username, cookie)
 			.then((res) => {
 				this.setState({
 					loading: false,
@@ -107,12 +98,6 @@ class App extends React.Component {
 			});
 	}
 
-	adminToggle() {
-		this.setState({
-			adminLogin: this.state.adminLogin ? false : true,
-		});
-	}
-
 	logout() {
 		localStorage.removeItem('loggedin');
 		localStorage.removeItem('adminloggedin');
@@ -123,40 +108,10 @@ class App extends React.Component {
 		});
 	}
 
-	componentDidUpdate() {
-		// if (this.props.user.credentials) {
-		// 	this.loginLocal();
-		// }
-		// if (
-		// 	!this.props.api.logged_in &&
-		// 	this.props.plex.token &&
-		// 	!this.state.mb_login
-		// ) {
-		// 	this.loginMb();
-		// }
-		// if (
-		// 	this.props.api.servers &&
-		// 	this.props.api.config &&
-		// 	!this.state.activeServerCheck
-		// ) {
-		// 	this.setState({
-		// 		activeServerCheck: true,
-		// 	});
-		// 	Api.activeServer(
-		// 		this.props.api.servers,
-		// 		this.props.api.config
-		// 	);
-		// }
-	}
-
 	loginLocal() {
 		if (localStorage.getItem('loggedin')) {
 			if (this.props.user.credentials) {
-				if (localStorage.getItem('adminloggedin') === 'true') {
-					this.login('', false, true, true);
-				} else {
-					this.login('', false, true, false);
-				}
+				this.login('', true);
 			} else {
 				setTimeout(() => {
 					this.loginLocal();
@@ -210,17 +165,7 @@ class App extends React.Component {
 									onSubmit={this.loginForm}
 									autoComplete="on"
 								>
-									<p>
-										Username -{' '}
-										<span
-											className="admin-toggle"
-											onClick={this.adminToggle}
-										>
-											{!this.state.adminLogin
-												? 'Admin?'
-												: 'Not Admin?'}
-										</span>
-									</p>
+									<p>Username</p>
 									<input
 										type="text"
 										name="username"
@@ -244,7 +189,7 @@ class App extends React.Component {
 								</form>
 							</div>
 							<p className="powered-by">
-								Petio build (alpha) 0.1.7
+								Petio build (alpha) 0.1.8
 							</p>
 						</>
 					) : (

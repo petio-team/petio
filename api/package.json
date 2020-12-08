@@ -9,6 +9,7 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
+		"bcrypt": "^5.0.0",
 		"cors": "^2.8.5",
 		"cron": "^1.8.2",
 		"express": "^4.17.1",
@@ -16,6 +17,8 @@
 		"fs": "0.0.1-security",
 		"http": "0.0.1-security",
 		"https": "^1.0.0",
+		"joi": "^17.3.0",
+		"jsonwebtoken": "^8.5.1",
 		"mongoose": "^5.10.9",
 		"nodejs-nodemailer-outlook": "^1.2.3",
 		"nodemailer": "^6.4.16",

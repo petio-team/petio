@@ -8,6 +8,8 @@ class Login extends React.Component {
 
 		this.state = {
 			loading: false,
+			username: '',
+			password: '',
 		};
 
 		this.loginForm = this.loginForm.bind(this);
@@ -47,10 +49,10 @@ class Login extends React.Component {
 				if (res.loggedIn) {
 					this.props.changeLogin(true);
 				}
-				// User.getRequests();
 			})
 			.catch((error) => {
 				console.log(error);
+				// Move this to error message
 				alert(
 					'There has been an error, Petio may be temporarily unavailable'
 				);

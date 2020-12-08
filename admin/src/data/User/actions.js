@@ -8,27 +8,20 @@ export function login(user, pass = false, cookie = false, admin) {
 			password = pass;
 		let authToken = false;
 		if (cookie) {
-			let ls_raw = localStorage.getItem('loggedin');
-			let parsed = window.atob(ls_raw);
-			if (admin) {
-				authToken = parsed;
-			} else {
-				username = parsed;
-			}
+			authToken = localStorage.getItem('loggedin');
 		}
 
 		api.login(username, password, admin, authToken)
 			.then((data) => {
 				if (data.user) {
-					let ls_user = window.btoa(data.user.title);
+					let ls_user = data.token;
 					if (data.admin) {
 						data.user.admin = true;
-						ls_user = window.btoa(data.user.authToken);
 						localStorage.setItem('adminloggedin', true);
 					} else {
 						localStorage.setItem('adminloggedin', false);
 					}
-					if (data.loggedIn || data.admin) {
+					if (data.loggedIn) {
 						if (!cookie) {
 							localStorage.setItem('loggedin', ls_user);
 						}
@@ -54,6 +47,8 @@ export function login(user, pass = false, cookie = false, admin) {
 }
 
 export function logout() {
+	localStorage.removeItem('loggedin');
+	localStorage.removeItem('adminloggedin');
 	finalise({
 		type: types.LOGOUT,
 	});
