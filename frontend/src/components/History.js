@@ -43,7 +43,9 @@ class History extends React.Component {
 			historyData: [],
 		});
 		Api.history(
-			this.props.user.current.admin ? 1 : this.props.user.current._id,
+			this.props.user.current.altId
+				? this.props.user.current.altId
+				: this.props.user.current._id,
 			this.props.type
 		)
 			.then((res) => {

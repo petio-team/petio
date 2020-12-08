@@ -1,8 +1,8 @@
 import { store } from '../store';
 import * as types from '../actionTypes';
 import * as api from './api';
-// import { get } from 'lodash';
 
+// Credit Tautulli
 const plex_oauth_loader =
 	'<style>' +
 	'.login-loader-container {' +
@@ -50,7 +50,7 @@ export function plexAuth(plexWindow) {
 	api.getPins()
 		.then((response) => response.json())
 		.then((res) => {
-			plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=df9e71a5-a6cd-488e-8730-aaa9195f7435&code=${res.code}`;
+			plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=067e602b-1e86-4739-900d-1abdf8f6da71&code=${res.code}`;
 
 			waitForPin(plexWindow, res.id);
 		})
@@ -70,7 +70,6 @@ function saveToken(token) {
 
 async function waitForPin(plexWindow, id) {
 	let response = await api.validatePin(id);
-	console.log(response);
 	if (response.authToken) {
 		plexWindow.close();
 		saveToken(response.authToken);
@@ -93,18 +92,29 @@ async function getUser(token) {
 	let servers = await api.getServers(token);
 	let serverList = servers
 		.getElementsByTagName('MediaContainer')[0]
-		.getElementsByTagName('Server');
+		.getElementsByTagName('Device');
 	let userData = user.getElementsByTagName('user')[0];
 	setup.user.email = userData.getAttribute('email');
 	setup.user.id = userData.getAttribute('id');
 	setup.user.username = userData.getAttribute('title');
+	setup.user.thumb = userData.getAttribute('thumb');
 	for (let server of serverList) {
-		if (server.getAttribute('owned') === '1') {
-			setup.servers[server.getAttribute('machineIdentifier')] = {
-				name: server.getAttribute('name'),
-				host: server.getAttribute('host'),
-				port: server.getAttribute('port'),
-			};
+		if (
+			server.getAttribute('owned') === '1' &&
+			server.getAttribute('provides') === 'server'
+		) {
+			let connections = server.getElementsByTagName('Connection');
+			for (let connection of connections) {
+				console.log(connection);
+				if (connection.getAttribute('local') === '0')
+					setup.servers[server.getAttribute('clientIdentifier')] = {
+						name: server.getAttribute('name'),
+						host: connection.getAttribute('address'),
+						port: connection.getAttribute('port'),
+						protocol: connection.getAttribute('protocol'),
+						platform: server.getAttribute('platform'),
+					};
+			}
 		}
 	}
 	finalise({
@@ -112,7 +122,6 @@ async function getUser(token) {
 		servers: setup.servers,
 		user: setup.user,
 	});
-	console.log(setup);
 }
 
 function finalise(data = false) {

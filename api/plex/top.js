@@ -15,7 +15,7 @@ function getTop(type) {
 		d.setHours(0, 0, 0);
 		d.setMilliseconds(0);
 		let timestamp = (d / 1000) | 0;
-		let url = `http://${prefs.plexIp}:${prefs.plexPort}/library/all/top?type=${type}&viewedAt>=${timestamp}&limit=20&X-Plex-Token=${prefs.plexToken}`;
+		let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/library/all/top?type=${type}&viewedAt>=${timestamp}&limit=20&X-Plex-Token=${prefs.plexToken}`;
 		request(
 			url,
 			{

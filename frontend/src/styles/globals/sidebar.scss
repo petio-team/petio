@@ -14,18 +14,43 @@
 		background: none;
 	}
 
+	.back-btn {
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 4;
+		height: 55px;
+		padding: 0 20px;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+
+		svg {
+			height: 21px;
+		}
+	}
+
 	&--inner {
-		pointer-events: none;
+		pointer-events: all;
+		display: flex;
+		justify-content: center;
+		background: $black;
+
+		@include media-breakpoint-up(lg) {
+			display: block;
+			background: none;
+		}
 
 		.logo {
-			display: flex;
+			display: inline-flex;
 			align-items: flex-start;
-			height: 65px;
-			padding: 20px 10px;
-			background: $black;
+			height: 55px;
+			padding: 16px 10px;
+
 			pointer-events: all;
 
 			@include media-breakpoint-up(lg) {
+				display: flex;
 				background: rgba(0, 0, 0, 0.3);
 				align-items: flex-start;
 				padding: 0px 20px;
@@ -136,6 +161,7 @@
 		}
 
 		&.user-profile {
+			display: none;
 			.thumb {
 				background-position: center;
 				background-repeat: no-repeat;
@@ -161,6 +187,7 @@
 			}
 
 			@include media-breakpoint-up(lg) {
+				display: flex;
 				.icon {
 					padding: 15px 0;
 				}
@@ -195,6 +222,44 @@
 			p {
 				color: $orange;
 			}
+		}
+	}
+
+	&--user-mob {
+		position: fixed;
+		top: 0;
+		right: 0;
+		border: none !important;
+		height: 55px;
+		width: auto;
+		z-index: 5;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		padding: 0 20px;
+		cursor: pointer;
+
+		.icon {
+			padding: 0;
+
+			.thumb {
+				background-position: center;
+				background-repeat: no-repeat;
+				background-size: cover;
+				background-color: rgba(255, 255, 255, 0.2);
+				border-radius: 50px;
+				height: 30px;
+				width: 30px;
+
+				@include media-breakpoint-up(lg) {
+					height: 30px;
+					width: 30px;
+				}
+			}
+		}
+
+		@include media-breakpoint-up(lg) {
+			display: none;
 		}
 	}
 }

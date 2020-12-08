@@ -71,6 +71,11 @@ export function actor(id = false) {
 	return process(request).then((res) => res.json());
 }
 
+export let checkConfig = () => {
+	let request = `${getAuth().api}/config`;
+	return process(request).then((res) => res.json());
+};
+
 function process(url, headers, method, body = null) {
 	let args = {
 		method: method,

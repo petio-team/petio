@@ -8,6 +8,6 @@ LABEL maintainer="Petio"
 RUN npm ci
 
 VOLUME /config
-EXPOSE 32600 32601
+EXPOSE 7778
 
 CMD [ "npm", "start" ]

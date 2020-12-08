@@ -346,9 +346,14 @@
 				display: flex;
 				flex-wrap: wrap;
 				margin-bottom: 20px;
+				flex-direction: row;
+				// justify-content: space-between;
+				margin-top: 10px;
 
 				@include media-breakpoint-up(lg) {
+					margin-top: 0;
 					margin-bottom: 20px;
+					flex-direction: row;
 				}
 
 				.hide-mb {
@@ -359,25 +364,34 @@
 
 				p {
 					margin-bottom: 5px;
-					font-size: 10px;
+					font-size: 12px;
 					line-height: 1;
-					text-transform: uppercase;
+					font-weight: 500;
+					margin-right: 10px;
 
 					@include media-breakpoint-up(lg) {
-						margin-bottom: 5px;
-						font-size: 12px;
+						margin-right: 0;
+						font-size: 14px;
+						// margin-bottom: 5px;
+						// font-size: 12px;
+						// font-weight: 300;
+						// text-transform: uppercase;
 					}
 				}
 
 				.genre {
 					@include media-breakpoint-down(md) {
-						width: 100%;
+						display: none;
 					}
 				}
 
 				.spacer {
 					margin: 0 10px;
 					color: $grey-medium;
+
+					@include media-breakpoint-down(md) {
+						display: none;
+					}
 				}
 			}
 		}
@@ -413,7 +427,7 @@
 			@include media-breakpoint-up(lg) {
 				font-size: 16px;
 				line-height: 26px;
-				font-weight: 500;
+				font-weight: 300;
 			}
 
 			@include media-breakpoint-up(xl) {

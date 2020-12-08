@@ -27,6 +27,8 @@
 		width: 500px;
 		max-width: calc(100% - 40px);
 		background: $black;
+		border-radius: 5px;
+		overflow: hidden;
 	}
 
 	&--top {

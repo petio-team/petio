@@ -7,7 +7,7 @@ services:
         image: ghcr.io/petio-team/petio:fe-latest
         container_name: 'petio'
         ports:
-            - '3260:80'
+            - '7777:80'
         networks:
             - mern-app
         depends_on:
@@ -16,6 +16,8 @@ services:
     petio-api:
         image: ghcr.io/petio-team/petio:be-latest
         container_name: 'petio-api'
+        ports:
+            - '7778:7778'
         networks:
             - mern-app
         depends_on:

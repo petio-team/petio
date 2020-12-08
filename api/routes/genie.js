@@ -126,7 +126,7 @@ router.get('/:id/movie', async (req, res) => {
 
 function getHistory(id) {
 	return new Promise((resolve, reject) => {
-		let url = `http://${prefs.plexIp}:${prefs.plexPort}/status/sessions/history/all?sort=viewedAt%3Adesc&accountID=${id}&viewedAt>=0&limit=20&X-Plex-Token=${prefs.plexToken}`;
+		let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/status/sessions/history/all?sort=viewedAt%3Adesc&accountID=${id}&viewedAt>=0&limit=20&X-Plex-Token=${prefs.plexToken}`;
 		request(
 			url,
 			{
