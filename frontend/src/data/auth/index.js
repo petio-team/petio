@@ -1,7 +1,7 @@
 import { store } from '../store';
 import * as types from '../actionTypes';
 
-const PlexRequestApi = `http://localhost:7777/api`;
+const PlexRequestApi = `${window.location.protocol}//${window.location.host}/api`;
 
 export function initAuth() {
 	finalise({
