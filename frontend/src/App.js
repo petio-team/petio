@@ -227,7 +227,7 @@ class App extends React.Component {
 				<div className="page">
 					<HashRouter>
 						<div className="sidebar">
-							<Sidebar />
+							<Sidebar history={HashRouter.history} />
 						</div>
 
 						<Switch>

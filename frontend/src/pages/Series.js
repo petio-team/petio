@@ -248,6 +248,13 @@ class Series extends React.Component {
 
 		let reviewBtn = null;
 
+		let trailerBtn = (
+			<button onClick={this.showTrailer} className="btn btn__square">
+				<TrailerIcon />
+				Trailer
+			</button>
+		);
+
 		if (this.props.user.reviews) {
 			if (this.props.user.reviews[this.props.match.params.id]) {
 				var hasReviewed = false;
@@ -436,13 +443,7 @@ class Series extends React.Component {
 						<div className="quick-view">
 							<div className="side-content">
 								<div className="series-action">
-									<button
-										onClick={this.showTrailer}
-										className="btn btn__square"
-									>
-										<TrailerIcon />
-										Trailer
-									</button>
+									{trailerBtn}
 									{reviewBtn}
 								</div>
 							</div>
