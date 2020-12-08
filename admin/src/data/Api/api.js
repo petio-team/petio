@@ -1,4 +1,4 @@
-const apiUrl = `http://${window.location.hostname}:7778`;
+const apiUrl = `/api`;
 
 export async function popular() {
 	let request = `${apiUrl}/trending`;
