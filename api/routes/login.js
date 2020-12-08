@@ -152,15 +152,18 @@ async function getFriend(username, res) {
 			let admin = await Admin.findOne({
 				$or: [{ username: username }, { email: username }],
 			});
-			admin.password = '';
-			res.json({
-				admin: false,
-				loggedIn: true,
-				user: admin,
-				token: createToken(admin, false),
-			});
+			if (admin) {
+				admin.password = '';
+				res.json({
+					admin: false,
+					loggedIn: true,
+					user: admin,
+					token: createToken(admin, false),
+				});
+			} else {
+				res.json({ admin: false, loggedIn: false, token: false });
+			}
 		} catch (err) {
-			console.log(err);
 			res.json({ admin: false, loggedIn: false, token: false });
 		}
 	}
