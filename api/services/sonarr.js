@@ -92,21 +92,11 @@ class Sonarr {
 			let seriesData = seriesLookup[0];
 			seriesData.ProfileId = 1;
 			seriesData.Path = `H:\\TV\\${seriesData.title}`;
+			seriesData.addOptions = {
+				searchForMissingEpisodes: true,
+			};
 			let add = await this.post('series', false, seriesData);
 			console.log(add);
-			let sonarrId = add.id;
-			let refresh = await this.refresh(sonarrId);
-			console.log(refresh);
-			// try {
-			// 	let newSeries = await this.post('/series', {
-			// 		tvdbId: '267440',
-			// 		title: 'Attack on Titan',
-			// 		profileId: 1,
-			// 	});
-			// 	console.log(newSeries);
-			// } catch (err) {
-			// 	console.log(err);
-			// }
 		}
 	}
 }
