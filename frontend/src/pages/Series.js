@@ -370,10 +370,11 @@ class Series extends React.Component {
 						{video && this.state.trailer ? (
 							<div className="series-trailer">
 								<iframe
+									style={{ pointerEvents: 'none' }}
 									frameBorder="0"
 									height="100%"
 									width="100%"
-									src={`https://youtube.com/embed/${video.key}?autoplay=1&controls=0&showinfo=0&autohide=1&loop=1&modestbranding=1&playsinline=1&playlist=${video.key}`}
+									src={`https://youtube.com/embed/${video.key}?autoplay=1&controls=0&showinfo=0&autohide=1&loop=1&modestbranding=1&playsinline=1&rel=0`}
 								></iframe>
 							</div>
 						) : null}

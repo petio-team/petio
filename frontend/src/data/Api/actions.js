@@ -201,32 +201,15 @@ export let get_plex_media = (id, type) => {
 	});
 };
 
-function sortObject(data, attr) {
-	var arr = [];
-	for (var prop in data) {
-		if (data.hasOwnProperty(prop)) {
-			var obj = {};
-			obj[prop] = data[prop];
-			obj.tempSortName = data[prop][attr].toLowerCase();
-			arr.push(obj);
-		}
-	}
-
-	arr.sort(function (a, b) {
-		return a > b ? 1 : a < b ? -1 : 0;
+export function checkConfig() {
+	return new Promise((resolve, reject) => {
+		api.checkConfig()
+			.then((data) => {
+				resolve(data);
+			})
+			.catch((err) => {
+				console.log(err);
+				reject();
+			});
 	});
-
-	var result = [];
-	for (var i = 0, l = arr.length; i < l; i++) {
-		var obj = arr[i];
-		delete obj.tempSortName;
-		for (var prop in obj) {
-			if (obj.hasOwnProperty(prop)) {
-				var id = prop;
-			}
-		}
-		var item = obj[id];
-		result.push(item);
-	}
-	return result;
 }

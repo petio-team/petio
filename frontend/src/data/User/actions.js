@@ -25,17 +25,16 @@ export function login(user, cookie = false) {
 						});
 						resolve(data);
 					} else {
-						alert('Invalid Login');
-						resolve({ error: 'User not found' });
+						reject('User not found');
 						return;
 					}
 				} else {
-					resolve({ error: 'User not found' });
+					reject('User not found');
 				}
 			})
 			.catch((err) => {
-				alert(err);
-				reject('Error');
+				console.log(err);
+				reject('An error has occured');
 			});
 	});
 }

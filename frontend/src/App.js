@@ -12,7 +12,6 @@ import Plex from './data/Plex';
 import User from './data/User';
 import Api from './data/Api';
 import Sidebar from './components/Sidebar';
-import ConfigSetup from './components/ConfigSetup';
 import Search from './pages/Search';
 import Series from './pages/Series';
 import Season from './pages/Season';
@@ -35,6 +34,8 @@ class App extends React.Component {
 			issuesOpen: false,
 			isLoggedIn: this.props.user.logged_in,
 			loading: false,
+			configChecked: false,
+			loginMsg: false,
 		};
 
 		this.openIssues = this.openIssues.bind(this);
@@ -62,7 +63,7 @@ class App extends React.Component {
 	}
 
 	login(username, cookie = false) {
-		if (!this.props.user.credentials) {
+		if (!this.props.user.credentials || this.state.config === 'failed') {
 			return;
 		}
 		this.setState({
@@ -72,6 +73,7 @@ class App extends React.Component {
 			.then((res) => {
 				this.setState({
 					loading: false,
+					loginMsg: false,
 				});
 				if (res.error) {
 					alert(res.error);
@@ -90,10 +92,10 @@ class App extends React.Component {
 				User.getRequests();
 			})
 			.catch((error) => {
-				console.log(error);
-				alert(
-					'There has been an error, Petio may be temporarily unavailable'
-				);
+				this.setState({
+					loginMsg: error,
+					loading: false,
+				});
 				localStorage.removeItem('loggedin');
 			});
 	}
@@ -132,10 +134,33 @@ class App extends React.Component {
 		});
 	}
 
-	componentDidMount() {
-		// if (this.props.user.credentials) {
+	checkConfig() {
+		this.setState({
+			configChecked: true,
+		});
+		Api.checkConfig()
+			.then((res) => {
+				console.log(res);
+				this.setState({
+					config: res.config,
+					loading: false,
+				});
+			})
+			.catch(() => {
+				this.setState({
+					error: true,
+					config: 'failed',
+				});
+			});
+	}
 
-		// }
+	componentDidUpdate() {
+		if (this.props.user.credentials && !this.state.configChecked) {
+			this.checkConfig();
+		}
+	}
+
+	componentDidMount() {
 		this.loginLocal();
 		if (this.state.openIssues) {
 			this.setState({
@@ -160,12 +185,11 @@ class App extends React.Component {
 										? 'Login'
 										: 'Admin Login'}
 								</p>
-								<p>Log in with your Plex username</p>
 								<form
 									onSubmit={this.loginForm}
 									autoComplete="on"
 								>
-									<p>Username</p>
+									<p>Username / Email</p>
 									<input
 										type="text"
 										name="username"
@@ -173,17 +197,16 @@ class App extends React.Component {
 										onChange={this.inputChange}
 										autoComplete="username"
 									/>
-									{this.state.adminLogin ? (
-										<>
-											<p>Password</p>
-											<input
-												type="password"
-												name="password"
-												value={this.state.password}
-												onChange={this.inputChange}
-												autoComplete="current-password"
-											/>
-										</>
+									{this.state.loginMsg ? (
+										<div className="msg msg__error msg__input">
+											{this.state.loginMsg}
+										</div>
+									) : null}
+									{this.state.config === 'failed' ? (
+										<div className="msg msg__error msg__input">
+											API Not configured, please complete
+											setup
+										</div>
 									) : null}
 									<button className="btn">Login</button>
 								</form>
@@ -264,7 +287,6 @@ class App extends React.Component {
 							</Route>
 						</Switch>
 					</HashRouter>
-					{!this.props.api.config ? <ConfigSetup /> : null}
 				</div>
 			);
 		}

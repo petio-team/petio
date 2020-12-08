@@ -8,6 +8,7 @@ import {
 	top,
 	history,
 	get_plex_media,
+	checkConfig,
 } from './actions';
 
 export default {
@@ -20,4 +21,5 @@ export default {
 	top,
 	history,
 	get_plex_media,
+	checkConfig,
 };
