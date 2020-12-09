@@ -240,6 +240,25 @@ function getLibrary(id) {
 	});
 }
 
+function getMeta(id) {
+	let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/library/metadata/${id}?X-Plex-Token=${prefs.plexToken}`;
+	return new Promise((resolve, reject) => {
+		request(
+			url,
+			{
+				method: 'GET',
+				json: true,
+			},
+			function (err, data) {
+				if (err) {
+					reject('Unable to get meta');
+				}
+				resolve(data.MediaContainer.Video);
+			}
+		);
+	});
+}
+
 async function saveMovie(movieObj) {
 	let movieDb = false;
 	let output = '';
@@ -256,11 +275,18 @@ async function saveMovie(movieObj) {
 		let externalId = false;
 		let externalIds = {};
 		if (idSource === 'plex') {
-			console.log(movieObj);
-			// for (let guid of movieObj.Guid) {
-			// 	let source = guid.id.split('://');
-			// 	externalIds[source[0] + '_id'] = source[1];
-			// }
+			let title = movieObj.title;
+			try {
+				movieObj = await getMeta(movieObj.ratingKey);
+				console.log(movieObj);
+				for (let guid of movieObj.Guid) {
+					let source = guid.id.split('://');
+					externalIds[source[0] + '_id'] = source[1];
+				}
+			} catch (err) {
+				console.log(`Unable to fetch meta for ${title}`);
+				return;
+			}
 		} else {
 			if (idSource === 'themoviedb') {
 				idSource = 'tmdb';
