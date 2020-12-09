@@ -256,10 +256,11 @@ async function saveMovie(movieObj) {
 		let externalId = false;
 		let externalIds = {};
 		if (idSource === 'plex') {
-			for (let guid of movieObj.Guid) {
-				let source = guid.id.split('://');
-				externalIds[source[0] + '_id'] = source[1];
-			}
+			console.log(movieObj.Guid);
+			// for (let guid of movieObj.Guid) {
+			// 	let source = guid.id.split('://');
+			// 	externalIds[source[0] + '_id'] = source[1];
+			// }
 		} else {
 			if (idSource === 'themoviedb') {
 				idSource = 'tmdb';
