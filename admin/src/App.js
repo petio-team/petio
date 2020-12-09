@@ -23,6 +23,7 @@ class App extends React.Component {
 			isLoggedIn: false,
 			loading: true,
 			config: false,
+			configChecked: true,
 		};
 
 		this.changeLogin = this.changeLogin.bind(this);
@@ -30,6 +31,9 @@ class App extends React.Component {
 	}
 
 	checkConfig() {
+		this.setState({
+			configChecked: true,
+		});
 		Api.checkConfig()
 			.then((res) => {
 				console.log(res);
@@ -41,6 +45,7 @@ class App extends React.Component {
 			.catch(() => {
 				this.setState({
 					error: true,
+					loading: false,
 				});
 			});
 	}
@@ -49,6 +54,12 @@ class App extends React.Component {
 		this.setState({
 			isLoggedIn: value,
 		});
+	}
+
+	componentDidUpdate() {
+		if (!this.state.config && !this.state.configChecked) {
+			this.checkConfig();
+		}
 	}
 
 	componentDidMount() {
