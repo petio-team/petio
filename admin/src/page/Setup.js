@@ -292,7 +292,7 @@ class Setup extends React.Component {
 					<div className="step-4">
 						<p>
 							Mongo Database path, leave this as default unless
-							you have configured your databse differently to
+							you have configured your database differently to
 							recommended.
 						</p>
 						<input
@@ -317,7 +317,7 @@ class Setup extends React.Component {
 							Please fill out the details for the email address
 							you'd like to be used as the send address for any
 							Petio emails. The server admin's email address will
-							be receive a copy of all emails sent.
+							also receive a copy of all emails sent.
 						</p>
 						<input
 							type="email"

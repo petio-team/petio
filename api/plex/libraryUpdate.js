@@ -72,7 +72,7 @@ async function createAdmin() {
 		try {
 			adminData = new Admin({
 				_id: prefs.adminId,
-				email: prefs.adminUsername,
+				email: prefs.adminEmail,
 				thumb: prefs.adminThumb,
 				title: prefs.adminDisplayName,
 				username: prefs.adminUsername,
