@@ -10,6 +10,8 @@ services:
             - '7777:80'
         networks:
             - mern-app
+        depends_on:
+            - petio-api
 
     petio-api:
         image: ghcr.io/petio-team/petio:be-latest

@@ -25,6 +25,10 @@
 		flex-direction: column;
 		justify-content: center;
 
+		@include media-breakpoint-up(lg) {
+			display: none;
+		}
+
 		svg {
 			height: 21px;
 		}
