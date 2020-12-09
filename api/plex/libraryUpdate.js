@@ -253,27 +253,36 @@ async function saveMovie(movieObj) {
 		let idSource = movieObj.guid
 			.replace('com.plexapp.agents.', '')
 			.split('://')[0];
-		if (idSource === 'themoviedb') {
-			idSource = 'tmdb';
-		}
 		let externalId = false;
 		let externalIds = {};
-		try {
-			externalId = movieObj.guid
-				.replace('com.plexapp.agents.', '')
-				.split('://')[1]
-				.split('?')[0];
+		if (idSource === 'plex') {
+			for (let guid of movieObj.Guid) {
+				let source = guid.id.split('://');
+				externalIds[source[0] + '_id'] = source[1];
+			}
+		} else {
+			if (idSource === 'themoviedb') {
+				idSource = 'tmdb';
+			}
 
-			externalIds = await externalIdMovie(externalId);
-		} catch (err) {
-			if (!externalId) {
-				console.log(
-					`Error - unable to parse id source from: ${movieObj.guid} - Movie: ${movieObj.title}`
-				);
-			} else {
-				console.log(err);
+			try {
+				externalId = movieObj.guid
+					.replace('com.plexapp.agents.', '')
+					.split('://')[1]
+					.split('?')[0];
+
+				externalIds = await externalIdMovie(externalId);
+			} catch (err) {
+				if (!externalId) {
+					console.log(
+						`Error - unable to parse id source from: ${movieObj.guid} - Movie: ${movieObj.title}`
+					);
+				} else {
+					console.log(err);
+				}
 			}
 		}
+
 		try {
 			let newMovie = new Movie({
 				_id: movieObj.ratingKey,
@@ -447,30 +456,39 @@ async function saveShow(showObj) {
 		let idSource = showObj.guid
 			.replace('com.plexapp.agents.', '')
 			.split('://')[0];
-		if (idSource === 'thetvdb') {
-			idSource = 'tvdb';
-		}
-		if (idSource === 'themoviedb') {
-			idSource = 'tmdb';
-		}
-		let externalId = showObj.guid
-			.replace('com.plexapp.agents.', '')
-			.split('://')[1]
-			.split('?')[0];
-		let tmdbId = false;
 		let externalIds = {};
-		if (idSource !== 'tmdb') {
-			try {
-				tmdbId = await externalIdTv(externalId, idSource);
-			} catch (err) {
-				console.log(err);
-				tmdbId = false;
+		let tmdbId = false;
+		if (idSource === 'plex') {
+			for (let guid of showObj.Guid) {
+				let source = guid.id.split('://');
+				externalIds[source[0] + '_id'] = source[1];
+				if (source[0] === 'tmdb') tmdbId = source[1];
 			}
 		} else {
-			try {
-				externalIds = await tmdbExternalIds(externalId);
-			} catch (err) {
-				console.log(err);
+			if (idSource === 'thetvdb') {
+				idSource = 'tvdb';
+			}
+			if (idSource === 'themoviedb') {
+				idSource = 'tmdb';
+			}
+			let externalId = showObj.guid
+				.replace('com.plexapp.agents.', '')
+				.split('://')[1]
+				.split('?')[0];
+
+			if (idSource !== 'tmdb') {
+				try {
+					tmdbId = await externalIdTv(externalId, idSource);
+				} catch (err) {
+					console.log(err);
+					tmdbId = false;
+				}
+			} else {
+				try {
+					externalIds = await tmdbExternalIds(externalId);
+				} catch (err) {
+					console.log(err);
+				}
 			}
 		}
 		try {
