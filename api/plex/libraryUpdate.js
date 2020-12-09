@@ -459,6 +459,7 @@ async function saveShow(showObj) {
 			.split('://')[0];
 		let externalIds = {};
 		let tmdbId = false;
+		let externalId = false;
 		if (idSource === 'plex') {
 			for (let guid of showObj.Guid) {
 				let source = guid.id.split('://');
@@ -472,7 +473,7 @@ async function saveShow(showObj) {
 			if (idSource === 'themoviedb') {
 				idSource = 'tmdb';
 			}
-			let externalId = showObj.guid
+			externalId = showObj.guid
 				.replace('com.plexapp.agents.', '')
 				.split('://')[1]
 				.split('?')[0];
