@@ -1,14 +1,21 @@
 const request = require('xhr-request');
+const Request = require('../models/request');
+const fs = require('fs');
+const path = require('path');
 
 class Sonarr {
 	constructor() {
-		this.config = {
-			protocol: 'http',
-			hostname: '10.10.0.10',
-			apiKey: 'e2593a3f2ed74722b4b2e412072af436',
-			port: 8989,
-			urlBase: '',
-		};
+		let project_folder, configFile;
+		if (process.pkg) {
+			project_folder = path.dirname(process.execPath);
+			configFile = path.join(project_folder, './config/sonarr.json');
+		} else {
+			project_folder = __dirname;
+			configFile = path.join(project_folder, '../config/sonarr.json');
+		}
+		const configData = fs.readFileSync(configFile);
+		const configParse = JSON.parse(configData);
+		this.config = configParse;
 	}
 
 	process(method, endpoint, params, body = false) {
@@ -59,19 +66,24 @@ class Sonarr {
 		try {
 			let check = await this.get('system/status');
 			if (check) {
-				console.log('Sonarr connection success');
+				console.log('SERVICE - SONARR: Sonarr connection success');
 				return true;
 			} else {
+				console.log('SERVICE - SONARR: ERR Connection failed');
 				return false;
 			}
 		} catch (err) {
-			console.log(err);
+			console.log('SERVICE - SONARR: ERR Connection failed');
 			return false;
 		}
 	}
 
-	getProfiles() {
-		return this.get('profile');
+	async getPaths() {
+		return await this.get('rootfolder');
+	}
+
+	async getProfiles() {
+		return await this.get('profile');
 	}
 
 	refresh(id) {
@@ -81,23 +93,86 @@ class Sonarr {
 		});
 	}
 
-	async getRequests() {
-		let config = await this.connect();
-		console.log(config);
-		if (config) {
-			let profiles = await this.getProfiles();
-			let seriesLookup = await this.get('series/lookup', {
-				term: 'tvdb:366625',
-			});
-			let seriesData = seriesLookup[0];
-			seriesData.ProfileId = 1;
-			seriesData.Path = `H:\\TV\\${seriesData.title}`;
-			seriesData.addOptions = {
-				searchForMissingEpisodes: true,
-			};
+	lookup(id) {
+		return this.get('series/lookup', {
+			term: `tvdb:${id}`,
+		});
+	}
+
+	async test() {
+		return await this.connect();
+	}
+
+	async add(seriesData) {
+		seriesData.ProfileId = this.config.profileId;
+		seriesData.Path = `${this.config.rootPath}${seriesData.title} (${seriesData.year})`;
+		seriesData.addOptions = {
+			searchForMissingEpisodes: true,
+		};
+
+		try {
 			let add = await this.post('series', false, seriesData);
 			console.log(add);
+			return add.id;
+		} catch (err) {
+			console.log(`SERVICE - SONARR: Unable to add series ${err}`);
+			return false;
 		}
+	}
+
+	async processJobs(jobQ) {
+		for (let job of jobQ) {
+			try {
+				let sonarrData = await this.lookup(job.tvdb_id);
+				let sonarrId = await this.add(sonarrData[0]);
+				let updatedRequest = await Request.findOneAndUpdate(
+					{
+						_id: job._id,
+					},
+					{
+						$set: {
+							sonarrId: sonarrId,
+						},
+					},
+					{ useFindAndModify: false }
+				);
+				if (updatedRequest) {
+					console.log(
+						`SERVICE - SONARR: Sonnar job added for ${job.title}`
+					);
+				}
+			} catch (err) {
+				console.log(
+					`SERVICE - SONARR: Unable to add series ${job.title}`
+				);
+			}
+		}
+	}
+
+	async getRequests() {
+		console.log(`SERVICE - SONARR: Polling requests`);
+		const active = await this.connect();
+		if (!active) {
+			console.log(`SERVICE - SONARR: Connection Failed Stopping Poll`);
+			return;
+		}
+		const requests = await Request.find();
+		let jobQ = [];
+		for (let req of requests) {
+			if (req.type === 'tv') {
+				if (!req.tvdb_id) {
+					console.log(
+						`SERVICE - SONARR: TVDB ID not found for ${req.title}`
+					);
+				} else if (!req.sonarrId) {
+					jobQ.push(req);
+					console.log(
+						`SERVICE - SONARR: ${req.title} added to job queue`
+					);
+				}
+			}
+		}
+		this.processJobs(jobQ);
 	}
 }
 

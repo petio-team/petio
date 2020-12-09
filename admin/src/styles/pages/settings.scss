@@ -1,0 +1,14 @@
+.settings {
+	&--wrap {
+		position: relative;
+	}
+
+	&--menu {
+		position: absolute;
+		top: -20px;
+		left: -20px;
+		width: 250px;
+		background: $grey-medium;
+		height: 100vh;
+	}
+}
