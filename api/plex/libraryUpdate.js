@@ -256,7 +256,7 @@ async function saveMovie(movieObj) {
 		let externalId = false;
 		let externalIds = {};
 		if (idSource === 'plex') {
-			console.log(movieObj.Guid);
+			console.log(movieObj);
 			// for (let guid of movieObj.Guid) {
 			// 	let source = guid.id.split('://');
 			// 	externalIds[source[0] + '_id'] = source[1];
