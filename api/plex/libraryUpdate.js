@@ -253,7 +253,7 @@ function getMeta(id) {
 				if (err) {
 					reject('Unable to get meta');
 				}
-				resolve(data.MediaContainer.Video);
+				resolve(data.MediaContainer.Metadata[0]);
 			}
 		);
 	});
