@@ -1,0 +1,10 @@
+{
+	"enabled": false,
+	"protocol": "http",
+	"hostname": "",
+	"apiKey": "",
+	"port": false,
+	"urlBase": "",
+	"rootPath": "",
+	"profileId": false
+}

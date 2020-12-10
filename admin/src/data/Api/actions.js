@@ -277,32 +277,78 @@ export function saveConfig(config) {
 	});
 }
 
-function sortObject(data, attr) {
-	var arr = [];
-	for (var prop in data) {
-		if (data.hasOwnProperty(prop)) {
-			var obj = {};
-			obj[prop] = data[prop];
-			obj.tempSortName = data[prop][attr].toLowerCase();
-			arr.push(obj);
-		}
-	}
+export async function sonarrConfig() {
+	let config = await api.sonarrConfig();
+	let paths = await api.sonarrPaths();
+	let profiles = await api.sonarrProfiles();
 
-	arr.sort(function (a, b) {
-		return a > b ? 1 : a < b ? -1 : 0;
+	return {
+		config: config,
+		paths: paths,
+		profiles: profiles,
+	};
+}
+
+export async function radarrConfig() {
+	let config = await api.radarrConfig();
+	let paths = await api.radarrPaths();
+	let profiles = await api.radarrProfiles();
+
+	return {
+		config: config,
+		paths: paths,
+		profiles: profiles,
+	};
+}
+
+export function saveSonarrConfig(config) {
+	return new Promise((resolve, reject) => {
+		api.saveSonarrConfig(config)
+			.then(() => {
+				resolve();
+			})
+			.catch((err) => {
+				console.log(err);
+				reject();
+			});
 	});
+}
 
-	var result = [];
-	for (var i = 0, l = arr.length; i < l; i++) {
-		var obj = arr[i];
-		delete obj.tempSortName;
-		for (var prop in obj) {
-			if (obj.hasOwnProperty(prop)) {
-				var id = prop;
-			}
-		}
-		var item = obj[id];
-		result.push(item);
-	}
-	return result;
+export function testSonarr() {
+	return new Promise((resolve, reject) => {
+		api.testSonarr()
+			.then((res) => {
+				resolve(res);
+			})
+			.catch((err) => {
+				console.log(err);
+				reject();
+			});
+	});
+}
+
+export function testRadarr() {
+	return new Promise((resolve, reject) => {
+		api.testRadarr()
+			.then((res) => {
+				resolve(res);
+			})
+			.catch((err) => {
+				console.log(err);
+				reject();
+			});
+	});
+}
+
+export function saveRadarrConfig(config) {
+	return new Promise((resolve, reject) => {
+		api.saveRadarrConfig(config)
+			.then(() => {
+				resolve();
+			})
+			.catch((err) => {
+				console.log(err);
+				reject();
+			});
+	});
 }
