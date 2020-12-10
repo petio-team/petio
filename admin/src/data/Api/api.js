@@ -103,6 +103,72 @@ export let saveConfig = (config) => {
 	return process(request, headers, 'post', body);
 };
 
+export function sonarrConfig() {
+	let headers = { 'Content-Type': 'application/json' };
+	let request = `${apiUrl}/services/sonarr/config`;
+	return process(request, headers, 'get').then((res) => res.json());
+}
+
+export let saveSonarrConfig = (config) => {
+	let request = `${apiUrl}/services/sonarr/config`;
+	let headers = {
+		'Content-Type': 'application/json',
+	};
+	let body = config;
+	return process(request, headers, 'post', body);
+};
+
+export function testSonarr() {
+	let headers = { 'Content-Type': 'application/json' };
+	let request = `${apiUrl}/services/sonarr/test`;
+	return process(request, headers, 'get').then((res) => res.json());
+}
+
+export function sonarrPaths() {
+	let headers = { 'Content-Type': 'application/json' };
+	let request = `${apiUrl}/services/sonarr/paths`;
+	return process(request, headers, 'get').then((res) => res.json());
+}
+
+export function sonarrProfiles() {
+	let headers = { 'Content-Type': 'application/json' };
+	let request = `${apiUrl}/services/sonarr/profiles`;
+	return process(request, headers, 'get').then((res) => res.json());
+}
+
+export function radarrConfig() {
+	let headers = { 'Content-Type': 'application/json' };
+	let request = `${apiUrl}/services/radarr/config`;
+	return process(request, headers, 'get').then((res) => res.json());
+}
+
+export function radarrPaths() {
+	let headers = { 'Content-Type': 'application/json' };
+	let request = `${apiUrl}/services/radarr/paths`;
+	return process(request, headers, 'get').then((res) => res.json());
+}
+
+export function radarrProfiles() {
+	let headers = { 'Content-Type': 'application/json' };
+	let request = `${apiUrl}/services/radarr/profiles`;
+	return process(request, headers, 'get').then((res) => res.json());
+}
+
+export function testRadarr() {
+	let headers = { 'Content-Type': 'application/json' };
+	let request = `${apiUrl}/services/radarr/test`;
+	return process(request, headers, 'get').then((res) => res.json());
+}
+
+export let saveRadarrConfig = (config) => {
+	let request = `${apiUrl}/services/radarr/config`;
+	let headers = {
+		'Content-Type': 'application/json',
+	};
+	let body = config;
+	return process(request, headers, 'post', body);
+};
+
 function process(url, headers, method, body = null) {
 	let args = {
 		method: method,

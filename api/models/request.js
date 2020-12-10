@@ -10,6 +10,7 @@ const RequestSchema = mongoose.Schema({
 	tvdb_id: String,
 	users: Array,
 	sonarrId: Number,
+	radarrId: Number,
 });
 
 module.exports = mongoose.model('Request', RequestSchema);

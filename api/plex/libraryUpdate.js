@@ -18,6 +18,7 @@ const outlook = require('../mail/mailer');
 const tmdbApikey = prefs.tmdbApi;
 const tmdb = 'https://api.themoviedb.org/3/';
 const Sonarr = require('../services/sonarr');
+const Radarr = require('../services/radarr');
 
 let mailer = [];
 
@@ -25,6 +26,7 @@ async function libraryUpdate() {
 	await createAdmin();
 	let libraries = false;
 	let sonarr = new Sonarr();
+	let radarr = new Radarr();
 	try {
 		libraries = await getLibraries();
 	} catch (err) {
@@ -38,6 +40,7 @@ async function libraryUpdate() {
 		console.log('LIB CRON: Complete');
 		execMail();
 		sonarr.getRequests();
+		radarr.getRequests();
 	} else {
 		console.log("Couldn't update libraries");
 	}

@@ -46,7 +46,6 @@ function createConfig(data) {
 	}
 	console.log(configFile);
 	fs.appendFileSync(configFile, data, (err) => {
-		console.log('hit');
 		if (err) {
 			console.log(err);
 		} else {

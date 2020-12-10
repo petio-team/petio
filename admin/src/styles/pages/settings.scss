@@ -4,11 +4,139 @@
 	}
 
 	&--menu {
-		position: absolute;
-		top: -20px;
-		left: -20px;
+		position: fixed;
+		top: 0px;
+		left: 250px;
 		width: 250px;
-		background: $grey-medium;
+		background: $black;
 		height: 100vh;
+
+		&--item {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			border-top: solid 4px transparent;
+			cursor: pointer;
+
+			@include media-breakpoint-up(lg) {
+				padding-left: 20px;
+				border-top: none;
+				border-right: solid 4px transparent;
+			}
+
+			p {
+				font-size: 16px;
+				color: white;
+				font-weight: 500;
+				margin: 0;
+				display: none;
+
+				@include media-breakpoint-up(lg) {
+					display: block;
+				}
+			}
+
+			.icon {
+				padding: 20px 0;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				width: 50px;
+
+				@include media-breakpoint-up(lg) {
+					padding: 20px 0;
+					width: 60px;
+				}
+
+				img {
+					height: 20px;
+					width: auto;
+					max-width: 100%;
+
+					&.png-safe {
+						filter: saturate(0) brightness(10);
+					}
+				}
+
+				svg {
+					height: 20px;
+
+					@include media-breakpoint-up(lg) {
+						height: 20px;
+					}
+
+					path {
+						fill: $grey-light;
+					}
+				}
+			}
+
+			&:hover {
+				background: rgba(0, 0, 0, 0.2);
+				border-top: solid 4px rgba(255, 255, 255, 0.2);
+
+				@include media-breakpoint-up(lg) {
+					border-top: none;
+					border-right: solid 4px rgba(255, 255, 255, 0.2);
+				}
+			}
+
+			&.active {
+				background: $orangeDark;
+				border-top: solid 4px $grey-light;
+
+				@include media-breakpoint-up(lg) {
+					border-top: none;
+					border-right: solid 4px $grey-light;
+				}
+
+				.icon {
+					svg path {
+						fill: $grey-light;
+					}
+				}
+
+				p {
+					color: $grey-light;
+				}
+			}
+		}
+	}
+
+	&--content {
+		margin-left: 250px;
+		padding: 50px 0;
+
+		section {
+			padding-left: 20px;
+			padding-right: 20px;
+
+			label {
+				margin-bottom: 10px;
+				display: block;
+			}
+		}
+	}
+}
+
+.setting-msg {
+	position: fixed;
+	top: 0;
+	left: 500px;
+	width: calc(100% - 500px);
+	background: $orange;
+	padding: 10px 40px;
+	z-index: 100;
+
+	&.good {
+		background: $good;
+	}
+
+	&.error {
+		background: $bad;
+	}
+
+	p {
+		margin: 0;
 	}
 }

@@ -119,7 +119,7 @@ class App extends React.Component {
 										api={this.props.api}
 									/>
 								</Route>
-								<Route exact path="/settings">
+								<Route path="/settings">
 									<Settings />
 								</Route>
 							</Switch>

@@ -3,15 +3,15 @@ const Request = require('../models/request');
 const fs = require('fs');
 const path = require('path');
 
-class Sonarr {
+class Radarr {
 	constructor() {
 		let project_folder, configFile;
 		if (process.pkg) {
 			project_folder = path.dirname(process.execPath);
-			configFile = path.join(project_folder, './config/sonarr.json');
+			configFile = path.join(project_folder, './config/radarr.json');
 		} else {
 			project_folder = __dirname;
-			configFile = path.join(project_folder, '../config/sonarr.json');
+			configFile = path.join(project_folder, '../config/radarr.json');
 		}
 		const configData = fs.readFileSync(configFile);
 		const configParse = JSON.parse(configData);
@@ -71,20 +71,20 @@ class Sonarr {
 
 	async connect(test = false) {
 		if (!this.config.enabled && !test) {
-			console.log('SERVICE - SONARR: Sonarr not enabled');
+			console.log('SERVICE - RADARR: Radarr not enabled');
 			return false;
 		}
 		try {
 			let check = await this.get('system/status');
 			if (check) {
-				console.log('SERVICE - SONARR: Sonarr connection success');
+				console.log('SERVICE - RADARR: Radarr connection success');
 				return true;
 			} else {
-				console.log('SERVICE - SONARR: ERR Connection failed');
+				console.log('SERVICE - RADARR: ERR Connection failed');
 				return false;
 			}
 		} catch (err) {
-			console.log('SERVICE - SONARR: ERR Connection failed');
+			console.log('SERVICE - RADARR: ERR Connection failed');
 			return false;
 		}
 	}
@@ -97,16 +97,9 @@ class Sonarr {
 		return await this.get('profile');
 	}
 
-	refresh(id) {
-		return this.post('command', false, {
-			name: 'refreshSeries',
-			seriesId: id,
-		});
-	}
-
 	lookup(id) {
-		return this.get('series/lookup', {
-			term: `tvdb:${id}`,
+		return this.get('movie/lookup', {
+			tmdbId: id,
 		});
 	}
 
@@ -114,19 +107,20 @@ class Sonarr {
 		return await this.connect(true);
 	}
 
-	async add(seriesData) {
-		seriesData.ProfileId = this.config.profileId;
-		seriesData.Path = `${this.config.rootPath}${seriesData.title} (${seriesData.year})`;
-		seriesData.addOptions = {
-			searchForMissingEpisodes: true,
+	async add(movieData) {
+		movieData.ProfileId = this.config.profileId;
+		movieData.Path = `${this.config.rootPath}${movieData.title} (${movieData.year})`;
+		movieData.addOptions = {
+			searchForMovie: true,
 		};
+		movieData.monitored = true;
 
 		try {
-			let add = await this.post('series', false, seriesData);
+			let add = await this.post('movie', false, movieData);
 			console.log(add);
 			return add.id;
 		} catch (err) {
-			console.log(`SERVICE - SONARR: Unable to add series ${err}`);
+			console.log(`SERVICE - RADARR: Unable to add movie ${err}`);
 			return false;
 		}
 	}
@@ -134,51 +128,51 @@ class Sonarr {
 	async processJobs(jobQ) {
 		for (let job of jobQ) {
 			try {
-				let sonarrData = await this.lookup(job.tvdb_id);
-				let sonarrId = await this.add(sonarrData[0]);
+				let radarrData = await this.lookup(job.tmdb_id);
+				let radarrId = await this.add(radarrData[0]);
 				let updatedRequest = await Request.findOneAndUpdate(
 					{
 						_id: job._id,
 					},
 					{
 						$set: {
-							sonarrId: sonarrId,
+							radarrId: radarrId,
 						},
 					},
 					{ useFindAndModify: false }
 				);
 				if (updatedRequest) {
 					console.log(
-						`SERVICE - SONARR: Sonnar job added for ${job.title}`
+						`SERVICE - RADARR: Sonnar job added for ${job.title}`
 					);
 				}
 			} catch (err) {
 				console.log(
-					`SERVICE - SONARR: Unable to add series ${job.title}`
+					`SERVICE - RADARR: Unable to add movie ${job.title}`
 				);
 			}
 		}
 	}
 
 	async getRequests() {
-		console.log(`SERVICE - SONARR: Polling requests`);
+		console.log(`SERVICE - RADARR: Polling requests`);
 		const active = await this.connect();
 		if (!active) {
-			console.log(`SERVICE - SONARR: Connection Failed Stopping Poll`);
+			console.log(`SERVICE - RADARR: Connection Failed Stopping Poll`);
 			return;
 		}
 		const requests = await Request.find();
 		let jobQ = [];
 		for (let req of requests) {
-			if (req.type === 'tv') {
-				if (!req.tvdb_id) {
+			if (req.type === 'movie') {
+				if (!req.tmdb_id) {
 					console.log(
-						`SERVICE - SONARR: TVDB ID not found for ${req.title}`
+						`SERVICE - RADARR: TMDB ID not found for ${req.title}`
 					);
-				} else if (!req.sonarrId) {
+				} else if (!req.radarrId) {
 					jobQ.push(req);
 					console.log(
-						`SERVICE - SONARR: ${req.title} added to job queue`
+						`SERVICE - RADARR: ${req.title} added to job queue`
 					);
 				}
 			}
@@ -187,4 +181,4 @@ class Sonarr {
 	}
 }
 
-module.exports = Sonarr;
+module.exports = Radarr;
