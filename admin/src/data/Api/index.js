@@ -13,6 +13,12 @@ import {
 	currentSessions,
 	checkConfig,
 	saveConfig,
+	sonarrConfig,
+	saveSonarrConfig,
+	saveRadarrConfig,
+	radarrConfig,
+	testSonarr,
+	testRadarr,
 } from './actions';
 
 export default {
@@ -30,4 +36,10 @@ export default {
 	currentSessions,
 	checkConfig,
 	saveConfig,
+	sonarrConfig,
+	saveSonarrConfig,
+	saveRadarrConfig,
+	radarrConfig,
+	testSonarr,
+	testRadarr,
 };

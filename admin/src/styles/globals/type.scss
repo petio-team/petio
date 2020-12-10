@@ -93,3 +93,8 @@ p {
 		color: $bad;
 	}
 }
+
+.capped-width {
+	width: 500px;
+	max-width: 100%;
+}

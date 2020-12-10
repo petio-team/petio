@@ -18,6 +18,7 @@ const outlook = require('../mail/mailer');
 const tmdbApikey = prefs.tmdbApi;
 const tmdb = 'https://api.themoviedb.org/3/';
 const Sonarr = require('../services/sonarr');
+const Radarr = require('../services/radarr');
 
 let mailer = [];
 
@@ -25,19 +26,21 @@ async function libraryUpdate() {
 	await createAdmin();
 	let libraries = false;
 	let sonarr = new Sonarr();
+	let radarr = new Radarr();
 	try {
 		libraries = await getLibraries();
 	} catch (err) {
-		console.log(err);
+		console.log(`LIB CRON: ${err}`);
 	}
 
 	if (libraries) {
 		await saveLibraries(libraries);
 		await updateLibraryContent(libraries);
 		await updateFriends();
-		console.log('sending mail!');
+		console.log('LIB CRON: Complete');
 		execMail();
 		sonarr.getRequests();
+		radarr.getRequests();
 	} else {
 		console.log("Couldn't update libraries");
 	}
@@ -48,7 +51,7 @@ async function createAdmin() {
 		_id: prefs.adminId,
 	});
 	if (adminFound) {
-		console.log('Admin Already Created, updating');
+		console.log('LIB CRON: Admin Already Created, updating');
 		try {
 			adminData = await Admin.findOneAndUpdate(
 				{ _id: prefs.adminId },
@@ -65,10 +68,10 @@ async function createAdmin() {
 				{ new: true, useFindAndModify: false }
 			);
 		} catch (err) {
-			console.log(err);
+			console.log(`LIB CRON: ${err}`);
 		}
 	} else {
-		console.log('Creating admin user');
+		console.log('LIB CRON: Creating admin user');
 		try {
 			adminData = new Admin({
 				_id: prefs.adminId,
@@ -81,7 +84,7 @@ async function createAdmin() {
 			});
 			await adminData.save();
 		} catch (err) {
-			console.log(err);
+			console.log(`LIB CRON: ${err}`);
 		}
 	}
 }
@@ -97,11 +100,11 @@ function getLibraries() {
 			},
 			function (err, data) {
 				if (err) {
-					console.log('Library update failed!');
+					console.log('LIB CRON: Library update failed!');
 					reject('Unable to get library info');
 					throw err;
 				}
-				console.log('Found Libraries');
+				console.log('LIB CRON: Found Libraries');
 				resolve(data.MediaContainer);
 			}
 		);
@@ -117,12 +120,12 @@ async function saveLibraries(libraries) {
 }
 
 async function saveLibrary(lib) {
-	console.log('Updating Library ' + lib);
+	console.log('LIB CRON: Updating Library ' + lib);
 	let libraryItem = false;
 	try {
 		libraryItem = await Library.findById(lib.uuid);
 	} catch {
-		console.log('Library Not found, attempting to create');
+		console.log('LIB CRON: Library Not found, attempting to create');
 	}
 	if (!libraryItem) {
 		try {
@@ -151,7 +154,7 @@ async function saveLibrary(lib) {
 			});
 			libraryItem = await newLibrary.save();
 		} catch (err) {
-			console.log(err);
+			console.log(`LIB CRON: ${err}`);
 		}
 	} else {
 		let updatedLibraryItem = false;
@@ -184,10 +187,10 @@ async function saveLibrary(lib) {
 				}
 			);
 		} catch (err) {
-			console.log(err);
+			console.log(`LIB CRON: ${err}`);
 		}
 		if (updatedLibraryItem) {
-			console.log('Library Updated');
+			console.log('LIB CRON: Library Updated');
 		}
 	}
 
@@ -214,7 +217,7 @@ async function updateLibraryContent(libraries) {
 					}
 				});
 			} catch (err) {
-				console.log(err);
+				console.log(`LIB CRON: ${err}`);
 			}
 		})
 	);
@@ -350,7 +353,7 @@ async function saveMovie(movieObj) {
 			movieDb = await newMovie.save();
 			mailAdded(movieObj, externalId);
 		} catch (err) {
-			console.log(err);
+			console.log(`LIB CRON: ${err}`);
 		}
 	} else {
 		try {
@@ -432,7 +435,7 @@ async function saveMusic(musicObj) {
 			});
 			musicDb = await newMusic.save();
 		} catch (err) {
-			console.log(err);
+			console.log(`LIB CRON: ${err}`);
 		}
 	}
 }
@@ -530,7 +533,7 @@ async function saveShow(showObj) {
 			showDb = await newShow.save();
 			mailAdded(showObj, externalId);
 		} catch (err) {
-			console.log(err);
+			console.log(`LIB CRON: ${err}`);
 		}
 	} else {
 		try {
@@ -593,7 +596,7 @@ async function updateFriends() {
 	try {
 		friendList = await getFriends();
 	} catch (err) {
-		console.log(err);
+		console.log(`LIB CRON: ${err}`);
 	}
 	// console.clear();
 	// console.log(friendList);
@@ -616,8 +619,8 @@ function getFriends() {
 			function (err, data) {
 				if (err) {
 					reject('Unable to get friends');
-					console.log('Unable to get friends');
-					console.log(err);
+					console.log('LIB CRON: Unable to get friends');
+					console.log(`LIB CRON: ${err}`);
 				}
 				if (!data) {
 					reject('no data');
@@ -658,7 +661,7 @@ async function saveFriend(obj) {
 			});
 			friendDb = await newFriend.save();
 		} catch (err) {
-			console.log(err);
+			console.log(`LIB CRON: ${err}`);
 		}
 		if (friendDb) {
 			output += 'Created ----------- New Friend Added!';
@@ -691,9 +694,9 @@ async function mailAdded(plexData, ref_id) {
 			{ useFindAndModify: false },
 			function (err, data) {
 				if (err) {
-					console.log(err);
+					console.log(`LIB CRON: ${err}`);
 				} else {
-					console.log('Request Removed!');
+					console.log('LIB CRON: Request Removed!');
 				}
 			}
 		);
