@@ -4,7 +4,7 @@
 	"private": true,
 	"dependencies": {
 		"@testing-library/jest-dom": "^5.11.6",
-		"@testing-library/react": "^9.3.2",
+		"@testing-library/react": "^11.2.2",
 		"@testing-library/user-event": "^7.1.2",
 		"axios": "^0.19.2",
 		"dateformat": "^3.0.3",
