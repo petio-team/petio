@@ -27,6 +27,13 @@ class Sonarr extends React.Component {
 		this.getSonarr = this.getSonarr.bind(this);
 		this.saveChanges = this.saveChanges.bind(this);
 		this.test = this.test.bind(this);
+
+		this.closeMsg = setInterval(() => {
+			this.setState({
+				isError: false,
+				isMsg: false,
+			});
+		}, 3000);
 	}
 
 	async saveChanges() {
@@ -107,6 +114,10 @@ class Sonarr extends React.Component {
 
 	componentDidMount() {
 		this.getSonarr();
+	}
+
+	componentWillUnmount() {
+		clearInterval(this.closeMsg);
 	}
 
 	render() {
