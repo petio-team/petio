@@ -467,31 +467,6 @@ async function saveShow(showObj) {
 				externalIds[source[0] + '_id'] = source[1];
 				if (source[0] === 'tmdb') tmdbId = source[1];
 			}
-<<<<<<< Updated upstream
-=======
-		} catch (err) {
-			console.log(`Unable to fetch meta for ${title}`);
-			return;
-		}
-	} else {
-		if (idSource === 'thetvdb') {
-			idSource = 'tvdb';
-		}
-		if (idSource === 'themoviedb') {
-			idSource = 'tmdb';
-		}
-		externalId = showObj.guid
-			.replace('com.plexapp.agents.', '')
-			.split('://')[1]
-			.split('?')[0];
-
-		if (idSource !== 'tmdb') {
-			try {
-				tmdbId = await externalIdTv(externalId, idSource);
-			} catch {
-				tmdbId = false;
-			}
->>>>>>> Stashed changes
 		} else {
 			if (idSource === 'thetvdb') {
 				idSource = 'tvdb';
