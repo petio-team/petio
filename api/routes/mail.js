@@ -44,7 +44,7 @@ router.get('/config', async (req, res) => {
 		data = {
 			emailEnabled: config.emailEnabled,
 			emailUser: config.emailUser,
-			emailPass: true,
+			emailPass: config.emailPass,
 			emailServer: config.emailServer,
 			emailPort: config.emailPort,
 			emailSecure: config.emailSecure,
@@ -56,25 +56,30 @@ router.get('/config', async (req, res) => {
 });
 
 router.get('/test', async (req, res) => {
-	let test = new Mailer().test();
-	res.json({ result: test });
+	let test = await new Mailer().test();
+	res.json({ result: test.result, error: test.error });
 });
 
-async function getConfig() {
-	let project_folder, configFile;
-	if (process.pkg) {
-		project_folder = path.dirname(process.execPath);
-		configFile = path.join(project_folder, './config/email.json');
-	} else {
-		project_folder = __dirname;
-		configFile = path.join(project_folder, '../config/email.json');
-	}
-	try {
-		let data = await fs.readFile(configFile);
-		return data;
-	} catch (err) {
-		return false;
-	}
+function getConfig() {
+	return new Promise((resolve, reject) => {
+		let project_folder, configFile;
+		if (process.pkg) {
+			project_folder = path.dirname(process.execPath);
+			configFile = path.join(project_folder, './config/email.json');
+		} else {
+			project_folder = __dirname;
+			configFile = path.join(project_folder, '../config/email.json');
+		}
+
+		fs.readFile(configFile, 'utf8', (err, data) => {
+			if (err) {
+				console.log(err);
+				resolve(false);
+				return;
+			}
+			resolve(JSON.parse(data));
+		});
+	});
 }
 
 function createConfig(data) {

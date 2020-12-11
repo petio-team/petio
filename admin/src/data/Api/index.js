@@ -21,6 +21,7 @@ import {
 	testRadarr,
 	saveEmailConfig,
 	getEmailConfig,
+	testEmail,
 } from './actions';
 
 export default {
@@ -46,4 +47,5 @@ export default {
 	testRadarr,
 	saveEmailConfig,
 	getEmailConfig,
+	testEmail,
 };

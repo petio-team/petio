@@ -13,7 +13,6 @@ class General extends React.Component {
 			email_server: '',
 			email_port: '',
 			email_secure: false,
-			email_pass_set: false,
 			email_enabled: false,
 		};
 
@@ -21,6 +20,7 @@ class General extends React.Component {
 		this.closeMsg = false;
 		this.saveEmail = this.saveEmail.bind(this);
 		this.loadConfigs = this.loadConfigs.bind(this);
+		this.testEmail = this.testEmail.bind(this);
 	}
 
 	inputChange(e) {
@@ -66,11 +66,11 @@ class General extends React.Component {
 			this.setState({
 				email_enabled: email.config.emailEnabled,
 				email_user: email.config.emailUser,
+				email_pass: email.config.emailPass,
 				email_server: email.config.emailServer,
 				email_port: email.config.emailPort,
 				email_secure: email.config.emailSecure,
 				loading: false,
-				email_pass_set: email.config.emailPass ? true : false,
 				isError: false,
 				isMsg: 'Email config loaded',
 			});
@@ -81,6 +81,45 @@ class General extends React.Component {
 				isError: 'Error getting email config',
 			});
 		}
+		clearInterval(this.closeMsg);
+		this.closeMsg = setInterval(() => {
+			this.setState({
+				isError: false,
+				isMsg: false,
+			});
+		}, 3000);
+	}
+
+	async testEmail() {
+		try {
+			await this.saveEmail();
+			let test = await Api.testEmail();
+			console.log(test);
+			if (test.result) {
+				this.setState({
+					isMsg: 'Email test passed',
+					isError: false,
+				});
+			} else {
+				this.setState({
+					isMsg: false,
+					isError: 'Email test Failed',
+				});
+			}
+		} catch (err) {
+			console.log(err);
+			this.setState({
+				isMsg: false,
+				isError: 'Email test Failed',
+			});
+		}
+		clearInterval(this.closeMsg);
+		this.closeMsg = setInterval(() => {
+			this.setState({
+				isError: false,
+				isMsg: false,
+			});
+		}, 3000);
 	}
 
 	componentDidMount() {
@@ -152,9 +191,6 @@ class General extends React.Component {
 						name="email_pass"
 						value={this.state.email_pass}
 						onChange={this.inputChange}
-						placeholder={
-							this.state.email_pass_set ? '••••••••••' : ''
-						}
 						autoComplete="new-password"
 						autoCorrect="off"
 						spellCheck="off"
@@ -182,12 +218,35 @@ class General extends React.Component {
 					<div className="checkbox-wrap mb--2">
 						<input
 							type="checkbox"
+							name="email_secure"
+							checked={this.state.email_secure}
+							onChange={this.inputChange}
+						/>
+						<p>
+							Use Secure{' '}
+							<small>(For port 587 or 25 use false)</small>
+						</p>
+					</div>
+					<div className="checkbox-wrap mb--2">
+						<input
+							type="checkbox"
 							name="email_enabled"
 							checked={this.state.email_enabled}
 							onChange={this.inputChange}
 						/>
 						<p>Enabled</p>
 					</div>
+					<p>
+						Using Gmail? Make sure to allow "less secure apps" to
+						allow Petio to send emails on your behalf. You can
+						change this setting{' '}
+						<a
+							target="_blank"
+							href="https://www.google.com/settings/security/lesssecureapps"
+						>
+							here
+						</a>
+					</p>
 
 					<button
 						className="btn"
@@ -197,7 +256,9 @@ class General extends React.Component {
 						Save
 					</button>
 
-					<button className="btn">Test</button>
+					<button className="btn" onClick={this.testEmail}>
+						Test
+					</button>
 				</section>
 			</>
 		);

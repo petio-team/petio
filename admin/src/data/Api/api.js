@@ -181,8 +181,16 @@ export let saveEmailConfig = (config) => {
 	return call(request, headers, 'post', body);
 };
 
-export let getEmailConfig = (config) => {
+export let getEmailConfig = () => {
 	let request = `${apiUrl}/mail/config`;
+	let headers = {
+		'Content-Type': 'application/json',
+	};
+	return call(request, headers, 'get').then((res) => res.json());
+};
+
+export let testEmail = () => {
+	let request = `${apiUrl}/mail/test`;
 	let headers = {
 		'Content-Type': 'application/json',
 	};

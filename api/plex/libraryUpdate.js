@@ -19,6 +19,7 @@ const tmdbApikey = prefs.tmdbApi;
 const tmdb = 'https://api.themoviedb.org/3/';
 const Sonarr = require('../services/sonarr');
 const Radarr = require('../services/radarr');
+const Mailer = require('../mail/mailer');
 
 let mailer = [];
 
@@ -724,7 +725,7 @@ function execMail() {
 	console.log(mailer);
 	mailer.forEach((mail, index) => {
 		setTimeout(() => {
-			outlook(mail[0], mail[1], mail[2], mail[3], mail[4]);
+			new Mailer().mail(mail[0], mail[1], mail[2], mail[3], mail[4]);
 		}, 10000 * (index + 1));
 	});
 	mailer = [];

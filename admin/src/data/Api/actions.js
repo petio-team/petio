@@ -366,9 +366,22 @@ export function saveEmailConfig(config) {
 	});
 }
 
-export function getEmailConfig(config) {
+export function getEmailConfig() {
 	return new Promise((resolve, reject) => {
-		api.getEmailConfig(config)
+		api.getEmailConfig()
+			.then((data) => {
+				resolve(data);
+			})
+			.catch((err) => {
+				console.log(err);
+				reject();
+			});
+	});
+}
+
+export function testEmail() {
+	return new Promise((resolve, reject) => {
+		api.testEmail()
 			.then((data) => {
 				resolve(data);
 			})

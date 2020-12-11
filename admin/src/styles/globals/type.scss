@@ -74,6 +74,12 @@ p {
 		line-height: 22px;
 		margin-bottom: 20px;
 	}
+
+	a {
+		text-decoration: underline;
+		color: $orange;
+		font-weight: 700;
+	}
 }
 
 .color {

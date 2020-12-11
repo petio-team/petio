@@ -7,10 +7,10 @@ class Mailer {
 		let project_folder, configFile;
 		if (process.pkg) {
 			project_folder = path.dirname(process.execPath);
-			configFile = path.join(project_folder, './config/radarr.json');
+			configFile = path.join(project_folder, './config/email.json');
 		} else {
 			project_folder = __dirname;
-			configFile = path.join(project_folder, '../config/radarr.json');
+			configFile = path.join(project_folder, '../config/email.json');
 		}
 		const configData = fs.readFileSync(configFile);
 		const configParse = JSON.parse(configData);
@@ -35,6 +35,7 @@ class Mailer {
 		const smtpServer = this.config.emailServer;
 		const smtpPort = parseInt(this.config.emailPort);
 		const secure = this.config.emailSecure ? true : false;
+		console.log(this.config);
 
 		const transporter = nodemailer.createTransport({
 			host: smtpServer,
@@ -58,16 +59,36 @@ class Mailer {
 	}
 
 	async test() {
-		let verify = await this.verify();
-		console.log(verify);
+		try {
+			let verify = await this.verify();
+			console.log(verify);
+			if (verify === true) {
+				return {
+					result: true,
+					error: false,
+				};
+			} else {
+				return {
+					result: false,
+					error: verify,
+				};
+			}
+		} catch (err) {
+			console.log(err);
+			return { result: false, error: err };
+		}
 	}
 
 	mail(subject, title, text, img, to = []) {
+		if (!this.config.emailEnabled) {
+			console.log('Email disabled, skipping sending emails');
+			return;
+		}
 		if (!this.transport) {
 			console.log('Email not configured, skipping sending emails');
 			return;
 		}
-		console.log(this.transport);
+		console.log('Dummy email would have sent');
 		return;
 
 		to.forEach((send, i) => {
