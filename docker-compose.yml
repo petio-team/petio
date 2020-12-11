@@ -4,7 +4,6 @@ networks:
         driver: bridge
 services:
     petio:
-        build: .
         image: ghcr.io/petio-team/petio:fe-latest
         container_name: 'petio'
         ports:
@@ -15,7 +14,6 @@ services:
             - petio-api
 
     petio-api:
-        build: .
         image: ghcr.io/petio-team/petio:be-latest
         container_name: 'petio-api'
         ports:
