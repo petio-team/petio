@@ -173,13 +173,6 @@ class Setup extends React.Component {
 			user: this.state.user,
 			server: selectedServer,
 			db: this.state.db,
-			email: {
-				emailUser: this.state.petioEmail,
-				emailPass: this.state.petioEmailPass,
-				emailServer: this.state.petioSMTP,
-				emailPort: this.state.petioPort,
-				tls: this.state.tls,
-			},
 		};
 		Api.saveConfig(config)
 			.then(() => {
@@ -301,61 +294,6 @@ class Setup extends React.Component {
 							value={this.state.db}
 							onChange={this.inputChange}
 						/>
-						<button
-							className="btn"
-							style={{ marginTop: '10px' }}
-							onClick={this.next}
-						>
-							Next
-						</button>
-					</div>
-				) : null}
-				{this.state.step === 5 ? (
-					<div className="step-5">
-						<p>Email Configuration</p>
-						<p>
-							Please fill out the details for the email address
-							you'd like to be used as the send address for any
-							Petio emails. The server admin's email address will
-							also receive a copy of all emails sent.
-						</p>
-						<input
-							type="email"
-							name="petioEmail"
-							placeholder="Email Address"
-							value={this.state.petioEmail}
-							onChange={this.inputChange}
-						/>
-						<input
-							type="password"
-							name="petioEmailPass"
-							placeholder="Email Password"
-							value={this.state.petioEmailPass}
-							onChange={this.inputChange}
-						/>
-						<input
-							type="text"
-							name="petioSMTP"
-							placeholder="SMTP Server / Host Name"
-							value={this.state.petioSMTP}
-							onChange={this.inputChange}
-						/>
-						<input
-							type="number"
-							name="petioPort"
-							placeholder="Port Number"
-							value={this.state.petioPort}
-							onChange={this.inputChange}
-						/>
-						{/* <div className="checkbox-wrap">
-							<input
-								type="checkbox"
-								name="tls"
-								value={this.state.tls}
-								onChange={this.inputChange}
-							/>
-							<p>Use TLS</p>
-						</div> */}
 						<button
 							className="btn"
 							style={{ marginTop: '10px' }}

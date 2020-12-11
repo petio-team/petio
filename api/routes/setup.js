@@ -20,8 +20,6 @@ router.post('/set', async (req, res) => {
 		plexIp: server.host,
 		plexPort: server.port,
 		plexToken: user.token,
-		emailUser: email.emailUser,
-		emailPass: email.emailPass,
 		adminUsername: user.username,
 		adminEmail: user.email,
 		adminPass: user.password,
@@ -29,9 +27,6 @@ router.post('/set', async (req, res) => {
 		adminThumb: user.thumb,
 		adminDisplayName: user.username,
 		fanartApi: '930d724053d35fcc01a1a6da58fbb80a',
-		emailServer: email.emailServer,
-		emailPort: email.emailPort,
-		tls: email.tls,
 	};
 	createConfig(JSON.stringify(configData, null, 2));
 });

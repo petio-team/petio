@@ -483,8 +483,7 @@ async function saveShow(showObj) {
 		if (idSource !== 'tmdb') {
 			try {
 				tmdbId = await externalIdTv(externalId, idSource);
-			} catch (err) {
-				console.log(err);
+			} catch {
 				tmdbId = false;
 			}
 		} else {
