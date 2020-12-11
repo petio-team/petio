@@ -28,12 +28,7 @@ class Sonarr extends React.Component {
 		this.saveChanges = this.saveChanges.bind(this);
 		this.test = this.test.bind(this);
 
-		this.closeMsg = setInterval(() => {
-			this.setState({
-				isError: false,
-				isMsg: false,
-			});
-		}, 3000);
+		this.closeMsg = false;
 	}
 
 	async saveChanges() {
@@ -48,10 +43,19 @@ class Sonarr extends React.Component {
 			profileId: this.state.sonarr_profile,
 		});
 		this.getSonarr();
+
 		this.setState({
 			isError: false,
 			isMsg: 'Sonarr settings saved!',
 		});
+
+		clearInterval(this.closeMsg);
+		this.closeMsg = setInterval(() => {
+			this.setState({
+				isError: false,
+				isMsg: false,
+			});
+		}, 3000);
 	}
 
 	async test() {
@@ -75,6 +79,13 @@ class Sonarr extends React.Component {
 				isMsg: false,
 			});
 		}
+		clearInterval(this.closeMsg);
+		this.closeMsg = setInterval(() => {
+			this.setState({
+				isError: false,
+				isMsg: false,
+			});
+		}, 3000);
 	}
 
 	inputChange(e) {
@@ -92,6 +103,9 @@ class Sonarr extends React.Component {
 	}
 
 	async getSonarr() {
+		this.setState({
+			loading: true,
+		});
 		try {
 			let sonarr = await Api.sonarrConfig();
 			this.setState({
@@ -109,6 +123,9 @@ class Sonarr extends React.Component {
 			});
 		} catch (err) {
 			console.log(err);
+			this.setState({
+				loading: false,
+			});
 		}
 	}
 
@@ -123,9 +140,21 @@ class Sonarr extends React.Component {
 	render() {
 		if (this.state.loading) {
 			return (
-				<div className="spinner--settings">
-					<Spinner />
-				</div>
+				<>
+					{this.state.isError ? (
+						<div className="setting-msg error">
+							<p>{this.state.isError}</p>
+						</div>
+					) : null}
+					{this.state.isMsg ? (
+						<div className="setting-msg good">
+							<p>{this.state.isMsg}</p>
+						</div>
+					) : null}
+					<div className="spinner--settings">
+						<Spinner />
+					</div>
+				</>
 			);
 		}
 		return (
@@ -153,17 +182,6 @@ class Sonarr extends React.Component {
 				</section>
 				<section>
 					<p className="main-title mb--2">Connection</p>
-					{this.state.sonarr_host ? (
-						<div className="checkbox-wrap mb--2">
-							<input
-								type="checkbox"
-								name="sonarr_active"
-								checked={this.state.sonarr_active}
-								onChange={this.inputChange}
-							/>
-							<p>Enabled</p>
-						</div>
-					) : null}
 					<label>Protocol</label>
 					<div className="select-wrap">
 						<select
@@ -263,17 +281,34 @@ class Sonarr extends React.Component {
 						) : (
 							<p>Loading...</p>
 						)}
+						{this.state.sonarr_host &&
+						this.state.sonarr_path &&
+						this.state.sonarr_profile ? (
+							<div className="checkbox-wrap mb--2">
+								<input
+									type="checkbox"
+									name="sonarr_active"
+									checked={this.state.sonarr_active}
+									onChange={this.inputChange}
+								/>
+								<p>Enabled</p>
+							</div>
+						) : null}
 					</section>
 				) : null}
 				<section>
-					<button className="btn" onClick={this.saveChanges}>
-						Save
-					</button>
-					<button
-						className="btn"
-						style={{ marginLeft: '10px' }}
-						onClick={this.test}
-					>
+					{this.state.sonarr_host &&
+					this.state.sonarr_path &&
+					this.state.sonarr_profile ? (
+						<button
+							className="btn"
+							onClick={this.saveChanges}
+							style={{ marginRight: '10px' }}
+						>
+							Save
+						</button>
+					) : null}
+					<button className="btn" onClick={this.test}>
 						Test
 					</button>
 				</section>

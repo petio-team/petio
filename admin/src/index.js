@@ -8,6 +8,7 @@ import './styles/main.scss';
 
 const startApp = () => {
 	initStore();
+	console.log(process.env);
 	ReactDOM.render(
 		<Provider store={store}>
 			<App />

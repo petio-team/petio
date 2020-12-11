@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { withRouter, Link, Switch, Route } from 'react-router-dom';
 
 import { ReactComponent as GeneralIcon } from '../assets/svg/settings-general.svg';
+import General from './settings/general';
 import Radarr from './settings/radarr';
 import Sonarr from './settings/sonarr';
 
@@ -67,9 +68,7 @@ class Settings extends React.Component {
 				<div className="settings--content">
 					<Switch>
 						<Route exact path="/settings">
-							<p className="main-title">
-								<section>General</section>
-							</p>
+							<General />
 						</Route>
 						<Route path="/settings/sonarr">
 							<Sonarr />
