@@ -36,6 +36,7 @@ class Sonarr {
 			let url = `${this.config.protocol}://${this.config.hostname}${
 				this.config.port ? ':' + this.config.port : ''
 			}${this.config.urlBase}/api/${endpoint}${paramsString}`;
+			console.log(url);
 			let args = {
 				method: method,
 				json: true,
@@ -126,6 +127,7 @@ class Sonarr {
 			console.log(add);
 			return add.id;
 		} catch (err) {
+			console.log(err);
 			console.log(`SERVICE - SONARR: Unable to add series ${err}`);
 			return false;
 		}
