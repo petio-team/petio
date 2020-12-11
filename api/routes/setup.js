@@ -7,7 +7,6 @@ router.post('/set', async (req, res) => {
 	let user = req.body.user;
 	let server = req.body.server;
 	let db = req.body.db;
-	let email = req.body.email;
 	if (!user || !server || !db) {
 		res.status(500).send('Missing Fields');
 	}
@@ -40,7 +39,7 @@ function createConfig(data) {
 		configFile = path.join(project_folder, '../config.json');
 	}
 	console.log(configFile);
-	fs.appendFileSync(configFile, data, (err) => {
+	fs.writeFileSync(configFile, data, (err) => {
 		if (err) {
 			console.log(err);
 		} else {

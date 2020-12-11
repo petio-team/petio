@@ -1,7 +1,1 @@
-{
-	"emailUser": "",
-	"emailPass": "",
-	"emailServer": "",
-	"emailPort": "",
-	"emailSecure": false
-}
+{"emailEnabled":false,"emailUser":"test","emailPass":"password","emailServer":"smtp","emailPort":"10","emailSecure":false}

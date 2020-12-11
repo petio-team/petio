@@ -31,7 +31,7 @@ const genieRoute = require('./routes/genie');
 const sessionsRoute = require('./routes/sessions');
 const setupRoute = require('./routes/setup');
 const servicesRoute = require('./routes/services');
-const Mailer = require('./mail/mailer');
+const mailRoute = require('./routes/mail');
 
 app.use(cors());
 app.options('*', cors());
@@ -65,11 +65,7 @@ if (!user_config) {
 	app.use('/genie', genieRoute);
 	app.use('/sessions', sessionsRoute);
 	app.use('/services', servicesRoute);
-
-	app.get('/mail-test', async (req, res) => {
-		let test = new Mailer().test();
-		res.json({ result: test });
-	});
+	app.use('/mail', mailRoute);
 
 	console.log('Connecting to Database, please wait....');
 	connectDb();

@@ -352,3 +352,29 @@ export function saveRadarrConfig(config) {
 			});
 	});
 }
+
+export function saveEmailConfig(config) {
+	return new Promise((resolve, reject) => {
+		api.saveEmailConfig(config)
+			.then(() => {
+				resolve();
+			})
+			.catch((err) => {
+				console.log(err);
+				reject();
+			});
+	});
+}
+
+export function getEmailConfig(config) {
+	return new Promise((resolve, reject) => {
+		api.getEmailConfig(config)
+			.then((data) => {
+				resolve(data);
+			})
+			.catch((err) => {
+				console.log(err);
+				reject();
+			});
+	});
+}
