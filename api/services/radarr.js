@@ -143,7 +143,7 @@ class Radarr {
 				);
 				if (updatedRequest) {
 					console.log(
-						`SERVICE - RADARR: Sonnar job added for ${job.title}`
+						`SERVICE - RADARR: Radarr job added for ${job.title}`
 					);
 				}
 			} catch (err) {
