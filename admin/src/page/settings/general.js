@@ -45,52 +45,6 @@ class General extends React.Component {
 					</p>
 					<button className="btn">Login with plex</button>
 				</section>
-				<section>
-					<p>Email Configuration</p>
-					<p>
-						Please fill out the details for the email address you'd
-						like to be used as the send address for any Petio
-						emails. The server admin's email address will also
-						receive a copy of all emails sent.
-					</p>
-					<input
-						type="email"
-						name="petioEmail"
-						placeholder="Email Address"
-						value={this.state.petioEmail}
-						onChange={this.inputChange}
-					/>
-					<input
-						type="password"
-						name="petioEmailPass"
-						placeholder="Email Password"
-						value={this.state.petioEmailPass}
-						onChange={this.inputChange}
-					/>
-					<input
-						type="text"
-						name="petioSMTP"
-						placeholder="SMTP Server / Host Name"
-						value={this.state.petioSMTP}
-						onChange={this.inputChange}
-					/>
-					<input
-						type="number"
-						name="petioPort"
-						placeholder="Port Number"
-						value={this.state.petioPort}
-						onChange={this.inputChange}
-					/>
-					<div className="checkbox-wrap">
-						<input
-							type="checkbox"
-							name="secure"
-							value={this.state.secure}
-							onChange={this.inputChange}
-						/>
-						<p>Use SSL</p>
-					</div>
-				</section>
 			</>
 		);
 	}

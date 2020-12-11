@@ -243,49 +243,75 @@ function getLibrary(id) {
 	});
 }
 
+function getMeta(id) {
+	let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/library/metadata/${id}?X-Plex-Token=${prefs.plexToken}`;
+	return new Promise((resolve, reject) => {
+		request(
+			url,
+			{
+				method: 'GET',
+				json: true,
+			},
+			function (err, data) {
+				if (err) {
+					reject('Unable to get meta');
+				}
+				resolve(data.MediaContainer.Metadata[0]);
+			}
+		);
+	});
+}
+
 async function saveMovie(movieObj) {
 	let movieDb = false;
-	let output = '';
 	try {
 		movieDb = await Movie.findById(movieObj.ratingKey);
 	} catch {
 		movieDb = false;
 	}
-	if (!movieDb) {
-		output += 'Movie Not found - ';
-		let idSource = movieObj.guid
-			.replace('com.plexapp.agents.', '')
-			.split('://')[0];
-		let externalId = false;
-		let externalIds = {};
-		if (idSource === 'plex') {
+
+	let idSource = movieObj.guid
+		.replace('com.plexapp.agents.', '')
+		.split('://')[0];
+	let externalId = false;
+	let externalIds = {};
+	if (idSource === 'plex') {
+		let title = movieObj.title;
+		try {
+			movieObj = await getMeta(movieObj.ratingKey);
 			for (let guid of movieObj.Guid) {
 				let source = guid.id.split('://');
 				externalIds[source[0] + '_id'] = source[1];
 			}
-		} else {
-			if (idSource === 'themoviedb') {
-				idSource = 'tmdb';
-			}
-
-			try {
-				externalId = movieObj.guid
-					.replace('com.plexapp.agents.', '')
-					.split('://')[1]
-					.split('?')[0];
-
-				externalIds = await externalIdMovie(externalId);
-			} catch (err) {
-				if (!externalId) {
-					console.log(
-						`Error - unable to parse id source from: ${movieObj.guid} - Movie: ${movieObj.title}`
-					);
-				} else {
-					console.log(err);
-				}
-			}
+		} catch (err) {
+			console.log(`Unable to fetch meta for ${title}`);
+			return;
+		}
+	} else {
+		if (idSource === 'themoviedb') {
+			idSource = 'tmdb';
 		}
 
+		try {
+			externalId = movieObj.guid
+				.replace('com.plexapp.agents.', '')
+				.split('://')[1]
+				.split('?')[0];
+
+			externalIds = await externalIdMovie(externalId);
+			externalIds.tmdb_id = externalIds.id ? externalIds.id : false;
+		} catch (err) {
+			if (!externalId) {
+				console.log(
+					`Error - unable to parse id source from: ${movieObj.guid} - Movie: ${movieObj.title}`
+				);
+			} else {
+				console.log(err);
+			}
+		}
+	}
+
+	if (!movieDb) {
 		try {
 			let newMovie = new Movie({
 				_id: movieObj.ratingKey,
@@ -320,38 +346,16 @@ async function saveMovie(movieObj) {
 				imdb_id: externalIds.hasOwnProperty('imdb_id')
 					? externalIds.imdb_id
 					: false,
-				tmdb_id: externalIds.hasOwnProperty('id')
-					? externalIds.id
+				tmdb_id: externalIds.hasOwnProperty('tmdb_id')
+					? externalIds.tmdb_id
 					: false,
 			});
 			movieDb = await newMovie.save();
-		} catch (err) {
-			// console.log(`LIB CRON: ${err}`);
-		}
-		if (movieDb) {
-			output += 'Created ----------- New Movie Added!';
 			mailAdded(movieObj, externalId);
-		} else {
-			output += 'Not Created';
-		}
-	} else {
-		output += 'Movie Found in Db';
-		let idSource = movieObj.guid
-			.replace('com.plexapp.agents.', '')
-			.split('://')[0];
-		if (idSource === 'themoviedb') {
-			idSource = 'tmdb';
-		}
-		let externalId = movieObj.guid
-			.replace('com.plexapp.agents.', '')
-			.split('://')[1]
-			.split('?')[0];
-		let externalIds = {};
-		try {
-			externalIds = await externalIdMovie(externalId);
 		} catch (err) {
 			console.log(`LIB CRON: ${err}`);
 		}
+	} else {
 		try {
 			updatedMovie = await Movie.findOneAndUpdate(
 				{
@@ -390,31 +394,29 @@ async function saveMovie(movieObj) {
 						imdb_id: externalIds.hasOwnProperty('imdb_id')
 							? externalIds.imdb_id
 							: false,
-						tmdb_id: externalIds.hasOwnProperty('id')
-							? externalIds.id
+						tmdb_id: externalIds.hasOwnProperty('tmdb_id')
+							? externalIds.tmdb_id
 							: false,
 					},
 				},
 				{ useFindAndModify: false }
 			);
 			mailAdded(movieObj, externalId);
-		} catch {
+		} catch (err) {
 			movieDb = false;
+			console.log(err);
 		}
 	}
-	// console.log(movieObj.title + ' - ' + output);
 }
 
 async function saveMusic(musicObj) {
 	let musicDb = false;
-	let output = '';
 	try {
 		musicDb = await Music.findById(musicObj.ratingKey);
 	} catch {
 		musicDb = false;
 	}
 	if (!musicDb) {
-		output += 'Artist Not found - ';
 		try {
 			let newMusic = new Music({
 				_id: musicObj.ratingKey,
@@ -435,65 +437,66 @@ async function saveMusic(musicObj) {
 		} catch (err) {
 			console.log(`LIB CRON: ${err}`);
 		}
-		if (musicDb) {
-			output += 'Created ----------- New Music Added!';
-		} else {
-			output += 'Not Created';
-		}
-	} else {
-		output += 'Artist Found in Db';
 	}
-	// console.log(musicObj.title + ' - ' + output);
 }
 
 async function saveShow(showObj) {
 	let showDb = false;
-	let output = '';
+
 	try {
 		showDb = await Show.findById(showObj.ratingKey);
 	} catch {
 		showDb = false;
 	}
-	if (!showDb) {
-		output += 'Show Not found - ';
-		let idSource = showObj.guid
-			.replace('com.plexapp.agents.', '')
-			.split('://')[0];
-		let externalIds = {};
-		let tmdbId = false;
-		if (idSource === 'plex') {
+
+	let idSource = showObj.guid
+		.replace('com.plexapp.agents.', '')
+		.split('://')[0];
+	let externalIds = {};
+	let tmdbId = false;
+	let externalId = false;
+	if (idSource === 'plex') {
+		let title = showObj.title;
+		try {
+			showObj = await getMeta(showObj.ratingKey);
 			for (let guid of showObj.Guid) {
 				let source = guid.id.split('://');
 				externalIds[source[0] + '_id'] = source[1];
 				if (source[0] === 'tmdb') tmdbId = source[1];
 			}
-		} else {
-			if (idSource === 'thetvdb') {
-				idSource = 'tvdb';
-			}
-			if (idSource === 'themoviedb') {
-				idSource = 'tmdb';
-			}
-			let externalId = showObj.guid
-				.replace('com.plexapp.agents.', '')
-				.split('://')[1]
-				.split('?')[0];
+		} catch (err) {
+			console.log(`Unable to fetch meta for ${title}`);
+			return;
+		}
+	} else {
+		if (idSource === 'thetvdb') {
+			idSource = 'tvdb';
+		}
+		if (idSource === 'themoviedb') {
+			idSource = 'tmdb';
+		}
+		externalId = showObj.guid
+			.replace('com.plexapp.agents.', '')
+			.split('://')[1]
+			.split('?')[0];
 
-			if (idSource !== 'tmdb') {
-				try {
-					tmdbId = await externalIdTv(externalId, idSource);
-				} catch (err) {
-					console.log(err);
-					tmdbId = false;
-				}
-			} else {
-				try {
-					externalIds = await tmdbExternalIds(externalId);
-				} catch (err) {
-					console.log(err);
-				}
+		if (idSource !== 'tmdb') {
+			try {
+				tmdbId = await externalIdTv(externalId, idSource);
+			} catch (err) {
+				console.log(err);
+				tmdbId = false;
+			}
+		} else {
+			try {
+				externalIds = await tmdbExternalIds(externalId);
+			} catch (err) {
+				console.log(err);
 			}
 		}
+	}
+
+	if (!showDb) {
 		try {
 			let newShow = new Show({
 				_id: showObj.ratingKey,
@@ -528,45 +531,11 @@ async function saveShow(showObj) {
 				tmdb_id: idSource === 'tmdb' ? externalId : tmdbId,
 			});
 			showDb = await newShow.save();
+			mailAdded(showObj, externalId);
 		} catch (err) {
 			console.log(`LIB CRON: ${err}`);
 		}
-		if (showDb) {
-			output += 'Created ----------- New Show Added!';
-			mailAdded(showObj, externalId);
-		} else {
-			output += 'Not Created';
-		}
 	} else {
-		output += 'Show Found in Db';
-		let idSource = showObj.guid
-			.replace('com.plexapp.agents.', '')
-			.split('://')[0];
-		if (idSource === 'thetvdb') {
-			idSource = 'tvdb';
-		}
-		if (idSource === 'themoviedb') {
-			idSource = 'tmdb';
-		}
-		let externalId = showObj.guid
-			.replace('com.plexapp.agents.', '')
-			.split('://')[1]
-			.split('?')[0];
-		let externalIds = {};
-		let tmdbId = false;
-		if (idSource !== 'tmdb') {
-			try {
-				tmdbId = await externalIdTv(externalId, idSource);
-			} catch (err) {
-				console.log(`LIB CRON: ${err} ${showObj.title}`);
-			}
-		} else {
-			try {
-				externalIds = await tmdbExternalIds(externalId);
-			} catch (err) {
-				console.log(`LIB CRON: ${err}`);
-			}
-		}
 		try {
 			updatedShow = await Show.findOneAndUpdate(
 				{
@@ -618,7 +587,6 @@ async function saveShow(showObj) {
 			showDb = false;
 		}
 	}
-	// console.log(showObj.title + ' - ' + output);
 }
 
 // Get Plex Friends

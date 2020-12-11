@@ -24,6 +24,8 @@ services:
             - mongo
         environment:
             - 'REACT_APP_DB_DEFAULT=mongodb://mongo:27017'
+        volumes:
+            - ./config:/app/config
 
     mongo:
         image: mongo:latest

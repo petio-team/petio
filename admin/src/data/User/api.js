@@ -1,11 +1,14 @@
-const apiUrl = `${window.location.protocol}//${window.location.host}/api`;
+const apiUrl =
+	process.env.NODE_ENV === 'development'
+		? 'http://localhost:7778'
+		: `${window.location.protocol}//${window.location.host}/api`;
 
 export function login(username, password, admin = false, token = false) {
 	let request = `${apiUrl}/login`;
 	let headers = {
 		'Content-Type': 'application/json',
 	};
-	return process(request, 'post', headers, {
+	return call(request, 'post', headers, {
 		username: username,
 		password: password,
 		admin: admin,
@@ -18,10 +21,10 @@ export let getRequests = () => {
 	let headers = {
 		'Content-Type': 'application/json',
 	};
-	return process(request, 'get', headers).then((res) => res.json());
+	return call(request, 'get', headers).then((res) => res.json());
 };
 
-function process(url, method, headers, body = null) {
+function call(url, method, headers, body = null) {
 	let args = {
 		headers: headers,
 		method: method,

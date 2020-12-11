@@ -98,7 +98,7 @@ class Radarr {
 	}
 
 	lookup(id) {
-		return this.get('movie/lookup', {
+		return this.get('movie/lookup/tmdb', {
 			tmdbId: id,
 		});
 	}
@@ -129,7 +129,7 @@ class Radarr {
 		for (let job of jobQ) {
 			try {
 				let radarrData = await this.lookup(job.tmdb_id);
-				let radarrId = await this.add(radarrData[0]);
+				let radarrId = await this.add(radarrData);
 				let updatedRequest = await Request.findOneAndUpdate(
 					{
 						_id: job._id,
@@ -143,10 +143,11 @@ class Radarr {
 				);
 				if (updatedRequest) {
 					console.log(
-						`SERVICE - RADARR: Sonnar job added for ${job.title}`
+						`SERVICE - RADARR: Radarr job added for ${job.title}`
 					);
 				}
 			} catch (err) {
+				console.log(err);
 				console.log(
 					`SERVICE - RADARR: Unable to add movie ${job.title}`
 				);

@@ -28,12 +28,7 @@ class Radarr extends React.Component {
 		this.saveChanges = this.saveChanges.bind(this);
 		this.test = this.test.bind(this);
 
-		this.closeMsg = setInterval(() => {
-			this.setState({
-				isError: false,
-				isMsg: false,
-			});
-		}, 3000);
+		this.closeMsg = false;
 	}
 
 	async saveChanges() {
@@ -47,11 +42,20 @@ class Radarr extends React.Component {
 			rootPath: this.state.radarr_path,
 			profileId: this.state.radarr_profile,
 		});
+
 		this.getRadarr();
+
 		this.setState({
 			isError: false,
 			isMsg: 'Radarr settings saved!',
 		});
+		clearInterval(this.closeMsg);
+		this.closeMsg = setInterval(() => {
+			this.setState({
+				isError: false,
+				isMsg: false,
+			});
+		}, 3000);
 	}
 
 	async test() {
@@ -75,6 +79,13 @@ class Radarr extends React.Component {
 				isMsg: false,
 			});
 		}
+		clearInterval(this.closeMsg);
+		this.closeMsg = setInterval(() => {
+			this.setState({
+				isError: false,
+				isMsg: false,
+			});
+		}, 3000);
 	}
 
 	inputChange(e) {
@@ -92,6 +103,9 @@ class Radarr extends React.Component {
 	}
 
 	async getRadarr() {
+		this.setState({
+			loading: true,
+		});
 		try {
 			let radarr = await Api.radarrConfig();
 			this.setState({
@@ -109,6 +123,9 @@ class Radarr extends React.Component {
 			});
 		} catch (err) {
 			console.log(err);
+			this.setState({
+				loading: false,
+			});
 		}
 	}
 
@@ -123,9 +140,21 @@ class Radarr extends React.Component {
 	render() {
 		if (this.state.loading) {
 			return (
-				<div className="spinner--settings">
-					<Spinner />
-				</div>
+				<>
+					{this.state.isError ? (
+						<div className="setting-msg error">
+							<p>{this.state.isError}</p>
+						</div>
+					) : null}
+					{this.state.isMsg ? (
+						<div className="setting-msg good">
+							<p>{this.state.isMsg}</p>
+						</div>
+					) : null}
+					<div className="spinner--settings">
+						<Spinner />
+					</div>
+				</>
 			);
 		}
 		return (
@@ -154,17 +183,6 @@ class Radarr extends React.Component {
 				</section>
 				<section>
 					<p className="main-title mb--2">Connection</p>
-					{this.state.radarr_host ? (
-						<div className="checkbox-wrap mb--2">
-							<input
-								type="checkbox"
-								name="radarr_active"
-								checked={this.state.radarr_active}
-								onChange={this.inputChange}
-							/>
-							<p>Enabled</p>
-						</div>
-					) : null}
 					<label>Protocol</label>
 					<div className="select-wrap">
 						<select
@@ -264,17 +282,34 @@ class Radarr extends React.Component {
 						) : (
 							<p>Loading...</p>
 						)}
+						{this.state.radarr_host &&
+						this.state.radarr_path &&
+						this.state.radarr_profile ? (
+							<div className="checkbox-wrap mb--2">
+								<input
+									type="checkbox"
+									name="radarr_active"
+									checked={this.state.radarr_active}
+									onChange={this.inputChange}
+								/>
+								<p>Enabled</p>
+							</div>
+						) : null}
 					</section>
 				) : null}
 				<section>
-					<button className="btn" onClick={this.saveChanges}>
-						Save
-					</button>
-					<button
-						className="btn"
-						style={{ marginLeft: '10px' }}
-						onClick={this.test}
-					>
+					{this.state.radarr_host &&
+					this.state.radarr_path &&
+					this.state.radarr_profile ? (
+						<button
+							className="btn"
+							onClick={this.saveChanges}
+							style={{ marginRight: '10px' }}
+						>
+							Save
+						</button>
+					) : null}
+					<button className="btn" onClick={this.test}>
 						Test
 					</button>
 				</section>
