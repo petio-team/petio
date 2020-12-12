@@ -19,6 +19,9 @@ import {
 	radarrConfig,
 	testSonarr,
 	testRadarr,
+	saveEmailConfig,
+	getEmailConfig,
+	testEmail,
 } from './actions';
 
 export default {
@@ -42,4 +45,7 @@ export default {
 	radarrConfig,
 	testSonarr,
 	testRadarr,
+	saveEmailConfig,
+	getEmailConfig,
+	testEmail,
 };

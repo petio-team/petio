@@ -19,6 +19,7 @@ const tmdbApikey = prefs.tmdbApi;
 const tmdb = 'https://api.themoviedb.org/3/';
 const Sonarr = require('../services/sonarr');
 const Radarr = require('../services/radarr');
+const Mailer = require('../mail/mailer');
 
 let mailer = [];
 
@@ -483,8 +484,7 @@ async function saveShow(showObj) {
 		if (idSource !== 'tmdb') {
 			try {
 				tmdbId = await externalIdTv(externalId, idSource);
-			} catch (err) {
-				console.log(err);
+			} catch {
 				tmdbId = false;
 			}
 		} else {
@@ -725,7 +725,7 @@ function execMail() {
 	console.log(mailer);
 	mailer.forEach((mail, index) => {
 		setTimeout(() => {
-			outlook(mail[0], mail[1], mail[2], mail[3], mail[4]);
+			new Mailer().mail(mail[0], mail[1], mail[2], mail[3], mail[4]);
 		}, 10000 * (index + 1));
 	});
 	mailer = [];
@@ -747,7 +747,7 @@ function externalIdTv(id, type) {
 				if (!data || !data.tv_results) {
 					reject('Error no data returned from tmdb TV external');
 				} else if (data.tv_results.length === 0) {
-					reject('No matches');
+					reject();
 				} else {
 					resolve(data.tv_results[0].id);
 				}

@@ -7,7 +7,6 @@ router.post('/set', async (req, res) => {
 	let user = req.body.user;
 	let server = req.body.server;
 	let db = req.body.db;
-	let email = req.body.email;
 	if (!user || !server || !db) {
 		res.status(500).send('Missing Fields');
 	}
@@ -20,8 +19,6 @@ router.post('/set', async (req, res) => {
 		plexIp: server.host,
 		plexPort: server.port,
 		plexToken: user.token,
-		emailUser: email.emailUser,
-		emailPass: email.emailPass,
 		adminUsername: user.username,
 		adminEmail: user.email,
 		adminPass: user.password,
@@ -29,9 +26,6 @@ router.post('/set', async (req, res) => {
 		adminThumb: user.thumb,
 		adminDisplayName: user.username,
 		fanartApi: '930d724053d35fcc01a1a6da58fbb80a',
-		emailServer: email.emailServer,
-		emailPort: email.emailPort,
-		tls: email.tls,
 	};
 	createConfig(JSON.stringify(configData, null, 2));
 });
@@ -45,7 +39,7 @@ function createConfig(data) {
 		configFile = path.join(project_folder, '../config.json');
 	}
 	console.log(configFile);
-	fs.appendFileSync(configFile, data, (err) => {
+	fs.writeFileSync(configFile, data, (err) => {
 		if (err) {
 			console.log(err);
 		} else {

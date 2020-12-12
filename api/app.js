@@ -31,6 +31,7 @@ const genieRoute = require('./routes/genie');
 const sessionsRoute = require('./routes/sessions');
 const setupRoute = require('./routes/setup');
 const servicesRoute = require('./routes/services');
+const mailRoute = require('./routes/mail');
 
 app.use(cors());
 app.options('*', cors());
@@ -64,11 +65,7 @@ if (!user_config) {
 	app.use('/genie', genieRoute);
 	app.use('/sessions', sessionsRoute);
 	app.use('/services', servicesRoute);
-
-	app.get('/mail-test', async (req, res) => {
-		// testMail();
-		res.send(200);
-	});
+	app.use('/mail', mailRoute);
 
 	console.log('Connecting to Database, please wait....');
 	connectDb();
@@ -97,6 +94,8 @@ if (!user_config) {
 			console.log('Library Watch Running:', d);
 			libraryUpdate();
 		});
+
+		libraryWatch.start();
 
 		libraryUpdate();
 	}
