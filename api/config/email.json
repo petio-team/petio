@@ -1,1 +1,7 @@
-{"emailEnabled":false,"emailUser":"ashdyson@onemedia.club","emailPass":"119812525aD$","emailServer":"smtp.gmail.com","emailPort":"465","emailSecure":true}
+{
+	"emailUser": "",
+	"emailPass": "",
+	"emailServer": "",
+	"emailPort": "",
+	"emailSecure": false
+}

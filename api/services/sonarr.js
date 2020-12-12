@@ -2,6 +2,7 @@ const request = require('xhr-request');
 const Request = require('../models/request');
 const fs = require('fs');
 const path = require('path');
+var sanitize = require('sanitize-filename');
 
 class Sonarr {
 	constructor() {
@@ -117,7 +118,9 @@ class Sonarr {
 
 	async add(seriesData) {
 		seriesData.ProfileId = this.config.profileId;
-		seriesData.Path = `${this.config.rootPath}${seriesData.title} (${seriesData.year})`;
+		seriesData.Path = `${this.config.rootPath}${sanitize(
+			seriesData.title
+		)} (${seriesData.year})`;
 		seriesData.addOptions = {
 			searchForMissingEpisodes: true,
 		};

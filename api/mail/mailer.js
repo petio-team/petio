@@ -1,6 +1,11 @@
 const nodemailer = require('nodemailer');
 const fs = require('fs');
 const path = require('path');
+const user_config = require('../util/config');
+if (!user_config) {
+	return;
+}
+const prefs = JSON.parse(user_config);
 
 class Mailer {
 	constructor() {
@@ -88,32 +93,31 @@ class Mailer {
 			console.log('Email not configured, skipping sending emails');
 			return;
 		}
-		console.log('Dummy email would have sent');
-		return;
 
-		to.forEach((send, i) => {
-			let timeout = i * 2000;
-			i++;
-			setTimeout(() => {
-				console.log(
-					`Sending email from: ${emailUser} to ${send} with the subject ${subject}`
-				);
-				transporter.sendMail({
-					auth: {
-						user: emailUser,
-						pass: emailPass,
-					},
-					from: `"Petio" <${emailUser}>`,
-					to: [send, adminEmail],
-					subject: subject,
-					html: mailHtml(title, text, img),
-					text: text,
-					onError: (e) => console.log(e),
-					onSuccess: (i) =>
-						console.log('Message sent: %s', i.messageId),
-				});
-			}, timeout); //timeout between emails
-		});
+		try {
+			to.forEach((send, i) => {
+				let timeout = i * 2000;
+				i++;
+				setTimeout(() => {
+					console.log(
+						`Sending email from: ${this.config.emailUser} to ${send} with the subject ${subject}`
+					);
+					this.transport.sendMail({
+						from: `"Petio" <${this.config.emailUser}>`,
+						to: [send, prefs.adminEmail],
+						subject: subject,
+						html: this.mailHtml(title, text, img),
+						text: text,
+						onError: (e) => console.log(e),
+						onSuccess: (i) =>
+							console.log('Message sent: %s', i.messageId),
+					});
+				}, timeout); //timeout between emails
+			});
+		} catch (err) {
+			console.log('Email failed');
+			console.log(err);
+		}
 	}
 }
 

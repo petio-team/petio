@@ -2,6 +2,7 @@ const request = require('xhr-request');
 const Request = require('../models/request');
 const fs = require('fs');
 const path = require('path');
+var sanitize = require('sanitize-filename');
 
 class Radarr {
 	constructor() {
@@ -109,7 +110,9 @@ class Radarr {
 
 	async add(movieData) {
 		movieData.ProfileId = this.config.profileId;
-		movieData.Path = `${this.config.rootPath}${movieData.title} (${movieData.year})`;
+		movieData.Path = `${this.config.rootPath}${sanitize(
+			movieData.title
+		)} (${movieData.year})`;
 		movieData.addOptions = {
 			searchForMovie: true,
 		};

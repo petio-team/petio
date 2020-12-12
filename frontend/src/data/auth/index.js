@@ -1,7 +1,10 @@
 import { store } from '../store';
 import * as types from '../actionTypes';
 
-const PlexRequestApi = `${window.location.protocol}//${window.location.host}/api`;
+const PlexRequestApi =
+	process.env.NODE_ENV === 'development'
+		? 'http://localhost:7778'
+		: `${window.location.protocol}//${window.location.host}/api`;
 
 export function initAuth() {
 	finalise({

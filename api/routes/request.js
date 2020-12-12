@@ -9,7 +9,9 @@ const express = require('express');
 const router = express.Router();
 const Request = require('../models/request');
 const User = require('../models/user');
-const outlook = require('../mail/mailer');
+const Mailer = require('../mail/mailer');
+const Sonarr = require('../services/sonarr');
+const Radarr = require('../services/radarr');
 
 router.post('/add', async (req, res) => {
 	let user = req.body.user;
@@ -38,6 +40,10 @@ router.post('/add', async (req, res) => {
 			const savedRequest = await newRequest.save();
 			res.json(savedRequest);
 			mailRequest(user._id, request.id);
+			let sonarr = new Sonarr();
+			let radarr = new Radarr();
+			sonarr.getRequests();
+			radarr.getRequests();
 		} catch (err) {
 			console.log(err);
 			res.status(500).json({ error: 'error adding request' });
@@ -55,7 +61,7 @@ async function mailRequest(user, request) {
 	const requestData = await Request.findOne({ requestId: request });
 	console.log(requestData);
 	let type = requestData.type === 'tv' ? 'TV Show' : 'Movie';
-	outlook(
+	new Mailer().mail(
 		`You've just requested the ${type} ${requestData.title}`,
 		`${type}: ${requestData.title}`,
 		`Your request has been received and you'll receive an email once it has been added to Plex!`,
