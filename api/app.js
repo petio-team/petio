@@ -95,6 +95,8 @@ if (!user_config) {
 			libraryUpdate();
 		});
 
+		libraryWatch.start();
+
 		libraryUpdate();
 	}
 }
