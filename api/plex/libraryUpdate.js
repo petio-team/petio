@@ -236,11 +236,16 @@ function getLibrary(id) {
 				json: true,
 			},
 			function (err, data) {
-				if (err || !data) {
+				if (err) {
 					console.log(data);
 					reject('Unable to get library content');
 				}
-				resolve(data.MediaContainer);
+				if (data) {
+					resolve(data.MediaContainer);
+				} else {
+					console.log(data);
+					reject('Unable to get library content');
+				}
 			}
 		);
 	});
