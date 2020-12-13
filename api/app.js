@@ -8,11 +8,10 @@ const https = require('https');
 const fs = require('fs');
 
 // Config
-const user_config = require('./util/config');
-const prefs = JSON.parse(user_config);
+const getConfig = require('./util/config');
 
 // Plex
-const libraryUpdate = require('./plex/libraryUpdate');
+const LibraryUpdate = require('./plex/libraryUpdate');
 
 // Routes
 const movieRoute = require('./routes/movie');
@@ -38,65 +37,73 @@ app.options('*', cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/config', async (req, res) => {
-	res.json(user_config ? { config: true } : { config: false });
+const libraryWatch = new CronJob('0 */30 * * * *', function () {
+	const d = new Date();
+	console.log('Library Watch Running:', d);
+	new LibraryUpdate().run();
 });
 
-if (!user_config) {
+init();
+
+function restart() {
+	app.stop();
+	init();
+}
+
+function init() {
 	console.log('Starting Server ');
-	console.log('No config, entering setup mode');
-	app.use('/setup', setupRoute);
 	app.listen(7778);
 	console.log('Listening on 7778');
-} else {
-	// Routing
-	app.use('/login', loginRoute);
-	app.use('/movie', movieRoute);
-	app.use('/show', showRoute);
-	app.use('/person', personRoute);
-	app.use('/search', searchRoute);
-	app.use('/trending', trendingRoute);
-	app.use('/request', requestRoute);
-	app.use('/top', topRoute);
-	app.use('/history', historyRoute);
-	app.use('/plex', plexRoute);
-	app.use('/review', reviewRoute);
-	app.use('/user', userRoute);
-	app.use('/genie', genieRoute);
-	app.use('/sessions', sessionsRoute);
-	app.use('/services', servicesRoute);
-	app.use('/mail', mailRoute);
-
-	console.log('Connecting to Database, please wait....');
-	connectDb();
-
-	async function connectDb() {
-		try {
-			await mongoose.connect(prefs.DB_URL, {
-				useNewUrlParser: true,
-				useUnifiedTopology: true,
-			});
-			console.log('Connected to Database ');
-			start();
-		} catch (err) {
-			console.log('Fatal error - database misconfigured!');
-			console.log('Removing config please restart');
-			fs.unlinkSync('./config.json');
-		}
-	}
-
-	async function start() {
+	const config = getConfig();
+	app.get('/config', async (req, res) => {
+		res.json(config ? { config: true } : { config: false });
+	});
+	if (!config) {
 		console.log('Starting Server ');
-		app.listen(7778);
-		console.log('Listening on 7778');
-		const libraryWatch = new CronJob('0 */30 * * * *', function () {
-			const d = new Date();
-			console.log('Library Watch Running:', d);
-			libraryUpdate();
-		});
+		console.log('No config, entering setup mode');
+		app.use('/setup', setupRoute);
+	} else {
+		// Routing
+		app.use('/login', loginRoute);
+		app.use('/movie', movieRoute);
+		app.use('/show', showRoute);
+		app.use('/person', personRoute);
+		app.use('/search', searchRoute);
+		app.use('/trending', trendingRoute);
+		app.use('/request', requestRoute);
+		app.use('/top', topRoute);
+		app.use('/history', historyRoute);
+		app.use('/plex', plexRoute);
+		app.use('/review', reviewRoute);
+		app.use('/user', userRoute);
+		app.use('/genie', genieRoute);
+		app.use('/sessions', sessionsRoute);
+		app.use('/services', servicesRoute);
+		app.use('/mail', mailRoute);
 
-		libraryWatch.start();
-
-		libraryUpdate();
+		console.log('Connecting to Database, please wait....');
+		connectDb();
 	}
 }
+
+async function connectDb() {
+	try {
+		await mongoose.connect(prefs.DB_URL, {
+			useNewUrlParser: true,
+			useUnifiedTopology: true,
+		});
+		console.log('Connected to Database ');
+		start();
+	} catch (err) {
+		console.log('Fatal error - database misconfigured!');
+		console.log('Removing config please restart');
+		fs.unlinkSync('./config/config.json');
+	}
+}
+
+async function start() {
+	libraryWatch.start();
+	new LibraryUpdate().run();
+}
+
+module.exports = restart;
