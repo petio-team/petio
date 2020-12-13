@@ -100,7 +100,8 @@ function getLibraries() {
 				json: true,
 			},
 			function (err, data) {
-				if (err) {
+				if (err || !data) {
+					console.log(data);
 					console.log('LIB CRON: Library update failed!');
 					reject('Unable to get library info');
 					throw err;
@@ -235,7 +236,8 @@ function getLibrary(id) {
 				json: true,
 			},
 			function (err, data) {
-				if (err) {
+				if (err || !data) {
+					console.log(data);
 					reject('Unable to get library content');
 				}
 				resolve(data.MediaContainer);
@@ -254,7 +256,8 @@ function getMeta(id) {
 				json: true,
 			},
 			function (err, data) {
-				if (err) {
+				if (err || !data) {
+					console.log(data);
 					reject('Unable to get meta');
 				}
 				resolve(data.MediaContainer.Metadata[0]);
