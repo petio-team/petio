@@ -4,11 +4,7 @@ const request = require('xhr-request');
 const Movie = require('../models/movie');
 
 // Config
-const user_config = require('../util/config');
-if (!user_config) {
-	return;
-}
-const prefs = JSON.parse(user_config);
+const getConfig = require('../util/config');
 
 router.get('/:id/movie', async (req, res) => {
 	let id = req.params.id;
@@ -125,6 +121,7 @@ router.get('/:id/movie', async (req, res) => {
 });
 
 function getHistory(id) {
+	const prefs = getConfig();
 	return new Promise((resolve, reject) => {
 		let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/status/sessions/history/all?sort=viewedAt%3Adesc&accountID=${id}&viewedAt>=0&limit=20&X-Plex-Token=${prefs.plexToken}`;
 		request(

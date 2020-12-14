@@ -1,12 +1,5 @@
 // Config
-const user_config = require('../util/config');
-if (!user_config) {
-	return;
-}
-const prefs = JSON.parse(user_config);
-
-const tmdbApikey = prefs.tmdbApi;
-const tmdb = 'https://api.themoviedb.org/3/';
+const getConfig = require('../util/config');
 const request = require('xhr-request');
 const onServer = require('../plex/onServer');
 const fanartLookup = require('../fanart');
@@ -67,6 +60,9 @@ async function trending() {
 }
 
 function getPerson() {
+	const config = getConfig();
+	const tmdbApikey = config.tmdbApi;
+	const tmdb = 'https://api.themoviedb.org/3/';
 	let url = `${tmdb}trending/person/week?api_key=${tmdbApikey}&append_to_response=images`;
 	return new Promise((resolve, reject) => {
 		request(
@@ -87,6 +83,9 @@ function getPerson() {
 }
 
 function getMovies() {
+	const config = getConfig();
+	const tmdbApikey = config.tmdbApi;
+	const tmdb = 'https://api.themoviedb.org/3/';
 	let url = `${tmdb}trending/movie/week?api_key=${tmdbApikey}&append_to_response=images`;
 	return new Promise((resolve, reject) => {
 		request(
@@ -107,6 +106,9 @@ function getMovies() {
 }
 
 function getShows() {
+	const config = getConfig();
+	const tmdbApikey = config.tmdbApi;
+	const tmdb = 'https://api.themoviedb.org/3/';
 	let url = `${tmdb}trending/tv/week?api_key=${tmdbApikey}&append_to_response=images`;
 	return new Promise((resolve, reject) => {
 		request(

@@ -178,12 +178,13 @@ class Setup extends React.Component {
 			.then(() => {
 				setTimeout(() => {
 					this.props.checkConfig();
-				}, 30000);
+				}, 10000);
 			})
 			.catch((err) => {
 				alert(
 					'Setup failed, check API is running and no errors, if this persists please contact the dev team.'
 				);
+				window.location.reload(false);
 			});
 	}
 

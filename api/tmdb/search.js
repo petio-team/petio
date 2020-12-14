@@ -1,12 +1,5 @@
 // Config
-const user_config = require('../util/config');
-if (!user_config) {
-	return;
-}
-const prefs = JSON.parse(user_config);
-
-const tmdbApikey = prefs.tmdbApi;
-const tmdb = 'https://api.themoviedb.org/3/';
+const getConfig = require('../util/config');
 const request = require('xhr-request');
 const onServer = require('../plex/onServer');
 
@@ -33,18 +26,27 @@ async function search(term) {
 }
 
 async function searchMovies(term) {
+	const config = getConfig();
+	const tmdbApikey = config.tmdbApi;
+	const tmdb = 'https://api.themoviedb.org/3/';
 	let url = `${tmdb}search/movie?query=${term}&include_adult=false&api_key=${tmdbApikey}&append_to_response=credits,videos`;
 	let data = await exec(url);
 	return data;
 }
 
 async function searchShows(term) {
+	const config = getConfig();
+	const tmdbApikey = config.tmdbApi;
+	const tmdb = 'https://api.themoviedb.org/3/';
 	let url = `${tmdb}search/tv?query=${term}&include_adult=false&api_key=${tmdbApikey}&append_to_response=credits,videos`;
 	let data = await exec(url);
 	return data;
 }
 
 async function searchPeople(term) {
+	const config = getConfig();
+	const tmdbApikey = config.tmdbApi;
+	const tmdb = 'https://api.themoviedb.org/3/';
 	let url = `${tmdb}search/person?query=${term}&include_adult=false&api_key=${tmdbApikey}&append_to_response=credits,videos`;
 	let data = await exec(url);
 	return data;

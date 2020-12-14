@@ -22,6 +22,10 @@
 		cursor: pointer;
 		display: flex;
 
+		div {
+			pointer-events: none;
+		}
+
 		.server-icon {
 			height: 40px;
 			width: 40px;
