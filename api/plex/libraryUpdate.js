@@ -106,8 +106,15 @@ function getLibraries() {
 					reject('Unable to get library info');
 					throw err;
 				}
-				console.log('LIB CRON: Found Libraries');
-				resolve(data.MediaContainer);
+
+				if (data) {
+					resolve(data.MediaContainer);
+					console.log('LIB CRON: Found Libraries');
+				} else {
+					console.log(data);
+					console.log('LIB CRON: Library update failed!');
+					reject('Unable to get library info');
+				}
 			}
 		);
 	});
@@ -265,7 +272,12 @@ function getMeta(id) {
 					console.log(data);
 					reject('Unable to get meta');
 				}
-				resolve(data.MediaContainer.Metadata[0]);
+				if (data) {
+					resolve(data.MediaContainer.Metadata[0]);
+				} else {
+					console.log(data);
+					reject('Unable to get meta');
+				}
 			}
 		);
 	});
