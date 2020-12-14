@@ -46,6 +46,7 @@ const libraryWatch = new CronJob('0 */30 * * * *', function () {
 init();
 
 function restart() {
+	console.log('Restarting server');
 	app.stop();
 	init();
 }
@@ -87,6 +88,7 @@ function init() {
 }
 
 async function connectDb() {
+	const prefs = getConfig();
 	try {
 		await mongoose.connect(prefs.DB_URL, {
 			useNewUrlParser: true,

@@ -1,9 +1,5 @@
 // Config
-const user_config = require('../util/config');
-if (!user_config) {
-	return;
-}
-const prefs = JSON.parse(user_config);
+const getConfig = require('../util/config');
 
 const express = require('express');
 const router = express.Router();
@@ -52,6 +48,7 @@ router.post('/add', async (req, res) => {
 });
 
 async function mailRequest(user, request) {
+	const prefs = getConfig();
 	let userData = await User.findOne({ _id: user });
 	if (!userData) {
 		userData = {

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
+const restartServer = require('../app');
 
 router.post('/set', async (req, res) => {
 	let user = req.body.user;
@@ -9,9 +10,9 @@ router.post('/set', async (req, res) => {
 	let db = req.body.db;
 	if (!user || !server || !db) {
 		res.status(500).send('Missing Fields');
+		return;
 	}
 
-	res.status(200).send('Config being created');
 	let configData = {
 		DB_URL: db + '/petio',
 		tmdbApi: 'a9a99e29e94d33f6a9a3bb78c7a450f7',
@@ -27,25 +28,37 @@ router.post('/set', async (req, res) => {
 		adminDisplayName: user.username,
 		fanartApi: '930d724053d35fcc01a1a6da58fbb80a',
 	};
-	createConfig(JSON.stringify(configData, null, 2));
+	try {
+		createConfig(JSON.stringify(configData, null, 2));
+		res.send('Config Created');
+		restartServer();
+		return;
+	} catch (err) {
+		res.status(500).send('Error Creating config');
+	}
 });
 function createConfig(data) {
-	let project_folder, configFile;
-	if (process.pkg) {
-		project_folder = path.dirname(process.execPath);
-		configFile = path.join(project_folder, './config.json');
-	} else {
-		project_folder = __dirname;
-		configFile = path.join(project_folder, '../config.json');
-	}
-	console.log(configFile);
-	fs.writeFileSync(configFile, data, (err) => {
-		if (err) {
-			console.log(err);
+	return new Promise((resolve, reject) => {
+		let project_folder, configFile;
+		if (process.pkg) {
+			project_folder = path.dirname(process.execPath);
+			configFile = path.join(project_folder, './config/config.json');
 		} else {
-			console.log(data);
+			project_folder = __dirname;
+			configFile = path.join(project_folder, '../config/config.json');
 		}
-		console.log('Config Created');
+		console.log(configFile);
+		fs.writeFileSync(configFile, data, (err) => {
+			if (err) {
+				console.log(err);
+				reject(err);
+				console.log('Config Failed');
+			} else {
+				console.log(data);
+				resolve();
+				console.log('Config Created');
+			}
+		});
 	});
 }
 

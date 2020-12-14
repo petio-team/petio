@@ -2,13 +2,10 @@ const request = require('xhr-request');
 const plexLookup = require('../plex/plexLookup');
 
 // Config
-const user_config = require('../util/config');
-if (!user_config) {
-	return;
-}
-const prefs = JSON.parse(user_config);
+const getConfig = require('../util/config');
 
 function getBandwidth() {
+	const prefs = getConfig();
 	return new Promise((resolve, reject) => {
 		let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/statistics/bandwidth?timespan=6&X-Plex-Token=${prefs.plexToken}`;
 		request(

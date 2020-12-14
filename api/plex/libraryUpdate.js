@@ -7,8 +7,6 @@ const Music = require('../models/artist');
 const Show = require('../models/show');
 const User = require('../models/user');
 const Request = require('../models/request');
-const tmdbApikey = prefs.tmdbApi;
-const tmdb = 'https://api.themoviedb.org/3/';
 const Sonarr = require('../services/sonarr');
 const Radarr = require('../services/radarr');
 const Mailer = require('../mail/mailer');
@@ -20,10 +18,11 @@ class LibraryUpdate {
 	constructor() {
 		this.config = getConfig();
 		this.mailer = [];
+		this.tmdb = 'https://api.themoviedb.org/3/';
 	}
 
 	async run() {
-		await createAdmin();
+		await this.createAdmin();
 		let libraries = false;
 		let sonarr = new Sonarr();
 		let radarr = new Radarr();
@@ -48,20 +47,20 @@ class LibraryUpdate {
 
 	async createAdmin() {
 		let adminFound = await Admin.findOne({
-			_id: prefs.adminId,
+			_id: this.config.adminId,
 		});
 		if (adminFound) {
 			console.log('LIB CRON: Admin Already Created, updating');
 			try {
 				adminData = await Admin.findOneAndUpdate(
-					{ _id: prefs.adminId },
+					{ _id: this.config.adminId },
 					{
 						$set: {
-							email: prefs.adminEmail,
-							thumb: prefs.adminThumb,
-							title: prefs.adminDisplayName,
-							username: prefs.adminUsername,
-							password: prefs.adminPass,
+							email: this.config.adminEmail,
+							thumb: this.config.adminThumb,
+							title: this.config.adminDisplayName,
+							username: this.config.adminUsername,
+							password: this.config.adminPass,
 							altId: 1,
 						},
 					},
@@ -74,12 +73,12 @@ class LibraryUpdate {
 			console.log('LIB CRON: Creating admin user');
 			try {
 				adminData = new Admin({
-					_id: prefs.adminId,
-					email: prefs.adminEmail,
-					thumb: prefs.adminThumb,
-					title: prefs.adminDisplayName,
-					username: prefs.adminUsername,
-					password: prefs.adminPass,
+					_id: this.config.adminId,
+					email: this.config.adminEmail,
+					thumb: this.config.adminThumb,
+					title: this.config.adminDisplayName,
+					username: this.config.adminUsername,
+					password: this.config.adminPass,
 					altId: 1,
 				});
 				await adminData.save();
@@ -91,7 +90,7 @@ class LibraryUpdate {
 
 	getLibraries() {
 		return new Promise((resolve, reject) => {
-			let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/library/sections/?X-Plex-Token=${prefs.plexToken}`;
+			let url = `${this.config.plexProtocol}://${this.config.plexIp}:${this.config.plexPort}/library/sections/?X-Plex-Token=${this.config.plexToken}`;
 			request(
 				url,
 				{
@@ -103,10 +102,15 @@ class LibraryUpdate {
 						console.log(data);
 						console.log('LIB CRON: Library update failed!');
 						reject('Unable to get library info');
-						throw err;
 					}
-					console.log('LIB CRON: Found Libraries');
-					resolve(data.MediaContainer);
+					if (data) {
+						console.log('LIB CRON: Found Libraries');
+						resolve(data.MediaContainer);
+					} else {
+						console.log(data);
+						console.log('LIB CRON: Library update failed!');
+						reject('Unable to get library info');
+					}
 				}
 			);
 		});
@@ -115,7 +119,7 @@ class LibraryUpdate {
 	async saveLibraries(libraries) {
 		await Promise.all(
 			libraries.Directory.map(async (lib) => {
-				await saveLibrary(lib);
+				await this.saveLibrary(lib);
 			})
 		);
 	}
@@ -153,7 +157,7 @@ class LibraryUpdate {
 					contentChangedAt: lib.contentChangedAt,
 					hidden: lib.hidden,
 				});
-				libraryItem = await newLibrary.save();
+				libraryItem = await this.newLibrary.save();
 			} catch (err) {
 				console.log(`LIB CRON: ${err}`);
 			}
@@ -202,15 +206,15 @@ class LibraryUpdate {
 		await Promise.all(
 			libraries.Directory.map(async (lib) => {
 				try {
-					let libContent = await getLibrary(lib.key);
+					let libContent = await this.getLibrary(lib.key);
 					Object.keys(libContent.Metadata).map((item) => {
 						let obj = libContent.Metadata[item];
 						if (obj.type === 'movie') {
-							saveMovie(obj);
+							this.saveMovie(obj);
 						} else if (obj.type === 'artist') {
-							saveMusic(obj);
+							this.saveMusic(obj);
 						} else if (obj.type === 'show') {
-							saveShow(obj);
+							this.saveShow(obj);
 						} else {
 							console.log(obj.type);
 						}
@@ -223,7 +227,7 @@ class LibraryUpdate {
 	}
 
 	getLibrary(id) {
-		let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/library/sections/${id}/all?X-Plex-Token=${prefs.plexToken}`;
+		let url = `${this.config.plexProtocol}://${this.config.plexIp}:${this.config.plexPort}/library/sections/${id}/all?X-Plex-Token=${this.config.plexToken}`;
 		// console.log(url);
 		return new Promise((resolve, reject) => {
 			request(
@@ -237,14 +241,19 @@ class LibraryUpdate {
 						console.log(data);
 						reject('Unable to get library content');
 					}
-					resolve(data.MediaContainer);
+					if (data) {
+						resolve(data.MediaContainer);
+					} else {
+						console.log(data);
+						reject('Unable to get library content');
+					}
 				}
 			);
 		});
 	}
 
 	getMeta(id) {
-		let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/library/metadata/${id}?X-Plex-Token=${prefs.plexToken}`;
+		let url = `${this.config.plexProtocol}://${this.config.plexIp}:${this.config.plexPort}/library/metadata/${id}?X-Plex-Token=${this.config.plexToken}`;
 		return new Promise((resolve, reject) => {
 			request(
 				url,
@@ -257,7 +266,12 @@ class LibraryUpdate {
 						console.log(data);
 						reject('Unable to get meta');
 					}
-					resolve(data.MediaContainer.Metadata[0]);
+					if (data) {
+						resolve(data.MediaContainer.Metadata[0]);
+					} else {
+						console.log(data);
+						reject('Unable to get meta');
+					}
 				}
 			);
 		});
@@ -279,7 +293,7 @@ class LibraryUpdate {
 		if (idSource === 'plex') {
 			let title = movieObj.title;
 			try {
-				movieObj = await getMeta(movieObj.ratingKey);
+				movieObj = await this.getMeta(movieObj.ratingKey);
 				for (let guid of movieObj.Guid) {
 					let source = guid.id.split('://');
 					externalIds[source[0] + '_id'] = source[1];
@@ -299,7 +313,7 @@ class LibraryUpdate {
 					.split('://')[1]
 					.split('?')[0];
 
-				externalIds = await externalIdMovie(externalId);
+				externalIds = await this.externalIdMovie(externalId);
 				externalIds.tmdb_id = externalIds.id ? externalIds.id : false;
 			} catch (err) {
 				if (!externalId) {
@@ -352,13 +366,13 @@ class LibraryUpdate {
 						: false,
 				});
 				movieDb = await newMovie.save();
-				mailAdded(movieObj, externalId);
+				this.mailAdded(movieObj, externalId);
 			} catch (err) {
 				console.log(`LIB CRON: ${err}`);
 			}
 		} else {
 			try {
-				updatedMovie = await Movie.findOneAndUpdate(
+				let updatedMovie = await Movie.findOneAndUpdate(
 					{
 						_id: movieObj.ratingKey,
 					},
@@ -403,7 +417,7 @@ class LibraryUpdate {
 					},
 					{ useFindAndModify: false }
 				);
-				mailAdded(movieObj, externalId);
+				this.mailAdded(movieObj, externalId);
 			} catch (err) {
 				movieDb = false;
 				console.log(err);
@@ -460,7 +474,7 @@ class LibraryUpdate {
 		if (idSource === 'plex') {
 			let title = showObj.title;
 			try {
-				showObj = await getMeta(showObj.ratingKey);
+				showObj = await this.getMeta(showObj.ratingKey);
 				for (let guid of showObj.Guid) {
 					let source = guid.id.split('://');
 					externalIds[source[0] + '_id'] = source[1];
@@ -484,13 +498,13 @@ class LibraryUpdate {
 
 			if (idSource !== 'tmdb') {
 				try {
-					tmdbId = await externalIdTv(externalId, idSource);
+					tmdbId = await this.externalIdTv(externalId, idSource);
 				} catch {
 					tmdbId = false;
 				}
 			} else {
 				try {
-					externalIds = await tmdbExternalIds(externalId);
+					externalIds = await this.tmdbExternalIds(externalId);
 				} catch (err) {
 					console.log(err);
 				}
@@ -534,13 +548,13 @@ class LibraryUpdate {
 					tmdb_id: idSource === 'tmdb' ? externalId : tmdbId,
 				});
 				showDb = await newShow.save();
-				mailAdded(showObj, externalId);
+				this.mailAdded(showObj, externalId);
 			} catch (err) {
 				console.log(`LIB CRON: ${err}`);
 			}
 		} else {
 			try {
-				updatedShow = await Show.findOneAndUpdate(
+				let updatedShow = await Show.findOneAndUpdate(
 					{
 						_id: showObj.ratingKey,
 					},
@@ -586,7 +600,7 @@ class LibraryUpdate {
 					},
 					{ useFindAndModify: false }
 				);
-				mailAdded(showObj, externalId);
+				this.mailAdded(showObj, externalId);
 			} catch {
 				showDb = false;
 			}
@@ -596,21 +610,19 @@ class LibraryUpdate {
 	async updateFriends() {
 		let friendList = false;
 		try {
-			friendList = await getFriends();
+			friendList = await this.getFriends();
 		} catch (err) {
 			console.log(`LIB CRON: ${err}`);
 		}
-		// console.clear();
-		// console.log(friendList);
 		if (friendList) {
 			Object.keys(friendList).map((item) => {
-				saveFriend(friendList[item]);
+				this.saveFriend(friendList[item]);
 			});
 		}
 	}
 
 	getFriends() {
-		let url = `https://plex.tv/pms/friends/all?X-Plex-Token=${prefs.plexToken}`;
+		let url = `https://plex.tv/pms/friends/all?X-Plex-Token=${this.config.plexToken}`;
 		return new Promise((resolve, reject) => {
 			request(
 				url,
@@ -673,7 +685,6 @@ class LibraryUpdate {
 		} else {
 			output += 'Friend Found in Db';
 		}
-		// console.log(obj.title + ' - ' + output);
 	}
 
 	async mailAdded(plexData, ref_id) {
@@ -684,10 +695,9 @@ class LibraryUpdate {
 				{ tvdb_id: ref_id },
 			],
 		});
-		// console.log(request);
 		if (request) {
 			request.users.map((user, i) => {
-				sendMail(user, i, request);
+				this.sendMail(user, i, request);
 			});
 			Request.findOneAndRemove(
 				{
@@ -710,11 +720,10 @@ class LibraryUpdate {
 	}
 
 	async sendMail(user, i, request) {
-		// let timeout = i * 3000;
 		let userData = await User.findOne({ _id: user });
 		if (!userData) {
 			userData = {
-				email: prefs.adminEmail,
+				email: this.config.adminEmail,
 			};
 		}
 
@@ -728,6 +737,7 @@ class LibraryUpdate {
 	}
 
 	execMail() {
+		console.log('MAILER: Parsing mail queue');
 		console.log(mailer);
 		this.mailer.forEach((mail, index) => {
 			setTimeout(() => {
@@ -738,7 +748,7 @@ class LibraryUpdate {
 	}
 
 	externalIdTv(id, type) {
-		let url = `${tmdb}find/${id}?api_key=${tmdbApikey}&language=en-US&external_source=${type}_id`;
+		let url = `${this.tmdb}find/${id}?api_key=${this.config.tmdbApi}&language=en-US&external_source=${type}_id`;
 		return new Promise((resolve, reject) => {
 			request(
 				url,
@@ -763,7 +773,7 @@ class LibraryUpdate {
 	}
 
 	tmdbExternalIds(id) {
-		let url = `${tmdb}tv/${id}/external_ids?api_key=${tmdbApikey}`;
+		let url = `${this.tmdb}tv/${id}/external_ids?api_key=${this.config.tmdbApi}`;
 		return new Promise((resolve, reject) => {
 			request(
 				url,
@@ -782,7 +792,7 @@ class LibraryUpdate {
 	}
 
 	externalIdMovie(id) {
-		let url = `${tmdb}movie/${id}/external_ids?api_key=${tmdbApikey}`;
+		let url = `${this.tmdb}movie/${id}/external_ids?api_key=${this.config.tmdbApi}`;
 		return new Promise((resolve, reject) => {
 			request(
 				url,

@@ -2,13 +2,10 @@ const request = require('xhr-request');
 const plexLookup = require('../plex/plexLookup');
 
 // Config
-const user_config = require('../util/config');
-if (!user_config) {
-	return;
-}
-const prefs = JSON.parse(user_config);
+const getConfig = require('../util/config');
 
 function getHistory(id, type) {
+	const prefs = getConfig();
 	return new Promise((resolve, reject) => {
 		let d = new Date();
 		d.setMonth(d.getMonth() - 1);

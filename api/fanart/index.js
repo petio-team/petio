@@ -1,14 +1,12 @@
 // Config
-const user_config = require('../util/config');
-if (!user_config) {
-	return;
-}
-const prefs = JSON.parse(user_config);
+const getConfig = require('../util/config');
 
 const request = require('xhr-request');
 
 async function fanart(id, type) {
-	let url = `https://webservice.fanart.tv/v3/${type}/${id}?api_key=${prefs.fanartApi}`;
+	const config = getConfig();
+	const fanartApi = config.fanartApi;
+	let url = `https://webservice.fanart.tv/v3/${type}/${id}?api_key=${fanartApi}`;
 	return new Promise((resolve, reject) => {
 		request(
 			url,

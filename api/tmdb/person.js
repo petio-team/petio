@@ -1,12 +1,5 @@
 // Config
-const user_config = require('../util/config');
-if (!user_config) {
-	return;
-}
-const prefs = JSON.parse(user_config);
-
-const tmdbApikey = prefs.tmdbApi;
-const tmdb = 'https://api.themoviedb.org/3/';
+const getConfig = require('../util/config');
 const request = require('xhr-request');
 
 async function personLookup(id) {
@@ -24,6 +17,9 @@ async function personLookup(id) {
 }
 
 async function getPersonInfo(id) {
+	const config = getConfig();
+	const tmdbApikey = config.tmdbApi;
+	const tmdb = 'https://api.themoviedb.org/3/';
 	let url = `${tmdb}person/${id}?api_key=${tmdbApikey}&append_to_response=images`;
 	return new Promise((resolve, reject) => {
 		request(
@@ -44,6 +40,9 @@ async function getPersonInfo(id) {
 }
 
 async function getPersonMovies(id) {
+	const config = getConfig();
+	const tmdbApikey = config.tmdbApi;
+	const tmdb = 'https://api.themoviedb.org/3/';
 	let url = `${tmdb}person/${id}/movie_credits?api_key=${tmdbApikey}&append_to_response=credits,videos`;
 	return new Promise((resolve, reject) => {
 		request(
@@ -64,6 +63,9 @@ async function getPersonMovies(id) {
 }
 
 async function getPersonShows(id) {
+	const config = getConfig();
+	const tmdbApikey = config.tmdbApi;
+	const tmdb = 'https://api.themoviedb.org/3/';
 	let url = `${tmdb}person/${id}/tv_credits?api_key=${tmdbApikey}&append_to_response=credits,videos`;
 	return new Promise((resolve, reject) => {
 		request(
