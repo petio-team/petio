@@ -642,8 +642,7 @@ class LibraryUpdate {
 						let dataParse = JSON.parse(
 							xmlParser.xml2json(data, { compact: false })
 						);
-						// console.log(dataParse.elements[0].elements);
-						// console.log(dataParse.MediaContainer.User);
+
 						if (dataParse.elements[0]) {
 							resolve(dataParse.elements[0].elements);
 						} else {
@@ -657,7 +656,6 @@ class LibraryUpdate {
 
 	async saveFriend(obj) {
 		// Maybe delete all and rebuild each time?
-		console.log(obj);
 		let friendDb = false;
 		let output = '';
 		try {
