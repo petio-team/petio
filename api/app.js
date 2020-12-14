@@ -39,6 +39,7 @@ class Main {
 			console.log('Library Watch Running:', d);
 			new LibraryUpdate().run();
 		});
+		this.createConfigDir(path.join(__dirname, './config'));
 		this.config = getConfig();
 		this.e = app;
 		this.server = null;
@@ -152,10 +153,10 @@ class Main {
 			};
 			try {
 				await this.createConfig(JSON.stringify(configData, null, 2));
+				await this.createDefaults();
 				res.send('Config Created');
 				console.log('Config Created');
 				this.restart();
-
 				return;
 			} catch (err) {
 				res.status(500).send('Error Creating config');
@@ -187,6 +188,64 @@ class Main {
 					console.log('Config Created');
 				}
 			});
+		});
+	}
+
+	async createDefaults() {
+		let project_folder = __dirname;
+		let email = path.join(project_folder, './config/email.json');
+		let emailDefault = JSON.stringify({
+			emailUser: '',
+			emailPass: '',
+			emailServer: '',
+			emailPort: '',
+			emailSecure: false,
+		});
+
+		let radarr = path.join(project_folder, './config/radarr.json');
+		let radarrDefault = JSON.stringify({
+			enabled: false,
+			protocol: 'http',
+			hostname: '',
+			apiKey: '',
+			port: false,
+			urlBase: '',
+			rootPath: '',
+			profileId: false,
+		});
+
+		let sonarr = path.join(project_folder, './config/sonarr.json');
+		let sonarrDefault = JSON.stringify({
+			enabled: false,
+			apiKey: '',
+			hostname: '',
+			port: '',
+			profileId: '',
+			protocol: 'http',
+			rootPath: '',
+			urlBase: '',
+		});
+		try {
+			await fs.writeFileSync(email, emailDefault);
+			await fs.writeFileSync(radarr, radarrDefault);
+			await fs.writeFileSync(sonarr, sonarrDefault);
+
+			return;
+		} catch (err) {
+			console.log('Fatal Error: Cannot create default configs');
+			throw err;
+		}
+	}
+
+	createConfigDir(dir) {
+		return new Promise((resolve, reject) => {
+			if (fs.existsSync(dir)) {
+				resolve();
+				return true;
+			}
+			fs.mkdirSync(dir);
+			console.log('Config Directory Created');
+			resolve();
 		});
 	}
 }
