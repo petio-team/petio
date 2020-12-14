@@ -1,4 +1,4 @@
-name: Binary - API
+name: Binary - Admin
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   api-binary:
-    name: Build Binary
+    name: Build Admin
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -26,11 +26,11 @@ jobs:
             ${{ runner.os }}-node-
       - name: Install packages
         run: npm ci
-        working-directory: api
+        working-directory: admin
       - name: Run build package
         run: npm run build
-        working-directory: api
+        working-directory: admin
       - uses: actions/upload-artifact@v2
         with:
-          name: api
-          path: api/build/
+          name: admin
+          path: admin/dist/

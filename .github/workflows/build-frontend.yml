@@ -1,4 +1,4 @@
-name: Binary - API
+name: Binary - Frontend
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   api-binary:
-    name: Build Binary
+    name: Build Frontend
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -26,11 +26,11 @@ jobs:
             ${{ runner.os }}-node-
       - name: Install packages
         run: npm ci
-        working-directory: api
+        working-directory: frontend
       - name: Run build package
         run: npm run build
-        working-directory: api
+        working-directory: frontend
       - uses: actions/upload-artifact@v2
         with:
-          name: api
-          path: api/build/
+          name: frontend
+          path: frontend/dist/
