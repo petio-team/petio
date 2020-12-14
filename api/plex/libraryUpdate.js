@@ -1,6 +1,6 @@
 const Admin = require('../models/admin');
 const request = require('xhr-request');
-const xmlParser = require('xml2json');
+const xmlParser = require('xml-js');
 const Library = require('../models/library');
 const Movie = require('../models/movie');
 const Music = require('../models/artist');
@@ -616,7 +616,7 @@ class LibraryUpdate {
 		}
 		if (friendList) {
 			Object.keys(friendList).map((item) => {
-				this.saveFriend(friendList[item]);
+				this.saveFriend(friendList[item].attributes);
 			});
 		}
 	}
@@ -639,10 +639,13 @@ class LibraryUpdate {
 					if (!data) {
 						reject('no data');
 					} else {
-						let dataParse = JSON.parse(xmlParser.toJson(data));
+						let dataParse = JSON.parse(
+							xmlParser.xml2json(data, { compact: false })
+						);
+						// console.log(dataParse.elements[0].elements);
 						// console.log(dataParse.MediaContainer.User);
-						if (dataParse.MediaContainer.User) {
-							resolve(dataParse.MediaContainer.User);
+						if (dataParse.elements[0]) {
+							resolve(dataParse.elements[0].elements);
 						} else {
 							reject('No User object returned');
 						}
@@ -654,6 +657,7 @@ class LibraryUpdate {
 
 	async saveFriend(obj) {
 		// Maybe delete all and rebuild each time?
+		console.log(obj);
 		let friendDb = false;
 		let output = '';
 		try {

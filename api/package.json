@@ -27,7 +27,7 @@
 		"saslprep": "^1.0.3",
 		"sonarr-api": "^0.2.0",
 		"xhr-request": "^1.1.0",
-		"xml2json": "^0.12.0"
+		"xml-js": "^1.6.11"
 	},
 	"devDependencies": {
 		"dotenv": "^8.2.0"
