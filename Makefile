@@ -3,10 +3,11 @@ build:
 
 pkg :
 	rm -rf ./bin && mkdir ./bin
-	pkg petio.js --out-path "./bin"
+	cd api && npm install
+	npm install && pkg petio.js --out-path "./bin"
 	mkdir ./bin/data
-	cd frontend && npm install && npm run build && mv build ../bin/data/fe
-	cd admin && npm install && npm run build && mv build ../bin/data/admin
+	# cd frontend && npm install && npm run build && mv build ../bin/data/fe
+	# cd admin && npm install && npm run build && mv build ../bin/data/admin
 
 clean:
 	rm -rf node_modules && rm -rf admin/node_modules && rm -rf frontend/node_modules && rm -rf api/node_modules
