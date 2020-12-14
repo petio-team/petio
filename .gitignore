@@ -13,3 +13,4 @@ api/config.json
 api/.DS_Store
 frontend/build
 admin/build
+api/config/
