@@ -72,7 +72,7 @@ class LibraryUpdate {
 		} else {
 			console.log('LIB CRON: Creating admin user');
 			try {
-				adminData = new Admin({
+				let adminData = new Admin({
 					_id: this.config.adminId,
 					email: this.config.adminEmail,
 					thumb: this.config.adminThumb,
