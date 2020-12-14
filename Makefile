@@ -2,12 +2,12 @@ build:
 	docker-compose pull && docker-compose up -d
 
 pkg :
-	# rm -rf ./bin && mkdir ./bin
-	# cd api && npm install
+	rm -rf ./bin && mkdir ./bin
+	cd api && npm install
 	npm install && pkg petio.js --out-path "./bin"
-	# mkdir ./bin/views
-	# cd frontend && npm install && npm run build && mv build ../bin/views/frontend
-	# cd admin && npm install && npm run build && mv build ../bin/views/admin
+	mkdir ./bin/views
+	cd frontend && npm install && REACT_APP_ENV=pkg npm run build && mv build ../bin/views/frontend
+	cd admin && npm install && REACT_APP_ENV=pkg npm run build && mv build ../bin/views/admin
 
 clean:
 	rm -rf ./bin

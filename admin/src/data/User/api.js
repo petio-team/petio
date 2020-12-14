@@ -1,5 +1,6 @@
 const apiUrl =
-	process.env.NODE_ENV === 'development' || process.pkg
+	process.env.NODE_ENV === 'development' ||
+	process.env.REACT_APP_ENV === 'pkg'
 		? 'http://localhost:7778'
 		: `${window.location.protocol}//${window.location.host}/api`;
 
