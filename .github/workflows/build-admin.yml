@@ -29,6 +29,8 @@ jobs:
         working-directory: admin
       - name: Run build package
         run: npm run build
+        env:
+          CI: false
         working-directory: admin
       - uses: actions/upload-artifact@v2
         with:
