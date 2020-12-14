@@ -1,10 +1,6 @@
 const jwt = require('jsonwebtoken');
 // Config
-const user_config = require('../util/config');
-if (!user_config) {
-	return;
-}
-const prefs = JSON.parse(user_config);
+const getConfig = require('../util/config');
 
 const express = require('express');
 const router = express.Router();
@@ -12,10 +8,16 @@ const User = require('../models/user');
 const Admin = require('../models/admin');
 
 router.post('/', async (req, res) => {
+	const prefs = getConfig();
 	let admin = req.body.admin;
 	let authToken = req.body.authToken;
 	let username = req.body.username;
 	let password = req.body.password;
+
+	if (!prefs) {
+		res.status(500).send('This Petio API is not setup');
+		return;
+	}
 
 	console.log(`LOGIN: New login attempted`);
 
@@ -64,6 +66,7 @@ router.post('/', async (req, res) => {
 });
 
 function createToken(user, admin = false) {
+	const prefs = getConfig();
 	return jwt.sign(
 		{ username: user.username, password: user.password, admin: admin },
 		prefs.plexToken

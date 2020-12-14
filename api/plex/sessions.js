@@ -1,13 +1,10 @@
 const request = require('xhr-request');
 
 // Config
-const user_config = require('../util/config');
-if (!user_config) {
-	return;
-}
-const prefs = JSON.parse(user_config);
+const getConfig = require('../util/config');
 
 function getSessions() {
+	const prefs = getConfig();
 	return new Promise((resolve, reject) => {
 		let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/status/sessions?X-Plex-Token=${prefs.plexToken}`;
 		request(

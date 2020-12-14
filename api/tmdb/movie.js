@@ -1,12 +1,6 @@
 // Config
-const user_config = require('../util/config');
-if (!user_config) {
-	return;
-}
-const prefs = JSON.parse(user_config);
+const getConfig = require('../util/config');
 
-const tmdbApikey = prefs.tmdbApi;
-const tmdb = 'https://api.themoviedb.org/3/';
 const fanartLookup = require('../fanart');
 const request = require('xhr-request');
 const onServer = require('../plex/onServer');
@@ -71,6 +65,9 @@ async function movieLookup(id, minified = false) {
 }
 
 async function getMovieData(id) {
+	const config = getConfig();
+	const tmdbApikey = config.tmdbApi;
+	const tmdb = 'https://api.themoviedb.org/3/';
 	let url = `${tmdb}movie/${id}?api_key=${tmdbApikey}&append_to_response=credits,videos`;
 	return new Promise((resolve, reject) => {
 		request(
@@ -91,6 +88,9 @@ async function getMovieData(id) {
 }
 
 async function getRecommendations(id) {
+	const config = getConfig();
+	const tmdbApikey = config.tmdbApi;
+	const tmdb = 'https://api.themoviedb.org/3/';
 	let url = `${tmdb}movie/${id}/recommendations?api_key=${tmdbApikey}&append_to_response=credits,videos`;
 
 	return new Promise((resolve, reject) => {

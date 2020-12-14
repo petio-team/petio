@@ -1,12 +1,5 @@
 // Config
-const user_config = require('../util/config');
-if (!user_config) {
-	return;
-}
-const prefs = JSON.parse(user_config);
-
-const tmdbApikey = prefs.tmdbApi;
-const tmdb = 'https://api.themoviedb.org/3/';
+const getConfig = require('../util/config');
 const fanartLookup = require('../fanart');
 const request = require('xhr-request');
 const onServer = require('../plex/onServer');
@@ -86,6 +79,9 @@ async function showLookup(id, minified = false) {
 }
 
 async function getShowData(id) {
+	const config = getConfig();
+	const tmdbApikey = config.tmdbApi;
+	const tmdb = 'https://api.themoviedb.org/3/';
 	let url = `${tmdb}tv/${id}?api_key=${tmdbApikey}&append_to_response=credits,videos`;
 
 	return new Promise((resolve, reject) => {
@@ -107,6 +103,9 @@ async function getShowData(id) {
 }
 
 async function getRecommendations(id) {
+	const config = getConfig();
+	const tmdbApikey = config.tmdbApi;
+	const tmdb = 'https://api.themoviedb.org/3/';
 	let url = `${tmdb}tv/${id}/recommendations?api_key=${tmdbApikey}&append_to_response=credits,videos`;
 
 	return new Promise((resolve, reject) => {
@@ -142,6 +141,9 @@ async function seasonsAsync(seasonList, id) {
 }
 
 async function getSeason(id, season) {
+	const config = getConfig();
+	const tmdbApikey = config.tmdbApi;
+	const tmdb = 'https://api.themoviedb.org/3/';
 	let url = `${tmdb}tv/${id}/season/${season}?api_key=${tmdbApikey}`;
 	return new Promise((resolve, reject) => {
 		request(
@@ -172,6 +174,9 @@ function findEnLogo(logos) {
 }
 
 function externalId(id) {
+	const config = getConfig();
+	const tmdbApikey = config.tmdbApi;
+	const tmdb = 'https://api.themoviedb.org/3/';
 	let url = `${tmdb}tv/${id}/external_ids?api_key=${tmdbApikey}`;
 	return new Promise((resolve, reject) => {
 		request(

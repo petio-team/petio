@@ -1,11 +1,6 @@
 const nodemailer = require('nodemailer');
 const fs = require('fs');
 const path = require('path');
-const user_config = require('../util/config');
-if (!user_config) {
-	return;
-}
-const prefs = JSON.parse(user_config);
 
 class Mailer {
 	constructor() {
@@ -104,7 +99,7 @@ class Mailer {
 					);
 					this.transport.sendMail({
 						from: `"Petio" <${this.config.emailUser}>`,
-						to: [send, prefs.adminEmail],
+						to: [send, this.adminEmail],
 						subject: subject,
 						html: this.mailHtml(title, text, img),
 						text: text,

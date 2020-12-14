@@ -172,6 +172,9 @@ class General extends React.Component {
 						here.
 					</p>
 					<button className="btn">Login with plex</button>
+					<button className="btn" style={{ marginLeft: '10px' }}>
+						Test
+					</button>
 				</section>
 				<section>
 					<p className="main-title mb--2">Email</p>
