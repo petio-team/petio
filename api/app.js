@@ -4,8 +4,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv/config');
 const CronJob = require('cron').CronJob;
-const https = require('https');
 const fs = require('fs');
+const path = require('path');
 
 // Config
 const getConfig = require('./util/config');
@@ -28,84 +28,168 @@ const reviewRoute = require('./routes/review');
 const userRoute = require('./routes/user');
 const genieRoute = require('./routes/genie');
 const sessionsRoute = require('./routes/sessions');
-const setupRoute = require('./routes/setup');
+// const setupRoute = require('./routes/setup');
 const servicesRoute = require('./routes/services');
 const mailRoute = require('./routes/mail');
 
-app.use(cors());
-app.options('*', cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-const libraryWatch = new CronJob('0 */30 * * * *', function () {
-	const d = new Date();
-	console.log('Library Watch Running:', d);
-	new LibraryUpdate().run();
-});
-
-init();
-
-function restart() {
-	console.log('Restarting server');
-	app.stop();
-	init();
-}
-
-function init() {
-	console.log('Starting Server ');
-	app.listen(7778);
-	console.log('Listening on 7778');
-	const config = getConfig();
-	app.get('/config', async (req, res) => {
-		res.json(config ? { config: true } : { config: false });
-	});
-	if (!config) {
-		console.log('Starting Server ');
-		console.log('No config, entering setup mode');
-		app.use('/setup', setupRoute);
-	} else {
-		// Routing
-		app.use('/login', loginRoute);
-		app.use('/movie', movieRoute);
-		app.use('/show', showRoute);
-		app.use('/person', personRoute);
-		app.use('/search', searchRoute);
-		app.use('/trending', trendingRoute);
-		app.use('/request', requestRoute);
-		app.use('/top', topRoute);
-		app.use('/history', historyRoute);
-		app.use('/plex', plexRoute);
-		app.use('/review', reviewRoute);
-		app.use('/user', userRoute);
-		app.use('/genie', genieRoute);
-		app.use('/sessions', sessionsRoute);
-		app.use('/services', servicesRoute);
-		app.use('/mail', mailRoute);
-
-		console.log('Connecting to Database, please wait....');
-		connectDb();
-	}
-}
-
-async function connectDb() {
-	const prefs = getConfig();
-	try {
-		await mongoose.connect(prefs.DB_URL, {
-			useNewUrlParser: true,
-			useUnifiedTopology: true,
+class Main {
+	constructor() {
+		this.cron = new CronJob('0 */30 * * * *', function () {
+			const d = new Date();
+			console.log('Library Watch Running:', d);
+			new LibraryUpdate().run();
 		});
-		console.log('Connected to Database ');
-		start();
-	} catch (err) {
-		console.log('Fatal error - database misconfigured!');
-		console.log('Removing config please restart');
-		fs.unlinkSync('./config/config.json');
+		this.config = getConfig();
+		this.e = app;
+		this.server = null;
+		this.e.use(cors());
+		this.e.options('*', cors());
+		this.e.use(express.json());
+		this.e.use(express.urlencoded({ extended: true }));
+	}
+
+	setRoutes() {
+		console.log('Setting up routes');
+		this.e.get('/config', async (req, res) => {
+			res.json(this.config ? { config: true } : { config: false });
+		});
+		this.setup();
+		if (this.config) {
+			this.e.use('/login', loginRoute);
+			this.e.use('/movie', movieRoute);
+			this.e.use('/show', showRoute);
+			this.e.use('/person', personRoute);
+			this.e.use('/search', searchRoute);
+			this.e.use('/trending', trendingRoute);
+			this.e.use('/request', requestRoute);
+			this.e.use('/top', topRoute);
+			this.e.use('/history', historyRoute);
+			this.e.use('/plex', plexRoute);
+			this.e.use('/review', reviewRoute);
+			this.e.use('/user', userRoute);
+			this.e.use('/genie', genieRoute);
+			this.e.use('/sessions', sessionsRoute);
+			this.e.use('/services', servicesRoute);
+			this.e.use('/mail', mailRoute);
+		}
+	}
+
+	async restart() {
+		console.log('Restarting server');
+		this.cron.stop();
+		await this.server.close();
+		this.config = getConfig();
+		this.init();
+	}
+
+	init() {
+		this.setRoutes();
+		console.log('Starting Server ');
+		this.server = this.e.listen(7778);
+		console.log('Listening on 7778');
+		if (!this.config) {
+			console.log('No config, entering setup mode');
+		} else {
+			// Routing
+			console.log('Connecting to Database, please wait....');
+			this.connectDb();
+		}
+	}
+
+	async connectDb() {
+		try {
+			await mongoose.connect(this.config.DB_URL, {
+				useNewUrlParser: true,
+				useUnifiedTopology: true,
+			});
+			console.log('Connected to Database ');
+			this.start();
+		} catch (err) {
+			console.log(err);
+			console.log('Fatal error - database misconfigured!');
+			console.log('Removing config please restart');
+			fs.unlinkSync('./config/config.json');
+		}
+	}
+
+	async start() {
+		const libUpdate = new LibraryUpdate();
+		this.cron.start();
+		libUpdate.run();
+	}
+
+	setup() {
+		this.e.post('/setup/set', async (req, res) => {
+			if (this.config) {
+				res.status(403).send('Config exists');
+				console.log(
+					'Error: Config creation blocked, config already exists, this is likely malicious'
+				);
+				return;
+			}
+			let user = req.body.user;
+			let server = req.body.server;
+			let db = req.body.db;
+			if (!user || !server || !db) {
+				res.status(500).send('Missing Fields');
+				return;
+			}
+
+			let configData = {
+				DB_URL: db + '/petio',
+				tmdbApi: 'a9a99e29e94d33f6a9a3bb78c7a450f7',
+				plexProtocol: server.protocol,
+				plexIp: server.host,
+				plexPort: server.port,
+				plexToken: user.token,
+				adminUsername: user.username,
+				adminEmail: user.email,
+				adminPass: user.password,
+				adminId: user.id,
+				adminThumb: user.thumb,
+				adminDisplayName: user.username,
+				fanartApi: '930d724053d35fcc01a1a6da58fbb80a',
+			};
+			try {
+				await this.createConfig(JSON.stringify(configData, null, 2));
+				res.send('Config Created');
+				console.log('Config Created');
+				this.restart();
+
+				return;
+			} catch (err) {
+				res.status(500).send('Error Creating config');
+				console.log('Config creation error');
+				console.log(err);
+			}
+		});
+	}
+
+	createConfig(data) {
+		return new Promise((resolve, reject) => {
+			let project_folder, configFile;
+			if (process.pkg) {
+				project_folder = path.dirname(process.execPath);
+				configFile = path.join(project_folder, './config/config.json');
+			} else {
+				project_folder = __dirname;
+				configFile = path.join(project_folder, './config/config.json');
+			}
+			console.log(configFile);
+			fs.writeFile(configFile, data, (err) => {
+				if (err) {
+					console.log(err);
+					reject(err);
+					console.log('Config Failed');
+				} else {
+					console.log(data);
+					resolve();
+					console.log('Config Created');
+				}
+			});
+		});
 	}
 }
 
-async function start() {
-	libraryWatch.start();
-	new LibraryUpdate().run();
-}
-
-module.exports = restart;
+const API = new Main();
+API.init();

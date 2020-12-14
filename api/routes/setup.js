@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
-const restartServer = require('../app');
 
 router.post('/set', async (req, res) => {
 	let user = req.body.user;
@@ -31,7 +30,6 @@ router.post('/set', async (req, res) => {
 	try {
 		createConfig(JSON.stringify(configData, null, 2));
 		res.send('Config Created');
-		restartServer();
 		return;
 	} catch (err) {
 		res.status(500).send('Error Creating config');

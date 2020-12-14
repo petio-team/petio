@@ -14,6 +14,11 @@ router.post('/', async (req, res) => {
 	let username = req.body.username;
 	let password = req.body.password;
 
+	if (!prefs) {
+		res.status(500).send('This Petio API is not setup');
+		return;
+	}
+
 	console.log(`LOGIN: New login attempted`);
 
 	if (authToken) {

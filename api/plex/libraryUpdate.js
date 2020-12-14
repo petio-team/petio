@@ -52,7 +52,7 @@ class LibraryUpdate {
 		if (adminFound) {
 			console.log('LIB CRON: Admin Already Created, updating');
 			try {
-				adminData = await Admin.findOneAndUpdate(
+				let adminData = await Admin.findOneAndUpdate(
 					{ _id: this.config.adminId },
 					{
 						$set: {
