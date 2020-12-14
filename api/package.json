@@ -21,6 +21,7 @@
 		"joi": "^17.3.0",
 		"jsonwebtoken": "^8.5.1",
 		"mongoose": "^5.11.6",
+		"node-expat": "^2.3.18",
 		"nodejs-nodemailer-outlook": "^1.2.3",
 		"nodemailer": "^6.4.16",
 		"nodemon": "^2.0.5",
