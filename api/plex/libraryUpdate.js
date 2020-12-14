@@ -1,6 +1,6 @@
 const Admin = require('../models/admin');
 const request = require('xhr-request');
-const xmlParser = require('xml2json');
+const xmlParser = require('xml-js');
 const Library = require('../models/library');
 const Movie = require('../models/movie');
 const Music = require('../models/artist');
@@ -72,7 +72,7 @@ class LibraryUpdate {
 		} else {
 			console.log('LIB CRON: Creating admin user');
 			try {
-				let adminData = new Admin({
+				adminData = new Admin({
 					_id: this.config.adminId,
 					email: this.config.adminEmail,
 					thumb: this.config.adminThumb,
@@ -157,7 +157,7 @@ class LibraryUpdate {
 					contentChangedAt: lib.contentChangedAt,
 					hidden: lib.hidden,
 				});
-				libraryItem = await newLibrary.save();
+				libraryItem = await this.newLibrary.save();
 			} catch (err) {
 				console.log(`LIB CRON: ${err}`);
 			}
@@ -198,6 +198,8 @@ class LibraryUpdate {
 				console.log('LIB CRON: Library Updated');
 			}
 		}
+
+		console.log(libraryItem.key);
 	}
 
 	async updateLibraryContent(libraries) {
@@ -614,7 +616,7 @@ class LibraryUpdate {
 		}
 		if (friendList) {
 			Object.keys(friendList).map((item) => {
-				this.saveFriend(friendList[item]);
+				this.saveFriend(friendList[item].attributes);
 			});
 		}
 	}
@@ -637,10 +639,12 @@ class LibraryUpdate {
 					if (!data) {
 						reject('no data');
 					} else {
-						let dataParse = JSON.parse(xmlParser.toJson(data));
-						// console.log(dataParse.MediaContainer.User);
-						if (dataParse.MediaContainer.User) {
-							resolve(dataParse.MediaContainer.User);
+						let dataParse = JSON.parse(
+							xmlParser.xml2json(data, { compact: false })
+						);
+
+						if (dataParse.elements[0]) {
+							resolve(dataParse.elements[0].elements);
 						} else {
 							reject('No User object returned');
 						}
