@@ -8,7 +8,7 @@ on:
 
 jobs:
   api-binary:
-    name: Run Migrations
+    name: Build Binary
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -28,8 +28,8 @@ jobs:
       - name: Install packages
         run: npm ci
         working-directory: api
-      - name: Run Migrations on Dev
-        run: pkg . --out-path ./bin
+      - name: Run build package
+        run: npm run build
         working-directory: api
       - uses: actions/upload-artifact@v2
         with:
