@@ -39,7 +39,13 @@ class Main {
 			console.log('Library Watch Running:', d);
 			new LibraryUpdate().run();
 		});
-		this.createConfigDir(path.join(__dirname, './config'));
+		if (process.pkg) {
+			this.createConfigDir(
+				path.join(path.dirname(process.execPath), './config')
+			);
+		} else {
+			this.createConfigDir(path.join(__dirname, './config'));
+		}
 		this.config = getConfig();
 		this.e = app;
 		this.server = null;
@@ -193,7 +199,9 @@ class Main {
 
 	async createDefaults() {
 		let project_folder = __dirname;
-		let email = path.join(project_folder, './config/email.json');
+		let email = process.pkg
+			? path.join(path.dirname(process.execPath), './config/email.json')
+			: path.join(project_folder, './config/email.json');
 		let emailDefault = JSON.stringify({
 			emailUser: '',
 			emailPass: '',
@@ -202,7 +210,9 @@ class Main {
 			emailSecure: false,
 		});
 
-		let radarr = path.join(project_folder, './config/radarr.json');
+		let radarr = process.pkg
+			? path.join(path.dirname(process.execPath), './config/radarr.json')
+			: path.join(project_folder, './config/radarr.json');
 		let radarrDefault = JSON.stringify({
 			enabled: false,
 			protocol: 'http',
@@ -214,7 +224,9 @@ class Main {
 			profileId: false,
 		});
 
-		let sonarr = path.join(project_folder, './config/sonarr.json');
+		let sonarr = process.pkg
+			? path.join(path.dirname(process.execPath), './config/sonarr.json')
+			: path.join(project_folder, './config/sonarr.json');
 		let sonarrDefault = JSON.stringify({
 			enabled: false,
 			apiKey: '',
@@ -239,6 +251,7 @@ class Main {
 
 	createConfigDir(dir) {
 		return new Promise((resolve, reject) => {
+			console.log('Attempting to create config dir');
 			if (fs.existsSync(dir)) {
 				resolve();
 				return true;
@@ -252,3 +265,5 @@ class Main {
 
 const API = new Main();
 API.init();
+
+module.exports = API;
