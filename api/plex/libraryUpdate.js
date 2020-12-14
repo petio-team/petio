@@ -157,7 +157,7 @@ class LibraryUpdate {
 					contentChangedAt: lib.contentChangedAt,
 					hidden: lib.hidden,
 				});
-				libraryItem = await this.newLibrary.save();
+				libraryItem = await newLibrary.save();
 			} catch (err) {
 				console.log(`LIB CRON: ${err}`);
 			}
@@ -198,8 +198,6 @@ class LibraryUpdate {
 				console.log('LIB CRON: Library Updated');
 			}
 		}
-
-		console.log(libraryItem.key);
 	}
 
 	async updateLibraryContent(libraries) {
