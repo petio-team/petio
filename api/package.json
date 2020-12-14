@@ -4,7 +4,8 @@
 	"description": "Rest Api for Petio",
 	"main": "index.js",
 	"scripts": {
-		"start": "node app.js"
+		"start": "node app.js",
+		"build": "pkg . --out-path ./bin"
 	},
 	"author": "",
 	"license": "ISC",
@@ -23,6 +24,7 @@
 		"nodejs-nodemailer-outlook": "^1.2.3",
 		"nodemailer": "^6.4.16",
 		"nodemon": "^2.0.5",
+		"pkg": "^4.4.9",
 		"sanitize-filename": "^1.6.3",
 		"saslprep": "^1.0.3",
 		"sonarr-api": "^0.2.0",
