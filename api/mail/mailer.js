@@ -4,18 +4,23 @@ const path = require('path');
 
 class Mailer {
 	constructor() {
-		let project_folder, configFile;
+		let project_folder, configFile, mconfigFile;
 		if (process.pkg) {
 			project_folder = path.dirname(process.execPath);
 			configFile = path.join(project_folder, './config/email.json');
+			mconfigFile = path.join(project_folder, './config/config.json');
 		} else {
 			project_folder = __dirname;
 			configFile = path.join(project_folder, '../config/email.json');
+			mconfigFile = path.join(project_folder, '../config/config.json');
 		}
 		const configData = fs.readFileSync(configFile);
 		const configParse = JSON.parse(configData);
 		this.config = configParse;
-		this.adminEmail = this.config.adminEmail;
+		const mainConfigData = fs.readFileSync(mconfigFile);
+		const mainConfigParse = JSON.parse(mainConfigData);
+		this.mainConfig = mainConfigParse;
+		this.adminEmail = this.mainConfig.adminEmail;
 		this.transport = this._transport();
 		this.verify = this._check;
 	}

@@ -1,7 +1,10 @@
 const apiUrl =
-	process.env.NODE_ENV === 'development'
+	process.env.NODE_ENV === 'development' ||
+	process.env.REACT_APP_ENV === 'pkg'
 		? 'http://localhost:7778'
 		: `${window.location.protocol}//${window.location.host}/api`;
+
+console.log(process.env);
 
 export async function popular() {
 	let request = `${apiUrl}/trending`;
