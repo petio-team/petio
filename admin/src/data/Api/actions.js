@@ -391,3 +391,16 @@ export function testEmail() {
 			});
 	});
 }
+
+export async function getUser(id) {
+	try {
+		let userData = await api.getUser(id);
+		finalise({
+			type: types.GET_USER,
+			user: userData,
+			id: userData._id,
+		});
+	} catch (err) {
+		console.log(err);
+	}
+}

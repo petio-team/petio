@@ -28,6 +28,7 @@ export default function (
 		},
 		actor_movie: {},
 		actor_series: {},
+		users: {},
 	},
 	action
 ) {
@@ -145,6 +146,16 @@ export default function (
 						cast: action.cast,
 						crew: action.crew,
 					},
+				},
+				updated: true,
+			};
+
+		case types.GET_USER:
+			return {
+				...state,
+				users: {
+					...state.users,
+					[action.id]: action.user,
 				},
 				updated: true,
 			};

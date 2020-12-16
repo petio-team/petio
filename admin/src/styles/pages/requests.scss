@@ -1,0 +1,39 @@
+.requests {
+	&--status {
+		padding: 5px 10px;
+		border-radius: 10px;
+		font-size: 10px;
+		display: inline-flex;
+		justify-content: center;
+		align-items: center;
+		line-height: 1;
+		text-transform: uppercase;
+		letter-spacing: 1px;
+		margin-right: 10px;
+
+		&__manual {
+			background: $grey-medium;
+		}
+
+		&__sonarr {
+			background: #35c5f4;
+		}
+
+		&__radarr {
+			background: $black;
+		}
+	}
+
+	&--icon {
+		svg {
+			height: 20px;
+			fill: white;
+		}
+	}
+
+	&--wrap {
+		p {
+			margin-bottom: 0;
+		}
+	}
+}

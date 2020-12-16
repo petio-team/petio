@@ -78,6 +78,10 @@ class Sonarr {
 		}
 		try {
 			let check = await this.get('system/status');
+			if (check.error) {
+				console.log('SERVICE - SONARR: ERR Connection failed');
+				return false;
+			}
 			if (check) {
 				console.log('SERVICE - SONARR: Sonarr connection success');
 				return true;
@@ -110,6 +114,14 @@ class Sonarr {
 		return this.get('series/lookup', {
 			term: `tvdb:${id}`,
 		});
+	}
+
+	async series(id) {
+		const active = await this.connect();
+		if (!active) {
+			return false;
+		}
+		return this.get(`series/${id}`);
 	}
 
 	async test() {

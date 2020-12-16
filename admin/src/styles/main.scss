@@ -63,9 +63,11 @@ $grid-breakpoints: $breakpoints;
 @import 'components/search-form';
 @import 'components/review';
 @import 'components/sessions';
+@import 'components/table';
 
 // pages
 @import 'pages/login';
 @import 'pages/setup';
 @import 'pages/dashboard';
 @import 'pages/settings';
+@import 'pages/requests';

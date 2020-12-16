@@ -1,0 +1,40 @@
+.generic-table {
+	width: 100%;
+	// table-layout: fixed;
+	border-collapse: collapse;
+
+	th,
+	td {
+		&:nth-child(odd) {
+			background: rgba(255, 255, 255, 0.05);
+		}
+
+		&:nth-child(even) {
+			background: rgba(255, 255, 255, 0.02);
+		}
+
+		&:first-child {
+			width: 400px;
+		}
+	}
+
+	th {
+		text-align: left;
+		padding: 20px;
+		padding-bottom: 20px;
+		border-bottom: solid 1px $grey-medium;
+	}
+
+	tr {
+		td {
+			padding: 20px;
+			// padding: 20px 0;
+			border-bottom: solid 1px $dark-grey;
+		}
+	}
+
+	&__rounded {
+		overflow: hidden;
+		border-radius: 5px;
+	}
+}

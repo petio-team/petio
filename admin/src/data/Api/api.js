@@ -200,6 +200,11 @@ export let testEmail = () => {
 	return call(request, headers, 'get').then((res) => res.json());
 };
 
+export function getUser(id) {
+	let request = `${apiUrl}/user/${id}`;
+	return call(request).then((res) => res.json());
+}
+
 function call(url, headers, method, body = null) {
 	let args = {
 		method: method,

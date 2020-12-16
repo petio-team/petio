@@ -70,8 +70,21 @@ async function mailRequest(user, request) {
 router.get('/all', async (req, res) => {
 	const requests = await Request.find();
 	let data = {};
+	let sonarr = new Sonarr();
+	let radarr = new Radarr();
 	requests.map((request, i) => {
+		// data[request.requestId] = request;
+		// data[request.requestId].radarr = false;
+		// data[request.requestId].sonarr = false;
+		request.test = 'test';
+		if (request.type === 'tv' && request.sonarrId) {
+			request.sonarr = sonarr.series(request.sonarrId);
+		}
+		if (request.type === 'movie' && request.radarrId) {
+			request.radarr = radarr.movie(request.radarrId);
+		}
 		data[request.requestId] = request;
+		console.log(data[request.requestId]);
 	});
 	res.json(data);
 });
