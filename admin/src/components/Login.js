@@ -108,7 +108,7 @@ class Login extends React.Component {
 							</form>
 						</div>
 						<p className="powered-by">
-							Petio Admin build (alpha) 0.1.1
+							Petio Admin build (alpha) 0.1.9
 						</p>
 					</>
 				) : (
