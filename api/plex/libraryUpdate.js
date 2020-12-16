@@ -12,8 +12,6 @@ const Radarr = require('../services/radarr');
 const Mailer = require('../mail/mailer');
 const getConfig = require('../util/config');
 
-let mailer = [];
-
 class LibraryUpdate {
 	constructor() {
 		this.config = getConfig();
@@ -72,7 +70,7 @@ class LibraryUpdate {
 		} else {
 			console.log('LIB CRON: Creating admin user');
 			try {
-				adminData = new Admin({
+				let adminData = new Admin({
 					_id: this.config.adminId,
 					email: this.config.adminEmail,
 					thumb: this.config.adminThumb,
@@ -740,13 +738,13 @@ class LibraryUpdate {
 
 	execMail() {
 		console.log('MAILER: Parsing mail queue');
-		console.log(mailer);
+		console.log(this.mailer);
 		this.mailer.forEach((mail, index) => {
 			setTimeout(() => {
 				new Mailer().mail(mail[0], mail[1], mail[2], mail[3], mail[4]);
 			}, 10000 * (index + 1));
 		});
-		mailer = [];
+		this.mailer = [];
 	}
 
 	externalIdTv(id, type) {
