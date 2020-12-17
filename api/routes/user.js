@@ -59,6 +59,8 @@ router.get('/:id', async (req, res) => {
 	}
 	if (userData) {
 		res.json(userData);
+	} else {
+		res.status(404).send();
 	}
 });
 

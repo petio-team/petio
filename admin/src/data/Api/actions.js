@@ -401,6 +401,18 @@ export async function getUser(id) {
 			id: userData._id,
 		});
 	} catch (err) {
-		console.log(err);
+		finalise({
+			type: types.GET_USER,
+			user: {
+				email: 'User Not Found',
+				recommendationsPlaylistId: false,
+				thumb: false,
+				title: 'User Not Found',
+				username: 'User Not Found',
+				__v: false,
+				_id: false,
+			},
+			id: id,
+		});
 	}
 }

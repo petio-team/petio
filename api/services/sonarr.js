@@ -37,7 +37,6 @@ class Sonarr {
 			let url = `${this.config.protocol}://${this.config.hostname}${
 				this.config.port ? ':' + this.config.port : ''
 			}${this.config.urlBase}/api/${endpoint}${paramsString}`;
-			console.log(url);
 			let args = {
 				method: method,
 				json: true,
@@ -83,7 +82,6 @@ class Sonarr {
 				return false;
 			}
 			if (check) {
-				console.log('SERVICE - SONARR: Sonarr connection success');
 				return true;
 			} else {
 				console.log('SERVICE - SONARR: ERR Connection failed');
@@ -103,13 +101,6 @@ class Sonarr {
 		return await this.get('profile');
 	}
 
-	refresh(id) {
-		return this.post('command', false, {
-			name: 'refreshSeries',
-			seriesId: id,
-		});
-	}
-
 	lookup(id) {
 		return this.get('series/lookup', {
 			term: `tvdb:${id}`,
@@ -122,6 +113,14 @@ class Sonarr {
 			return false;
 		}
 		return this.get(`series/${id}`);
+	}
+
+	async queue() {
+		const active = await this.connect();
+		if (!active) {
+			return false;
+		}
+		return this.get(`queue`);
 	}
 
 	async test() {

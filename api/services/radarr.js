@@ -36,7 +36,7 @@ class Radarr {
 			});
 			let url = `${this.config.protocol}://${this.config.hostname}${
 				this.config.port ? ':' + this.config.port : ''
-			}${this.config.urlBase}/api/${endpoint}${paramsString}`;
+			}${this.config.urlBase}/api/v3/${endpoint}${paramsString}`;
 			let args = {
 				method: method,
 				json: true,
@@ -82,7 +82,6 @@ class Radarr {
 				return false;
 			}
 			if (check) {
-				console.log('SERVICE - RADARR: Radarr connection success');
 				return true;
 			} else {
 				console.log('SERVICE - RADARR: ERR Connection failed');
@@ -108,12 +107,27 @@ class Radarr {
 		});
 	}
 
+	async refresh() {
+		return await this.post('command', false, {
+			name: 'RefreshMonitoredDownloads',
+		});
+	}
+
 	async movie(id) {
 		const active = await this.connect();
 		if (!active) {
 			return false;
 		}
 		return this.get(`movie/${id}`);
+	}
+
+	async queue() {
+		const active = await this.connect();
+		if (!active) {
+			return false;
+		}
+		await this.refresh();
+		return this.get(`queue`);
 	}
 
 	async test() {
