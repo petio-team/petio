@@ -135,7 +135,7 @@ class Radarr {
 	}
 
 	async add(movieData) {
-		movieData.ProfileId = this.config.profileId;
+		movieData.qualityProfileId = parseInt(this.config.profileId);
 		movieData.Path = `${this.config.rootPath}${sanitize(
 			movieData.title
 		)} (${movieData.year})`;
@@ -146,11 +146,13 @@ class Radarr {
 
 		try {
 			let add = await this.post('movie', false, movieData);
-			console.log(add);
+			if (Array.isArray(add)) {
+				if (add[1].errorMessage) throw add[1].errorMessage;
+			}
 			return add.id;
 		} catch (err) {
 			console.log(`SERVICE - RADARR: Unable to add movie ${err}`);
-			return false;
+			throw err;
 		}
 	}
 
@@ -176,9 +178,8 @@ class Radarr {
 					);
 				}
 			} catch (err) {
-				console.log(err);
 				console.log(
-					`SERVICE - RADARR: Unable to add movie ${job.title}`
+					`SERVICE - RADARR: Unable to add movie ${job.title} - ERR: ${err}`
 				);
 			}
 		}
