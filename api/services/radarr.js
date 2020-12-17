@@ -98,7 +98,7 @@ class Radarr {
 	}
 
 	async getProfiles() {
-		return await this.get('profile');
+		return await this.get('qualityProfile');
 	}
 
 	lookup(id) {
