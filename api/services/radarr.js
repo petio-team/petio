@@ -82,7 +82,7 @@ class Radarr {
 				return false;
 			}
 			if (check) {
-				return true;
+				return check;
 			} else {
 				console.log('SERVICE - RADARR: ERR Connection failed');
 				return false;
@@ -135,8 +135,10 @@ class Radarr {
 	}
 
 	async add(movieData) {
+		let system = await this.get('system/status');
+		let sep = system.isWindows ? '//' : '/';
 		movieData.qualityProfileId = parseInt(this.config.profileId);
-		movieData.Path = `${this.config.rootPath}${sanitize(
+		movieData.Path = `${this.config.rootPath}${sep}${sanitize(
 			movieData.title
 		)} (${movieData.year})`;
 		movieData.addOptions = {
