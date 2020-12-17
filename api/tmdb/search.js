@@ -2,11 +2,12 @@
 const getConfig = require('../util/config');
 const request = require('xhr-request');
 const onServer = require('../plex/onServer');
+var sanitize = require('sanitize-filename');
 
 async function search(term) {
-	let movies = await searchMovies(term);
-	let shows = await searchShows(term);
-	let people = await searchPeople(term);
+	let movies = await searchMovies(sanitize(term));
+	let shows = await searchShows(sanitize(term));
+	let people = await searchPeople(sanitize(term));
 
 	for (let i = 0; i < movies.results.length; i++) {
 		let res = await onServer('movie', false, false, movies.results[i].id);
