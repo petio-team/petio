@@ -22,6 +22,7 @@ import {
 	saveEmailConfig,
 	getEmailConfig,
 	testEmail,
+	getUser,
 } from './actions';
 
 export default {
@@ -48,4 +49,5 @@ export default {
 	saveEmailConfig,
 	getEmailConfig,
 	testEmail,
+	getUser,
 };

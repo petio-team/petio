@@ -15,6 +15,7 @@ import { ReactComponent as Spinner } from './assets/svg/spinner.svg';
 import Api from './data/Api';
 import Setup from './page/Setup';
 import Settings from './page/Settings';
+import Requests from './page/Requests';
 
 class App extends React.Component {
 	constructor(props) {
@@ -132,6 +133,12 @@ class App extends React.Component {
 								</Route>
 								<Route path="/settings">
 									<Settings />
+								</Route>
+								<Route path="/requests">
+									<Requests
+										user={this.props.user}
+										api={this.props.api}
+									/>
 								</Route>
 							</Switch>
 						</div>

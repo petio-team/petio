@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
-const request = require('xhr-request');
 const Admin = require('../models/admin');
 const http = require('follow-redirects').http;
 
@@ -60,6 +59,8 @@ router.get('/:id', async (req, res) => {
 	}
 	if (userData) {
 		res.json(userData);
+	} else {
+		res.status(404).send();
 	}
 });
 

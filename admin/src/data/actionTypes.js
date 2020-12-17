@@ -6,6 +6,7 @@ export const GET_REVIEWS = 'GET_REVIEWS';
 export const GET_REQUESTS = 'GET_REQUESTS';
 export const PLEX_TOKEN = 'PLEX_TOKEN';
 export const PLEX_DETAILS = 'PLEX_DETAILS';
+export const GET_USER = 'GET_USER';
 
 // Metadata
 export const POPULAR = 'POPULAR';

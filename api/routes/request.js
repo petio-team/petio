@@ -70,9 +70,46 @@ async function mailRequest(user, request) {
 router.get('/all', async (req, res) => {
 	const requests = await Request.find();
 	let data = {};
-	requests.map((request, i) => {
-		data[request.requestId] = request;
-	});
+	let sonarr = new Sonarr();
+	let radarr = new Radarr();
+	let sonarrQ = await sonarr.queue();
+	let radarrQ = await radarr.queue();
+
+	await Promise.all(
+		requests.map(async (request, i) => {
+			let status = false;
+			let info = false;
+
+			if (request.type === 'tv' && request.sonarrId) {
+				status = sonarrQ.filter((obj) => {
+					return obj.series.id === request.sonarrId;
+				});
+				info = await sonarr.series(request.sonarrId);
+			}
+			if (request.type === 'movie' && request.radarrId) {
+				if (radarrQ.records.length > 0)
+					status = radarrQ.records.filter((obj) => {
+						return obj.movieId === request.radarrId;
+					});
+				info = await radarr.movie(request.radarrId);
+			}
+
+			data[request.requestId] = {
+				title: request.title,
+				status: status,
+				info: info,
+				requestId: request.requestId,
+				type: request.type,
+				thumb: request.thumb,
+				imdb_id: request.imdb_id,
+				tmdb_id: request.tmdb_id,
+				tvdb_id: request.tvdb_id,
+				users: request.users,
+				sonarrId: request.sonarrId,
+				radarrId: request.radarrId,
+			};
+		})
+	);
 	res.json(data);
 });
 
