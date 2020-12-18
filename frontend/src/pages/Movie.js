@@ -166,7 +166,12 @@ class Movie extends React.Component {
 		if (this.props.api.movie_lookup[id])
 			movieData = this.props.api.movie_lookup[id];
 
-		if (!movieData || movieData.isMinified || !this.props.user) {
+		if (
+			!movieData ||
+			movieData.isMinified ||
+			!this.props.user ||
+			movieData.error
+		) {
 			return <MovieShowLoading />;
 		}
 
@@ -200,47 +205,6 @@ class Movie extends React.Component {
 			}
 		}
 
-		let reviewBtn = null;
-
-		if (this.props.user.reviews) {
-			if (this.props.user.reviews[this.props.match.params.id]) {
-				var hasReviewed = false;
-				for (
-					var i = 0;
-					i <
-					this.props.user.reviews[this.props.match.params.id].length;
-					i++
-				) {
-					if (
-						this.props.user.reviews[this.props.match.params.id][i]
-							.user == this.props.user.current._id
-					) {
-						hasReviewed = this.props.user.reviews[
-							this.props.match.params.id
-						][i];
-					}
-				}
-				reviewBtn = (
-					<button
-						className="btn btn__square"
-						onClick={this.openReview}
-					>
-						{!hasReviewed ? (
-							<>
-								<StarIcon />
-								Review
-							</>
-						) : (
-							<>
-								<StarIcon />
-								Reviewed {(hasReviewed.score / 10) * 100}%
-							</>
-						)}
-					</button>
-				);
-			}
-		}
-
 		return (
 			<div
 				className="movie-wrap"
@@ -261,16 +225,15 @@ class Movie extends React.Component {
 					trailer={this.state.trailer}
 					requested={this.state.requested}
 					request={this.request}
-					reviewBtn={reviewBtn}
 				/>
 				<div className="movie-content">
-					{reviewBtn}
 					<MovieOverview
 						movieData={movieData}
 						video={video}
 						user={this.props.user}
-						reviewbtn={reviewBtn}
 						showTrailer={this.showTrailer}
+						match={this.props.match}
+						openReview={this.openReview}
 					/>
 					<section>
 						<h3 className="sub-title mb--1">Cast</h3>

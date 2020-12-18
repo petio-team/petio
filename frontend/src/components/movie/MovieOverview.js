@@ -53,6 +53,42 @@ class MovieOverview extends React.Component {
 		let userRating = 'Not Reviewed';
 		let userRatingVal = 0;
 
+		let hasReviewed = false;
+		if (this.props.user.reviews) {
+			if (this.props.user.reviews[this.props.match.params.id]) {
+				for (
+					var i = 0;
+					i <
+					this.props.user.reviews[this.props.match.params.id].length;
+					i++
+				) {
+					if (
+						this.props.user.reviews[this.props.match.params.id][i]
+							.user == this.props.user.current._id
+					) {
+						hasReviewed = this.props.user.reviews[
+							this.props.match.params.id
+						][i];
+					}
+				}
+			}
+		}
+		let reviewBtn = (
+			<button className="btn btn__square" onClick={this.props.openReview}>
+				{!hasReviewed ? (
+					<>
+						<StarIcon />
+						Review
+					</>
+				) : (
+					<>
+						<StarIcon />
+						Reviewed {(hasReviewed.score / 10) * 100}%
+					</>
+				)}
+			</button>
+		);
+
 		return (
 			<section>
 				<div className="quick-view">
@@ -67,7 +103,7 @@ class MovieOverview extends React.Component {
 									Trailer
 								</button>
 							) : null}
-							{this.props.reviewBtn}
+							{reviewBtn}
 							<div className="resolutions">
 								{this.props.movieData.available_resolutions.includes(
 									'4k'
