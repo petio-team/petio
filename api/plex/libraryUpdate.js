@@ -196,8 +196,6 @@ class LibraryUpdate {
 				console.log('LIB CRON: Library Updated');
 			}
 		}
-
-		console.log(libraryItem.key);
 	}
 
 	async updateLibraryContent(libraries) {

@@ -1,7 +1,7 @@
 body {
 	// background: red;
 	max-width: 100vw;
-	overflow-x: hidden;
+	overflow: hidden;
 	color: $black;
 	background: linear-gradient(
 		135deg,
@@ -16,4 +16,13 @@ body {
 	color: white;
 	-webkit-font-smoothing: antialiased;
 	min-height: 100vh;
+}
+
+#root {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	overflow-y: auto;
 }
