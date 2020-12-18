@@ -22,6 +22,7 @@ async function movieLookup(id, minified = false) {
 				movie.tile = findEnLogo(fanart.moviethumb);
 			}
 		}
+		let collectionData = false;
 		let onPlex = await onServer('movie', movie.imdb_id, false, id);
 		let recommendations = await getRecommendations(id);
 		let recommendationsData = [];
@@ -33,7 +34,22 @@ async function movieLookup(id, minified = false) {
 				recommendationsData.push(recommendation.id);
 			});
 		}
+		if (!minified && movie.belongs_to_collection) {
+			try {
+				let collection = await getCollection(
+					movie.belongs_to_collection.id
+				);
+				collectionData = [];
+				collection.parts.map((part) => {
+					collectionData.push(part.id);
+				});
+			} catch (err) {
+				console.log(err);
+				console.log(`Error getting collection data - ${movie.title}`);
+			}
+		}
 		movie.recommendations = recommendationsData;
+		movie.collection = collectionData;
 		delete movie.production_countries;
 		delete movie.budget;
 		delete movie.adult;
@@ -92,6 +108,30 @@ async function getRecommendations(id) {
 	const tmdbApikey = config.tmdbApi;
 	const tmdb = 'https://api.themoviedb.org/3/';
 	let url = `${tmdb}movie/${id}/recommendations?api_key=${tmdbApikey}&append_to_response=credits,videos`;
+
+	return new Promise((resolve, reject) => {
+		request(
+			url,
+			{
+				method: 'GET',
+				json: true,
+			},
+			function (err, data) {
+				if (err) {
+					reject(err);
+				}
+
+				resolve(data);
+			}
+		);
+	});
+}
+
+async function getCollection(id) {
+	const config = getConfig();
+	const tmdbApikey = config.tmdbApi;
+	const tmdb = 'https://api.themoviedb.org/3/';
+	let url = `${tmdb}collection/${id}?api_key=${tmdbApikey}`;
 
 	return new Promise((resolve, reject) => {
 		request(
