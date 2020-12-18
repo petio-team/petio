@@ -19,7 +19,7 @@ class Requests extends React.Component {
 
 	componentDidMount() {
 		this.getRequests();
-		this.heartbeat = setInterval(() => this.getRequests(true), 10000);
+		this.heartbeat = setInterval(() => this.getRequests(true), 30000);
 	}
 
 	componentDidUpdate() {
