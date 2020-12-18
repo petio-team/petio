@@ -136,7 +136,7 @@ class Radarr {
 
 	async add(movieData) {
 		let system = await this.get('system/status');
-		let sep = system.isWindows ? '//' : '/';
+		let sep = system.isWindows ? '\\' : '/';
 		movieData.qualityProfileId = parseInt(this.config.profileId);
 		movieData.Path = `${this.config.rootPath}${sep}${sanitize(
 			movieData.title
