@@ -591,6 +591,26 @@ class Movie extends React.Component {
 							})}
 						</Carousel>
 					</section>
+					{movieData.belongs_to_collection &&
+					movieData.collection.length > 0 ? (
+						<section>
+							<h3 className="sub-title mb--1">
+								{movieData.belongs_to_collection.name}
+							</h3>
+							<Carousel>
+								{movieData.collection.map((key) => {
+									return (
+										<div
+											className="collection--item"
+											key={`collection-${key}`}
+										>
+											<MovieCard movie={{ id: key }} />
+										</div>
+									);
+								})}
+							</Carousel>
+						</section>
+					) : null}
 					{related}
 					<section>
 						<h3 className="sub-title mb--1">Reviews</h3>
