@@ -20,6 +20,8 @@ import User from '../data/User';
 import Review from '../components/Review';
 import ReviewsList from '../components/ReviewsLists';
 import MovieShowLoading from '../components/MovieShowLoading';
+import MovieTop from '../components/movie/MovieTop';
+import MovieOverview from '../components/movie/MovieOverview';
 
 class Movie extends React.Component {
 	constructor(props) {
@@ -135,6 +137,7 @@ class Movie extends React.Component {
 	}
 
 	getReviews() {
+		console.log('reviews got');
 		let id = this.props.match.params.id;
 		User.getReviews(id);
 	}
@@ -157,45 +160,13 @@ class Movie extends React.Component {
 		});
 	}
 
-	timeConvert(n) {
-		var num = n;
-		var hours = num / 60;
-		var rhours = Math.floor(hours);
-		var minutes = (hours - rhours) * 60;
-		var rminutes = Math.round(minutes);
-		var hrs =
-			rhours < 1 ? '' : rhours === 1 ? 'hr' : rhours > 1 ? 'hrs' : '';
-		return `${rhours >= 1 ? rhours : ''} ${hrs} ${rminutes} mins`;
-	}
-
-	findNested(obj, key, value) {
-		// Base case
-		if (obj[key] === value) {
-			return obj;
-		} else {
-			for (var i = 0, len = Object.keys(obj).length; i < len; i++) {
-				if (typeof obj[i] == 'object') {
-					var found = this.findNested(obj[i], key, value);
-					if (found) {
-						// If the object was found in the recursive call, bubble it up.
-						return found;
-					}
-				}
-			}
-		}
-	}
-
 	render() {
 		let id = this.state.id;
 		let movieData = null;
 		if (this.props.api.movie_lookup[id])
 			movieData = this.props.api.movie_lookup[id];
 
-		if (!movieData) {
-			return <MovieShowLoading />;
-		}
-
-		if (movieData.isMinified) {
+		if (!movieData || movieData.isMinified || !this.props.user) {
 			return <MovieShowLoading />;
 		}
 
@@ -219,36 +190,15 @@ class Movie extends React.Component {
 			);
 		}
 
-		let requestBtn = movieData.on_server ? (
-			<div className="btn btn__square good">
-				<CheckIcon />
-				On Plex
-			</div>
-		) : this.state.requested ? (
-			<button className="btn btn__square blue" onClick={this.request}>
-				{`Requested by ${this.state.requested} 
-				${this.state.requested > 1 ? 'users' : 'user'}`}
-			</button>
-		) : (
-			<button className="btn btn__square" onClick={this.request}>
-				<RequestIcon />
-				Request
-			</button>
-		);
+		let video = movieData.videos.results
+			? movieData.videos.results[0]
+			: false;
 
-		let watchBtn = movieData.onServer ? (
-			<button className="btn btn__square good">
-				<WatchIcon />
-				Play
-			</button>
-		) : null;
-
-		let reportBtn = (
-			<button className="btn btn__square" onClick={this.props.openIssues}>
-				<ReportIcon />
-				Report an issue
-			</button>
-		);
+		if (video) {
+			if (video.site !== 'YouTube') {
+				video = false;
+			}
+		}
 
 		let reviewBtn = null;
 
@@ -268,7 +218,6 @@ class Movie extends React.Component {
 						hasReviewed = this.props.user.reviews[
 							this.props.match.params.id
 						][i];
-						break;
 					}
 				}
 				reviewBtn = (
@@ -292,72 +241,6 @@ class Movie extends React.Component {
 			}
 		}
 
-		let criticRating = movieData.vote_average;
-
-		let director = this.findNested(
-			movieData.credits.crew,
-			'job',
-			'Director'
-		);
-
-		let screenplay = this.findNested(
-			movieData.credits.crew,
-			'job',
-			'Screenplay'
-		);
-
-		let video = movieData.videos.results
-			? movieData.videos.results[0]
-			: false;
-
-		if (video) {
-			if (video.site !== 'YouTube') {
-				video = false;
-			}
-		}
-
-		let userRating = 'Not Reviewed';
-		let userRatingVal = 0;
-
-		if (this.props.user.reviews) {
-			if (this.props.user.reviews[this.props.match.params.id]) {
-				if (
-					Object.keys(
-						this.props.user.reviews[this.props.match.params.id]
-					).length > 0
-				) {
-					let ratingsUser = 0;
-
-					Object.keys(
-						this.props.user.reviews[this.props.match.params.id]
-					).map((r) => {
-						ratingsUser +=
-							(this.props.user.reviews[
-								this.props.match.params.id
-							][r].score /
-								10) *
-							100;
-					});
-
-					userRating = `${(
-						ratingsUser /
-						Object.keys(
-							this.props.user.reviews[this.props.match.params.id]
-						).length
-					).toFixed(0)}% (${
-						Object.keys(
-							this.props.user.reviews[this.props.match.params.id]
-						).length
-					} reviews)`;
-					userRatingVal =
-						ratingsUser /
-						Object.keys(
-							this.props.user.reviews[this.props.match.params.id]
-						).length;
-				}
-			}
-		}
-
 		return (
 			<div
 				className="movie-wrap"
@@ -372,211 +255,23 @@ class Movie extends React.Component {
 					getReviews={this.getReviews}
 					item={movieData}
 				/>
-				<div
-					className={`movie-top ${
-						this.state.trailer ? 'show-trailer' : ''
-					}`}
-				>
-					<div
-						className="movie-backdrop"
-						key={`${movieData.title}__backdrop`}
-					>
-						{video && this.state.trailer ? (
-							<div className="series-trailer">
-								<iframe
-									style={{ pointerEvents: 'none' }}
-									frameBorder="0"
-									height="100%"
-									width="100%"
-									src={`https://youtube.com/embed/${video.key}?autoplay=1&controls=0&showinfo=0&autohide=1&loop=1&modestbranding=1&playsinline=1&rel=0`}
-								></iframe>
-							</div>
-						) : null}
-						{movieData.backdrop_path ? (
-							<LazyLoadImage
-								src={
-									'https://image.tmdb.org/t/p/w1280/' +
-									movieData.backdrop_path
-								}
-								alt={movieData.title}
-								effect="blur"
-								key={`${movieData.title}__backdrop`}
-							/>
-						) : (
-							<div
-								className="no-backdrop"
-								style={{
-									backgroundImage: 'url(/p-seamless.png)',
-								}}
-							></div>
-						)}
-					</div>
-					<div className="movie-poster">
-						<div className="movie-poster--inner">
-							{movieData.poster_path ? (
-								<LazyLoadImage
-									src={
-										'https://image.tmdb.org/t/p/w500/' +
-										movieData.poster_path
-									}
-									alt={movieData.title}
-									effect="blur"
-									key={`${movieData.title}__poster`}
-								/>
-							) : null}
-						</div>
-					</div>
-					<div className="movie-details">
-						<span></span>
-						<div className="movie-details--top">
-							{movieData.logo ? (
-								<LazyLoadImage
-									className="movie-logo"
-									src={movieData.logo}
-								/>
-							) : (
-								<h1 className="single-title">
-									{movieData.title}
-								</h1>
-							)}
-						</div>
-						<div className="movie--actions">
-							{watchBtn}
-							{requestBtn}
-							{reportBtn}
-						</div>
-					</div>
-				</div>
+				<MovieTop
+					movieData={movieData}
+					openIssues={this.props.openIssues}
+					trailer={this.state.trailer}
+					requested={this.state.requested}
+					request={this.request}
+					reviewBtn={reviewBtn}
+				/>
 				<div className="movie-content">
-					<section>
-						<div className="quick-view">
-							<div className="side-content">
-								<div className="movie-action">
-									{video ? (
-										<button
-											onClick={this.showTrailer}
-											className="btn btn__square"
-										>
-											<TrailerIcon />
-											Trailer
-										</button>
-									) : null}
-									{reviewBtn}
-									<div className="resolutions">
-										{movieData.available_resolutions.includes(
-											'4k'
-										) ? (
-											<ResIconUHd />
-										) : null}
-										{movieData.available_resolutions.includes(
-											'1080'
-										) ? (
-											<ResIconFHd />
-										) : null}
-										{movieData.available_resolutions.includes(
-											'720'
-										) ? (
-											<ResIconHd />
-										) : null}
-									</div>
-								</div>
-							</div>
-							<div className="info">
-								<div className="details">
-									<p className="year">
-										{new Date(
-											movieData.release_date
-										).getFullYear()}
-									</p>
-									<p className="spacer">|</p>
-									<p className="runtime">
-										{this.timeConvert(movieData.runtime)}
-									</p>
-									<p className="spacer">|</p>
-									<p className="genre">
-										{movieData.genres.map((genre, i) => {
-											if (
-												i ===
-												movieData.genres.length - 1
-											)
-												return genre.name;
-											return genre.name + ' / ';
-										})}
-									</p>
-									<p className="spacer hide-mb">|</p>
-									<p>
-										Rating:{' '}
-										<span
-											className={`color-${
-												criticRating > 7.9
-													? 'green'
-													: criticRating > 6.9
-													? 'blue'
-													: criticRating > 4.9
-													? 'orange'
-													: 'red'
-											}`}
-										>
-											{criticRating}
-										</span>
-									</p>
-									<p className="spacer">|</p>
-									<p>
-										User Rating:{' '}
-										<span
-											className={`color-${
-												userRatingVal > 79
-													? 'green'
-													: userRatingVal > 69
-													? 'blue'
-													: userRatingVal > 49
-													? 'orange'
-													: 'red'
-											}`}
-										>
-											{userRating}
-										</span>
-									</p>
-								</div>
-								<div className="movie-action__mobile">
-									{watchBtn}
-									{requestBtn}
-									{reportBtn}
-									{reviewBtn}
-								</div>
-								<div className="movie-crew">
-									{director ? (
-										<div className="movie-crew--item">
-											<p className="sub-title">
-												Director
-											</p>
-											<Link
-												to={`/person/${director.id}`}
-												className="crew-credit"
-											>
-												{director.name}
-											</Link>
-										</div>
-									) : null}
-									{screenplay ? (
-										<div className="movie-crew--item">
-											<p className="sub-title">
-												Screenplay
-											</p>
-											<Link
-												to={`/person/${screenplay.id}`}
-												className="crew-credit"
-											>
-												{screenplay.name}
-											</Link>
-										</div>
-									) : null}
-								</div>
-								<p className="sub-title mb--1">Synopsis</p>
-								<p className="overview">{movieData.overview}</p>
-							</div>
-						</div>
-					</section>
+					{reviewBtn}
+					<MovieOverview
+						movieData={movieData}
+						video={video}
+						user={this.props.user}
+						reviewbtn={reviewBtn}
+						showTrailer={this.showTrailer}
+					/>
 					<section>
 						<h3 className="sub-title mb--1">Cast</h3>
 						<Carousel>
