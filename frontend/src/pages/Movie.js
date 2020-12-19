@@ -1,20 +1,10 @@
 import React from "react";
-import { withRouter, Link } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import PersonCard from "../components/PersonCard";
 import MovieCard from "../components/MovieCard";
 import Api from "../data/Api";
 import Carousel from "../components/Carousel";
-import { ReactComponent as RequestIcon } from "../assets/svg/request.svg";
-import { ReactComponent as ReportIcon } from "../assets/svg/report.svg";
-import { ReactComponent as WatchIcon } from "../assets/svg/play.svg";
-import { ReactComponent as CheckIcon } from "../assets/svg/check.svg";
-import { ReactComponent as StarIcon } from "../assets/svg/star.svg";
-import { ReactComponent as TrailerIcon } from "../assets/svg/video.svg";
-import { ReactComponent as ResIconHd } from "../assets/svg/720p.svg";
-import { ReactComponent as ResIconFHd } from "../assets/svg/1080p.svg";
-import { ReactComponent as ResIconUHd } from "../assets/svg/4k.svg";
-import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import User from "../data/User";
 import Review from "../components/Review";
@@ -38,7 +28,6 @@ class Movie extends React.Component {
     this.getMovie = this.getMovie.bind(this);
     this.request = this.request.bind(this);
     this.getRequests = this.getRequests.bind(this);
-    // this.getRelated = this.getRelated.bind(this);
     this.init = this.init.bind(this);
     this.showTrailer = this.showTrailer.bind(this);
     this.openReview = this.openReview.bind(this);
@@ -160,15 +149,9 @@ class Movie extends React.Component {
   render() {
     let id = this.state.id;
     let movieData = null;
-    if (this.props.api.movie_lookup[id])
-      movieData = this.props.api.movie_lookup[id];
+    if (this.props.api.movie_lookup[id]) movieData = this.props.api.movie_lookup[id];
 
-    if (
-      !movieData ||
-      movieData.isMinified ||
-      !this.props.user ||
-      movieData.error
-    ) {
+    if (!movieData || movieData.isMinified || !this.props.user || movieData.error) {
       return <MovieShowLoading />;
     }
 
@@ -201,11 +184,7 @@ class Movie extends React.Component {
     }
 
     return (
-      <div
-        className="movie-wrap"
-        data-id={movieData.imdb_id}
-        key={`${movieData.title}__wrap`}
-      >
+      <div className="movie-wrap" data-id={movieData.imdb_id} key={`${movieData.title}__wrap`}>
         <Review
           id={this.props.match.params.id}
           user={this.props.user.current}
@@ -245,12 +224,9 @@ class Movie extends React.Component {
               })}
             </Carousel>
           </section>
-          {movieData.belongs_to_collection &&
-          movieData.collection.length > 0 ? (
+          {movieData.belongs_to_collection && movieData.collection.length > 0 ? (
             <section>
-              <h3 className="sub-title mb--1">
-                {movieData.belongs_to_collection.name}
-              </h3>
+              <h3 className="sub-title mb--1">{movieData.belongs_to_collection.name}</h3>
               <Carousel>
                 {movieData.collection.map((key) => {
                   return (
@@ -266,10 +242,7 @@ class Movie extends React.Component {
           <section>
             <h3 className="sub-title mb--1">Reviews</h3>
             {this.props.user.reviews ? (
-              <ReviewsList
-                reviews={this.props.user.reviews[id]}
-                external={movieData.reviews}
-              />
+              <ReviewsList reviews={this.props.user.reviews[id]} external={movieData.reviews} />
             ) : null}
           </section>
         </div>
@@ -281,9 +254,7 @@ class Movie extends React.Component {
 Movie = withRouter(Movie);
 
 function MovieContainer(props) {
-  return (
-    <Movie api={props.api} user={props.user} openIssues={props.openIssues} />
-  );
+  return <Movie api={props.api} user={props.user} openIssues={props.openIssues} />;
 }
 
 const mapStateToProps = function (state) {

@@ -48,7 +48,6 @@ async function movieLookup(id, minified = false) {
     }
 
     if (!minified) {
-      console.log("running");
       try {
         let reviews = await getReviews(id);
 
