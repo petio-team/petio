@@ -506,19 +506,32 @@
     width: 100%;
     display: flex;
     align-items: center;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
+
+    @include media-breakpoint-up(lg) {
+      margin-bottom: 30px;
+    }
 
     p {
       margin: 0;
-      font-size: 12px;
+      font-size: 10px;
       font-weight: 500;
+
+      @include media-breakpoint-up(lg) {
+        font-size: 12px;
+      }
     }
 
     &--sep {
-      padding: 0 10px;
-      font-size: 12px;
+      padding: 0 5px;
+      font-size: 10px;
       line-height: 22px;
       font-weight: 500;
+
+      @include media-breakpoint-up(lg) {
+        padding: 0 10px;
+        font-size: 12px;
+      }
     }
 
     &--item {
@@ -552,13 +565,22 @@
     margin-bottom: 30px;
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
   }
 
   &--item {
     margin-right: 10px;
     padding: 5px 10px;
-    border: solid 1px white;
+    // border: solid 1px white;
     font-size: 10px;
     border-radius: 5px;
+    display: flex;
+    align-items: center;
+    background: rgba($grey-light, 0.2);
+
+    svg {
+      height: 10px;
+      margin-right: 5px;
+    }
   }
 }

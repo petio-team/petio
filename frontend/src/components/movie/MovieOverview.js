@@ -6,6 +6,26 @@ import { ReactComponent as ResIconFHd } from "../../assets/svg/1080p.svg";
 import { ReactComponent as ResIconUHd } from "../../assets/svg/4k.svg";
 import { ReactComponent as StarIcon } from "../../assets/svg/star.svg";
 
+import { ReactComponent as GenreAction } from "../../assets/svg//genres/action.svg";
+import { ReactComponent as GenreAdventure } from "../../assets/svg//genres/adventure.svg";
+import { ReactComponent as GenreAnimation } from "../../assets/svg//genres/animation.svg";
+import { ReactComponent as GenreComedy } from "../../assets/svg//genres/comedy.svg";
+import { ReactComponent as GenreCrime } from "../../assets/svg//genres/crime.svg";
+import { ReactComponent as GenreDocumentary } from "../../assets/svg//genres/documentary.svg";
+import { ReactComponent as GenreDrama } from "../../assets/svg//genres/drama.svg";
+import { ReactComponent as GenreFamily } from "../../assets/svg//genres/family.svg";
+import { ReactComponent as GenreFantasy } from "../../assets/svg//genres/fantasy.svg";
+import { ReactComponent as GenreHistory } from "../../assets/svg//genres/history.svg";
+import { ReactComponent as GenreHorror } from "../../assets/svg//genres/horror.svg";
+import { ReactComponent as GenreMusic } from "../../assets/svg//genres/music.svg";
+import { ReactComponent as GenreMystery } from "../../assets/svg//genres/mystery.svg";
+import { ReactComponent as GenreRomance } from "../../assets/svg//genres/romance.svg";
+import { ReactComponent as GenreScienceFiction } from "../../assets/svg//genres/science-fiction.svg";
+import { ReactComponent as GenreTvMovie } from "../../assets/svg//genres/tv-movie.svg";
+import { ReactComponent as GenreThriller } from "../../assets/svg//genres/thriller.svg";
+import { ReactComponent as GenreWar } from "../../assets/svg//genres/war.svg";
+import { ReactComponent as GenreWestern } from "../../assets/svg//genres/western.svg";
+
 class MovieOverview extends React.Component {
   findNested(obj, key, value) {
     // Base case
@@ -30,8 +50,53 @@ class MovieOverview extends React.Component {
     var rhours = Math.floor(hours);
     var minutes = (hours - rhours) * 60;
     var rminutes = ("0" + Math.round(minutes)).slice(-2);
-    var hrs = rhours < 1 ? "" : rhours === 1 ? "hr" : rhours > 1 ? "hr" : "";
-    return `${rhours >= 1 ? rhours : ""}${hrs}${rminutes}`;
+    var hrs = rhours < 1 ? "" : rhours === 1 ? "hr" : rhours > 1 ? "hrs" : "";
+    return `${rhours >= 1 ? rhours : ""}${hrs}${rminutes}m`;
+  }
+
+  genreIcon(name) {
+    switch (name) {
+      case "Action":
+        return <GenreAction />;
+      case "Adventure":
+        return <GenreAdventure />;
+      case "Animation":
+        return <GenreAnimation />;
+      case "Comedy":
+        return <GenreComedy />;
+      case "Crime":
+        return <GenreCrime />;
+      case "Documentary":
+        return <GenreDocumentary />;
+      case "Drama":
+        return <GenreDrama />;
+      case "Family":
+        return <GenreFamily />;
+      case "Fantasy":
+        return <GenreFantasy />;
+      case "History":
+        return <GenreHistory />;
+      case "Horror":
+        return <GenreHorror />;
+      case "Music":
+        return <GenreMusic />;
+      case "Mystery":
+        return <GenreMystery />;
+      case "Romance":
+        return <GenreRomance />;
+      case "Science Fiction":
+        return <GenreScienceFiction />;
+      case "TV Movie":
+        return <GenreTvMovie />;
+      case "Thriller":
+        return <GenreThriller />;
+      case "War":
+        return <GenreWar />;
+      case "Western":
+        return <GenreWestern />;
+      default:
+        return null;
+    }
   }
 
   render() {
@@ -79,7 +144,9 @@ class MovieOverview extends React.Component {
           total += this.props.externalReviews.length;
         }
 
-        userRating = `${(ratingsUser / (total - ignore)).toFixed(0)}% (${total - ignore} reviews)`;
+        userRating = ratingsUser
+          ? `${(ratingsUser / (total - ignore)).toFixed(0)}% (${total - ignore} reviews)`
+          : "Not Reviewed";
 
         userRatingVal = ratingsUser / (total - ignore);
       }
@@ -165,7 +232,12 @@ class MovieOverview extends React.Component {
               <div className="genre--wrap">
                 {this.props.movieData.genres.map((genre, i) => {
                   // if (i === this.props.movieData.genres.length - 1) return genre.name;
-                  return <div className="genre--item">{genre.name}</div>;
+                  return (
+                    <div className="genre--item">
+                      {this.genreIcon(genre.name)}
+                      {genre.name}
+                    </div>
+                  );
                 })}
               </div>
               <div className="movie-crew">
