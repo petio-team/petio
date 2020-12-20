@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const FriendSchema = mongoose.Schema(
 	{
-		_id: String,
+		id: String,
 		title: String,
 		username: String,
 		email: String,
