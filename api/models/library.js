@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 const LibrarySchema = mongoose.Schema(
 	{
-		_id: String,
 		allowSync: Boolean,
 		art: String,
 		composite: String,
