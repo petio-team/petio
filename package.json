@@ -1,15 +1,15 @@
 {
-	"name": "petio",
-	"version": "0.1.9.2",
-	"description": "Request Platform for Plex",
-	"main": "petio.js",
-	"author": "",
-	"license": "ISC",
-	"dependencies": {
-		"express": "^4.17.1",
-		"open": "^7.3.0"
-	},
-	"scripts": {
-		"start": "node petio.js"
-	}
+  "name": "petio",
+  "version": "0.1.9.3",
+  "description": "Request Platform for Plex",
+  "main": "petio.js",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "open": "^7.3.0"
+  },
+  "scripts": {
+    "start": "node petio.js"
+  }
 }
