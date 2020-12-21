@@ -141,9 +141,10 @@ class MovieShowOverview extends React.Component {
         let ratingsUser = 0;
         let ignore = 0;
         let total = 0;
+        console.log(this.props.user.reviews[this.props.match.params.id]);
         if (this.props.user.reviews[this.props.match.params.id]) {
           for (var i = 0; i < this.props.user.reviews[this.props.match.params.id].length; i++) {
-            if (this.props.user.reviews[this.props.match.params.id][i].user == this.props.user.current._id) {
+            if (this.props.user.reviews[this.props.match.params.id][i].user == this.props.user.current.id) {
               hasReviewed = this.props.user.reviews[this.props.match.params.id][i];
             }
           }
@@ -171,8 +172,9 @@ class MovieShowOverview extends React.Component {
         userRatingVal = ratingsUser / (total - ignore);
       }
     }
+    console.log(hasReviewed);
     let reviewBtn = (
-      <button className="btn btn__square" onClick={this.props.openReview}>
+      <button className="btn btn__square" onClick={!hasReviewed ? this.props.openReview : null}>
         {!hasReviewed ? (
           <>
             <StarIcon />
