@@ -21,7 +21,6 @@ class Sidebar extends React.Component {
 	}
 
 	render() {
-		console.log(this.props.history);
 		let current = this.props.location.pathname;
 		let user = this.props.user.current;
 		return (
