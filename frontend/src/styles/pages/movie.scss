@@ -1,61 +1,61 @@
-.movie {
-	&-wrap {
-		@extend .series-wrap;
-	}
+// .movie {
+// 	&-wrap {
+// 		@extend .series-wrap;
+// 	}
 
-	&-top {
-		@extend .series-top;
-	}
+// 	&-top {
+// 		@extend .series-top;
+// 	}
 
-	&-logo {
-		@extend .series-logo;
-	}
+// 	&-logo {
+// 		@extend .series-logo;
+// 	}
 
-	&-poster {
-		@extend .series-poster;
+// 	&-poster {
+// 		@extend .series-poster;
 
-		&--inner {
-			@extend .series-poster--inner;
-		}
-	}
+// 		&--inner {
+// 			@extend .series-poster--inner;
+// 		}
+// 	}
 
-	&-details {
-		@extend .series-details;
+// 	&-details {
+// 		@extend .series-details;
 
-		.movie-title {
-			@extend .series-title;
-		}
-	}
+// 		.movie-title {
+// 			@extend .series-title;
+// 		}
+// 	}
 
-	&--actions {
-		@extend .series--actions;
-	}
+// 	&--actions {
+// 		@extend .series--actions;
+// 	}
 
-	&-backdrop {
-		@extend .series-backdrop;
-	}
+// 	&-backdrop {
+// 		@extend .series-backdrop;
+// 	}
 
-	&-cast {
-		@extend .series-cast;
-	}
+// 	&-cast {
+// 		@extend .series-cast;
+// 	}
 
-	&-crew {
-		@extend .series-crew;
+// 	&-crew {
+// 		@extend .series-crew;
 
-		&--item {
-			@extend .series-crew--item;
-		}
-	}
+// 		&--item {
+// 			@extend .series-crew--item;
+// 		}
+// 	}
 
-	&-action {
-		@extend .series-action;
+// 	&-action {
+// 		@extend .series-action;
 
-		&__mobile {
-			@extend .series-action__mobile;
-		}
-	}
+// 		&__mobile {
+// 			@extend .series-action__mobile;
+// 		}
+// 	}
 
-	&-content {
-		@extend .series-content;
-	}
-}
+// 	&-content {
+// 		@extend .series-content;
+// 	}
+// }

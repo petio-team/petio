@@ -165,7 +165,7 @@ class Radarr {
 				let radarrId = await this.add(radarrData);
 				let updatedRequest = await Request.findOneAndUpdate(
 					{
-						_id: job._id,
+						requestId: job.requestId,
 					},
 					{
 						$set: {

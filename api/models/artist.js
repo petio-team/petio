@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 const MusicSchema = mongoose.Schema(
 	{
-		_id: String,
 		title: String,
 		ratingKey: Number,
 		key: String,

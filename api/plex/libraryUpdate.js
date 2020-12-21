@@ -45,13 +45,13 @@ class LibraryUpdate {
 
 	async createAdmin() {
 		let adminFound = await Admin.findOne({
-			_id: this.config.adminId,
+			id: this.config.adminId,
 		});
 		if (adminFound) {
 			console.log('LIB CRON: Admin Already Created, updating');
 			try {
 				let adminData = await Admin.findOneAndUpdate(
-					{ _id: this.config.adminId },
+					{ id: this.config.adminId },
 					{
 						$set: {
 							email: this.config.adminEmail,
@@ -71,7 +71,7 @@ class LibraryUpdate {
 			console.log('LIB CRON: Creating admin user');
 			try {
 				let adminData = new Admin({
-					_id: this.config.adminId,
+					id: this.config.adminId,
 					email: this.config.adminEmail,
 					thumb: this.config.adminThumb,
 					title: this.config.adminDisplayName,
@@ -126,14 +126,13 @@ class LibraryUpdate {
 		console.log('LIB CRON: Updating Library ' + lib);
 		let libraryItem = false;
 		try {
-			libraryItem = await Library.findById(lib.uuid);
+			libraryItem = await Library.findOne({ uuid: lib.uuid });
 		} catch {
 			console.log('LIB CRON: Library Not found, attempting to create');
 		}
 		if (!libraryItem) {
 			try {
 				let newLibrary = new Library({
-					_id: lib.uuid,
 					allowSync: lib.allowSync,
 					art: lib.art,
 					composite: lib.composite,
@@ -163,7 +162,7 @@ class LibraryUpdate {
 			let updatedLibraryItem = false;
 			try {
 				updatedLibraryItem = await Library.updateOne(
-					{ _id: lib.uuid },
+					{ uuid: lib.uuid },
 					{
 						$set: {
 							allowSync: lib.allowSync,
@@ -276,7 +275,7 @@ class LibraryUpdate {
 	async saveMovie(movieObj) {
 		let movieDb = false;
 		try {
-			movieDb = await Movie.findById(movieObj.ratingKey);
+			movieDb = await Movie.findOne({ ratingKey: movieObj.ratingKey });
 		} catch {
 			movieDb = false;
 		}
@@ -325,7 +324,6 @@ class LibraryUpdate {
 		if (!movieDb) {
 			try {
 				let newMovie = new Movie({
-					_id: movieObj.ratingKey,
 					title: movieObj.title,
 					ratingKey: movieObj.ratingKey,
 					key: movieObj.key,
@@ -370,7 +368,7 @@ class LibraryUpdate {
 			try {
 				let updatedMovie = await Movie.findOneAndUpdate(
 					{
-						_id: movieObj.ratingKey,
+						ratingKey: movieObj.ratingKey,
 					},
 					{
 						$set: {
@@ -424,14 +422,13 @@ class LibraryUpdate {
 	async saveMusic(musicObj) {
 		let musicDb = false;
 		try {
-			musicDb = await Music.findById(musicObj.ratingKey);
+			musicDb = await Music.findOne({ raingKey: musicObj.ratingKey });
 		} catch {
 			musicDb = false;
 		}
 		if (!musicDb) {
 			try {
 				let newMusic = new Music({
-					_id: musicObj.ratingKey,
 					title: musicObj.title,
 					ratingKey: musicObj.ratingKey,
 					key: musicObj.key,
@@ -456,7 +453,7 @@ class LibraryUpdate {
 		let showDb = false;
 
 		try {
-			showDb = await Show.findById(showObj.ratingKey);
+			showDb = await Show.findOne({ ratingKey: showObj.ratingKey });
 		} catch {
 			showDb = false;
 		}
@@ -510,7 +507,6 @@ class LibraryUpdate {
 		if (!showDb) {
 			try {
 				let newShow = new Show({
-					_id: showObj.ratingKey,
 					ratingKey: showObj.ratingKey,
 					key: showObj.key,
 					guid: showObj.guid,
@@ -552,7 +548,7 @@ class LibraryUpdate {
 			try {
 				let updatedShow = await Show.findOneAndUpdate(
 					{
-						_id: showObj.ratingKey,
+						ratingKey: showObj.ratingKey,
 					},
 					{
 						$set: {
@@ -655,7 +651,7 @@ class LibraryUpdate {
 		let friendDb = false;
 		let output = '';
 		try {
-			friendDb = await User.findById(obj.id);
+			friendDb = await User.findOne({ id: obj.id });
 		} catch {
 			friendDb = false;
 		}
@@ -663,7 +659,7 @@ class LibraryUpdate {
 			output += 'Friend Not found - ';
 			try {
 				let newFriend = new User({
-					_id: obj.id,
+					id: obj.id,
 					title: obj.title,
 					username: obj.username,
 					email: obj.email,
@@ -718,7 +714,7 @@ class LibraryUpdate {
 	}
 
 	async sendMail(user, i, request) {
-		let userData = await User.findOne({ _id: user });
+		let userData = await User.findOne({ id: user });
 		if (!userData) {
 			userData = {
 				email: this.config.adminEmail,
