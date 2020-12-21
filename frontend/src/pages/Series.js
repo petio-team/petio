@@ -18,8 +18,8 @@ import User from "../data/User";
 import Review from "../components/Review";
 import ReviewsList from "../components/ReviewsLists";
 import MovieShowLoading from "../components/MovieShowLoading";
-import ShowTop from "../components/show/ShowTop";
-import ShowOverview from "../components/show/ShowOverview";
+import MovieShowTop from "../components/MovieShowTop";
+import MovieShowOverview from "../components/MovieShowOverview";
 
 class Series extends React.Component {
   constructor(props) {
@@ -219,10 +219,7 @@ class Series extends React.Component {
       if (this.props.user.reviews[this.props.match.params.id]) {
         var hasReviewed = false;
         for (var i = 0; i < this.props.user.reviews[this.props.match.params.id].length; i++) {
-          if (
-            this.props.user.reviews[this.props.match.params.id][i].user ==
-            this.props.user.current._id
-          ) {
+          if (this.props.user.reviews[this.props.match.params.id][i].user == this.props.user.current._id) {
             hasReviewed = this.props.user.reviews[this.props.match.params.id][i];
             break;
           }
@@ -256,17 +253,13 @@ class Series extends React.Component {
           let ratingsUser = 0;
 
           Object.keys(this.props.user.reviews[this.props.match.params.id]).map((r) => {
-            ratingsUser +=
-              (this.props.user.reviews[this.props.match.params.id][r].score / 10) * 100;
+            ratingsUser += (this.props.user.reviews[this.props.match.params.id][r].score / 10) * 100;
           });
 
-          userRating = `${(
-            ratingsUser / Object.keys(this.props.user.reviews[this.props.match.params.id]).length
-          ).toFixed(0)}% (${
+          userRating = `${(ratingsUser / Object.keys(this.props.user.reviews[this.props.match.params.id]).length).toFixed(0)}% (${
             Object.keys(this.props.user.reviews[this.props.match.params.id]).length
           } reviews)`;
-          userRatingVal =
-            ratingsUser / Object.keys(this.props.user.reviews[this.props.match.params.id]).length;
+          userRatingVal = ratingsUser / Object.keys(this.props.user.reviews[this.props.match.params.id]).length;
         }
       }
     }
@@ -280,25 +273,13 @@ class Series extends React.Component {
     }
 
     return (
-      <div className="series-wrap" data-id={seriesData.imdb_id} key={`${seriesData.title}__wrap`}>
-        <Review
-          id={this.props.match.params.id}
-          user={this.props.user.current}
-          active={this.state.reviewOpen}
-          closeReview={this.closeReview}
-          getReviews={this.getReviews}
-          item={seriesData}
-        />
-        <ShowTop
-          seriesData={seriesData}
-          trailer={this.state.trailer}
-          requested={this.state.requested}
-          request={this.request}
-        />
+      <div className="media-wrap" data-id={seriesData.imdb_id} key={`${seriesData.title}__wrap`}>
+        <Review id={this.props.match.params.id} user={this.props.user.current} active={this.state.reviewOpen} closeReview={this.closeReview} getReviews={this.getReviews} item={seriesData} />
+        <MovieShowTop mediaData={seriesData} trailer={this.state.trailer} requested={this.state.requested} request={this.request} />
 
-        <div className="series-content">
-          <ShowOverview
-            seriesData={seriesData}
+        <div className="media-content">
+          <MovieShowOverview
+            mediaData={seriesData}
             video={video}
             user={this.props.user}
             showTrailer={this.showTrailer}
@@ -314,31 +295,18 @@ class Series extends React.Component {
                 return (
                   <div className="card type--movie-tv" key={`season--${season.season_number}${id}`}>
                     <div className="card--inner">
-                      <Link
-                        to={`/series/${id}/season/${season.season_number}`}
-                        className="full-link"
-                      ></Link>
+                      <Link to={`/series/${id}/season/${season.season_number}`} className="full-link"></Link>
                       <div className="image-wrap">
                         {season.poster_path ? (
-                          <img
-                            src={`https://image.tmdb.org/t/p/w200/${season.poster_path}`}
-                            alt={season.name}
-                          />
+                          <img src={`https://image.tmdb.org/t/p/w200/${season.poster_path}`} alt={season.name} />
                         ) : seriesData.poster_path ? (
-                          <img
-                            src={`https://image.tmdb.org/t/p/w500/${seriesData.poster_path}`}
-                            alt={season.name}
-                          />
+                          <img src={`https://image.tmdb.org/t/p/w500/${seriesData.poster_path}`} alt={season.name} />
                         ) : null}
                       </div>
                       <div className="text-wrap">
                         <p className="title">
                           {season.name}
-                          <span className="year">
-                            {season.air_date
-                              ? "(" + new Date(season.air_date).getFullYear() + ")"
-                              : ""}
-                          </span>
+                          <span className="year">{season.air_date ? "(" + new Date(season.air_date).getFullYear() + ")" : ""}</span>
                         </p>
                       </div>
                     </div>
@@ -351,13 +319,7 @@ class Series extends React.Component {
             <h3 className="sub-title mb--1">Cast</h3>
             <Carousel>
               {seriesData.credits.cast.map((cast, key) => {
-                return (
-                  <PersonCard
-                    key={`${cast.name}--${cast.character}`}
-                    person={cast}
-                    character={cast.character}
-                  />
-                );
+                return <PersonCard key={`${cast.name}--${cast.character}`} person={cast} character={cast.character} />;
               })}
             </Carousel>
           </section>

@@ -10,8 +10,8 @@ import User from "../data/User";
 import Review from "../components/Review";
 import ReviewsList from "../components/ReviewsLists";
 import MovieShowLoading from "../components/MovieShowLoading";
-import MovieTop from "../components/movie/MovieTop";
-import MovieOverview from "../components/movie/MovieOverview";
+import MovieShowTop from "../components/MovieShowTop";
+import MovieShowOverview from "../components/MovieShowOverview";
 
 class Movie extends React.Component {
   constructor(props) {
@@ -184,25 +184,12 @@ class Movie extends React.Component {
     }
 
     return (
-      <div className="movie-wrap" data-id={movieData.imdb_id} key={`${movieData.title}__wrap`}>
-        <Review
-          id={this.props.match.params.id}
-          user={this.props.user.current}
-          active={this.state.reviewOpen}
-          closeReview={this.closeReview}
-          getReviews={this.getReviews}
-          item={movieData}
-        />
-        <MovieTop
-          movieData={movieData}
-          openIssues={this.props.openIssues}
-          trailer={this.state.trailer}
-          requested={this.state.requested}
-          request={this.request}
-        />
-        <div className="movie-content">
-          <MovieOverview
-            movieData={movieData}
+      <div className="media-wrap" data-id={movieData.imdb_id} key={`${movieData.title}__wrap`}>
+        <Review id={this.props.match.params.id} user={this.props.user.current} active={this.state.reviewOpen} closeReview={this.closeReview} getReviews={this.getReviews} item={movieData} />
+        <MovieShowTop mediaData={movieData} openIssues={this.props.openIssues} trailer={this.state.trailer} requested={this.state.requested} request={this.request} />
+        <div className="media-content">
+          <MovieShowOverview
+            mediaData={movieData}
             video={video}
             user={this.props.user}
             showTrailer={this.showTrailer}
@@ -214,13 +201,7 @@ class Movie extends React.Component {
             <h3 className="sub-title mb--1">Cast</h3>
             <Carousel>
               {movieData.credits.cast.map((cast, key) => {
-                return (
-                  <PersonCard
-                    key={`person--${cast.name}`}
-                    person={cast}
-                    character={cast.character}
-                  />
-                );
+                return <PersonCard key={`person--${cast.name}`} person={cast} character={cast.character} />;
               })}
             </Carousel>
           </section>
@@ -241,9 +222,7 @@ class Movie extends React.Component {
           {related}
           <section>
             <h3 className="sub-title mb--1">Reviews</h3>
-            {this.props.user.reviews ? (
-              <ReviewsList reviews={this.props.user.reviews[id]} external={movieData.reviews} />
-            ) : null}
+            {this.props.user.reviews ? <ReviewsList reviews={this.props.user.reviews[id]} external={movieData.reviews} /> : null}
           </section>
         </div>
       </div>

@@ -1,4 +1,4 @@
-.series {
+.media {
   &-wrap {
     position: relative;
   }
@@ -18,7 +18,7 @@
     &.show-trailer {
       padding-top: 40vh;
 
-      .series-backdrop {
+      .media-backdrop {
         background: black;
 
         img {
@@ -165,7 +165,7 @@
       padding-top: 50px;
     }
 
-    .series-title {
+    .media-title {
       @extend .main-title;
 
       line-height: 36px;
@@ -379,7 +379,7 @@
       }
     }
 
-    .series-crew {
+    .media-crew {
       display: flex;
 
       &--item {
