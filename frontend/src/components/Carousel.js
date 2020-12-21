@@ -16,6 +16,7 @@ class Carousel extends React.Component {
       offset: 0,
       left: true,
       right: true,
+      init: false,
     };
 
     this.carouselRef = React.createRef();
@@ -26,9 +27,22 @@ class Carousel extends React.Component {
     this.scroll = this.scroll.bind(this);
   }
 
+  static getDerivedStateFromProps(props, current_state) {
+    if (current_state.value !== props.value) {
+      alert("prop change");
+    }
+    return null;
+  }
+
   componentDidMount() {
     this.init();
     window.addEventListener("resize", this.init);
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props !== prevProps) {
+      this.init();
+    }
   }
 
   componentWillUnmount() {
@@ -51,6 +65,7 @@ class Carousel extends React.Component {
       cardWidth: cardWidth,
       left: false,
       right: cards.length > cardsPerView ? true : false,
+      init: true,
     });
   }
 
