@@ -7,7 +7,7 @@ export default function (
 			rules: [],
 			seen_clients: [],
 			blocked_clients: [],
-			_id: false,
+			id: false,
 			username: false,
 			owner: false,
 			__v: 0,

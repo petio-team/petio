@@ -154,7 +154,7 @@ class Sonarr {
 				let sonarrId = await this.add(sonarrData[0]);
 				let updatedRequest = await Request.findOneAndUpdate(
 					{
-						_id: job._id,
+						sonarrId: sonarrId,
 					},
 					{
 						$set: {

@@ -15,7 +15,7 @@ class ReviewsList extends React.Component {
 							for (let i = 0; i < 10; i++) {
 								stars.push(
 									<div
-										key={`${review._id}__${i}`}
+										key={`${review.id}__${i}`}
 										className={`stars-1 star ${
 											review.score > i ? 'active' : ''
 										}`}
@@ -30,7 +30,7 @@ class ReviewsList extends React.Component {
 							return (
 								<div
 									className="reviews-list--item"
-									key={review._id}
+									key={review.id}
 								>
 									<div className="reviews-list--thumb">
 										<div

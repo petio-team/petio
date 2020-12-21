@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 const TvSchema = mongoose.Schema(
 	{
-		_id: String,
 		ratingKey: Number,
 		key: String,
 		guid: String,

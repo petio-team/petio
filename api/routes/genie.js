@@ -144,7 +144,7 @@ async function findMatches(criteria) {
 	if (criteria.type === 'movie') {
 		try {
 			let matches = await Movie.find({
-				_id: {
+				id: {
 					$nin: criteria.watched,
 				},
 				'Media.videoResolution': { $ne: '4k' },
@@ -223,47 +223,3 @@ function sortValues(list) {
 }
 
 module.exports = router;
-
-// db.stuff.aggregate([
-// 	{ $match: { name: 'Test' } }, // <== the fields that should always match
-// 	{
-// 		$facet: {
-// 			matchedBoth: [
-// 				{ $match: { country: 'USA', city: 'Seattle' } }, // <== bull's-eye
-// 				{ $addFields: { weight: 10 } }, // <== 10 stones
-// 			],
-// 			matchedCity: [
-// 				{ $match: { country: '', city: 'Seattle' } }, // <== the $match may need to be improved, see below
-// 				{ $addFields: { weight: 5 } },
-// 			],
-// 			matchedCountry: [
-// 				{ $match: { country: 'USA', city: '' } },
-// 				{ $addFields: { weight: 0 } }, // <== weightless, yet still a match
-// 			],
-// 			// add more rules here, if needed
-// 		},
-// 	},
-// 	// get them together. Should list all rules from above
-// 	{
-// 		$project: {
-// 			doc: {
-// 				$concatArrays: [
-// 					'$matchedBoth',
-// 					'$matchedCity',
-// 					'$matchedCountry',
-// 				],
-// 			},
-// 		},
-// 	},
-// 	{ $unwind: '$doc' }, // <== split them apart
-// 	{ $sort: { 'doc.weight': -1 } }, // <== and order by weight, desc
-// 	// reshape to retrieve documents in its original format
-// 	{
-// 		$project: {
-// 			_id: '$doc._id',
-// 			name: '$doc.name',
-// 			country: '$doc.country',
-// 			city: '$doc.city',
-// 		},
-// 	},
-// ]);

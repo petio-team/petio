@@ -76,7 +76,7 @@ class Requests extends React.Component {
 			if (requests[key].type === 'tv') {
 				request = this.props.api.series_lookup[key];
 			}
-			let user = this.props.user.current._id;
+			let user = this.props.user.current.id;
 
 			if (!request || !requests[key].users.includes(user)) return null;
 			return <RequestCard key={key + '_your'} request={request} />;
