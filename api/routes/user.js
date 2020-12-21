@@ -10,12 +10,14 @@ router.get('/thumb/:id', async (req, res) => {
 		userData = await User.findById(req.params.id);
 	} catch (err) {
 		res.json({ error: err });
+		return;
 	}
 	if (!userData) {
 		try {
 			userData = await Admin.findById(req.params.id);
 		} catch (err) {
 			res.json({ error: err });
+			return;
 		}
 	}
 	if (userData) {
@@ -49,12 +51,14 @@ router.get('/:id', async (req, res) => {
 		userData = await User.findById(req.params.id);
 	} catch (err) {
 		res.json({ error: err });
+		return;
 	}
 	if (!userData) {
 		try {
 			userData = await Admin.findById(req.params.id);
 		} catch (err) {
 			res.json({ error: err });
+			return;
 		}
 	}
 	if (userData) {

@@ -27,7 +27,7 @@ class Review extends React.Component {
 			score: this.state.rating,
 			comment: '',
 		};
-		User.review(this.props.item, this.props.user._id, review);
+		User.review(this.props.item, this.props.user.id, review);
 		setTimeout(() => {
 			this.props.closeReview();
 			this.props.getReviews();

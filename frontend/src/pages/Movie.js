@@ -97,7 +97,7 @@ class Movie extends React.Component {
 		let movie = this.props.api.movie_lookup[id];
 		let requests = this.props.user.requests[id];
 		if (requests) {
-			if (requests.users.includes(this.props.user.current._id)) {
+			if (requests.users.includes(this.props.user.current.id)) {
 				alert('Already Requested');
 				return;
 			}
@@ -263,7 +263,7 @@ class Movie extends React.Component {
 				) {
 					if (
 						this.props.user.reviews[this.props.match.params.id][i]
-							.user == this.props.user.current._id
+							.user == this.props.user.current.id
 					) {
 						hasReviewed = this.props.user.reviews[
 							this.props.match.params.id

@@ -16,17 +16,17 @@ router.post('/add', async (req, res) => {
 	if (existing) {
 		let updatedRequest = await Request.updateOne(
 			{ requestId: request.id },
-			{ $push: { users: user._id } }
+			{ $push: { users: user.id } }
 		);
 		res.json(updatedRequest);
-		mailRequest(user._id, request.id);
+		mailRequest(user.id, request.id);
 	} else {
 		const newRequest = new Request({
 			requestId: request.id,
 			type: request.type,
 			title: request.title,
 			thumb: request.thumb,
-			users: [user._id],
+			users: [user.id],
 			imdb_id: request.imdb_id,
 			tmdb_id: request.tmdb_id,
 			tvdb_id: request.tvdb_id,
@@ -35,7 +35,7 @@ router.post('/add', async (req, res) => {
 		try {
 			const savedRequest = await newRequest.save();
 			res.json(savedRequest);
-			mailRequest(user._id, request.id);
+			mailRequest(user.id, request.id);
 			let sonarr = new Sonarr();
 			let radarr = new Radarr();
 			sonarr.getRequests();
@@ -49,7 +49,7 @@ router.post('/add', async (req, res) => {
 
 async function mailRequest(user, request) {
 	const prefs = getConfig();
-	let userData = await User.findOne({ _id: user });
+	let userData = await User.findOne({ id: user });
 	if (!userData) {
 		userData = {
 			email: prefs.adminEmail,

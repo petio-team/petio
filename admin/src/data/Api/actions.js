@@ -398,7 +398,7 @@ export async function getUser(id) {
 		finalise({
 			type: types.GET_USER,
 			user: userData,
-			id: userData._id,
+			id: userData.id,
 		});
 	} catch (err) {
 		finalise({
@@ -410,7 +410,7 @@ export async function getUser(id) {
 				title: 'User Not Found',
 				username: 'User Not Found',
 				__v: false,
-				_id: false,
+				id: false,
 			},
 			id: id,
 		});
