@@ -22,53 +22,54 @@ $xxl: 1440px;
 $xxxl: 1920px;
 
 $breakpoints: (
-	xs: $xs,
-	sm: $sm,
-	md: $md,
-	lg: $lg,
-	xl: $xl,
-	xxl: $xxl,
-	xxxl: $xxxl,
+  xs: $xs,
+  sm: $sm,
+  md: $md,
+  lg: $lg,
+  xl: $xl,
+  xxl: $xxl,
+  xxxl: $xxxl,
 );
 
 $container-max-widths: (
-	sm: 100%,
-	md: 100%,
-	lg: calc(100% - 30px),
-	xl: calc(100% - 100px),
-	xxl: calc(100% - 100px),
-	xxxl: calc(100% - 100px),
+  sm: 100%,
+  md: 100%,
+  lg: calc(100% - 30px),
+  xl: calc(100% - 100px),
+  xxl: calc(100% - 100px),
+  xxxl: calc(100% - 100px),
 );
 
 $grid-breakpoints: $breakpoints;
 
 // dependencies
-@import 'pre/normalize';
-@import 'pre/mixins';
-@import 'pre/fonts';
+@import "pre/normalize";
+@import "pre/mixins";
+@import "pre/fonts";
 
 // globals
-@import 'globals/type';
-@import 'globals/margins';
-@import 'globals/body';
-@import 'globals/page';
-@import 'globals/sidebar';
+@import "globals/type";
+@import "globals/margins";
+@import "globals/body";
+@import "globals/page";
+@import "globals/sidebar";
 
 // components
-@import 'components/input';
-@import 'components/spinner';
-@import 'components/section';
-@import 'components/buttons';
-@import 'components/card';
-@import 'components/carousel';
-@import 'components/search-form';
-@import 'components/review';
-@import 'components/sessions';
-@import 'components/table';
+@import "components/input";
+@import "components/spinner";
+@import "components/section";
+@import "components/buttons";
+@import "components/card";
+@import "components/carousel";
+@import "components/search-form";
+@import "components/review";
+@import "components/sessions";
+@import "components/table";
+@import "components/sonarr-radarr";
 
 // pages
-@import 'pages/login';
-@import 'pages/setup';
-@import 'pages/dashboard';
-@import 'pages/settings';
-@import 'pages/requests';
+@import "pages/login";
+@import "pages/setup";
+@import "pages/dashboard";
+@import "pages/settings";
+@import "pages/requests";
