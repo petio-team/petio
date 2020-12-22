@@ -17,7 +17,7 @@ class Sonarr {
     const configData = fs.readFileSync(configFile);
     const configParse = JSON.parse(configData);
     this.fullConfig = configParse;
-    if (id) {
+    if (id !== false) {
       this.config = configParse[id];
     }
   }
@@ -117,11 +117,17 @@ class Sonarr {
   }
 
   async queue() {
-    const active = await this.connect();
-    if (!active) {
-      return false;
+    let queue = {};
+    for (let i; i < this.fullConfig.length; i++) {
+      this.config = server;
+      const active = await this.connect();
+      if (!active) {
+        return false;
+      }
+      await this.refresh();
+      queue[i] = await this.get(`queue`);
     }
-    return this.get(`queue`);
+    return queue;
   }
 
   async test() {
@@ -129,8 +135,8 @@ class Sonarr {
   }
 
   async add(seriesData) {
-    seriesData.ProfileId = this.config.profileId;
-    seriesData.Path = `${this.config.rootPath}${sanitize(seriesData.title)} (${seriesData.year})`;
+    seriesData.ProfileId = this.config.profile;
+    seriesData.Path = `${this.config.path_title}${sanitize(seriesData.title)} (${seriesData.year})`;
     seriesData.addOptions = {
       searchForMissingEpisodes: true,
     };
@@ -148,35 +154,36 @@ class Sonarr {
 
   async processJobs(jobQ) {
     for (let job of jobQ) {
-      try {
-        let sonarrData = await this.lookup(job.tvdb_id);
-        let sonarrId = await this.add(sonarrData[0]);
-        let updatedRequest = await Request.findOneAndUpdate(
-          {
-            sonarrId: sonarrId,
-          },
-          {
-            $set: {
+      for (let server of this.fullConfig) {
+        if (!server.active) {
+          return;
+        }
+
+        this.config = server;
+        try {
+          let sonarrData = await this.lookup(job.tvdb_id);
+          let sonarrId = await this.add(sonarrData[0]);
+          let updatedRequest = await Request.findOneAndUpdate(
+            {
               sonarrId: sonarrId,
             },
-          },
-          { useFindAndModify: false }
-        );
-        if (updatedRequest) {
-          console.log(`SERVICE - SONARR: Sonnar job added for ${job.title}`);
+            { $push: { sonarrId: sonarrId } },
+            { useFindAndModify: false }
+          );
+          if (updatedRequest) {
+            console.log(`SERVICE - SONARR: Sonnar job added for ${job.title}`);
+          }
+        } catch (err) {
+          console.log(`SERVICE - SONARR: Unable to add series ${job.title}`);
         }
-      } catch (err) {
-        console.log(`SERVICE - SONARR: Unable to add series ${job.title}`);
       }
     }
   }
 
   async getRequests() {
-    return false;
     console.log(`SERVICE - SONARR: Polling requests`);
-    const active = await this.connect();
-    if (!active) {
-      console.log(`SERVICE - SONARR: Connection Failed Stopping Poll`);
+    if (!this.fullConfig || this.fullConfig.length === 0) {
+      console.log(`SERVICE - SONARR: No active servers`);
       return;
     }
     const requests = await Request.find();
@@ -185,7 +192,7 @@ class Sonarr {
       if (req.type === "tv") {
         if (!req.tvdb_id) {
           console.log(`SERVICE - SONARR: TVDB ID not found for ${req.title}`);
-        } else if (!req.sonarrId) {
+        } else {
           jobQ.push(req);
           console.log(`SERVICE - SONARR: ${req.title} added to job queue`);
         }

@@ -17,7 +17,7 @@ class Radarr {
     const configData = fs.readFileSync(configFile);
     const configParse = JSON.parse(configData);
     this.fullConfig = configParse;
-    if (id) {
+    if (id !== false) {
       this.config = configParse[id];
     }
   }
@@ -123,12 +123,17 @@ class Radarr {
   }
 
   async queue() {
-    const active = await this.connect();
-    if (!active) {
-      return false;
+    let queue = {};
+    for (let i; i < this.fullConfig.length; i++) {
+      this.config = server;
+      const active = await this.connect();
+      if (!active) {
+        return false;
+      }
+      await this.refresh();
+      queue[i] = await this.get(`queue`);
     }
-    await this.refresh();
-    return this.get(`queue`);
+    return queue;
   }
 
   async test() {
@@ -138,8 +143,8 @@ class Radarr {
   async add(movieData) {
     let system = await this.get("system/status");
     let sep = system.isWindows ? "\\" : "/";
-    movieData.qualityProfileId = parseInt(this.config.profileId);
-    movieData.Path = `${this.config.rootPath}${sep}${sanitize(movieData.title)} (${movieData.year})`;
+    movieData.qualityProfileId = parseInt(this.config.profile);
+    movieData.Path = `${this.config.path_title}${sep}${sanitize(movieData.title)} (${movieData.year})`;
     movieData.addOptions = {
       searchForMovie: true,
     };
@@ -147,6 +152,7 @@ class Radarr {
 
     try {
       let add = await this.post("movie", false, movieData);
+
       if (Array.isArray(add)) {
         if (add[1].errorMessage) throw add[1].errorMessage;
       }
@@ -159,35 +165,37 @@ class Radarr {
 
   async processJobs(jobQ) {
     for (let job of jobQ) {
-      try {
-        let radarrData = await this.lookup(job.tmdb_id);
-        let radarrId = await this.add(radarrData);
-        let updatedRequest = await Request.findOneAndUpdate(
-          {
-            requestId: job.requestId,
-          },
-          {
-            $set: {
-              radarrId: radarrId,
-            },
-          },
-          { useFindAndModify: false }
-        );
-        if (updatedRequest) {
-          console.log(`SERVICE - RADARR: Radarr job added for ${job.title}`);
+      for (let server of this.fullConfig) {
+        if (!server.active) {
+          console.log(`SERVICE - RADARR: Server not active`);
+          return;
         }
-      } catch (err) {
-        console.log(`SERVICE - RADARR: Unable to add movie ${job.title} - ERR: ${err}`);
+
+        this.config = server;
+        try {
+          let radarrData = await this.lookup(job.tmdb_id);
+          let radarrId = await this.add(radarrData);
+          let updatedRequest = await Request.findOneAndUpdate(
+            {
+              requestId: job.requestId,
+            },
+            { $push: { radarrId: radarrId } },
+            { useFindAndModify: false }
+          );
+          if (updatedRequest) {
+            console.log(`SERVICE - RADARR: Radarr job added for ${job.title}`);
+          }
+        } catch (err) {
+          console.log(`SERVICE - RADARR: Unable to add movie ${job.title} - ERR: ${err}`);
+        }
       }
     }
   }
 
   async getRequests() {
-    return false;
     console.log(`SERVICE - RADARR: Polling requests`);
-    const active = await this.connect();
-    if (!active) {
-      console.log(`SERVICE - RADARR: Connection Failed Stopping Poll`);
+    if (!this.fullConfig || this.fullConfig.length === 0) {
+      console.log(`SERVICE - RADARR: No active servers`);
       return;
     }
     const requests = await Request.find();
@@ -196,7 +204,7 @@ class Radarr {
       if (req.type === "movie") {
         if (!req.tmdb_id) {
           console.log(`SERVICE - RADARR: TMDB ID not found for ${req.title}`);
-        } else if (!req.radarrId) {
+        } else {
           jobQ.push(req);
           console.log(`SERVICE - RADARR: ${req.title} added to job queue`);
         }
