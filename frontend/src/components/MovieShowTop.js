@@ -1,19 +1,11 @@
 import React from "react";
 import { ReactComponent as RequestIcon } from "../assets/svg/request.svg";
 import { ReactComponent as ReportIcon } from "../assets/svg/report.svg";
-import { ReactComponent as WatchIcon } from "../assets/svg/play.svg";
 import { ReactComponent as CheckIcon } from "../assets/svg/check.svg";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 
 class MovieShowTop extends React.Component {
   render() {
-    let watchBtn = this.props.mediaData.onServer ? (
-      <button className="btn btn__square good">
-        <WatchIcon />
-        Play
-      </button>
-    ) : null;
-
     let requestBtn = this.props.mediaData.on_server ? (
       <div className="btn btn__square good">
         <CheckIcon />
@@ -50,7 +42,7 @@ class MovieShowTop extends React.Component {
       <div className={`media-top ${this.props.trailer ? "show-trailer" : ""}`}>
         <div className="media-backdrop" key={`${this.props.mediaData.title}__backdrop`}>
           {video && this.props.trailer ? (
-            <div className="series-trailer">
+            <div className="media-trailer">
               <iframe
                 frameBorder="0"
                 height="100%"
@@ -88,7 +80,6 @@ class MovieShowTop extends React.Component {
             {this.props.mediaData.logo ? <LazyLoadImage className="media-logo" src={this.props.mediaData.logo} /> : <h1 className="single-title">{this.props.mediaData.title}</h1>}
           </div>
           <div className="media--actions">
-            {watchBtn}
             {requestBtn}
             {reportBtn}
           </div>

@@ -6,6 +6,10 @@ import { ReactComponent as ResIconFHd } from "../assets/svg/1080p.svg";
 import { ReactComponent as ResIconUHd } from "../assets/svg/4k.svg";
 import { ReactComponent as StarIcon } from "../assets/svg/star.svg";
 
+import { ReactComponent as RequestIcon } from "../assets/svg/request.svg";
+import { ReactComponent as ReportIcon } from "../assets/svg/report.svg";
+import { ReactComponent as CheckIcon } from "../assets/svg/check.svg";
+
 import { ReactComponent as GenreAction } from "../assets/svg/genres/action.svg";
 import { ReactComponent as GenreAdventure } from "../assets/svg/genres/adventure.svg";
 import { ReactComponent as GenreAnimation } from "../assets/svg/genres/animation.svg";
@@ -135,6 +139,30 @@ class MovieShowOverview extends React.Component {
     let userRating = "Not Reviewed";
     let userRatingVal = 0;
 
+    let requestBtn = this.props.mediaData.on_server ? (
+      <div className="btn btn__square good">
+        <CheckIcon />
+        On Plex
+      </div>
+    ) : this.props.requested ? (
+      <button className="btn btn__square blue" onClick={this.props.request}>
+        {`Requested by ${this.props.requested}
+				${this.props.requested > 1 ? "users" : "user"}`}
+      </button>
+    ) : (
+      <button className="btn btn__square" onClick={this.props.request}>
+        <RequestIcon />
+        Request
+      </button>
+    );
+
+    let reportBtn = (
+      <button className="btn btn__square" onClick={this.props.openIssues}>
+        <ReportIcon />
+        Report an issue
+      </button>
+    );
+
     let hasReviewed = false;
     if (this.props.user.reviews) {
       if (this.props.user.reviews[this.props.match.params.id] || this.props.externalReviews) {
@@ -172,7 +200,6 @@ class MovieShowOverview extends React.Component {
         userRatingVal = ratingsUser / (total - ignore);
       }
     }
-    console.log(hasReviewed);
     let reviewBtn = (
       <button className="btn btn__square" onClick={!hasReviewed ? this.props.openReview : null}>
         {!hasReviewed ? (
@@ -243,6 +270,10 @@ class MovieShowOverview extends React.Component {
                     </div>
                   );
                 })}
+              </div>
+              <div className="media--actions__mob">
+                {requestBtn}
+                {reportBtn}
               </div>
               <div className="media-crew">
                 {director ? (
