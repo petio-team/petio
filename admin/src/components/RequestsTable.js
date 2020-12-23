@@ -130,12 +130,48 @@ class RequestsTable extends React.Component {
         if (req.children[r].info.message === "NotFound") {
           return <span className="requests--status requests--status__bad">Removed</span>;
         }
+
+        if (req.type === "tv" && req.children[r].info) {
+          if (req.children[r].info.episodeCount === req.children[r].info.episodeFileCount) {
+            return <span className="requests--status requests--status__good">Downloaded</span>;
+          }
+
+          if (req.children[r].info.seasons) {
+            let missing = false;
+            for (let season of req.children[r].info.seasons) {
+              if (season.statistics.percentOfEpisodes !== 100) missing = true;
+            }
+
+            if (!missing) {
+              return <span className="requests--status requests--status__good">Downloaded</span>;
+            } else {
+              return <span className="requests--status requests--status__bad">Unavailable</span>;
+            }
+          }
+        }
+
+        if (req.type === "movie" && req.children[r].info) {
+          if (req.children[r].info.inCinemas || req.children[r].info.digitalRelease) {
+            if (req.children[r].info.inCinemas) {
+              var diff = Math.floor(new Date(req.children[r].info.inCinemas) - new Date());
+              if (diff > 0) {
+                return <span className="requests--status requests--status__blue">~{this.calcDate(diff)}</span>;
+              }
+            }
+            if (req.children[r].info.digitalRelease) {
+              let digitalDate = new Date(req.children[r].info.digitalRelease);
+              if (new Date() - digitalDate < 0) {
+                return <span className="requests--status requests--status__cinema">In Cinemas</span>;
+              } else {
+                return <span className="requests--status requests--status__bad">Unavailable</span>;
+              }
+            } else {
+              return <span className="requests--status requests--status__bad">Unavailable</span>;
+            }
+          }
+        }
       }
     }
-
-    // if (req.info.message === "NotFound") {
-    //   return <span className="requests--status requests--status__bad">Removed</span>;
-    // }
 
     // if (req.type === "tv" && req.info) {
     //   if (req.info.episodeCount === req.info.episodeFileCount) {

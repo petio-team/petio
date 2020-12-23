@@ -72,6 +72,7 @@ router.get("/all", async (req, res) => {
   try {
     let sonarrQ = await sonarr.queue();
     let radarrQ = await radarr.queue();
+
     data = {};
 
     await Promise.all(
