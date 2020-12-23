@@ -46,14 +46,92 @@ class RequestsTable extends React.Component {
     return message;
   }
 
-  reqState(req) {
-    // if (req.status.length > 0) {
-    //   return <span className="requests--status requests--status__orange">Downloading</span>;
-    // }
+  children(req) {
+    if (req.children.length === 0) {
+      return null;
+    }
+    let render = [];
+    req.children.map((server) => {
+      let type = req.type;
+      console.log(server);
+      // let prog = (child.sizeleft / child.size - 1) * -1 * 100;
+      if (server.status.length > 0) {
+        render.push(
+          server.status.map((child, row) => {
+            let prog = (child.sizeleft / child.size - 1) * -1 * 100;
+            return (
+              <>
+                {row === 0 ? (
+                  <tr className="sub">
+                    <td colSpan="5">
+                      <p>Server: {server.info.serverName}</p>
+                    </td>
+                  </tr>
+                ) : null}
+                <tr className="child">
+                  <td>
+                    {type === "tv" ? (
+                      <p>
+                        Series: {child.episode.seasonNumber} Episode: {child.episode.episodeNumber}
+                      </p>
+                    ) : null}
+                    {type === "movie" ? <p>Movie</p> : null}
+                  </td>
+                  <td>
+                    <span className="requests--quality">{child.quality.quality.name}</span>
+                  </td>
+                  <td>
+                    {" "}
+                    <div className="requests--prog--wrap">
+                      <div className="requests--prog">
+                        <span
+                          className="requests--prog--active"
+                          style={{
+                            width: prog + "%",
+                          }}
+                        ></span>
+                      </div>
 
-    // if (req.info.downloaded || req.info.movieFile) {
-    //   return <span className="requests--status requests--status__good">Downloaded</span>;
-    // }
+                      {(child.status !== "Downloading" && child.status !== "downloading") || !child.timeleft ? (
+                        <p>
+                          <strong className="capitalise">{child.status}</strong>
+                        </p>
+                      ) : (
+                        <p>
+                          Time left <strong>{child.timeleft}</strong>
+                        </p>
+                      )}
+                    </div>
+                  </td>
+                  <td></td>
+                </tr>
+              </>
+            );
+          })
+        );
+      } else {
+        return null;
+      }
+    });
+    return render;
+  }
+
+  reqState(req) {
+    if (req.children.length > 0) {
+      for (let r = 0; r < req.children.length; r++) {
+        if (req.children[r].status.length > 0) {
+          return <span className="requests--status requests--status__orange">Downloading</span>;
+        }
+
+        if (req.children[r].info.downloaded || req.children[r].info.movieFile) {
+          return <span className="requests--status requests--status__good">Downloaded</span>;
+        }
+
+        if (req.children[r].info.message === "NotFound") {
+          return <span className="requests--status requests--status__bad">Removed</span>;
+        }
+      }
+    }
 
     // if (req.info.message === "NotFound") {
     //   return <span className="requests--status requests--status__bad">Removed</span>;
@@ -107,7 +185,6 @@ class RequestsTable extends React.Component {
       <table className="generic-table generic-table__rounded">
         <thead>
           <tr>
-            <th>Date Added</th>
             <th className="fixed">Title</th>
             <th>Type</th>
             <th>Status</th>
@@ -120,7 +197,7 @@ class RequestsTable extends React.Component {
           {Object.keys(this.props.requests).length === 0 ? (
             <tr>
               <td>No requests</td>
-              <td></td>
+
               <td></td>
               <td></td>
               <td></td>
@@ -129,7 +206,8 @@ class RequestsTable extends React.Component {
           ) : (
             Object.keys(this.props.requests).map((key) => {
               let req = this.props.requests[key];
-              let active = null;
+
+              // for (let i = 0; i < )
 
               // if (req.status.length > 0) {
               //   active = req.status.map((child) => {
@@ -180,13 +258,12 @@ class RequestsTable extends React.Component {
               return (
                 <React.Fragment key={key}>
                   <tr>
-                    <td>{/*req.info.added ? new Date(req.info.added).toLocaleDateString() : "n/a" */}</td>
                     <td className="fixed">{req.title}</td>
                     <td>{this.typeIcon(req.type)}</td>
                     <td>
-                      {/* {this.reqState(req)} */}
-                      {/* {req.sonarrId.length > 0 ? <span className="requests--status requests--status__sonarr">Sonarr</span> : null}
-                      {req.radarrId.length > 0 ? <span className="requests--status requests--status__radarr">Radarr</span> : null} */}
+                      {this.reqState(req)}
+                      {req.sonarrId.length > 0 ? <span className="requests--status requests--status__sonarr">Sonarr</span> : null}
+                      {req.radarrId.length > 0 ? <span className="requests--status requests--status__radarr">Radarr</span> : null}
                     </td>
                     <td>
                       {req.users.map((user, i) => {
@@ -195,7 +272,7 @@ class RequestsTable extends React.Component {
                     </td>
                     <td></td>
                   </tr>
-                  {active}
+                  {this.children(req)}
                 </React.Fragment>
               );
             })

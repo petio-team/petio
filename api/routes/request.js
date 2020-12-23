@@ -72,14 +72,42 @@ router.get("/all", async (req, res) => {
   try {
     let sonarrQ = await sonarr.queue();
     let radarrQ = await radarr.queue();
-
-    data.sonarrQueue = sonarrQ;
-    data.radarrQueue = radarrQ;
+    data = {};
 
     await Promise.all(
       requests.map(async (request, i) => {
-        let status = false;
-        let info = false;
+        let children = [];
+
+        if (request.type === "movie" && request.radarrId.length > 0) {
+          for (let i = 0; i < request.radarrId.length; i++) {
+            let server = new Radarr(i);
+            children[i] = {};
+            children[i].info = await server.movie(request.radarrId[i]);
+            children[i].info.serverName = server.config.title;
+            children[i].status = [];
+            for (let o = 0; o < radarrQ[i].records.length; o++) {
+              if (radarrQ[i].records[o].movieId === request.radarrId[i]) {
+                children[i].status[o] = radarrQ[i].records[o];
+              }
+            }
+          }
+        }
+
+        if (request.type === "tv" && request.sonarrId.length > 0) {
+          for (let i = 0; i < request.sonarrId.length; i++) {
+            let server = new Sonarr(i);
+            children[i] = {};
+            children[i].info = await server.series(request.sonarrId[i]);
+            children[i].info.serverName = server.config.title;
+            children[i].status = [];
+            // children[i] = sonarrQ;
+            for (let o = 0; o < sonarrQ[i].length; o++) {
+              if (sonarrQ[i][o].series.id === request.sonarrId[i]) {
+                children[i].status.push(sonarrQ[i][o]);
+              }
+            }
+          }
+        }
 
         // if (request.type === "tv" && request.sonarrId) {
         //   status = sonarrQ.filter((obj) => {
@@ -97,8 +125,7 @@ router.get("/all", async (req, res) => {
 
         data[request.requestId] = {
           title: request.title,
-          status: status,
-          info: info,
+          children: children,
           requestId: request.requestId,
           type: request.type,
           thumb: request.thumb,

@@ -123,15 +123,16 @@ class Radarr {
   }
 
   async queue() {
-    let queue = {};
-    for (let i; i < this.fullConfig.length; i++) {
-      this.config = server;
+    let queue = [];
+    for (let i = 0; i < this.fullConfig.length; i++) {
+      this.config = this.fullConfig[i];
       const active = await this.connect();
       if (!active) {
         return false;
       }
       await this.refresh();
       queue[i] = await this.get(`queue`);
+      queue[i]["serverName"] = this.config.title;
     }
     return queue;
   }
@@ -204,7 +205,7 @@ class Radarr {
       if (req.type === "movie") {
         if (!req.tmdb_id) {
           console.log(`SERVICE - RADARR: TMDB ID not found for ${req.title}`);
-        } else {
+        } else if (req.radarrId.length === 0) {
           jobQ.push(req);
           console.log(`SERVICE - RADARR: ${req.title} added to job queue`);
         }

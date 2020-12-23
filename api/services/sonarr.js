@@ -117,15 +117,16 @@ class Sonarr {
   }
 
   async queue() {
-    let queue = {};
-    for (let i; i < this.fullConfig.length; i++) {
-      this.config = server;
+    let queue = [];
+    for (let i = 0; i < this.fullConfig.length; i++) {
+      this.config = this.fullConfig[i];
       const active = await this.connect();
       if (!active) {
         return false;
       }
-      await this.refresh();
+      // await this.refresh();
       queue[i] = await this.get(`queue`);
+      queue[i]["serverName"] = this.config.title;
     }
     return queue;
   }
@@ -165,7 +166,7 @@ class Sonarr {
           let sonarrId = await this.add(sonarrData[0]);
           let updatedRequest = await Request.findOneAndUpdate(
             {
-              sonarrId: sonarrId,
+              requestId: job.requestId,
             },
             { $push: { sonarrId: sonarrId } },
             { useFindAndModify: false }
@@ -174,6 +175,7 @@ class Sonarr {
             console.log(`SERVICE - SONARR: Sonnar job added for ${job.title}`);
           }
         } catch (err) {
+          console.log(err);
           console.log(`SERVICE - SONARR: Unable to add series ${job.title}`);
         }
       }
@@ -192,7 +194,7 @@ class Sonarr {
       if (req.type === "tv") {
         if (!req.tvdb_id) {
           console.log(`SERVICE - SONARR: TVDB ID not found for ${req.title}`);
-        } else {
+        } else if (req.sonarrId.length === 0) {
           jobQ.push(req);
           console.log(`SERVICE - SONARR: ${req.title} added to job queue`);
         }
