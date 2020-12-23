@@ -196,6 +196,9 @@ class Movie extends React.Component {
             match={this.props.match}
             openReview={this.openReview}
             externalReviews={movieData.reviews}
+            openIssues={this.props.openIssues}
+            requested={this.state.requested}
+            request={this.request}
           />
           <section>
             <h3 className="sub-title mb--1">Cast</h3>
