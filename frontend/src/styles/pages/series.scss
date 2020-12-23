@@ -190,6 +190,20 @@
         margin-bottom: 10px;
       }
     }
+
+    &__mob {
+      display: flex;
+      margin-bottom: 10px;
+
+      .btn {
+        margin-right: 10px;
+        margin-bottom: 10px;
+      }
+
+      @include media-breakpoint-up(lg) {
+        display: none;
+      }
+    }
   }
 
   &-backdrop {
@@ -273,28 +287,6 @@
       width: 100%;
       text-align: center;
       justify-content: center;
-    }
-
-    &__mobile {
-      display: flex;
-      flex-wrap: wrap;
-      margin-bottom: 10px;
-
-      @include media-breakpoint-up(lg) {
-        display: none;
-      }
-
-      .btn {
-        margin-right: 10px;
-        margin-bottom: 10px;
-        // width: 100%;
-        justify-content: center;
-
-        @include media-breakpoint-up(md) {
-          width: 200px;
-          margin-right: 10px;
-        }
-      }
     }
   }
 
@@ -562,10 +554,14 @@
 
 .genre {
   &--wrap {
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     display: flex;
     align-items: center;
     flex-wrap: wrap;
+
+    @include media-breakpoint-up(lg) {
+      margin-bottom: 30px;
+    }
   }
 
   &--item {
