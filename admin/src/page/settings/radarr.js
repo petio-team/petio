@@ -1,6 +1,8 @@
 import React from "react";
 import Api from "../../data/Api";
 
+import { v4 as uuidv4 } from "uuid";
+
 import { ReactComponent as Add } from "../../assets/svg/plus-circle.svg";
 import { ReactComponent as ServerIcon } from "../../assets/svg/server.svg";
 
@@ -32,6 +34,7 @@ class Radarr extends React.Component {
       path: false,
       profile: false,
       activeServer: false,
+      uuid: false,
     };
 
     this.inputChange = this.inputChange.bind(this);
@@ -64,6 +67,7 @@ class Radarr extends React.Component {
       path_title: this.state.path_title,
       profile: this.state.profile,
       profile_title: this.state.profile_title,
+      uuid: this.state.uuid,
     };
 
     console.log(servers);
@@ -213,11 +217,13 @@ class Radarr extends React.Component {
         profile_title: this.state.servers[id].profile_title,
         path: this.state.servers[id].path,
         path_title: this.state.servers[id].path_title,
+        uuid: this.state.servers[id].uuid,
       });
     } else {
       this.setState({
         wizardOpen: true,
         activeServer: id,
+        uuid: uuidv4(),
       });
     }
   }
@@ -239,6 +245,7 @@ class Radarr extends React.Component {
       wizardOpen: false,
       editWizardOpen: false,
       activeServer: false,
+      uuid: false,
     });
   }
 
@@ -309,6 +316,7 @@ class Radarr extends React.Component {
                     <p>Status: {server.active ? "Enabled" : "Disabled"}</p>
                     <p>Profile: {server.profile_title ? server.profile_title : "Not set"}</p>
                     <p>Path: {server.path_title ? server.path_title : "Not set"}</p>
+                    <p className="small">ID: {server.uuid ? server.uuid : "Error"}</p>
                     <div className="btn-wrap">
                       <button className="btn" onClick={() => this.openWizard(i)}>
                         Edit

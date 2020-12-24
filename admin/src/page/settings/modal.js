@@ -120,6 +120,7 @@ class Modal extends React.Component {
           <button className="btn bad" style={{ marginLeft: "10px" }} onClick={this.props.deleteServer}>
             Delete
           </button>
+          <input type="hidden" value={this.props.state.uuid} readOnly={true} />
         </div>
       </div>
     );
