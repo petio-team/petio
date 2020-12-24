@@ -32,7 +32,7 @@ class RequestsTable extends React.Component {
   calcDate(diff) {
     var day = 1000 * 60 * 60 * 24;
 
-    var days = Math.floor(diff / day);
+    var days = Math.ceil(diff / day);
     var months = Math.floor(days / 31);
     var years = Math.floor(months / 12);
     days = days - months * 31;
@@ -153,7 +153,7 @@ class RequestsTable extends React.Component {
         if (req.type === "movie" && req.children[r].info) {
           if (req.children[r].info.inCinemas || req.children[r].info.digitalRelease) {
             if (req.children[r].info.inCinemas) {
-              var diff = Math.floor(new Date(req.children[r].info.inCinemas) - new Date());
+              var diff = Math.ceil(new Date(req.children[r].info.inCinemas) - new Date());
               if (diff > 0) {
                 return <span className="requests--status requests--status__blue">~{this.calcDate(diff)}</span>;
               }
