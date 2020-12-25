@@ -180,7 +180,8 @@ class Radarr {
             {
               requestId: job.requestId,
             },
-            { $push: { radarrId: radarrId } },
+            { $push: { radarrId: { [this.config.uuid]: radarrId } } },
+            // continue here
             { useFindAndModify: false }
           );
           if (updatedRequest) {
