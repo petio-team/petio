@@ -4,8 +4,8 @@ const plexHeaders = {
   "X-Plex-Device": "API",
   "X-Plex-Device-Name": "Petio",
   "X-Plex-Product": "Petio",
-  "X-Plex-Version": "0.1.9.3",
-  "X-Plex-Platform-Version": "0.1.9.3",
+  "X-Plex-Version": "0.2.0.1",
+  "X-Plex-Platform-Version": "0.2.0.1",
   "X-Plex-Client-Identifier": "067e602b-1e86-4739-900d-1abdf8f6da71",
 };
 
