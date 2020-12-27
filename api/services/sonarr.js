@@ -168,15 +168,15 @@ class Sonarr {
             {
               requestId: job.requestId,
             },
-            { $push: { sonarrId: sonarrId } },
+            { $push: { sonarrId: { [this.config.uuid]: sonarrId } } },
             { useFindAndModify: false }
           );
           if (updatedRequest) {
-            console.log(`SERVICE - SONARR: Sonnar job added for ${job.title}`);
+            console.log(`SERVICE - SONARR: [${this.config.title}] Sonnar job added for ${job.title}`);
           }
         } catch (err) {
           console.log(err);
-          console.log(`SERVICE - SONARR: Unable to add series ${job.title}`);
+          console.log(`SERVICE - SONARR: [${this.config.title}] Unable to add series ${job.title}`);
         }
       }
     }

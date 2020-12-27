@@ -120,7 +120,7 @@ class Main {
   async start() {
     const libUpdate = new LibraryUpdate();
     this.cron.start();
-    // libUpdate.run();
+    libUpdate.run();
   }
 
   setup() {

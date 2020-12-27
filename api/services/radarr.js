@@ -181,14 +181,13 @@ class Radarr {
               requestId: job.requestId,
             },
             { $push: { radarrId: { [this.config.uuid]: radarrId } } },
-            // continue here
             { useFindAndModify: false }
           );
           if (updatedRequest) {
-            console.log(`SERVICE - RADARR: Radarr job added for ${job.title}`);
+            console.log(`SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`);
           }
         } catch (err) {
-          console.log(`SERVICE - RADARR: Unable to add movie ${job.title} - ERR: ${err}`);
+          console.log(`SERVICE - RADARR: [${this.config.title}] Unable to add movie ${job.title} - ERR: ${err}`);
         }
       }
     }

@@ -82,8 +82,11 @@ router.get("/all", async (req, res) => {
         if (request.type === "movie" && request.radarrId.length > 0) {
           for (let i = 0; i < request.radarrId.length; i++) {
             let server = new Radarr(i);
+            let radarrIds = request.radarrId[i];
+            let rId = radarrIds[Object.keys(radarrIds)[0]];
             children[i] = {};
-            children[i].info = await server.movie(request.radarrId[i]);
+            children[i].id = rId;
+            children[i].info = await server.movie(rId);
             children[i].info.serverName = server.config.title;
             children[i].status = [];
             for (let o = 0; o < radarrQ[i].records.length; o++) {
@@ -97,8 +100,11 @@ router.get("/all", async (req, res) => {
         if (request.type === "tv" && request.sonarrId.length > 0) {
           for (let i = 0; i < request.sonarrId.length; i++) {
             let server = new Sonarr(i);
+            let sonarrIds = request.sonarrId[i];
+            let sId = sonarrIds[Object.keys(sonarrIds)[0]];
             children[i] = {};
-            children[i].info = await server.series(request.sonarrId[i]);
+            children[i].id = sId;
+            children[i].info = await server.series(sId);
             children[i].info.serverName = server.config.title;
             children[i].status = [];
             // children[i] = sonarrQ;
@@ -109,20 +115,6 @@ router.get("/all", async (req, res) => {
             }
           }
         }
-
-        // if (request.type === "tv" && request.sonarrId) {
-        //   status = sonarrQ.filter((obj) => {
-        //     return obj.series.id === request.sonarrId;
-        //   });
-        //   info = await sonarr.series(request.sonarrId);
-        // }
-        // if (request.type === "movie" && request.radarrId) {
-        //   if (radarrQ.records.length > 0)
-        //     status = radarrQ.records.filter((obj) => {
-        //       return obj.movieId === request.radarrId;
-        //     });
-        //   info = await radarr.movie(request.radarrId);
-        // }
 
         data[request.requestId] = {
           title: request.title,
