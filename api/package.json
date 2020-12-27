@@ -1,42 +1,40 @@
 {
-	"name": "petio-rest",
-	"version": "1.0.0",
-	"description": "Rest Api for Petio",
-	"main": "index.js",
-	"scripts": {
-		"start": "node app.js",
-		"build": "pkg . --out-path ./bin"
-	},
-	"author": "",
-	"license": "ISC",
-	"dependencies": {
-		"bcrypt": "^5.0.0",
-		"cors": "^2.8.5",
-		"cron": "^1.8.2",
-		"express": "^4.17.1",
-		"follow-redirects": "^1.13.0",
-		"fs": "0.0.1-security",
-		"http": "0.0.1-security",
-		"https": "^1.0.0",
-		"joi": "^17.3.0",
-		"jsonwebtoken": "^8.5.1",
-		"mongoose": "^5.11.6",
-		"node-expat": "^2.3.18",
-		"nodejs-nodemailer-outlook": "^1.2.3",
-		"nodemailer": "^6.4.16",
-		"sanitize-filename": "^1.6.3",
-		"saslprep": "^1.0.3",
-		"sonarr-api": "^0.2.0",
-		"xhr-request": "^1.1.0",
-		"xml-js": "^1.6.11"
-	},
-	"devDependencies": {
-		"dotenv": "^8.2.0"
-	},
-	"bin": "app.js",
-	"targets": [
-		"node14-linux-x64",
-		"node14-macos-x64",
-		"node14-win-x64"
-	]
+  "name": "petio-rest",
+  "version": "1.0.0",
+  "description": "Rest Api for Petio",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "cors": "^2.8.5",
+    "cron": "^1.8.2",
+    "express": "^4.17.1",
+    "follow-redirects": "^1.13.0",
+    "fs": "0.0.1-security",
+    "http": "0.0.1-security",
+    "https": "^1.0.0",
+    "joi": "^17.3.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.11.6",
+    "nodejs-nodemailer-outlook": "^1.2.3",
+    "nodemailer": "^6.4.16",
+    "sanitize-filename": "^1.6.3",
+    "saslprep": "^1.0.3",
+    "sonarr-api": "^0.2.0",
+    "xhr-request": "^1.1.0",
+    "xml-js": "^1.6.11"
+  },
+  "devDependencies": {
+    "dotenv": "^8.2.0"
+  },
+  "bin": "app.js",
+  "targets": [
+    "node14-linux-x64",
+    "node14-macos-x64",
+    "node14-win-x64"
+  ]
 }
