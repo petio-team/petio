@@ -275,7 +275,7 @@ class Series extends React.Component {
     return (
       <div className="media-wrap" data-id={seriesData.imdb_id} key={`${seriesData.title}__wrap`}>
         <Review id={this.props.match.params.id} user={this.props.user.current} active={this.state.reviewOpen} closeReview={this.closeReview} getReviews={this.getReviews} item={seriesData} />
-        <MovieShowTop mediaData={seriesData} trailer={this.state.trailer} requested={this.state.requested} request={this.request} />
+        <MovieShowTop mediaData={seriesData} trailer={this.state.trailer} requested={this.state.requested} request={this.request} openIssues={this.props.openIssues} />
 
         <div className="media-content">
           <MovieShowOverview
@@ -285,7 +285,10 @@ class Series extends React.Component {
             showTrailer={this.showTrailer}
             match={this.props.match}
             openReview={this.openReview}
+            requested={this.state.requested}
+            request={this.request}
             externalReviews={seriesData.reviews}
+            openIssues={this.props.openIssues}
           />
 
           <section>
