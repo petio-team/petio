@@ -145,7 +145,7 @@ class MovieShowOverview extends React.Component {
         On Plex
       </div>
     ) : this.props.requested ? (
-      <button className="btn btn__square blue" onClick={this.props.request}>
+      <button className="btn btn__square blue">
         {`Requested by ${this.props.requested}
 				${this.props.requested > 1 ? "users" : "user"}`}
       </button>
