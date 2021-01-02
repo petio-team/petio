@@ -20,7 +20,8 @@ class Sonarr {
     if (id !== false) {
       this.config = configParse[id];
 
-      if (!this.config.title) {
+      if (!this.config) {
+        this.config = {};
         this.config.title = "Server Removed";
       }
     }
