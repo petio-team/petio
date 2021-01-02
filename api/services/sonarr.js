@@ -72,6 +72,9 @@ class Sonarr {
   }
 
   async connect(test = false) {
+    if (!this.config) {
+      return false;
+    }
     if (!this.config.active && !test) {
       console.log("SERVICE - SONARR: Sonarr not enabled");
       return false;

@@ -72,6 +72,9 @@ class Radarr {
   }
 
   async connect(test = false) {
+    if (!this.config) {
+      return false;
+    }
     if (!this.config.active && !test) {
       console.log("SERVICE - RADARR: Radarr not enabled");
       return false;
