@@ -89,7 +89,7 @@ router.get("/all", async (req, res) => {
             children[i].info = await server.movie(rId);
             children[i].info.serverName = server.config.title;
             children[i].status = [];
-            if (radarrQ[i].records) {
+            if (radarrQ[i]) {
               for (let o = 0; o < radarrQ[i].records.length; o++) {
                 if (radarrQ[i].records[o].movieId === rId) {
                   children[i].status[o] = radarrQ[i].records[o];
@@ -110,7 +110,7 @@ router.get("/all", async (req, res) => {
             children[i].info.serverName = server.config.title;
             children[i].status = [];
             // children[i] = sonarrQ;
-            if (radarrQ[i].records) {
+            if (sonarrQ[i]) {
               for (let o = 0; o < sonarrQ[i].length; o++) {
                 if (sonarrQ[i][o].series.id === sId) {
                   children[i].status.push(sonarrQ[i][o]);
