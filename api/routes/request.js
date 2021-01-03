@@ -81,9 +81,10 @@ router.get("/all", async (req, res) => {
 
         if (request.type === "movie" && request.radarrId.length > 0) {
           for (let i = 0; i < Object.keys(request.radarrId).length; i++) {
-            let server = new Radarr(i);
             let radarrIds = request.radarrId[i];
             let rId = radarrIds[Object.keys(radarrIds)[0]];
+            let serverUuid = Object.keys(radarrIds)[0];
+            let server = new Radarr(serverUuid);
             children[i] = {};
             children[i].id = rId;
             children[i].info = await server.movie(rId);
@@ -101,15 +102,15 @@ router.get("/all", async (req, res) => {
 
         if (request.type === "tv" && request.sonarrId.length > 0) {
           for (let i = 0; i < Object.keys(request.sonarrId).length; i++) {
-            let server = new Sonarr(i);
             let sonarrIds = request.sonarrId[i];
             let sId = sonarrIds[Object.keys(sonarrIds)[0]];
+            let serverUuid = Object.keys(sonarrIds)[0];
+            let server = new Sonarr(serverUuid);
             children[i] = {};
             children[i].id = sId;
             children[i].info = await server.series(sId);
             children[i].info.serverName = server.config.title;
             children[i].status = [];
-            // children[i] = sonarrQ;
             if (sonarrQ[i]) {
               for (let o = 0; o < sonarrQ[i].length; o++) {
                 if (sonarrQ[i][o].series.id === sId) {

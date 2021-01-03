@@ -21,7 +21,7 @@ class Modal extends React.Component {
 
   async getSettings() {
     try {
-      let settings = this.props.type === "radarr" ? await Api.radarrOptions(this.props.state.activeServer) : await Api.sonarrOptions(this.props.state.activeServer);
+      let settings = this.props.type === "radarr" ? await Api.radarrOptions(this.props.state.uuid) : await Api.sonarrOptions(this.props.state.uuid);
       if (settings.profiles.error || settings.paths.error) {
         return;
       }

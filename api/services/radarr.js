@@ -18,10 +18,18 @@ class Radarr {
     const configParse = JSON.parse(configData);
     this.fullConfig = configParse;
     if (id !== false) {
-      this.config = configParse[id];
+      this.config = this.findUuid(id, configParse);
       if (!this.config) {
         this.config = {};
         this.config.title = "Server Removed";
+      }
+    }
+  }
+
+  findUuid(uuid, config) {
+    for (var i = 0; i < config.length; i++) {
+      if (config[i].uuid === uuid) {
+        return config[i];
       }
     }
   }
