@@ -93,7 +93,7 @@ class Login extends React.Component {
                 <button className="btn">Login</button>
               </form>
             </div>
-            <p className="powered-by">Petio Admin build (alpha) 0.2.0.1</p>
+            <p className="powered-by">Petio Admin build (alpha) 0.2.0.2</p>
           </>
         ) : (
           <div className="spinner">

@@ -53,11 +53,16 @@ class RequestsTable extends React.Component {
     let render = [];
     req.children.map((server) => {
       let type = req.type;
-      console.log(server);
+
       // let prog = (child.sizeleft / child.size - 1) * -1 * 100;
       if (server.status.length > 0) {
         render.push(
           server.status.map((child, row) => {
+            if (!child) {
+              console.log(req);
+              return null;
+            }
+
             let prog = (child.sizeleft / child.size - 1) * -1 * 100;
             return (
               <>

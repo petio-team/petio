@@ -64,6 +64,35 @@ async function mailRequest(user, request) {
   );
 }
 
+router.get("/min", async (req, res) => {
+  const requests = await Request.find();
+  let data = {};
+  try {
+    data = {};
+
+    await Promise.all(
+      requests.map(async (request, i) => {
+        data[request.requestId] = {
+          title: request.title,
+          requestId: request.requestId,
+          type: request.type,
+          thumb: request.thumb,
+          imdb_id: request.imdb_id,
+          tmdb_id: request.tmdb_id,
+          tvdb_id: request.tvdb_id,
+          users: request.users,
+          sonarrId: request.sonarrId,
+          radarrId: request.radarrId,
+        };
+      })
+    );
+  } catch (err) {
+    console.log(err);
+    console.log(`ERR: Error getting requests`);
+  }
+  res.json(data);
+});
+
 router.get("/all", async (req, res) => {
   const requests = await Request.find();
   let data = {};
@@ -80,37 +109,42 @@ router.get("/all", async (req, res) => {
         let children = [];
 
         if (request.type === "movie" && request.radarrId.length > 0) {
-          for (let i = 0; i < request.radarrId.length; i++) {
-            let server = new Radarr(i);
+          for (let i = 0; i < Object.keys(request.radarrId).length; i++) {
             let radarrIds = request.radarrId[i];
             let rId = radarrIds[Object.keys(radarrIds)[0]];
+            let serverUuid = Object.keys(radarrIds)[0];
+            let server = new Radarr(serverUuid);
             children[i] = {};
             children[i].id = rId;
             children[i].info = await server.movie(rId);
             children[i].info.serverName = server.config.title;
             children[i].status = [];
-            for (let o = 0; o < radarrQ[i].records.length; o++) {
-              if (radarrQ[i].records[o].movieId === rId) {
-                children[i].status[o] = radarrQ[i].records[o];
+            if (radarrQ[i]) {
+              for (let o = 0; o < radarrQ[i].records.length; o++) {
+                if (radarrQ[i].records[o].movieId === rId) {
+                  children[i].status[o] = radarrQ[i].records[o];
+                }
               }
             }
           }
         }
 
         if (request.type === "tv" && request.sonarrId.length > 0) {
-          for (let i = 0; i < request.sonarrId.length; i++) {
-            let server = new Sonarr(i);
+          for (let i = 0; i < Object.keys(request.sonarrId).length; i++) {
             let sonarrIds = request.sonarrId[i];
             let sId = sonarrIds[Object.keys(sonarrIds)[0]];
+            let serverUuid = Object.keys(sonarrIds)[0];
+            let server = new Sonarr(serverUuid);
             children[i] = {};
             children[i].id = sId;
             children[i].info = await server.series(sId);
             children[i].info.serverName = server.config.title;
             children[i].status = [];
-            // children[i] = sonarrQ;
-            for (let o = 0; o < sonarrQ[i].length; o++) {
-              if (sonarrQ[i][o].series.id === sId) {
-                children[i].status.push(sonarrQ[i][o]);
+            if (sonarrQ[i]) {
+              for (let o = 0; o < sonarrQ[i].length; o++) {
+                if (sonarrQ[i][o].series.id === sId) {
+                  children[i].status.push(sonarrQ[i][o]);
+                }
               }
             }
           }

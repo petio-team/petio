@@ -439,3 +439,19 @@ export async function getUser(id) {
     });
   }
 }
+
+export async function allUsers() {
+  try {
+    let userData = await api.allUsers();
+    let data = {};
+    userData.map((user) => {
+      data[user.id] = user;
+    });
+    finalise({
+      type: types.ALL_USERS,
+      users: data,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+}

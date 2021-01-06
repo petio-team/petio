@@ -320,7 +320,7 @@ class Sonarr extends React.Component {
                       <button className="btn" onClick={() => this.openWizard(i)}>
                         Edit
                       </button>
-                      <button className="btn" onClick={() => this.test(i)}>
+                      <button className="btn" onClick={() => this.test(server.uuid)}>
                         Test
                       </button>
                     </div>

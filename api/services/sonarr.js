@@ -18,7 +18,20 @@ class Sonarr {
     const configParse = JSON.parse(configData);
     this.fullConfig = configParse;
     if (id !== false) {
-      this.config = configParse[id];
+      this.config = this.findUuid(id, configParse);
+
+      if (!this.config) {
+        this.config = {};
+        this.config.title = "Server Removed";
+      }
+    }
+  }
+
+  findUuid(uuid, config) {
+    for (var i = 0; i < config.length; i++) {
+      if (config[i].uuid === uuid) {
+        return config[i];
+      }
     }
   }
 
@@ -72,6 +85,9 @@ class Sonarr {
   }
 
   async connect(test = false) {
+    if (!this.config || this.config.title == "Server Removed") {
+      return false;
+    }
     if (!this.config.active && !test) {
       console.log("SERVICE - SONARR: Sonarr not enabled");
       return false;
