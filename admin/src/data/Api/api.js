@@ -201,6 +201,11 @@ export function getUser(id) {
   return call(request).then((res) => res.json());
 }
 
+export function allUsers() {
+  let request = `${apiUrl}/user/all`;
+  return call(request).then((res) => res.json());
+}
+
 function call(url, headers, method, body = null) {
   let args = {
     method: method,
