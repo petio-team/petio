@@ -554,18 +554,19 @@
 
 .genre {
   &--wrap {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
     flex-wrap: wrap;
 
     @include media-breakpoint-up(lg) {
-      margin-bottom: 30px;
+      margin-bottom: 20px;
     }
   }
 
   &--item {
     margin-right: 10px;
+    margin-bottom: 10px;
     padding: 5px 10px;
     // border: solid 1px white;
     font-size: 10px;
