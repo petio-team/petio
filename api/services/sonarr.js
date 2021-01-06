@@ -85,7 +85,7 @@ class Sonarr {
   }
 
   async connect(test = false) {
-    if (!this.config) {
+    if (!this.config || this.config.title == "Server Removed") {
       return false;
     }
     if (!this.config.active && !test) {

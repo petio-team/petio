@@ -46,6 +46,21 @@ router.get("/thumb/:id", async (req, res) => {
   }
 });
 
+router.get("/all", async (req, res) => {
+  try {
+    userData = await User.find();
+  } catch (err) {
+    res.json({ error: err });
+    return;
+  }
+
+  if (userData) {
+    res.json(userData);
+  } else {
+    res.status(404).send();
+  }
+});
+
 router.get("/:id", async (req, res) => {
   try {
     userData = await User.findOne({ id: req.params.id });
