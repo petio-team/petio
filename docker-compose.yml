@@ -1,42 +1,26 @@
-version: '3'
+version: "3"
 networks:
-    mern-app:
-        driver: bridge
+  mern-app:
+    driver: bridge
 services:
-    petio:
-        image: ghcr.io/petio-team/petio:fe-latest
-        container_name: 'petio'
-        ports:
-            - '7777:80'
-        networks:
-            - mern-app
-        depends_on:
-            - petio-api
+  petio:
+    image: ghcr.io/petio-team/petio:dev
+    container_name: "petio"
+    ports:
+      - "7777:7777"
+    networks:
+      - mern-app
 
-    petio-api:
-        image: ghcr.io/petio-team/petio:be-latest
-        container_name: 'petio-api'
-        ports:
-            - '7778:7778'
-        networks:
-            - mern-app
-        depends_on:
-            - mongo
-        environment:
-            - 'REACT_APP_DB_DEFAULT=mongodb://mongo:27017'
-        volumes:
-            - ./config:/app/config
-
-    mongo:
-        image: mongo:latest
-        container_name: 'mongo'
-        hostname: mongo
-        ports:
-            - '27017:27017'
-        networks:
-            - mern-app
-        volumes:
-            - mongo-data:/data/db
+  mongo:
+    image: mongo:latest
+    container_name: "mongo"
+    hostname: mongo
+    ports:
+      - "27017:27017"
+    networks:
+      - mern-app
+    volumes:
+      - mongo-data:/data/db
 volumes:
-    mongo-data:
-        driver: local
+  mongo-data:
+    driver: local
