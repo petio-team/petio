@@ -28,12 +28,12 @@ class Wrapper {
   }
 
   admin() {
-    const adminPath = process.pkg ? path.join(path.dirname(process.execPath), "./views/admin") : "./views/admin";
+    const adminPath = process.pkg ? path.join(path.dirname(process.execPath), "./views/admin") : path.join(__dirname, "./views/admin");
     app.use("/admin/", express.static(adminPath));
   }
 
   user() {
-    const fePath = process.pkg ? path.join(path.dirname(process.execPath), "./views/frontend") : "./views/frontend";
+    const fePath = process.pkg ? path.join(path.dirname(process.execPath), "./views/frontend") : path.join(__dirname, "./views/frontend");
     app.use("/", express.static(fePath));
   }
 }
