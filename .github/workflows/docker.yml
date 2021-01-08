@@ -1,9 +1,9 @@
-name: Docker Build AIO
+name: Docker Build Dev
 
 on:
   push:
     branches:
-      - docker-rework
+      - dev
 jobs:
   docker-aio:
     name: Build Full Docker
