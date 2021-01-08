@@ -182,7 +182,7 @@ class App extends React.Component {
                   <button className="btn">Login</button>
                 </form>
               </div>
-              <p className="powered-by">Petio build (alpha) 0.2.0</p>
+              <p className="powered-by">Petio build (alpha) 0.2.1</p>
             </>
           ) : (
             <div className="spinner">

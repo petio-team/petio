@@ -7,7 +7,7 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 
 class Wrapper {
   init() {
-    console.log("running");
+    console.log("Starting Petio");
     this.admin();
     this.user();
     this.api();
