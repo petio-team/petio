@@ -85,6 +85,9 @@ class Main {
       this.e.use("/sessions", sessionsRoute);
       this.e.use("/services", servicesRoute);
       this.e.use("/mail", mailRoute);
+      this.e.get("*", function (req, res) {
+        res.status(404).send("Petio API: route not found");
+      });
     }
   }
 

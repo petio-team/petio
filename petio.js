@@ -11,6 +11,7 @@ class Wrapper {
     this.admin();
     this.user();
     this.api();
+    this.notfound();
     app.listen(7777);
     // open("http://localhost:7777/admin/");
   }
@@ -35,6 +36,12 @@ class Wrapper {
   user() {
     const fePath = process.pkg ? path.join(path.dirname(process.execPath), "./views/frontend") : path.join(__dirname, "./views/frontend");
     app.use("/", express.static(fePath));
+  }
+
+  notfound() {
+    app.get("*", function (req, res) {
+      res.status(404).send("Petio Router: not found");
+    });
   }
 }
 
