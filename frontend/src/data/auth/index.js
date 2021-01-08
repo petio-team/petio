@@ -2,9 +2,7 @@ import { store } from "../store";
 import * as types from "../actionTypes";
 
 const PlexRequestApi =
-  process.env.NODE_ENV === "development" || process.env.REACT_APP_ENV === "pkg"
-    ? "http://localhost:7778"
-    : `${window.location.protocol}//${window.location.host}${window.location.pathname.replace("/admin/", "")}/api`;
+  process.env.NODE_ENV === "development" || process.env.REACT_APP_ENV === "pkg" ? "http://localhost:7778" : `${window.location.protocol}//${window.location.host}${window.location.pathname}/api`;
 
 export function initAuth() {
   finalise({
