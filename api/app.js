@@ -34,11 +34,20 @@ const mailRoute = require("./routes/mail");
 
 class Main {
   constructor() {
-    this.cron = new CronJob("0 */30 * * * *", function () {
+    // Runs every night at 00:00
+    this.cron = new CronJob("0 0 * * *", function () {
       const d = new Date();
-      console.log("Library Watch Running:", d);
+      console.log("Full Scan Started:", d);
       new LibraryUpdate().run();
     });
+
+    // Runs every 30 mins
+    this.partial = new CronJob("0 */30 * * * *", function () {
+      const d = new Date();
+      console.log("Partial Scan Started:", d);
+      new LibraryUpdate().partial();
+    });
+
     if (process.pkg) {
       this.createConfigDir(path.join(path.dirname(process.execPath), "./config"));
     } else {
@@ -96,7 +105,6 @@ class Main {
     if (!this.config) {
       console.log("No config, entering setup mode");
     } else {
-      // Routing
       console.log("Connecting to Database, please wait....");
       this.connectDb();
     }
@@ -121,6 +129,7 @@ class Main {
   async start() {
     const libUpdate = new LibraryUpdate();
     this.cron.start();
+    this.partial.start();
     libUpdate.run();
   }
 
