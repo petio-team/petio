@@ -98,16 +98,18 @@ async function getUser(token) {
   for (let server of serverList) {
     if (server.getAttribute("owned") === "1" && server.getAttribute("provides") === "server") {
       let connections = server.getElementsByTagName("Connection");
+      let i = 0;
       for (let connection of connections) {
         console.log(connection);
         // if (connection.getAttribute('local') === '0')
-        setup.servers[server.getAttribute("clientIdentifier")] = {
+        setup.servers[server.getAttribute("clientIdentifier") + i] = {
           name: server.getAttribute("name"),
           host: connection.getAttribute("address"),
           port: connection.getAttribute("port"),
           protocol: connection.getAttribute("protocol"),
           platform: server.getAttribute("platform"),
         };
+        i++;
       }
     }
   }
