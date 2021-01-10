@@ -12,6 +12,7 @@ const getConfig = require("./util/config");
 
 // Plex
 const LibraryUpdate = require("./plex/libraryUpdate");
+const testConnection = require("./plex/testConnection");
 
 // Routes
 const movieRoute = require("./routes/movie");
@@ -137,6 +138,27 @@ class Main {
   }
 
   setup() {
+    this.e.post("/setup/test_server", async (req, res) => {
+      let server = req.body.server;
+      if (!server) {
+        res.status(400).send("Bad Request");
+        return;
+      }
+      try {
+        let test = await testConnection(server.protocol, server.host, server.port, server.token);
+        let status = test !== 200 ? "failed" : "connected";
+        res.status(200).json({
+          status: status,
+          code: test,
+        });
+      } catch (err) {
+        console.log(err);
+        res.status(404).json({
+          status: "failed",
+          code: 404,
+        });
+      }
+    });
     this.e.post("/setup/set", async (req, res) => {
       if (this.config) {
         res.status(403).send("Config exists");

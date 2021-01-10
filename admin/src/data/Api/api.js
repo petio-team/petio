@@ -209,6 +209,15 @@ export function allUsers() {
   return call(request).then((res) => res.json());
 }
 
+export let testServer = (server) => {
+  let request = `${apiUrl}/setup/test_server`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  let body = { server: server };
+  return call(request, headers, "post", body).then((res) => res.json());
+};
+
 function call(url, headers, method, body = null) {
   let args = {
     method: method,
