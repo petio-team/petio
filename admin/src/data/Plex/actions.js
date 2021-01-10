@@ -1,6 +1,7 @@
 import { store } from "../store";
 import * as types from "../actionTypes";
 import * as api from "./api";
+import { testServer } from "../Api/api";
 
 // Credit Tautulli
 const plex_oauth_loader =
@@ -108,6 +109,7 @@ async function getUser(token) {
           port: connection.getAttribute("port"),
           protocol: connection.getAttribute("protocol"),
           platform: server.getAttribute("platform"),
+          status: "pending",
         };
         i++;
       }
@@ -118,6 +120,36 @@ async function getUser(token) {
     servers: setup.servers,
     user: setup.user,
   });
+
+  testPlexServers(setup.servers, token);
+}
+
+function testPlexServers(servers, token) {
+  Object.keys(servers).map((key) => {
+    let server = servers[key];
+    server.token = token;
+    testPlexServer(server, key);
+  });
+}
+
+async function testPlexServer(server, key) {
+  try {
+    let test = await testServer(server);
+    console.log(test);
+    server.status = test.status;
+    finalise({
+      type: types.PLEX_SERVER,
+      key: key,
+      server: server,
+    });
+  } catch {
+    server.status = "failed";
+    finalise({
+      type: types.PLEX_SERVER,
+      key: key,
+      server: server,
+    });
+  }
 }
 
 function finalise(data = false) {
