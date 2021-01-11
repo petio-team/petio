@@ -1,6 +1,7 @@
 import { store } from "../store";
 import * as types from "../actionTypes";
 import * as api from "./api";
+import Api from ".";
 
 function finalise(data = false) {
   if (!data) return false;
@@ -453,5 +454,15 @@ export async function allUsers() {
     });
   } catch (err) {
     console.log(err);
+  }
+}
+
+export async function testMongo(mongo) {
+  try {
+    let result = await api.testMongo(mongo);
+    return result.status;
+  } catch (err) {
+    console.log(err);
+    return "failed";
   }
 }
