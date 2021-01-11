@@ -81,7 +81,7 @@ class ReviewsList extends React.Component {
               );
             })
           : null}
-        {this.props.external.length === 0 && this.props.reviews.length === 0 ? <p>No reviews</p> : null}
+        {this.props.external ? this.props.external.length === 0 && this.props.reviews.length === 0 ? <p>No reviews</p> : null : null}
       </div>
     );
   }

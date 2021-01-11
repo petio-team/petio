@@ -1,62 +1,126 @@
 .setup--wrap {
-	width: 400px;
-	max-width: 100%;
-	margin: auto;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	min-height: 100vh;
+  width: 400px;
+  max-width: 100%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
 
-	.main-title {
-		margin-bottom: 20px;
-	}
+  .main-title {
+    margin-bottom: 20px;
+  }
 
-	.server-select-option {
-		background: rgba($grey-medium, 0.5);
-		color: $grey-light;
-		padding: 20px;
-		// border-bottom: solid 1px $black;
-		border-radius: 5px;
-		margin-bottom: 5px;
-		transition: background 0.3s ease;
-		cursor: pointer;
-		display: flex;
+  .server-select-option {
+    background: rgba($grey-medium, 0.5);
+    color: $grey-light;
+    padding: 20px;
+    // border-bottom: solid 1px $black;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    transition: background 0.3s ease, opacity 0.3s ease;
+    cursor: pointer;
+    display: flex;
 
-		div {
-			pointer-events: none;
-		}
+    &.disabled {
+      pointer-events: none;
+      opacity: 0.5;
+    }
 
-		.server-icon {
-			height: 40px;
-			width: 40px;
-			margin-right: 20px;
-			pointer-events: none;
-		}
+    div {
+      pointer-events: none;
+    }
 
-		p {
-			margin: 0;
-			text-transform: uppercase;
-			pointer-events: none;
+    .server-icon {
+      height: 40px;
+      width: 40px;
+      min-width: 40px;
+      margin-right: 20px;
+      pointer-events: none;
+    }
 
-			&.server-loc {
-				font-size: 12px;
-				text-transform: none;
-			}
-		}
+    .server-status {
+      margin-left: auto;
 
-		&:hover {
-			background: rgba($grey-medium, 0.8);
-		}
+      &-item {
+        display: none;
+        justify-content: center;
+        align-items: center;
+        height: 40px;
+        width: 40px;
 
-		&.selected {
-			background: $orange;
-		}
-	}
+        &.active {
+          display: flex;
+        }
+      }
 
-	.loading {
-		svg {
-			width: 50px;
-			height: 50px;
-		}
-	}
+      &-pending {
+        svg {
+          height: 40px;
+          width: 40px;
+        }
+      }
+
+      &-good,
+      &-bad {
+        span {
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border: solid 1px red;
+
+          svg {
+            width: 15px;
+            height: auto;
+          }
+        }
+      }
+
+      &-good {
+        span {
+          border-color: $green;
+
+          svg {
+            fill: $green;
+          }
+        }
+      }
+
+      &-bad {
+        span {
+          border-color: $bad;
+          color: $bad;
+        }
+      }
+    }
+
+    p {
+      margin: 0;
+      text-transform: uppercase;
+      pointer-events: none;
+
+      &.server-loc {
+        font-size: 12px;
+        text-transform: none;
+      }
+    }
+
+    &:hover {
+      background: rgba($grey-medium, 0.8);
+    }
+
+    &.selected {
+      background: $orange;
+    }
+  }
+
+  .loading {
+    svg {
+      width: 50px;
+      height: 50px;
+    }
+  }
 }

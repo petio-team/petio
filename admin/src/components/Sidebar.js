@@ -7,6 +7,7 @@ import { ReactComponent as ReviewIcon } from "../assets/svg/star.svg";
 import { ReactComponent as RequestIcon } from "../assets/svg/bookmark.svg";
 import { ReactComponent as SettingsIcon } from "../assets/svg/settings.svg";
 import { ReactComponent as CloseIcon } from "../assets/svg/close.svg";
+import { ReactComponent as AdminIcon } from "../assets/svg/admin.svg";
 import User from "../data/User";
 
 class Sidebar extends React.Component {
@@ -80,6 +81,12 @@ class Sidebar extends React.Component {
               <CloseIcon />
             </div>
           </div>
+          <a className="menu--item" href={`${window.location.protocol}//${window.location.host}${window.location.pathname.replace("/admin/", "")}`}>
+            <p>Exit Admin</p>
+            <div className="icon">
+              <AdminIcon />
+            </div>
+          </a>
         </div>
       </div>
     );

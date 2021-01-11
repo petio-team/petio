@@ -1,4 +1,7 @@
-const apiUrl = process.env.NODE_ENV === "development" || process.env.REACT_APP_ENV === "pkg" ? "http://localhost:7778" : `${window.location.protocol}//${window.location.host}/api`;
+const apiUrl =
+  process.env.NODE_ENV === "development" || process.env.REACT_APP_ENV === "pkg"
+    ? "http://localhost:7778"
+    : `${window.location.protocol}//${window.location.host}${window.location.pathname.replace("/admin/", "")}/api`;
 
 console.log(process.env);
 
@@ -205,6 +208,15 @@ export function allUsers() {
   let request = `${apiUrl}/user/all`;
   return call(request).then((res) => res.json());
 }
+
+export let testServer = (server) => {
+  let request = `${apiUrl}/setup/test_server`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  let body = { server: server };
+  return call(request, headers, "post", body).then((res) => res.json());
+};
 
 function call(url, headers, method, body = null) {
   let args = {
