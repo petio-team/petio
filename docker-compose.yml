@@ -1,15 +1,21 @@
 version: "3"
 networks:
-  mern-app:
+  petio-network:
     driver: bridge
 services:
   petio:
     image: ghcr.io/petio-team/petio:latest
     container_name: "petio"
+    hostname: petio
+    logging:
+      driver: json-file
+      options:
+        max-file: 10
+        max-size: 200k
     ports:
       - "7777:7777"
     networks:
-      - mern-app
+      - petio-network
     volumes:
       - ./config:/app/api/config
 
@@ -17,10 +23,15 @@ services:
     image: mongo:latest
     container_name: "mongo"
     hostname: mongo
+    logging:
+      driver: json-file
+      options:
+        max-file: 10
+        max-size: 200k
     ports:
       - "27017:27017"
     networks:
-      - mern-app
+      - petio-network
     volumes:
       - ./db:/data/db
 volumes:

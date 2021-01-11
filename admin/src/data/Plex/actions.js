@@ -115,6 +115,14 @@ async function getUser(token) {
       }
     }
   }
+  setup.servers["plex_docker"] = {
+    name: "Docker",
+    host: "petio",
+    port: "32400",
+    protocol: "http",
+    platform: "docker",
+    status: "pending",
+  };
   finalise({
     type: types.PLEX_DETAILS,
     servers: setup.servers,

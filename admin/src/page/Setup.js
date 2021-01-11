@@ -5,6 +5,7 @@ import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
 import { ReactComponent as Windows } from "../assets/svg/windows.svg";
 import { ReactComponent as OSX } from "../assets/svg/mac.svg";
 import { ReactComponent as Linux } from "../assets/svg/linux.svg";
+import { ReactComponent as Docker } from "../assets/svg/docker.svg";
 import { ReactComponent as Server } from "../assets/svg/server.svg";
 import { ReactComponent as Good } from "../assets/svg/check.svg";
 import { ReactComponent as Bad } from "../assets/svg/close.svg";
@@ -62,6 +63,9 @@ class Setup extends React.Component {
 
       case "MacOSX":
         return <OSX />;
+
+      case "docker":
+        return <Docker />;
 
       default:
         return <Server />;
