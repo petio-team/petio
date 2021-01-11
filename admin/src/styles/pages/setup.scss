@@ -1,6 +1,6 @@
 .setup--wrap {
   width: 400px;
-  max-width: 100%;
+  max-width: calc(100% - 40px);
   margin: auto;
   display: flex;
   flex-direction: column;
