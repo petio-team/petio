@@ -124,3 +124,166 @@
     }
   }
 }
+
+.setup--steps {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 50px;
+
+  span {
+    height: 1px;
+    width: 100%;
+    background: $grey-medium;
+    opacity: 0.5;
+    margin: 0 5px;
+  }
+}
+
+.setup--step {
+  height: 25px;
+  width: 25px;
+  min-width: 25px;
+  border: solid 2px white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  font-size: 12px;
+  opacity: 0.1;
+  transition: color 0.5s ease, opacity 0.5s ease, border-color 0.5s ease;
+
+  &.complete {
+    border-color: white;
+    color: white;
+    opacity: 0.8;
+  }
+
+  &.active {
+    border-color: $orange;
+    color: $orange;
+    opacity: 1;
+  }
+}
+
+.setup--content {
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.mongo {
+  &-wrap {
+    background: rgba($grey-medium, 0.5);
+    color: $grey-light;
+    padding: 20px;
+    // border-bottom: solid 1px $black;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    transition: background 0.3s ease, opacity 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+
+  &-icon {
+    height: 40px;
+    width: 40px;
+    min-width: 40px;
+    margin-right: 20px;
+    pointer-events: none;
+  }
+
+  &-prefix {
+    background: $grey-medium;
+    height: 100%;
+    height: 30px;
+    line-height: 30px;
+    padding: 0 10px 0 15px;
+    font-size: 12px;
+  }
+
+  &-content {
+    display: flex;
+    align-items: center;
+    max-width: 100%;
+    border-radius: 50px;
+    overflow: hidden;
+    background: hsla(0, 0%, 100%, 0.1);
+    height: 30px;
+
+    input {
+      height: 20px;
+      background: none;
+      padding: 0 10px;
+      font-size: 16px;
+      border-radius: 0 !important;
+      border: none;
+      outline: none !important;
+      color: #fff;
+      width: 100%;
+      border: none !important;
+      margin-bottom: 0;
+    }
+  }
+
+  &-status {
+    margin-left: 20px;
+
+    &-item {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      height: 40px;
+      width: 40px;
+
+      &.active {
+        display: flex;
+      }
+    }
+
+    &-pending {
+      svg {
+        height: 40px;
+        width: 40px;
+      }
+    }
+
+    &-good,
+    &-bad {
+      span {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: solid 1px red;
+
+        svg {
+          width: 15px;
+          height: auto;
+        }
+      }
+    }
+
+    &-good {
+      span {
+        border-color: $green;
+
+        svg {
+          fill: $green;
+        }
+      }
+    }
+
+    &-bad {
+      span {
+        border-color: $bad;
+        color: $bad;
+      }
+    }
+  }
+}

@@ -218,6 +218,15 @@ export let testServer = (server) => {
   return call(request, headers, "post", body).then((res) => res.json());
 };
 
+export let testMongo = (mongo) => {
+  let request = `${apiUrl}/setup/test_mongo`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  let body = { mongo: mongo };
+  return call(request, headers, "post", body).then((res) => res.json());
+};
+
 function call(url, headers, method, body = null) {
   let args = {
     method: method,

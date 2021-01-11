@@ -159,6 +159,31 @@ class Main {
         });
       }
     });
+    this.e.post("/setup/test_mongo", async (req, res) => {
+      let mongo = req.body.mongo;
+      console.log(`testing mongo connection: ${mongo}`);
+      if (!mongo) {
+        res.status(400).send("Bad Request");
+        return;
+      }
+      try {
+        await mongoose.connect(mongo, {
+          useNewUrlParser: true,
+          useUnifiedTopology: true,
+          connectTimeoutMS: 1000,
+        });
+        mongoose.connection.close();
+        res.status(200).json({
+          status: "connected",
+        });
+      } catch (err) {
+        res.status(401).json({
+          status: "failed",
+          error: err,
+          tried: mongo,
+        });
+      }
+    });
     this.e.post("/setup/set", async (req, res) => {
       if (this.config) {
         res.status(403).send("Config exists");
