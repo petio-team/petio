@@ -40,6 +40,7 @@ class Setup extends React.Component {
       password: "",
       selectedServer: false,
       mongoStatus: "",
+      mongoType: "mongodb://",
       finalText: "Getting things set up...",
     };
 
@@ -51,6 +52,7 @@ class Setup extends React.Component {
     this.next = this.next.bind(this);
     this.testMongo = this.testMongo.bind(this);
     this.waitText = this.waitText.bind(this);
+    this.changeMongoType = this.changeMongoType.bind(this);
   }
 
   serverIcon(platform) {
@@ -79,6 +81,7 @@ class Setup extends React.Component {
 
     this.setState({
       [name]: value,
+      mongoStatus: "",
     });
   }
 
@@ -146,7 +149,7 @@ class Setup extends React.Component {
     this.setState({
       mongoStatus: "pending",
     });
-    let db = "mongodb://" + this.state.db;
+    let db = this.state.mongoType + this.state.db;
     let test = await Api.testMongo(db);
     this.setState({
       mongoStatus: test,
@@ -161,7 +164,7 @@ class Setup extends React.Component {
     let config = {
       user: this.state.user,
       server: selectedServer,
-      db: "mongodb://" + this.state.db,
+      db: this.state.mongoType + this.state.db,
     };
     this.waitText();
     Api.saveConfig(config)
@@ -221,6 +224,13 @@ class Setup extends React.Component {
 
   timeout(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  changeMongoType() {
+    this.setState({
+      mongoType: this.state.mongoType === "mongodb+srv://" ? "mongodb://" : "mongodb+srv://",
+      mongoStatus: "",
+    });
   }
 
   render() {
@@ -307,13 +317,16 @@ class Setup extends React.Component {
           ) : null}
           {this.state.step === 4 ? (
             <div className="step-4">
-              <p>Mongo Database path, leave this as default unless you have configured your database differently to recommended.</p>
+              <p>Mongo Database path, if using docker leave as default, otherwise specify your db path.</p>
+              <p>To switch between local / cloud db clusters click on the prefix to switch between the two.</p>
               <div className="mongo-wrap">
                 <div className="mongo-icon">
                   <Server />
                 </div>
                 <div className="mongo-content">
-                  <div className="mongo-prefix">mongodb://</div>
+                  <div className="mongo-prefix" onClick={this.changeMongoType}>
+                    {this.state.mongoType}
+                  </div>
                   <input type="text" name="db" value={this.state.db} onChange={this.inputChange} />
                 </div>
                 <div className="mongo-status">

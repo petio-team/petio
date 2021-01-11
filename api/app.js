@@ -170,7 +170,7 @@ class Main {
         await mongoose.connect(mongo, {
           useNewUrlParser: true,
           useUnifiedTopology: true,
-          connectTimeoutMS: 1000,
+          // connectTimeoutMS: 1000,
         });
         mongoose.connection.close();
         res.status(200).json({
