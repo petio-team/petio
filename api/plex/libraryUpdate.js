@@ -31,18 +31,18 @@ class LibraryUpdate {
       console.log(`LIB CRON: Partial scan failed - unable to get recent`);
       return;
     }
-    // console.log(recent.Metadata);
+
     Object.keys(recent.Metadata).map((i) => {
       let obj = recent.Metadata[i];
 
       if (obj.type === "movie") {
-        console.log(`LIB CRON: Partial scan - ${obj.title}`);
         this.saveMovie(obj);
+        console.log(`LIB CRON: Partial scan - ${obj.title}`);
       } else if (obj.type === "artist") {
         this.saveMusic(obj);
       } else if (obj.type === "show") {
-        console.log(`LIB CRON: Partial scan - ${obj.title}`);
         this.saveShow(obj);
+        console.log(`LIB CRON: Partial scan - ${obj.title}`);
       } else if (obj.type === "season") {
         let parent = {
           ratingKey: obj.parentRatingKey,
@@ -70,8 +70,9 @@ class LibraryUpdate {
           studio: "",
           titleSort: "",
         };
-        console.log(`LIB CRON: Partial scan - ${parent.title} - Built from series`);
+
         this.saveShow(parent);
+        console.log(`LIB CRON: Partial scan - ${parent.title} - Built from series`);
       } else {
         console.log(obj);
       }
@@ -365,7 +366,7 @@ class LibraryUpdate {
     let movieDb = false;
     try {
       movieDb = await Movie.findOne({ ratingKey: movieObj.ratingKey });
-      if (!this.full) {
+      if (!this.full && movieDb) {
         return;
       }
     } catch {
