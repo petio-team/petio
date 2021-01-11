@@ -117,7 +117,7 @@ async function getUser(token) {
   }
   setup.servers["plex_docker"] = {
     name: "Docker",
-    host: "petio",
+    host: "plex",
     port: "32400",
     protocol: "http",
     platform: "docker",
