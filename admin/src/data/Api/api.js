@@ -1,7 +1,4 @@
-const apiUrl =
-  process.env.NODE_ENV === "development" || process.env.REACT_APP_ENV === "pkg"
-    ? "http://localhost:7778"
-    : `${window.location.protocol}//${window.location.host}${window.location.pathname.replace("/admin/", "")}/api`;
+const apiUrl = process.env.NODE_ENV === "development" ? "http://localhost:7778" : `${window.location.protocol}//${window.location.host}${window.location.pathname.replace("/admin/", "")}/api`;
 
 console.log(process.env);
 
