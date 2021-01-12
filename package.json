@@ -13,6 +13,7 @@
     "url": "^0.11.0"
   },
   "scripts": {
-    "start": "node petio.js"
+    "start": "node petio.js",
+    "version": "npm -s run env echo '$npm_package_version'"
   }
 }
