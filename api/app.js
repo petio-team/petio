@@ -167,6 +167,16 @@ class Main {
         return;
       }
       try {
+        // Ensure no db is passed
+        if (mongo.split("@")[1].split("/").length > 1) {
+          res.status(401).json({
+            status: "failed",
+            error: "db path included",
+            tried: mongo,
+            l: mongo.split("@")[1].split("/").length,
+          });
+          return;
+        }
         await mongoose.connect(mongo, {
           useNewUrlParser: true,
           useUnifiedTopology: true,
