@@ -1,6 +1,7 @@
 import React from "react";
 import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
 import User from "../data/User";
+import pjson from "../../package.json";
 
 class Login extends React.Component {
   constructor(props) {
@@ -93,7 +94,7 @@ class Login extends React.Component {
                 <button className="btn">Login</button>
               </form>
             </div>
-            <p className="powered-by">Petio Admin build (alpha) 0.2.11</p>
+            <p className="powered-by">Petio Admin build (alpha) {pjson.version}</p>
           </>
         ) : (
           <div className="spinner">

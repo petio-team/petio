@@ -10,6 +10,7 @@ import { ReactComponent as Server } from "../assets/svg/server.svg";
 import { ReactComponent as Good } from "../assets/svg/check.svg";
 import { ReactComponent as Bad } from "../assets/svg/close.svg";
 import Api from "../data/Api";
+import pjson from "../../package.json";
 
 /* eslint-disable */
 const popupCenter = (url, title, w, h) => {
@@ -362,6 +363,7 @@ class Setup extends React.Component {
             </div>
           ) : null}
         </div>
+        <p className="setup--version">Petio Admin build (alpha) {pjson.version}</p>
       </div>
     );
   }

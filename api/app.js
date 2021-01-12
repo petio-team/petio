@@ -6,6 +6,7 @@ require("dotenv/config");
 const CronJob = require("cron").CronJob;
 const fs = require("fs");
 const path = require("path");
+const pjson = require("./package.json");
 
 // Config
 const getConfig = require("./util/config");
@@ -103,7 +104,7 @@ class Main {
   init() {
     this.setRoutes();
     console.log("Starting Server ");
-    console.log("Petio API Version 0.2.11 alpha");
+    console.log(`Petio API Version ${pjson.version} alpha`);
     this.server = this.e.listen(7778);
     console.log("Listening");
     if (!this.config) {

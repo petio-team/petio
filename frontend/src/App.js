@@ -16,6 +16,7 @@ import Movies from "./pages/Movies";
 import Requests from "./pages/Requests";
 import Shows from "./pages/Shows";
 import { ReactComponent as Spinner } from "./assets/svg/spinner.svg";
+import pjson from "../package.json";
 
 class App extends React.Component {
   constructor(props) {
@@ -182,7 +183,7 @@ class App extends React.Component {
                   <button className="btn">Login</button>
                 </form>
               </div>
-              <p className="powered-by">Petio build (alpha) 0.2.11</p>
+              <p className="powered-by">Petio build (alpha) {pjson.version}</p>
             </>
           ) : (
             <div className="spinner">

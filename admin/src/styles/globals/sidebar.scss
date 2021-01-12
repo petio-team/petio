@@ -1,161 +1,175 @@
 .menu {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 50px;
-	height: 100%;
-	background: rgba($dark-grey, 1);
-	// box-shadow: 2px 0px 14px 0px rgba(0, 0, 0, 0.34);
-	z-index: 99;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 50px;
+  height: 100%;
+  background: rgba($dark-grey, 1);
+  // box-shadow: 2px 0px 14px 0px rgba(0, 0, 0, 0.34);
+  z-index: 99;
 
-	@include media-breakpoint-up(lg) {
-		width: 250px;
-	}
+  @include media-breakpoint-up(lg) {
+    width: 250px;
+  }
 
-	.logo {
-		text-transform: uppercase;
-		font-size: 32px;
-		line-height: 1;
-		color: white;
-		font-family: 'Logo', sans-serif;
-		margin: 0;
+  .logo {
+    text-transform: uppercase;
+    font-size: 32px;
+    line-height: 1;
+    color: white;
+    font-family: "Logo", sans-serif;
+    margin: 0;
 
-		@include media-breakpoint-up(lg) {
-			font-size: 32px;
-		}
+    @include media-breakpoint-up(lg) {
+      font-size: 32px;
+    }
 
-		span {
-			color: orange;
-		}
-	}
+    span {
+      color: orange;
+    }
+  }
 
-	&--logo {
-		padding: 20px;
-		display: none;
+  &--logo {
+    padding: 20px;
+    display: none;
 
-		@include media-breakpoint-up(lg) {
-			display: block;
-		}
-	}
+    @include media-breakpoint-up(lg) {
+      display: block;
+    }
+  }
 
-	&--title {
-		font-size: 12px;
-		letter-spacing: 2px;
-		text-transform: uppercase;
-		font-weight: 500;
-		margin-bottom: 0;
-	}
+  &--title {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 0;
+  }
 
-	&--item {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		border-top: solid 4px transparent;
-		cursor: pointer;
+  &--item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: solid 4px transparent;
+    cursor: pointer;
 
-		@include media-breakpoint-up(lg) {
-			padding-left: 20px;
-			border-top: none;
-			border-right: solid 4px transparent;
-		}
+    @include media-breakpoint-up(lg) {
+      padding-left: 20px;
+      border-top: none;
+      border-right: solid 4px transparent;
+    }
 
-		p {
-			font-size: 16px;
-			color: white;
-			font-weight: 500;
-			margin: 0;
-			display: none;
+    p {
+      font-size: 16px;
+      color: white;
+      font-weight: 500;
+      margin: 0;
+      display: none;
 
-			@include media-breakpoint-up(lg) {
-				display: block;
-			}
-		}
+      @include media-breakpoint-up(lg) {
+        display: block;
+      }
+    }
 
-		.icon {
-			padding: 20px 0;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			width: 50px;
+    .icon {
+      padding: 20px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 50px;
 
-			@include media-breakpoint-up(lg) {
-				padding: 20px 0;
-				width: 60px;
-			}
+      @include media-breakpoint-up(lg) {
+        padding: 20px 0;
+        width: 60px;
+      }
 
-			svg {
-				height: 20px;
+      svg {
+        height: 20px;
 
-				@include media-breakpoint-up(lg) {
-					height: 20px;
-				}
+        @include media-breakpoint-up(lg) {
+          height: 20px;
+        }
 
-				path {
-					fill: $grey-light;
-				}
-			}
-		}
+        path {
+          fill: $grey-light;
+        }
+      }
+    }
 
-		&.user-profile {
-			.thumb {
-				background-position: center;
-				background-repeat: no-repeat;
-				background-size: cover;
-				background-color: rgba(255, 255, 255, 0.2);
-				border-radius: 50px;
-				height: 30px;
-				width: 30px;
+    &.user-profile {
+      .thumb {
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 50px;
+        height: 30px;
+        width: 30px;
 
-				@include media-breakpoint-up(lg) {
-					height: 30px;
-					width: 30px;
-				}
-			}
+        @include media-breakpoint-up(lg) {
+          height: 30px;
+          width: 30px;
+        }
+      }
 
-			p {
-				max-width: 150px;
-				overflow: hidden;
-			}
+      p {
+        max-width: 150px;
+        overflow: hidden;
+      }
 
-			.icon {
-				padding: 10px 0;
-			}
+      .icon {
+        padding: 10px 0;
+      }
 
-			@include media-breakpoint-up(lg) {
-				.icon {
-					padding: 15px 0;
-				}
-			}
-		}
+      @include media-breakpoint-up(lg) {
+        .icon {
+          padding: 15px 0;
+        }
+      }
+    }
 
-		&:hover {
-			background: rgba(0, 0, 0, 0.2);
-			border-top: solid 4px rgba(255, 255, 255, 0.2);
+    &:hover {
+      background: rgba(0, 0, 0, 0.2);
+      border-top: solid 4px rgba(255, 255, 255, 0.2);
 
-			@include media-breakpoint-up(lg) {
-				border-top: none;
-				border-right: solid 4px rgba(255, 255, 255, 0.2);
-			}
-		}
+      @include media-breakpoint-up(lg) {
+        border-top: none;
+        border-right: solid 4px rgba(255, 255, 255, 0.2);
+      }
+    }
 
-		&.active {
-			background: $black;
-			border-top: solid 4px $orangeDark;
+    &.active {
+      background: $black;
+      border-top: solid 4px $orangeDark;
 
-			@include media-breakpoint-up(lg) {
-				border-top: none;
-				border-right: solid 4px $orangeDark;
-			}
+      @include media-breakpoint-up(lg) {
+        border-top: none;
+        border-right: solid 4px $orangeDark;
+      }
 
-			.icon {
-				svg path {
-					fill: $orange;
-				}
-			}
+      .icon {
+        svg path {
+          fill: $orange;
+        }
+      }
 
-			p {
-				color: $orange;
-			}
-		}
-	}
+      p {
+        color: $orange;
+      }
+    }
+  }
+
+  &--version {
+    position: absolute;
+    left: 20px;
+    bottom: 20px;
+    margin: 0;
+    font-size: 10px;
+    line-height: 1;
+    display: none;
+
+    @include media-breakpoint-up(lg) {
+      display: block;
+    }
+  }
 }

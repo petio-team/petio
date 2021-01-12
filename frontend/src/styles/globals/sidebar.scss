@@ -263,4 +263,18 @@
       display: none;
     }
   }
+
+  &--version {
+    position: absolute;
+    left: 20px;
+    bottom: 20px;
+    margin: 0;
+    font-size: 10px;
+    line-height: 1;
+    display: none;
+
+    @include media-breakpoint-up(lg) {
+      display: block;
+    }
+  }
 }

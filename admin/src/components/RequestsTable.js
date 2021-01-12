@@ -137,7 +137,7 @@ class RequestsTable extends React.Component {
         }
 
         if (req.type === "tv" && req.children[r].info) {
-          if (req.children[r].info.episodeCount === req.children[r].info.episodeFileCount) {
+          if (req.children[r].info.episodeCount === req.children[r].info.episodeFileCount && req.children[r].info.episodeCount > 0) {
             return <span className="requests--status requests--status__good">Downloaded</span>;
           }
 
@@ -150,7 +150,13 @@ class RequestsTable extends React.Component {
             if (!missing) {
               return <span className="requests--status requests--status__good">Downloaded</span>;
             } else {
-              return <span className="requests--status requests--status__bad">Unavailable</span>;
+              let airDate = req.children[r].info.firstAired;
+              var diff = Math.ceil(new Date(airDate) - new Date());
+              if (diff > 0) {
+                return <span className="requests--status requests--status__blue">~{this.calcDate(diff)}</span>;
+              } else {
+                return <span className="requests--status requests--status__bad">Unavailable</span>;
+              }
             }
           }
         }
