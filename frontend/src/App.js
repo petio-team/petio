@@ -225,7 +225,9 @@ class App extends React.Component {
               </Route>
               <Route exact path="/series/:id/season/:season">
                 <Issues open={this.state.openIssues} close={this.closeIssues} />
-                <Season openIssues={this.openIssues} />
+                <div className="page-wrap">
+                  <Season openIssues={this.openIssues} />
+                </div>
               </Route>
               <Route path="/person/:id">
                 <Actor />
