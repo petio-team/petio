@@ -13,7 +13,6 @@ class Issues extends React.Component {
       type: "",
       option: "",
       detail: "",
-      active: true,
     };
 
     this.inputChange = this.inputChange.bind(this);
@@ -58,6 +57,11 @@ class Issues extends React.Component {
         user: user,
         issue: this.state.option,
         comment: this.state.detail,
+      });
+      this.setState({
+        type: "",
+        option: "",
+        detail: "",
       });
       this.props.close();
     } catch {
@@ -117,7 +121,7 @@ class Issues extends React.Component {
               <input type="hidden" name="type" defaultValue={this.state.type} readOnly />
               <input type="hidden" name="user" value={this.props.user.current.id} readOnly />
               <div className="styled-input--select">
-                <select name="option" onChange={this.inputChange}>
+                <select name="option" value={this.state.option} onChange={this.inputChange}>
                   <option value="">Choose an option</option>
                   {this.state.type === "movie" ? (
                     <>
@@ -136,7 +140,7 @@ class Issues extends React.Component {
                   <option value="other">Other, please specify</option>
                 </select>
               </div>
-              <textarea className="styled-input--textarea" placeholder="Notes" name="detail" onChange={this.inputChange}></textarea>
+              <textarea className="styled-input--textarea" value={this.state.detail} placeholder="Notes" name="detail" onChange={this.inputChange}></textarea>
             </section>
             <div className="btn btn__square bad" onClick={this.props.close}>
               Cancel
