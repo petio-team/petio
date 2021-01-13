@@ -30,9 +30,9 @@ const reviewRoute = require("./routes/review");
 const userRoute = require("./routes/user");
 const genieRoute = require("./routes/genie");
 const sessionsRoute = require("./routes/sessions");
-// const setupRoute = require('./routes/setup');
 const servicesRoute = require("./routes/services");
 const mailRoute = require("./routes/mail");
+const issueRoute = require("./routes/issue");
 
 class Main {
   constructor() {
@@ -87,6 +87,7 @@ class Main {
       this.e.use("/sessions", sessionsRoute);
       this.e.use("/services", servicesRoute);
       this.e.use("/mail", mailRoute);
+      this.e.use("/issue", issueRoute);
       this.e.get("*", function (req, res) {
         res.status(404).send("Petio API: route not found");
       });

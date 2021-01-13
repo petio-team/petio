@@ -169,7 +169,6 @@ class MovieShowOverview extends React.Component {
         let ratingsUser = 0;
         let ignore = 0;
         let total = 0;
-        console.log(this.props.user.reviews[this.props.match.params.id]);
         if (this.props.user.reviews[this.props.match.params.id]) {
           for (var i = 0; i < this.props.user.reviews[this.props.match.params.id].length; i++) {
             if (this.props.user.reviews[this.props.match.params.id][i].user == this.props.user.current.id) {
@@ -264,7 +263,7 @@ class MovieShowOverview extends React.Component {
                 {this.props.mediaData.genres.map((genre, i) => {
                   // if (i === this.props.mediaData.genres.length - 1) return genre.name;
                   return (
-                    <div className="genre--item">
+                    <div key={`genre_${genre.name}`} className="genre--item">
                       {this.genreIcon(genre.name)}
                       {genre.name}
                     </div>
