@@ -274,6 +274,7 @@ class MovieShowOverview extends React.Component {
               <div className="media--actions__mob">
                 {requestBtn}
                 {reportBtn}
+                {reviewBtn}
               </div>
               <div className="media-crew">
                 {director ? (

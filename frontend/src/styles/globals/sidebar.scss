@@ -82,7 +82,7 @@
 
   &--scroll {
     max-height: calc(100vh - 68px);
-    overflow-y: scroll;
+    overflow-y: hidden;
     width: 100%;
     background: $dark-grey;
     // min-height: calc(100vh - 68px);
@@ -109,6 +109,7 @@
       box-shadow: none;
       position: static;
       display: block;
+      overflow-y: auto;
     }
   }
 
