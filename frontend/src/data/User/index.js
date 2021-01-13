@@ -1,19 +1,21 @@
 import {
-	login,
-	// loginAdmin,
-	logout,
-	request,
-	getRequests,
-	review,
-	getReviews,
-} from './actions';
+  login,
+  // loginAdmin,
+  logout,
+  request,
+  getRequests,
+  review,
+  getReviews,
+  addIssue,
+} from "./actions";
 
 export default {
-	login,
-	// loginAdmin,
-	logout,
-	request,
-	getRequests,
-	review,
-	getReviews,
+  login,
+  // loginAdmin,
+  logout,
+  request,
+  getRequests,
+  review,
+  getReviews,
+  addIssue,
 };
