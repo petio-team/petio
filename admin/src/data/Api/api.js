@@ -224,6 +224,14 @@ export let testMongo = (mongo) => {
   return call(request, headers, "post", body).then((res) => res.json());
 };
 
+export let getIssues = () => {
+  let request = `${apiUrl}/issue/all`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  return call(request, headers).then((res) => res.json());
+};
+
 function call(url, headers, method, body = null) {
   let args = {
     method: method,

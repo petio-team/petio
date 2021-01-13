@@ -466,3 +466,17 @@ export async function testMongo(mongo) {
     return "failed";
   }
 }
+
+export function getIssues() {
+  return new Promise((resolve, reject) => {
+    api
+      .getIssues()
+      .then((res) => {
+        resolve(res);
+      })
+      .catch((err) => {
+        console.log(err);
+        reject();
+      });
+  });
+}

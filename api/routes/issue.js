@@ -55,34 +55,10 @@ router.post("/add", async (req, res) => {
 //   );
 // }
 
-// router.get("/min", async (req, res) => {
-//   const requests = await Request.find();
-//   let data = {};
-//   try {
-//     data = {};
-
-//     await Promise.all(
-//       requests.map(async (request, i) => {
-//         data[request.requestId] = {
-//           title: request.title,
-//           requestId: request.requestId,
-//           type: request.type,
-//           thumb: request.thumb,
-//           imdb_id: request.imdb_id,
-//           tmdb_id: request.tmdb_id,
-//           tvdb_id: request.tvdb_id,
-//           users: request.users,
-//           sonarrId: request.sonarrId,
-//           radarrId: request.radarrId,
-//         };
-//       })
-//     );
-//   } catch (err) {
-//     console.log(err);
-//     console.log(`ERR: Error getting requests`);
-//   }
-//   res.json(data);
-// });
+router.get("/all", async (req, res) => {
+  const issues = await Issue.find();
+  res.json(issues);
+});
 
 // router.get("/all", async (req, res) => {
 //   const requests = await Request.find();
