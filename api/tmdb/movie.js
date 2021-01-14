@@ -5,6 +5,8 @@ const fanartLookup = require("../fanart");
 const request = require("xhr-request");
 const onServer = require("../plex/onServer");
 
+const ISO6391 = require("iso-639-1");
+
 async function movieLookup(id, minified = false) {
   let fanart = minified ? false : await fanartLookup(id, "movies");
   let movie = false;
@@ -59,10 +61,11 @@ async function movieLookup(id, minified = false) {
 
     movie.recommendations = recommendationsData;
     movie.collection = collectionData;
+
     delete movie.production_countries;
     delete movie.budget;
     delete movie.adult;
-    delete movie.original_language;
+    // delete movie.original_language;
     delete movie.original_title;
     delete movie.production_companies;
     if (minified) {
@@ -81,6 +84,8 @@ async function movieLookup(id, minified = false) {
       delete movie.videos;
       delete movie.vote_average;
       delete movie.vote_count;
+    } else {
+      movie.original_language_format = ISO6391.getName(movie.original_language);
     }
     if (!movie.id) {
       return { error: "no id returned" };

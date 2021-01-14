@@ -34,3 +34,9 @@ body {
 .media-backdrop .lazy-load-image-background.blur.lazy-load-image-loaded > img {
   opacity: 0.3;
 }
+
+.desktop-only {
+  @include media-breakpoint-down(md) {
+    display: none;
+  }
+}
