@@ -510,6 +510,23 @@
   &.sub-title {
     width: 100px;
   }
+
+  &.details {
+    width: 200px;
+    max-width: 100%;
+  }
+}
+
+.genre-placeholder {
+  height: 21px;
+  width: 70px;
+  opacity: 0.3;
+}
+
+.mob-btn-placeholder {
+  .btn {
+    width: 80px;
+  }
 }
 
 .detail {

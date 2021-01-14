@@ -10,6 +10,16 @@ body {
   color: white;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+  max-height: 100vh;
+}
+
+html,
+body {
+  @include media-breakpoint-down(md) {
+    position: fixed;
+    overflow: hidden;
+    pointer-events: none;
+  }
 }
 
 #root {
