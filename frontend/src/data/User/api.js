@@ -1,7 +1,8 @@
 import { getAuth } from "../auth";
 
-export function login(username, token = false) {
-  console.log(getAuth().api);
+export async function login(username, token = false) {
+  let IP = await getIP();
+  console.log(IP);
   let request = `${getAuth().api}/login`;
   let headers = {
     "Content-Type": "application/json",
@@ -9,7 +10,12 @@ export function login(username, token = false) {
   return process(request, "post", headers, {
     username: username,
     authToken: token,
+    ip: IP.ip,
   }).then((res) => res.json());
+}
+
+function getIP() {
+  return fetch("https://jsonip.com", { mode: "cors" }).then((resp) => resp.json());
 }
 
 export let request = (req, user) => {
