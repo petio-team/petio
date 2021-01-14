@@ -15,4 +15,4 @@ frontend/build
 admin/build
 api/config/
 bin/
-*.zip
+.zip
