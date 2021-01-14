@@ -134,9 +134,9 @@ class Main {
 
   async start() {
     const libUpdate = new LibraryUpdate();
-    // this.cron.start();
-    // this.partial.start();
-    // libUpdate.run();
+    this.cron.start();
+    this.partial.start();
+    libUpdate.run();
   }
 
   setup() {
