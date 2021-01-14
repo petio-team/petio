@@ -266,21 +266,23 @@ class Dashboard extends React.Component {
           <div className="widget--item--inner">
             <div className="widget--title">Issues</div>
             <hr />
-            {this.state.issues
-              ? this.state.issues.map((issue) => {
-                  return (
-                    <div className="issue-item" key={`issue_${issue._id}`}>
-                      <p className="issue-item--title">{issue.title}</p>
-                      <p className="issue-item--detail">
-                        <span>Issue:</span> {this.formatIssue(issue.issue)}
-                      </p>
-                      <p className="issue-item--detail">
-                        <span>Comment:</span> {issue.comment}
-                      </p>
-                    </div>
-                  );
-                })
-              : null}
+            {this.state.issues.length > 0 ? (
+              this.state.issues.map((issue) => {
+                return (
+                  <div className="issue-item" key={`issue_${issue._id}`}>
+                    <p className="issue-item--title">{issue.title}</p>
+                    <p className="issue-item--detail">
+                      <span>Issue:</span> {this.formatIssue(issue.issue)}
+                    </p>
+                    <p className="issue-item--detail">
+                      <span>Comment:</span> {issue.comment}
+                    </p>
+                  </div>
+                );
+              })
+            ) : (
+              <p>No issues</p>
+            )}
           </div>
         </div>
       </div>
