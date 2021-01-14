@@ -46,6 +46,15 @@ class RequestsTable extends React.Component {
     return message;
   }
 
+  cinemaWindow(diff) {
+    var day = 1000 * 60 * 60 * 24;
+    var days = Math.ceil(diff / day);
+    if (days >= 31) {
+      return false;
+    }
+    return true;
+  }
+
   children(req) {
     if (req.children.length === 0) {
       return null;
@@ -155,6 +164,9 @@ class RequestsTable extends React.Component {
               if (diff > 0) {
                 return <span className="requests--status requests--status__blue">~{this.calcDate(diff)}</span>;
               } else {
+                if (req.children[r].info.episodeFileCount > 0) {
+                  return <span className="requests--status requests--status__blue">Partially Downloaded</span>;
+                }
                 return <span className="requests--status requests--status__bad">Unavailable</span>;
               }
             }
@@ -177,6 +189,12 @@ class RequestsTable extends React.Component {
                 return <span className="requests--status requests--status__bad">Unavailable</span>;
               }
             } else {
+              if (req.children[r].info.inCinemas) {
+                var diff = Math.ceil(new Date() - new Date(req.children[r].info.inCinemas));
+                if (this.cinemaWindow(diff)) {
+                  return <span className="requests--status requests--status__cinema">In Cinemas</span>;
+                }
+              }
               return <span className="requests--status requests--status__bad">Unavailable</span>;
             }
           }
