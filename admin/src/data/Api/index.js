@@ -26,6 +26,8 @@ import {
   testEmail,
   getUser,
   allUsers,
+  testMongo,
+  getIssues,
 } from "./actions";
 
 export default {
@@ -56,4 +58,6 @@ export default {
   testEmail,
   getUser,
   allUsers,
+  testMongo,
+  getIssues,
 };

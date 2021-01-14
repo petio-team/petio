@@ -8,7 +8,9 @@ import { ReactComponent as RequestIcon } from "../assets/svg/bookmark.svg";
 import { ReactComponent as SettingsIcon } from "../assets/svg/settings.svg";
 import { ReactComponent as CloseIcon } from "../assets/svg/close.svg";
 import { ReactComponent as AdminIcon } from "../assets/svg/admin.svg";
+import { ReactComponent as IssueIcon } from "../assets/svg/issue.svg";
 import User from "../data/User";
+import pjson from "../../package.json";
 
 class Sidebar extends React.Component {
   constructor(props) {
@@ -57,6 +59,12 @@ class Sidebar extends React.Component {
               <RequestIcon />
             </div>
           </Link>
+          <Link to="/issues" className={"menu--item " + (current === "/issues" || current.startsWith("/issues/") ? "active" : "")}>
+            <p>Issues</p>
+            <div className="icon">
+              <IssueIcon />
+            </div>
+          </Link>
           <Link to="/reviews" className={"menu--item " + (current === "/reviews" || current.startsWith("/reviews/") ? "active" : "")}>
             <p>Reviews</p>
             <div className="icon">
@@ -88,6 +96,7 @@ class Sidebar extends React.Component {
             </div>
           </a>
         </div>
+        <p className="menu--version">version {pjson.version}</p>
       </div>
     );
   }

@@ -77,7 +77,11 @@ class MovieShowTop extends React.Component {
         <div className="media-details">
           <span></span>
           <div className="media-details--top">
-            {this.props.mediaData.logo ? <LazyLoadImage className="media-logo" src={this.props.mediaData.logo} /> : <h1 className="single-title">{this.props.mediaData.title}</h1>}
+            {this.props.mediaData.logo ? (
+              <LazyLoadImage className="media-logo" src={this.props.mediaData.logo} />
+            ) : (
+              <h1 className="single-title">{this.props.mediaData.title ? this.props.mediaData.title : this.props.mediaData.name}</h1>
+            )}
           </div>
           <div className="media--actions">
             {requestBtn}

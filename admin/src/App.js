@@ -110,16 +110,24 @@ class App extends React.Component {
             <div className="view">
               <Switch>
                 <Route exact path="/">
-                  <Dashboard user={this.props.user} api={this.props.api} />
+                  <div className="page-wrap">
+                    <Dashboard user={this.props.user} api={this.props.api} />
+                  </div>
                 </Route>
                 <Route path="/settings">
-                  <Settings />
+                  <div className="page-wrap">
+                    <Settings />
+                  </div>
                 </Route>
                 <Route path="/requests">
-                  <Requests user={this.props.user} api={this.props.api} />
+                  <div className="page-wrap">
+                    <Requests user={this.props.user} api={this.props.api} />
+                  </div>
                 </Route>
                 <Route path="/users">
-                  <Users api={this.props.api} />
+                  <div className="page-wrap">
+                    <Users api={this.props.api} />
+                  </div>
                 </Route>
               </Switch>
             </div>

@@ -20,6 +20,10 @@ class Requests extends React.Component {
   componentDidMount() {
     this.getRequests();
     this.heartbeat = setInterval(() => this.getRequests(true), 30000);
+
+    let page = document.querySelectorAll(".page-wrap")[0];
+    page.scrollTop = 0;
+    window.scrollTo(0, 0);
   }
 
   componentDidUpdate() {

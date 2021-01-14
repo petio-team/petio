@@ -33,18 +33,29 @@ class MovieShowLoading extends React.Component {
                   <div className="btn btn__square placeholder"></div>
                 </div>
               </div>
-              <div className="info">
-                <div className="details text-placeholder"></div>
-                <div className="media-action__mobile">
-                  <div className="btn btn__square placeholder"></div>
-                  <div className="btn btn__square placeholder"></div>
+              <div className="detail--wrap">
+                <div className="detail--content">
+                  <div className="detail--bar">
+                    <div className="details text-placeholder"></div>
+                  </div>
+                  <div className="genre--wrap">
+                    <div className="genre--item genre-placeholder"></div>
+                    <div className="genre--item genre-placeholder"></div>
+                    <div className="genre--item genre-placeholder"></div>
+                    <div className="genre--item genre-placeholder"></div>
+                  </div>
+                  <div className="media--actions__mob mob-btn-placeholder">
+                    <div className="btn btn__square placeholder"></div>
+                    <div className="btn btn__square placeholder"></div>
+                    <div className="btn btn__square placeholder"></div>
+                  </div>
+                  <div className="media-crew">
+                    <div className="media-crew--item text-placeholder"></div>
+                    <div className="media-crew--item text-placeholder"></div>
+                  </div>
+                  <div className="sub-title mb--1 text-placeholder"></div>
+                  <div className="overview text-placeholder"></div>
                 </div>
-                <div className="media-crew">
-                  <div className="media-crew--item text-placeholder"></div>
-                  <div className="media-crew--item text-placeholder"></div>
-                </div>
-                <div className="sub-title mb--1 text-placeholder"></div>
-                <div className="overview text-placeholder"></div>
               </div>
             </div>
           </section>

@@ -6,6 +6,7 @@ require("dotenv/config");
 const CronJob = require("cron").CronJob;
 const fs = require("fs");
 const path = require("path");
+const pjson = require("./package.json");
 
 // Config
 const getConfig = require("./util/config");
@@ -29,9 +30,9 @@ const reviewRoute = require("./routes/review");
 const userRoute = require("./routes/user");
 const genieRoute = require("./routes/genie");
 const sessionsRoute = require("./routes/sessions");
-// const setupRoute = require('./routes/setup');
 const servicesRoute = require("./routes/services");
 const mailRoute = require("./routes/mail");
+const issueRoute = require("./routes/issue");
 
 class Main {
   constructor() {
@@ -86,6 +87,7 @@ class Main {
       this.e.use("/sessions", sessionsRoute);
       this.e.use("/services", servicesRoute);
       this.e.use("/mail", mailRoute);
+      this.e.use("/issue", issueRoute);
       this.e.get("*", function (req, res) {
         res.status(404).send("Petio API: route not found");
       });
@@ -103,7 +105,7 @@ class Main {
   init() {
     this.setRoutes();
     console.log("Starting Server ");
-    console.log("Petio API Version 0.2.1 alpha");
+    console.log(`Petio API Version ${pjson.version} alpha`);
     this.server = this.e.listen(7778);
     console.log("Listening");
     if (!this.config) {
@@ -156,6 +158,41 @@ class Main {
         res.status(404).json({
           status: "failed",
           code: 404,
+        });
+      }
+    });
+    this.e.post("/setup/test_mongo", async (req, res) => {
+      let mongo = req.body.mongo;
+      console.log(`testing mongo connection: ${mongo}`);
+      if (!mongo) {
+        res.status(400).send("Bad Request");
+        return;
+      }
+      try {
+        // Ensure no db is passed
+        if (mongo.split("@")[1].split("/").length > 1) {
+          res.status(401).json({
+            status: "failed",
+            error: "db path included",
+            tried: mongo,
+            l: mongo.split("@")[1].split("/").length,
+          });
+          return;
+        }
+        await mongoose.connect(mongo, {
+          useNewUrlParser: true,
+          useUnifiedTopology: true,
+          // connectTimeoutMS: 1000,
+        });
+        mongoose.connection.close();
+        res.status(200).json({
+          status: "connected",
+        });
+      } catch (err) {
+        res.status(401).json({
+          status: "failed",
+          error: err,
+          tried: mongo,
         });
       }
     });

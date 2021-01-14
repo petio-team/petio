@@ -57,6 +57,14 @@ export let getReviews = (id) => {
   return process(request, "get", headers).then((res) => res.json());
 };
 
+export let addIssue = (issue) => {
+  let request = `${getAuth().api}/issue/add`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  return process(request, "post", headers, issue).then((res) => res.json());
+};
+
 function process(url, method, headers, body = null) {
   let args = {
     headers: headers,

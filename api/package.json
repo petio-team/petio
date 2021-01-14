@@ -1,6 +1,6 @@
 {
   "name": "petio-rest",
-  "version": "0.2.1",
+  "version": "0.2.14",
   "description": "Rest Api for Petio",
   "main": "index.js",
   "scripts": {
@@ -17,6 +17,7 @@
     "fs": "0.0.1-security",
     "http": "0.0.1-security",
     "https": "^1.0.0",
+    "iso-639-1": "^2.1.5",
     "joi": "^17.3.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.11.6",

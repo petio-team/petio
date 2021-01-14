@@ -8,7 +8,7 @@ import { ReactComponent as PersonIcon } from "../assets/svg/people.svg";
 import { ReactComponent as RequestIcon } from "../assets/svg/bookmark.svg";
 import { ReactComponent as AdminIcon } from "../assets/svg/admin.svg";
 import { ReactComponent as BackIcon } from "../assets/svg/back.svg";
-import User from "../data/User";
+import pjson from "../../package.json";
 
 class Sidebar extends React.Component {
   constructor(props) {
@@ -96,6 +96,7 @@ class Sidebar extends React.Component {
             </div>
           </a>
         </div>
+        <p className="sidebar--version">version {pjson.version}</p>
       </div>
     );
   }

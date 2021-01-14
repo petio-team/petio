@@ -2,6 +2,11 @@ import React from "react";
 import Api from "../data/Api";
 
 class Users extends React.Component {
+  componentDidMount() {
+    let page = document.querySelectorAll(".page-wrap")[0];
+    page.scrollTop = 0;
+    window.scrollTo(0, 0);
+  }
   render() {
     return (
       <>

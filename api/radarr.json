@@ -1,0 +1,16 @@
+[
+  {
+    "active": true,
+    "title": "Default",
+    "protocol": "http",
+    "hostname": "10.10.0.10",
+    "apiKey": "838b8626eb1640dbabbe0b8696a2dd4c",
+    "port": "7878",
+    "urlBase": "",
+    "path": "5",
+    "path_title": "X:\\Root\\Films",
+    "profile": "4",
+    "profile_title": "HD-1080p",
+    "uuid": "4ad3c4f7-3ddc-4562-8cb8-e6dcb2abaa50"
+  }
+]

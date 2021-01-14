@@ -16,6 +16,7 @@ import Movies from "./pages/Movies";
 import Requests from "./pages/Requests";
 import Shows from "./pages/Shows";
 import { ReactComponent as Spinner } from "./assets/svg/spinner.svg";
+import pjson from "../package.json";
 
 class App extends React.Component {
   constructor(props) {
@@ -182,7 +183,7 @@ class App extends React.Component {
                   <button className="btn">Login</button>
                 </form>
               </div>
-              <p className="powered-by">Petio build (alpha) 0.2.1</p>
+              <p className="powered-by">Petio build (alpha) {pjson.version}</p>
             </>
           ) : (
             <div className="spinner">
@@ -224,7 +225,9 @@ class App extends React.Component {
               </Route>
               <Route exact path="/series/:id/season/:season">
                 <Issues open={this.state.openIssues} close={this.closeIssues} />
-                <Season openIssues={this.openIssues} />
+                <div className="page-wrap">
+                  <Season openIssues={this.openIssues} />
+                </div>
               </Route>
               <Route path="/person/:id">
                 <Actor />

@@ -169,7 +169,6 @@ class MovieShowOverview extends React.Component {
         let ratingsUser = 0;
         let ignore = 0;
         let total = 0;
-        console.log(this.props.user.reviews[this.props.match.params.id]);
         if (this.props.user.reviews[this.props.match.params.id]) {
           for (var i = 0; i < this.props.user.reviews[this.props.match.params.id].length; i++) {
             if (this.props.user.reviews[this.props.match.params.id][i].user == this.props.user.current.id) {
@@ -253,18 +252,29 @@ class MovieShowOverview extends React.Component {
                 </p>
                 <div className="detail--bar--sep">·</div>
                 <p>
-                  Rating: <span className={`color-${criticRating > 7.9 ? "green" : criticRating > 6.9 ? "blue" : criticRating > 4.9 ? "orange" : "red"}`}>{criticRating}</span>
+                  <span className="desktop-only">Rating: </span>
+                  <span className={`color-${criticRating > 7.9 ? "green" : criticRating > 6.9 ? "blue" : criticRating > 4.9 ? "orange" : "red"}`}>{criticRating}</span>
                 </p>
                 <div className="detail--bar--sep">·</div>
                 <p>
-                  User Rating: <span className={`color-${userRatingVal > 79 ? "green" : userRatingVal > 69 ? "blue" : userRatingVal > 49 ? "orange" : "red"}`}>{userRating}</span>
+                  <span className="desktop-only">User Rating: </span>
+                  <span className={`color-${userRatingVal > 79 ? "green" : userRatingVal > 69 ? "blue" : userRatingVal > 49 ? "orange" : "red"}`}>{userRating}</span>
                 </p>
+                {this.props.mediaData.original_language_format ? (
+                  <>
+                    <div className="detail--bar--sep">·</div>
+                    <p>
+                      <span className="desktop-only">Language: </span>
+                      {this.props.mediaData.original_language_format}
+                    </p>
+                  </>
+                ) : null}
               </div>
               <div className="genre--wrap">
                 {this.props.mediaData.genres.map((genre, i) => {
                   // if (i === this.props.mediaData.genres.length - 1) return genre.name;
                   return (
-                    <div className="genre--item">
+                    <div key={`genre_${genre.name}`} className="genre--item">
                       {this.genreIcon(genre.name)}
                       {genre.name}
                     </div>
@@ -274,6 +284,7 @@ class MovieShowOverview extends React.Component {
               <div className="media--actions__mob">
                 {requestBtn}
                 {reportBtn}
+                {reviewBtn}
               </div>
               <div className="media-crew">
                 {director ? (

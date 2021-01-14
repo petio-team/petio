@@ -8,10 +8,12 @@
     position: relative;
     padding-top: 0;
     transition: padding 0.3s ease;
+    padding-top: 50px;
     // margin: -25px 0;
 
     @include media-breakpoint-up(lg) {
       margin: 0;
+      padding-top: 0;
       // height: 250px;
     }
 
@@ -121,6 +123,8 @@
       overflow: hidden;
       height: 0;
       background: #484e50;
+      border-radius: 5px;
+      overflow: hidden;
 
       @include media-breakpoint-up(lg) {
         background: $dark-grey;
@@ -130,6 +134,7 @@
         padding-bottom: 0;
         position: relative;
         padding-bottom: 150%;
+        border-radius: 0;
       }
     }
 
@@ -175,6 +180,13 @@
         line-height: 18px;
       }
     }
+
+    &--top {
+      @include media-breakpoint-down(md) {
+        margin-top: auto;
+        margin-bottom: 40px;
+      }
+    }
   }
 
   &--actions {
@@ -198,6 +210,26 @@
       .btn {
         margin-right: 10px;
         margin-bottom: 10px;
+        font-size: 8px;
+        padding: 0 7px;
+
+        @include media-breakpoint-up(sm) {
+          font-size: 9px;
+        }
+
+        @include media-breakpoint-up(md) {
+          font-size: 12px;
+          padding: 0 20px;
+          height: 35px;
+        }
+
+        svg {
+          display: none;
+
+          @include media-breakpoint-up(sm) {
+            display: block;
+          }
+        }
       }
 
       @include media-breakpoint-up(lg) {
@@ -477,6 +509,23 @@
 
   &.sub-title {
     width: 100px;
+  }
+
+  &.details {
+    width: 200px;
+    max-width: 100%;
+  }
+}
+
+.genre-placeholder {
+  height: 21px;
+  width: 70px;
+  opacity: 0.3;
+}
+
+.mob-btn-placeholder {
+  .btn {
+    width: 80px;
   }
 }
 

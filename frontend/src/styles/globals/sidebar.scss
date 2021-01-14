@@ -65,7 +65,7 @@
         font-size: 32px;
         line-height: 1;
         color: white;
-        font-family: "Logo", sans-serif;
+        font-family: "Khula", sans-serif;
         margin: 0;
 
         @include media-breakpoint-up(lg) {
@@ -82,7 +82,7 @@
 
   &--scroll {
     max-height: calc(100vh - 68px);
-    overflow-y: scroll;
+    overflow-y: hidden;
     width: 100%;
     background: $dark-grey;
     // min-height: calc(100vh - 68px);
@@ -109,6 +109,7 @@
       box-shadow: none;
       position: static;
       display: block;
+      overflow-y: auto;
     }
   }
 
@@ -261,6 +262,20 @@
 
     @include media-breakpoint-up(lg) {
       display: none;
+    }
+  }
+
+  &--version {
+    position: absolute;
+    left: 20px;
+    bottom: 20px;
+    margin: 0;
+    font-size: 10px;
+    line-height: 1;
+    display: none;
+
+    @include media-breakpoint-up(lg) {
+      display: block;
     }
   }
 }

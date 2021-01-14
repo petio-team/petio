@@ -70,7 +70,7 @@ async function showLookup(id, minified = false) {
       delete show.number_of_episodes;
       delete show.number_of_seasons;
       delete show.origin_country;
-      delete show.original_language;
+      // delete show.original_language;
       delete show.original_name;
       delete show.overview;
       delete show.popularity;
@@ -79,6 +79,8 @@ async function showLookup(id, minified = false) {
       delete show.vote_average;
       delete show.vote_count;
       delete show.seasons;
+    } else {
+      show.original_language_format = ISO6391.getName(show.original_language);
     }
     let onPlex = await onServer("show", show.imdb_id, show.tvdb_id, id);
     show.on_server = onPlex.exists;

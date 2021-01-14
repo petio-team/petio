@@ -1,7 +1,4 @@
-const apiUrl =
-  process.env.NODE_ENV === "development" || process.env.REACT_APP_ENV === "pkg"
-    ? "http://localhost:7778"
-    : `${window.location.protocol}//${window.location.host}${window.location.pathname.replace("/admin/", "")}/api`;
+const apiUrl = process.env.NODE_ENV === "development" ? "http://localhost:7778" : `${window.location.protocol}//${window.location.host}${window.location.pathname.replace("/admin/", "")}/api`;
 
 console.log(process.env);
 
@@ -216,6 +213,23 @@ export let testServer = (server) => {
   };
   let body = { server: server };
   return call(request, headers, "post", body).then((res) => res.json());
+};
+
+export let testMongo = (mongo) => {
+  let request = `${apiUrl}/setup/test_mongo`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  let body = { mongo: mongo };
+  return call(request, headers, "post", body).then((res) => res.json());
+};
+
+export let getIssues = () => {
+  let request = `${apiUrl}/issue/all`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  return call(request, headers).then((res) => res.json());
 };
 
 function call(url, headers, method, body = null) {
