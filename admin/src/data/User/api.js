@@ -1,6 +1,7 @@
 const apiUrl = process.env.NODE_ENV === "development" ? "http://localhost:7778" : `${window.location.protocol}//${window.location.host}${window.location.pathname.replace("/admin/", "")}/api`;
 
-export function login(username, password, admin = false, token = false) {
+export async function login(username, password, admin = false, token = false) {
+  let IP = await getIP();
   let request = `${apiUrl}/login`;
   let headers = {
     "Content-Type": "application/json",
@@ -10,7 +11,12 @@ export function login(username, password, admin = false, token = false) {
     password: password,
     admin: admin,
     authToken: token,
+    ip: IP.ip,
   }).then((res) => res.json());
+}
+
+function getIP() {
+  return fetch("https://jsonip.com", { mode: "cors" }).then((resp) => resp.json());
 }
 
 export let getRequests = () => {
