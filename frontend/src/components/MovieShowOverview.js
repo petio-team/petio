@@ -252,12 +252,23 @@ class MovieShowOverview extends React.Component {
                 </p>
                 <div className="detail--bar--sep">·</div>
                 <p>
-                  Rating: <span className={`color-${criticRating > 7.9 ? "green" : criticRating > 6.9 ? "blue" : criticRating > 4.9 ? "orange" : "red"}`}>{criticRating}</span>
+                  <span className="desktop-only">Rating: </span>
+                  <span className={`color-${criticRating > 7.9 ? "green" : criticRating > 6.9 ? "blue" : criticRating > 4.9 ? "orange" : "red"}`}>{criticRating}</span>
                 </p>
                 <div className="detail--bar--sep">·</div>
                 <p>
-                  User Rating: <span className={`color-${userRatingVal > 79 ? "green" : userRatingVal > 69 ? "blue" : userRatingVal > 49 ? "orange" : "red"}`}>{userRating}</span>
+                  <span className="desktop-only">User Rating: </span>
+                  <span className={`color-${userRatingVal > 79 ? "green" : userRatingVal > 69 ? "blue" : userRatingVal > 49 ? "orange" : "red"}`}>{userRating}</span>
                 </p>
+                {this.props.mediaData.original_language_format ? (
+                  <>
+                    <div className="detail--bar--sep">·</div>
+                    <p>
+                      <span className="desktop-only">Language: </span>
+                      {this.props.mediaData.original_language_format}
+                    </p>
+                  </>
+                ) : null}
               </div>
               <div className="genre--wrap">
                 {this.props.mediaData.genres.map((genre, i) => {
