@@ -4,6 +4,8 @@ const fanartLookup = require("../fanart");
 const request = require("xhr-request");
 const onServer = require("../plex/onServer");
 
+const ISO6391 = require("iso-639-1");
+
 async function showLookup(id, minified = false) {
   let external = await externalId(id);
   let fanart = minified ? false : await fanartLookup(external.tvdb_id, "tv");
