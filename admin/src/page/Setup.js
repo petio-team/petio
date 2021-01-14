@@ -234,6 +234,12 @@ class Setup extends React.Component {
     });
   }
 
+  componentDidMount() {
+    let page = document.querySelectorAll(".page-wrap")[0];
+    page.scrollTop = 0;
+    window.scrollTo(0, 0);
+  }
+
   render() {
     return (
       <div className="setup--wrap">

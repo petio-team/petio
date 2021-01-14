@@ -42,6 +42,10 @@ class Dashboard extends React.Component {
     this.getIssues();
     this.heartbeat = setInterval(() => this.pollServer(), 1000);
     this.heartbeatDelay = setInterval(() => this.pollServerDelay(), 10000);
+
+    let page = document.querySelectorAll(".page-wrap")[0];
+    page.scrollTop = 0;
+    window.scrollTo(0, 0);
   }
 
   componentDidUpdate() {
@@ -186,67 +190,98 @@ class Dashboard extends React.Component {
     }
   }
 
+  formatIssue(issue) {
+    switch (issue) {
+      case "episodes":
+        return "Missing Episodes";
+      case "subs":
+        return "Missing / Wrong Subtitles";
+      case "bad-video":
+        return "Bad Quality / Video Issue";
+      case "bad-audio":
+        return "Audio Issue / Audio Sync";
+      default:
+        return "Not Specified";
+    }
+  }
+
   render() {
     let requests = this.props.user.requests;
     return (
       <div className="widget--board">
         <div className="widget--item widget--item__30">
-          <div className="widget--title">Bandwidth</div>
-          <hr />
-          {this.state.bandwidth ? <Bandwidth bandwidth={this.state.bandwidth} /> : null}
+          <div className="widget--item--inner">
+            <div className="widget--title">Bandwidth</div>
+            <hr />
+            {this.state.bandwidth ? <Bandwidth bandwidth={this.state.bandwidth} /> : null}
+          </div>
         </div>
         <div className="widget--item widget--item__30">
-          <div className="widget--title">CPU</div>
-          <hr />
-          {this.state.serverInfo ? <Cpu cpu={this.state.serverInfo} /> : null}
+          <div className="widget--item--inner">
+            <div className="widget--title">CPU</div>
+            <hr />
+            {this.state.serverInfo ? <Cpu cpu={this.state.serverInfo} /> : null}
+          </div>
         </div>
         <div className="widget--item widget--item__30">
-          <div className="widget--title">RAM</div>
-          <hr />
-          {this.state.serverInfo ? <Ram ram={this.state.serverInfo} /> : null}
+          <div className="widget--item--inner">
+            <div className="widget--title">RAM</div>
+            <hr />
+            {this.state.serverInfo ? <Ram ram={this.state.serverInfo} /> : null}
+          </div>
         </div>
         <div className="widget--item">
-          <div className="widget--title">Requests</div>
-          <hr />
-          {!requests ? (
-            <CarouselLoading />
-          ) : (
-            <Carousel>
-              {Object.keys(requests).map((key) => {
-                let request = this.props.api.movie_lookup[key];
-                let users = requests[key].users;
-                if (requests[key].type === "tv") {
-                  request = this.props.api.series_lookup[key];
-                }
-                if (!request) return null;
-                return <RequestCard key={key} users={users} request={request} />;
-              })}
-            </Carousel>
-          )}
+          <div className="widget--item--inner">
+            <div className="widget--title">Requests</div>
+            <hr />
+            {!requests ? (
+              <CarouselLoading />
+            ) : (
+              <Carousel>
+                {Object.keys(requests).map((key) => {
+                  let request = this.props.api.movie_lookup[key];
+                  let users = requests[key].users;
+                  if (requests[key].type === "tv") {
+                    request = this.props.api.series_lookup[key];
+                  }
+                  if (!request) return null;
+                  return <RequestCard key={key} users={users} request={request} />;
+                })}
+              </Carousel>
+            )}
+          </div>
         </div>
 
         <div className={"widget--item widget--item__50 " + (this.state.sessionsCollapsed ? "collapsed" : "")}>
-          <div className="session--toggle" onClick={this.toggleSessions}>
-            {this.state.sessionsCollapsed ? "Details" : "Overview"}
+          <div className="widget--item--inner">
+            <div className="session--toggle" onClick={this.toggleSessions}>
+              {this.state.sessionsCollapsed ? "Details" : "Overview"}
+            </div>
+            <div className="widget--title">Now Playing</div>
+            <hr />
+            <Sessions sessions={this.state.sessions} />
           </div>
-          <div className="widget--title">Now Playing</div>
-          <hr />
-          <Sessions sessions={this.state.sessions} />
         </div>
         <div className="widget--item widget--item__50">
-          <div className="widget--title">Issues</div>
-          <hr />
-          {this.state.issues
-            ? this.state.issues.map((issue) => {
-                return (
-                  <div className="issue-item" key={`issue_${issue._id}`}>
-                    <p>{issue.title}</p>
-                    <p className="small">{issue.issue}</p>
-                    <p className="small">{issue.comment}</p>
-                  </div>
-                );
-              })
-            : null}
+          <div className="widget--item--inner">
+            <div className="widget--title">Issues</div>
+            <hr />
+            {this.state.issues
+              ? this.state.issues.map((issue) => {
+                  return (
+                    <div className="issue-item" key={`issue_${issue._id}`}>
+                      <p className="issue-item--title">{issue.title}</p>
+                      <p className="issue-item--detail">
+                        <span>Issue:</span> {this.formatIssue(issue.issue)}
+                      </p>
+                      <p className="issue-item--detail">
+                        <span>Comment:</span> {issue.comment}
+                      </p>
+                    </div>
+                  );
+                })
+              : null}
+          </div>
         </div>
       </div>
     );
