@@ -13,6 +13,7 @@ router.post("/", async (req, res) => {
   let authToken = req.body.authToken;
   let username = req.body.username;
   let password = req.body.password;
+  let request_ip = req.body.ip;
 
   if (!prefs) {
     res.status(500).send("This Petio API is not setup");
@@ -20,7 +21,7 @@ router.post("/", async (req, res) => {
   }
 
   console.log(`LOGIN: New login attempted`);
-  console.log(`LOGIN: Request IP: ${req.connection.remoteAddress}`);
+  console.log(`LOGIN: Request IP: ${request_ip}`);
   if (authToken) {
     console.log(`LOGIN: JWT Token Passed`);
     try {
@@ -29,10 +30,10 @@ router.post("/", async (req, res) => {
       console.log(`LOGIN: Token fine`);
       if (user.admin) {
         console.log(`LOGIN: Token is admin`);
-        getAdmin(user.username, user.password, res, req);
+        getAdmin(user.username, user.password, res, request_ip);
       } else {
         console.log(`LOGIN: Token is user`);
-        getFriend(user.username, res, req);
+        getFriend(user.username, res, request_ip);
       }
     } catch {
       console.log(`LOGIN: Invalid token, rejected`);
@@ -57,10 +58,10 @@ router.post("/", async (req, res) => {
     }
     if (admin) {
       console.log(`LOGIN: User is admin`);
-      getAdmin(username, password, res, req);
+      getAdmin(username, password, res, request_ip);
     } else {
       console.log(`LOGIN: User is standard`);
-      getFriend(username, res, req);
+      getFriend(username, res, request_ip);
     }
   }
 });
@@ -70,7 +71,7 @@ function createToken(user, admin = false) {
   return jwt.sign({ username: user.username, password: user.password, admin: admin }, prefs.plexToken);
 }
 
-async function getAdmin(username, password, res, req) {
+async function getAdmin(username, password, res, request_ip) {
   let admin = await Admin.findOne({
     $or: [
       { username: username, password: password },
@@ -91,7 +92,7 @@ async function getAdmin(username, password, res, req) {
         { _id: admin._id },
         {
           $set: {
-            lastIp: req.connection.remoteAddress,
+            lastIp: request_ip,
           },
         }
       );
@@ -109,7 +110,7 @@ async function getAdmin(username, password, res, req) {
   }
 }
 
-async function getFriend(username, res, req) {
+async function getFriend(username, res, request_ip) {
   let friend = await User.findOne({
     $or: [{ username: username }, { email: username }, { title: username }],
   });
@@ -121,7 +122,7 @@ async function getFriend(username, res, req) {
       user: friend,
       token: createToken(friend, false),
     });
-    friend.lastIp = req.connection.remoteAddress;
+    friend.lastIp = request_ip;
     friend.save();
   } else {
     let admin = await Admin.findOne({
@@ -141,7 +142,7 @@ async function getFriend(username, res, req) {
           { _id: admin._id },
           {
             $set: {
-              lastIp: req.connection.remoteAddress,
+              lastIp: request_ip,
             },
           }
         );
