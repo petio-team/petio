@@ -113,7 +113,7 @@
     }
 
     &.selected {
-      background: $orange;
+      background: $primary;
     }
   }
 
@@ -161,8 +161,8 @@
   }
 
   &.active {
-    border-color: $orange;
-    color: $orange;
+    border-color: $primary;
+    color: $primary;
     opacity: 1;
   }
 }

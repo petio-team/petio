@@ -160,11 +160,7 @@ class Movie extends React.Component {
     if (movieData.recommendations) {
       relatedItems = movieData.recommendations.map((key) => {
         // if (this.props.api.movie_lookup[id]) {
-        return (
-          <div className="related--item" key={`related-${key}`}>
-            <MovieCard movie={{ id: key }} />
-          </div>
-        );
+        return <MovieCard key={`related-${key}`} movie={{ id: key }} />;
         // }
       });
       related = (

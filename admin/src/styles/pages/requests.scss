@@ -1,115 +1,115 @@
 .requests {
-	&--status {
-		padding: 2px 5px;
-		border-radius: 10px;
-		font-size: 8px;
-		display: inline-flex;
-		justify-content: center;
-		align-items: center;
-		line-height: 1;
-		text-transform: uppercase;
-		margin-bottom: 5px;
-		margin-right: 5px;
+  &--status {
+    padding: 2px 5px;
+    border-radius: 10px;
+    font-size: 8px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 1;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    margin-right: 5px;
 
-		@include media-breakpoint-up(lg) {
-			margin-right: 10px;
-			letter-spacing: 1px;
-			padding: 5px 10px;
-			border-radius: 10px;
-			font-size: 10px;
-			margin-bottom: 0;
-		}
+    @include media-breakpoint-up(lg) {
+      margin-right: 10px;
+      letter-spacing: 1px;
+      padding: 5px 10px;
+      border-radius: 10px;
+      font-size: 10px;
+      margin-bottom: 0;
+    }
 
-		&__manual {
-			background: $grey-medium;
-		}
+    &__manual {
+      background: $grey-medium;
+    }
 
-		&__sonarr {
-			background: #35c5f4;
-			color: $black;
-		}
+    &__sonarr {
+      background: #35c5f4;
+      color: $black;
+    }
 
-		&__radarr {
-			background: $black;
-			color: $orange;
-		}
+    &__radarr {
+      background: $black;
+      color: $primary;
+    }
 
-		&__bad {
-			background: $bad;
-		}
+    &__bad {
+      background: $bad;
+    }
 
-		&__blue {
-			background: $blue;
-		}
+    &__blue {
+      background: $blue;
+    }
 
-		&__orange {
-			background: $orange;
-		}
+    &__orange {
+      background: $primary;
+    }
 
-		&__good {
-			background: $good;
-			color: $black;
-		}
+    &__good {
+      background: $good;
+      color: $black;
+    }
 
-		&__cinema {
-			background: $purple;
-		}
-	}
+    &__cinema {
+      background: $purple;
+    }
+  }
 
-	&--quality {
-		padding: 5px 10px;
-		border-radius: 10px;
-		font-size: 8px;
-		display: inline-flex;
-		justify-content: center;
-		align-items: center;
-		line-height: 1;
-		text-transform: uppercase;
-		letter-spacing: 1px;
-		margin-right: 10px;
-		background: $grey-medium;
-	}
+  &--quality {
+    padding: 5px 10px;
+    border-radius: 10px;
+    font-size: 8px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-right: 10px;
+    background: $grey-medium;
+  }
 
-	&--icon {
-		svg {
-			height: 10px;
-			fill: white;
+  &--icon {
+    svg {
+      height: 10px;
+      fill: white;
 
-			@include media-breakpoint-up(lg) {
-				height: 20px;
-			}
-		}
-	}
+      @include media-breakpoint-up(lg) {
+        height: 20px;
+      }
+    }
+  }
 
-	&--wrap {
-		p {
-			margin-bottom: 0;
-		}
-	}
+  &--wrap {
+    p {
+      margin-bottom: 0;
+    }
+  }
 
-	&--prog {
-		width: 40%;
-		height: 4px;
-		background: $black;
-		position: relative;
-		margin-right: 20px;
+  &--prog {
+    width: 40%;
+    height: 4px;
+    background: $black;
+    position: relative;
+    margin-right: 20px;
 
-		&--active {
-			position: absolute;
-			top: 0;
-			left: 0;
-			background: $orange;
-			height: 100%;
-			transition: width 10s linear;
-		}
+    &--active {
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: $primary;
+      height: 100%;
+      transition: width 10s linear;
+    }
 
-		&--wrap {
-			display: flex;
-			align-items: center;
+    &--wrap {
+      display: flex;
+      align-items: center;
 
-			p {
-				font-size: 10px;
-			}
-		}
-	}
+      p {
+        font-size: 10px;
+      }
+    }
+  }
 }

@@ -1,142 +1,142 @@
 .settings {
-	&--wrap {
-		position: relative;
-	}
+  &--wrap {
+    position: relative;
+  }
 
-	&--menu {
-		position: fixed;
-		top: 0px;
-		left: 250px;
-		width: 250px;
-		background: $black;
-		height: 100vh;
+  &--menu {
+    position: fixed;
+    top: 0px;
+    left: 250px;
+    width: 250px;
+    background: $black;
+    height: 100vh;
 
-		&--item {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			border-top: solid 4px transparent;
-			cursor: pointer;
+    &--item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: solid 4px transparent;
+      cursor: pointer;
 
-			@include media-breakpoint-up(lg) {
-				padding-left: 20px;
-				border-top: none;
-				border-right: solid 4px transparent;
-			}
+      @include media-breakpoint-up(lg) {
+        padding-left: 20px;
+        border-top: none;
+        border-right: solid 4px transparent;
+      }
 
-			p {
-				font-size: 16px;
-				color: white;
-				font-weight: 500;
-				margin: 0;
-				display: none;
+      p {
+        font-size: 16px;
+        color: white;
+        font-weight: 500;
+        margin: 0;
+        display: none;
 
-				@include media-breakpoint-up(lg) {
-					display: block;
-				}
-			}
+        @include media-breakpoint-up(lg) {
+          display: block;
+        }
+      }
 
-			.icon {
-				padding: 20px 0;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				width: 50px;
+      .icon {
+        padding: 20px 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 50px;
 
-				@include media-breakpoint-up(lg) {
-					padding: 20px 0;
-					width: 60px;
-				}
+        @include media-breakpoint-up(lg) {
+          padding: 20px 0;
+          width: 60px;
+        }
 
-				img {
-					height: 20px;
-					width: auto;
-					max-width: 100%;
+        img {
+          height: 20px;
+          width: auto;
+          max-width: 100%;
 
-					&.png-safe {
-						filter: saturate(0) brightness(10);
-					}
-				}
+          &.png-safe {
+            filter: saturate(0) brightness(10);
+          }
+        }
 
-				svg {
-					height: 20px;
+        svg {
+          height: 20px;
 
-					@include media-breakpoint-up(lg) {
-						height: 20px;
-					}
+          @include media-breakpoint-up(lg) {
+            height: 20px;
+          }
 
-					path {
-						fill: $grey-light;
-					}
-				}
-			}
+          path {
+            fill: $grey-light;
+          }
+        }
+      }
 
-			&:hover {
-				background: rgba(0, 0, 0, 0.2);
-				border-top: solid 4px rgba(255, 255, 255, 0.2);
+      &:hover {
+        background: rgba(0, 0, 0, 0.2);
+        border-top: solid 4px rgba(255, 255, 255, 0.2);
 
-				@include media-breakpoint-up(lg) {
-					border-top: none;
-					border-right: solid 4px rgba(255, 255, 255, 0.2);
-				}
-			}
+        @include media-breakpoint-up(lg) {
+          border-top: none;
+          border-right: solid 4px rgba(255, 255, 255, 0.2);
+        }
+      }
 
-			&.active {
-				background: $orangeDark;
-				border-top: solid 4px $grey-light;
+      &.active {
+        background: $primaryDark;
+        border-top: solid 4px $grey-light;
 
-				@include media-breakpoint-up(lg) {
-					border-top: none;
-					border-right: solid 4px $grey-light;
-				}
+        @include media-breakpoint-up(lg) {
+          border-top: none;
+          border-right: solid 4px $grey-light;
+        }
 
-				.icon {
-					svg path {
-						fill: $grey-light;
-					}
-				}
+        .icon {
+          svg path {
+            fill: $grey-light;
+          }
+        }
 
-				p {
-					color: $grey-light;
-				}
-			}
-		}
-	}
+        p {
+          color: $grey-light;
+        }
+      }
+    }
+  }
 
-	&--content {
-		margin-left: 250px;
-		padding: 50px 0;
+  &--content {
+    margin-left: 250px;
+    padding: 50px 0;
 
-		section {
-			padding-left: 20px;
-			padding-right: 20px;
+    section {
+      padding-left: 20px;
+      padding-right: 20px;
 
-			label {
-				margin-bottom: 10px;
-				display: block;
-			}
-		}
-	}
+      label {
+        margin-bottom: 10px;
+        display: block;
+      }
+    }
+  }
 }
 
 .setting-msg {
-	position: fixed;
-	top: 0;
-	left: 500px;
-	width: calc(100% - 500px);
-	background: $orange;
-	padding: 10px 40px;
-	z-index: 100;
+  position: fixed;
+  top: 0;
+  left: 500px;
+  width: calc(100% - 500px);
+  background: $primary;
+  padding: 10px 40px;
+  z-index: 100;
 
-	&.good {
-		background: $good;
-	}
+  &.good {
+    background: $good;
+  }
 
-	&.error {
-		background: $bad;
-	}
+  &.error {
+    background: $bad;
+  }
 
-	p {
-		margin: 0;
-	}
+  p {
+    margin: 0;
+  }
 }

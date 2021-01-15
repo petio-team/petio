@@ -1,94 +1,94 @@
-input:not([type='checkbox']) {
-	display: block;
-	width: 300px;
-	margin-bottom: 20px;
-	// appearance: none;
-	border: none;
-	outline: none;
-	height: 40px;
-	font-size: 16px;
-	padding: 0 15px;
-	border-bottom: solid 2px transparent;
+input:not([type="checkbox"]) {
+  display: block;
+  width: 300px;
+  margin-bottom: 20px;
+  // appearance: none;
+  border: none;
+  outline: none;
+  height: 40px;
+  font-size: 16px;
+  padding: 0 15px;
+  border-bottom: solid 2px transparent;
 
-	&:focus {
-		border-bottom: solid 2px $orange;
-	}
+  &:focus {
+    border-bottom: solid 2px $primary;
+  }
 
-	&.disabled,
-	&:read-only {
-		opacity: 0.5;
-		cursor: no-drop;
-	}
+  &.disabled,
+  &:read-only {
+    opacity: 0.5;
+    cursor: no-drop;
+  }
 }
 
-input[type='checkbox'] {
-	appearance: none;
-	width: 20px;
-	height: 20px;
-	position: relative;
-	background: white;
-	outline: none !important;
-	border-radius: 0 !important;
+input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  position: relative;
+  background: white;
+  outline: none !important;
+  border-radius: 0 !important;
 
-	&:checked {
-		&:after {
-			content: '';
-			position: absolute;
-			top: 3px;
-			left: 3px;
-			width: calc(100% - 6px);
-			height: calc(100% - 6px);
-			background: $orange;
-		}
-	}
+  &:checked {
+    &:after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: calc(100% - 6px);
+      height: calc(100% - 6px);
+      background: $primary;
+    }
+  }
 }
 
 .checkbox-wrap {
-	display: flex;
-	align-items: center;
+  display: flex;
+  align-items: center;
 
-	input {
-		margin-right: 10px;
-	}
+  input {
+    margin-right: 10px;
+  }
 
-	p {
-		margin: 0;
-	}
+  p {
+    margin: 0;
+  }
 }
 
 .select-wrap {
-	position: relative;
-	display: block;
-	width: 300px;
-	margin-bottom: 20px;
-	border: none;
-	outline: none;
-	height: 40px;
-	font-size: 16px;
-	border-bottom: solid 2px transparent;
+  position: relative;
+  display: block;
+  width: 300px;
+  margin-bottom: 20px;
+  border: none;
+  outline: none;
+  height: 40px;
+  font-size: 16px;
+  border-bottom: solid 2px transparent;
 
-	&:after {
-		content: '';
-		position: absolute;
-		top: 12px;
-		right: 10px;
-		width: 10px;
-		height: 10px;
-		border-bottom: solid 2px $black;
-		border-right: solid 2px $black;
-		transform: rotate(45deg);
-		pointer-events: none;
-	}
+  &:after {
+    content: "";
+    position: absolute;
+    top: 12px;
+    right: 10px;
+    width: 10px;
+    height: 10px;
+    border-bottom: solid 2px $black;
+    border-right: solid 2px $black;
+    transform: rotate(45deg);
+    pointer-events: none;
+  }
 
-	select {
-		border-radius: 0 !important;
-		outline: none !important;
-		appearance: none;
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		padding: 0 15px;
-	}
+  select {
+    border-radius: 0 !important;
+    outline: none !important;
+    appearance: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0 15px;
+  }
 }

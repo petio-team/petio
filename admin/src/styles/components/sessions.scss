@@ -1,206 +1,206 @@
 .session {
-	display: flex;
-	width: 100%;
-	margin-bottom: 20px;
+  display: flex;
+  width: 100%;
+  margin-bottom: 20px;
 
-	&--media {
-		width: 100px;
-		min-width: 100px;
-		position: relative;
+  &--media {
+    width: 100px;
+    min-width: 100px;
+    position: relative;
 
-		&--inner {
-			position: relative;
-		}
+    &--inner {
+      position: relative;
+    }
 
-		@include media-breakpoint-up(lg) {
-			width: 150px;
-			min-width: 150px;
-		}
+    @include media-breakpoint-up(lg) {
+      width: 150px;
+      min-width: 150px;
+    }
 
-		.card {
-			.text-wrap {
-				display: none;
-			}
+    .card {
+      .text-wrap {
+        display: none;
+      }
 
-			.image-wrap {
-				&:after {
-					display: none;
-				}
-			}
+      .image-wrap {
+        &:after {
+          display: none;
+        }
+      }
 
-			.playback-status {
-				position: absolute;
-				bottom: 0;
-				left: 0;
-				width: 30px;
-				height: 30px;
-				z-index: 5;
-				background: $orange;
-				display: flex;
-				justify-content: center;
-				align-items: center;
+      .playback-status {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 30px;
+        height: 30px;
+        z-index: 5;
+        background: $primary;
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
-				svg {
-					height: 10px;
-					fill: $black;
-					color: $black;
-				}
-			}
-		}
-	}
+        svg {
+          height: 10px;
+          fill: $black;
+          color: $black;
+        }
+      }
+    }
+  }
 
-	&--duration {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 4px;
-		z-index: 5;
-		background: $dark-grey;
-	}
+  &--duration {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    z-index: 5;
+    background: $dark-grey;
+  }
 
-	&--prog {
-		position: absolute;
-		top: 0;
-		left: 0;
-		height: 100%;
-		background: $orange;
-		width: 100%;
-		transition: max-width 10s linear;
-	}
+  &--prog {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: $primary;
+    width: 100%;
+    transition: max-width 10s linear;
+  }
 
-	&--user {
-		width: 30px;
-		height: 30px;
-		border-radius: 50%;
-		overflow: hidden;
-		position: absolute;
-		bottom: -7px;
-		right: 0px;
-		z-index: 5;
+  &--user {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    overflow: hidden;
+    position: absolute;
+    bottom: -7px;
+    right: 0px;
+    z-index: 5;
 
-		@include media-breakpoint-up(lg) {
-			width: 40px;
-			height: 40px;
-			bottom: -5px;
-			right: 5px;
-		}
+    @include media-breakpoint-up(lg) {
+      width: 40px;
+      height: 40px;
+      bottom: -5px;
+      right: 5px;
+    }
 
-		img {
-			width: 100%;
-			height: 100%;
-		}
-	}
+    img {
+      width: 100%;
+      height: 100%;
+    }
+  }
 
-	&--info {
-		padding-left: 10px;
-		width: 100%;
+  &--info {
+    padding-left: 10px;
+    width: 100%;
 
-		@include media-breakpoint-up(lg) {
-			padding-left: 20px;
-		}
+    @include media-breakpoint-up(lg) {
+      padding-left: 20px;
+    }
 
-		p:not(.session--title) {
-			margin: 0;
-			font-size: 10px;
-			font-weight: 500;
-			line-height: 1.2;
-		}
+    p:not(.session--title) {
+      margin: 0;
+      font-size: 10px;
+      font-weight: 500;
+      line-height: 1.2;
+    }
 
-		p {
-			strong {
-				margin-top: 10px;
-				font-size: 12px;
-				display: block;
-			}
+    p {
+      strong {
+        margin-top: 10px;
+        font-size: 12px;
+        display: block;
+      }
 
-			svg {
-				height: 14px;
-				margin: 0 5px;
-			}
+      svg {
+        height: 14px;
+        margin: 0 5px;
+      }
 
-			display: flex;
-			align-items: center;
-		}
+      display: flex;
+      align-items: center;
+    }
 
-		br {
-			font-size: 12px;
-		}
-	}
+    br {
+      font-size: 12px;
+    }
+  }
 
-	&--secure {
-		&.secure-false {
-			color: $bad;
-		}
-		&.secure-true {
-			color: $good;
-		}
-		svg {
-			height: 8px !important;
-		}
-	}
+  &--secure {
+    &.secure-false {
+      color: $bad;
+    }
+    &.secure-true {
+      color: $good;
+    }
+    svg {
+      height: 8px !important;
+    }
+  }
 
-	&--title {
-		font-size: 14px;
-		font-weight: 600;
-		margin: 0;
-	}
+  &--title {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0;
+  }
 
-	&--playback {
-		margin-top: 10px;
-	}
+  &--playback {
+    margin-top: 10px;
+  }
 
-	&--label {
-		margin-right: 5px;
-	}
+  &--label {
+    margin-right: 5px;
+  }
 
-	&--toggle {
-		position: absolute;
-		top: 10px;
-		right: 10px;
-		color: $orange;
-		cursor: pointer;
-		font-weight: 500;
-		text-transform: uppercase;
-		letter-spacing: 1px;
-		font-size: 12px;
+  &--toggle {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: $primary;
+    cursor: pointer;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 12px;
 
-		@include media-breakpoint-up(lg) {
-			top: 22px;
-			right: 20px;
-			font-size: 14px;
-		}
-	}
+    @include media-breakpoint-up(lg) {
+      top: 22px;
+      right: 20px;
+      font-size: 14px;
+    }
+  }
 
-	&--decision-icon {
-		display: flex;
-		align-items: center;
-		color: $good;
-		svg {
-			height: 10px !important;
-			margin: 0 5px 0 0 !important;
-		}
+  &--decision-icon {
+    display: flex;
+    align-items: center;
+    color: $good;
+    svg {
+      height: 10px !important;
+      margin: 0 5px 0 0 !important;
+    }
 
-		&.stream {
-			color: $blue;
-		}
+    &.stream {
+      color: $blue;
+    }
 
-		&.transcode {
-			color: $bad;
-		}
-	}
+    &.transcode {
+      color: $bad;
+    }
+  }
 }
 
 .collapsed {
-	.session {
-		width: auto;
-		&--info {
-			display: none;
-		}
-	}
+  .session {
+    width: auto;
+    &--info {
+      display: none;
+    }
+  }
 }
 
 .sessions {
-	display: flex;
-	flex-wrap: wrap;
+  display: flex;
+  flex-wrap: wrap;
 }

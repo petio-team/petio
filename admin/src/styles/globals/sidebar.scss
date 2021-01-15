@@ -140,21 +140,21 @@
 
     &.active {
       background: $black;
-      border-top: solid 4px $orangeDark;
+      border-top: solid 4px $primaryDark;
 
       @include media-breakpoint-up(lg) {
         border-top: none;
-        border-right: solid 4px $orangeDark;
+        border-right: solid 4px $primaryDark;
       }
 
       .icon {
         svg path {
-          fill: $orange;
+          fill: $primary;
         }
       }
 
       p {
-        color: $orange;
+        color: $primary;
       }
     }
   }

@@ -41,12 +41,12 @@
     border-bottom: solid 2px transparent;
 
     &:focus {
-      border-bottom: solid 2px $orange;
+      border-bottom: solid 2px $primary;
     }
   }
 
   .admin-toggle {
-    color: $orange;
+    color: $primary;
     cursor: pointer;
   }
 
@@ -59,7 +59,7 @@
     line-height: 1;
 
     a {
-      color: $orange;
+      color: $primary;
     }
   }
 }

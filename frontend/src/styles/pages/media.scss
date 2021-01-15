@@ -86,7 +86,7 @@
     width: 100px;
     min-width: 100px;
     position: relative;
-
+    border-radius: 5px;
     height: 150px;
 
     span {
@@ -594,7 +594,7 @@
 
         svg {
           height: 20px;
-          fill: $orange;
+          fill: $primary;
         }
       }
     }
