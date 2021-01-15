@@ -1,232 +1,257 @@
-import React from 'react';
-import { withRouter, Link } from 'react-router-dom';
-import { connect } from 'react-redux';
-import Api from '../data/Api';
-import MovieCard from '../components/MovieCard';
-import TvCard from '../components/TvCard';
-import Carousel from '../components/Carousel';
-import { ReactComponent as Spinner } from '../assets/svg/spinner.svg';
+import React from "react";
+import { withRouter, Link } from "react-router-dom";
+import { connect } from "react-redux";
+import Api from "../data/Api";
+import MovieCard from "../components/MovieCard";
+import TvCard from "../components/TvCard";
+import Carousel from "../components/Carousel";
+import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
 
 class Actor extends React.Component {
-	constructor(props) {
-		super(props);
+  constructor(props) {
+    super(props);
 
-		this.getActor = this.getActor.bind(this);
-		this.handleScroll = this.handleScroll.bind(this);
-	}
-	componentDidMount() {
-		let page = document.querySelectorAll('.page-wrap')[0];
-		page.scrollTop = 0;
-		window.scrollTo(0, 0);
-		let id = this.props.match.params.id;
+    this.getActor = this.getActor.bind(this);
+    this.handleScroll = this.handleScroll.bind(this);
+  }
+  componentDidMount() {
+    let page = document.querySelectorAll(".page-wrap")[0];
+    page.scrollTop = 0;
+    window.scrollTo(0, 0);
+    let id = this.props.match.params.id;
 
-		this.getActor(id);
-	}
+    this.getActor(id);
+  }
 
-	getActor(id) {
-		if (!this.props.api.person_lookup[id]) {
-			// check for cached
-			Api.person(id);
-		}
-	}
+  getActor(id) {
+    if (!this.props.api.person_lookup[id]) {
+      // check for cached
+      Api.person(id);
+    }
+  }
 
-	handleScroll(e) {
-		let banner = e.currentTarget.querySelectorAll('.person--banner')[0];
-		let poster = e.currentTarget.querySelectorAll(
-			'.person--thumb--inner'
-		)[0];
-		let offset =
-			e.currentTarget.scrollTop > banner.offsetHeight
-				? 1
-				: e.currentTarget.scrollTop / banner.offsetHeight;
-		let posterOffset = 50 * offset;
-		offset = offset * 10 + 40;
-		banner.style.backgroundPosition = `50% ${offset}%`;
-		poster.style.transform = `translateY(${posterOffset}px)`;
-	}
+  handleScroll(e) {
+    let banner = e.currentTarget.querySelectorAll(".person--banner")[0];
+    let poster = e.currentTarget.querySelectorAll(".person--thumb--inner")[0];
+    let offset = e.currentTarget.scrollTop > banner.offsetHeight ? 1 : e.currentTarget.scrollTop / banner.offsetHeight;
+    let posterOffset = 50 * offset;
+    offset = offset * 10 + 40;
+    banner.style.backgroundPosition = `50% ${offset}%`;
+    poster.style.transform = `translateY(${posterOffset}px)`;
+  }
 
-	render() {
-		let id = this.props.match.params.id;
-		let personData = this.props.api.person_lookup[id];
+  sortByRanking(a, b) {
+    if (a.ranking < b.ranking) {
+      return 1;
+    }
+    if (a.ranking > b.ranking) {
+      return -1;
+    }
+    return 0;
+  }
 
-		if (!personData) {
-			return (
-				<div className="page-wrap">
-					<div className="spinner">
-						<Spinner />
-					</div>
-				</div>
-			);
-		}
+  processCredits(credits, items) {
+    for (let i in items) {
+      let item = items[i];
+      if (!credits[item.id]) {
+        let ranking = Math.round(item.popularity * item.vote_count);
+        item.ranking = ranking;
+        credits[item.id] = item;
+      }
 
-		let banner = false;
-		let bWidth = 0;
+      if (item.job) {
+        if (credits[item.id].jobs) {
+          credits[item.id].jobs[item.job] = item.job;
+        } else {
+          credits[item.id].jobs = new Array();
+          credits[item.id].jobs[item.job] = item.job;
+        }
+      }
+      if (item.character) {
+        if (credits[item.id].characters) {
+          credits[item.id].characters[item.character] = item.character;
+        } else {
+          credits[item.id].characters = new Array();
+          credits[item.id].characters[item.character] = item.character;
+        }
+      }
 
-		// Credits Movie
-		let movieCredits = this.props.api.actor_movie[id];
-		let movieActing = false;
-		let movieProduction = false;
+      // if (credits[item.id]) {
+      //   // do nothing yet
+      //   if (item.job) {
+      //     if (credits[item.id].jobs) {
+      //       credits[item.id].jobs.push(item.job);
+      //     } else {
+      //       credits[item.id].jobs = new Array(item.job);
+      //     }
+      //   }
+      //   if (item.character) {
+      //     if (credits[item.id].characters) {
+      //       credits[item.id].characters.push(item.character);
+      //     } else {
+      //       credits[item.id].characters = new Array(item.character);
+      //     }
+      //   }
+      // } else {
+      //   let ranking = Math.round(item.popularity * item.vote_count);
+      //   item.ranking = ranking;
+      //   credits[item.id] = item;
+      // }
+    }
+    return credits;
+  }
 
-		if (movieCredits) {
-			movieActing = movieCredits.cast;
-			movieProduction = movieCredits.crew;
-		}
+  processCredit(item, personData) {
+    let credit = null;
 
-		// Credits TV
-		let tvCredits = this.props.api.actor_series[id];
-		let tvActing = false;
-		let tvProduction = false;
+    if (personData.known_for_department !== "Acting") {
+      // Not actor
+      credit = item.jobs ? item.jobs : item.characters ? item.characters : null;
+    } else {
+      // actor
+      credit = item.characters ? item.characters : item.jobs ? item.jobs : null;
+    }
 
-		if (tvCredits) {
-			tvActing = tvCredits.cast;
-			tvProduction = tvCredits.crew;
-		}
+    if (credit) {
+      let output = "";
+      for (let i in credit) {
+        output += `${credit[i]} / `;
+      }
+      credit = output;
+      credit = credit.substring(0, credit.length - 3);
+    }
 
-		if (!personData.images) {
-			banner = false;
-			bWidth = 0;
-		} else {
-			personData.images.profiles.forEach((image) => {
-				if (image.width > bWidth) {
-					banner = image;
-					bWidth = image.width;
-				}
-			});
-		}
+    return credit;
+  }
 
-		return (
-			<>
-				<div className="page-wrap" onScroll={this.handleScroll}>
-					<div
-						className="person--banner"
-						style={{
-							backgroundImage: `url(https://image.tmdb.org/t/p/original/${banner.file_path})`,
-						}}
-					></div>
-					<div className="person--top">
-						<div className="person--thumb">
-							<div className="person--thumb--inner">
-								<img
-									src={`https://image.tmdb.org/t/p/w1280/${personData.profile_path}`}
-								/>
-							</div>
-						</div>
-						<div className="person--details">
-							<h1 className="single-title">{personData.name}</h1>
-							<p>{personData.place_of_birth}</p>
-							<p>{personData.known_for_department}</p>
-						</div>
+  render() {
+    let id = this.props.match.params.id;
+    let personData = this.props.api.person_lookup[id];
 
-						{/* {personData.images.profiles.map((image) => {
-						return (
-							<img
-								src={`https://image.tmdb.org/t/p/w1280/${image.file_path}`}
-							/>
-						);
-					})} */}
-					</div>
-					<section>
-						<div className="person--bio">
-							<h3 className="sub-title mb--1">Biography</h3>
-							<div className="bio">
-								{personData.biography.split('\n').map((str) => (
-									<p>{str}</p>
-								))}
-							</div>
-						</div>
-					</section>
-					{movieActing ? (
-						<section>
-							<h3 className="sub-title mb--1">Movies (Acting)</h3>
-							<Carousel>
-								{Object.keys(movieActing).map((key, i) => {
-									let result = movieActing[key];
-									if (result.popularity < 10) return null; // threshold to display
-									return (
-										<MovieCard
-											key={result.id + '-cast-' + i}
-											movie={result}
-											character={result.character}
-										/>
-									);
-								})}
-							</Carousel>
-						</section>
-					) : null}
-					{movieProduction ? (
-						<section>
-							<h3 className="sub-title mb--1">
-								Movies (Production)
-							</h3>
-							<Carousel>
-								{Object.keys(movieProduction).map((key, i) => {
-									let result = movieProduction[key];
-									if (result.popularity < 10) return null; // threshold to display
-									return (
-										<MovieCard
-											key={result.id + '-cast-' + i}
-											movie={result}
-											character={result.job}
-										/>
-									);
-								})}
-							</Carousel>
-						</section>
-					) : null}
-					{tvActing ? (
-						<section>
-							<h3 className="sub-title mb--1">Shows (Acting)</h3>
-							<Carousel>
-								{Object.keys(tvActing).map((key, i) => {
-									let result = tvActing[key];
-									if (result.popularity < 10) return null; // threshold to display
-									return (
-										<TvCard
-											key={result.id + '-cast-' + i}
-											series={result}
-											character={result.character}
-										/>
-									);
-								})}
-							</Carousel>
-						</section>
-					) : null}
-					{tvProduction ? (
-						<section>
-							<h3 className="sub-title mb--1">
-								Shows (Production)
-							</h3>
-							<Carousel>
-								{Object.keys(tvProduction).map((key, i) => {
-									let result = tvProduction[key];
-									if (result.popularity < 10) return null; // threshold to display
-									return (
-										<TvCard
-											key={result.id + '-cast-' + i}
-											series={result}
-											character={result.job}
-										/>
-									);
-								})}
-							</Carousel>
-						</section>
-					) : null}
-				</div>
-			</>
-		);
-	}
+    if (!personData) {
+      return (
+        <div className="page-wrap">
+          <div className="spinner">
+            <Spinner />
+          </div>
+        </div>
+      );
+    }
+
+    let banner = false;
+    let bWidth = 0;
+
+    // Credits Movie
+    let movieCredits = this.props.api.actor_movie[id];
+    let moviesList = false;
+
+    if (movieCredits) {
+      moviesList = {};
+      moviesList = this.processCredits(moviesList, movieCredits.cast);
+      moviesList = this.processCredits(moviesList, movieCredits.crew);
+      moviesList = Object.values(moviesList);
+      moviesList.sort(this.sortByRanking);
+    }
+
+    // Credits TV
+    let tvCredits = this.props.api.actor_series[id];
+    let showsList = false;
+
+    if (tvCredits) {
+      showsList = {};
+      showsList = this.processCredits(showsList, tvCredits.cast);
+      showsList = this.processCredits(showsList, tvCredits.crew);
+      showsList = Object.values(showsList);
+      showsList.sort(this.sortByRanking);
+    }
+
+    if (!personData.images) {
+      banner = false;
+      bWidth = 0;
+    } else {
+      personData.images.profiles.forEach((image) => {
+        if (image.width > bWidth) {
+          banner = image;
+          bWidth = image.width;
+        }
+      });
+    }
+
+    console.log(moviesList);
+
+    return (
+      <>
+        <div className="page-wrap" onScroll={this.handleScroll}>
+          <div className="person--wrap">
+            <div
+              className="person--banner"
+              style={{
+                backgroundImage: `url(https://image.tmdb.org/t/p/original/${banner.file_path})`,
+              }}
+            ></div>
+            <div className="person--top">
+              <div className="person--thumb">
+                <div className="person--thumb--inner">
+                  <img src={`https://image.tmdb.org/t/p/w1280/${personData.profile_path}`} />
+                </div>
+              </div>
+              <div className="person--details">
+                <h1 className="single-title">{personData.name}</h1>
+                <p>{personData.place_of_birth}</p>
+                <p>{personData.known_for_department}</p>
+              </div>
+            </div>
+            <section>
+              <div className="person--bio">
+                <h3 className="sub-title mb--1">Biography</h3>
+                <div className="bio">
+                  {personData.biography.split("\n").map((str) => (
+                    <p>{str}</p>
+                  ))}
+                </div>
+              </div>
+            </section>
+            {moviesList.length > 0 ? (
+              <section>
+                <h3 className="sub-title mb--1">Movies</h3>
+                <Carousel>
+                  {Object.keys(moviesList).map((key, i) => {
+                    let result = moviesList[key];
+                    if (result.rating < 100) return null; // threshold to display
+                    return <MovieCard key={result.id + "-cast-" + i} movie={result} character={this.processCredit(result, personData)} />;
+                  })}
+                </Carousel>
+              </section>
+            ) : null}
+            {showsList.length > 0 ? (
+              <section>
+                <h3 className="sub-title mb--1">TV</h3>
+                <Carousel>
+                  {Object.keys(showsList).map((key, i) => {
+                    let result = showsList[key];
+                    if (result.rating < 100) return null; // threshold to display
+                    return <TvCard key={result.id + "-cast-" + i} series={result} character={this.processCredit(result, personData)} />;
+                  })}
+                </Carousel>
+              </section>
+            ) : null}
+          </div>
+        </div>
+      </>
+    );
+  }
 }
 
 Actor = withRouter(Actor);
 
 function ActorContainer(props) {
-	return <Actor api={props.api} />;
+  return <Actor api={props.api} />;
 }
 
 const mapStateToProps = function (state) {
-	return {
-		api: state.api,
-	};
+  return {
+    api: state.api,
+  };
 };
 
 export default connect(mapStateToProps)(ActorContainer);

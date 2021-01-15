@@ -20,6 +20,10 @@ class LibraryUpdate {
     this.full = true;
   }
 
+  run() {
+    this.scan();
+  }
+
   async partial() {
     this.full = false;
     let recent = false;
@@ -81,7 +85,7 @@ class LibraryUpdate {
     radarr.getRequests();
   }
 
-  async run() {
+  async scan() {
     console.log(`LIB CRON: Running ${this.full ? "Full" : "Partial"}`);
     await this.createAdmin();
     let libraries = false;
@@ -499,8 +503,8 @@ class LibraryUpdate {
   async saveMusic(musicObj) {
     let musicDb = false;
     try {
-      musicDb = await Music.findOne({ raingKey: musicObj.ratingKey });
-      if (!this.full) {
+      musicDb = await Music.findOne({ ratingKey: musicObj.ratingKey });
+      if (!this.full && musicDb) {
         return;
       }
     } catch {
