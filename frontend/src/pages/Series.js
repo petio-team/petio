@@ -198,11 +198,7 @@ class Series extends React.Component {
     if (seriesData.recommendations) {
       relatedItems = seriesData.recommendations.map((key) => {
         // if (this.props.api.series_lookup[id]) {
-        return (
-          <div className="related--item" key={`related-${key}`}>
-            <TvCard series={{ id: key }} />
-          </div>
-        );
+        return <TvCard key={`related-${key}`} series={{ id: key }} />;
         // }
       });
       related = (
