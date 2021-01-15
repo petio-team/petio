@@ -30,7 +30,7 @@
     }
 
     @include media-breakpoint-up(lg) {
-      height: 80vh;
+      height: 50vh;
       background-position: 50% 40%;
       background-size: cover;
       background-attachment: initial;
@@ -107,10 +107,29 @@
     .bio {
       width: 400px;
       max-width: 100%;
+      overflow: hidden;
+      max-height: calc(18px * 10);
+      transition: max-height 0.4s ease;
 
       @include media-breakpoint-up(lg) {
         width: 600px;
+        max-height: calc(22px * 10);
       }
+
+      &.open {
+        max-height: 1000px;
+      }
+    }
+
+    &--read-more {
+      color: $primary;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 20px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: inline-block;
     }
   }
 
@@ -145,7 +164,7 @@
     }
 
     @include media-breakpoint-up(lg) {
-      height: 80vh;
+      height: 50vh;
     }
 
     &:after {

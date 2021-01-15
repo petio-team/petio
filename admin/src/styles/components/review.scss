@@ -1,152 +1,152 @@
 .review {
-	&--wrap {
-		position: fixed;
-		top: 0;
-		left: 0;
-		z-index: 999;
-		width: 100%;
-		height: 100vh;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		opacity: 0;
-		pointer-events: none;
-		transition: all 0.3s ease;
+  &--wrap {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
 
-		@include media-breakpoint-up(lg) {
-			background: rgba(0, 0, 0, 0.6);
-		}
+    @include media-breakpoint-up(lg) {
+      background: rgba(0, 0, 0, 0.6);
+    }
 
-		&.active {
-			opacity: 1;
-			pointer-events: all;
-		}
-	}
+    &.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+  }
 
-	&--inner {
-		width: 500px;
-		max-width: calc(100% - 40px);
-		background: $black;
-	}
+  &--inner {
+    width: 500px;
+    max-width: calc(100% - 40px);
+    background: $black;
+  }
 
-	&--top {
-		background: $orange;
-		padding: 10px;
+  &--top {
+    background: $primary;
+    padding: 10px;
 
-		h3 {
-			font-size: 15px;
-			text-transform: uppercase;
-			letter-spacing: 1px;
-		}
-	}
+    h3 {
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+  }
 
-	&--main {
-		padding: 20px 10px 10px;
+  &--main {
+    padding: 20px 10px 10px;
 
-		.save-review {
-			margin-left: 10px;
-		}
+    .save-review {
+      margin-left: 10px;
+    }
 
-		.stars-wrap {
-			display: flex;
-			margin-bottom: 15px;
+    .stars-wrap {
+      display: flex;
+      margin-bottom: 15px;
 
-			&:hover {
-				.star {
-					opacity: 1;
-				}
-			}
+      &:hover {
+        .star {
+          opacity: 1;
+        }
+      }
 
-			.star {
-				opacity: 0.5;
-				padding-right: 5px;
-				cursor: pointer;
+      .star {
+        opacity: 0.5;
+        padding-right: 5px;
+        cursor: pointer;
 
-				svg {
-					height: 20px;
+        svg {
+          height: 20px;
 
-					path {
-						fill: $orange;
-					}
+          path {
+            fill: $primary;
+          }
 
-					@include media-breakpoint-up(lg) {
-						height: 30px;
-					}
-				}
+          @include media-breakpoint-up(lg) {
+            height: 30px;
+          }
+        }
 
-				&.active {
-					opacity: 1;
-				}
+        &.active {
+          opacity: 1;
+        }
 
-				&:hover {
-					opacity: 1;
+        &:hover {
+          opacity: 1;
 
-					& ~ .star {
-						opacity: 0.5;
-					}
-				}
-			}
-		}
-	}
+          & ~ .star {
+            opacity: 0.5;
+          }
+        }
+      }
+    }
+  }
 }
 
 .reviews-list {
-	&--wrap {
-		padding: 30px 0;
-	}
+  &--wrap {
+    padding: 30px 0;
+  }
 
-	&--item {
-		display: flex;
-	}
+  &--item {
+    display: flex;
+  }
 
-	&--thumb {
-		padding-right: 30px;
+  &--thumb {
+    padding-right: 30px;
 
-		.thumb {
-			background-position: center;
-			background-repeat: no-repeat;
-			background-size: cover;
-			background-color: rgba(255, 255, 255, 0.2);
-			border-radius: 50px;
-			height: 30px;
-			width: 30px;
+    .thumb {
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 50px;
+      height: 30px;
+      width: 30px;
 
-			@include media-breakpoint-up(lg) {
-				height: 50px;
-				width: 50px;
-			}
-		}
-	}
+      @include media-breakpoint-up(lg) {
+        height: 50px;
+        width: 50px;
+      }
+    }
+  }
 
-	&--content {
-		padding-left: 30px;
-		border-left: solid 1px rgba(255, 255, 255, 0.1);
+  &--content {
+    padding-left: 30px;
+    border-left: solid 1px rgba(255, 255, 255, 0.1);
 
-		.stars-wrap {
-			display: flex;
-			margin-bottom: 15px;
+    .stars-wrap {
+      display: flex;
+      margin-bottom: 15px;
 
-			.star {
-				opacity: 0.5;
-				padding-right: 5px;
-				cursor: pointer;
+      .star {
+        opacity: 0.5;
+        padding-right: 5px;
+        cursor: pointer;
 
-				&:hover {
-					opacity: 0.5 !important;
-				}
+        &:hover {
+          opacity: 0.5 !important;
+        }
 
-				svg {
-					height: 10px;
+        svg {
+          height: 10px;
 
-					path {
-						fill: $orange;
-					}
-				}
+          path {
+            fill: $primary;
+          }
+        }
 
-				&.active {
-					opacity: 1 !important;
-				}
-			}
-		}
-	}
+        &.active {
+          opacity: 1 !important;
+        }
+      }
+    }
+  }
 }

@@ -11,8 +11,13 @@ class Actor extends React.Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      bioOpen: false,
+    };
+
     this.getActor = this.getActor.bind(this);
     this.handleScroll = this.handleScroll.bind(this);
+    this.toggleBio = this.toggleBio.bind(this);
   }
   componentDidMount() {
     let page = document.querySelectorAll(".page-wrap")[0];
@@ -34,7 +39,7 @@ class Actor extends React.Component {
     let banner = e.currentTarget.querySelectorAll(".person--banner")[0];
     let poster = e.currentTarget.querySelectorAll(".person--thumb--inner")[0];
     let offset = e.currentTarget.scrollTop > banner.offsetHeight ? 1 : e.currentTarget.scrollTop / banner.offsetHeight;
-    let posterOffset = 50 * offset;
+    let posterOffset = 10 * offset;
     offset = offset * 10 + 40;
     banner.style.backgroundPosition = `50% ${offset}%`;
     poster.style.transform = `translateY(${posterOffset}px)`;
@@ -75,28 +80,6 @@ class Actor extends React.Component {
           credits[item.id].characters[item.character] = item.character;
         }
       }
-
-      // if (credits[item.id]) {
-      //   // do nothing yet
-      //   if (item.job) {
-      //     if (credits[item.id].jobs) {
-      //       credits[item.id].jobs.push(item.job);
-      //     } else {
-      //       credits[item.id].jobs = new Array(item.job);
-      //     }
-      //   }
-      //   if (item.character) {
-      //     if (credits[item.id].characters) {
-      //       credits[item.id].characters.push(item.character);
-      //     } else {
-      //       credits[item.id].characters = new Array(item.character);
-      //     }
-      //   }
-      // } else {
-      //   let ranking = Math.round(item.popularity * item.vote_count);
-      //   item.ranking = ranking;
-      //   credits[item.id] = item;
-      // }
     }
     return credits;
   }
@@ -122,6 +105,12 @@ class Actor extends React.Component {
     }
 
     return credit;
+  }
+
+  toggleBio() {
+    this.setState({
+      bioOpen: this.state.bioOpen ? false : true,
+    });
   }
 
   render() {
@@ -177,8 +166,6 @@ class Actor extends React.Component {
       });
     }
 
-    console.log(moviesList);
-
     return (
       <>
         <div className="page-wrap" onScroll={this.handleScroll}>
@@ -204,11 +191,14 @@ class Actor extends React.Component {
             <section>
               <div className="person--bio">
                 <h3 className="sub-title mb--1">Biography</h3>
-                <div className="bio">
-                  {personData.biography.split("\n").map((str) => (
-                    <p>{str}</p>
+                <div className={`bio ${this.state.bioOpen ? "open" : ""}`}>
+                  {personData.biography.split("\n").map((str, i) => (
+                    <p key={`bio-${i}`}>{str}</p>
                   ))}
                 </div>
+                <p onClick={this.toggleBio} className="person--bio--read-more">
+                  {this.state.bioOpen ? "Read less" : "Read more"}
+                </p>
               </div>
             </section>
             {moviesList.length > 0 ? (

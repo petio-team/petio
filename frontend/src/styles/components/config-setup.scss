@@ -1,94 +1,93 @@
 .config-setup {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background: #00000000;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	flex-direction: column;
-	padding: 15px;
-	z-index: 2000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #00000000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 15px;
+  z-index: 2000;
 
-	&--inner {
-		width: 600px;
-		max-width: 100%;
-		padding: 20px;
-		background: $dark-grey;
-		transform: translateY(100vh);
+  &--inner {
+    width: 600px;
+    max-width: 100%;
+    padding: 20px;
+    background: $dark-grey;
+    transform: translateY(100vh);
 
-		p {
-			max-width: 80%;
-		}
+    p {
+      max-width: 80%;
+    }
 
-		.icon {
-			margin-right: 20px;
-			svg {
-				height: 30px;
+    .icon {
+      margin-right: 20px;
+      svg {
+        height: 30px;
 
-				path {
-					fill: white;
-					transition: fill 0.3s ease;
-				}
-			}
-		}
+        path {
+          fill: white;
+          transition: fill 0.3s ease;
+        }
+      }
+    }
 
-		.server-list {
-			display: flex;
-			flex-wrap: wrap;
-			margin: 10px -10px 10px -10px;
-			&--item {
-				width: 100%;
-				padding: 10px;
+    .server-list {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 10px -10px 10px -10px;
+      &--item {
+        width: 100%;
+        padding: 10px;
 
-				&-inner {
-					background: rgba(0, 0, 0, 0.1);
-					display: flex;
-					align-items: center;
-					padding: 10px;
-					transition: background 0.3s ease, color 0.3s ease,
-						border 0.3s ease;
-					cursor: pointer;
-					border-right: solid 5px rgba(0, 0, 0, 0.1);
+        &-inner {
+          background: rgba(0, 0, 0, 0.1);
+          display: flex;
+          align-items: center;
+          padding: 10px;
+          transition: background 0.3s ease, color 0.3s ease, border 0.3s ease;
+          cursor: pointer;
+          border-right: solid 5px rgba(0, 0, 0, 0.1);
 
-					&.disabled {
-						opacity: 0.3;
-						pointer-events: none;
-					}
+          &.disabled {
+            opacity: 0.3;
+            pointer-events: none;
+          }
 
-					&:hover:not(.active) {
-						background: rgba(0, 0, 0, 0.2);
-						color: $orange;
-						border-right: solid 5px $orange;
+          &:hover:not(.active) {
+            background: rgba(0, 0, 0, 0.2);
+            color: $primary;
+            border-right: solid 5px $primary;
 
-						.icon svg path {
-							fill: $orange;
-						}
-					}
+            .icon svg path {
+              fill: $primary;
+            }
+          }
 
-					&.active {
-						background: $orange;
-						border-right: solid 5px $orangeDark;
-					}
-				}
+          &.active {
+            background: $primary;
+            border-right: solid 5px $primaryDark;
+          }
+        }
 
-				@include media-breakpoint-up(lg) {
-					width: 50%;
-				}
-			}
-		}
-	}
+        @include media-breakpoint-up(lg) {
+          width: 50%;
+        }
+      }
+    }
+  }
 
-	&.loaded {
-		background: #0000008f;
-		transition: background 0.8s ease;
-		.config-setup {
-			&--inner {
-				transform: translateY(0);
-				transition: transform 0.4s ease 0.3s;
-			}
-		}
-	}
+  &.loaded {
+    background: #0000008f;
+    transition: background 0.8s ease;
+    .config-setup {
+      &--inner {
+        transform: translateY(0);
+        transition: transform 0.4s ease 0.3s;
+      }
+    }
+  }
 }
