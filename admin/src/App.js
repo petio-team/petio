@@ -92,7 +92,9 @@ class App extends React.Component {
     if (this.state.config === false) {
       return (
         <div className="app">
-          <Setup checkConfig={this.checkConfig} />
+          <div className="page-wrap">
+            <Setup checkConfig={this.checkConfig} />
+          </div>
         </div>
       );
     }
