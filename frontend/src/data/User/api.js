@@ -1,7 +1,13 @@
 import { getAuth } from "../auth";
 
 export async function login(username, token = false) {
-  let IP = await getIP();
+  let IP = false;
+  try {
+    let lookup = await getIP();
+    IP = lookup.ip;
+  } catch {
+    console.log("Cannot get IP");
+  }
   console.log(IP);
   let request = `${getAuth().api}/login`;
   let headers = {
@@ -10,12 +16,12 @@ export async function login(username, token = false) {
   return process(request, "post", headers, {
     username: username,
     authToken: token,
-    ip: IP.ip,
+    ip: IP,
   }).then((res) => res.json());
 }
 
 function getIP() {
-  return fetch("https://jsonip.com", { mode: "cors" }).then((resp) => resp.json());
+  return fetch("https://api.ipify.org/?format=json", { mode: "cors" }).then((resp) => resp.json());
 }
 
 export let request = (req, user) => {
