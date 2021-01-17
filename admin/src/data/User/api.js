@@ -23,7 +23,7 @@ export async function login(username, password, admin = false, token = false) {
 }
 
 function getIP() {
-  return fetch("https://api.ipify.org/?format=json", { mode: "cors" }).then((resp) => resp.json());
+  return fetch("https://api.ipify.org/?format=json").then((resp) => resp.json());
 }
 
 export let getRequests = () => {
