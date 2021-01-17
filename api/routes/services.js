@@ -70,7 +70,6 @@ function saveSonarrConfig(data) {
       project_folder = __dirname;
       configFile = path.join(project_folder, "../config/sonarr.json");
     }
-    // data = JSON.stringify(data);
     fs.writeFile(configFile, data, (err) => {
       if (err) {
         console.log(err);
@@ -156,7 +155,6 @@ function saveRadarrConfig(data) {
       project_folder = __dirname;
       configFile = path.join(project_folder, "../config/radarr.json");
     }
-    // data = JSON.stringify(data);
     fs.writeFile(configFile, data, (err) => {
       if (err) {
         console.log(err);
