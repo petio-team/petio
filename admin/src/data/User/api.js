@@ -18,7 +18,7 @@ export async function login(username, password, admin = false, token = false) {
     password: password,
     admin: admin,
     authToken: token,
-    ip: IP.ip,
+    ip: IP,
   }).then((res) => res.json());
 }
 
