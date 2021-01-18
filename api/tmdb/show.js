@@ -72,7 +72,6 @@ async function showLookup(id, minified = false) {
       delete show.number_of_episodes;
       delete show.number_of_seasons;
       delete show.origin_country;
-      // delete show.original_language;
       delete show.original_name;
       delete show.overview;
       delete show.popularity;
@@ -144,9 +143,7 @@ async function getRecommendations(id) {
 async function getSeasons(seasons, id) {
   let seasonList = [];
   Object.keys(seasons).map((key) => {
-    // if (key > 0) {
     seasonList.push(seasons[key].season_number);
-    // }
   });
   return seasonsAsync(seasonList, id);
 }
