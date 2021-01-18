@@ -732,7 +732,7 @@ class LibraryUpdate {
         let newFriend = new User({
           id: obj.id,
           title: obj.title,
-          username: obj.username,
+          username: obj.username ? obj.username : obj.title,
           email: obj.email,
           recommendationsPlaylistId: obj.recommendationsPlaylistId,
           thumb: obj.thumb,
