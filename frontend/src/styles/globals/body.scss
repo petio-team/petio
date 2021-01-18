@@ -16,7 +16,7 @@ body {
 html,
 body {
   @include media-breakpoint-down(md) {
-    position: fixed;
+    // position: fixed;
     overflow: hidden;
     pointer-events: none;
   }
