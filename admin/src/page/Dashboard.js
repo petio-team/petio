@@ -168,7 +168,7 @@ class Dashboard extends React.Component {
   getRequests() {
     let requests = this.props.user.requests;
     if (!requests) {
-      User.getRequests();
+      User.getRequests(true);
     } else {
       this.setState({
         requests: true,

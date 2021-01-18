@@ -25,6 +25,7 @@ class LibraryUpdate {
   }
 
   async partial() {
+    console.log(`LIB CRON: Running Partial`);
     this.full = false;
     let recent = false;
     let sonarr = new Sonarr();
@@ -36,57 +37,61 @@ class LibraryUpdate {
       return;
     }
 
-    Object.keys(recent.Metadata).map((i) => {
-      let obj = recent.Metadata[i];
+    await Promise.all(
+      Object.keys(recent.Metadata).map(async (i) => {
+        let obj = recent.Metadata[i];
 
-      if (obj.type === "movie") {
-        this.saveMovie(obj);
-        console.log(`LIB CRON: Partial scan - ${obj.title}`);
-      } else if (obj.type === "artist") {
-        this.saveMusic(obj);
-      } else if (obj.type === "show") {
-        this.saveShow(obj);
-        console.log(`LIB CRON: Partial scan - ${obj.title}`);
-      } else if (obj.type === "season") {
-        let parent = {
-          ratingKey: obj.parentRatingKey,
-          guid: obj.parentGuid,
-          key: obj.parentKey,
-          type: "show",
-          title: obj.parentTitle,
-          contentRating: "",
-          summary: "",
-          index: obj.index,
-          rating: "",
-          year: "",
-          thumb: "",
-          art: "",
-          banner: "",
-          theme: "",
-          duration: "",
-          originallyAvailableAt: "",
-          leafCount: "",
-          viewedLeafCount: "",
-          childCount: "",
-          addedAt: "",
-          updatedAt: "",
-          Genre: "",
-          studio: "",
-          titleSort: "",
-        };
+        if (obj.type === "movie") {
+          await this.saveMovie(obj);
+          console.log(`LIB CRON: Partial scan - ${obj.title}`);
+        } else if (obj.type === "artist") {
+          await this.saveMusic(obj);
+        } else if (obj.type === "show") {
+          await this.saveShow(obj);
+          console.log(`LIB CRON: Partial scan - ${obj.title}`);
+        } else if (obj.type === "season") {
+          let parent = {
+            ratingKey: obj.parentRatingKey,
+            guid: obj.parentGuid,
+            key: obj.parentKey,
+            type: "show",
+            title: obj.parentTitle,
+            contentRating: "",
+            summary: "",
+            index: obj.index,
+            rating: "",
+            year: "",
+            thumb: "",
+            art: "",
+            banner: "",
+            theme: "",
+            duration: "",
+            originallyAvailableAt: "",
+            leafCount: "",
+            viewedLeafCount: "",
+            childCount: "",
+            addedAt: "",
+            updatedAt: "",
+            Genre: "",
+            studio: "",
+            titleSort: "",
+          };
 
-        this.saveShow(parent);
-        console.log(`LIB CRON: Partial scan - ${parent.title} - Built from series`);
-      } else {
-        console.log(obj);
-      }
-    });
+          await this.saveShow(parent);
+          console.log(`LIB CRON: Partial scan - ${parent.title} - Built from series`);
+        } else {
+          console.log(obj);
+        }
+      })
+    );
     sonarr.getRequests();
     radarr.getRequests();
+    this.execMail();
+    console.log("LIB CRON: Partial Scan Complete");
   }
 
   async scan() {
-    console.log(`LIB CRON: Running ${this.full ? "Full" : "Partial"}`);
+    console.log(`LIB CRON: Running Full`);
     await this.createAdmin();
     let libraries = false;
     let sonarr = new Sonarr();
@@ -101,10 +106,10 @@ class LibraryUpdate {
       await this.saveLibraries(libraries);
       await this.updateLibraryContent(libraries);
       await this.updateFriends();
-      console.log("LIB CRON: Complete");
-      this.execMail();
       sonarr.getRequests();
       radarr.getRequests();
+      this.execMail();
+      console.log("LIB CRON: Full Scan Complete");
     } else {
       console.log("Couldn't update libraries");
     }
@@ -296,18 +301,20 @@ class LibraryUpdate {
       libraries.Directory.map(async (lib) => {
         try {
           let libContent = await this.getLibrary(lib.key);
-          Object.keys(libContent.Metadata).map((item) => {
-            let obj = libContent.Metadata[item];
-            if (obj.type === "movie") {
-              this.saveMovie(obj);
-            } else if (obj.type === "artist") {
-              this.saveMusic(obj);
-            } else if (obj.type === "show") {
-              this.saveShow(obj);
-            } else {
-              console.log(obj.type);
-            }
-          });
+          await Promise.all(
+            Object.keys(libContent.Metadata).map(async (item) => {
+              let obj = libContent.Metadata[item];
+              if (obj.type === "movie") {
+                await this.saveMovie(obj);
+              } else if (obj.type === "artist") {
+                await this.saveMusic(obj);
+              } else if (obj.type === "show") {
+                await this.saveShow(obj);
+              } else {
+                console.log(obj.type);
+              }
+            })
+          );
         } catch (err) {
           console.log(`LIB CRON: ${err}`);
         }
@@ -446,7 +453,8 @@ class LibraryUpdate {
           tmdb_id: externalIds.hasOwnProperty("tmdb_id") ? externalIds.tmdb_id : false,
         });
         movieDb = await newMovie.save();
-        this.mailAdded(movieObj, externalId);
+        await this.mailAdded(movieObj, externalId);
+        console.log(`LIB CRON: Movie Added - ${showObj.title}`);
       } catch (err) {
         console.log(`LIB CRON: ${err}`);
       }
@@ -492,7 +500,6 @@ class LibraryUpdate {
           },
           { useFindAndModify: false }
         );
-        this.mailAdded(movieObj, externalId);
       } catch (err) {
         movieDb = false;
         console.log(err);
@@ -538,7 +545,7 @@ class LibraryUpdate {
 
     try {
       showDb = await Show.findOne({ ratingKey: showObj.ratingKey });
-      if (!this.full) {
+      if (!this.full && showDb) {
         return;
       }
     } catch {
@@ -620,7 +627,8 @@ class LibraryUpdate {
           tmdb_id: idSource === "tmdb" ? externalId : tmdbId,
         });
         showDb = await newShow.save();
-        this.mailAdded(showObj, externalId);
+        await this.mailAdded(showObj, externalId);
+        console.log(`LIB CRON: Show Added - ${showObj.title}`);
       } catch (err) {
         console.log(`LIB CRON: ${err}`);
       }
@@ -665,7 +673,6 @@ class LibraryUpdate {
           },
           { useFindAndModify: false }
         );
-        this.mailAdded(showObj, externalId);
       } catch {
         showDb = false;
       }
@@ -757,9 +764,11 @@ class LibraryUpdate {
       $or: [{ imdb_id: ref_id }, { tmdb_id: ref_id }, { tvdb_id: ref_id }],
     });
     if (request) {
-      request.users.map((user, i) => {
-        this.sendMail(user, i, request);
-      });
+      await Promise.all(
+        request.users.map(async (user, i) => {
+          await this.sendMail(user, i, request);
+        })
+      );
       Request.findOneAndRemove(
         {
           $or: [{ imdb_id: ref_id }, { tmdb_id: ref_id }, { tvdb_id: ref_id }],
@@ -791,6 +800,9 @@ class LibraryUpdate {
       `https://image.tmdb.org/t/p/w500${request.thumb}`,
       [userData.email],
     ]);
+
+    console.log(`LIB CRON: Mailer updated`);
+    console.log(this.mailer);
   }
 
   execMail() {

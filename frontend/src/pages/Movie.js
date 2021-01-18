@@ -85,7 +85,7 @@ class Movie extends React.Component {
     let movie = this.props.api.movie_lookup[id];
     let requests = this.props.user.requests[id];
     if (requests) {
-      if (requests.users.includes(this.props.user.current._id)) {
+      if (requests.users.includes(this.props.user.current.id)) {
         alert("Already Requested");
         return;
       }

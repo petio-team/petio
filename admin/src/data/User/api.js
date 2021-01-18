@@ -26,8 +26,8 @@ function getIP() {
   return fetch("https://api.ipify.org/?format=json").then((resp) => resp.json());
 }
 
-export let getRequests = () => {
-  let request = `${apiUrl}/request/all`;
+export let getRequests = (min) => {
+  let request = min ? `${apiUrl}/request/min` : `${apiUrl}/request/all`;
   let headers = {
     "Content-Type": "application/json",
   };

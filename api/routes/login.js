@@ -21,6 +21,7 @@ router.post("/", async (req, res) => {
   }
 
   console.log(`LOGIN: New login attempted`);
+  console.log(`LOGIN: Request User: ${username}`);
   console.log(`LOGIN: Request IP: ${request_ip}`);
   if (authToken) {
     console.log(`LOGIN: JWT Token Passed`);
