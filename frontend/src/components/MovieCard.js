@@ -13,12 +13,32 @@ class MovieCard extends React.Component {
       onServer: false,
       imdbId: false,
       tmdbId: false,
+      inView: false,
     };
     this.getMovie = this.getMovie.bind(this);
+    this.card = React.createRef();
+    this.inView = this.inView.bind(this);
   }
 
   componentDidMount() {
-    this.getMovie();
+    // this.getMovie();
+    this.inView();
+  }
+
+  componentDidUpdate() {
+    if (!this.state.inView) {
+      this.inView();
+    }
+  }
+
+  inView() {
+    const left = this.card.current.getBoundingClientRect().left;
+    if (left <= this.props.width * 2) {
+      this.setState({
+        inView: true,
+      });
+      this.getMovie();
+    }
   }
 
   getMovie() {
@@ -26,7 +46,6 @@ class MovieCard extends React.Component {
     let id = movie.id;
     if (!this.props.api.movie_lookup[id]) {
       // check for cached
-
       if (!id) return false;
       Api.movie(id, true);
     }
@@ -38,9 +57,10 @@ class MovieCard extends React.Component {
     if (!id || id === "false") {
       return null;
     }
+    // Loading state
     if (!movie) {
       return (
-        <div key={id} data-key={id} className={"card type--movie-tv "}>
+        <div ref={this.card} key={id} data-key={id} className={"card type--movie-tv "}>
           <div className="card--inner">
             <Link to={`/movie/${id}`} className="full-link"></Link>
             <div className="image-wrap">
@@ -65,12 +85,16 @@ class MovieCard extends React.Component {
     ) : (
       <div className="no-poster"></div>
     );
+    // Final render
     return (
-      <div key={movie.id} data-key={movie.id} className={`card type--movie-tv ${movie.on_server ? "on-server" : ""} ${this.props.user.requests[movie.id] ? "requested" : ""}`}>
+      <div ref={this.card} key={movie.id} data-key={movie.id} className={`card type--movie-tv ${movie.on_server ? "on-server" : ""} ${this.props.user.requests[movie.id] ? "requested" : ""}`}>
         <div className="card--inner">
           <Link to={`/movie/${movie.id}`} className="full-link"></Link>
 
-          <div className="image-wrap">{img}</div>
+          <div className="image-wrap">
+            {this.props.popular_count ? <p className="popular-card--count">{this.props.popular_count}</p> : null}
+            {img}
+          </div>
           <div className="text-wrap">
             <p className="title" title={movie.title}>
               {movie.title}
@@ -86,7 +110,7 @@ class MovieCard extends React.Component {
 MovieCard = withRouter(MovieCard);
 
 function MovieCardContainer(props) {
-  return <MovieCard api={props.api} movie={props.movie} character={props.character} user={props.user} />;
+  return <MovieCard api={props.api} movie={props.movie} character={props.character} user={props.user} pos={props.pos} width={props.width} popular_count={props.popular_count} />;
 }
 
 const mapStateToProps = function (state) {

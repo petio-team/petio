@@ -66,7 +66,7 @@ class Season extends React.Component {
   render() {
     let id = this.props.match.params.id;
     let season = this.props.match.params.season;
-    let seriesData = this.props.api.series_lookup[id];
+    let seriesData = Object.assign({}, this.props.api.series_lookup[id]);
     let seasonData = this.props.api.series_lookup[id] ? this.props.api.series_lookup[id].seasonData[season] : false;
     if (seriesData) seriesData.poster_path = seasonData ? seasonData.poster_path : seriesData.poster_path;
     console.log(seasonData);

@@ -2,20 +2,13 @@ import React from "react";
 import { ReactComponent as LeftArrow } from "../assets/svg/back.svg";
 import { ReactComponent as RightArrow } from "../assets/svg/forward.svg";
 
-const widths = {
-  small: 0,
-  medium: 0,
-  large: 160,
-};
-
 class Carousel extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
       offset: 0,
-      left: true,
-      right: true,
+      pos: 0,
       init: false,
     };
 
@@ -66,17 +59,20 @@ class Carousel extends React.Component {
       left: false,
       right: cards.length > cardsPerView ? true : false,
       init: true,
+      width: carousel.offsetWidth,
     });
   }
 
   scroll(e) {
     let carousel = this.carouselRef.current;
-    let pos = carousel.scrollLeft; //+ carousel.offsetWidth;
+    let position = carousel.scrollLeft; //+ carousel.offsetWidth;
     let max = carousel.scrollWidth - carousel.offsetWidth;
-    console.log(pos, max);
     this.setState({
-      left: pos !== 0 ? true : false,
-      right: pos === max ? false : true,
+      // left: position !== 0 ? true : false,
+      // right: position === max ? false : true,
+      width: carousel.offsetWidth,
+      pos: position,
+      max: max,
     });
   }
 
@@ -85,7 +81,6 @@ class Carousel extends React.Component {
     let scrollAmount = this.state.cardWidth * this.state.cardsPerView;
     let start = carousel.scrollLeft;
     let movement = Math.floor((start + scrollAmount) / this.state.cardWidth) * this.state.cardWidth;
-    console.log(start, scrollAmount, movement);
     carousel.scrollTo({
       top: 0,
       left: movement,
@@ -98,7 +93,6 @@ class Carousel extends React.Component {
     let scrollAmount = this.state.cardWidth * this.state.cardsPerView;
     let start = carousel.scrollLeft;
     let movement = Math.floor((start - scrollAmount) / this.state.cardWidth) * this.state.cardWidth;
-    console.log(start, scrollAmount, movement);
     carousel.scrollTo({
       top: 0,
       left: movement,
@@ -107,18 +101,24 @@ class Carousel extends React.Component {
   }
 
   render() {
+    const childrenWithProps = React.Children.map(this.props.children, (child) => {
+      if (React.isValidElement(child)) {
+        return React.cloneElement(child, { pos: this.state.pos, width: this.state.width });
+      }
+      return child;
+    });
     return (
-      <div className="carousel--wrap" ref={this.wrapper}>
+      <div className="carousel--wrap" ref={this.wrapper} data-width={this.state.width}>
         <div className="carousel--controls">
-          <div className={`carousel--controls--item carousel--prev ${this.state.left ? "" : "disabled"}`} onClick={this.prev}>
+          <div className={`carousel--controls--item carousel--prev ${this.state.pos > 0 ? "" : "disabled"}`} onClick={this.prev}>
             <LeftArrow />
           </div>
-          <div className={`carousel--controls--item carousel--next ${this.state.right ? "" : "disabled"}`} onClick={this.next}>
+          <div className={`carousel--controls--item carousel--next ${this.state.pos !== this.state.max ? "" : "disabled"}`} onClick={this.next}>
             <RightArrow />
           </div>
         </div>
         <div className={`carousel`} ref={this.carouselRef} onScroll={this.scroll}>
-          <div className="carousel--inner">{this.props.children}</div>
+          <div className="carousel--inner">{childrenWithProps}</div>
         </div>
       </div>
     );

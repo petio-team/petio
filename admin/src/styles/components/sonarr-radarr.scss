@@ -60,11 +60,11 @@
         cursor: pointer;
 
         &:hover {
-          color: $orange;
-          border-color: $orange;
+          color: $primary;
+          border-color: $primary;
 
           svg {
-            fill: $orange;
+            fill: $primary;
           }
         }
       }
@@ -89,7 +89,7 @@
     z-index: 20;
 
     &--top {
-      background: $orange;
+      background: $primary;
       color: white;
       padding: 15px;
       display: flex;

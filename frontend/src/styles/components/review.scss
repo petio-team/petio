@@ -32,7 +32,7 @@
   }
 
   &--top {
-    background: $orange;
+    background: $primary;
     padding: 10px 20px;
 
     h3 {
@@ -68,7 +68,7 @@
           height: 20px;
 
           path {
-            fill: $orange;
+            fill: $primary;
           }
 
           @include media-breakpoint-up(lg) {
@@ -168,7 +168,7 @@
           height: 10px;
 
           path {
-            fill: $orange;
+            fill: $primary;
           }
         }
 

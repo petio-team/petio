@@ -1,11 +1,12 @@
+import pjson from "../../../package.json";
 const plexHeaders = {
   "Content-Type": "application/json",
   Accept: "application/json",
   "X-Plex-Device": "API",
   "X-Plex-Device-Name": "Petio",
   "X-Plex-Product": "Petio",
-  "X-Plex-Version": "0.2.0",
-  "X-Plex-Platform-Version": "0.2.0",
+  "X-Plex-Version": "1.0.0",
+  "X-Plex-Platform-Version": pjson.version,
   "X-Plex-Client-Identifier": "067e602b-1e86-4739-900d-1abdf8f6da71",
 };
 

@@ -27,7 +27,7 @@ class App extends React.Component {
       activeServerCheck: false,
       issuesOpen: false,
       isLoggedIn: this.props.user.logged_in,
-      loading: false,
+      loading: true,
       configChecked: false,
       loginMsg: false,
     };
@@ -113,6 +113,10 @@ class App extends React.Component {
           this.loginLocal();
         }, 500);
       }
+    } else {
+      this.setState({
+        loading: false,
+      });
     }
   }
 
@@ -137,7 +141,7 @@ class App extends React.Component {
         console.log(res);
         this.setState({
           config: res.config,
-          loading: false,
+          // loading: false,
         });
       })
       .catch(() => {
@@ -164,6 +168,15 @@ class App extends React.Component {
   }
 
   render() {
+    if (this.state.loading) {
+      return (
+        <div className="login-wrap">
+          <div className="spinner">
+            <Spinner />
+          </div>
+        </div>
+      );
+    }
     let user = this.props.api.current_user;
     if (!this.state.isLoggedIn) {
       return (

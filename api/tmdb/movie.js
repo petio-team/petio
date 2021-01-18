@@ -65,7 +65,6 @@ async function movieLookup(id, minified = false) {
     delete movie.production_countries;
     delete movie.budget;
     delete movie.adult;
-    // delete movie.original_language;
     delete movie.original_title;
     delete movie.production_companies;
     if (minified) {
@@ -110,7 +109,6 @@ async function getMovieData(id) {
         if (err) {
           reject();
         }
-        // console.log(data);
         resolve(data);
       }
     );

@@ -63,15 +63,14 @@ class Popular extends React.Component {
                     return null;
                   }
                   return (
-                    <div key={t} className="popular-card">
-                      <p className="popular-card--count">{this.state.topData[t].globalViewCount}</p>
-                      <MovieCard
-                        key={this.state.topData[t].item.tmdb_id}
-                        movie={{
-                          id: this.state.topData[t].item.tmdb_id,
-                        }}
-                      />
-                    </div>
+                    <MovieCard
+                      key={t}
+                      key={this.state.topData[t].item.tmdb_id}
+                      movie={{
+                        id: this.state.topData[t].item.tmdb_id,
+                      }}
+                      popular_count={this.state.topData[t].globalViewCount}
+                    />
                   );
                 })}
               </Carousel>
@@ -95,15 +94,13 @@ class Popular extends React.Component {
                     return null;
                   }
                   return (
-                    <div key={this.state.topData[t].item.tmdb_id} className="popular-card">
-                      <p className="popular-card--count">{this.state.topData[t].globalViewCount}</p>
-                      <TvCard
-                        key={this.state.topData[t].id}
-                        series={{
-                          id: this.state.topData[t].item.tmdb_id,
-                        }}
-                      />
-                    </div>
+                    <TvCard
+                      key={this.state.topData[t].id}
+                      series={{
+                        id: this.state.topData[t].item.tmdb_id,
+                      }}
+                      popular_count={this.state.topData[t].globalViewCount}
+                    />
                   );
                 })}
               </Carousel>

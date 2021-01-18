@@ -8,15 +8,15 @@
   &--inner {
     position: relative;
     margin-top: 2px;
-    box-shadow: 0 0 0 0 $orange;
+    box-shadow: 0 0 0 0 $primary;
     transition: box-shadow 0.3s ease;
 
     @include media-breakpoint-up(lg) {
       &:hover {
         .image-wrap {
-          // border: solid 2px $orange;
+          // border: solid 2px $primary;
           filter: brightness(0.7);
-          box-shadow: 0 0 0 2px $orange, 0 5px 10px 0px rgba(black, 0.3);
+          box-shadow: 0 0 0 2px $primary, 0 5px 10px 0px rgba(black, 0.3);
 
           &:before {
             opacity: 0.4;
@@ -214,12 +214,12 @@
   &--count {
     z-index: 3;
     position: absolute;
-    left: calc(50% - 30px);
-    top: 30%;
+    left: calc(50% - 25px);
+    top: calc(50% - 25px);
     width: 50px;
     height: 50px;
     background: rgba($dark-grey, 0.9);
-    color: $orange;
+    color: $primary;
     font-size: 20px;
     display: flex;
     justify-content: center;

@@ -21,6 +21,7 @@ router.post("/", async (req, res) => {
   }
 
   console.log(`LOGIN: New login attempted`);
+  console.log(`LOGIN: Request User: ${username}`);
   console.log(`LOGIN: Request IP: ${request_ip}`);
   if (authToken) {
     console.log(`LOGIN: JWT Token Passed`);
@@ -32,6 +33,9 @@ router.post("/", async (req, res) => {
         console.log(`LOGIN: Token is admin`);
         getAdmin(user.username, user.password, res, request_ip);
       } else {
+        if (!user.username) {
+          throw "No username";
+        }
         console.log(`LOGIN: Token is user`);
         getFriend(user.username, res, request_ip);
       }

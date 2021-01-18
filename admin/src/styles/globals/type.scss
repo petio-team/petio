@@ -1,6 +1,6 @@
 body {
-	font-family: 'Open Sans', sans-serif;
-	font-family: 'Lato', sans-serif;
+  font-family: "Open Sans", sans-serif;
+  font-family: "Lato", sans-serif;
 }
 
 h1,
@@ -11,100 +11,100 @@ h5,
 h6,
 p,
 a {
-	margin: 0;
-	text-decoration: none;
-	color: $black;
-	user-select: none;
+  margin: 0;
+  text-decoration: none;
+  color: $black;
+  user-select: none;
 }
 
 .main-title {
-	font-size: 24px;
-	line-height: 28px;
-	font-weight: 700;
-	margin-bottom: 0;
-	color: white;
+  font-size: 24px;
+  line-height: 28px;
+  font-weight: 700;
+  margin-bottom: 0;
+  color: white;
 }
 
 .single-title {
-	font-size: 24px;
-	line-height: 28px;
-	font-weight: 700;
-	margin-bottom: 0;
-	color: white;
+  font-size: 24px;
+  line-height: 28px;
+  font-weight: 700;
+  margin-bottom: 0;
+  color: white;
 
-	@include media-breakpoint-up(lg) {
-		font-size: 44px;
-		line-height: 48px;
-	}
+  @include media-breakpoint-up(lg) {
+    font-size: 44px;
+    line-height: 48px;
+  }
 }
 
 .sub-title {
-	font-size: 12px;
-	line-height: 16px;
-	font-weight: 700;
-	letter-spacing: 0;
-	margin-bottom: 0;
-	text-transform: uppercase;
-	color: white;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 700;
+  letter-spacing: 0;
+  margin-bottom: 0;
+  text-transform: uppercase;
+  color: white;
 
-	@include media-breakpoint-up(lg) {
-		font-size: 15px;
-		line-height: 24px;
-	}
+  @include media-breakpoint-up(lg) {
+    font-size: 15px;
+    line-height: 24px;
+  }
 }
 
 .small {
-	font-size: 10px;
-	line-height: 14px;
+  font-size: 10px;
+  line-height: 14px;
 }
 
 .upper {
-	text-transform: uppercase;
+  text-transform: uppercase;
 }
 
 .capitalise {
-	text-transform: capitalize;
+  text-transform: capitalize;
 }
 
 p {
-	margin-bottom: 10px;
-	font-weight: 300;
-	color: white;
-	font-size: 12px;
-	line-height: 18px;
+  margin-bottom: 10px;
+  font-weight: 300;
+  color: white;
+  font-size: 12px;
+  line-height: 18px;
 
-	@include media-breakpoint-up(lg) {
-		font-size: 16px;
-		line-height: 22px;
-		margin-bottom: 20px;
-	}
+  @include media-breakpoint-up(lg) {
+    font-size: 16px;
+    line-height: 22px;
+    margin-bottom: 20px;
+  }
 
-	a {
-		text-decoration: underline;
-		color: $orange;
-		font-weight: 700;
-	}
+  a {
+    text-decoration: underline;
+    color: $primary;
+    font-weight: 700;
+  }
 }
 
 .color {
-	&-green {
-		color: $good;
-	}
+  &-green {
+    color: $good;
+  }
 
-	&-orange {
-		color: $orange;
-	}
+  &-orange {
+    color: $primary;
+  }
 
-	&-blue {
-		color: $blue;
-	}
+  &-blue {
+    color: $blue;
+  }
 
-	&-red {
-		color: $bad;
-	}
+  &-red {
+    color: $bad;
+  }
 }
 
 .capped-width {
-	width: 500px;
-	max-width: 100%;
+  width: 500px;
+  max-width: 100%;
 }

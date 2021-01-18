@@ -4,8 +4,8 @@ $grey-light: #e0e3e6;
 $grey-medium: #868c96;
 $dark-grey: #343536;
 $bad: #f06464;
-$orange: #e19f1f;
-$orangeDark: #c78c0d;
+$primary: #e19f1f;
+$primaryDark: #c78c0d;
 $green: #96c83c;
 $good: $green;
 $blue: #19a0d7;
@@ -68,8 +68,7 @@ $grid-breakpoints: $breakpoints;
 
 // pages
 @import "pages/login";
-@import "pages/series";
+@import "pages/media";
 @import "pages/season";
-@import "pages/movie";
 @import "pages/person";
 @import "pages/profile";
