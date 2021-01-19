@@ -3,6 +3,7 @@ const getConfig = require("../util/config");
 const request = require("xhr-request");
 
 async function personLookup(id) {
+  console.log(`TMDB Person Lookup ${id}`);
   let info = await getPersonInfo(id);
   let movies = await getPersonMovies(id);
   let tv = await getPersonShows(id);

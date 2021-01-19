@@ -6,12 +6,16 @@ const onServer = require("../plex/onServer");
 
 const ISO6391 = require("iso-639-1");
 
+const cacheManager = require("cache-manager");
+const memoryCache = cacheManager.caching({ store: "memory", max: 500, ttl: 86400 /*seconds*/ });
+
 async function showLookup(id, minified = false) {
   let external = await externalId(id);
   let fanart = minified ? false : await fanartLookup(external.tvdb_id, "tv");
   let show = false;
   try {
-    show = await getShowData(id);
+    data = await getShowData(id);
+    show = Object.assign({}, data);
   } catch {
     return { error: "not found" };
   }
@@ -31,7 +35,8 @@ async function showLookup(id, minified = false) {
     delete show.languages;
     if (!minified) {
       let recommendations = await getRecommendations(id);
-      let seasons = await getSeasons(show.seasons, id);
+      let seasonsLookup = await getSeasons(show.seasons, id);
+      let seasons = Object.assign({}, seasonsLookup);
       let seasonData = {};
       let recommendationsData = [];
       Object.keys(seasons).map((key) => {
@@ -92,7 +97,71 @@ async function showLookup(id, minified = false) {
   }
 }
 
+// Caching Layer
+
 async function getShowData(id) {
+  let data = false;
+  try {
+    data = await memoryCache.wrap(id, function () {
+      return tmdbData(id);
+    });
+  } catch (err) {
+    console.log(err);
+  }
+  return data;
+}
+
+async function externalId(id) {
+  let data = false;
+  try {
+    data = await memoryCache.wrap(`ext_${id}`, function () {
+      return idLookup(id);
+    });
+  } catch (err) {
+    console.log(err);
+  }
+  return data;
+}
+
+async function getRecommendations(id) {
+  let data = false;
+  try {
+    data = await memoryCache.wrap(`rec_${id}`, function () {
+      return recommendationData(id);
+    });
+  } catch (err) {
+    console.log(err);
+  }
+  return data;
+}
+
+async function getReviews(id) {
+  let data = false;
+  try {
+    data = await memoryCache.wrap(`rev_${id}`, function () {
+      return reviewsData(id);
+    });
+  } catch (err) {
+    console.log(err);
+  }
+  return data;
+}
+
+async function getSeasons(seasons, id) {
+  let data = false;
+  try {
+    data = await memoryCache.wrap(`seasons_${id}`, function () {
+      return seasonsData(seasons, id);
+    });
+  } catch (err) {
+    console.log(err);
+  }
+  return data;
+}
+
+// Lookup layer
+
+async function tmdbData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
@@ -116,7 +185,7 @@ async function getShowData(id) {
   });
 }
 
-async function getRecommendations(id) {
+async function recommendationData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
@@ -140,7 +209,7 @@ async function getRecommendations(id) {
   });
 }
 
-async function getSeasons(seasons, id) {
+async function seasonsData(seasons, id) {
   let seasonList = [];
   Object.keys(seasons).map((key) => {
     seasonList.push(seasons[key].season_number);
@@ -175,7 +244,7 @@ async function getSeason(id, season) {
   });
 }
 
-async function getReviews(id) {
+async function reviewsData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
@@ -209,7 +278,7 @@ function findEnLogo(logos) {
   return logoUrl;
 }
 
-function externalId(id) {
+function idLookup(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";

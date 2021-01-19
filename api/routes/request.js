@@ -8,6 +8,8 @@ const User = require("../models/user");
 const Mailer = require("../mail/mailer");
 const Sonarr = require("../services/sonarr");
 const Radarr = require("../services/radarr");
+const movieLookup = require("../tmdb/movie");
+const showLookup = require("../tmdb/show");
 
 router.post("/add", async (req, res) => {
   let user = req.body.user;
@@ -107,7 +109,7 @@ router.get("/all", async (req, res) => {
     await Promise.all(
       requests.map(async (request, i) => {
         let children = [];
-
+        let media = [];
         if (request.type === "movie" && request.radarrId.length > 0) {
           for (let i = 0; i < Object.keys(request.radarrId).length; i++) {
             let radarrIds = request.radarrId[i];
@@ -127,6 +129,7 @@ router.get("/all", async (req, res) => {
               }
             }
           }
+          media = await movieLookup(request.requestId, true);
         }
 
         if (request.type === "tv" && request.sonarrId.length > 0) {
@@ -148,6 +151,7 @@ router.get("/all", async (req, res) => {
               }
             }
           }
+          media = await showLookup(request.requestId, true);
         }
 
         data[request.requestId] = {
@@ -162,6 +166,7 @@ router.get("/all", async (req, res) => {
           users: request.users,
           sonarrId: request.sonarrId,
           radarrId: request.radarrId,
+          media: media,
         };
       })
     );
