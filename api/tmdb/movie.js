@@ -7,11 +7,15 @@ const onServer = require("../plex/onServer");
 
 const ISO6391 = require("iso-639-1");
 
+const cacheManager = require("cache-manager");
+const memoryCache = cacheManager.caching({ store: "memory", max: 500, ttl: 86400 /*seconds*/ });
+
 async function movieLookup(id, minified = false) {
   let fanart = minified ? false : await fanartLookup(id, "movies");
   let movie = false;
   try {
-    movie = await getMovieData(id);
+    data = await getMovieData(id);
+    movie = Object.assign({}, data);
   } catch {
     return { error: "not found" };
   }
@@ -93,7 +97,59 @@ async function movieLookup(id, minified = false) {
   }
 }
 
+// Caching Layer
+
 async function getMovieData(id) {
+  let data = false;
+  try {
+    data = await memoryCache.wrap(id, function () {
+      return tmdbData(id);
+    });
+  } catch (err) {
+    console.log(err);
+  }
+  return data;
+}
+
+async function getRecommendations(id) {
+  let data = false;
+  try {
+    data = await memoryCache.wrap(`rec_${id}`, function () {
+      return recommendationData(id);
+    });
+  } catch (err) {
+    console.log(err);
+  }
+  return data;
+}
+
+async function getReviews(id) {
+  let data = false;
+  try {
+    data = await memoryCache.wrap(`rev_${id}`, function () {
+      return reviewsData(id);
+    });
+  } catch (err) {
+    console.log(err);
+  }
+  return data;
+}
+
+async function getCollection(id) {
+  let data = false;
+  try {
+    data = await memoryCache.wrap(`col_${id}`, function () {
+      return collectionData(id);
+    });
+  } catch (err) {
+    console.log(err);
+  }
+  return data;
+}
+
+// Lookup Layer
+
+function tmdbData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
@@ -109,13 +165,14 @@ async function getMovieData(id) {
         if (err) {
           reject();
         }
+        data.timestamp = new Date();
         resolve(data);
       }
     );
   });
 }
 
-async function getRecommendations(id) {
+async function recommendationData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
@@ -139,7 +196,7 @@ async function getRecommendations(id) {
   });
 }
 
-async function getCollection(id) {
+async function collectionData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
@@ -163,7 +220,7 @@ async function getCollection(id) {
   });
 }
 
-async function getReviews(id) {
+async function reviewsData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";

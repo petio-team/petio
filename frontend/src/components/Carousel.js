@@ -10,6 +10,7 @@ class Carousel extends React.Component {
       offset: 0,
       pos: 0,
       init: false,
+      width: false,
     };
 
     this.carouselRef = React.createRef();
@@ -51,15 +52,15 @@ class Carousel extends React.Component {
     let cardWidth = exampleCard ? exampleCard.offsetWidth + parseFloat(style.marginRight) : 0;
     let wrapperWidth = wrapper.offsetWidth;
     let cardsPerView = Math.floor(wrapperWidth / cardWidth);
+    let max = carousel.scrollWidth - carousel.offsetWidth;
 
     this.setState({
       cardsPerView: cardsPerView,
       wrapperWidth: wrapperWidth,
       cardWidth: cardWidth,
-      left: false,
-      right: cards.length > cardsPerView ? true : false,
       init: true,
       width: carousel.offsetWidth,
+      max: max,
     });
   }
 
@@ -68,8 +69,6 @@ class Carousel extends React.Component {
     let position = carousel.scrollLeft; //+ carousel.offsetWidth;
     let max = carousel.scrollWidth - carousel.offsetWidth;
     this.setState({
-      // left: position !== 0 ? true : false,
-      // right: position === max ? false : true,
       width: carousel.offsetWidth,
       pos: position,
       max: max,
@@ -113,7 +112,7 @@ class Carousel extends React.Component {
           <div className={`carousel--controls--item carousel--prev ${this.state.pos > 0 ? "" : "disabled"}`} onClick={this.prev}>
             <LeftArrow />
           </div>
-          <div className={`carousel--controls--item carousel--next ${this.state.pos !== this.state.max ? "" : "disabled"}`} onClick={this.next}>
+          <div className={`carousel--controls--item carousel--next ${this.state.pos < this.state.max ? "" : "disabled"}`} onClick={this.next}>
             <RightArrow />
           </div>
         </div>

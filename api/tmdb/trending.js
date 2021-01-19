@@ -3,6 +3,9 @@ const getConfig = require("../util/config");
 const request = require("xhr-request");
 const onServer = require("../plex/onServer");
 
+const cacheManager = require("cache-manager");
+const memoryCache = cacheManager.caching({ store: "memory", max: 3, ttl: 86400 /*seconds*/ });
+
 async function trending() {
   let person = await getPerson();
   let movies = await getMovies();
@@ -27,7 +30,48 @@ async function trending() {
   return data;
 }
 
-function getPerson() {
+// Caching Layer
+
+async function getPerson() {
+  let data = false;
+  try {
+    data = await memoryCache.wrap("person", function () {
+      return personData();
+    });
+  } catch (err) {
+    console.log(err);
+  }
+  return data;
+}
+
+async function getMovies() {
+  let data = false;
+  try {
+    data = await memoryCache.wrap("movies", function () {
+      return moviesData();
+    });
+  } catch (err) {
+    console.log(err);
+  }
+  return data;
+}
+
+async function getShows() {
+  let data = false;
+  try {
+    data = await memoryCache.wrap("shows", function () {
+      return showsData();
+    });
+  } catch (err) {
+    console.log(err);
+  }
+  return data;
+}
+
+// Lookup layer
+
+function personData() {
+  console.log("Person from source");
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
@@ -50,7 +94,8 @@ function getPerson() {
   });
 }
 
-function getMovies() {
+function moviesData() {
+  console.log("Movies from source");
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
@@ -73,7 +118,8 @@ function getMovies() {
   });
 }
 
-function getShows() {
+function showsData() {
+  console.log("Shows from source");
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
