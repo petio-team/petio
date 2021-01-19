@@ -10,6 +10,7 @@ class Carousel extends React.Component {
       offset: 0,
       pos: 0,
       init: false,
+      width: false,
     };
 
     this.carouselRef = React.createRef();
