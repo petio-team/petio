@@ -16,6 +16,7 @@ class Users extends React.Component {
 
     this.sortBy = this.sortBy.bind(this);
     this.sortCol = this.sortCol.bind(this);
+    this.inputChange = this.inputChange.bind(this);
   }
   componentDidMount() {
     let page = document.querySelectorAll(".page-wrap")[0];
@@ -63,6 +64,10 @@ class Users extends React.Component {
   closeModal(id) {
     this.setState({
       [`${id}Open`]: false,
+      cu_username: "",
+      cu_email: "",
+      cu_password: "",
+      cu_linked: "",
     });
   }
 
@@ -86,6 +91,8 @@ class Users extends React.Component {
           <p className="sub-title mb--1">New user</p>
           <input className="styled-input--input" placeholder="Username" type="text" name="cu_username" value={this.state.cu_username} onChange={this.inputChange} />
           <input className="styled-input--input" placeholder="Email" type="email" name="cu_email" value={this.state.cu_email} onChange={this.inputChange} />
+          <p className="sub-title mt--2 mb--1">Password</p>
+          <input className="styled-input--input" placeholder="Password" type="text" name="cu_password" value={this.state.cu_password} onChange={this.inputChange} />
           <p className="sub-title mt--2 mb--1">Link history to existing user</p>
           <div className="styled-input--select">
             <select name="cu_linked" value={this.state.cu_linked} onChange={this.inputChange}>
