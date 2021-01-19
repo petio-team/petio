@@ -39,6 +39,31 @@
       @include media-breakpoint-up(lg) {
         padding: 20px;
       }
+
+      &.sortable {
+        cursor: pointer;
+        vertical-align: center;
+
+        svg {
+          width: 15px;
+          height: 15px;
+          float: right;
+        }
+
+        &.active {
+          &.ASC {
+            svg {
+              transform: rotate(-90deg);
+            }
+          }
+
+          &.DESC {
+            svg {
+              transform: rotate(90deg);
+            }
+          }
+        }
+      }
     }
 
     td {

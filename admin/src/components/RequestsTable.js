@@ -56,15 +56,17 @@ class RequestsTable extends React.Component {
   }
 
   getYear(req) {
-    if (Object.keys(req.media).length > 0) {
-      if (req.type === "movie") {
-        return req.media.release_date ? new Date(req.media.release_date).getFullYear() : null;
+    if (req.media)
+      if (Object.keys(req.media).length > 0) {
+        if (req.type === "movie") {
+          return req.media.release_date ? new Date(req.media.release_date).getFullYear() : null;
+        } else {
+          return req.media.first_air_date ? new Date(req.media.first_air_date).getFullYear() : null;
+        }
       } else {
-        return req.media.first_air_date ? new Date(req.media.first_air_date).getFullYear() : null;
+        return null;
       }
-    } else {
-      return null;
-    }
+    return null;
   }
 
   children(req) {
