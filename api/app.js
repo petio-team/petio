@@ -33,6 +33,7 @@ const sessionsRoute = require("./routes/sessions");
 const servicesRoute = require("./routes/services");
 const mailRoute = require("./routes/mail");
 const issueRoute = require("./routes/issue");
+const profileRoute = require("./routes/profiles");
 
 class Main {
   constructor() {
@@ -88,6 +89,7 @@ class Main {
       this.e.use("/services", servicesRoute);
       this.e.use("/mail", mailRoute);
       this.e.use("/issue", issueRoute);
+      this.e.use("/profiles", profileRoute);
       this.e.get("*", function (req, res) {
         res.status(404).send("Petio API: route not found");
       });
@@ -185,7 +187,7 @@ class Main {
         await mongoose.connect(mongo + "/petio", {
           useNewUrlParser: true,
           useUnifiedTopology: true,
-          // connectTimeoutMS: 1000,
+          socketTimeoutMS: 100,
         });
         mongoose.connection.close();
         res.status(200).json({
@@ -215,7 +217,7 @@ class Main {
 
       let configData = {
         DB_URL: db + "/petio",
-        tmdbApi: "a9a99e29e94d33f6a9a3bb78c7a450f7",
+        tmdbApi: "1af5ad19a2d972a67cd27eb033979c4c",
         plexProtocol: server.protocol,
         plexIp: server.host,
         plexPort: server.port,
@@ -226,7 +228,7 @@ class Main {
         adminId: user.id,
         adminThumb: user.thumb,
         adminDisplayName: user.username,
-        fanartApi: "930d724053d35fcc01a1a6da58fbb80a",
+        fanartApi: "ee409f6fb0c5cd2352e7a454d3f580d4",
       };
       try {
         await this.createConfig(JSON.stringify(configData, null, 2));
