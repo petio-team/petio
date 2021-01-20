@@ -18,8 +18,10 @@ class Users extends React.Component {
       np_name: "",
       np_quota: 0,
       np_auto_approve: false,
-      np_sonarr: [],
-      np_radarr: [],
+      np_sonarr: {},
+      np_radarr: {},
+      bulk_users: {},
+      bulk_users_all: false,
     };
 
     this.sortBy = this.sortBy.bind(this);
@@ -29,7 +31,7 @@ class Users extends React.Component {
     this.getArrs = this.getArrs.bind(this);
     this.getProfiles = this.getProfiles.bind(this);
     this.saveProfile = this.saveProfile.bind(this);
-    this.changeProfileServers = this.changeProfileServers.bind(this);
+    this.changeCheckbox = this.changeCheckbox.bind(this);
     this.findServerByUuid = this.findServerByUuid.bind(this);
   }
   componentDidMount() {
@@ -98,19 +100,33 @@ class Users extends React.Component {
     const target = e.target;
     const name = target.name;
     let value = target.type === "checkbox" ? target.checked : target.value;
-
-    this.setState({
-      [name]: value,
-    });
+    if (name === "bulk_users_all") {
+      let userCheckboxes = document.querySelectorAll(".user-checkbox");
+      let bu = {};
+      if (!this.state.bulk_users_all)
+        for (let c = 0; c < userCheckboxes.length; c++) {
+          let cb = userCheckboxes[c];
+          bu[cb.name] = true;
+        }
+      this.setState({
+        [name]: value,
+        bulk_users: bu,
+      });
+    } else {
+      this.setState({
+        [name]: value,
+      });
+    }
   }
 
-  changeProfileServers(e) {
+  changeCheckbox(e) {
     const target = e.target;
     const name = target.name;
     let value = target.checked;
     let type = target.dataset.type;
 
     this.setState({
+      bulk_users_all: false,
       [type]: {
         ...this.state[type],
         [name]: value,
@@ -227,7 +243,7 @@ class Users extends React.Component {
             this.state.s_servers.map((server) => {
               return (
                 <label key={server.uuid}>
-                  <input data-type="np_sonarr" type="checkbox" checked={this.state.np_sonarr[server.uuid]} name={server.uuid} onChange={this.changeProfileServers} /> {server.title}
+                  <input data-type="np_sonarr" type="checkbox" checked={this.state.np_sonarr[server.uuid]} name={server.uuid} onChange={this.changeCheckbox} /> {server.title}
                 </label>
               );
             })
@@ -239,7 +255,7 @@ class Users extends React.Component {
             this.state.r_servers.map((server) => {
               return (
                 <label key={server.uuid}>
-                  <input data-type="np_radarr" type="checkbox" checked={this.state.np_radarr[server.uuid]} name={server.uuid} onChange={this.changeProfileServers} /> {server.title}
+                  <input data-type="np_radarr" type="checkbox" checked={this.state.np_radarr[server.uuid]} name={server.uuid} onChange={this.changeCheckbox} /> {server.title}
                 </label>
               );
             })
@@ -298,14 +314,18 @@ class Users extends React.Component {
               {this.state.profiles && this.state.s_servers
                 ? this.state.profiles.map((profile) => {
                     return (
-                      <tr>
+                      <tr key={profile._id}>
                         <td>{profile.name}</td>
                         <td>
                           {Object.keys(profile.sonarr).length > 0
                             ? Object.keys(profile.sonarr).map((s) => {
                                 let server = this.findServerByUuid(s, "s_servers");
                                 let serverName = server ? server.title : "Not Found";
-                                return <span className="requests--status requests--status__sonarr">{serverName}</span>;
+                                return (
+                                  <span key={`${profile._id}_${s}`} className="requests--status requests--status__sonarr">
+                                    {serverName}
+                                  </span>
+                                );
                               })
                             : "None"}
                         </td>
@@ -314,7 +334,11 @@ class Users extends React.Component {
                             ? Object.keys(profile.radarr).map((r) => {
                                 let server = this.findServerByUuid(r, "r_servers");
                                 let serverName = server ? server.title : "Not Found";
-                                return <span className="requests--status requests--status__radarr">{serverName}</span>;
+                                return (
+                                  <span key={`${profile._id}_${r}`} className="requests--status requests--status__radarr">
+                                    {serverName}
+                                  </span>
+                                );
                               })
                             : "None"}
                         </td>
@@ -335,12 +359,18 @@ class Users extends React.Component {
             <button className="btn btn__square" onClick={() => this.openModal("addUser")}>
               Add +
             </button>
+            <button className={`btn btn__square ${Object.keys(this.state.bulk_users).length > 0 ? "" : "disabled"}`} onClick={() => this.openModal("bulkUsers")}>
+              Bulk edit
+            </button>
           </div>
         </section>
         <section>
           <table className="generic-table generic-table__rounded">
             <thead>
               <tr>
+                <th>
+                  <input className="checkbox-small" type="checkbox" checked={this.state.bulk_users_all} name={"bulk_users_all"} onChange={this.inputChange} />
+                </th>
                 <th className={`sortable ${this.state.sortBy === "title" ? "active" : ""} ${this.state.dir}`} onClick={() => this.sortCol("title")}>
                   Title
                   <Arrow />
@@ -365,6 +395,9 @@ class Users extends React.Component {
                 let user = usersSorted[u];
                 return (
                   <tr key={user._id}>
+                    <td>
+                      <input className="checkbox-small user-checkbox" data-type="bulk_users" type="checkbox" checked={this.state.bulk_users[user._id]} name={user._id} onChange={this.changeCheckbox} />
+                    </td>
                     <td>
                       {user.title} {user.custom ? "(Custom)" : ""}
                     </td>

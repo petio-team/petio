@@ -41,6 +41,11 @@ input[type="checkbox"] {
       background: $primary;
     }
   }
+
+  &.checkbox-small {
+    width: 15px;
+    height: 15px;
+  }
 }
 
 .checkbox-wrap {
