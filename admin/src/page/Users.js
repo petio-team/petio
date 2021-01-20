@@ -20,11 +20,13 @@ class Users extends React.Component {
     this.sortCol = this.sortCol.bind(this);
     this.inputChange = this.inputChange.bind(this);
     this.createUser = this.createUser.bind(this);
+    this.getArrs = this.getArrs.bind(this);
   }
   componentDidMount() {
     let page = document.querySelectorAll(".page-wrap")[0];
     page.scrollTop = 0;
     window.scrollTo(0, 0);
+    this.getArrs();
   }
 
   sortBy(a, b) {
@@ -85,6 +87,23 @@ class Users extends React.Component {
     });
   }
 
+  async getArrs() {
+    try {
+      let radarr = await Api.radarrConfig();
+      let sonarr = await Api.sonarrConfig();
+      this.setState({
+        r_servers: radarr,
+        s_servers: sonarr,
+      });
+    } catch (err) {
+      console.log(err);
+      this.setState({
+        r_servers: false,
+        s_servers: false,
+      });
+    }
+  }
+
   async createUser() {
     console.log({
       id: `custom_${this.state.cu_username.replace(" ", "-")}`,
@@ -140,10 +159,80 @@ class Users extends React.Component {
           </div>
           {this.state.cu_error ? <p>{this.state.cu_error}</p> : null}
         </Modal>
+        <Modal title="Add Profile" open={this.state.addProfileOpen} close={() => this.closeModal("addProfile")} submit={false}>
+          <p className="sub-title mb--1">New profile</p>
+          <input className="styled-input--input" placeholder="Name" type="text" name="np_name" value={this.state.np_name} onChange={this.inputChange} />
+          <p className="sub-title mb--1">Sonarr</p>
+          {this.state.s_servers ? (
+            this.state.s_servers.map((server) => {
+              return (
+                <label key={server.uuid}>
+                  <input type="checkbox" value={this.state[`np_sonarr_option_${server.uuid}`]} name={`np_sonarr_option_${server.uuid}`} onChange={this.inputChange} /> {server.title}
+                </label>
+              );
+            })
+          ) : (
+            <p>No Sonarr Servers</p>
+          )}
+          <p className="sub-title mb--1">Radarr</p>
+          {this.state.r_servers ? (
+            this.state.r_servers.map((server) => {
+              return (
+                <label key={server.uuid}>
+                  <input type="checkbox" value={this.state[`np_radarr_option_${server.uuid}`]} name={`np_radarr_option_${server.uuid}`} onChange={this.inputChange} /> {server.title}
+                </label>
+              );
+            })
+          ) : (
+            <p>No Sonarr Servers</p>
+          )}
+          <p className="sub-title mb--1">Auto Approve</p>
+          <label>
+            <input type="checkbox" name="np_auto_approve" /> Enabled
+          </label>
+          <p className="sub-title mb--1">Quota</p>
+          <p>
+            <small>Quota of requests per week. For no limit leave at 0</small>
+          </p>
+          <input className="styled-input--input" type="number" name="np_quota" defaultValue={0} value={this.state.np_quote} onChange={this.inputChange} />
+        </Modal>
         <section>
-          <p className="main-title">User Profiles</p>
+          <div className="title-btn">
+            <p className="main-title">User Profiles</p>
+            <button className="btn btn__square" onClick={() => this.openModal("addProfile")}>
+              Add +
+            </button>
+          </div>
         </section>
-        <section></section>
+        <section>
+          <p className="mb--2">
+            User profiles determine what should happen when a user makes a request. If using Sonarr / Radarr you can pick which servers the request is sent to. You can also choose to allow auto
+            approval for certain users.
+          </p>
+          <table className="generic-table generic-table__rounded">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Sonarr</th>
+                <th>Radarr</th>
+                <th>Auto approve</th>
+                <th>Quota</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Default</td>
+                <td>All</td>
+                <td>All</td>
+                <td>Yes</td>
+                <td>∞</td>
+                <td>None</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
         <section>
           <div className="title-btn">
             <p className="main-title">Users</p>
