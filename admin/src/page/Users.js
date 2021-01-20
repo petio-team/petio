@@ -4,6 +4,8 @@ import Api from "../data/Api";
 import Modal from "../components/Modal";
 
 import { ReactComponent as Arrow } from "../assets/svg/arrow-left.svg";
+import { ReactComponent as Check } from "../assets/svg/check.svg";
+import { ReactComponent as Close } from "../assets/svg/close.svg";
 
 class Users extends React.Component {
   constructor(props) {
@@ -17,6 +19,7 @@ class Users extends React.Component {
     this.sortBy = this.sortBy.bind(this);
     this.sortCol = this.sortCol.bind(this);
     this.inputChange = this.inputChange.bind(this);
+    this.createUser = this.createUser.bind(this);
   }
   componentDidMount() {
     let page = document.querySelectorAll(".page-wrap")[0];
@@ -68,6 +71,7 @@ class Users extends React.Component {
       cu_email: "",
       cu_password: "",
       cu_linked: "",
+      cu_error: false,
     });
   }
 
@@ -81,13 +85,40 @@ class Users extends React.Component {
     });
   }
 
+  async createUser() {
+    console.log({
+      id: `custom_${this.state.cu_username.replace(" ", "-")}`,
+      username: this.state.cu_username,
+      email: this.state.cu_email,
+      password: this.state.cu_password,
+      linked: this.state.cu_linked,
+    });
+
+    let newUser = await Api.createUser({
+      id: `custom_${this.state.cu_username.replace(" ", "-")}`,
+      username: this.state.cu_username,
+      email: this.state.cu_email,
+      password: this.state.cu_password,
+      linked: this.state.cu_linked,
+    });
+
+    if (newUser.error) {
+      this.setState({
+        cu_error: newUser.error,
+      });
+    } else {
+      this.closeModal("addUser");
+      Api.allUsers();
+    }
+  }
+
   render() {
     let usersUnsorted = Object.values(this.props.api.users);
     let usersSorted = usersUnsorted.sort(this.sortBy);
     let usersAz = Object.values(usersUnsorted).sort(this.sortAz);
     return (
       <>
-        <Modal title="Add User" open={this.state.addUserOpen} close={() => this.closeModal("addUser")}>
+        <Modal title="Add User" open={this.state.addUserOpen} close={() => this.closeModal("addUser")} submit={this.createUser}>
           <p className="sub-title mb--1">New user</p>
           <input className="styled-input--input" placeholder="Username" type="text" name="cu_username" value={this.state.cu_username} onChange={this.inputChange} />
           <input className="styled-input--input" placeholder="Email" type="email" name="cu_email" value={this.state.cu_email} onChange={this.inputChange} />
@@ -100,16 +131,17 @@ class Users extends React.Component {
               {Object.keys(usersAz).map((u) => {
                 let user = usersAz[u];
                 return (
-                  <option key={`user_linked_${user._id}`} value={user.id}>
+                  <option key={`user_linked_${user._id}`} value={user.altId ? user.altId : user.id}>
                     {user.title}
                   </option>
                 );
               })}
             </select>
           </div>
+          {this.state.cu_error ? <p>{this.state.cu_error}</p> : null}
         </Modal>
         <section>
-          <p className="main-title">User Roles</p>
+          <p className="main-title">User Profiles</p>
         </section>
         <section></section>
         <section>
@@ -136,6 +168,10 @@ class Users extends React.Component {
                   Email
                   <Arrow />
                 </th>
+                <th>Role</th>
+                <th>Profile</th>
+                <th>Active</th>
+                <th>Last IP</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -144,9 +180,17 @@ class Users extends React.Component {
                 let user = usersSorted[u];
                 return (
                   <tr key={user._id}>
-                    <td>{user.title}</td>
+                    <td>
+                      {user.title} {user.custom ? "(Custom)" : ""}
+                    </td>
                     <td>{user.username}</td>
                     <td>{user.email}</td>
+                    <td>{user.role ? user.role : "user"}</td>
+                    <td>{user.profile ? user.profile : "default"}</td>
+                    <td>
+                      <div className="table-icon">{user.disabled ? <Close /> : <Check />}</div>
+                    </td>
+                    <td>{user.lastIp ? user.lastIp : "n/a"}</td>
                     <td></td>
                   </tr>
                 );

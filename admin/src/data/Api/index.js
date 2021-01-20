@@ -28,6 +28,7 @@ import {
   allUsers,
   testMongo,
   getIssues,
+  createUser,
 } from "./actions";
 
 export default {
@@ -60,4 +61,5 @@ export default {
   allUsers,
   testMongo,
   getIssues,
+  createUser,
 };

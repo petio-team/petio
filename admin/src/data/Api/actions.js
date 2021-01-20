@@ -480,3 +480,13 @@ export function getIssues() {
       });
   });
 }
+
+export async function createUser(user) {
+  try {
+    let result = await api.createUser(user);
+    return result;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}

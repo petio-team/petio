@@ -232,6 +232,15 @@ export let getIssues = () => {
   return call(request, headers).then((res) => res.json());
 };
 
+export let createUser = (user) => {
+  let request = `${apiUrl}/user/create_custom`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  let body = { user: user };
+  return call(request, headers, "post", body).then((res) => res.json());
+};
+
 function call(url, headers, method, body = null) {
   let args = {
     method: method,

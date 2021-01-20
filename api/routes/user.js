@@ -49,13 +49,19 @@ router.get("/thumb/:id", async (req, res) => {
 router.get("/all", async (req, res) => {
   try {
     userData = await User.find();
+    adminData = await Admin.find();
   } catch (err) {
     res.json({ error: err });
     return;
   }
 
   if (userData) {
-    res.json(userData);
+    let data = Object.values(Object.assign(userData, adminData));
+    Object.keys(data).map((u) => {
+      let user = data[u];
+      if (user.password) user.password = "removed";
+    });
+    res.json(data);
   } else {
     res.status(404).send();
   }
@@ -80,6 +86,48 @@ router.get("/:id", async (req, res) => {
     res.json(userData);
   } else {
     res.status(404).send();
+  }
+});
+
+router.post("/create_custom", async (req, res) => {
+  let user = req.body.user;
+  if (!user) {
+    res.status(500).json({
+      error: "No user details",
+    });
+  }
+  let friend = await User.findOne({
+    $or: [{ username: user.username }, { email: user.email }, { title: user.username }],
+  });
+  let admin = await Admin.findOne({
+    $or: [{ username: user.username }, { email: user.email }, { title: user.username }],
+  });
+  if (friend || admin) {
+    res.status(409).json({
+      error: "User exists, please change the username or email",
+    });
+    return;
+  } else {
+    try {
+      let newUser = new User({
+        id: user.id,
+        title: user.username,
+        username: user.username,
+        email: user.email,
+        recommendationsPlaylistId: false,
+        thumb: false,
+        password: user.password,
+        altId: user.linked,
+        custom: true,
+      });
+      await newUser.save();
+      res.status(200).json(newUser);
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({
+        error: "Error creating user",
+      });
+    }
   }
 });
 

@@ -12,6 +12,11 @@ const FriendSchema = mongoose.Schema(
     Server: Array,
     altId: String,
     lastIp: String,
+    password: String,
+    role: String,
+    profile: String,
+    custom: Boolean,
+    disabled: Boolean,
   },
   { collection: "friends" }
 );
