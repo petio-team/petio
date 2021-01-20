@@ -6,6 +6,7 @@ import Modal from "../components/Modal";
 import { ReactComponent as Arrow } from "../assets/svg/arrow-left.svg";
 import { ReactComponent as Check } from "../assets/svg/check.svg";
 import { ReactComponent as Close } from "../assets/svg/close.svg";
+import { saveProfile } from "../data/Api/actions";
 
 class Users extends React.Component {
   constructor(props) {
@@ -14,6 +15,11 @@ class Users extends React.Component {
       sortBy: "title",
       dir: "DESC",
       addUserOpen: false,
+      np_name: "",
+      np_quota: 0,
+      np_auto_approve: false,
+      np_sonarr: [],
+      np_radarr: [],
     };
 
     this.sortBy = this.sortBy.bind(this);
@@ -21,12 +27,17 @@ class Users extends React.Component {
     this.inputChange = this.inputChange.bind(this);
     this.createUser = this.createUser.bind(this);
     this.getArrs = this.getArrs.bind(this);
+    this.getProfiles = this.getProfiles.bind(this);
+    this.saveProfile = this.saveProfile.bind(this);
+    this.changeProfileServers = this.changeProfileServers.bind(this);
+    this.findServerByUuid = this.findServerByUuid.bind(this);
   }
   componentDidMount() {
     let page = document.querySelectorAll(".page-wrap")[0];
     page.scrollTop = 0;
     window.scrollTo(0, 0);
     this.getArrs();
+    this.getProfiles();
   }
 
   sortBy(a, b) {
@@ -74,16 +85,36 @@ class Users extends React.Component {
       cu_password: "",
       cu_linked: "",
       cu_error: false,
+      np_name: "",
+      np_auto_approve: false,
+      np_quota: 0,
+      np_radarr: [],
+      np_sonarr: [],
+      activeProfile: false,
     });
   }
 
   inputChange(e) {
     const target = e.target;
     const name = target.name;
-    let value = target.value;
+    let value = target.type === "checkbox" ? target.checked : target.value;
 
     this.setState({
       [name]: value,
+    });
+  }
+
+  changeProfileServers(e) {
+    const target = e.target;
+    const name = target.name;
+    let value = target.checked;
+    let type = target.dataset.type;
+
+    this.setState({
+      [type]: {
+        ...this.state[type],
+        [name]: value,
+      },
     });
   }
 
@@ -104,15 +135,21 @@ class Users extends React.Component {
     }
   }
 
-  async createUser() {
-    console.log({
-      id: `custom_${this.state.cu_username.replace(" ", "-")}`,
-      username: this.state.cu_username,
-      email: this.state.cu_email,
-      password: this.state.cu_password,
-      linked: this.state.cu_linked,
-    });
+  async getProfiles() {
+    try {
+      let profiles = await Api.getProfiles();
+      this.setState({
+        profiles: profiles,
+      });
+    } catch (err) {
+      console.log(err);
+      this.setState({
+        profiles: [],
+      });
+    }
+  }
 
+  async createUser() {
     let newUser = await Api.createUser({
       id: `custom_${this.state.cu_username.replace(" ", "-")}`,
       username: this.state.cu_username,
@@ -129,6 +166,29 @@ class Users extends React.Component {
       this.closeModal("addUser");
       Api.allUsers();
     }
+  }
+
+  async saveProfile() {
+    await Api.saveProfile({
+      id: this.state.activeProfile,
+      name: this.state.np_name,
+      quota: this.state.np_quota,
+      radarr: this.state.np_radarr,
+      sonarr: this.state.np_sonarr,
+      autoApprove: this.state.np_auto_approve,
+    });
+    this.closeModal("addProfile");
+    this.getProfiles();
+  }
+
+  findServerByUuid(uuid, type) {
+    for (let s in this.state[type]) {
+      let server = this.state[type][s];
+      if (server.uuid === uuid) {
+        return server;
+      }
+    }
+    return false;
   }
 
   render() {
@@ -159,7 +219,7 @@ class Users extends React.Component {
           </div>
           {this.state.cu_error ? <p>{this.state.cu_error}</p> : null}
         </Modal>
-        <Modal title="Add Profile" open={this.state.addProfileOpen} close={() => this.closeModal("addProfile")} submit={false}>
+        <Modal title="Add Profile" open={this.state.addProfileOpen} close={() => this.closeModal("addProfile")} submit={this.saveProfile}>
           <p className="sub-title mb--1">New profile</p>
           <input className="styled-input--input" placeholder="Name" type="text" name="np_name" value={this.state.np_name} onChange={this.inputChange} />
           <p className="sub-title mb--1">Sonarr</p>
@@ -167,7 +227,7 @@ class Users extends React.Component {
             this.state.s_servers.map((server) => {
               return (
                 <label key={server.uuid}>
-                  <input type="checkbox" value={this.state[`np_sonarr_option_${server.uuid}`]} name={`np_sonarr_option_${server.uuid}`} onChange={this.inputChange} /> {server.title}
+                  <input data-type="np_sonarr" type="checkbox" checked={this.state.np_sonarr[server.uuid]} name={server.uuid} onChange={this.changeProfileServers} /> {server.title}
                 </label>
               );
             })
@@ -179,7 +239,7 @@ class Users extends React.Component {
             this.state.r_servers.map((server) => {
               return (
                 <label key={server.uuid}>
-                  <input type="checkbox" value={this.state[`np_radarr_option_${server.uuid}`]} name={`np_radarr_option_${server.uuid}`} onChange={this.inputChange} /> {server.title}
+                  <input data-type="np_radarr" type="checkbox" checked={this.state.np_radarr[server.uuid]} name={server.uuid} onChange={this.changeProfileServers} /> {server.title}
                 </label>
               );
             })
@@ -188,18 +248,24 @@ class Users extends React.Component {
           )}
           <p className="sub-title mb--1">Auto Approve</p>
           <label>
-            <input type="checkbox" name="np_auto_approve" /> Enabled
+            <input type="checkbox" name="np_auto_approve" checked={this.state.np_auto_approve} onChange={this.inputChange} /> Enabled
           </label>
           <p className="sub-title mb--1">Quota</p>
           <p>
             <small>Quota of requests per week. For no limit leave at 0</small>
           </p>
-          <input className="styled-input--input" type="number" name="np_quota" defaultValue={0} value={this.state.np_quote} onChange={this.inputChange} />
+          <input className="styled-input--input" type="number" name="np_quota" value={this.state.np_quota} onChange={this.inputChange} />
         </Modal>
         <section>
           <div className="title-btn">
             <p className="main-title">User Profiles</p>
-            <button className="btn btn__square" onClick={() => this.openModal("addProfile")}>
+            <button
+              className="btn btn__square"
+              onClick={() => {
+                this.openModal("addProfile");
+                this.setState({ activeProfile: false });
+              }}
+            >
               Add +
             </button>
           </div>
@@ -216,7 +282,7 @@ class Users extends React.Component {
                 <th>Sonarr</th>
                 <th>Radarr</th>
                 <th>Auto approve</th>
-                <th>Quota</th>
+                <th>Quota (per week)</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -229,6 +295,36 @@ class Users extends React.Component {
                 <td>∞</td>
                 <td>None</td>
               </tr>
+              {this.state.profiles && this.state.s_servers
+                ? this.state.profiles.map((profile) => {
+                    return (
+                      <tr>
+                        <td>{profile.name}</td>
+                        <td>
+                          {Object.keys(profile.sonarr).length > 0
+                            ? Object.keys(profile.sonarr).map((s) => {
+                                let server = this.findServerByUuid(s, "s_servers");
+                                let serverName = server ? server.title : "Not Found";
+                                return <span className="requests--status requests--status__sonarr">{serverName}</span>;
+                              })
+                            : "None"}
+                        </td>
+                        <td>
+                          {Object.keys(profile.radarr).length > 0
+                            ? Object.keys(profile.radarr).map((r) => {
+                                let server = this.findServerByUuid(r, "r_servers");
+                                let serverName = server ? server.title : "Not Found";
+                                return <span className="requests--status requests--status__radarr">{serverName}</span>;
+                              })
+                            : "None"}
+                        </td>
+                        <td>{profile.autoApprove ? "Yes" : "No"}</td>
+                        <td>{profile.quota === 0 ? "∞" : profile.quota}</td>
+                        <td>None</td>
+                      </tr>
+                    );
+                  })
+                : null}
             </tbody>
           </table>
         </section>

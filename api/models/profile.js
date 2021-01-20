@@ -3,8 +3,8 @@ const mongoose = require("mongoose");
 const ProfileSchema = mongoose.Schema(
   {
     name: String,
-    sonarr: Array,
-    radarr: Array,
+    sonarr: Object,
+    radarr: Object,
     autoApprove: Boolean,
     quota: Number,
   },

@@ -490,3 +490,23 @@ export async function createUser(user) {
     return false;
   }
 }
+
+export async function getProfiles() {
+  try {
+    let result = await api.getProfiles();
+    return result;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+export async function saveProfile(profile) {
+  try {
+    let result = await api.saveProfile(profile);
+    return result;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}

@@ -241,6 +241,23 @@ export let createUser = (user) => {
   return call(request, headers, "post", body).then((res) => res.json());
 };
 
+export let getProfiles = () => {
+  let request = `${apiUrl}/profiles/all`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  return call(request, headers).then((res) => res.json());
+};
+
+export let saveProfile = (profile) => {
+  let request = `${apiUrl}/profiles/save_profile`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  let body = { profile: profile };
+  return call(request, headers, "post", body).then((res) => res.json());
+};
+
 function call(url, headers, method, body = null) {
   let args = {
     method: method,

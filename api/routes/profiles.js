@@ -17,7 +17,7 @@ router.get("/all", async (req, res) => {
   }
 });
 
-router.post("/create_profile", async (req, res) => {
+router.post("/save_profile", async (req, res) => {
   let profile = req.body.profile;
   if (!profile) {
     res.status(500).json({
