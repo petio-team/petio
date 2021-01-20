@@ -132,3 +132,14 @@
     fill: white;
   }
 }
+
+.table-action {
+  font-size: 10px;
+  color: $primary;
+  text-decoration: underline;
+  cursor: pointer;
+
+  @include media-breakpoint-up(lg) {
+    font-size: 14px;
+  }
+}

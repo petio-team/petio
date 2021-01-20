@@ -33,6 +33,8 @@ class Users extends React.Component {
     this.saveProfile = this.saveProfile.bind(this);
     this.changeCheckbox = this.changeCheckbox.bind(this);
     this.findServerByUuid = this.findServerByUuid.bind(this);
+    this.findProfile = this.findProfile.bind(this);
+    this.setActiveProfile = this.setActiveProfile.bind(this);
   }
   componentDidMount() {
     let page = document.querySelectorAll(".page-wrap")[0];
@@ -165,6 +167,18 @@ class Users extends React.Component {
     }
   }
 
+  setActiveProfile(id) {
+    let profile = this.findProfile(id);
+    this.setState({
+      activeProfile: id,
+      np_name: profile.name,
+      np_quota: profile.quota,
+      np_auto_approve: profile.autoApprove,
+      np_sonarr: profile.sonarr,
+      np_radarr: profile.radarr,
+    });
+  }
+
   async createUser() {
     let newUser = await Api.createUser({
       id: `custom_${this.state.cu_username.replace(" ", "-")}`,
@@ -202,6 +216,16 @@ class Users extends React.Component {
       let server = this.state[type][s];
       if (server.uuid === uuid) {
         return server;
+      }
+    }
+    return false;
+  }
+
+  findProfile(id) {
+    for (let p in this.state.profiles) {
+      let profile = this.state.profiles[p];
+      if (profile._id === id) {
+        return profile;
       }
     }
     return false;
@@ -332,8 +356,10 @@ class Users extends React.Component {
                         <td>
                           {Object.keys(profile.radarr).length > 0
                             ? Object.keys(profile.radarr).map((r) => {
+                                if (!profile.radarr[r]) return null;
                                 let server = this.findServerByUuid(r, "r_servers");
                                 let serverName = server ? server.title : "Not Found";
+
                                 return (
                                   <span key={`${profile._id}_${r}`} className="requests--status requests--status__radarr">
                                     {serverName}
@@ -344,7 +370,18 @@ class Users extends React.Component {
                         </td>
                         <td>{profile.autoApprove ? "Yes" : "No"}</td>
                         <td>{profile.quota === 0 ? "∞" : profile.quota}</td>
-                        <td>None</td>
+                        <td>
+                          <p
+                            className="table-action"
+                            onClick={() => {
+                              this.openModal("addProfile");
+
+                              this.setActiveProfile(profile._id);
+                            }}
+                          >
+                            Edit
+                          </p>
+                        </td>
                       </tr>
                     );
                   })
