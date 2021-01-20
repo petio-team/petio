@@ -334,7 +334,7 @@ class Setup extends React.Component {
                   <div className="mongo-prefix" onClick={this.changeMongoType}>
                     {this.state.mongoType}
                   </div>
-                  <input type="text" name="db" value={this.state.db} onChange={this.inputChange} />
+                  <input style={this.state.mongoStatus === "pending" ? { pointerEvents: "none" } : { pointerEvents: "all" }} type="text" name="db" value={this.state.db} onChange={this.inputChange} />
                 </div>
                 <div className="mongo-status">
                   <div className={`mongo-status-item mongo-status-pending ${this.state.mongoStatus === "pending" ? "active" : ""}`}>
