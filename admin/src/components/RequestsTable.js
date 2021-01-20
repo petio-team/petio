@@ -108,6 +108,7 @@ class RequestsTable extends React.Component {
                     ) : null}
                     {type === "movie" ? <p>Movie</p> : null}
                   </td>
+                  <td></td>
                   <td>
                     <span className="requests--quality">{child.quality.quality.name}</span>
                   </td>
