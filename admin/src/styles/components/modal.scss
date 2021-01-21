@@ -66,5 +66,13 @@
         margin-right: 15px;
       }
     }
+
+    .modal-btns {
+      display: flex;
+
+      .delete-modal {
+        margin-left: auto;
+      }
+    }
   }
 }

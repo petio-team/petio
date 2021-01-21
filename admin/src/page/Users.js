@@ -32,6 +32,8 @@ class Users extends React.Component {
     this.setActiveUser = this.setActiveUser.bind(this);
     this.saveUser = this.saveUser.bind(this);
     this.findProfile = this.findProfile.bind(this);
+    this.bulkSave = this.bulkSave.bind(this);
+    this.deleteUser = this.deleteUser.bind(this);
   }
   componentDidMount() {
     let page = document.querySelectorAll(".page-wrap")[0];
@@ -89,6 +91,8 @@ class Users extends React.Component {
       eu_role: "",
       eu_profile: "",
       eu_enabled: false,
+      bu_error: false,
+      eu_error: false,
     });
   }
 
@@ -231,7 +235,16 @@ class Users extends React.Component {
   }
 
   async deleteUser() {
-    alert("user to delete");
+    let del = await Api.deleteUser(this.state.activeUser);
+
+    if (del.error) {
+      this.setState({
+        eu_error: del.error,
+      });
+    } else {
+      this.closeModal("editUser");
+      Api.allUsers();
+    }
   }
 
   findProfile(id) {
@@ -242,6 +255,30 @@ class Users extends React.Component {
       }
     }
     return false;
+  }
+
+  async bulkSave() {
+    let users = new Array();
+    Object.keys(this.state.bulk_users).map((u) => {
+      if (this.state.bulk_users[u]) {
+        users.push(u);
+      }
+    });
+
+    let upd = await Api.bulkEditUser({
+      users: users,
+      profile: this.state.bu_profile,
+      enabled: this.state.bu_enabled,
+    });
+
+    if (upd.error) {
+      this.setState({
+        bu_error: upd.error,
+      });
+    } else {
+      this.closeModal("bulkUsers");
+      Api.allUsers();
+    }
   }
 
   render() {
@@ -284,7 +321,6 @@ class Users extends React.Component {
           <p className="sub-title mt--2 mb--1">Email</p>
           <input className="styled-input--input" placeholder="Email" type="email" name="eu_email" value={this.state.eu_email} onChange={this.inputChange} />
           <p className="sub-title mt--2 mb--1">Role</p>
-
           <div className="styled-input--select">
             <select name="eu_role" value={this.state.eu_role} onChange={this.inputChange}>
               {this.state.activeUser ? (
@@ -328,6 +364,35 @@ class Users extends React.Component {
           {this.state.eu_error ? <p>{this.state.eu_error}</p> : null}
         </Modal>
 
+        <Modal title="Bulk Edit" open={this.state.bulkUsersOpen} close={() => this.closeModal("bulkUsers")} submit={this.bulkSave}>
+          <p>You are editing all selected users, any changes will apply to them all</p>
+          <p className="sub-title mt--2 mb--1">Profile</p>
+          <div className="styled-input--select">
+            <select name="bu_profile" value={this.state.bu_profile} onChange={this.inputChange}>
+              <option value="">Default</option>
+              {this.state.profiles
+                ? Object.keys(this.state.profiles).map((p) => {
+                    let profile = this.state.profiles[p];
+                    return (
+                      <option key={`bulk_user_profile_${profile._id}`} value={profile._id}>
+                        {profile.name}
+                      </option>
+                    );
+                  })
+                : null}
+            </select>
+          </div>
+
+          <p className="sub-title mt--2 ">Enabled / Disabled</p>
+          <p className="mb--1">
+            <small>Note: admin cannot be disabled</small>
+          </p>
+          <label>
+            <input type="checkbox" checked={this.state.bu_enabled} name="bu_enabled" onChange={this.inputChange} /> Enable this user
+          </label>
+          {this.state.bu_error ? <p>{this.state.bu_error}</p> : null}
+        </Modal>
+
         <Profiles
           addProfileOpen={this.state.addProfileOpen}
           closeModal={this.closeModal}
@@ -347,7 +412,16 @@ class Users extends React.Component {
             <button className="btn btn__square" onClick={() => this.openModal("addUser")}>
               Add +
             </button>
-            <button className={`btn btn__square ${Object.keys(this.state.bulk_users).length > 0 ? "" : "disabled"}`} onClick={() => this.openModal("bulkUsers")}>
+            <button
+              className={`btn btn__square ${Object.keys(this.state.bulk_users).length > 0 ? "" : "disabled"}`}
+              onClick={() => {
+                this.openModal("bulkUsers");
+                this.setState({
+                  bu_enabled: true,
+                  bu_profile: "",
+                });
+              }}
+            >
               Bulk edit
             </button>
           </div>
@@ -384,7 +458,14 @@ class Users extends React.Component {
                 return (
                   <tr key={user._id}>
                     <td>
-                      <input className="checkbox-small user-checkbox" data-type="bulk_users" type="checkbox" checked={this.state.bulk_users[user._id]} name={user._id} onChange={this.changeCheckbox} />
+                      <input
+                        className="checkbox-small user-checkbox"
+                        data-type="bulk_users"
+                        type="checkbox"
+                        checked={this.state.bulk_users ? this.state.bulk_users[user._id] : false}
+                        name={user._id}
+                        onChange={this.changeCheckbox}
+                      />
                     </td>
                     <td>
                       {user.title} {user.custom ? "(Custom)" : ""}

@@ -147,6 +147,7 @@
   text-decoration: underline;
   cursor: pointer;
   margin: 0;
+  font-weight: 700;
 
   @include media-breakpoint-up(lg) {
     font-size: 14px;

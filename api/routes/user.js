@@ -176,4 +176,80 @@ router.post("/edit", async (req, res) => {
   }
 });
 
+router.post("/bulk_edit", async (req, res) => {
+  let users = req.body.users;
+  let enabled = req.body.enabled;
+  let profile = req.body.profile;
+
+  if (!users) {
+    res.status(500).json({
+      error: "No user details",
+    });
+    return;
+  }
+
+  try {
+    await Promise.all(
+      users.map(async (user) => {
+        await User.updateMany(
+          {
+            _id: user,
+          },
+          {
+            $set: {
+              profile: profile,
+              disabled: enabled ? false : true,
+            },
+          }
+        );
+        await Admin.updateMany(
+          {
+            _id: user,
+          },
+          {
+            $set: {
+              profile: profile,
+            },
+          }
+        );
+      })
+    );
+    res.json({
+      message: "Users saved",
+    });
+  } catch {
+    res.status(500).json({
+      error: "Error editing user",
+    });
+  }
+});
+
+router.post("/delete_user", async (req, res) => {
+  let user = req.body.user;
+  if (!user) {
+    res.status(500).json({
+      error: "No user details",
+    });
+    return;
+  }
+
+  if (!user.custom) {
+    res.status(401).json({
+      error: "Cannot delete non custom users",
+    });
+    return;
+  }
+
+  try {
+    await User.findByIdAndDelete(user._id);
+    res.json({
+      message: "User deleted",
+    });
+  } catch {
+    res.status(500).json({
+      error: "Error deleting user",
+    });
+  }
+});
+
 module.exports = router;

@@ -33,6 +33,8 @@ import {
   saveProfile,
   deleteProfile,
   editUser,
+  bulkEditUser,
+  deleteUser,
 } from "./actions";
 
 export default {
@@ -70,4 +72,6 @@ export default {
   saveProfile,
   deleteProfile,
   editUser,
+  bulkEditUser,
+  deleteUser,
 };

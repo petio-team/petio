@@ -276,6 +276,24 @@ export let editUser = (user) => {
   return call(request, headers, "post", body).then((res) => res.json());
 };
 
+export let deleteUser = (user) => {
+  let request = `${apiUrl}/user/delete_user`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  let body = { user: user };
+  return call(request, headers, "post", body).then((res) => res.json());
+};
+
+export let bulkEditUser = (data) => {
+  let request = `${apiUrl}/user/bulk_edit`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  let body = data;
+  return call(request, headers, "post", body).then((res) => res.json());
+};
+
 function call(url, headers, method, body = null) {
   let args = {
     method: method,

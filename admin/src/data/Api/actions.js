@@ -530,3 +530,23 @@ export async function editUser(user) {
     return false;
   }
 }
+
+export async function deleteUser(user) {
+  try {
+    let result = await api.deleteUser(user);
+    return result;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+export async function bulkEditUser(data) {
+  try {
+    let result = await api.bulkEditUser(data);
+    return result;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
