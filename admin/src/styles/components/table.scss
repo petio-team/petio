@@ -8,6 +8,14 @@
     font-size: 14px;
   }
 
+  p {
+    font-size: 10px;
+
+    @include media-breakpoint-up(lg) {
+      font-size: 14px;
+    }
+  }
+
   tr:not(.child):not(.sub) {
     th,
     td {
@@ -138,6 +146,7 @@
   color: $primary;
   text-decoration: underline;
   cursor: pointer;
+  margin: 0;
 
   @include media-breakpoint-up(lg) {
     font-size: 14px;

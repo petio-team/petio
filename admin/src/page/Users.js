@@ -6,7 +6,7 @@ import Modal from "../components/Modal";
 import { ReactComponent as Arrow } from "../assets/svg/arrow-left.svg";
 import { ReactComponent as Check } from "../assets/svg/check.svg";
 import { ReactComponent as Close } from "../assets/svg/close.svg";
-import { saveProfile } from "../data/Api/actions";
+import Profiles from "./users/Profiles";
 
 class Users extends React.Component {
   constructor(props) {
@@ -15,11 +15,6 @@ class Users extends React.Component {
       sortBy: "title",
       dir: "DESC",
       addUserOpen: false,
-      np_name: "",
-      np_quota: 0,
-      np_auto_approve: false,
-      np_sonarr: {},
-      np_radarr: {},
       bulk_users: {},
       bulk_users_all: false,
     };
@@ -30,18 +25,19 @@ class Users extends React.Component {
     this.createUser = this.createUser.bind(this);
     this.getArrs = this.getArrs.bind(this);
     this.getProfiles = this.getProfiles.bind(this);
-    this.saveProfile = this.saveProfile.bind(this);
     this.changeCheckbox = this.changeCheckbox.bind(this);
     this.findServerByUuid = this.findServerByUuid.bind(this);
+    this.openModal = this.openModal.bind(this);
+    this.closeModal = this.closeModal.bind(this);
+    this.setActiveUser = this.setActiveUser.bind(this);
+    this.saveUser = this.saveUser.bind(this);
     this.findProfile = this.findProfile.bind(this);
-    this.setActiveProfile = this.setActiveProfile.bind(this);
   }
   componentDidMount() {
     let page = document.querySelectorAll(".page-wrap")[0];
     page.scrollTop = 0;
     window.scrollTo(0, 0);
     this.getArrs();
-    this.getProfiles();
   }
 
   sortBy(a, b) {
@@ -89,12 +85,10 @@ class Users extends React.Component {
       cu_password: "",
       cu_linked: "",
       cu_error: false,
-      np_name: "",
-      np_auto_approve: false,
-      np_quota: 0,
-      np_radarr: [],
-      np_sonarr: [],
-      activeProfile: false,
+      eu_email: "",
+      eu_role: "",
+      eu_profile: "",
+      eu_enabled: false,
     });
   }
 
@@ -153,32 +147,6 @@ class Users extends React.Component {
     }
   }
 
-  async getProfiles() {
-    try {
-      let profiles = await Api.getProfiles();
-      this.setState({
-        profiles: profiles,
-      });
-    } catch (err) {
-      console.log(err);
-      this.setState({
-        profiles: [],
-      });
-    }
-  }
-
-  setActiveProfile(id) {
-    let profile = this.findProfile(id);
-    this.setState({
-      activeProfile: id,
-      np_name: profile.name,
-      np_quota: profile.quota,
-      np_auto_approve: profile.autoApprove,
-      np_sonarr: profile.sonarr,
-      np_radarr: profile.radarr,
-    });
-  }
-
   async createUser() {
     let newUser = await Api.createUser({
       id: `custom_${this.state.cu_username.replace(" ", "-")}`,
@@ -198,19 +166,6 @@ class Users extends React.Component {
     }
   }
 
-  async saveProfile() {
-    await Api.saveProfile({
-      id: this.state.activeProfile,
-      name: this.state.np_name,
-      quota: this.state.np_quota,
-      radarr: this.state.np_radarr,
-      sonarr: this.state.np_sonarr,
-      autoApprove: this.state.np_auto_approve,
-    });
-    this.closeModal("addProfile");
-    this.getProfiles();
-  }
-
   findServerByUuid(uuid, type) {
     for (let s in this.state[type]) {
       let server = this.state[type][s];
@@ -219,6 +174,64 @@ class Users extends React.Component {
       }
     }
     return false;
+  }
+
+  findUser(id) {
+    for (let u in this.props.api.users) {
+      let user = this.props.api.users[u];
+      if (user._id === id) {
+        return user;
+      }
+    }
+    return false;
+  }
+
+  setActiveUser(id) {
+    let user = this.findUser(id);
+    this.setState({
+      activeUser: user,
+      eu_email: user.email,
+      eu_role: user.role ? user.role : "user",
+      eu_profile: user.profile ? user.profile : "",
+      eu_enabled: user.disabled ? false : true,
+    });
+  }
+
+  async getProfiles() {
+    try {
+      let profiles = await Api.getProfiles();
+      this.setState({
+        profiles: profiles,
+      });
+    } catch (err) {
+      console.log(err);
+      this.setState({
+        profiles: [],
+      });
+    }
+  }
+
+  async saveUser() {
+    let edited = await Api.editUser({
+      id: this.state.activeUser._id,
+      email: this.state.eu_email,
+      role: this.state.eu_role,
+      profile: this.state.eu_profile,
+      disabled: this.state.eu_enabled ? false : true,
+    });
+
+    if (edited.error) {
+      this.setState({
+        eu_error: edited.error,
+      });
+    } else {
+      this.closeModal("editUser");
+      Api.allUsers();
+    }
+  }
+
+  async deleteUser() {
+    alert("user to delete");
   }
 
   findProfile(id) {
@@ -259,136 +272,74 @@ class Users extends React.Component {
           </div>
           {this.state.cu_error ? <p>{this.state.cu_error}</p> : null}
         </Modal>
-        <Modal title="Add Profile" open={this.state.addProfileOpen} close={() => this.closeModal("addProfile")} submit={this.saveProfile}>
-          <p className="sub-title mb--1">New profile</p>
-          <input className="styled-input--input" placeholder="Name" type="text" name="np_name" value={this.state.np_name} onChange={this.inputChange} />
-          <p className="sub-title mb--1">Sonarr</p>
-          {this.state.s_servers ? (
-            this.state.s_servers.map((server) => {
-              return (
-                <label key={server.uuid}>
-                  <input data-type="np_sonarr" type="checkbox" checked={this.state.np_sonarr[server.uuid]} name={server.uuid} onChange={this.changeCheckbox} /> {server.title}
-                </label>
-              );
-            })
-          ) : (
-            <p>No Sonarr Servers</p>
-          )}
-          <p className="sub-title mb--1">Radarr</p>
-          {this.state.r_servers ? (
-            this.state.r_servers.map((server) => {
-              return (
-                <label key={server.uuid}>
-                  <input data-type="np_radarr" type="checkbox" checked={this.state.np_radarr[server.uuid]} name={server.uuid} onChange={this.changeCheckbox} /> {server.title}
-                </label>
-              );
-            })
-          ) : (
-            <p>No Sonarr Servers</p>
-          )}
-          <p className="sub-title mb--1">Auto Approve</p>
-          <label>
-            <input type="checkbox" name="np_auto_approve" checked={this.state.np_auto_approve} onChange={this.inputChange} /> Enabled
-          </label>
-          <p className="sub-title mb--1">Quota</p>
-          <p>
-            <small>Quota of requests per week. For no limit leave at 0</small>
-          </p>
-          <input className="styled-input--input" type="number" name="np_quota" value={this.state.np_quota} onChange={this.inputChange} />
-        </Modal>
-        <section>
-          <div className="title-btn">
-            <p className="main-title">User Profiles</p>
-            <button
-              className="btn btn__square"
-              onClick={() => {
-                this.openModal("addProfile");
-                this.setState({ activeProfile: false });
-              }}
-            >
-              Add +
-            </button>
+
+        <Modal
+          title="Edit User"
+          open={this.state.editUserOpen}
+          close={() => this.closeModal("editUser")}
+          submit={this.saveUser}
+          delete={this.state.activeUser ? (this.state.activeUser.custom ? this.deleteUser : false) : false}
+        >
+          <p className="sub-title mb--1">Editing {this.state.activeUser ? this.state.activeUser.title : "user"}</p>
+          <p className="sub-title mt--2 mb--1">Email</p>
+          <input className="styled-input--input" placeholder="Email" type="email" name="eu_email" value={this.state.eu_email} onChange={this.inputChange} />
+          <p className="sub-title mt--2 mb--1">Role</p>
+
+          <div className="styled-input--select">
+            <select name="eu_role" value={this.state.eu_role} onChange={this.inputChange}>
+              {this.state.activeUser ? (
+                this.state.activeUser.role !== "admin" ? (
+                  <>
+                    <option value="user">User</option>
+                    <option value="moderator">Moderator</option>
+                  </>
+                ) : (
+                  <option value="admin">Admin</option>
+                )
+              ) : null}
+            </select>
           </div>
-        </section>
-        <section>
-          <p className="mb--2">
-            User profiles determine what should happen when a user makes a request. If using Sonarr / Radarr you can pick which servers the request is sent to. You can also choose to allow auto
-            approval for certain users.
-          </p>
-          <table className="generic-table generic-table__rounded">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Sonarr</th>
-                <th>Radarr</th>
-                <th>Auto approve</th>
-                <th>Quota (per week)</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Default</td>
-                <td>All</td>
-                <td>All</td>
-                <td>Yes</td>
-                <td>∞</td>
-                <td>None</td>
-              </tr>
-              {this.state.profiles && this.state.s_servers
-                ? this.state.profiles.map((profile) => {
+          <p className="sub-title mt--2 mb--1">Profile</p>
+          <div className="styled-input--select">
+            <select name="eu_profile" value={this.state.eu_profile} onChange={this.inputChange}>
+              <option value="">Default</option>
+              {this.state.profiles
+                ? Object.keys(this.state.profiles).map((p) => {
+                    let profile = this.state.profiles[p];
                     return (
-                      <tr key={profile._id}>
-                        <td>{profile.name}</td>
-                        <td>
-                          {Object.keys(profile.sonarr).length > 0
-                            ? Object.keys(profile.sonarr).map((s) => {
-                                let server = this.findServerByUuid(s, "s_servers");
-                                let serverName = server ? server.title : "Not Found";
-                                return (
-                                  <span key={`${profile._id}_${s}`} className="requests--status requests--status__sonarr">
-                                    {serverName}
-                                  </span>
-                                );
-                              })
-                            : "None"}
-                        </td>
-                        <td>
-                          {Object.keys(profile.radarr).length > 0
-                            ? Object.keys(profile.radarr).map((r) => {
-                                if (!profile.radarr[r]) return null;
-                                let server = this.findServerByUuid(r, "r_servers");
-                                let serverName = server ? server.title : "Not Found";
-
-                                return (
-                                  <span key={`${profile._id}_${r}`} className="requests--status requests--status__radarr">
-                                    {serverName}
-                                  </span>
-                                );
-                              })
-                            : "None"}
-                        </td>
-                        <td>{profile.autoApprove ? "Yes" : "No"}</td>
-                        <td>{profile.quota === 0 ? "∞" : profile.quota}</td>
-                        <td>
-                          <p
-                            className="table-action"
-                            onClick={() => {
-                              this.openModal("addProfile");
-
-                              this.setActiveProfile(profile._id);
-                            }}
-                          >
-                            Edit
-                          </p>
-                        </td>
-                      </tr>
+                      <option key={`user_profile_${profile._id}`} value={profile._id}>
+                        {profile.name}
+                      </option>
                     );
                   })
                 : null}
-            </tbody>
-          </table>
-        </section>
+            </select>
+          </div>
+          {this.state.activeUser ? (
+            this.state.activeUser.role !== "admin" ? (
+              <>
+                <p className="sub-title mt--2 mb--1">Enabled / Disabled</p>
+                <label>
+                  <input type="checkbox" checked={this.state.eu_enabled} name="eu_enabled" onChange={this.inputChange} /> Enable this user
+                </label>
+              </>
+            ) : null
+          ) : null}
+          {this.state.eu_error ? <p>{this.state.eu_error}</p> : null}
+        </Modal>
+
+        <Profiles
+          addProfileOpen={this.state.addProfileOpen}
+          closeModal={this.closeModal}
+          s_servers={this.state.s_servers}
+          r_servers={this.state.r_servers}
+          inputChange={this.inputChange}
+          findServerByUuid={this.findServerByUuid}
+          openModal={this.openModal}
+          profiles={this.state.profiles}
+          getProfiles={this.getProfiles}
+          findProfile={this.findProfile}
+        />
 
         <section>
           <div className="title-btn">
@@ -441,12 +392,22 @@ class Users extends React.Component {
                     <td>{user.username}</td>
                     <td>{user.email}</td>
                     <td>{user.role ? user.role : "user"}</td>
-                    <td>{user.profile ? user.profile : "default"}</td>
+                    <td>{user.profile ? (this.findProfile(user.profile) ? this.findProfile(user.profile).name : "Removed") : "default"}</td>
                     <td>
                       <div className="table-icon">{user.disabled ? <Close /> : <Check />}</div>
                     </td>
                     <td>{user.lastIp ? user.lastIp : "n/a"}</td>
-                    <td></td>
+                    <td>
+                      <p
+                        className="table-action"
+                        onClick={() => {
+                          this.openModal("editUser");
+                          this.setActiveUser(user._id);
+                        }}
+                      >
+                        Edit
+                      </p>
+                    </td>
                   </tr>
                 );
               })}

@@ -83,6 +83,7 @@ router.get("/:id", async (req, res) => {
     }
   }
   if (userData) {
+    if (userData.password) userData.password = "removed";
     res.json(userData);
   } else {
     res.status(404).send();
@@ -128,6 +129,50 @@ router.post("/create_custom", async (req, res) => {
         error: "Error creating user",
       });
     }
+  }
+});
+
+router.post("/edit", async (req, res) => {
+  let user = req.body.user;
+  if (!user) {
+    res.status(500).json({
+      error: "No user details",
+    });
+  }
+  try {
+    if (user.role === "admin") {
+      await Admin.findOneAndUpdate(
+        { _id: user.id },
+        {
+          $set: {
+            email: user.email,
+            profile: user.profile,
+            disabled: user.disabled,
+          },
+        },
+        { new: true, useFindAndModify: false }
+      );
+    } else {
+      await User.findOneAndUpdate(
+        { _id: user.id },
+        {
+          $set: {
+            email: user.email,
+            role: user.role,
+            profile: user.profile,
+            disabled: user.disabled,
+          },
+        },
+        { new: true, useFindAndModify: false }
+      );
+    }
+    res.json({
+      message: "User edited",
+    });
+  } catch {
+    res.status(500).json({
+      error: "Error editing user",
+    });
   }
 });
 

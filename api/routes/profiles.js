@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Profile = require("../models/profile");
+const User = require("../models/user");
+const Admin = require("../models/admin");
 
 router.get("/all", async (req, res) => {
   try {
@@ -25,6 +27,25 @@ router.post("/save_profile", async (req, res) => {
     });
   }
 
+  if (profile.isDefault) {
+    try {
+      await Profile.findOneAndUpdate(
+        { isDefault: true },
+        {
+          $set: {
+            isDefault: false,
+          },
+        },
+        { new: true, useFindAndModify: false }
+      );
+    } catch {
+      res.status(500).json({
+        error: "Failed to update, error removing defaults",
+      });
+      return;
+    }
+  }
+
   if (profile.id) {
     try {
       await Profile.findOneAndUpdate(
@@ -36,6 +57,7 @@ router.post("/save_profile", async (req, res) => {
             radarr: profile.radarr,
             autoApprove: profile.autoApprove,
             quota: profile.quota,
+            isDefault: profile.isDefault,
           },
         },
         { new: true, useFindAndModify: false }
@@ -56,6 +78,7 @@ router.post("/save_profile", async (req, res) => {
         radarr: profile.radarr,
         autoApprove: profile.autoApprove,
         quota: profile.quota,
+        isDefault: profile.isDefault,
       });
       await newProfile.save();
       res.status(200).json(newProfile);
@@ -65,6 +88,51 @@ router.post("/save_profile", async (req, res) => {
         error: "Error creating user",
       });
     }
+  }
+});
+
+router.post("/delete_profile", async (req, res) => {
+  let profile = req.body.profile;
+  if (!profile || !profile.id) {
+    res.status(500).json({
+      error: "No profile details",
+    });
+  }
+
+  try {
+    await User.updateMany(
+      {
+        profile: profile.id,
+      },
+      {
+        $unset: {
+          profile: "",
+        },
+      }
+    );
+    await Admin.updateMany(
+      {
+        profile: profile.id,
+      },
+      {
+        $unset: {
+          profile: "",
+        },
+      }
+    );
+  } catch (err) {
+    console.log(err);
+  }
+
+  try {
+    await Profile.findOneAndDelete({ _id: profile.id });
+    res.status(200).json({
+      message: "Profile deleted",
+    });
+  } catch {
+    res.status(500).json({
+      error: "Failed to delete",
+    });
   }
 });
 

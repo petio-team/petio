@@ -7,6 +7,7 @@ const ProfileSchema = mongoose.Schema(
     radarr: Object,
     autoApprove: Boolean,
     quota: Number,
+    isDefault: Boolean,
   },
   { collection: "profiles" }
 );

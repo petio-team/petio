@@ -510,3 +510,23 @@ export async function saveProfile(profile) {
     return false;
   }
 }
+
+export async function deleteProfile(profile) {
+  try {
+    let result = await api.deleteProfile(profile);
+    return result;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+export async function editUser(user) {
+  try {
+    let result = await api.editUser(user);
+    return result;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
