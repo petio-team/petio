@@ -1,8 +1,41 @@
 import React from "react";
 import { ReactComponent as MovieIcon } from "../assets/svg/movie.svg";
 import { ReactComponent as TvIcon } from "../assets/svg/tv.svg";
+import { ReactComponent as Arrow } from "../assets/svg/arrow-left.svg";
 
 class RequestsTable extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      sortBy: "title",
+      dir: "DESC",
+    };
+
+    this.sortBy = this.sortBy.bind(this);
+    this.sortCol = this.sortCol.bind(this);
+  }
+
+  sortBy(a, b) {
+    let sortVal = this.state.sortBy;
+    if (a[sortVal].toLowerCase() > b[sortVal].toLowerCase()) {
+      return this.state.dir === "DESC" ? 1 : -1;
+    }
+    if (a[sortVal].toLowerCase() < b[sortVal].toLowerCase()) {
+      return this.state.dir === "DESC" ? -1 : 1;
+    }
+    return 0;
+  }
+
+  sortCol(type) {
+    if (!type) return;
+    let sw = this.state.sortBy === type ? true : false;
+    let dir = sw ? (this.state.dir === "DESC" ? "ASC" : "DESC") : "DESC";
+    this.setState({
+      dir: dir,
+      sortBy: type,
+    });
+  }
+
   getUsername(id) {
     if (!this.props.api.users) {
       return null;
@@ -56,15 +89,17 @@ class RequestsTable extends React.Component {
   }
 
   getYear(req) {
-    if (Object.keys(req.media).length > 0) {
-      if (req.type === "movie") {
-        return req.media.release_date ? new Date(req.media.release_date).getFullYear() : null;
+    if (req.media)
+      if (Object.keys(req.media).length > 0) {
+        if (req.type === "movie") {
+          return req.media.release_date ? new Date(req.media.release_date).getFullYear() : null;
+        } else {
+          return req.media.first_air_date ? new Date(req.media.first_air_date).getFullYear() : null;
+        }
       } else {
-        return req.media.first_air_date ? new Date(req.media.first_air_date).getFullYear() : null;
+        return null;
       }
-    } else {
-      return null;
-    }
+    return null;
   }
 
   children(req) {
@@ -106,6 +141,7 @@ class RequestsTable extends React.Component {
                     ) : null}
                     {type === "movie" ? <p>Movie</p> : null}
                   </td>
+                  <td></td>
                   <td>
                     <span className="requests--quality">{child.quality.quality.name}</span>
                   </td>
@@ -223,11 +259,17 @@ class RequestsTable extends React.Component {
   }
 
   render() {
+    let requestsUnsorted = Object.values(this.props.requests);
+    let requestsSorted = requestsUnsorted.sort(this.sortBy);
+
     return (
       <table className="generic-table generic-table__rounded">
         <thead>
           <tr>
-            <th className="fixed">Title</th>
+            <th className={`fixed sortable ${this.state.sortBy === "title" ? "active" : ""} ${this.state.dir}`} onClick={() => this.sortCol("title")}>
+              Title
+              <Arrow />
+            </th>
             <th>Year</th>
             <th>Type</th>
             <th>Status</th>
@@ -236,7 +278,7 @@ class RequestsTable extends React.Component {
           </tr>
         </thead>
         <tbody>
-          {Object.keys(this.props.requests).length === 0 ? (
+          {Object.keys(requestsSorted).length === 0 ? (
             <tr>
               <td>No requests</td>
               <td></td>
@@ -246,8 +288,8 @@ class RequestsTable extends React.Component {
               <td></td>
             </tr>
           ) : (
-            Object.keys(this.props.requests).map((key) => {
-              let req = this.props.requests[key];
+            Object.keys(requestsSorted).map((key) => {
+              let req = requestsSorted[key];
 
               return (
                 <React.Fragment key={key}>

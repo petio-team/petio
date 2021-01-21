@@ -225,7 +225,7 @@
     height: 30px;
 
     input {
-      height: 20px;
+      height: 30px !important;
       background: none;
       padding: 0 10px;
       font-size: 16px;
@@ -234,8 +234,9 @@
       outline: none !important;
       color: #fff;
       width: 100%;
+      line-height: 30px !important;
       border: none !important;
-      margin-bottom: 0;
+      margin-bottom: 0 !important;
     }
   }
 

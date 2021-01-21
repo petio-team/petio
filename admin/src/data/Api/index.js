@@ -28,6 +28,13 @@ import {
   allUsers,
   testMongo,
   getIssues,
+  createUser,
+  getProfiles,
+  saveProfile,
+  deleteProfile,
+  editUser,
+  bulkEditUser,
+  deleteUser,
 } from "./actions";
 
 export default {
@@ -60,4 +67,11 @@ export default {
   allUsers,
   testMongo,
   getIssues,
+  createUser,
+  getProfiles,
+  saveProfile,
+  deleteProfile,
+  editUser,
+  bulkEditUser,
+  deleteUser,
 };

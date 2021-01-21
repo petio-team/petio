@@ -11,6 +11,7 @@ const RequestSchema = mongoose.Schema({
   users: Array,
   sonarrId: Array,
   radarrId: Array,
+  approved: Boolean,
 });
 
 module.exports = mongoose.model("Request", RequestSchema);

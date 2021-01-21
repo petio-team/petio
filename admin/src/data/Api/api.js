@@ -232,6 +232,68 @@ export let getIssues = () => {
   return call(request, headers).then((res) => res.json());
 };
 
+export let createUser = (user) => {
+  let request = `${apiUrl}/user/create_custom`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  let body = { user: user };
+  return call(request, headers, "post", body).then((res) => res.json());
+};
+
+export let getProfiles = () => {
+  let request = `${apiUrl}/profiles/all`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  return call(request, headers).then((res) => res.json());
+};
+
+export let saveProfile = (profile) => {
+  let request = `${apiUrl}/profiles/save_profile`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  let body = { profile: profile };
+  return call(request, headers, "post", body).then((res) => res.json());
+};
+
+export let deleteProfile = (profile) => {
+  let request = `${apiUrl}/profiles/delete_profile`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  let body = { profile: profile };
+  return call(request, headers, "post", body).then((res) => res.json());
+};
+
+export let editUser = (user) => {
+  let request = `${apiUrl}/user/edit`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  let body = { user: user };
+  return call(request, headers, "post", body).then((res) => res.json());
+};
+
+export let deleteUser = (user) => {
+  let request = `${apiUrl}/user/delete_user`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  let body = { user: user };
+  return call(request, headers, "post", body).then((res) => res.json());
+};
+
+export let bulkEditUser = (data) => {
+  let request = `${apiUrl}/user/bulk_edit`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  let body = data;
+  return call(request, headers, "post", body).then((res) => res.json());
+};
+
 function call(url, headers, method, body = null) {
   let args = {
     method: method,

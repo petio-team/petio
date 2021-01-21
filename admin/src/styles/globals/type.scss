@@ -108,3 +108,12 @@ p {
   width: 500px;
   max-width: 100%;
 }
+
+.title-btn {
+  display: flex;
+  align-items: center;
+
+  .btn {
+    margin-left: 20px;
+  }
+}

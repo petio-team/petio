@@ -1,6 +1,6 @@
 {
   "name": "petio-admin",
-  "version": "0.2.17",
+  "version": "0.2.18",
   "private": true,
   "homepage": ".",
   "dependencies": {
@@ -37,14 +37,10 @@
   },
   "browserslist": {
     "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
+      "since 2010"
     ],
     "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
+      "since 2010"
     ]
   },
   "devDependencies": {}
