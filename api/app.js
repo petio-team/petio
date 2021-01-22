@@ -7,6 +7,7 @@ const CronJob = require("cron").CronJob;
 const fs = require("fs");
 const path = require("path");
 const pjson = require("./package.json");
+require("./node_modules/cache-manager/lib/stores/memory.js");
 
 // Config
 const getConfig = require("./util/config");
