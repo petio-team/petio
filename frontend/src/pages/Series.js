@@ -323,9 +323,10 @@ class Series extends React.Component {
             </Carousel>
           </section>
           {related}
+
           <section>
             <h3 className="sub-title mb--1">Reviews</h3>
-            <ReviewsList reviews={this.props.user.reviews[id]} external={seriesData.reviews} />
+            {this.props.user.reviews ? <ReviewsList reviews={this.props.user.reviews[id]} external={seriesData.reviews} /> : null}
           </section>
         </div>
       </div>

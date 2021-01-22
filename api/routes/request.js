@@ -10,40 +10,43 @@ const Sonarr = require("../services/sonarr");
 const Radarr = require("../services/radarr");
 const movieLookup = require("../tmdb/movie");
 const showLookup = require("../tmdb/show");
+const processRequest = require("../requests/process");
 
 router.post("/add", async (req, res) => {
   let user = req.body.user;
   let request = req.body.request;
-  let existing = await Request.findOne({ requestId: request.id });
-  if (existing) {
-    let updatedRequest = await Request.updateOne({ requestId: request.id }, { $push: { users: user.id } });
-    res.json(updatedRequest);
-    mailRequest(user.id, request.id);
-  } else {
-    const newRequest = new Request({
-      requestId: request.id,
-      type: request.type,
-      title: request.title,
-      thumb: request.thumb,
-      users: [user.id],
-      imdb_id: request.imdb_id,
-      tmdb_id: request.tmdb_id,
-      tvdb_id: request.tvdb_id,
-    });
+  let process = await new processRequest(request, user).new();
+  console.log(process);
+  // let existing = await Request.findOne({ requestId: request.id });
+  // if (existing) {
+  //   let updatedRequest = await Request.updateOne({ requestId: request.id }, { $push: { users: user.id } });
+  //   res.json(updatedRequest);
+  //   mailRequest(user.id, request.id);
+  // } else {
+  //   const newRequest = new Request({
+  //     requestId: request.id,
+  //     type: request.type,
+  //     title: request.title,
+  //     thumb: request.thumb,
+  //     users: [user.id],
+  //     imdb_id: request.imdb_id,
+  //     tmdb_id: request.tmdb_id,
+  //     tvdb_id: request.tvdb_id,
+  //   });
 
-    try {
-      const savedRequest = await newRequest.save();
-      res.json(savedRequest);
-      mailRequest(user.id, request.id);
-      let sonarr = new Sonarr();
-      let radarr = new Radarr();
-      sonarr.getRequests();
-      radarr.getRequests();
-    } catch (err) {
-      console.log(err);
-      res.status(500).json({ error: "error adding request" });
-    }
-  }
+  //   try {
+  //     const savedRequest = await newRequest.save();
+  //     res.json(savedRequest);
+  //     mailRequest(user.id, request.id);
+  //     let sonarr = new Sonarr();
+  //     let radarr = new Radarr();
+  //     sonarr.getRequests();
+  //     radarr.getRequests();
+  //   } catch (err) {
+  //     console.log(err);
+  //     res.status(500).json({ error: "error adding request" });
+  //   }
+  // }
 });
 
 async function mailRequest(user, request) {
