@@ -80,7 +80,7 @@ class Movie extends React.Component {
     }
   }
 
-  request() {
+  async request() {
     let id = this.props.match.params.id;
     let movie = this.props.api.movie_lookup[id];
     let requests = this.props.user.requests[id];
@@ -99,11 +99,14 @@ class Movie extends React.Component {
       thumb: movie.poster_path,
       type: "movie",
     };
-    User.request(request, this.props.user.current).then(() => {
-      User.getRequests().then(() => {
-        this.getRequests();
-      });
-    });
+    try {
+      let req = await User.request(request, this.props.user.current);
+      console.log(req);
+      await User.getRequests();
+      this.getRequests();
+    } catch (err) {
+      alert(err);
+    }
   }
 
   openReview() {

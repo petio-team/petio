@@ -96,7 +96,7 @@ class Series extends React.Component {
     }
   }
 
-  request() {
+  async request() {
     let id = this.props.match.params.id;
     let series = this.props.api.series_lookup[id];
     let requests = this.props.user.requests[id];
@@ -115,9 +115,15 @@ class Series extends React.Component {
       type: "tv",
       thumb: series.poster_path,
     };
-    User.request(request, this.props.user.current).then(() => {
-      User.getRequests();
-    });
+
+    try {
+      let req = await User.request(request, this.props.user.current);
+      console.log(req);
+      await User.getRequests();
+      this.getRequests();
+    } catch (err) {
+      alert(err);
+    }
   }
 
   getReviews() {
@@ -323,9 +329,10 @@ class Series extends React.Component {
             </Carousel>
           </section>
           {related}
+
           <section>
             <h3 className="sub-title mb--1">Reviews</h3>
-            <ReviewsList reviews={this.props.user.reviews[id]} external={seriesData.reviews} />
+            {this.props.user.reviews ? <ReviewsList reviews={this.props.user.reviews[id]} external={seriesData.reviews} /> : null}
           </section>
         </div>
       </div>

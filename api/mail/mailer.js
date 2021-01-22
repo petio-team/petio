@@ -43,7 +43,6 @@ class Mailer {
     const smtpServer = this.config.emailServer;
     const smtpPort = parseInt(this.config.emailPort);
     const secure = this.config.emailSecure ? true : false;
-    console.log(this.config);
 
     const transporter = nodemailer.createTransport({
       host: smtpServer,
@@ -88,7 +87,7 @@ class Mailer {
   }
 
   // Build email and send to transport
-  mail(subject, title, text, img, to = []) {
+  mail(subject, title, text, img, to = [], name = []) {
     if (!this.config.emailEnabled) {
       console.log("Email disabled, skipping sending emails");
       return;
@@ -102,17 +101,19 @@ class Mailer {
       // Send mail
       to.forEach((send, i) => {
         let timeout = i * 2000; //timeout between emails to avoid quota
+        let username = name[i];
         i++;
         setTimeout(() => {
           console.log(`Sending email from: ${this.config.emailUser} to ${send} with the subject ${subject}`);
           this.transport.sendMail({
             from: `"Petio" <${this.config.emailUser}>`,
-            to: [send, this.adminEmail], // send all emails to admin too (may be a setting later)
+            to: `${username} <${send}>`,
+            bcc: this.adminEmail,
             subject: subject,
-            html: this.mailHtml(title, text, img, send),
+            html: this.mailHtml(title, text, img, username),
             text: text,
             onError: (e) => console.log(e),
-            onSuccess: (i) => console.log("Message sent: %s", i.messageId),
+            onSuccess: (s) => console.log("Message sent: %s", s.messageId),
           });
         }, timeout);
       });

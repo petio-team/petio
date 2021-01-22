@@ -274,6 +274,7 @@ class RequestsTable extends React.Component {
             <th>Type</th>
             <th>Status</th>
             <th>Users</th>
+            <th>Approved</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -281,6 +282,7 @@ class RequestsTable extends React.Component {
           {Object.keys(requestsSorted).length === 0 ? (
             <tr>
               <td>No requests</td>
+              <td></td>
               <td></td>
               <td></td>
               <td></td>
@@ -307,6 +309,7 @@ class RequestsTable extends React.Component {
                         return <p key={`${req.id}_${user}_${i}`}>{this.getUsername(user)}</p>;
                       })}
                     </td>
+                    <td>{req.approved ? "Yes" : "No"}</td>
                     <td></td>
                   </tr>
                   {this.children(req)}
