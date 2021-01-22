@@ -246,10 +246,10 @@ class Radarr {
         } else if (req.radarrId.length === 0 || this.forced) {
           if (!req.approved) {
             console.log(`SERVICE - RADARR: Request requires approval - ${req.title}`);
-            return;
+          } else {
+            jobQ.push(req);
+            console.log(`SERVICE - RADARR: ${req.title} added to job queue`);
           }
-          jobQ.push(req);
-          console.log(`SERVICE - RADARR: ${req.title} added to job queue`);
         }
       }
     }

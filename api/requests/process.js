@@ -49,7 +49,17 @@ class processRequest {
   }
 
   async existing() {
+    let userDetails = await User.findOne({ id: this.user.id });
+    if (!userDetails) {
+      userDetails = await Admin.findOne({ id: this.user.id });
+    }
+    let profile = userDetails.profile ? await Profile.findById(this.user.profile) : false;
+    let autoApprove = profile ? profile.autoApprove : false;
     await Request.updateOne({ requestId: this.request.id }, { $push: { users: this.user.id } });
+    if (autoApprove) {
+      await Request.updateOne({ requestId: this.request.id }, { $set: { approved: true } });
+      await this.sendToDvr(profile);
+    }
     return {
       message: "request updated",
       user: this.user.title,
@@ -58,8 +68,6 @@ class processRequest {
   }
 
   async create() {
-    let admin = false;
-
     let userDetails = await User.findOne({ id: this.user.id });
     if (!userDetails) {
       userDetails = await Admin.findOne({ id: this.user.id });
@@ -91,6 +99,16 @@ class processRequest {
       };
     }
 
+    await this.sendToDvr(profile);
+
+    return {
+      message: "request added",
+      user: this.user.title,
+      request: this.request,
+    };
+  }
+
+  async sendToDvr(profile) {
     // If profile is set use arrs from profile
     if (profile) {
       if (profile.radarr) {
@@ -117,12 +135,6 @@ class processRequest {
       sonarr.getRequests();
       radarr.getRequests();
     }
-
-    return {
-      message: "request added",
-      user: this.user.title,
-      request: this.request,
-    };
   }
 
   async mailRequest() {
