@@ -1,5 +1,6 @@
 const Request = require("../models/request");
 const User = require("../models/user");
+const Admin = require("../models/admin");
 const Profile = require("../models/profile");
 const Mailer = require("../mail/mailer");
 const Sonarr = require("../services/sonarr");
@@ -21,8 +22,11 @@ class processRequest {
         } else {
           out = await this.create();
         }
-        let updatedUser = await User.findOneAndUpdate({ id: this.user.id }, { $inc: { quotaCount: 1 } }, { new: true, useFindAndModify: false });
-        out.quota = updatedUser.quotaCount;
+        if (quotaPass !== "admin") {
+          let updatedUser = await User.findOneAndUpdate({ id: this.user.id }, { $inc: { quotaCount: 1 } }, { new: true, useFindAndModify: false });
+          out.quota = updatedUser.quotaCount;
+        }
+        this.mailRequest();
       } catch (err) {
         console.log("REQ: Error");
         console.log(err);
@@ -33,7 +37,6 @@ class processRequest {
           request: this.request,
         };
       }
-      this.mailRequest();
     } else {
       out = {
         message: `You are over your quota. Quotas reset each week.`,
@@ -55,9 +58,15 @@ class processRequest {
   }
 
   async create() {
+    let admin = false;
+
     let userDetails = await User.findOne({ id: this.user.id });
+    if (!userDetails) {
+      userDetails = await Admin.findOne({ id: this.user.id });
+    }
     let profile = userDetails.profile ? await Profile.findById(this.user.profile) : false;
     let autoApprove = profile ? profile.autoApprove : false;
+
     const newRequest = new Request({
       requestId: this.request.id,
       type: this.request.type,
@@ -136,6 +145,13 @@ class processRequest {
 
   async checkQuota() {
     let userDetails = await User.findOne({ id: this.user.id });
+    if (!userDetails) {
+      let admin = await Admin.findOne({ id: this.user.id });
+      if (admin) {
+        return "admin";
+      }
+      return false;
+    }
     let userQuota = userDetails.quotaCount ? userDetails.quotaCount : 0;
     let profile = userDetails.profile ? await Profile.findById(this.user.profile) : false;
     let quotaCap = profile ? profile.quota : 0;
