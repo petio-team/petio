@@ -480,3 +480,73 @@ export function getIssues() {
       });
   });
 }
+
+export async function createUser(user) {
+  try {
+    let result = await api.createUser(user);
+    return result;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+export async function getProfiles() {
+  try {
+    let result = await api.getProfiles();
+    return result;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+export async function saveProfile(profile) {
+  try {
+    let result = await api.saveProfile(profile);
+    return result;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+export async function deleteProfile(profile) {
+  try {
+    let result = await api.deleteProfile(profile);
+    return result;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+export async function editUser(user) {
+  try {
+    let result = await api.editUser(user);
+    return result;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+export async function deleteUser(user) {
+  try {
+    let result = await api.deleteUser(user);
+    return result;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+export async function bulkEditUser(data) {
+  try {
+    let result = await api.bulkEditUser(data);
+    return result;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}

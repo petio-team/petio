@@ -13,6 +13,8 @@ const AdminSchema = mongoose.Schema(
     password: String,
     altId: String,
     lastIp: String,
+    role: String,
+    profile: String,
   },
   { collection: "admin" }
 );

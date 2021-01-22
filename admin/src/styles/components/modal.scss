@@ -1,6 +1,6 @@
 //
 
-.issues {
+.modal {
   &--wrap {
     position: fixed;
     top: 0;
@@ -48,13 +48,31 @@
     padding: 20px;
 
     select,
-    input,
+    input:not([type="checkbox"]),
     textarea {
       width: 100%;
     }
 
-    .save-issue {
-      margin-left: 10px;
+    .btn {
+      margin-right: 10px;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+
+      input {
+        margin-right: 15px;
+      }
+    }
+
+    .modal-btns {
+      display: flex;
+
+      .delete-modal {
+        margin-left: auto;
+      }
     }
   }
 }

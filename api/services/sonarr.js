@@ -153,6 +153,7 @@ class Sonarr {
 
   async add(seriesData) {
     seriesData.ProfileId = this.config.profile;
+    seriesData.seasonFolder = true;
     seriesData.Path = `${this.config.path_title}${sanitize(seriesData.title)} (${seriesData.year})`;
     seriesData.addOptions = {
       searchForMissingEpisodes: true,

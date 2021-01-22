@@ -5,7 +5,15 @@
   font-size: 10px;
 
   @include media-breakpoint-up(lg) {
-    font-size: 16px;
+    font-size: 14px;
+  }
+
+  p {
+    font-size: 10px;
+
+    @include media-breakpoint-up(lg) {
+      font-size: 14px;
+    }
   }
 
   tr:not(.child):not(.sub) {
@@ -33,20 +41,57 @@
 
     th {
       text-align: left;
-      padding: 10px;
+      padding: 5px;
       border-bottom: solid 1px $grey-medium;
 
       @include media-breakpoint-up(lg) {
-        padding: 20px;
+        padding: 10px;
+      }
+
+      &.sortable {
+        cursor: pointer;
+        vertical-align: center;
+
+        svg {
+          width: 15px;
+          height: 15px;
+          float: right;
+        }
+
+        &.active {
+          &.ASC {
+            svg {
+              transform: rotate(-90deg);
+            }
+          }
+
+          &.DESC {
+            svg {
+              transform: rotate(90deg);
+            }
+          }
+        }
       }
     }
 
     td {
-      padding: 10px;
+      padding: 5px;
       border-bottom: solid 1px $dark-grey;
 
       @include media-breakpoint-up(lg) {
-        padding: 20px;
+        padding: 10px;
+      }
+    }
+
+    &:hover {
+      td {
+        &:nth-child(odd) {
+          background: rgba(255, 255, 255, 0.1);
+        }
+
+        &:nth-child(even) {
+          background: rgba(255, 255, 255, 0.08);
+        }
       }
     }
   }
@@ -54,7 +99,7 @@
   tr.child {
     td {
       font-weight: 10px;
-      padding: 5px 20px;
+      padding: 5px 10px;
 
       p {
         font-size: 8px;
@@ -86,5 +131,25 @@
   &__rounded {
     overflow: hidden;
     border-radius: 5px;
+  }
+}
+
+.table-icon {
+  svg {
+    height: 15px;
+    fill: white;
+  }
+}
+
+.table-action {
+  font-size: 10px;
+  color: $primary;
+  text-decoration: underline;
+  cursor: pointer;
+  margin: 0;
+  font-weight: 700;
+
+  @include media-breakpoint-up(lg) {
+    font-size: 14px;
   }
 }

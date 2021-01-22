@@ -31,6 +31,7 @@ class LibraryUpdate {
     let sonarr = new Sonarr();
     let radarr = new Radarr();
     try {
+      await this.updateFriends();
       recent = await this.getRecent();
     } catch {
       console.log(`LIB CRON: Partial scan failed - unable to get recent`);
@@ -132,6 +133,7 @@ class LibraryUpdate {
               username: this.config.adminUsername,
               password: this.config.adminPass,
               altId: 1,
+              role: "admin",
             },
           },
           { new: true, useFindAndModify: false }
