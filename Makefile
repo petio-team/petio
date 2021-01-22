@@ -9,6 +9,7 @@ pkg :
 	cd frontend && npm install && REACT_APP_ENV=pkg npm run build && mv build ../bin/views/frontend
 	cd admin && npm install && REACT_APP_ENV=pkg npm run build && mv build ../bin/views/admin
 	zip -r petio.zip ./bin
+	rm -rf ./bin
 
 clean:
 	rm -rf ./bin
