@@ -7,8 +7,8 @@ const Music = require("../models/artist");
 const Show = require("../models/show");
 const User = require("../models/user");
 const Request = require("../models/request");
-const Sonarr = require("../services/sonarr");
-const Radarr = require("../services/radarr");
+// const Sonarr = require("../services/sonarr");
+// const Radarr = require("../services/radarr");
 const Mailer = require("../mail/mailer");
 const getConfig = require("../util/config");
 
@@ -28,8 +28,8 @@ class LibraryUpdate {
     console.log(`LIB CRON: Running Partial`);
     this.full = false;
     let recent = false;
-    let sonarr = new Sonarr();
-    let radarr = new Radarr();
+    // let sonarr = new Sonarr();
+    // let radarr = new Radarr();
     try {
       await this.updateFriends();
       recent = await this.getRecent();
@@ -85,8 +85,8 @@ class LibraryUpdate {
         }
       })
     );
-    sonarr.getRequests();
-    radarr.getRequests();
+    // sonarr.getRequests();
+    // radarr.getRequests();
     this.execMail();
     console.log("LIB CRON: Partial Scan Complete");
   }
@@ -95,8 +95,8 @@ class LibraryUpdate {
     console.log(`LIB CRON: Running Full`);
     await this.createAdmin();
     let libraries = false;
-    let sonarr = new Sonarr();
-    let radarr = new Radarr();
+    // let sonarr = new Sonarr();
+    // let radarr = new Radarr();
     try {
       libraries = await this.getLibraries();
     } catch (err) {
@@ -107,8 +107,8 @@ class LibraryUpdate {
       await this.saveLibraries(libraries);
       await this.updateLibraryContent(libraries);
       await this.updateFriends();
-      sonarr.getRequests();
-      radarr.getRequests();
+      // sonarr.getRequests();
+      // radarr.getRequests();
       this.execMail();
       console.log("LIB CRON: Full Scan Complete");
     } else {
@@ -746,6 +746,7 @@ class LibraryUpdate {
           recommendationsPlaylistId: obj.recommendationsPlaylistId,
           thumb: obj.thumb,
           Server: obj.Server,
+          quotaCount: 0,
         });
         friendDb = await newFriend.save();
       } catch (err) {
@@ -790,9 +791,12 @@ class LibraryUpdate {
   async sendMail(user, i, request) {
     let userData = await User.findOne({ id: user });
     if (!userData) {
-      userData = {
-        email: this.config.adminEmail,
-      };
+      console.log("LIB CRON: Err: No user data");
+      return;
+    }
+    if (!userData.email) {
+      console.log("LIB CRON: Err: User has no email");
+      return;
     }
 
     this.mailer.push([
@@ -801,6 +805,7 @@ class LibraryUpdate {
       "Your request has now been processed and is ready to watch on Plex, thanks for your request!",
       `https://image.tmdb.org/t/p/w500${request.thumb}`,
       [userData.email],
+      [userData.title],
     ]);
 
     console.log(`LIB CRON: Mailer updated`);

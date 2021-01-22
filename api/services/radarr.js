@@ -5,7 +5,7 @@ const path = require("path");
 var sanitize = require("sanitize-filename");
 
 class Radarr {
-  constructor(id = false) {
+  constructor(id = false, forced = false) {
     let project_folder, configFile;
     if (process.pkg) {
       project_folder = path.dirname(process.execPath);
@@ -17,8 +17,10 @@ class Radarr {
     const configData = fs.readFileSync(configFile);
     const configParse = JSON.parse(configData);
     this.fullConfig = configParse;
+    this.forced = forced;
     if (id !== false) {
       this.config = this.findUuid(id, configParse);
+
       if (!this.config) {
         this.config = {};
         this.config.title = "Server Removed";
@@ -181,13 +183,8 @@ class Radarr {
 
   async processJobs(jobQ) {
     for (let job of jobQ) {
-      for (let server of this.fullConfig) {
-        if (!server.active) {
-          console.log(`SERVICE - RADARR: Server not active`);
-          return;
-        }
-
-        this.config = server;
+      // Target server
+      if (this.config) {
         try {
           let radarrData = await this.lookup(job.tmdb_id);
           let radarrId = await this.add(radarrData);
@@ -203,6 +200,32 @@ class Radarr {
           }
         } catch (err) {
           console.log(`SERVICE - RADARR: [${this.config.title}] Unable to add movie ${job.title} - ERR: ${err}`);
+        }
+      } else {
+        // Loop for all servers default
+        for (let server of this.fullConfig) {
+          if (!server.active) {
+            console.log(`SERVICE - RADARR: Server not active`);
+            return;
+          }
+
+          this.config = server;
+          try {
+            let radarrData = await this.lookup(job.tmdb_id);
+            let radarrId = await this.add(radarrData);
+            let updatedRequest = await Request.findOneAndUpdate(
+              {
+                requestId: job.requestId,
+              },
+              { $push: { radarrId: { [this.config.uuid]: radarrId } } },
+              { useFindAndModify: false }
+            );
+            if (updatedRequest) {
+              console.log(`SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`);
+            }
+          } catch (err) {
+            console.log(`SERVICE - RADARR: [${this.config.title}] Unable to add movie ${job.title} - ERR: ${err}`);
+          }
         }
       }
     }
@@ -220,7 +243,11 @@ class Radarr {
       if (req.type === "movie") {
         if (!req.tmdb_id) {
           console.log(`SERVICE - RADARR: TMDB ID not found for ${req.title}`);
-        } else if (req.radarrId.length === 0) {
+        } else if (req.radarrId.length === 0 || this.forced) {
+          if (!req.approved) {
+            console.log(`SERVICE - RADARR: Request requires approval - ${req.title}`);
+            return;
+          }
           jobQ.push(req);
           console.log(`SERVICE - RADARR: ${req.title} added to job queue`);
         }

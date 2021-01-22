@@ -49,18 +49,35 @@ export function logout() {
 
 export function request(req, user) {
   return new Promise((resolve, reject) => {
-    api.request(req, user).then((data) => {
-      if (data && !data.error) {
-        resolve(
-          finalise({
-            type: types.GET_REQUESTS,
-            requests: data,
-          })
-        );
-      } else {
-        reject("Error");
-      }
-    });
+    api
+      .request(req, user)
+      .then((data) => {
+        if (data && !data.error) {
+          resolve(
+            finalise({
+              type: types.GET_REQUESTS,
+              requests: data,
+            }),
+            finalise({
+              type: types.UPDATE_QUOTA,
+              quota: data.quota,
+            })
+          );
+        } else {
+          if (data) {
+            reject(data.message);
+          } else {
+            reject("API Connection error");
+          }
+        }
+      })
+      .catch((data) => {
+        if (data) {
+          reject(data.message);
+        } else {
+          reject("API Connection error");
+        }
+      });
   });
 }
 
