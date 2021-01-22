@@ -16,6 +16,7 @@ const FriendSchema = mongoose.Schema(
     profile: String,
     custom: Boolean,
     disabled: Boolean,
+    quotaCount: Number,
   },
   { collection: "friends" }
 );

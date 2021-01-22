@@ -16,6 +16,8 @@ const getConfig = require("./util/config");
 const LibraryUpdate = require("./plex/libraryUpdate");
 const testConnection = require("./plex/testConnection");
 
+const QuotaSystem = require("./requests/quotas");
+
 // Routes
 const movieRoute = require("./routes/movie");
 const showRoute = require("./routes/show");
@@ -50,6 +52,13 @@ class Main {
       const d = new Date();
       console.log("Partial Scan Started:", d);
       new LibraryUpdate().partial();
+    });
+
+    // Every Sunday at 11pm
+    this.resetQuotas = new CronJob("0 11 * * sun", function () {
+      const d = new Date();
+      console.log("Quotas cleared:", d);
+      new QuotaSystem().reset();
     });
 
     if (process.pkg) {
@@ -136,10 +145,12 @@ class Main {
   }
 
   async start() {
-    const libUpdate = new LibraryUpdate();
-    this.cron.start();
-    this.partial.start();
-    libUpdate.run();
+    // const libUpdate = new LibraryUpdate();
+    // this.cron.start();
+    // this.partial.start();
+    // libUpdate.run();
+    this.resetQuotas.start();
+    new QuotaSystem().reset();
   }
 
   setup() {

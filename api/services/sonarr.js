@@ -5,7 +5,7 @@ const path = require("path");
 var sanitize = require("sanitize-filename");
 
 class Sonarr {
-  constructor(id = false) {
+  constructor(id = false, forced = false) {
     let project_folder, configFile;
     if (process.pkg) {
       project_folder = path.dirname(process.execPath);
@@ -17,6 +17,7 @@ class Sonarr {
     const configData = fs.readFileSync(configFile);
     const configParse = JSON.parse(configData);
     this.fullConfig = configParse;
+    this.forced = forced;
     if (id !== false) {
       this.config = this.findUuid(id, configParse);
 
@@ -172,6 +173,25 @@ class Sonarr {
 
   async processJobs(jobQ) {
     for (let job of jobQ) {
+      if (this.config) {
+        try {
+          let sonarrData = await this.lookup(job.tvdb_id);
+          let sonarrId = await this.add(sonarrData[0]);
+          let updatedRequest = await Request.findOneAndUpdate(
+            {
+              requestId: job.requestId,
+            },
+            { $push: { sonarrId: { [this.config.uuid]: sonarrId } } },
+            { useFindAndModify: false }
+          );
+          if (updatedRequest) {
+            console.log(`SERVICE - SONARR: [${this.config.title}] Sonnar job added for ${job.title}`);
+          }
+        } catch (err) {
+          console.log(err);
+          console.log(`SERVICE - SONARR: [${this.config.title}] Unable to add series ${job.title}`);
+        }
+      }
       for (let server of this.fullConfig) {
         if (!server.active) {
           return;
@@ -211,7 +231,11 @@ class Sonarr {
       if (req.type === "tv") {
         if (!req.tvdb_id) {
           console.log(`SERVICE - SONARR: TVDB ID not found for ${req.title}`);
-        } else if (req.sonarrId.length === 0) {
+        } else if (req.sonarrId.length === 0 || this.forced) {
+          if (!req.approved) {
+            console.log(`SERVICE - SONARR: Request requires approval - ${req.title}`);
+            return;
+          }
           jobQ.push(req);
           console.log(`SERVICE - SONARR: ${req.title} added to job queue`);
         }
