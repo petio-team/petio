@@ -234,10 +234,10 @@ class Sonarr {
         } else if (req.sonarrId.length === 0 || this.forced) {
           if (!req.approved) {
             console.log(`SERVICE - SONARR: Request requires approval - ${req.title}`);
-            return;
+          } else {
+            jobQ.push(req);
+            console.log(`SERVICE - SONARR: ${req.title} added to job queue`);
           }
-          jobQ.push(req);
-          console.log(`SERVICE - SONARR: ${req.title} added to job queue`);
         }
       }
     }
