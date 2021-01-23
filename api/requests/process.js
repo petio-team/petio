@@ -58,7 +58,7 @@ class processRequest {
     await Request.updateOne({ requestId: this.request.id }, { $push: { users: this.user.id } });
     if (autoApprove) {
       await Request.updateOne({ requestId: this.request.id }, { $set: { approved: true } });
-      await this.sendToDvr(profile);
+      this.sendToDvr(profile);
     }
     return {
       message: "request updated",
@@ -89,6 +89,7 @@ class processRequest {
 
     try {
       await newRequest.save();
+      this.sendToDvr(profile);
     } catch (err) {
       console.log(err);
       return {
@@ -99,8 +100,6 @@ class processRequest {
       };
     }
 
-    await this.sendToDvr(profile);
-
     return {
       message: "request added",
       user: this.user.title,
@@ -109,31 +108,30 @@ class processRequest {
   }
 
   async sendToDvr(profile) {
+    console.log("Sending to DVR");
     // If profile is set use arrs from profile
     if (profile) {
-      if (profile.radarr) {
+      if (profile.radarr && this.request.type === "movie") {
         Object.keys(profile.radarr).map((r) => {
           let active = profile.radarr[r];
           if (active) {
-            new Radarr(r, true).getRequests();
+            new Radarr(r).processRequest(this.request.id);
           }
         });
       }
-      if (profile.sonarr) {
+      if (profile.sonarr && this.request.type === "tv") {
         Object.keys(profile.sonarr).map((s) => {
           let active = profile.sonarr[s];
           if (active) {
-            new Sonarr(s, true).getRequests();
+            new Sonarr(s).processRequest(this.request.id);
           }
         });
       }
     } else {
       // No profile set send to all arrs
       console.log("No profile");
-      let sonarr = new Sonarr();
-      let radarr = new Radarr();
-      sonarr.getRequests();
-      radarr.getRequests();
+      if (this.request.type === "tv") new Sonarr().processRequest(this.request.id);
+      if (this.request.type === "movie") new Radarr().processRequest(this.request.id);
     }
   }
 

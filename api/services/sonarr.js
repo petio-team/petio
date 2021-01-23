@@ -219,29 +219,26 @@ class Sonarr {
     }
   }
 
-  async getRequests() {
-    console.log(`SERVICE - SONARR: Polling requests`);
+  async processRequest(id) {
+    console.log(`SERVICE - SONARR: Processing request`);
     if (!this.fullConfig || this.fullConfig.length === 0) {
       console.log(`SERVICE - SONARR: No active servers`);
       return;
     }
-    const requests = await Request.find();
-    let jobQ = [];
-    for (let req of requests) {
-      if (req.type === "tv") {
-        if (!req.tvdb_id) {
-          console.log(`SERVICE - SONARR: TVDB ID not found for ${req.title}`);
-        } else if (req.sonarrId.length === 0 || this.forced) {
-          if (!req.approved) {
-            console.log(`SERVICE - SONARR: Request requires approval - ${req.title}`);
-          } else {
-            jobQ.push(req);
-            console.log(`SERVICE - SONARR: ${req.title} added to job queue`);
-          }
+
+    const req = await Request.findOne({ requestId: id });
+    if (req.type === "tv") {
+      if (!req.tvdb_id) {
+        console.log(`SERVICE - SONARR: TVDB ID not found for ${req.title}`);
+      } else if (req.sonarrId.length === 0 || this.forced) {
+        if (!req.approved) {
+          console.log(`SERVICE - SONARR: Request requires approval - ${req.title}`);
+        } else {
+          console.log("SERVICE - SONARR: Request passed to queue");
+          this.processJobs([req]);
         }
       }
     }
-    this.processJobs(jobQ);
   }
 }
 
