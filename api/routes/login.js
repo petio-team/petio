@@ -121,6 +121,7 @@ async function getFriend(username, res, request_ip) {
   if (friend) {
     if (friend.disabled) {
       res.json({ admin: false, loggedIn: false, token: false });
+      return;
     }
     console.log(`LOGIN: User found`);
     res.json({

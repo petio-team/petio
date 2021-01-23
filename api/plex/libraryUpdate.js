@@ -7,8 +7,7 @@ const Music = require("../models/artist");
 const Show = require("../models/show");
 const User = require("../models/user");
 const Request = require("../models/request");
-// const Sonarr = require("../services/sonarr");
-// const Radarr = require("../services/radarr");
+const Profile = require("../models/profile");
 const Mailer = require("../mail/mailer");
 const getConfig = require("../util/config");
 
@@ -28,8 +27,6 @@ class LibraryUpdate {
     console.log(`LIB CRON: Running Partial`);
     this.full = false;
     let recent = false;
-    // let sonarr = new Sonarr();
-    // let radarr = new Radarr();
     try {
       await this.updateFriends();
       recent = await this.getRecent();
@@ -85,8 +82,6 @@ class LibraryUpdate {
         }
       })
     );
-    // sonarr.getRequests();
-    // radarr.getRequests();
     this.execMail();
     console.log("LIB CRON: Partial Scan Complete");
   }
@@ -95,8 +90,6 @@ class LibraryUpdate {
     console.log(`LIB CRON: Running Full`);
     await this.createAdmin();
     let libraries = false;
-    // let sonarr = new Sonarr();
-    // let radarr = new Radarr();
     try {
       libraries = await this.getLibraries();
     } catch (err) {
@@ -107,8 +100,6 @@ class LibraryUpdate {
       await this.saveLibraries(libraries);
       await this.updateLibraryContent(libraries);
       await this.updateFriends();
-      // sonarr.getRequests();
-      // radarr.getRequests();
       this.execMail();
       console.log("LIB CRON: Full Scan Complete");
     } else {
@@ -729,15 +720,14 @@ class LibraryUpdate {
   async saveFriend(obj) {
     // Maybe delete all and rebuild each time?
     let friendDb = false;
-    let output = "";
     try {
       friendDb = await User.findOne({ id: obj.id });
     } catch {
       friendDb = false;
     }
     if (!friendDb) {
-      output += "Friend Not found - ";
       try {
+        let defaultProfile = await Profile.findOne({ isDefault: true });
         let newFriend = new User({
           id: obj.id,
           title: obj.title,
@@ -748,17 +738,18 @@ class LibraryUpdate {
           Server: obj.Server,
           quotaCount: 0,
         });
+        if (defaultProfile) {
+          newFriend.profile = defaultProfile._id;
+        }
         friendDb = await newFriend.save();
       } catch (err) {
         console.log(`LIB CRON: ${err}`);
       }
       if (friendDb) {
-        output += "Created ----------- New Friend Added!";
+        console.log(`LIB CRON: User Created ${obj.title}`);
       } else {
-        output += "Not Created";
+        console.log(`LIB CRON: User Failed to Create ${obj.title}`);
       }
-    } else {
-      output += "Friend Found in Db";
     }
   }
 
