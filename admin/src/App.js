@@ -71,8 +71,8 @@ class App extends React.Component {
         <div className="app">
           <div className="setup--wrap">
             <p className="main-title">Error</p>
-            <p>Something's wrong I can feel it...</p>
-            <p>Ok, you've managed to get the admin front end to load. But it looks like I can't talk to the API service.</p>
+            <p>Something's wrong...</p>
+            <p>Ok, you've managed to get the admin front end to load. But it looks like the API service isn't accessible.</p>
             <p>
               Please make sure the API service has started and is still running without any errors. Just finished the setup wizard? If the API can't connect to the DB it will reject the configuration
               and needs a restart, so check the logs.
