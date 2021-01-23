@@ -119,6 +119,10 @@ async function getFriend(username, res, request_ip) {
     $or: [{ username: username }, { email: username }, { title: username }],
   });
   if (friend) {
+    if (friend.disabled) {
+      res.json({ admin: false, loggedIn: false, token: false });
+      return;
+    }
     console.log(`LOGIN: User found`);
     res.json({
       admin: false,
