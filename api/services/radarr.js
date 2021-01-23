@@ -231,29 +231,26 @@ class Radarr {
     }
   }
 
-  async getRequests() {
-    console.log(`SERVICE - RADARR: Polling requests`);
+  async processRequest(id) {
+    console.log(`SERVICE - RADARR: Processing request`);
     if (!this.fullConfig || this.fullConfig.length === 0) {
       console.log(`SERVICE - RADARR: No active servers`);
       return;
     }
-    const requests = await Request.find();
-    let jobQ = [];
-    for (let req of requests) {
-      if (req.type === "movie") {
-        if (!req.tmdb_id) {
-          console.log(`SERVICE - RADARR: TMDB ID not found for ${req.title}`);
-        } else if (req.radarrId.length === 0 || this.forced) {
-          if (!req.approved) {
-            console.log(`SERVICE - RADARR: Request requires approval - ${req.title}`);
-          } else {
-            jobQ.push(req);
-            console.log(`SERVICE - RADARR: ${req.title} added to job queue`);
-          }
+
+    const req = await Request.findOne({ requestId: id });
+    if (req.type === "movie") {
+      if (!req.tmdb_id) {
+        console.log(`SERVICE - RADARR: TMDB ID not found for ${req.title}`);
+      } else if (req.radarrId.length === 0) {
+        if (!req.approved) {
+          console.log(`SERVICE - RADARR: Request requires approval - ${req.title}`);
+        } else {
+          console.log("SERVICE - RADARR: Request passed to queue");
+          this.processJobs([req]);
         }
       }
     }
-    this.processJobs(jobQ);
   }
 }
 

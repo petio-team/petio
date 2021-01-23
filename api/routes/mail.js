@@ -30,7 +30,6 @@ router.post("/create", async (req, res) => {
 
 router.get("/config", async (req, res) => {
   let config = await getConfig();
-  console.log(config);
   let data = false;
   if (!config) {
     data = {
