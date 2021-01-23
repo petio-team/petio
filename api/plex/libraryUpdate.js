@@ -808,7 +808,7 @@ class LibraryUpdate {
     console.log(this.mailer);
     this.mailer.forEach((mail, index) => {
       setTimeout(() => {
-        new Mailer().mail(mail[0], mail[1], mail[2], mail[3], mail[4]);
+        new Mailer().mail(mail[0], mail[1], mail[2], mail[3], mail[4], mail[5]);
       }, 10000 * (index + 1));
     });
     this.mailer = [];
