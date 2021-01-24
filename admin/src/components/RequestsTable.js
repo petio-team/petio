@@ -310,7 +310,16 @@ class RequestsTable extends React.Component {
                       })}
                     </td>
                     <td>{req.approved ? "Yes" : "No"}</td>
-                    <td></td>
+                    <td>
+                      <p
+                        className="table-action"
+                        onClick={() => {
+                          this.props.editReq(req);
+                        }}
+                      >
+                        Edit
+                      </p>
+                    </td>
                   </tr>
                   {this.children(req)}
                 </React.Fragment>
