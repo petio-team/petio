@@ -781,6 +781,9 @@ class LibraryUpdate {
   async sendMail(user, i, request) {
     let userData = await User.findOne({ id: user });
     if (!userData) {
+      userData = await Admin.findOne({ id: user });
+    }
+    if (!userData) {
       console.log("LIB CRON: Err: No user data");
       return;
     }
