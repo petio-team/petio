@@ -182,6 +182,9 @@ class RequestsTable extends React.Component {
   }
 
   reqState(req) {
+    if (!req.approved) {
+      return <span className="requests--status requests--status__pending">Pending</span>;
+    }
     if (req.children) {
       if (req.children.length > 0) {
         for (let r = 0; r < req.children.length; r++) {
