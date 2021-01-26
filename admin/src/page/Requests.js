@@ -17,6 +17,7 @@ class Requests extends React.Component {
       deleteRequestOpen: false,
       edit_radarr: {},
       edit_sonarr: {},
+      req_delete_reason: "",
     };
 
     this.getRequests = this.getRequests.bind(this);
@@ -26,6 +27,10 @@ class Requests extends React.Component {
     this.changeServerSettings = this.changeServerSettings.bind(this);
     this.renderReqEdit = this.renderReqEdit.bind(this);
     this.deleteReq = this.deleteReq.bind(this);
+    this.updateReq = this.updateReq.bind(this);
+    this.removeReq = this.removeReq.bind(this);
+    this.approveReq = this.approveReq.bind(this);
+    this.inputChange = this.inputChange.bind(this);
   }
 
   componentDidMount() {
@@ -48,6 +53,7 @@ class Requests extends React.Component {
   closeModal(id) {
     this.setState({
       [`${id}Open`]: false,
+      req_delete_reason: "",
     });
   }
 
@@ -276,14 +282,30 @@ class Requests extends React.Component {
     this.openModal("deleteRequest");
   }
 
+  updateReq() {
+    this.closeModal("editRequest");
+    alert("req updated");
+  }
+
+  approveReq() {
+    this.closeModal("editRequest");
+    alert("req approved");
+  }
+
+  removeReq() {
+    this.closeModal("deleteRequest");
+    let reason = this.state.req_delete_reason.length > 0 ? this.state.req_delete_reason : "No reason provided";
+    alert(`req deleted - reason ${reason}`);
+  }
+
   render() {
     return (
       <>
-        <Modal title="Remove Request" open={this.state.deleteRequestOpen} close={() => this.closeModal("deleteRequest")}>
+        <Modal title="Remove Request" open={this.state.deleteRequestOpen} close={() => this.closeModal("deleteRequest")} submit={this.removeReq}>
           <p className="sub-title mb--1">Removing {this.state.activeRequest ? this.state.activeRequest.title : ""}</p>
           <textarea
             className="styled-input--textarea"
-            value={this.state.detail}
+            value={this.state.req_delete_reason}
             placeholder="Message to user: E.g Sorry this Movie is not available"
             name="req_delete_reason"
             onChange={this.inputChange}
@@ -299,6 +321,7 @@ class Requests extends React.Component {
           submitText={this.state.activeRequest ? (this.state.activeRequest.sonarrId.length > 0 || this.state.activeRequest.radarrId.length > 0 ? "Save" : "Save & Approve") : false}
           deleteText={this.state.activeRequest ? (this.state.activeRequest.sonarrId.length > 0 || this.state.activeRequest.radarrId.length > 0 ? "Delete" : "Deny") : false}
           delete={this.deleteReq}
+          submit={this.state.activeRequest ? (this.state.activeRequest.sonarrId.length > 0 || this.state.activeRequest.radarrId.length > 0 ? this.updateReq : this.approveReq) : false}
         >
           {this.state.activeRequest ? (
             <>
