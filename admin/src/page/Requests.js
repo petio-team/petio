@@ -179,7 +179,6 @@ class Requests extends React.Component {
         let req = this.state.requests[key];
         for (let i = 0; i < req.users.length; i++) {
           if (!this.props.api.users[req.users[i]]) {
-            console.log(req.users[i]);
             Api.getUser(req.users[i]);
           }
         }
@@ -292,10 +291,15 @@ class Requests extends React.Component {
     alert("req approved");
   }
 
-  removeReq() {
-    this.closeModal("deleteRequest");
-    let reason = this.state.req_delete_reason.length > 0 ? this.state.req_delete_reason : "No reason provided";
-    alert(`req deleted - reason ${reason}`);
+  async removeReq() {
+    let reason = this.state.req_delete_reason.length > 0 ? this.state.req_delete_reason : false;
+    let remove = await Api.removeRequest(this.state.activeRequest, reason);
+    if (remove) {
+      this.closeModal("deleteRequest");
+      this.getRequests(true);
+    } else {
+      alert("Failed to remove request");
+    }
   }
 
   render() {

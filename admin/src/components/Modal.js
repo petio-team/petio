@@ -21,7 +21,7 @@ class Modal extends React.Component {
               </div>
               {this.props.delete ? (
                 <div className="btn btn__square bad delete-modal" onClick={this.props.delete}>
-                  {this.props.deleteText ? this.props.deleteText : "Submit"}
+                  {this.props.deleteText ? this.props.deleteText : "Delete"}
                 </div>
               ) : null}
             </div>

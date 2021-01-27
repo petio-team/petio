@@ -294,6 +294,15 @@ export let bulkEditUser = (data) => {
   return call(request, headers, "post", body).then((res) => res.json());
 };
 
+export let removeReq = (req, reason) => {
+  let request = `${apiUrl}/request/remove`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  let body = { request: req, reason: reason };
+  return call(request, headers, "post", body);
+};
+
 function call(url, headers, method, body = null) {
   let args = {
     method: method,

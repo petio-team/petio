@@ -1,4 +1,5 @@
 const Request = require("../models/request");
+const Archive = require("../models/archive");
 const User = require("../models/user");
 const Admin = require("../models/admin");
 const Profile = require("../models/profile");
@@ -173,6 +174,40 @@ class processRequest {
     }
 
     return true;
+  }
+
+  async archive(complete = Boolean, removed = Boolean, reason = false) {
+    console.log(this.request);
+    let archiveRequest = new Archive({
+      requestId: this.request.requestId,
+      type: this.request.type,
+      title: this.request.title,
+      thumb: this.request.thumb,
+      imdb_id: this.request.imdb_id,
+      tmdb_id: this.request.tmdb_id,
+      tvdb_id: this.request.tvdb_id,
+      users: this.request.users,
+      sonarrId: this.request.sonarrId,
+      radarrId: this.request.radarrId,
+      approved: this.request.approved,
+      removed: removed ? true : false,
+      removed_reason: reason,
+      complete: complete ? true : false,
+    });
+    await archiveRequest.save();
+    Request.findOneAndRemove(
+      {
+        requestId: this.request.requestId,
+      },
+      { useFindAndModify: false },
+      function (err, data) {
+        if (err) {
+          console.log(`REQ: Archive Error: ${err}`);
+        } else {
+          console.log("REQ: Request Archived!");
+        }
+      }
+    );
   }
 }
 
