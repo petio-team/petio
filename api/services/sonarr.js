@@ -193,29 +193,30 @@ class Sonarr {
           console.log(err);
           console.log(`SERVICE - SONARR: [${this.config.title}] Unable to add series ${job.title}`);
         }
-      }
-      for (let server of this.fullConfig) {
-        if (!server.active) {
-          return;
-        }
-
-        this.config = server;
-        try {
-          let sonarrData = await this.lookup(job.tvdb_id);
-          let sonarrId = await this.add(sonarrData[0]);
-          let updatedRequest = await Request.findOneAndUpdate(
-            {
-              requestId: job.requestId,
-            },
-            { $push: { sonarrId: { [this.config.uuid]: sonarrId } } },
-            { useFindAndModify: false }
-          );
-          if (updatedRequest) {
-            console.log(`SERVICE - SONARR: [${this.config.title}] Sonnar job added for ${job.title}`);
+      } else {
+        for (let server of this.fullConfig) {
+          if (!server.active) {
+            return;
           }
-        } catch (err) {
-          console.log(err);
-          console.log(`SERVICE - SONARR: [${this.config.title}] Unable to add series ${job.title}`);
+
+          this.config = server;
+          try {
+            let sonarrData = await this.lookup(job.tvdb_id);
+            let sonarrId = await this.add(sonarrData[0]);
+            let updatedRequest = await Request.findOneAndUpdate(
+              {
+                requestId: job.requestId,
+              },
+              { $push: { sonarrId: { [this.config.uuid]: sonarrId } } },
+              { useFindAndModify: false }
+            );
+            if (updatedRequest) {
+              console.log(`SERVICE - SONARR: [${this.config.title}] Sonnar job added for ${job.title}`);
+            }
+          } catch (err) {
+            console.log(err);
+            console.log(`SERVICE - SONARR: [${this.config.title}] Unable to add series ${job.title}`);
+          }
         }
       }
     }
