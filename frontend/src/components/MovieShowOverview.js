@@ -246,9 +246,9 @@ class MovieShowOverview extends React.Component {
                 <div className="detail--bar--sep">·</div>
                 <p className="runtime">
                   {this.props.mediaData.runtime ? this.timeConvert(this.props.mediaData.runtime) : null}
-                  {this.props.mediaData.episode_run_time
+                  {this.props.mediaData.episode_run_time.length > 0
                     ? this.timeConvert(Array.isArray(this.props.mediaData.episode_run_time) ? this.props.mediaData.episode_run_time[0] : this.props.mediaData.episode_run_time)
-                    : null}
+                    : "Unknown"}
                 </p>
                 <div className="detail--bar--sep">·</div>
                 <p>
