@@ -182,6 +182,9 @@ class RequestsTable extends React.Component {
   }
 
   reqState(req) {
+    if (!req.approved) {
+      return <span className="requests--status requests--status__pending">Pending</span>;
+    }
     if (req.children) {
       if (req.children.length > 0) {
         for (let r = 0; r < req.children.length; r++) {
@@ -310,7 +313,16 @@ class RequestsTable extends React.Component {
                       })}
                     </td>
                     <td>{req.approved ? "Yes" : "No"}</td>
-                    <td></td>
+                    <td>
+                      <p
+                        className="table-action"
+                        onClick={() => {
+                          this.props.editReq(req);
+                        }}
+                      >
+                        Edit
+                      </p>
+                    </td>
                   </tr>
                   {this.children(req)}
                 </React.Fragment>

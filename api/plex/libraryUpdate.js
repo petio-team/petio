@@ -30,7 +30,8 @@ class LibraryUpdate {
     try {
       await this.updateFriends();
       recent = await this.getRecent();
-    } catch {
+    } catch (err) {
+      console.log(err);
       console.log(`LIB CRON: Partial scan failed - unable to get recent`);
       return;
     }
@@ -190,7 +191,6 @@ class LibraryUpdate {
         },
         function (err, data) {
           if (err || !data) {
-            console.log(data);
             console.log("LIB CRON: Recently added failed!");
             reject();
           }
@@ -198,7 +198,6 @@ class LibraryUpdate {
             console.log("LIB CRON: Recently Added received");
             resolve(data.MediaContainer);
           } else {
-            console.log(data);
             console.log("LIB CRON: Recently added failed!");
             reject();
           }
@@ -781,6 +780,9 @@ class LibraryUpdate {
 
   async sendMail(user, i, request) {
     let userData = await User.findOne({ id: user });
+    if (!userData) {
+      userData = await Admin.findOne({ id: user });
+    }
     if (!userData) {
       console.log("LIB CRON: Err: No user data");
       return;
