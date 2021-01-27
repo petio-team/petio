@@ -136,6 +136,39 @@ class processRequest {
     }
   }
 
+  async removeFromDVR() {
+    if (this.request) {
+      if (this.request.radarrId.length > 0 && this.request.type === "movie") {
+        for (let i = 0; i < Object.keys(this.request.radarrId).length; i++) {
+          let radarrIds = this.request.radarrId[i];
+          let rId = radarrIds[Object.keys(radarrIds)[0]];
+          let serverUuid = Object.keys(radarrIds)[0];
+          let server = new Radarr(serverUuid);
+          try {
+            server.remove(rId);
+            console.log(`REQ: ${this.request.title} removed from Radarr server - ${serverUuid}`);
+          } catch (err) {
+            console.log(`REQ: Error unable to remove from Radarr`, err);
+          }
+        }
+      }
+      if (this.request.sonarrId.length > 0 && this.request.type === "tv") {
+        for (let i = 0; i < Object.keys(this.request.sonarrId).length; i++) {
+          let sonarrIds = this.request.sonarrId[i];
+          let sId = sonarrIds[Object.keys(sonarrIds)[0]];
+          let serverUuid = Object.keys(sonarrIds)[0];
+          let server = new Sonarr(serverUuid);
+          try {
+            server.remove(sId);
+            console.log(`REQ: ${this.request.title} removed from Sonarr server - ${serverUuid}`);
+          } catch (err) {
+            console.log(`REQ: Error unable to remove from Sonarr`, err);
+          }
+        }
+      }
+    }
+  }
+
   async mailRequest() {
     let userData = this.user;
     if (!userData.email) {

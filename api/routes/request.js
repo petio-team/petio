@@ -137,8 +137,10 @@ router.get("/all", async (req, res) => {
 router.post("/remove", async (req, res) => {
   let request = req.body.request;
   let reason = req.body.reason;
-  await new processRequest(request).archive(false, true, reason);
+  let process = new processRequest(request);
+  await process.archive(false, true, reason);
   res.status(200).send();
+  process.removeFromDVR();
   let emails = [];
   let titles = [];
   await Promise.all(
@@ -151,14 +153,6 @@ router.post("/remove", async (req, res) => {
       emails.push(userData.email);
       titles.push(userData.title);
     })
-  );
-  console.log(
-    `Your request was ${request.approved ? "removed" : "denied"} for ${request.title}`,
-    `Your request was ${request.approved ? "removed" : "denied"} for ${request.title}`,
-    `Unfortunately your request could not be processed.${reason ? ` This is because - ${reason}.` : ""} Thanks for your request anyway!`,
-    `https://image.tmdb.org/t/p/w500${request.thumb}`,
-    emails,
-    titles
   );
   new Mailer().mail(
     `Your request was ${request.approved ? "removed" : "denied"} for ${request.title}`,
