@@ -152,7 +152,6 @@ class Requests extends React.Component {
         req.radarrId.map((r, i) => {
           let uuid = Object.keys(r)[0];
           let child = req.children[i] ? req.children[i].info : {};
-          console.log(child.path.replace(`/${req.title} (${child.year})`, ""));
           edit_radarr[uuid] = {
             active: true,
             profile: child.qualityProfileId ? child.qualityProfileId : false,
