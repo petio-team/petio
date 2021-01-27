@@ -59,7 +59,9 @@ router.get("/all", async (req, res) => {
     let data = Object.values(Object.assign(userData, adminData));
     Object.keys(data).map((u) => {
       let user = data[u];
-      if (user.password) user.password = "removed";
+      if (user) {
+        if (user.password) user.password = "removed";
+      }
     });
     res.json(data);
   } else {
