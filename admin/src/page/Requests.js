@@ -384,7 +384,7 @@ class Requests extends React.Component {
           open={this.state.editRequestOpen}
           close={() => this.closeModal("editRequest")}
           submitText={this.state.activeRequest ? (this.state.activeRequest.approved ? "Save" : "Save & Approve") : false}
-          deleteText={this.state.activeRequest ? (this.state.activeRequest.sonarrId.length > 0 || this.state.activeRequest.radarrId.length > 0 ? "Delete" : "Deny") : false}
+          deleteText={this.state.activeRequest ? (this.state.activeRequest.approved ? "Delete" : "Deny") : false}
           delete={this.deleteReq}
           submit={this.state.activeRequest ? (this.state.activeRequest.sonarrId.length > 0 || this.state.activeRequest.radarrId.length > 0 ? false : this.approveReq) : false}
         >
