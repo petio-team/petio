@@ -155,7 +155,7 @@ class Requests extends React.Component {
           edit_radarr[uuid] = {
             active: true,
             profile: child.qualityProfileId ? child.qualityProfileId : false,
-            path: child.path ? child.path.replace(`/${req.title} (${child.year})`, "") : false,
+            path: child.path ? child.path.replace(`/${req.title} (${child.year})`, "").replace(`\\${req.title} (${child.year})`, "") : false,
           };
         });
       }
@@ -168,7 +168,7 @@ class Requests extends React.Component {
           edit_sonarr[uuid] = {
             active: true,
             profile: child.qualityProfileId ? child.qualityProfileId : false,
-            path: child.path ? child.path.replace(`/${req.title} (${child.year})`, "") : false,
+            path: child.path ? child.path.replace(`/${req.title} (${child.year})`, "").replace(`\\${req.title} (${child.year})`, "") : false,
           };
         });
       }
