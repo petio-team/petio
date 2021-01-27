@@ -155,7 +155,7 @@ class Requests extends React.Component {
           edit_radarr[uuid] = {
             active: true,
             profile: child.qualityProfileId ? child.qualityProfileId : false,
-            path: child.path ? child.path.replace(`/${req.title} (${child.year})`, "") : false,
+            path: child.path ? child.path.replace(`/${req.title} (${child.year})`, "").replace(`\\${req.title} (${child.year})`, "") : false,
           };
         });
       }
@@ -168,7 +168,7 @@ class Requests extends React.Component {
           edit_sonarr[uuid] = {
             active: true,
             profile: child.qualityProfileId ? child.qualityProfileId : false,
-            path: child.path ? child.path.replace(`/${req.title} (${child.year})`, "") : false,
+            path: child.path ? child.path.replace(`/${req.title} (${child.year})`, "").replace(`\\${req.title} (${child.year})`, "") : false,
           };
         });
       }
@@ -234,9 +234,10 @@ class Requests extends React.Component {
           />
           Use this server
         </label>
-        <p className="request-edit--server--subtitle">Profile</p>
+
         {server.options ? (
           <>
+            <p className="request-edit--server--subtitle">Profile</p>
             <div className={`styled-input--select ${editable ? "" : "disabled"}`}>
               <select
                 data-type={type}
@@ -284,7 +285,20 @@ class Requests extends React.Component {
             </div>
           </>
         ) : (
-          <p>Error with Server settings</p>
+          <>
+            <p className="request-edit--server--subtitle">Profile</p>
+            <div className="styled-input--select disabled">
+              <select>
+                <option value="">Loading...</option>
+              </select>
+            </div>
+            <p className="request-edit--server--subtitle">Root Path</p>
+            <div className="styled-input--select disabled">
+              <select>
+                <option value="">Loading...</option>
+              </select>
+            </div>
+          </>
         )}
         {editable ? null : (
           <p style={{ margin: 0 }}>
