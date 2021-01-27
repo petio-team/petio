@@ -221,51 +221,57 @@ class Requests extends React.Component {
           Use this server
         </label>
         <p className="request-edit--server--subtitle">Profile</p>
-        <div className={`styled-input--select ${editable ? "" : "disabled"}`}>
-          <select
-            data-type={type}
-            data-id={server.uuid}
-            name="profile"
-            value={this.state[`edit_${type}`][server.uuid] ? this.state[`edit_${type}`][server.uuid].profile : false}
-            onChange={this.changeServerSettings}
-          >
-            <option value="">Please choose</option>
-            {server.options.profiles ? (
-              server.options.profiles.map((profile, i) => {
-                return (
-                  <option key={`${type}_profile_${server.uuid}_${profile.id}`} value={profile.id}>
-                    {profile.name}
-                  </option>
-                );
-              })
-            ) : (
-              <option value=""></option>
-            )}
-          </select>
-        </div>
-        <p className="request-edit--server--subtitle">Root Path</p>
-        <div className={`styled-input--select ${editable ? "" : "disabled"}`}>
-          <select
-            data-type={type}
-            data-id={server.uuid}
-            name="path"
-            value={this.state[`edit_${type}`][server.uuid] ? this.state[`edit_${type}`][server.uuid].path : false}
-            onChange={this.changeServerSettings}
-          >
-            <option value="">Please choose</option>
-            {server.options.paths ? (
-              server.options.paths.map((path, i) => {
-                return (
-                  <option key={`${type}_profile_${server.uuid}_${path.id}`} value={path.path}>
-                    {path.path}
-                  </option>
-                );
-              })
-            ) : (
-              <option value=""></option>
-            )}
-          </select>
-        </div>
+        {server.options ? (
+          <>
+            <div className={`styled-input--select ${editable ? "" : "disabled"}`}>
+              <select
+                data-type={type}
+                data-id={server.uuid}
+                name="profile"
+                value={this.state[`edit_${type}`][server.uuid] ? this.state[`edit_${type}`][server.uuid].profile : false}
+                onChange={this.changeServerSettings}
+              >
+                <option value="">Please choose</option>
+                {server.options.profiles ? (
+                  server.options.profiles.map((profile, i) => {
+                    return (
+                      <option key={`${type}_profile_${server.uuid}_${profile.id}`} value={profile.id}>
+                        {profile.name}
+                      </option>
+                    );
+                  })
+                ) : (
+                  <option value=""></option>
+                )}
+              </select>
+            </div>
+            <p className="request-edit--server--subtitle">Root Path</p>
+            <div className={`styled-input--select ${editable ? "" : "disabled"}`}>
+              <select
+                data-type={type}
+                data-id={server.uuid}
+                name="path"
+                value={this.state[`edit_${type}`][server.uuid] ? this.state[`edit_${type}`][server.uuid].path : false}
+                onChange={this.changeServerSettings}
+              >
+                <option value="">Please choose</option>
+                {server.options.paths ? (
+                  server.options.paths.map((path, i) => {
+                    return (
+                      <option key={`${type}_profile_${server.uuid}_${path.id}`} value={path.path}>
+                        {path.path}
+                      </option>
+                    );
+                  })
+                ) : (
+                  <option value=""></option>
+                )}
+              </select>
+            </div>
+          </>
+        ) : (
+          <p>Error with Server settings</p>
+        )}
         {editable ? null : (
           <p style={{ margin: 0 }}>
             <small>{`These settings cannot be edited once sent to ${type}`}</small>
