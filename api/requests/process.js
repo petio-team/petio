@@ -1,4 +1,5 @@
 const Request = require("../models/request");
+const Archive = require("../models/archive");
 const User = require("../models/user");
 const Admin = require("../models/admin");
 const Profile = require("../models/profile");
@@ -135,6 +136,39 @@ class processRequest {
     }
   }
 
+  async removeFromDVR() {
+    if (this.request) {
+      if (this.request.radarrId.length > 0 && this.request.type === "movie") {
+        for (let i = 0; i < Object.keys(this.request.radarrId).length; i++) {
+          let radarrIds = this.request.radarrId[i];
+          let rId = radarrIds[Object.keys(radarrIds)[0]];
+          let serverUuid = Object.keys(radarrIds)[0];
+          let server = new Radarr(serverUuid);
+          try {
+            server.remove(rId);
+            console.log(`REQ: ${this.request.title} removed from Radarr server - ${serverUuid}`);
+          } catch (err) {
+            console.log(`REQ: Error unable to remove from Radarr`, err);
+          }
+        }
+      }
+      if (this.request.sonarrId.length > 0 && this.request.type === "tv") {
+        for (let i = 0; i < Object.keys(this.request.sonarrId).length; i++) {
+          let sonarrIds = this.request.sonarrId[i];
+          let sId = sonarrIds[Object.keys(sonarrIds)[0]];
+          let serverUuid = Object.keys(sonarrIds)[0];
+          let server = new Sonarr(serverUuid);
+          try {
+            server.remove(sId);
+            console.log(`REQ: ${this.request.title} removed from Sonarr server - ${serverUuid}`);
+          } catch (err) {
+            console.log(`REQ: Error unable to remove from Sonarr`, err);
+          }
+        }
+      }
+    }
+  }
+
   async mailRequest() {
     let userData = this.user;
     if (!userData.email) {
@@ -173,6 +207,40 @@ class processRequest {
     }
 
     return true;
+  }
+
+  async archive(complete = Boolean, removed = Boolean, reason = false) {
+    console.log(this.request);
+    let archiveRequest = new Archive({
+      requestId: this.request.requestId,
+      type: this.request.type,
+      title: this.request.title,
+      thumb: this.request.thumb,
+      imdb_id: this.request.imdb_id,
+      tmdb_id: this.request.tmdb_id,
+      tvdb_id: this.request.tvdb_id,
+      users: this.request.users,
+      sonarrId: this.request.sonarrId,
+      radarrId: this.request.radarrId,
+      approved: this.request.approved,
+      removed: removed ? true : false,
+      removed_reason: reason,
+      complete: complete ? true : false,
+    });
+    await archiveRequest.save();
+    Request.findOneAndRemove(
+      {
+        requestId: this.request.requestId,
+      },
+      { useFindAndModify: false },
+      function (err, data) {
+        if (err) {
+          console.log(`REQ: Archive Error: ${err}`);
+        } else {
+          console.log("REQ: Request Archived!");
+        }
+      }
+    );
   }
 }
 

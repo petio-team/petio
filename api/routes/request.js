@@ -1,10 +1,8 @@
-// Config
-const getConfig = require("../util/config");
-
 const express = require("express");
 const router = express.Router();
 const Request = require("../models/request");
 const User = require("../models/user");
+const Admin = require("../models/admin");
 const Mailer = require("../mail/mailer");
 const Sonarr = require("../services/sonarr");
 const Radarr = require("../services/radarr");
@@ -134,6 +132,36 @@ router.get("/all", async (req, res) => {
     console.log(`ERR: Error getting requests`);
   }
   res.json(data);
+});
+
+router.post("/remove", async (req, res) => {
+  let request = req.body.request;
+  let reason = req.body.reason;
+  let process = new processRequest(request);
+  await process.archive(false, true, reason);
+  res.status(200).send();
+  process.removeFromDVR();
+  let emails = [];
+  let titles = [];
+  await Promise.all(
+    request.users.map(async (user) => {
+      let userData = await User.findOne({ id: user });
+      if (!userData) {
+        userData = await Admin.findOne({ id: user });
+      }
+      if (!userData) return;
+      emails.push(userData.email);
+      titles.push(userData.title);
+    })
+  );
+  new Mailer().mail(
+    `Your request was ${request.approved ? "removed" : "denied"} for ${request.title}`,
+    `Your request was ${request.approved ? "removed" : "denied"} for ${request.title}`,
+    `Unfortunately your request could not be processed.${reason ? ` This is because - ${reason}.` : ""} Thanks for your request anyway!`,
+    `https://image.tmdb.org/t/p/w500${request.thumb}`,
+    emails,
+    titles
+  );
 });
 
 module.exports = router;

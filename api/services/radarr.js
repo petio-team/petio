@@ -81,6 +81,10 @@ class Radarr {
     return this.process("get", endpoint, params);
   }
 
+  async delete(endpoint, params = false) {
+    return this.process("delete", endpoint, params);
+  }
+
   async post(endpoint, params = false, body = {}) {
     return this.process("post", endpoint, params, body);
   }
@@ -137,6 +141,14 @@ class Radarr {
       return false;
     }
     return this.get(`movie/${id}`);
+  }
+
+  async remove(id) {
+    const active = await this.connect();
+    if (!active) {
+      return false;
+    }
+    return this.delete(`movie/${id}`);
   }
 
   async queue() {

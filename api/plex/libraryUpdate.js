@@ -10,6 +10,7 @@ const Request = require("../models/request");
 const Profile = require("../models/profile");
 const Mailer = require("../mail/mailer");
 const getConfig = require("../util/config");
+const processRequest = require("../requests/process");
 
 class LibraryUpdate {
   constructor() {
@@ -762,19 +763,7 @@ class LibraryUpdate {
           await this.sendMail(user, i, request);
         })
       );
-      Request.findOneAndRemove(
-        {
-          $or: [{ imdb_id: ref_id }, { tmdb_id: ref_id }, { tvdb_id: ref_id }],
-        },
-        { useFindAndModify: false },
-        function (err, data) {
-          if (err) {
-            console.log(`LIB CRON: ${err}`);
-          } else {
-            console.log("LIB CRON: Request Removed!");
-          }
-        }
-      );
+      new processRequest(request).archive(true, false);
     }
   }
 

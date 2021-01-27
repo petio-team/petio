@@ -550,3 +550,13 @@ export async function bulkEditUser(data) {
     return false;
   }
 }
+
+export async function removeRequest(request, reason) {
+  try {
+    await api.removeReq(request, reason);
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
