@@ -85,7 +85,6 @@ router.get("/all", async (req, res) => {
               }
             }
           }
-          media = await movieLookup(request.requestId, true);
         }
 
         if (request.type === "tv" && request.sonarrId.length > 0) {
@@ -107,6 +106,13 @@ router.get("/all", async (req, res) => {
               }
             }
           }
+        }
+
+        if (request.type === "movie") {
+          media = await movieLookup(request.requestId, true);
+        }
+
+        if (request.type === "tv") {
           media = await showLookup(request.requestId, true);
         }
 
@@ -162,6 +168,46 @@ router.post("/remove", async (req, res) => {
     emails,
     titles
   );
+});
+
+router.post("/update", async (req, res) => {
+  let request = req.body.request;
+  let servers = req.body.servers;
+  try {
+    await Request.findOneAndUpdate(
+      { requestId: request.requestId },
+      {
+        $set: {
+          approved: true,
+        },
+      },
+      { new: true, useFindAndModify: false }
+    );
+    if (servers && request.type === "movie") {
+      await Promise.all(
+        Object.keys(servers).map(async (r) => {
+          let active = servers[r].active;
+          if (active) {
+            await new Radarr(r, false, servers[r].profile, servers[r].path).processRequest(request.requestId);
+          }
+        })
+      );
+    }
+    if (servers && request.type === "tv") {
+      await Promise.all(
+        Object.keys(servers).map(async (s) => {
+          let active = servers[s].active;
+          if (active) {
+            await new Sonarr(s, false, servers[s].profile, servers[s].path).processRequest(request.requestId);
+          }
+        })
+      );
+    }
+    res.status(200).send();
+  } catch (err) {
+    console.log(err);
+    res.status(500).send();
+  }
 });
 
 module.exports = router;

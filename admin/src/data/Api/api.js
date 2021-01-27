@@ -303,6 +303,15 @@ export let removeReq = (req, reason) => {
   return call(request, headers, "post", body);
 };
 
+export let updateReq = (req, servers) => {
+  let request = `${apiUrl}/request/update`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  let body = { request: req, servers: servers };
+  return call(request, headers, "post", body);
+};
+
 function call(url, headers, method, body = null) {
   let args = {
     method: method,

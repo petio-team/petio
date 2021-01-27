@@ -36,6 +36,7 @@ import {
   bulkEditUser,
   deleteUser,
   removeRequest,
+  updateRequest,
 } from "./actions";
 
 export default {
@@ -76,4 +77,5 @@ export default {
   bulkEditUser,
   deleteUser,
   removeRequest,
+  updateRequest,
 };

@@ -5,7 +5,7 @@ const path = require("path");
 var sanitize = require("sanitize-filename");
 
 class Sonarr {
-  constructor(id = false, forced = false) {
+  constructor(id = false, forced = false, profileOvr = false, pathOvr = false) {
     let project_folder, configFile;
     if (process.pkg) {
       project_folder = path.dirname(process.execPath);
@@ -20,6 +20,8 @@ class Sonarr {
     this.forced = forced;
     if (id !== false) {
       this.config = this.findUuid(id, configParse);
+      if (profileOvr) this.config.profile = profileOvr;
+      if (pathOvr) this.config.path_title = pathOvr;
 
       if (!this.config) {
         this.config = {};

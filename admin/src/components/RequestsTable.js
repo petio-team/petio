@@ -82,7 +82,7 @@ class RequestsTable extends React.Component {
   cinemaWindow(diff) {
     var day = 1000 * 60 * 60 * 24;
     var days = Math.ceil(diff / day);
-    if (days >= 31) {
+    if (days >= 62) {
       return false;
     }
     return true;
@@ -127,7 +127,7 @@ class RequestsTable extends React.Component {
               <>
                 {row === 0 ? (
                   <tr className="sub">
-                    <td colSpan="5">
+                    <td colSpan="7">
                       <p>Server: {server.info.serverName}</p>
                     </td>
                   </tr>
@@ -168,6 +168,8 @@ class RequestsTable extends React.Component {
                       )}
                     </div>
                   </td>
+                  <td></td>
+                  <td></td>
                   <td></td>
                 </tr>
               </>

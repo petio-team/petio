@@ -319,9 +319,37 @@ class Requests extends React.Component {
     alert("req updated");
   }
 
-  approveReq() {
+  async approveReq() {
+    let servers = {};
+    let err = false;
+    let type_server = {};
+    if (this.state.activeRequest.type === "tv") {
+      type_server = this.state.edit_sonarr;
+    } else {
+      type_server = this.state.edit_radarr;
+    }
+    if (Object.keys(type_server).length > 0) {
+      Object.keys(type_server).map((r) => {
+        let server = type_server[r];
+        if (server.active) {
+          if (server.profile && server.path) {
+            servers[r] = server;
+          } else {
+            err = "Missing Path / Profile";
+          }
+        }
+      });
+    }
+
+    if (err) {
+      alert(err);
+      return;
+    }
+
+    console.log(this.state.activeRequest, servers);
+    await Api.updateRequest(this.state.activeRequest, servers);
     this.closeModal("editRequest");
-    alert("req approved");
+    this.getRequests(true);
   }
 
   async removeReq() {
@@ -355,10 +383,10 @@ class Requests extends React.Component {
           title="Edit Request"
           open={this.state.editRequestOpen}
           close={() => this.closeModal("editRequest")}
-          submitText={this.state.activeRequest ? (this.state.activeRequest.sonarrId.length > 0 || this.state.activeRequest.radarrId.length > 0 ? "Save" : "Save & Approve") : false}
+          submitText={this.state.activeRequest ? (this.state.activeRequest.approved ? "Save" : "Save & Approve") : false}
           deleteText={this.state.activeRequest ? (this.state.activeRequest.sonarrId.length > 0 || this.state.activeRequest.radarrId.length > 0 ? "Delete" : "Deny") : false}
           delete={this.deleteReq}
-          submit={this.state.activeRequest ? (this.state.activeRequest.sonarrId.length > 0 || this.state.activeRequest.radarrId.length > 0 ? this.updateReq : this.approveReq) : false}
+          submit={this.state.activeRequest ? (this.state.activeRequest.sonarrId.length > 0 || this.state.activeRequest.radarrId.length > 0 ? false : this.approveReq) : false}
         >
           {this.state.activeRequest ? (
             <>

@@ -560,3 +560,13 @@ export async function removeRequest(request, reason) {
     return false;
   }
 }
+
+export async function updateRequest(request, servers) {
+  try {
+    await api.updateReq(request, servers);
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
