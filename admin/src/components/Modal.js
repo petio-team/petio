@@ -15,7 +15,9 @@ class Modal extends React.Component {
                 <div className="btn btn__square save-modal" onClick={this.props.submit}>
                   {this.props.submitText ? this.props.submitText : "Submit"}
                 </div>
-              ) : null}
+              ) : (
+                <div className="btn btn__square disabled">{this.props.submitText ? this.props.submitText : "Submit"}</div>
+              )}
               <div className="btn btn__square bad" onClick={this.props.close}>
                 Cancel
               </div>
