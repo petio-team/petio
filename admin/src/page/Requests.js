@@ -160,9 +160,23 @@ class Requests extends React.Component {
         });
       }
     }
+    if (req.type === "tv") {
+      if (req.sonarrId.length > 0) {
+        req.sonarrId.map((r, i) => {
+          let uuid = Object.keys(r)[0];
+          let child = req.children[i] ? req.children[i].info : {};
+          edit_sonarr[uuid] = {
+            active: true,
+            profile: child.qualityProfileId ? child.qualityProfileId : false,
+            path: child.path ? child.path.replace(`/${req.title} (${child.year})`, "") : false,
+          };
+        });
+      }
+    }
     this.setState({
       activeRequest: req,
       edit_radarr: edit_radarr,
+      edit_sonarr: edit_sonarr,
     });
     this.openModal("editRequest");
   }
@@ -337,29 +351,15 @@ class Requests extends React.Component {
               <p className="sub-title mb--1">{this.state.activeRequest.title}</p>
               <p className="sub-title mt--2 mb--1">Edit {this.state.activeRequest.type === "tv" ? "Sonarr" : "Radarr"}</p>
               {this.state.activeRequest.type === "tv" ? (
-                this.state.activeRequest.sonarrId.length > 0 ? (
-                  this.state.activeRequest.sonarrId.map((s) => {
-                    let uuid = Object.keys(s)[0];
-                    let server = this.findServerByUuid(uuid, "s_servers");
-                    return <p style={{ marginBottom: 0 }}>Request already sent to {server.title}</p>;
-                  })
-                ) : this.state.s_servers ? (
+                this.state.s_servers ? (
                   this.state.s_servers.map((server) => {
-                    return (
-                      <>
-                        <label key={server.uuid}>
-                          <input data-type="np_radarr" type="checkbox" checked={this.state.np_sonarr ? this.state.np_sonarr[server.uuid] : false} name={server.uuid} onChange={this.changeCheckbox} />{" "}
-                          {server.title}
-                        </label>
-                      </>
-                    );
+                    return this.renderReqEdit(server, "sonarr");
                   })
                 ) : (
-                  <p>No Sonarr Servers</p>
+                  <p>No Radarr Servers</p>
                 )
               ) : this.state.r_servers ? (
                 this.state.r_servers.map((server) => {
-                  // Is movie and not sent to radarr yet
                   return this.renderReqEdit(server, "radarr");
                 })
               ) : (
