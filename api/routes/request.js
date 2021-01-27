@@ -85,7 +85,6 @@ router.get("/all", async (req, res) => {
               }
             }
           }
-          media = await movieLookup(request.requestId, true);
         }
 
         if (request.type === "tv" && request.sonarrId.length > 0) {
@@ -107,6 +106,13 @@ router.get("/all", async (req, res) => {
               }
             }
           }
+        }
+
+        if (request.type === "movie") {
+          media = await movieLookup(request.requestId, true);
+        }
+
+        if (request.type === "tv") {
           media = await showLookup(request.requestId, true);
         }
 
