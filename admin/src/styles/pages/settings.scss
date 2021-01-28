@@ -4,25 +4,17 @@
   }
 
   &--menu {
-    position: fixed;
-    top: 0px;
-    left: 250px;
-    width: 250px;
-    background: $black;
-    height: 100vh;
+    display: flex;
+    flex-wrap: nowrap;
+    border-bottom: solid 1px rgba(255, 255, 255, 0.1);
 
     &--item {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-top: solid 4px transparent;
       cursor: pointer;
-
-      @include media-breakpoint-up(lg) {
-        padding-left: 20px;
-        border-top: none;
-        border-right: solid 4px transparent;
-      }
+      margin-right: 50px;
+      padding: 0 20px;
 
       p {
         font-size: 16px;
@@ -41,15 +33,10 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        width: 50px;
-
-        @include media-breakpoint-up(lg) {
-          padding: 20px 0;
-          width: 60px;
-        }
+        padding-left: 20px;
 
         img {
-          height: 20px;
+          height: 15px;
           width: auto;
           max-width: 100%;
 
@@ -59,11 +46,7 @@
         }
 
         svg {
-          height: 20px;
-
-          @include media-breakpoint-up(lg) {
-            height: 20px;
-          }
+          height: 15px;
 
           path {
             fill: $grey-light;
@@ -72,39 +55,26 @@
       }
 
       &:hover {
-        background: rgba(0, 0, 0, 0.2);
-        border-top: solid 4px rgba(255, 255, 255, 0.2);
-
-        @include media-breakpoint-up(lg) {
-          border-top: none;
-          border-right: solid 4px rgba(255, 255, 255, 0.2);
-        }
+        border-bottom: solid 1px white;
       }
 
       &.active {
-        background: $primaryDark;
-        border-top: solid 4px $grey-light;
-
-        @include media-breakpoint-up(lg) {
-          border-top: none;
-          border-right: solid 4px $grey-light;
-        }
+        border-bottom: solid 1px $primary;
 
         .icon {
           svg path {
-            fill: $grey-light;
+            fill: $primary;
           }
         }
 
         p {
-          color: $grey-light;
+          color: $primary;
         }
       }
     }
   }
 
   &--content {
-    margin-left: 250px;
     padding: 50px 0;
 
     section {
@@ -120,10 +90,10 @@
 }
 
 .setting-msg {
-  position: fixed;
+  position: absolute;
   top: 0;
-  left: 500px;
-  width: calc(100% - 500px);
+  left: 0;
+  width: 100%;
   background: $primary;
   padding: 10px 40px;
   z-index: 100;

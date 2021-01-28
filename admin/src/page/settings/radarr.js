@@ -7,7 +7,7 @@ import { ReactComponent as Add } from "../../assets/svg/plus-circle.svg";
 import { ReactComponent as ServerIcon } from "../../assets/svg/server.svg";
 
 import { ReactComponent as Spinner } from "../../assets/svg/spinner.svg";
-import Modal from "./modal";
+import Modal from "../../components/Modal";
 
 class Radarr extends React.Component {
   constructor(props) {
@@ -44,6 +44,8 @@ class Radarr extends React.Component {
     this.openWizard = this.openWizard.bind(this);
     this.closeWizard = this.closeWizard.bind(this);
     // this.test = this.test.bind(this);
+    this.openModal = this.openModal.bind(this);
+    this.closeModal = this.closeModal.bind(this);
 
     this.closeMsg = false;
   }
@@ -249,6 +251,34 @@ class Radarr extends React.Component {
     });
   }
 
+  openModal(id) {
+    this.setState({
+      [`${id}Open`]: true,
+    });
+  }
+
+  closeModal(id) {
+    this.setState({
+      [`${id}Open`]: false,
+      active: false,
+      title: "",
+      protocol: "http",
+      host: "localhost",
+      port: null,
+      base: "",
+      apikey: "",
+      active: false,
+      profiles: false,
+      paths: false,
+      path: false,
+      profile: false,
+      wizardOpen: false,
+      editWizardOpen: false,
+      activeServer: false,
+      uuid: false,
+    });
+  }
+
   render() {
     let serverCount = 0;
     if (this.state.loading) {
@@ -282,19 +312,39 @@ class Radarr extends React.Component {
             <p>{this.state.isMsg}</p>
           </div>
         ) : null}
-        {this.state.wizardOpen ? <Modal title="Add New Server" edit={false} state={this.state} inputChange={this.inputChange} saveServer={this.saveServer} closeWizard={this.closeWizard} /> : null}
-        {this.state.editWizardOpen ? (
-          <Modal
-            title={`Edit ${this.state.title}`}
-            edit={true}
-            state={this.state}
-            inputChange={this.inputChange}
-            saveServer={this.saveServer}
-            closeWizard={this.closeWizard}
-            deleteServer={this.deleteServer}
-            type="radarr"
-          />
-        ) : null}
+
+        <Modal title="Add new server" open={this.state.addServerOpen} submitText="Save" close={() => this.closeModal("addServer")}>
+          <label>Title</label>
+          <input className="styled-input--input" type="text" name="title" value={this.state.title} onChange={this.inputChange} />
+          <label>Protocol</label>
+          <div className="styled-input--select">
+            <select name="protocol" value={this.state.protocol} onChange={this.inputChange}>
+              <option value="http">HTTP</option>
+              <option value="https">HTTPS</option>
+            </select>
+          </div>
+          <label>Host</label>
+          <input className="styled-input--input" type="text" name="host" value={this.state.host} onChange={this.inputChange} />
+          <label>Port</label>
+          <input className="styled-input--input" type="number" name="port" value={this.state.port} onChange={this.inputChange} />
+          <label>URL Base</label>
+          <input className="styled-input--input" type="text" name="base" value={this.state.base} onChange={this.inputChange} />
+          <label>API Key</label>
+          <input className="styled-input--input" type="text" name="apikey" value={this.state.apikey} onChange={this.inputChange} />
+          <label>Profile</label>
+          <div className="styled-input--select disabled">
+            <select name="profile" value={this.state.profile} onChange={this.inputChange}>
+              <option value="">Please test connection</option>
+            </select>
+          </div>
+          <label>Path</label>
+          <div className="styled-input--select disabled">
+            <select name="path" value={this.state.path} onChange={this.inputChange}>
+              <option value="">Please test connection</option>
+            </select>
+          </div>
+        </Modal>
+
         <section>
           <p className="main-title mb--2">Radarr</p>
           <p className="capped-width">
@@ -318,7 +368,13 @@ class Radarr extends React.Component {
                     <p>Path: {server.path_title ? server.path_title : "Not set"}</p>
                     <p className="small">ID: {server.uuid ? server.uuid : "Error"}</p>
                     <div className="btn-wrap">
-                      <button className="btn" onClick={() => this.openWizard(i)}>
+                      <button
+                        className="btn"
+                        onClick={() => {
+                          this.openModal("addServer");
+                          this.openWizard(i);
+                        }}
+                      >
                         Edit
                       </button>
                       <button className="btn" onClick={() => this.test(server.uuid)}>
@@ -330,7 +386,13 @@ class Radarr extends React.Component {
               );
             })}
             <div className="sr--instance sr--add-new">
-              <div className="sr--instance--inner" onClick={() => this.openWizard(serverCount)}>
+              <div
+                className="sr--instance--inner"
+                onClick={() => {
+                  this.openModal("addServer");
+                  this.openWizard(serverCount);
+                }}
+              >
                 <p className="sr--title">Add new</p>
                 <Add />
               </div>
