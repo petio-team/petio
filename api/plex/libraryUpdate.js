@@ -763,7 +763,7 @@ class LibraryUpdate {
           await this.sendMail(user, i, request);
         })
       );
-      new processRequest(request).archive(true, false);
+      await new processRequest(request).archive(true, false);
     }
   }
 
