@@ -20,10 +20,18 @@ class App extends React.Component {
       loading: true,
       config: false,
       configChecked: true,
+      mobMenuOpen: true,
     };
 
     this.changeLogin = this.changeLogin.bind(this);
     this.checkConfig = this.checkConfig.bind(this);
+    this.toggleMobMenu = this.toggleMobMenu.bind(this);
+  }
+
+  toggleMobMenu() {
+    this.setState({
+      mobMenuOpen: this.state.mobMenuOpen ? false : true,
+    });
   }
 
   checkConfig() {
@@ -108,7 +116,19 @@ class App extends React.Component {
       return (
         <div className="app">
           <HashRouter>
-            <Sidebar changeLogin={this.changeLogin} />
+            <div className="mob-menu-top">
+              <div className="logo-wrap">
+                <div className="logo">
+                  Pet<span>io</span>
+                </div>
+              </div>
+              <button className={`nav-toggle ${this.state.mobMenuOpen ? "active" : ""}`} onClick={this.toggleMobMenu}>
+                <span></span>
+                <span></span>
+                <span></span>
+              </button>
+            </div>
+            <Sidebar mobOpen={this.state.mobMenuOpen} changeLogin={this.changeLogin} />
             <div className="view">
               <Switch>
                 <Route exact path="/">
