@@ -461,7 +461,7 @@ class LibraryUpdate {
         });
         movieDb = await newMovie.save();
         await this.mailAdded(movieObj, externalId);
-        console.log(`LIB CRON: Movie Added - ${showObj.title}`);
+        console.log(`LIB CRON: Movie Added - ${movieObj.title}`);
       } catch (err) {
         console.log(`LIB CRON: ${err}`);
       }
