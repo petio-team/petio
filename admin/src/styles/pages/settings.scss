@@ -90,13 +90,15 @@
 }
 
 .setting-msg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
+  position: fixed;
+  bottom: 50px;
+  right: 50px;
+  min-width: 300px;
+  max-width: 100%;
   background: $primary;
-  padding: 10px 40px;
+  padding: 20px 40px;
   z-index: 100;
+  border-radius: 5px;
 
   &.good {
     background: $good;

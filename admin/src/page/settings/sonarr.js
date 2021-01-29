@@ -7,7 +7,7 @@ import { ReactComponent as Add } from "../../assets/svg/plus-circle.svg";
 import { ReactComponent as ServerIcon } from "../../assets/svg/server.svg";
 
 import { ReactComponent as Spinner } from "../../assets/svg/spinner.svg";
-import Modal from "./modal";
+import Modal from "../../components/Modal";
 
 class Sonarr extends React.Component {
   constructor(props) {
@@ -44,6 +44,9 @@ class Sonarr extends React.Component {
     this.openWizard = this.openWizard.bind(this);
     this.closeWizard = this.closeWizard.bind(this);
     // this.test = this.test.bind(this);
+    this.openModal = this.openModal.bind(this);
+    this.closeModal = this.closeModal.bind(this);
+    this.getSettings = this.getSettings.bind(this);
 
     this.closeMsg = false;
   }
@@ -73,8 +76,7 @@ class Sonarr extends React.Component {
     console.log(servers);
     // return;
     await Api.saveSonarrConfig(servers);
-    this.getSonarr();
-    this.closeWizard();
+    this.getSonarr(true);
 
     this.setState({
       isError: false,
@@ -120,14 +122,20 @@ class Sonarr extends React.Component {
     }, 3000);
   }
 
-  async test(id) {
+  async test(id, add = false) {
+    if (add) {
+      await this.saveServer();
+    }
     try {
       let result = await Api.testSonarr(id);
       if (result.connection) {
         this.setState({
           isError: false,
           isMsg: "Sonarr Test Connection success!",
+          newServer: false,
         });
+        await this.getSonarr(true);
+        await this.getSettings(id);
       } else {
         this.setState({
           isError: "Sonarr Test Connection failed!",
@@ -162,7 +170,6 @@ class Sonarr extends React.Component {
 
     if (target.type === "select-one") {
       let title = target.options[target.selectedIndex].text;
-      console.log(`${name}_title`);
       this.setState({
         [name]: value,
         [`${name}_title`]: title,
@@ -174,9 +181,9 @@ class Sonarr extends React.Component {
     }
   }
 
-  async getSonarr() {
+  async getSonarr(live = false) {
     this.setState({
-      loading: true,
+      loading: live ? false : true,
     });
     try {
       let sonarr = await Api.sonarrConfig();
@@ -219,6 +226,7 @@ class Sonarr extends React.Component {
         path_title: this.state.servers[id].path_title,
         uuid: this.state.servers[id].uuid,
       });
+      this.getSettings(this.state.servers[id].uuid);
     } else {
       this.setState({
         wizardOpen: true,
@@ -247,6 +255,50 @@ class Sonarr extends React.Component {
       activeServer: false,
       uuid: false,
     });
+  }
+
+  openModal(id) {
+    this.setState({
+      [`${id}Open`]: true,
+    });
+  }
+
+  closeModal(id) {
+    this.setState({
+      [`${id}Open`]: false,
+      active: false,
+      title: "",
+      protocol: "http",
+      host: "localhost",
+      port: null,
+      base: "",
+      apikey: "",
+      active: false,
+      profiles: false,
+      paths: false,
+      path: false,
+      profile: false,
+      wizardOpen: false,
+      editWizardOpen: false,
+      activeServer: false,
+      uuid: false,
+    });
+  }
+
+  async getSettings(uuid) {
+    try {
+      let settings = await Api.sonarrOptions(uuid);
+      if (settings.profiles.error || settings.paths.error) {
+        return;
+      }
+      if (this.state.uuid === uuid)
+        this.setState({
+          profiles: settings.profiles.length > 0 ? settings.profiles : false,
+          paths: settings.paths.length > 0 ? settings.paths : false,
+        });
+    } catch {
+      return;
+    }
   }
 
   render() {
@@ -282,18 +334,91 @@ class Sonarr extends React.Component {
             <p>{this.state.isMsg}</p>
           </div>
         ) : null}
-        {this.state.wizardOpen ? <Modal title="Add New Server" edit={false} state={this.state} inputChange={this.inputChange} saveServer={this.saveServer} closeWizard={this.closeWizard} /> : null}
-        {this.state.editWizardOpen ? (
-          <Modal
-            title={`Edit ${this.state.title}`}
-            edit={true}
-            state={this.state}
-            inputChange={this.inputChange}
-            saveServer={this.saveServer}
-            closeWizard={this.closeWizard}
-            deleteServer={this.deleteServer}
-          />
-        ) : null}
+
+        <Modal
+          title="Add new server"
+          open={this.state.addServerOpen}
+          submitText="Save"
+          submit={() => {
+            this.saveServer();
+            this.closeModal("addServer");
+          }}
+          close={() => this.closeModal("addServer")}
+          delete={
+            this.state.newServer
+              ? false
+              : () => {
+                  this.deleteServer();
+                  this.closeModal("addServer");
+                }
+          }
+        >
+          <label>Title</label>
+          <input className="styled-input--input" type="text" name="title" value={this.state.title} onChange={this.inputChange} />
+          <label>Protocol</label>
+          <div className="styled-input--select">
+            <select name="protocol" value={this.state.protocol} onChange={this.inputChange}>
+              <option value="http">HTTP</option>
+              <option value="https">HTTPS</option>
+            </select>
+          </div>
+          <label>Host</label>
+          <input className="styled-input--input" type="text" name="host" value={this.state.host} onChange={this.inputChange} />
+          <label>Port</label>
+          <input className="styled-input--input" type="number" name="port" value={this.state.port ? this.state.port : false} onChange={this.inputChange} />
+          <label>URL Base</label>
+          <input className="styled-input--input" type="text" name="base" value={this.state.base} onChange={this.inputChange} />
+          <label>API Key</label>
+          <input className="styled-input--input" type="text" name="apikey" value={this.state.apikey} onChange={this.inputChange} />
+          <button className="btn btn__square mb--1" onClick={() => this.test(this.state.uuid, true)}>
+            Test
+          </button>
+          <label>Profile</label>
+          <div className={`styled-input--select ${this.state.profiles ? "" : "disabled"}`}>
+            <select name="profile" value={this.state.profile} onChange={this.inputChange}>
+              {this.state.profiles && !this.state.newServer ? (
+                <>
+                  <option value="">Choose an option</option>
+                  {this.state.profiles.map((item) => {
+                    return (
+                      <option key={`p__${item.id}`} value={item.id}>
+                        {item.name}
+                      </option>
+                    );
+                  })}
+                </>
+              ) : (
+                <option value="">{this.state.newServer ? "Please test connection" : "Loading..."}</option>
+              )}
+            </select>
+          </div>
+          <label>Path</label>
+          <div className={`styled-input--select ${this.state.profiles ? "" : "disabled"}`}>
+            <select name="path" value={this.state.path} onChange={this.inputChange}>
+              {this.state.paths ? (
+                <>
+                  <option value="">Choose an option</option>
+                  {this.state.paths.map((item) => {
+                    return (
+                      <option key={`pp__${item.id}`} value={item.id}>
+                        {item.path}
+                      </option>
+                    );
+                  })}
+                </>
+              ) : (
+                <option value="">{this.state.newServer ? "Please test connection" : "Loading..."}</option>
+              )}
+            </select>
+          </div>
+          {!this.state.newServer && this.state.path && this.state.profile ? (
+            <div className="checkbox-wrap mb--2">
+              <input type="checkbox" name="active" checked={this.state.active} onChange={this.inputChange} />
+              <p>Enabled</p>
+            </div>
+          ) : null}
+        </Modal>
+
         <section>
           <p className="main-title mb--2">Sonarr</p>
           <p className="capped-width">
@@ -317,10 +442,16 @@ class Sonarr extends React.Component {
                     <p>Path: {server.path_title ? server.path_title : "Not set"}</p>
                     <p className="small">ID: {server.uuid ? server.uuid : "Error"}</p>
                     <div className="btn-wrap">
-                      <button className="btn" onClick={() => this.openWizard(i)}>
+                      <button
+                        className="btn btn__square"
+                        onClick={() => {
+                          this.openModal("addServer");
+                          this.openWizard(i);
+                        }}
+                      >
                         Edit
                       </button>
-                      <button className="btn" onClick={() => this.test(server.uuid)}>
+                      <button className="btn btn__square" onClick={() => this.test(server.uuid)}>
                         Test
                       </button>
                     </div>
@@ -329,7 +460,13 @@ class Sonarr extends React.Component {
               );
             })}
             <div className="sr--instance sr--add-new">
-              <div className="sr--instance--inner" onClick={() => this.openWizard(serverCount)}>
+              <div
+                className="sr--instance--inner"
+                onClick={() => {
+                  this.openModal("addServer");
+                  this.openWizard(serverCount);
+                }}
+              >
                 <p className="sr--title">Add new</p>
                 <Add />
               </div>
