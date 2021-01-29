@@ -259,7 +259,7 @@ class Setup extends React.Component {
           {this.state.step === 1 ? (
             <div className="step-1">
               <p>Welcome to Petio, firstly lets log in to Plex to get all of your user and server info</p>
-              <button className="btn" onClick={this.loginOauth}>
+              <button className="btn btn__square" onClick={this.loginOauth}>
                 Login with plex
               </button>
             </div>
@@ -273,7 +273,7 @@ class Setup extends React.Component {
               <input type="email" name="email" value={this.props.plex.user.email} readOnly={true} />
               <p>Petio Admin Password</p>
               <input type="password" name="password" value={this.state.password} onChange={this.inputChange} />
-              <button className="btn" onClick={this.saveUser}>
+              <button className="btn btn__square" onClick={this.saveUser}>
                 Next
               </button>
             </div>
@@ -317,7 +317,7 @@ class Setup extends React.Component {
                   );
                 })
               )}
-              <button className={"btn " + (this.state.selectedServer ? "" : "disabled")} style={{ marginTop: "10px" }} onClick={this.changeToDb}>
+              <button className={"btn btn__square " + (this.state.selectedServer ? "" : "disabled")} style={{ marginTop: "10px" }} onClick={this.changeToDb}>
                 Next
               </button>
             </div>
@@ -352,10 +352,10 @@ class Setup extends React.Component {
                   </div>
                 </div>
               </div>
-              <button className={`btn ${this.state.mongoStatus === "pending" ? "disabled" : ""}`} style={{ marginTop: "10px", marginRight: "10px" }} onClick={this.testMongo}>
+              <button className={`btn btn__square ${this.state.mongoStatus === "pending" ? "disabled" : ""}`} style={{ marginTop: "10px", marginRight: "10px" }} onClick={this.testMongo}>
                 Test
               </button>
-              <button className={`btn ${this.state.mongoStatus !== "connected" ? "disabled" : ""}`} style={{ marginTop: "10px" }} onClick={this.finalise}>
+              <button className={`btn btn__square ${this.state.mongoStatus !== "connected" ? "disabled" : ""}`} style={{ marginTop: "10px" }} onClick={this.finalise}>
                 Finish
               </button>
             </div>

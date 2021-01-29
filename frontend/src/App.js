@@ -193,7 +193,7 @@ class App extends React.Component {
                   <input type="text" name="username" value={this.state.username} onChange={this.inputChange} autoComplete="username" />
                   {this.state.loginMsg ? <div className="msg msg__error msg__input">{this.state.loginMsg}</div> : null}
                   {this.state.config === "failed" ? <div className="msg msg__error msg__input">API Not configured, please complete setup</div> : null}
-                  <button className="btn">Login</button>
+                  <button className="btn btn__square">Login</button>
                 </form>
               </div>
               <p className="powered-by">Petio build (alpha) {pjson.version}</p>

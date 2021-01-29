@@ -91,7 +91,7 @@ class Login extends React.Component {
                 <p>Password</p>
                 <input type="password" name="password" value={this.state.password} onChange={this.inputChange} autoComplete="current-password" />
 
-                <button className="btn">Login</button>
+                <button className="btn btn__square">Login</button>
               </form>
             </div>
             <p className="powered-by">Petio Admin build (alpha) {pjson.version}</p>
