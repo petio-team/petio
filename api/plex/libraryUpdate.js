@@ -393,6 +393,7 @@ class LibraryUpdate {
     let idSource = movieObj.guid.replace("com.plexapp.agents.", "").split("://")[0];
     let externalId = false;
     let externalIds = {};
+    if (idSource === "local") return;
     if (idSource === "plex") {
       let title = movieObj.title;
       try {
@@ -562,6 +563,7 @@ class LibraryUpdate {
     let externalIds = {};
     let tmdbId = false;
     let externalId = false;
+    if (idSource === "local") return;
     if (idSource === "plex") {
       let title = showObj.title;
       try {
