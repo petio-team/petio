@@ -630,3 +630,25 @@
     }
   }
 }
+
+.networks,
+.companies {
+  &--wrap {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  &--item {
+    margin-right: 20px;
+    margin-bottom: 20px;
+
+    a {
+      display: block;
+    }
+
+    img {
+      height: 30px;
+      filter: brightness(0) invert(1);
+    }
+  }
+}

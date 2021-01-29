@@ -274,7 +274,6 @@ class MovieShowOverview extends React.Component {
               </div>
               <div className="genre--wrap">
                 {this.props.mediaData.genres.map((genre, i) => {
-                  // if (i === this.props.mediaData.genres.length - 1) return genre.name;
                   return (
                     <div key={`genre_${genre.name}`} className="genre--item">
                       {this.genreIcon(genre.name)}
@@ -287,6 +286,38 @@ class MovieShowOverview extends React.Component {
                 {requestBtn}
                 {reportBtn}
                 {reviewBtn}
+              </div>
+              <div className="companies--wrap">
+                {this.props.mediaData.production_companies
+                  ? this.props.mediaData.production_companies.length > 0
+                    ? this.props.mediaData.production_companies.map((co) => {
+                        if (!co.logo_path) return;
+                        return (
+                          <div className="companies--item" key={`co__${co.id}`}>
+                            <Link to={`/company/${co.id}`} title={co.name}>
+                              <img src={`https://image.tmdb.org/t/p/w500${co.logo_path}`} />
+                            </Link>
+                          </div>
+                        );
+                      })
+                    : null
+                  : null}
+              </div>
+              <div className="networks--wrap">
+                {this.props.mediaData.networks
+                  ? this.props.mediaData.networks.length > 0
+                    ? this.props.mediaData.networks.map((network) => {
+                        if (!network.logo_path) return;
+                        return (
+                          <div className="networks--item" key={`net__${network.id}`}>
+                            <Link to={`/networks/${network.id}`} title={network.name}>
+                              <img src={`https://image.tmdb.org/t/p/w500${network.logo_path}`} />
+                            </Link>
+                          </div>
+                        );
+                      })
+                    : null
+                  : null}
               </div>
               <div className="media-crew">
                 {director ? (

@@ -70,7 +70,7 @@ async function movieLookup(id, minified = false) {
     delete movie.budget;
     delete movie.adult;
     delete movie.original_title;
-    delete movie.production_companies;
+    // delete movie.production_companies;
     if (minified) {
       delete movie.credits;
       delete movie.backdrop_path;
