@@ -36,49 +36,62 @@ class LibraryUpdate {
       console.log(`LIB CRON: Partial scan failed - unable to get recent`);
       return;
     }
+    let matched = {};
 
     await Promise.all(
       Object.keys(recent.Metadata).map(async (i) => {
         let obj = recent.Metadata[i];
 
         if (obj.type === "movie") {
-          await this.saveMovie(obj);
-          console.log(`LIB CRON: Partial scan - ${obj.title}`);
+          if (matched[obj.ratingKey]) {
+            matched[obj.ratingKey] = true;
+            await this.saveMovie(obj);
+            console.log(`LIB CRON: Partial scan - ${obj.title}`);
+          }
         } else if (obj.type === "artist") {
-          await this.saveMusic(obj);
+          if (matched[obj.ratingKey]) {
+            matched[obj.ratingKey] = true;
+            await this.saveMusic(obj);
+          }
         } else if (obj.type === "show") {
-          await this.saveShow(obj);
-          console.log(`LIB CRON: Partial scan - ${obj.title}`);
+          if (matched[obj.ratingKey]) {
+            matched[obj.ratingKey] = true;
+            await this.saveShow(obj);
+            console.log(`LIB CRON: Partial scan - ${obj.title}`);
+          }
         } else if (obj.type === "season") {
-          let parent = {
-            ratingKey: obj.parentRatingKey,
-            guid: obj.parentGuid,
-            key: obj.parentKey,
-            type: "show",
-            title: obj.parentTitle,
-            contentRating: "",
-            summary: "",
-            index: obj.index,
-            rating: "",
-            year: "",
-            thumb: "",
-            art: "",
-            banner: "",
-            theme: "",
-            duration: "",
-            originallyAvailableAt: "",
-            leafCount: "",
-            viewedLeafCount: "",
-            childCount: "",
-            addedAt: "",
-            updatedAt: "",
-            Genre: "",
-            studio: "",
-            titleSort: "",
-          };
+          if (!matched[obj.parentRatingKey]) {
+            matched[obj.parentRatingKey] = true;
+            let parent = {
+              ratingKey: obj.parentRatingKey,
+              guid: obj.parentGuid,
+              key: obj.parentKey,
+              type: "show",
+              title: obj.parentTitle,
+              contentRating: "",
+              summary: "",
+              index: obj.index,
+              rating: "",
+              year: "",
+              thumb: "",
+              art: "",
+              banner: "",
+              theme: "",
+              duration: "",
+              originallyAvailableAt: "",
+              leafCount: "",
+              viewedLeafCount: "",
+              childCount: "",
+              addedAt: "",
+              updatedAt: "",
+              Genre: "",
+              studio: "",
+              titleSort: "",
+            };
 
-          await this.saveShow(parent);
-          console.log(`LIB CRON: Partial scan - ${parent.title} - Built from series`);
+            await this.saveShow(parent);
+            console.log(`LIB CRON: Partial scan - ${parent.title} - Built from series`);
+          }
         } else {
           console.log(obj);
         }
