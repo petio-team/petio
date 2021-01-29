@@ -197,6 +197,10 @@
   justify-content: center;
   align-items: center;
 
+  @include media-breakpoint-up(lg) {
+    display: none;
+  }
+
   .logo-wrap {
     height: 55px;
     padding: 16px 10px;
