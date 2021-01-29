@@ -369,7 +369,7 @@ class LibraryUpdate {
   async saveMovie(movieObj) {
     let movieDb = false;
     try {
-      movieDb = await Movie.findOne({ ratingKey: movieObj.ratingKey });
+      movieDb = await Movie.findOne({ ratingKey: parseInt(movieObj.ratingKey) });
       if (!this.full && movieDb) {
         return;
       }
@@ -503,7 +503,7 @@ class LibraryUpdate {
   async saveMusic(musicObj) {
     let musicDb = false;
     try {
-      musicDb = await Music.findOne({ ratingKey: musicObj.ratingKey });
+      musicDb = await Music.findOne({ ratingKey: parseInt(musicObj.ratingKey) });
       if (!this.full && musicDb) {
         return;
       }
@@ -537,7 +537,7 @@ class LibraryUpdate {
     let showDb = false;
 
     try {
-      showDb = await Show.findOne({ ratingKey: showObj.ratingKey });
+      showDb = await Show.findOne({ ratingKey: parseInt(showObj.ratingKey) });
       if (!this.full && showDb) {
         return;
       }
