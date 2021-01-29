@@ -210,6 +210,7 @@ class Sonarr extends React.Component {
   openWizard(id) {
     if (this.state.servers[id]) {
       this.setState({
+        newServer: false,
         editWizardOpen: true,
         activeServer: id,
         active: this.state.servers[id].active ? this.state.servers[id].active : false,
@@ -229,6 +230,7 @@ class Sonarr extends React.Component {
       this.getSettings(this.state.servers[id].uuid);
     } else {
       this.setState({
+        newServer: true,
         wizardOpen: true,
         activeServer: id,
         uuid: uuidv4(),
@@ -254,6 +256,7 @@ class Sonarr extends React.Component {
       editWizardOpen: false,
       activeServer: false,
       uuid: false,
+      newServer: false,
     });
   }
 
