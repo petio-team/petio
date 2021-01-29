@@ -168,8 +168,8 @@ class General extends React.Component {
         <section>
           <p className="main-title mb--2">Plex</p>
           <p>If connection has been lost to Plex re-authenticate here.</p>
-          <button className="btn btn__square">Login with plex</button>
-          <button className="btn btn__square" style={{ marginLeft: "10px" }}>
+          <button className="btn btn__square disabled">Login with plex</button>
+          <button className="btn btn__square disabled" style={{ marginLeft: "10px" }}>
             Test
           </button>
         </section>

@@ -26,7 +26,7 @@ class Sidebar extends React.Component {
     let current = this.props.location.pathname;
     let user = this.props.user.current;
     return (
-      <div className="menu">
+      <div className={`menu ${this.props.mobOpen ? "open" : ""}`}>
         <div className="menu--logo">
           <div className="logo">
             Pet<span>io</span>
@@ -105,7 +105,7 @@ class Sidebar extends React.Component {
 Sidebar = withRouter(Sidebar);
 
 function SidebarContainer(props) {
-  return <Sidebar user={props.user} changeLogin={props.changeLogin} />;
+  return <Sidebar user={props.user} changeLogin={props.changeLogin} mobOpen={props.mobOpen} />;
 }
 
 const mapStateToProps = function (state) {

@@ -10,6 +10,7 @@
     text-transform: uppercase;
     margin-bottom: 5px;
     margin-right: 5px;
+    white-space: nowrap;
 
     @include media-breakpoint-up(lg) {
       margin-right: 10px;

@@ -13,11 +13,13 @@ body {
 }
 
 .view {
-  margin-left: 50px;
+  // margin-left: 50px;
   // padding: 10px;
+  padding-top: 55px;
 
   @include media-breakpoint-up(lg) {
     margin-left: 250px;
+    padding-top: 0;
     // padding: 20px;
   }
 }
