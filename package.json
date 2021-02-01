@@ -14,6 +14,8 @@
   },
   "scripts": {
     "start": "node petio.js",
-    "version": "npm -s run env echo '$npm_package_version'"
+    "version": "npm -s run env echo '$npm_package_version'",
+    "stamp-version": "mv petio.zip petio-${npm_package_version}.zip",
+    "stamp-version-a": "mv petio.zip petio-${npm_package_version}-alpha.zip"
   }
 }
