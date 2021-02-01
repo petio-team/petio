@@ -43,13 +43,13 @@ class LibraryUpdate {
         let obj = recent.Metadata[i];
 
         if (obj.type === "movie") {
-          if (matched[obj.ratingKey]) {
+          if (!matched[obj.ratingKey]) {
             matched[obj.ratingKey] = true;
             await this.saveMovie(obj);
             console.log(`LIB CRON: Partial scan - ${obj.title}`);
           }
         } else if (obj.type === "artist") {
-          if (matched[obj.ratingKey]) {
+          if (!matched[obj.ratingKey]) {
             matched[obj.ratingKey] = true;
             await this.saveMusic(obj);
           }
@@ -461,7 +461,7 @@ class LibraryUpdate {
         });
         movieDb = await newMovie.save();
         await this.mailAdded(movieObj, externalId);
-        console.log(`LIB CRON: Movie Added - ${showObj.title}`);
+        console.log(`LIB CRON: Movie Added - ${movieObj.title}`);
       } catch (err) {
         console.log(`LIB CRON: ${err}`);
       }

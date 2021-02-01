@@ -71,6 +71,26 @@ export function actor(id = false) {
   return process(request).then((res) => res.json());
 }
 
+export async function discover(type, page, params = {}) {
+  let headers = { "Content-Type": "application/json" };
+  let request = `${getAuth().api}/${type}/discover`;
+  let body = {
+    page: page,
+    params: params,
+  };
+  return process(request, headers, "post", body).then((res) => res.json());
+}
+
+export async function networkDetails(id) {
+  let request = `${getAuth().api}/show/network/${id}`;
+  return process(request).then((res) => res.json());
+}
+
+export async function companyDetails(id) {
+  let request = `${getAuth().api}/movie/company/${id}`;
+  return process(request).then((res) => res.json());
+}
+
 export let checkConfig = () => {
   let request = `${getAuth().api}/config`;
   return process(request).then((res) => res.json());

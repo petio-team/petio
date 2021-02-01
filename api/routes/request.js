@@ -6,7 +6,7 @@ const Admin = require("../models/admin");
 const Mailer = require("../mail/mailer");
 const Sonarr = require("../services/sonarr");
 const Radarr = require("../services/radarr");
-const movieLookup = require("../tmdb/movie");
+const { movieLookup } = require("../tmdb/movie");
 const showLookup = require("../tmdb/show");
 const processRequest = require("../requests/process");
 

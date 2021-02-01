@@ -300,4 +300,58 @@ function idLookup(id) {
   });
 }
 
-module.exports = showLookup;
+function discoverSeries(page = 1, params = {}) {
+  const config = getConfig();
+  const tmdbApikey = config.tmdbApi;
+  const tmdb = "https://api.themoviedb.org/3/";
+  let par = "";
+  Object.keys(params).map((i) => {
+    par += `&${i}=${params[i]}`;
+  });
+  let url = `${tmdb}discover/tv?api_key=${tmdbApikey}${par}&page=${page}`;
+  return new Promise((resolve, reject) => {
+    request(
+      url,
+      {
+        method: "GET",
+        json: true,
+      },
+      function (err, data) {
+        if (err) {
+          reject(err);
+        }
+
+        resolve(data);
+      }
+    );
+  });
+}
+
+function network(id) {
+  const config = getConfig();
+  const tmdbApikey = config.tmdbApi;
+  const tmdb = "https://api.themoviedb.org/3/";
+  let url = `${tmdb}network/${id}?api_key=${tmdbApikey}`;
+  return new Promise((resolve, reject) => {
+    request(
+      url,
+      {
+        method: "GET",
+        json: true,
+      },
+      function (err, data) {
+        if (err) {
+          reject(err);
+        }
+
+        resolve(data);
+      }
+    );
+  });
+}
+
+module.exports = {
+  discoverSeries,
+  showLookup,
+  network,
+};

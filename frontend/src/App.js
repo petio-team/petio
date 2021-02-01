@@ -17,6 +17,9 @@ import Requests from "./pages/Requests";
 import Shows from "./pages/Shows";
 import { ReactComponent as Spinner } from "./assets/svg/spinner.svg";
 import pjson from "../package.json";
+import Genre from "./pages/Genre";
+import Networks from "./pages/Networks";
+import Company from "./pages/Company";
 
 class App extends React.Component {
   constructor(props) {
@@ -193,7 +196,7 @@ class App extends React.Component {
                   <input type="text" name="username" value={this.state.username} onChange={this.inputChange} autoComplete="username" />
                   {this.state.loginMsg ? <div className="msg msg__error msg__input">{this.state.loginMsg}</div> : null}
                   {this.state.config === "failed" ? <div className="msg msg__error msg__input">API Not configured, please complete setup</div> : null}
-                  <button className="btn">Login</button>
+                  <button className="btn btn__square">Login</button>
                 </form>
               </div>
               <p className="powered-by">Petio build (alpha) {pjson.version}</p>
@@ -259,6 +262,21 @@ class App extends React.Component {
               <Route exact path="/tv">
                 <div className="page-wrap">
                   <Shows />
+                </div>
+              </Route>
+              <Route exact path="/genre/:type/:id">
+                <div className="page-wrap">
+                  <Genre />
+                </div>
+              </Route>
+              <Route exact path="/networks/:id">
+                <div className="page-wrap">
+                  <Networks />
+                </div>
+              </Route>
+              <Route exact path="/company/:id">
+                <div className="page-wrap">
+                  <Company />
                 </div>
               </Route>
             </Switch>

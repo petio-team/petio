@@ -2,8 +2,11 @@ import React from "react";
 import { withRouter, Link } from "react-router-dom";
 import { connect } from "react-redux";
 import Api from "../data/Api";
+import User from "../data/User";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
+
+import { ReactComponent as RequestIcon } from "../assets/svg/request.svg";
 
 class MovieCard extends React.Component {
   constructor(props) {
@@ -18,6 +21,7 @@ class MovieCard extends React.Component {
     this.getMovie = this.getMovie.bind(this);
     this.card = React.createRef();
     this.inView = this.inView.bind(this);
+    this.request = this.request.bind(this);
   }
 
   componentDidMount() {
@@ -33,7 +37,7 @@ class MovieCard extends React.Component {
 
   inView() {
     const left = this.card.current.getBoundingClientRect().left;
-    if (left <= this.props.width * 2) {
+    if (left <= this.props.width * 2 || this.props.view) {
       this.setState({
         inView: true,
       });
@@ -48,6 +52,28 @@ class MovieCard extends React.Component {
       // check for cached
       if (!id) return false;
       Api.movie(id, true);
+    }
+  }
+
+  async request() {
+    let id = this.props.movie.id;
+    let movie = this.props.api.movie_lookup[id];
+
+    let request = {
+      id: movie.id,
+      imdb_id: movie.imdb_id,
+      tmdb_id: movie.id,
+      tvdb_id: "n/a",
+      title: movie.title,
+      thumb: movie.poster_path,
+      type: "movie",
+    };
+    try {
+      let req = await User.request(request, this.props.user.current);
+      console.log(req);
+      await User.getRequests();
+    } catch (err) {
+      alert(err);
     }
   }
 
@@ -90,7 +116,11 @@ class MovieCard extends React.Component {
       <div ref={this.card} key={movie.id} data-key={movie.id} className={`card type--movie-tv ${movie.on_server ? "on-server" : ""} ${this.props.user.requests[movie.id] ? "requested" : ""}`}>
         <div className="card--inner">
           <Link to={`/movie/${movie.id}`} className="full-link"></Link>
-
+          {!this.props.user.requests[movie.id] && !movie.on_server ? (
+            <div className="quick-req" title="Request now" onClick={this.request}>
+              <RequestIcon />
+            </div>
+          ) : null}
           <div className="image-wrap">
             {this.props.popular_count ? <p className="popular-card--count">{this.props.popular_count}</p> : null}
             {img}
@@ -110,7 +140,7 @@ class MovieCard extends React.Component {
 MovieCard = withRouter(MovieCard);
 
 function MovieCardContainer(props) {
-  return <MovieCard api={props.api} movie={props.movie} character={props.character} user={props.user} pos={props.pos} width={props.width} popular_count={props.popular_count} />;
+  return <MovieCard api={props.api} movie={props.movie} character={props.character} user={props.user} pos={props.pos} width={props.width} popular_count={props.popular_count} view={props.view} />;
 }
 
 const mapStateToProps = function (state) {

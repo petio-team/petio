@@ -34,16 +34,16 @@ class Settings extends React.Component {
               <GeneralIcon />
             </div>
           </Link>
-          <Link to="/settings/sonarr" className={"settings--menu--item " + (current === "/settings/sonarr" ? "active" : "")}>
-            <p>Sonarr</p>
-            <div className="icon">
-              <img className="" src="https://raw.githubusercontent.com/Sonarr/Sonarr/phantom-develop/Logo/256.png" />
-            </div>
-          </Link>
           <Link to="/settings/radarr" className={"settings--menu--item " + (current === "/settings/radarr" ? "active" : "")}>
             <p>Radarr</p>
             <div className="icon">
               <img className="png-safe" src="https://avatars1.githubusercontent.com/u/25025331" />
+            </div>
+          </Link>
+          <Link to="/settings/sonarr" className={"settings--menu--item " + (current === "/settings/sonarr" ? "active" : "")}>
+            <p>Sonarr</p>
+            <div className="icon">
+              <img className="" src="https://raw.githubusercontent.com/Sonarr/Sonarr/phantom-develop/Logo/256.png" />
             </div>
           </Link>
         </div>
@@ -52,11 +52,11 @@ class Settings extends React.Component {
             <Route exact path="/settings">
               <General />
             </Route>
-            <Route path="/settings/sonarr">
-              <Sonarr />
-            </Route>
             <Route path="/settings/radarr">
               <Radarr />
+            </Route>
+            <Route path="/settings/sonarr">
+              <Sonarr />
             </Route>
           </Switch>
         </div>

@@ -70,7 +70,7 @@ async function movieLookup(id, minified = false) {
     delete movie.budget;
     delete movie.adult;
     delete movie.original_title;
-    delete movie.production_companies;
+    // delete movie.production_companies;
     if (minified) {
       delete movie.credits;
       delete movie.backdrop_path;
@@ -254,4 +254,58 @@ function findEnLogo(logos) {
   return logoUrl;
 }
 
-module.exports = movieLookup;
+function discoverMovie(page = 1, params = {}) {
+  const config = getConfig();
+  const tmdbApikey = config.tmdbApi;
+  const tmdb = "https://api.themoviedb.org/3/";
+  let par = "";
+  Object.keys(params).map((i) => {
+    par += `&${i}=${params[i]}`;
+  });
+  let url = `${tmdb}discover/movie?api_key=${tmdbApikey}${par}&page=${page}`;
+  return new Promise((resolve, reject) => {
+    request(
+      url,
+      {
+        method: "GET",
+        json: true,
+      },
+      function (err, data) {
+        if (err) {
+          reject(err);
+        }
+
+        resolve(data);
+      }
+    );
+  });
+}
+
+function company(id) {
+  const config = getConfig();
+  const tmdbApikey = config.tmdbApi;
+  const tmdb = "https://api.themoviedb.org/3/";
+  let url = `${tmdb}company/${id}?api_key=${tmdbApikey}`;
+  return new Promise((resolve, reject) => {
+    request(
+      url,
+      {
+        method: "GET",
+        json: true,
+      },
+      function (err, data) {
+        if (err) {
+          reject(err);
+        }
+
+        resolve(data);
+      }
+    );
+  });
+}
+
+module.exports = {
+  discoverMovie,
+  movieLookup,
+  company,
+};
