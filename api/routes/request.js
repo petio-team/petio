@@ -7,7 +7,7 @@ const Mailer = require("../mail/mailer");
 const Sonarr = require("../services/sonarr");
 const Radarr = require("../services/radarr");
 const { movieLookup } = require("../tmdb/movie");
-const showLookup = require("../tmdb/show");
+const { showLookup } = require("../tmdb/show");
 const processRequest = require("../requests/process");
 
 router.post("/add", async (req, res) => {
