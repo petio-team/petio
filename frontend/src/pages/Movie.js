@@ -211,9 +211,13 @@ class Movie extends React.Component {
             <section>
               <h3 className="sub-title mb--1">{movieData.belongs_to_collection.name}</h3>
               <Carousel>
-                {movieData.collection.map((key) => {
-                  return <MovieCard key={`collection-${key}`} movie={{ id: key }} />;
-                })}
+                {movieData.collection
+                  .sort(function (a, b) {
+                    return a - b;
+                  })
+                  .map((key) => {
+                    return <MovieCard key={`collection-${key}`} movie={{ id: key }} />;
+                  })}
               </Carousel>
             </section>
           ) : null}

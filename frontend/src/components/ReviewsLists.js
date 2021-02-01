@@ -52,9 +52,11 @@ class ReviewsList extends React.Component {
                   );
                 }
               }
-              let thumb = review.author_details.avatar_path.includes("https:")
-                ? review.author_details.avatar_path.substring(1)
-                : `https://www.themoviedb.org/t/p/w128_and_h128_face${review.author_details.avatar_path}`;
+              let thumb = review.author_details.avatar_path
+                ? review.author_details.avatar_path.includes("https:")
+                  ? review.author_details.avatar_path.substring(1)
+                  : `https://www.themoviedb.org/t/p/w128_and_h128_face${review.author_details.avatar_path}`
+                : "";
 
               let text = review.content;
               text = text.replace(/\*\*\*(.*?)\*\*\*/g, '<span style="display: block; margin: 0"><b>$1</b></span>');
