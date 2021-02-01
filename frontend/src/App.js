@@ -17,6 +17,7 @@ import Requests from "./pages/Requests";
 import Shows from "./pages/Shows";
 import { ReactComponent as Spinner } from "./assets/svg/spinner.svg";
 import pjson from "../package.json";
+import Genre from "./pages/Genre";
 
 class App extends React.Component {
   constructor(props) {
@@ -259,6 +260,11 @@ class App extends React.Component {
               <Route exact path="/tv">
                 <div className="page-wrap">
                   <Shows />
+                </div>
+              </Route>
+              <Route exact path="/genre/:type/:id">
+                <div className="page-wrap">
+                  <Genre />
                 </div>
               </Route>
             </Switch>

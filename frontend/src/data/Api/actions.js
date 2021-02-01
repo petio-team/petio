@@ -191,6 +191,20 @@ export async function history(user_id, type) {
   });
 }
 
+export async function discover(type, page, params) {
+  return new Promise((resolve, reject) => {
+    api
+      .discover(type, page, params)
+      .then((data) => {
+        resolve(data);
+      })
+      .catch((err) => {
+        console.log(err);
+        reject("Error parsing discover");
+      });
+  });
+}
+
 export let get_plex_media = (id, type) => {
   return new Promise((resolve, reject) => {
     api

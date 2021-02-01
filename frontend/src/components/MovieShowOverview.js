@@ -275,10 +275,10 @@ class MovieShowOverview extends React.Component {
               <div className="genre--wrap">
                 {this.props.mediaData.genres.map((genre, i) => {
                   return (
-                    <div key={`genre_${genre.name}`} className="genre--item">
+                    <Link to={`/genre/${this.props.mediaData.seasons ? "tv" : "movie"}/${genre.id}`} key={`genre_${genre.name}`} className="genre--item">
                       {this.genreIcon(genre.name)}
                       {genre.name}
-                    </div>
+                    </Link>
                   );
                 })}
               </div>

@@ -1,0 +1,50 @@
+.genre {
+  &--title {
+    display: flex;
+    align-items: center;
+  }
+
+  &--icon {
+    margin-right: 10px;
+    svg {
+      height: 30px;
+      margin-right: 5px;
+    }
+  }
+
+  &--grid {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: -10px;
+    margin-right: -10px;
+
+    &--card {
+      width: calc(100% / 4);
+      padding: 0 10px 10px;
+
+      @include media-breakpoint-up(md) {
+        width: calc(100% / 5);
+      }
+
+      @include media-breakpoint-up(lg) {
+        width: calc(100% / 5);
+      }
+
+      @include media-breakpoint-up(xl) {
+        width: calc(100% / 6);
+      }
+
+      @include media-breakpoint-up(xxl) {
+        width: calc(100% / 7);
+      }
+
+      @include media-breakpoint-up(xxxl) {
+        width: calc(100% / 8);
+      }
+    }
+
+    .card {
+      margin: 0;
+    }
+  }
+}

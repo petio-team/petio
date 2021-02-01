@@ -254,4 +254,35 @@ function findEnLogo(logos) {
   return logoUrl;
 }
 
-module.exports = movieLookup;
+function discoverMovie(page = 1, params = {}) {
+  const config = getConfig();
+  const tmdbApikey = config.tmdbApi;
+  const tmdb = "https://api.themoviedb.org/3/";
+  let par = "";
+  Object.keys(params).map((i) => {
+    par += `&${i}=${params[i]}`;
+  });
+  let url = `${tmdb}discover/movie?api_key=${tmdbApikey}${par}&page=${page}`;
+  console.log(url);
+  return new Promise((resolve, reject) => {
+    request(
+      url,
+      {
+        method: "GET",
+        json: true,
+      },
+      function (err, data) {
+        if (err) {
+          reject(err);
+        }
+
+        resolve(data);
+      }
+    );
+  });
+}
+
+module.exports = {
+  discoverMovie,
+  movieLookup,
+};

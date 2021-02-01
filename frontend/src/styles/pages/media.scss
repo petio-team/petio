@@ -623,6 +623,12 @@
     display: flex;
     align-items: center;
     background: rgba($grey-light, 0.2);
+    color: white;
+    transition: background 0.3s ease;
+
+    &:hover {
+      background: rgba($grey-light, 0.4);
+    }
 
     svg {
       height: 10px;
@@ -675,12 +681,12 @@
   &--item {
     a:hover {
       img {
-        opacity: 0.6;
+        opacity: 1;
       }
     }
 
     img {
-      opacity: 0.3;
+      opacity: 0.6;
       filter: grayscale(1) invert(1);
     }
   }

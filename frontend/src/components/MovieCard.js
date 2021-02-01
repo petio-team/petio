@@ -33,7 +33,7 @@ class MovieCard extends React.Component {
 
   inView() {
     const left = this.card.current.getBoundingClientRect().left;
-    if (left <= this.props.width * 2) {
+    if (left <= this.props.width * 2 || this.props.view) {
       this.setState({
         inView: true,
       });
@@ -110,7 +110,7 @@ class MovieCard extends React.Component {
 MovieCard = withRouter(MovieCard);
 
 function MovieCardContainer(props) {
-  return <MovieCard api={props.api} movie={props.movie} character={props.character} user={props.user} pos={props.pos} width={props.width} popular_count={props.popular_count} />;
+  return <MovieCard api={props.api} movie={props.movie} character={props.character} user={props.user} pos={props.pos} width={props.width} popular_count={props.popular_count} view={props.view} />;
 }
 
 const mapStateToProps = function (state) {

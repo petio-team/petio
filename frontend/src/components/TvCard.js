@@ -33,7 +33,7 @@ class TvCard extends React.Component {
 
   inView() {
     const left = this.card.current.getBoundingClientRect().left;
-    if (left <= this.props.width * 2) {
+    if (left <= this.props.width * 2 || this.props.view) {
       this.setState({
         inView: true,
       });
@@ -109,7 +109,7 @@ class TvCard extends React.Component {
 TvCard = withRouter(TvCard);
 
 function TvCardContainer(props) {
-  return <TvCard api={props.api} series={props.series} character={props.character} pos={props.pos} width={props.width} popular_count={props.popular_count} />;
+  return <TvCard api={props.api} series={props.series} character={props.character} pos={props.pos} width={props.width} popular_count={props.popular_count} view={props.view} />;
 }
 
 const mapStateToProps = function (state) {
