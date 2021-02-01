@@ -2,8 +2,11 @@ import React from "react";
 import { withRouter, Link } from "react-router-dom";
 import { connect } from "react-redux";
 import Api from "../data/Api";
+import User from "../data/User";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
+
+import { ReactComponent as RequestIcon } from "../assets/svg/request.svg";
 
 class TvCard extends React.Component {
   constructor(props) {
@@ -18,6 +21,7 @@ class TvCard extends React.Component {
     this.getMovie = this.getSeries.bind(this);
     this.card = React.createRef();
     this.inView = this.inView.bind(this);
+    this.request = this.request.bind(this);
   }
 
   componentDidMount() {
@@ -28,6 +32,29 @@ class TvCard extends React.Component {
   componentDidUpdate() {
     if (!this.state.inView) {
       this.inView();
+    }
+  }
+
+  async request() {
+    let id = this.props.series.id;
+    let series = this.props.api.series_lookup[id];
+
+    let request = {
+      id: series.id,
+      tmdb_id: series.id,
+      tvdb_id: series.tvdb_id,
+      imdb_id: series.imdb_id,
+      title: series.name,
+      type: "tv",
+      thumb: series.poster_path,
+    };
+
+    try {
+      let req = await User.request(request, this.props.user.current);
+      console.log(req);
+      await User.getRequests();
+    } catch (err) {
+      alert(err);
     }
   }
 
@@ -86,10 +113,14 @@ class TvCard extends React.Component {
       <div className="no-poster"></div>
     );
     return (
-      <div ref={this.card} key={series.id} data-key={series.id} className={"card type--movie-tv " + (series.on_server ? "on-server" : "")}>
+      <div ref={this.card} key={series.id} data-key={series.id} className={`card type--movie-tv ${series.on_server ? "on-server" : ""} ${this.props.user.requests[series.id] ? "requested" : ""}`}>
         <div className="card--inner">
           <Link to={`/series/${series.id}`} className="full-link"></Link>
-
+          {!this.props.user.requests[series.id] && !series.on_server ? (
+            <div className="quick-req" title="Request now" onClick={this.request}>
+              <RequestIcon />
+            </div>
+          ) : null}
           <div className="image-wrap">
             {this.props.popular_count ? <p className="popular-card--count">{this.props.popular_count}</p> : null}
             {img}
@@ -109,12 +140,13 @@ class TvCard extends React.Component {
 TvCard = withRouter(TvCard);
 
 function TvCardContainer(props) {
-  return <TvCard api={props.api} series={props.series} character={props.character} pos={props.pos} width={props.width} popular_count={props.popular_count} view={props.view} />;
+  return <TvCard user={props.user} api={props.api} series={props.series} character={props.character} pos={props.pos} width={props.width} popular_count={props.popular_count} view={props.view} />;
 }
 
 const mapStateToProps = function (state) {
   return {
     api: state.api,
+    user: state.user,
   };
 };
 
