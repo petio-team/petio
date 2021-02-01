@@ -205,6 +205,34 @@ export async function discover(type, page, params) {
   });
 }
 
+export async function networkDetails(id) {
+  return new Promise((resolve, reject) => {
+    api
+      .networkDetails(id)
+      .then((data) => {
+        resolve(data);
+      })
+      .catch((err) => {
+        console.log(err);
+        reject("Error getting network");
+      });
+  });
+}
+
+export async function companyDetails(id) {
+  return new Promise((resolve, reject) => {
+    api
+      .companyDetails(id)
+      .then((data) => {
+        resolve(data);
+      })
+      .catch((err) => {
+        console.log(err);
+        reject("Error getting company");
+      });
+  });
+}
+
 export let get_plex_media = (id, type) => {
   return new Promise((resolve, reject) => {
     api

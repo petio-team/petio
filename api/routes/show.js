@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { showLookup, discoverSeries } = require("../tmdb/show");
+const { showLookup, discoverSeries, network } = require("../tmdb/show");
 
 router.get("/lookup/:id", async (req, res) => {
   let data = await showLookup(req.params.id, false);
@@ -16,6 +16,11 @@ router.post("/discover", async (req, res) => {
   let page = req.body.page ? req.body.page : 1;
   let params = req.body.params;
   let data = await discoverSeries(page, params);
+  res.json(data);
+});
+
+router.get("/network/:id", async (req, res) => {
+  let data = await network(req.params.id);
   res.json(data);
 });
 

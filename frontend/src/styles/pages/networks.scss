@@ -1,16 +1,17 @@
-.genre {
+.network {
   &--title {
     display: flex;
     align-items: center;
-  }
 
-  &--icon {
-    margin-right: 10px;
-    display: flex;
+    img {
+      max-height: 50px;
+      filter: grayscale(1) invert(1);
+      max-width: 150px;
 
-    svg {
-      height: 30px;
-      margin-right: 5px;
+      @include media-breakpoint-up(lg) {
+        max-height: 100px;
+        max-width: 300px;
+      }
     }
   }
 

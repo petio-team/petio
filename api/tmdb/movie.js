@@ -263,7 +263,29 @@ function discoverMovie(page = 1, params = {}) {
     par += `&${i}=${params[i]}`;
   });
   let url = `${tmdb}discover/movie?api_key=${tmdbApikey}${par}&page=${page}`;
-  console.log(url);
+  return new Promise((resolve, reject) => {
+    request(
+      url,
+      {
+        method: "GET",
+        json: true,
+      },
+      function (err, data) {
+        if (err) {
+          reject(err);
+        }
+
+        resolve(data);
+      }
+    );
+  });
+}
+
+function company(id) {
+  const config = getConfig();
+  const tmdbApikey = config.tmdbApi;
+  const tmdb = "https://api.themoviedb.org/3/";
+  let url = `${tmdb}company/${id}?api_key=${tmdbApikey}`;
   return new Promise((resolve, reject) => {
     request(
       url,
@@ -285,4 +307,5 @@ function discoverMovie(page = 1, params = {}) {
 module.exports = {
   discoverMovie,
   movieLookup,
+  company,
 };
