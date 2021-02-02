@@ -82,6 +82,17 @@ function saveSonarrConfig(data) {
   });
 }
 
+router.get("/calendar", async (req, res) => {
+  try {
+    let sonarr = await new Sonarr().calendar();
+    let radarr = await new Radarr().calendar();
+    let full = [...sonarr, ...radarr];
+    res.json(full);
+  } catch {
+    res.json([]);
+  }
+});
+
 // Radarr
 
 router.get("/radarr/paths/:id", async (req, res) => {

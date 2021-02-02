@@ -22,19 +22,30 @@ class Review extends React.Component {
     });
   }
 
-  saveReview() {
-    let review = {
-      score: this.state.rating,
-      comment: "",
-    };
-    User.review(this.props.item, this.props.user.id, review);
-    setTimeout(() => {
-      this.props.closeReview();
-      this.props.getReviews();
-      this.setState({
-        rating: 0,
+  async saveReview() {
+    try {
+      let review = {
+        score: this.state.rating,
+        comment: "",
+      };
+      User.review(this.props.item, this.props.user.id, review);
+      setTimeout(() => {
+        this.props.closeReview();
+        this.props.getReviews();
+        this.setState({
+          rating: 0,
+        });
+        this.props.msg({
+          message: `Review saved`,
+          type: "good",
+        });
+      }, 1000);
+    } catch (err) {
+      this.props.msg({
+        message: `Error adding review`,
+        type: "error",
       });
-    }, 1000);
+    }
   }
 
   render() {

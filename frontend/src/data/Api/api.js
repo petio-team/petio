@@ -91,6 +91,11 @@ export async function companyDetails(id) {
   return process(request).then((res) => res.json());
 }
 
+export async function guideCalendar() {
+  let request = `${getAuth().api}/services/calendar`;
+  return process(request).then((res) => res.json());
+}
+
 export let checkConfig = () => {
   let request = `${getAuth().api}/config`;
   return process(request).then((res) => res.json());

@@ -29,7 +29,7 @@ class Movies extends React.Component {
           <Carousel>
             {Object.keys(this.props.api.popular).length > 0
               ? this.props.api.popular.movies.map((movie) => {
-                  return <MovieCard key={movie.id} movie={movie} />;
+                  return <MovieCard key={movie.id} msg={this.props.msg} movie={movie} />;
                 })
               : null}
           </Carousel>
@@ -42,7 +42,7 @@ class Movies extends React.Component {
 Movies = withRouter(Movies);
 
 function MoviesContainer(props) {
-  return <Movies api={props.api} />;
+  return <Movies api={props.api} msg={props.msg} />;
 }
 
 const mapStateToProps = function (state) {

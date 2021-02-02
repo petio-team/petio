@@ -208,7 +208,7 @@ class Actor extends React.Component {
                   {Object.keys(moviesList).map((key, i) => {
                     let result = moviesList[key];
                     if (result.rating < 100) return null; // threshold to display
-                    return <MovieCard key={result.id + "-cast-" + i} movie={result} character={this.processCredit(result, personData)} />;
+                    return <MovieCard key={result.id + "-cast-" + i} movie={result} msg={this.props.msg} character={this.processCredit(result, personData)} />;
                   })}
                 </Carousel>
               </section>
@@ -220,7 +220,7 @@ class Actor extends React.Component {
                   {Object.keys(showsList).map((key, i) => {
                     let result = showsList[key];
                     if (result.rating < 100) return null; // threshold to display
-                    return <TvCard key={result.id + "-cast-" + i} series={result} character={this.processCredit(result, personData)} />;
+                    return <TvCard key={result.id + "-cast-" + i} series={result} msg={this.props.msg} character={this.processCredit(result, personData)} />;
                   })}
                 </Carousel>
               </section>
@@ -235,7 +235,7 @@ class Actor extends React.Component {
 Actor = withRouter(Actor);
 
 function ActorContainer(props) {
-  return <Actor api={props.api} />;
+  return <Actor api={props.api} msg={props.msg} />;
 }
 
 const mapStateToProps = function (state) {

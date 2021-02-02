@@ -665,12 +665,18 @@
 
     img {
       transition: opacity 0.3s ease;
+      max-height: 20px;
+      max-width: 60px;
       height: 20px;
+      object-fit: contain;
       // filter: brightness(0) invert(1);
       opacity: 0.5;
 
       @include media-breakpoint-up(lg) {
+        max-height: 30px;
+        max-width: 100px;
         height: 30px;
+        object-fit: contain;
       }
     }
   }

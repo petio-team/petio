@@ -1,4 +1,4 @@
-import { getPopular, movie, series, search, clearSearch, person, top, history, get_plex_media, checkConfig, discover, networkDetails, companyDetails } from "./actions";
+import { getPopular, movie, series, search, clearSearch, person, top, history, get_plex_media, checkConfig, discover, networkDetails, companyDetails, guideCalendar } from "./actions";
 
 export default {
   getPopular,
@@ -14,4 +14,5 @@ export default {
   discover,
   networkDetails,
   companyDetails,
+  guideCalendar,
 };

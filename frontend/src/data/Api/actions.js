@@ -233,6 +233,20 @@ export async function companyDetails(id) {
   });
 }
 
+export async function guideCalendar(id) {
+  return new Promise((resolve, reject) => {
+    api
+      .guideCalendar()
+      .then((data) => {
+        resolve(data);
+      })
+      .catch((err) => {
+        console.log(err);
+        reject("Error getting network");
+      });
+  });
+}
+
 export let get_plex_media = (id, type) => {
   return new Promise((resolve, reject) => {
     api
