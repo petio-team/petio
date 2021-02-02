@@ -36,6 +36,7 @@ class MovieCard extends React.Component {
   }
 
   inView() {
+    if (!this.card.current) return;
     const left = this.card.current.getBoundingClientRect().left;
     if (left <= this.props.width * 2 || this.props.view) {
       this.setState({

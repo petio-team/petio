@@ -1,0 +1,252 @@
+// @import "react-big-calendar/lib/sass/styles";
+@import "react-big-calendar/lib/css/react-big-calendar.css";
+
+// .rbc-date-cell,
+// .rbc-day-bg,
+// .rbc-month-row {
+//   min-height: 50px;
+// }
+
+.rbc-calendar {
+  min-height: 700px;
+}
+
+.rbc-row {
+  // min-height: 150px;
+}
+
+.rbc-month-row {
+  border: none !important;
+  overflow: visible !important;
+}
+
+.rbc-event-content {
+  overflow: visible !important;
+  width: 100%;
+  padding: 0 5px 2px 5px;
+}
+
+.rbc-date-cell {
+  a {
+    font-size: 10px;
+    font-weight: 500 !important;
+  }
+}
+
+.rbc-day-bg {
+  background: rgba($grey-light, 0.1);
+  border: none !important;
+  margin: 2px;
+  border-radius: 5px;
+
+  &.rbc-off-range-bg {
+    background: rgba($grey-medium, 0.1);
+  }
+
+  &.rbc-today {
+    background: rgba(white, 0.3);
+  }
+}
+
+.rbc-selected {
+  background: none !important;
+}
+
+.rbc-event:focus,
+.rbc-day-slot .rbc-background-event:focus {
+  outline: none !important;
+}
+
+.calendar--event {
+  background: rgba($grey-light, 0.1);
+  padding: 2px 5px;
+  width: 100%;
+  border-radius: 2px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+
+  &--icon {
+    margin-right: 2px;
+    display: flex;
+    svg {
+      height: 10px;
+      fill: white;
+    }
+  }
+
+  p {
+    font-size: 10px;
+    line-height: 1;
+    margin: 0;
+    font-weight: 500;
+  }
+
+  &.recorded {
+    background: rgba($primary, 0.8);
+  }
+
+  &.hasAired:not(.recorded):not(.airsToday) {
+    background: rgba($bad, 0.5);
+  }
+
+  &.airsToday {
+    background: rgba($blue, 0.5);
+  }
+
+  &--wrap {
+    position: relative;
+  }
+}
+
+.rbc-event {
+  display: flex;
+  flex-wrap: wrap;
+  background: none;
+  padding: 0;
+  margin-bottom: 0;
+  font-size: 12px;
+  // background: rgba($grey-light, 0.1);
+
+  &.rbc-selected {
+    .calendar--event {
+      // background: $primary;
+    }
+  }
+}
+
+.rbc-show-more {
+  margin: 0 5px 0;
+  padding: 2px 5px;
+  // width: 100%;
+  border-radius: 2px;
+  font-size: 10px;
+  line-height: 1;
+  font-weight: 500;
+}
+
+.rbc-month-view {
+  border: none;
+}
+
+.rbc-header {
+  border: none !important;
+
+  span {
+    font-size: 12px;
+    font-weight: 500;
+  }
+}
+
+.rbc-btn-group {
+  button {
+    appearance: none;
+    height: 35px;
+    line-height: 33px;
+    line-height: 1;
+    border: solid 2px transparent;
+    background: none;
+    color: white;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    padding: 0 10px;
+    border-radius: 4px !important;
+    font-size: 10px;
+    background: rgba($grey-light, 0.4);
+    height: 25px;
+
+    @include media-breakpoint-up(lg) {
+      font-size: 12px;
+      height: 35px;
+      padding: 0 20px;
+    }
+
+    &:hover,
+    &:focus,
+    &:active {
+      // background: rgba($grey-light, 0.8);
+      // border: solid 2px transparent;
+      // color: black;
+      box-shadow: none;
+
+      background: $primary;
+      color: black;
+      border: solid 2px $primary;
+    }
+
+    &.rbc-active {
+      background: $primary;
+      color: black;
+      border: solid 2px $primary;
+
+      &:hover,
+      &:focus,
+      &:active {
+        background: $primaryDark;
+        color: black;
+        border: solid 2px $primaryDark;
+      }
+    }
+  }
+
+  button + button {
+    margin-left: 5px;
+  }
+}
+
+.rbc-toolbar-label {
+  font-weight: 700;
+}
+
+.rbc-time-slot {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.rbc-event-label {
+  display: none;
+}
+
+.rbc-agenda-view {
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.rbc-agenda-view table.rbc-agenda-table {
+  @extend .generic-table;
+  border: none;
+
+  tr td,
+  tr th {
+    background: rgba(255, 255, 255, 0.05) !important;
+  }
+
+  tr th {
+    border-bottom: solid 1px $grey-medium !important;
+  }
+
+  .rbc-agenda-date-cell {
+    background: rgba(255, 255, 255, 0.02) !important;
+  }
+
+  tr th:first-child {
+    background: rgba(255, 255, 255, 0.02) !important;
+  }
+}
+
+.rbc-agenda-view table.rbc-agenda-table tbody > tr > td + td {
+  border-left: none;
+}
+
+.request-guide {
+  @include media-breakpoint-down(md) {
+    display: none;
+  }
+}
