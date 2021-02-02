@@ -83,7 +83,7 @@
   }
 
   &.recorded {
-    background: rgba($primary, 0.8);
+    background: rgba($good, 0.8);
   }
 
   &.hasAired:not(.recorded):not(.airsToday) {

@@ -96,7 +96,7 @@ class Networks extends React.Component {
               this.state.results.map((result) => {
                 return (
                   <div className="network--grid--card" key={`gen__${result.id}`}>
-                    <TvCard series={result} view={true} />
+                    <TvCard series={result} msg={this.props.msg} view={true} />
                   </div>
                 );
               })

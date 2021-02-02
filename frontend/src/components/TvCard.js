@@ -50,11 +50,17 @@ class TvCard extends React.Component {
     };
 
     try {
-      let req = await User.request(request, this.props.user.current);
-      console.log(req);
+      await User.request(request, this.props.user.current);
+      this.props.msg({
+        message: `New Request added: ${series.name}`,
+        type: "good",
+      });
       await User.getRequests();
     } catch (err) {
-      alert(err);
+      this.props.msg({
+        message: err,
+        type: "error",
+      });
     }
   }
 
@@ -140,7 +146,19 @@ class TvCard extends React.Component {
 TvCard = withRouter(TvCard);
 
 function TvCardContainer(props) {
-  return <TvCard user={props.user} api={props.api} series={props.series} character={props.character} pos={props.pos} width={props.width} popular_count={props.popular_count} view={props.view} />;
+  return (
+    <TvCard
+      user={props.user}
+      api={props.api}
+      series={props.series}
+      character={props.character}
+      pos={props.pos}
+      width={props.width}
+      popular_count={props.popular_count}
+      view={props.view}
+      msg={props.msg}
+    />
+  );
 }
 
 const mapStateToProps = function (state) {

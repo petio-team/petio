@@ -70,11 +70,17 @@ class MovieCard extends React.Component {
       type: "movie",
     };
     try {
-      let req = await User.request(request, this.props.user.current);
-      console.log(req);
+      await User.request(request, this.props.user.current);
+      this.props.msg({
+        message: `New Request added: ${movie.title}`,
+        type: "good",
+      });
       await User.getRequests();
     } catch (err) {
-      alert(err);
+      this.props.msg({
+        message: err,
+        type: "error",
+      });
     }
   }
 
@@ -141,7 +147,19 @@ class MovieCard extends React.Component {
 MovieCard = withRouter(MovieCard);
 
 function MovieCardContainer(props) {
-  return <MovieCard api={props.api} movie={props.movie} character={props.character} user={props.user} pos={props.pos} width={props.width} popular_count={props.popular_count} view={props.view} />;
+  return (
+    <MovieCard
+      api={props.api}
+      movie={props.movie}
+      character={props.character}
+      user={props.user}
+      pos={props.pos}
+      width={props.width}
+      popular_count={props.popular_count}
+      view={props.view}
+      msg={props.msg}
+    />
+  );
 }
 
 const mapStateToProps = function (state) {

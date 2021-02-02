@@ -200,8 +200,6 @@ class processRequest {
     let profile = userDetails.profile ? await Profile.findById(this.user.profile) : false;
     let quotaCap = profile ? profile.quota : 0;
 
-    console.log(userQuota, quotaCap);
-
     if (quotaCap > 0 && userQuota >= quotaCap) {
       return false;
     }

@@ -67,6 +67,7 @@ $grid-breakpoints: $breakpoints;
 @import "components/input";
 @import "components/table";
 @import "components/calendar";
+@import "components/push-msg";
 
 // pages
 @import "pages/login";

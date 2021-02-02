@@ -21,13 +21,6 @@ class Carousel extends React.Component {
     this.scroll = this.scroll.bind(this);
   }
 
-  static getDerivedStateFromProps(props, current_state) {
-    if (current_state.value !== props.value) {
-      alert("prop change");
-    }
-    return null;
-  }
-
   componentDidMount() {
     this.init();
     window.addEventListener("resize", this.init);

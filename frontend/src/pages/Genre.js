@@ -242,14 +242,14 @@ class Genre extends React.Component {
                 if (type === "TV") {
                   return (
                     <div className="genre--grid--card" key={`gen__${result.id}`}>
-                      <TvCard series={result} view={true} />
+                      <TvCard series={result} msg={this.props.msg} view={true} />
                     </div>
                   );
                 }
                 if (type === "Movies") {
                   return (
                     <div className="genre--grid--card" key={`gen__${result.id}`}>
-                      <MovieCard movie={result} view={true} />
+                      <MovieCard movie={result} view={true} msg={this.props.msg} />
                     </div>
                   );
                 }

@@ -96,7 +96,7 @@ class Company extends React.Component {
               this.state.results.map((result) => {
                 return (
                   <div className="company--grid--card" key={`gen__${result.id}`}>
-                    <MovieCard movie={result} view={true} />
+                    <MovieCard msg={this.props.msg} movie={result} view={true} />
                   </div>
                 );
               })
