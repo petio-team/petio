@@ -16,6 +16,7 @@ import Movies from "./pages/Movies";
 import Requests from "./pages/Requests";
 import Shows from "./pages/Shows";
 import { ReactComponent as Spinner } from "./assets/svg/spinner.svg";
+import { ReactComponent as TmdbLogo } from "./assets/svg/tmdb.svg";
 import pjson from "../package.json";
 import Genre from "./pages/Genre";
 import Networks from "./pages/Networks";
@@ -225,6 +226,14 @@ class App extends React.Component {
                   {this.state.config === "failed" ? <div className="msg msg__error msg__input">API Not configured, please complete setup</div> : null}
                   <button className="btn btn__square">Login</button>
                 </form>
+              </div>
+              <div className="credits">
+                <a href="https://fanart.tv/" target="_blank">
+                  <p>FanArt.tv</p>
+                </a>
+                <a href="https://www.themoviedb.org/" target="_blank">
+                  <TmdbLogo />
+                </a>
               </div>
               <p className="powered-by">Petio build (alpha) {pjson.version}</p>
             </>

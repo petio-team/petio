@@ -247,13 +247,14 @@ class MovieShowOverview extends React.Component {
                   {this.props.mediaData.first_air_date ? new Date(this.props.mediaData.first_air_date).getFullYear() : null}
                 </p>
                 <div className="detail--bar--sep">·</div>
-                <p className="runtime">
-                  {this.props.mediaData.runtime ? this.timeConvert(this.props.mediaData.runtime) : null}
-                  {this.props.mediaData.episode_run_time
+                <p className="runtime" title="Running Time">
+                  {this.props.mediaData.runtime
+                    ? this.timeConvert(this.props.mediaData.runtime)
+                    : this.props.mediaData.episode_run_time
                     ? this.props.mediaData.episode_run_time.length > 0
                       ? this.timeConvert(Array.isArray(this.props.mediaData.episode_run_time) ? this.props.mediaData.episode_run_time[0] : this.props.mediaData.episode_run_time)
                       : "Unknown"
-                    : null}
+                    : "Not Available"}
                 </p>
                 <div className="detail--bar--sep">·</div>
                 <p>

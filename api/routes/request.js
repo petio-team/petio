@@ -173,6 +173,7 @@ router.post("/remove", async (req, res) => {
 router.post("/update", async (req, res) => {
   let request = req.body.request;
   let servers = req.body.servers;
+  let approved = req.body.request.approved;
   try {
     await Request.findOneAndUpdate(
       { requestId: request.requestId },
@@ -204,6 +205,31 @@ router.post("/update", async (req, res) => {
       );
     }
     res.status(200).send();
+    if (!approved) {
+      let emails = [];
+      let titles = [];
+      await Promise.all(
+        request.users.map(async (user) => {
+          let userData = await User.findOne({ id: user });
+          if (!userData) {
+            userData = await Admin.findOne({ id: user });
+          }
+          if (!userData) return;
+          emails.push(userData.email);
+          titles.push(userData.title);
+        })
+      );
+      const requestData = request;
+      let type = requestData.type === "tv" ? "TV Show" : "Movie";
+      new Mailer().mail(
+        `Request approved for ${requestData.title}`,
+        `${type}: ${requestData.title}`,
+        `Your request has been reviewed and has been approved. You'll receive an email once it has been added to Plex!`,
+        `https://image.tmdb.org/t/p/w500${requestData.thumb}`,
+        emails,
+        titles
+      );
+    }
   } catch (err) {
     console.log(err);
     res.status(500).send();

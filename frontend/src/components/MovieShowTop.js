@@ -53,12 +53,7 @@ class MovieShowTop extends React.Component {
               key={`${this.props.mediaData.title}__backdrop`}
             />
           ) : (
-            <div
-              className="no-backdrop"
-              style={{
-                backgroundImage: "url(/p-seamless.png)",
-              }}
-            ></div>
+            <div className="no-backdrop"></div>
           )}
         </div>
         <div className="media-poster">
