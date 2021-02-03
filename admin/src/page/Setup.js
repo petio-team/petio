@@ -9,6 +9,7 @@ import { ReactComponent as Docker } from "../assets/svg/docker.svg";
 import { ReactComponent as Server } from "../assets/svg/server.svg";
 import { ReactComponent as Good } from "../assets/svg/check.svg";
 import { ReactComponent as Bad } from "../assets/svg/close.svg";
+import { ReactComponent as TmdbLogo } from "../assets/svg/tmdb.svg";
 import Api from "../data/Api";
 import pjson from "../../package.json";
 
@@ -368,6 +369,16 @@ class Setup extends React.Component {
               </div>
             </div>
           ) : null}
+        </div>
+        <div className="credits">
+          <a href="https://fanart.tv/" target="_blank">
+            <p>
+              <strong>FAN</strong>ART<span>.TV</span>
+            </p>
+          </a>
+          <a href="https://www.themoviedb.org/" target="_blank">
+            <TmdbLogo />
+          </a>
         </div>
         <p className="setup--version">Petio Admin build (alpha) {pjson.version}</p>
       </div>

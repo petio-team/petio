@@ -495,8 +495,10 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-size: 200px;
-  background-color: $dark-grey;
+  // background-size: 200px;
+  // background-color: $dark-grey;
+  background: $dark-grey;
+  background: linear-gradient(225deg, rgba($grey-light, 0.2) 0%, rgba($grey-light, 0.2) 20%, rgba($black, 0.2) 80%, rgba($black, 0.2) 100%);
 }
 
 .text-placeholder {

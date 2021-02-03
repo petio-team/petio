@@ -260,24 +260,23 @@ class Sonarr {
     let mainCalendar = [];
     let now = new Date();
     for (let server of this.fullConfig) {
-      if (!server.active) {
-        return;
-      }
+      if (server.active) {
+        this.config = server;
 
-      this.config = server;
-
-      try {
-        let serverCal = await this.get("/calendar", {
-          unmonitored: true,
-          start: new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString(),
-          end: new Date(now.getFullYear(), now.getMonth() + 2, 1).toISOString(),
-        });
-
-        mainCalendar = [...mainCalendar, ...serverCal];
-      } catch (err) {
-        console.trace(err);
+        try {
+          let serverCal = await this.get("/calendar", {
+            unmonitored: true,
+            start: new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString(),
+            end: new Date(now.getFullYear(), now.getMonth() + 2, 1).toISOString(),
+          });
+          mainCalendar = [...mainCalendar, ...serverCal];
+        } catch (err) {
+          console.trace(err);
+        }
       }
     }
+
+    console.log(mainCalendar);
 
     return mainCalendar;
   }

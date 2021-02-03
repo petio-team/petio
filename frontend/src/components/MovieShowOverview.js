@@ -29,6 +29,7 @@ import { ReactComponent as GenreTvMovie } from "../assets/svg/genres/tv-movie.sv
 import { ReactComponent as GenreThriller } from "../assets/svg/genres/thriller.svg";
 import { ReactComponent as GenreWar } from "../assets/svg/genres/war.svg";
 import { ReactComponent as GenreWestern } from "../assets/svg/genres/western.svg";
+import { ReactComponent as GenreAnime } from "../assets/svg/genres/anime.svg";
 
 class MovieShowOverview extends React.Component {
   findNested(obj, key, value) {
@@ -124,6 +125,8 @@ class MovieShowOverview extends React.Component {
         return null;
       case "War & Politics ":
         return <GenreWar />;
+      case "anime":
+        return <GenreAnime />;
       default:
         return null;
     }
@@ -140,10 +143,10 @@ class MovieShowOverview extends React.Component {
     let userRatingVal = 0;
 
     let requestBtn = this.props.mediaData.on_server ? (
-      <div className="btn btn__square good">
+      <a href={`plexapp://${this.props.mediaData.on_server}`} target="_blank" className="btn btn__square good">
         <CheckIcon />
-        On Plex
-      </div>
+        Watch now
+      </a>
     ) : this.props.requested ? (
       <button className="btn btn__square blue" onClick={this.props.request}>
         {`Requested by ${this.props.requested}
@@ -244,13 +247,14 @@ class MovieShowOverview extends React.Component {
                   {this.props.mediaData.first_air_date ? new Date(this.props.mediaData.first_air_date).getFullYear() : null}
                 </p>
                 <div className="detail--bar--sep">·</div>
-                <p className="runtime">
-                  {this.props.mediaData.runtime ? this.timeConvert(this.props.mediaData.runtime) : null}
-                  {this.props.mediaData.episode_run_time
+                <p className="runtime" title="Running Time">
+                  {this.props.mediaData.runtime
+                    ? this.timeConvert(this.props.mediaData.runtime)
+                    : this.props.mediaData.episode_run_time
                     ? this.props.mediaData.episode_run_time.length > 0
                       ? this.timeConvert(Array.isArray(this.props.mediaData.episode_run_time) ? this.props.mediaData.episode_run_time[0] : this.props.mediaData.episode_run_time)
                       : "Unknown"
-                    : null}
+                    : "Not Available"}
                 </p>
                 <div className="detail--bar--sep">·</div>
                 <p>
@@ -281,6 +285,18 @@ class MovieShowOverview extends React.Component {
                     </Link>
                   );
                 })}
+                {Object.keys(this.props.mediaData.keywords.results).length > 0
+                  ? this.props.mediaData.keywords.results.map((genre, i) => {
+                      let customGenres = [210024];
+                      if (customGenres.includes(genre.id))
+                        return (
+                          <Link to={`/genre/${this.props.mediaData.seasons ? "tv" : "movie"}/${genre.id}`} key={`genre_${genre.name}`} className="genre--item" style={{ textTransform: "capitalize" }}>
+                            {this.genreIcon(genre.name)}
+                            {genre.name}
+                          </Link>
+                        );
+                    })
+                  : null}
               </div>
               <div className="media--actions__mob">
                 {requestBtn}

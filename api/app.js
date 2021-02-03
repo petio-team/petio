@@ -233,6 +233,7 @@ class Main {
         plexIp: server.host,
         plexPort: server.port,
         plexToken: user.token,
+        plexClientID: server.clientId,
         adminUsername: user.username,
         adminEmail: user.email,
         adminPass: user.password,

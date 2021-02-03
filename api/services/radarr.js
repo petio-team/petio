@@ -272,21 +272,22 @@ class Radarr {
     let now = new Date();
     for (let server of this.fullConfig) {
       if (!server.active) {
-        return;
-      }
+        this.config = server;
 
-      this.config = server;
+        try {
+          let serverCal = await this.get("/calendar", {
+            unmonitored: true,
+            start: new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString(),
+            end: new Date(now.getFullYear(), now.getMonth() + 2, 1).toISOString(),
+          });
 
-      try {
-        let serverCal = await this.get("/calendar", {
-          unmonitored: true,
-          start: new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString(),
-          end: new Date(now.getFullYear(), now.getMonth() + 2, 1).toISOString(),
-        });
+          console.log(serverCal.length, server.title, "radarr");
 
-        mainCalendar = [...mainCalendar, ...serverCal];
-      } catch (err) {
-        console.trace(err);
+          mainCalendar = [...mainCalendar, ...serverCal];
+          console.log(mainCalendar.length);
+        } catch (err) {
+          console.trace(err);
+        }
       }
     }
 

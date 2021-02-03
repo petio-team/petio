@@ -88,7 +88,8 @@ router.get("/calendar", async (req, res) => {
     let radarr = await new Radarr().calendar();
     let full = [...sonarr, ...radarr];
     res.json(full);
-  } catch {
+  } catch (err) {
+    console.trace(err);
     res.json([]);
   }
 });

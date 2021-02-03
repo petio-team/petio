@@ -6,6 +6,10 @@ import { getAuth } from "../data/auth";
 
 class ReviewsList extends React.Component {
   render() {
+    console.log(this.props);
+    if (!this.props.reviews) {
+      return null;
+    }
     return (
       <div className="reviews-list--wrap">
         {this.props.reviews
