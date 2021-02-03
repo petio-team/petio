@@ -183,11 +183,13 @@ class Movie extends React.Component {
       );
     }
 
-    let video = movieData.videos.results ? movieData.videos.results[0] : false;
-
-    if (video) {
-      if (video.site !== "YouTube") {
-        video = false;
+    let video = false;
+    if (movieData.videos.results) {
+      for (let i = 0; i < movieData.videos.results.length; i++) {
+        let vid = movieData.videos.results[i];
+        if (vid.site === "YouTube" && !video) {
+          video = vid;
+        }
       }
     }
 
@@ -202,7 +204,7 @@ class Movie extends React.Component {
           getReviews={this.getReviews}
           item={movieData}
         />
-        <MovieShowTop mediaData={movieData} openIssues={this.props.openIssues} trailer={this.state.trailer} requested={this.state.requested} request={this.request} />
+        <MovieShowTop mediaData={movieData} video={video} openIssues={this.props.openIssues} trailer={this.state.trailer} requested={this.state.requested} request={this.request} />
         <div className="media-content">
           <MovieShowOverview
             mediaData={movieData}

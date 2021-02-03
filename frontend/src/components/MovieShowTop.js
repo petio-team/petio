@@ -30,13 +30,7 @@ class MovieShowTop extends React.Component {
       </button>
     );
 
-    let video = this.props.mediaData.videos.results ? this.props.mediaData.videos.results[0] : false;
-
-    if (video) {
-      if (video.site !== "YouTube") {
-        video = false;
-      }
-    }
+    let video = this.props.video;
 
     return (
       <div className={`media-top ${this.props.trailer ? "show-trailer" : ""}`}>

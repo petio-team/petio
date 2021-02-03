@@ -23,6 +23,7 @@ import { ReactComponent as GenreTvMovie } from "../assets/svg/genres/tv-movie.sv
 import { ReactComponent as GenreThriller } from "../assets/svg/genres/thriller.svg";
 import { ReactComponent as GenreWar } from "../assets/svg/genres/war.svg";
 import { ReactComponent as GenreWestern } from "../assets/svg/genres/western.svg";
+import { ReactComponent as GenreAnime } from "../assets/svg/genres/anime.svg";
 
 class Genre extends React.Component {
   constructor(props) {
@@ -95,6 +96,8 @@ class Genre extends React.Component {
         return "Talk";
       case 10768:
         return "War & Politics";
+      case 210024:
+        return "Anime";
       default:
         return `Genre ${this.props.match.params.id}`;
     }
@@ -164,8 +167,10 @@ class Genre extends React.Component {
         return <GenreTvMovie />;
       case "Talk":
         return null;
-      case "War & Politics ":
+      case "War & Politics":
         return <GenreWar />;
+      case "Anime":
+        return <GenreAnime />;
       default:
         return null;
     }
@@ -210,9 +215,14 @@ class Genre extends React.Component {
     });
     let id = this.props.match.params.id;
     let type = this.props.match.params.type === "tv" ? "show" : "movie";
-    let data = await Api.discover(type, page, {
-      with_genres: id,
-    });
+    let keywords = [210024];
+    let data = keywords.includes(parseInt(id))
+      ? await Api.discover(type, page, {
+          with_keywords: id,
+        })
+      : await Api.discover(type, page, {
+          with_genres: id,
+        });
     if (data.results) {
       this.setState({
         results: this.state.results ? [...this.state.results, ...data.results] : data.results,
@@ -224,7 +234,6 @@ class Genre extends React.Component {
   }
 
   render() {
-    let id = this.props.match.params.id;
     let type = this.props.match.params.type === "tv" ? "TV" : "Movies";
     let genreName = this.genreName();
     return (

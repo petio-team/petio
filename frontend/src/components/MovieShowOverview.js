@@ -29,6 +29,7 @@ import { ReactComponent as GenreTvMovie } from "../assets/svg/genres/tv-movie.sv
 import { ReactComponent as GenreThriller } from "../assets/svg/genres/thriller.svg";
 import { ReactComponent as GenreWar } from "../assets/svg/genres/war.svg";
 import { ReactComponent as GenreWestern } from "../assets/svg/genres/western.svg";
+import { ReactComponent as GenreAnime } from "../assets/svg/genres/anime.svg";
 
 class MovieShowOverview extends React.Component {
   findNested(obj, key, value) {
@@ -124,6 +125,8 @@ class MovieShowOverview extends React.Component {
         return null;
       case "War & Politics ":
         return <GenreWar />;
+      case "anime":
+        return <GenreAnime />;
       default:
         return null;
     }
@@ -281,6 +284,18 @@ class MovieShowOverview extends React.Component {
                     </Link>
                   );
                 })}
+                {Object.keys(this.props.mediaData.keywords.results).length > 0
+                  ? this.props.mediaData.keywords.results.map((genre, i) => {
+                      let customGenres = [210024];
+                      if (customGenres.includes(genre.id))
+                        return (
+                          <Link to={`/genre/${this.props.mediaData.seasons ? "tv" : "movie"}/${genre.id}`} key={`genre_${genre.name}`} className="genre--item" style={{ textTransform: "capitalize" }}>
+                            {this.genreIcon(genre.name)}
+                            {genre.name}
+                          </Link>
+                        );
+                    })
+                  : null}
               </div>
               <div className="media--actions__mob">
                 {requestBtn}

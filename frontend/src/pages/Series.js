@@ -275,11 +275,13 @@ class Series extends React.Component {
       }
     }
 
-    let video = seriesData.videos.results ? seriesData.videos.results[0] : false;
-
-    if (video) {
-      if (video.site !== "YouTube") {
-        video = false;
+    let video = false;
+    if (seriesData.videos.results) {
+      for (let i = 0; i < seriesData.videos.results.length; i++) {
+        let vid = seriesData.videos.results[i];
+        if (vid.site === "YouTube" && !video) {
+          video = vid;
+        }
       }
     }
 
@@ -294,7 +296,7 @@ class Series extends React.Component {
           getReviews={this.getReviews}
           item={seriesData}
         />
-        <MovieShowTop mediaData={seriesData} trailer={this.state.trailer} requested={this.state.requested} request={this.request} openIssues={this.props.openIssues} />
+        <MovieShowTop mediaData={seriesData} video={video} trailer={this.state.trailer} requested={this.state.requested} request={this.request} openIssues={this.props.openIssues} />
 
         <div className="media-content">
           <MovieShowOverview

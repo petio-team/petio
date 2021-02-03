@@ -19,6 +19,9 @@ async function movieLookup(id, minified = false) {
   } catch {
     return { error: "not found" };
   }
+  if (movie.success === false) {
+    return { error: "not found" };
+  }
   if (movie) {
     if (fanart) {
       if (fanart.hdmovielogo) {
@@ -65,6 +68,8 @@ async function movieLookup(id, minified = false) {
 
     movie.recommendations = recommendationsData;
     movie.collection = collectionData;
+    movie.keywords.results = movie.keywords.keywords;
+    movie.keywords.keywords = {};
 
     delete movie.production_countries;
     delete movie.budget;
@@ -153,7 +158,7 @@ function tmdbData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}movie/${id}?api_key=${tmdbApikey}&append_to_response=credits,videos`;
+  let url = `${tmdb}movie/${id}?api_key=${tmdbApikey}&append_to_response=credits,videos,keywords`;
   return new Promise((resolve, reject) => {
     request(
       url,
@@ -176,7 +181,7 @@ async function recommendationData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}movie/${id}/recommendations?api_key=${tmdbApikey}&append_to_response=credits,videos`;
+  let url = `${tmdb}movie/${id}/recommendations?api_key=${tmdbApikey}&append_to_response=credits,videos,keywords`;
 
   return new Promise((resolve, reject) => {
     request(

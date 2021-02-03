@@ -19,6 +19,9 @@ async function showLookup(id, minified = false) {
   } catch {
     return { error: "not found" };
   }
+  if (show.success === false) {
+    return { error: "not found" };
+  }
   if (show) {
     if (fanart) {
       if (fanart.hdtvlogo) {
@@ -165,7 +168,7 @@ async function tmdbData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}tv/${id}?api_key=${tmdbApikey}&append_to_response=credits,videos`;
+  let url = `${tmdb}tv/${id}?api_key=${tmdbApikey}&append_to_response=credits,videos,keywords`;
 
   return new Promise((resolve, reject) => {
     request(
@@ -189,7 +192,7 @@ async function recommendationData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}tv/${id}/recommendations?api_key=${tmdbApikey}&append_to_response=credits,videos`;
+  let url = `${tmdb}tv/${id}/recommendations?api_key=${tmdbApikey}&append_to_response=credits,videos,keywords`;
 
   return new Promise((resolve, reject) => {
     request(
