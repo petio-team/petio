@@ -110,6 +110,7 @@ async function getUser(token) {
           protocol: connection.getAttribute("protocol"),
           platform: server.getAttribute("platform"),
           status: "pending",
+          clientId: server.getAttribute("clientIdentifier"),
         };
         i++;
       }
