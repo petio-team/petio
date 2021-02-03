@@ -229,7 +229,9 @@ class App extends React.Component {
               </div>
               <div className="credits">
                 <a href="https://fanart.tv/" target="_blank">
-                  <p>FanArt.tv</p>
+                  <p>
+                    <strong>FAN</strong>ART<span>.TV</span>
+                  </p>
                 </a>
                 <a href="https://www.themoviedb.org/" target="_blank">
                   <TmdbLogo />

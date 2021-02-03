@@ -7,10 +7,10 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 class MovieShowTop extends React.Component {
   render() {
     let requestBtn = this.props.mediaData.on_server ? (
-      <div className="btn btn__square good">
+      <a href={`https://app.plex.tv/desktop#!/${this.props.mediaData.on_server}`} target="_blank" className="btn btn__square good">
         <CheckIcon />
-        On Plex
-      </div>
+        Watch now
+      </a>
     ) : this.props.requested ? (
       <button className="btn btn__square blue" onClick={this.props.request}>
         {`Requested by ${this.props.requested}

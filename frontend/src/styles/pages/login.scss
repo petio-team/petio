@@ -102,9 +102,18 @@
     p {
       margin: 0;
       line-height: 1;
-      font-weight: 500;
+      font-weight: 400;
       width: 100%;
       color: rgba(white, 0.3);
+      letter-spacing: 1px;
+
+      strong {
+        font-weight: 700;
+      }
+
+      span {
+        font-weight: 300;
+      }
     }
 
     svg {

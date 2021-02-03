@@ -497,8 +497,8 @@
   height: 100%;
   // background-size: 200px;
   // background-color: $dark-grey;
-  background: rgb(199, 140, 13);
-  background: linear-gradient(225deg, rgba($primaryDark, 0.2) 0%, rgba($primaryDark, 0.2) 40%, rgba($primary, 0.2) 60%, rgba($primary, 0.2) 100%);
+  background: $dark-grey;
+  background: linear-gradient(225deg, rgba($grey-light, 0.2) 0%, rgba($grey-light, 0.2) 20%, rgba($black, 0.2) 80%, rgba($black, 0.2) 100%);
 }
 
 .text-placeholder {
