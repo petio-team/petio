@@ -7,7 +7,11 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 class MovieShowTop extends React.Component {
   render() {
     let requestBtn = this.props.mediaData.on_server ? (
-      <a href={`https://app.plex.tv/desktop#!/${this.props.mediaData.on_server}`} target="_blank" className="btn btn__square good">
+      <a
+        href={`https://app.plex.tv/desktop#!/server/${this.props.mediaData.on_server.serverKey}/details?key=%2Flibrary%2Fmetadata%2F${this.props.mediaData.on_server.ratingKey}`}
+        target="_blank"
+        className="btn btn__square good"
+      >
         <CheckIcon />
         Watch now
       </a>

@@ -42,7 +42,7 @@ async function onServer(type, imdb, tvdb, tmdb) {
             resolutions.push(item.Media[0].videoResolution);
           }
         });
-        return { exists: `server/${clientId}/details?key=%2Flibrary%2Fmetadata%2F${found[0].ratingKey}`, resolutions: resolutions };
+        return { exists: { ratingKey: found[0].ratingKey, serverKey: clientId }, resolutions: resolutions };
       } else {
         return { exists: false, resolutions: resolutions };
       }
@@ -76,7 +76,7 @@ async function onServer(type, imdb, tvdb, tmdb) {
 
     if (foundItemImdb || foundItemTvdb || foundItemTmdb) {
       let found = foundItemImdb || foundItemTvdb || foundItemTmdb;
-      return { exists: `server/${clientId}/details?key=%2Flibrary%2Fmetadata%2F${found.ratingKey}`, resolutions: [] };
+      return { exists: { ratingKey: found.ratingKey, serverKey: clientId }, resolutions: [] };
       // return { exists: true, resolutions: [] };
     } else {
       return { exists: false, resolutions: [] };
