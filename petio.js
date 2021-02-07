@@ -44,7 +44,8 @@ class Wrapper {
   // Catch 404s at main router level
   notfound() {
     app.get("*", function (req, res) {
-      res.status(404).send("Petio Router: not found");
+      console.log(req);
+      res.status(404).send(`Petio Router: not found - ${req.url}`);
     });
   }
 }
