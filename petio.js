@@ -9,6 +9,10 @@ class Wrapper {
   // Start Main Wrapper
   init() {
     console.log("Starting Petio");
+    app.use("//", function (req, res, next) {
+      req.url = req.url.substring(1);
+      next();
+    });
     this.admin();
     this.user();
     this.api();
@@ -23,6 +27,7 @@ class Wrapper {
       createProxyMiddleware({
         target: "http://localhost:7778",
         pathRewrite: {
+          "^//api/": "/", // remove base path
           "^/api/": "/", // remove base path
         },
       })
@@ -44,7 +49,7 @@ class Wrapper {
   // Catch 404s at main router level
   notfound() {
     app.get("*", function (req, res) {
-      res.status(404).send("Petio Router: not found");
+      res.status(404).send(`Petio Router: not found - ${req.path}`);
     });
   }
 }

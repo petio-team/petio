@@ -2,6 +2,8 @@ FROM node:14.15.1-alpine3.12 as build
 
 LABEL maintainer="Petio"
 
+RUN apk add --no-cache git
+
 COPY ./petio.js /app/petio.js
 COPY ./package.json /app/package.json
 WORKDIR /app
