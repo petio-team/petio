@@ -2,12 +2,7 @@
 api/node_modules/
 admin/node_modules/
 frontend/node_modules/
-#admin/src/
-#admin/public/
-#frontend/src/
-#frontend/public/
 node_modules/
-#admin/.eslintcache
 .DS_Store
 api/config.json
 api/.DS_Store
@@ -17,4 +12,5 @@ api/config/
 bin/
 *.zip
 views/
-.eslintcache
+frontend/.eslintcache
+admin/.eslintcache

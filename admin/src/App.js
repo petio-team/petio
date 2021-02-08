@@ -151,6 +151,12 @@ class App extends React.Component {
                     <Users api={this.props.api} />
                   </div>
                 </Route>
+                <Route path="*" exact>
+                  <div className="page-wrap">
+                    <h1 className="main-title mb--1">Not found</h1>
+                    <p>This page doesn't exist</p>
+                  </div>
+                </Route>
               </Switch>
             </div>
           </HashRouter>
