@@ -1,49 +1,39 @@
 const express = require("express");
 const path = require("path");
 const app = express();
-const open = require("open");
 const API = require("./api/app");
-const { createProxyMiddleware } = require("http-proxy-middleware");
+const router = require("./router");
+const fs = require("fs");
 
 class Wrapper {
   // Start Main Wrapper
-  init() {
-    console.log("Starting Petio");
-    app.use("//", function (req, res, next) {
-      req.url = req.url.substring(1);
-      next();
-    });
-    this.admin();
-    this.user();
-    this.api();
-    this.notfound();
-    app.listen(7777);
+  async getBase() {
+    try {
+      let config = require("./api/config/config.json");
+      if (config.base_path) {
+        return config.base_path;
+      } else {
+        return "/";
+      }
+    } catch (err) {
+      console.log(err);
+      return "/";
+    }
   }
 
-  // Proxy API on port 7778 internally
-  api() {
-    app.use(
-      "/api",
-      createProxyMiddleware({
-        target: "http://localhost:7778",
-        pathRewrite: {
-          "^//api/": "/", // remove base path
-          "^/api/": "/", // remove base path
-        },
-      })
-    );
-  }
-
-  // Serve Admin files
-  admin() {
-    const adminPath = process.pkg ? path.join(path.dirname(process.execPath), "./views/admin") : path.join(__dirname, "./views/admin");
-    app.use("/admin/", express.static(adminPath));
-  }
-
-  // Server user frontend files
-  user() {
-    const fePath = process.pkg ? path.join(path.dirname(process.execPath), "./views/frontend") : path.join(__dirname, "./views/frontend");
-    app.use("/", express.static(fePath));
+  async init() {
+    try {
+      let basePath = await this.getBase();
+      console.log(`ROUTER: Base path found - ${basePath}`);
+      app.use((req, res, next) => {
+        req.basePath = basePath;
+        next();
+      });
+      app.use(basePath, router);
+      app.listen(7777);
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   // Catch 404s at main router level
