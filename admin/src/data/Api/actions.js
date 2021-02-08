@@ -416,6 +416,20 @@ export function getEmailConfig() {
   });
 }
 
+export function getConfig() {
+  return new Promise((resolve, reject) => {
+    api
+      .getConfig()
+      .then((data) => {
+        resolve(data);
+      })
+      .catch((err) => {
+        console.log(err);
+        reject();
+      });
+  });
+}
+
 export function testEmail() {
   return new Promise((resolve, reject) => {
     api

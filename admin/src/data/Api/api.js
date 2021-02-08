@@ -197,6 +197,14 @@ export let getEmailConfig = () => {
   return call(request, headers, "get").then((res) => res.json());
 };
 
+export let getConfig = () => {
+  let request = `${apiUrl}/config/current`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  return call(request, headers, "get").then((res) => res.json());
+};
+
 export let testEmail = () => {
   let request = `${apiUrl}/mail/test`;
   let headers = {
