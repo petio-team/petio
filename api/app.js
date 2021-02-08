@@ -101,7 +101,7 @@ class Main {
       this.e.use("/issue", issueRoute);
       this.e.use("/profiles", profileRoute);
       this.e.get("*", function (req, res) {
-        res.status(404).send("Petio API: route not found");
+        res.status(404).send(`Petio API: route not found - ${req.url}`);
       });
     }
   }

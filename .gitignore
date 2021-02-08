@@ -16,3 +16,4 @@ admin/build
 api/config/
 bin/
 *.zip
+views/
