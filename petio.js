@@ -9,14 +9,20 @@ class Wrapper {
   // Start Main Wrapper
   async getBase() {
     try {
-      let config = require("./api/config/config.json");
+      let config = false;
+      if (process.pkg) {
+        let project_folder = path.dirname(process.execPath);
+        let configFile = path.join(project_folder, "./config/config.json");
+        config = JSON.parse(fs.readFileSync(configFile));
+      } else {
+        config = require("./api/config/config.json");
+      }
       if (config.base_path) {
         return config.base_path;
       } else {
         return "/";
       }
-    } catch (err) {
-      console.log(err);
+    } catch {
       return "/";
     }
   }
