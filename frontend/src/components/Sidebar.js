@@ -16,6 +16,13 @@ class Sidebar extends React.Component {
     this.goBack = this.goBack.bind(this);
   }
 
+  stripTrailingSlash(str) {
+    if (str.substr(-1) === "/") {
+      return str.substr(0, str.length - 1);
+    }
+    return str;
+  }
+
   goBack() {
     this.props.history.goBack();
   }
@@ -90,7 +97,10 @@ class Sidebar extends React.Component {
             </div>
           </Link>
           {user.role === "admin" ? (
-            <a className="sidebar--item" href={`${window.location.protocol}//${window.location.host}${window.location.pathname === "/" ? "" : window.location.pathname}/admin/`}>
+            <a
+              className="sidebar--item"
+              href={`${window.location.protocol}//${window.location.host}${window.location.pathname === "/" ? "" : this.stripTrailingSlash(window.location.pathname)}/admin/`}
+            >
               <p>Admin</p>
               <div className="icon">
                 <AdminIcon />
