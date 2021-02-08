@@ -14,6 +14,7 @@ class General extends React.Component {
       email_port: "",
       email_secure: false,
       email_enabled: false,
+      base_path: "",
     };
 
     this.inputChange = this.inputChange.bind(this);
@@ -21,6 +22,7 @@ class General extends React.Component {
     this.saveEmail = this.saveEmail.bind(this);
     this.loadConfigs = this.loadConfigs.bind(this);
     this.testEmail = this.testEmail.bind(this);
+    this.saveBasePath = this.saveBasePath.bind(this);
   }
 
   inputChange(e) {
@@ -50,6 +52,23 @@ class General extends React.Component {
     this.setState({
       isError: false,
       isMsg: "Email settings saved!",
+    });
+    clearInterval(this.closeMsg);
+    this.closeMsg = setInterval(() => {
+      this.setState({
+        isError: false,
+        isMsg: false,
+      });
+    }, 3000);
+  }
+
+  async saveBasePath() {
+    await Api.updateConfig({
+      base_path: this.state.base_path,
+    });
+    this.setState({
+      isError: false,
+      isMsg: "Base Path saved, please restart Petio!",
     });
     clearInterval(this.closeMsg);
     this.closeMsg = setInterval(() => {
@@ -206,6 +225,19 @@ class General extends React.Component {
 
           <button className="btn btn__square" onClick={this.testEmail}>
             Test
+          </button>
+        </section>
+        <section>
+          <p className="main-title mb--2">Base path</p>
+          <p>
+            A base path can be applied to serve petio from a subdirectory. Any specified base must not include a trailing slash and will be applied to the end of the access URL. For example{" "}
+            <code>/petio</code> would become <code>localhost:7777/petio</code>
+            <br></br>
+            <small>Warning! This will require a restart of Petio to take effect.</small>
+          </p>
+          <input type="text" name="base_path" value={this.state.base_path} onChange={this.inputChange} autoCorrect="off" spellCheck="off" />
+          <button className="btn btn__square" onClick={this.saveBasePath}>
+            Save
           </button>
         </section>
       </>

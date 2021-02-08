@@ -286,6 +286,20 @@ export function saveConfig(config) {
   });
 }
 
+export function updateConfig(config) {
+  return new Promise((resolve, reject) => {
+    api
+      .updateConfig(config)
+      .then(() => {
+        resolve();
+      })
+      .catch((err) => {
+        console.log(err);
+        reject();
+      });
+  });
+}
+
 export async function sonarrConfig() {
   let config = await api.sonarrConfig();
 

@@ -37,6 +37,7 @@ const servicesRoute = require("./routes/services");
 const mailRoute = require("./routes/mail");
 const issueRoute = require("./routes/issue");
 const profileRoute = require("./routes/profiles");
+const configRoute = require("./routes/config");
 
 class Main {
   constructor() {
@@ -100,8 +101,9 @@ class Main {
       this.e.use("/mail", mailRoute);
       this.e.use("/issue", issueRoute);
       this.e.use("/profiles", profileRoute);
+      this.e.use("/config", configRoute);
       this.e.get("*", function (req, res) {
-        res.status(404).send("Petio API: route not found");
+        res.status(404).send(`Petio API: route not found - ${req.url}`);
       });
     }
   }
@@ -241,6 +243,7 @@ class Main {
         adminThumb: user.thumb,
         adminDisplayName: user.username,
         fanartApi: "ee409f6fb0c5cd2352e7a454d3f580d4",
+        base_path: "",
       };
       try {
         await this.createConfig(JSON.stringify(configData, null, 2));

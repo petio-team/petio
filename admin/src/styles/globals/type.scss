@@ -117,3 +117,21 @@ p {
     margin-left: 20px;
   }
 }
+
+code {
+  background: rgba($grey-medium, 0.3);
+  border-radius: 4px;
+  padding: 0 10px;
+  font-size: 10px;
+  line-height: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+
+  @include media-breakpoint-up(lg) {
+    font-size: 12px;
+    line-height: 22px;
+    margin-bottom: 20px;
+    height: 22px;
+  }
+}

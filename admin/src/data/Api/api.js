@@ -105,6 +105,15 @@ export let saveConfig = (config) => {
   return call(request, headers, "post", body);
 };
 
+export let updateConfig = (config) => {
+  let request = `${apiUrl}/config/update`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  let body = config;
+  return call(request, headers, "post", body);
+};
+
 export function sonarrConfig() {
   let headers = { "Content-Type": "application/json" };
   let request = `${apiUrl}/services/sonarr/config`;
