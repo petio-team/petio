@@ -82,6 +82,7 @@ class General extends React.Component {
   async loadConfigs() {
     try {
       let email = await Api.getEmailConfig();
+      let config = await Api.getConfig();
       this.setState({
         email_enabled: email.config.emailEnabled,
         email_user: email.config.emailUser,
@@ -89,6 +90,7 @@ class General extends React.Component {
         email_server: email.config.emailServer,
         email_port: email.config.emailPort,
         email_secure: email.config.emailSecure,
+        base_path: config.base_path ? config.base_path : "",
         loading: false,
         isError: false,
         isMsg: "Email config loaded",
