@@ -17,3 +17,4 @@ api/config/
 bin/
 *.zip
 views/
+.eslintcache

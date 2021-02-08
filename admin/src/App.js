@@ -20,7 +20,7 @@ class App extends React.Component {
       loading: true,
       config: false,
       configChecked: true,
-      mobMenuOpen: true,
+      mobMenuOpen: false,
     };
 
     this.changeLogin = this.changeLogin.bind(this);
