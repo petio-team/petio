@@ -13,7 +13,7 @@ router.post("/", async (req, res) => {
   let authToken = req.body.authToken;
   let username = req.body.username;
   let password = req.body.password;
-  let request_ip = req.body.ip;
+  let request_ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
 
   if (!prefs) {
     res.status(500).send("This Petio API is not setup");

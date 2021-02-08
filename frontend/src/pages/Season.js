@@ -21,6 +21,8 @@ class Season extends React.Component {
 
     this.daysTillAir = this.daysTillAir.bind(this);
     this.getReviews = this.getReviews.bind(this);
+    this.request = this.request.bind(this);
+    this.getRequests = this.getRequests.bind(this);
   }
 
   componentDidMount() {
@@ -30,6 +32,7 @@ class Season extends React.Component {
     let id = this.props.match.params.id;
     let season = this.props.match.params.season;
     this.getReviews();
+    this.getRequests();
 
     if (!this.props.api.series_lookup[id]) {
       // check for cached
@@ -39,9 +42,72 @@ class Season extends React.Component {
     }
   }
 
+  async request() {
+    let id = this.props.match.params.id;
+    let series = this.props.api.series_lookup[id];
+    let requests = this.props.user.requests[id];
+    if (requests) {
+      if (requests.users.includes(this.props.user.current.id)) {
+        this.props.msg({
+          message: "Already Requested",
+          type: "error",
+        });
+        return;
+      }
+    }
+    let request = {
+      id: series.id,
+      tmdb_id: series.id,
+      tvdb_id: series.tvdb_id,
+      imdb_id: series.imdb_id,
+      title: series.name,
+      type: "tv",
+      thumb: series.poster_path,
+    };
+
+    try {
+      await User.request(request, this.props.user.current);
+      this.props.msg({
+        message: `New Request added: ${series.name}`,
+        type: "good",
+      });
+      await User.getRequests();
+      this.getRequests();
+    } catch (err) {
+      this.props.msg({
+        message: err,
+        type: "error",
+      });
+    }
+  }
+
   getReviews() {
     let id = this.props.match.params.id;
     User.getReviews(id);
+  }
+
+  getRequests() {
+    let id = this.props.match.params.id;
+    let requests = this.props.user.requests;
+    if (!requests) return;
+    if (!requests[id]) {
+      if (this.state.requested) {
+        this.setState({
+          requested: false,
+        });
+      }
+      return;
+    }
+    let requestUsers = Object.keys(requests[id].users).length;
+    if (this.props.user.requests[id] && requestUsers !== this.state.requested) {
+      this.setState({
+        requested: requestUsers,
+      });
+    } else if (!requests[id] && this.state.requested) {
+      this.setState({
+        requested: false,
+      });
+    }
   }
 
   daysTillAir(airDate) {
@@ -200,7 +266,7 @@ class Season extends React.Component {
 Season = withRouter(Season);
 
 function SeasonContainer(props) {
-  return <Season api={props.api} user={props.user} openIssues={props.openIssues} />;
+  return <Season api={props.api} user={props.user} openIssues={props.openIssues} msg={props.msg} />;
 }
 
 const mapStateToProps = function (state) {

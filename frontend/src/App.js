@@ -289,7 +289,7 @@ class App extends React.Component {
               <Route exact path="/series/:id/season/:season">
                 <Issues open={this.state.openIssues} close={this.closeIssues} msg={this.msg} />
                 <div className="page-wrap">
-                  <Season openIssues={this.openIssues} />
+                  <Season openIssues={this.openIssues} msg={this.msg} />
                 </div>
               </Route>
               <Route path="/person/:id">
