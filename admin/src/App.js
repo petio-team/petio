@@ -20,7 +20,7 @@ class App extends React.Component {
       loading: true,
       config: false,
       configChecked: true,
-      mobMenuOpen: true,
+      mobMenuOpen: false,
     };
 
     this.changeLogin = this.changeLogin.bind(this);
@@ -149,6 +149,12 @@ class App extends React.Component {
                 <Route path="/users">
                   <div className="page-wrap">
                     <Users api={this.props.api} />
+                  </div>
+                </Route>
+                <Route path="*" exact>
+                  <div className="page-wrap">
+                    <h1 className="main-title mb--1">Not found</h1>
+                    <p>This page doesn't exist</p>
                   </div>
                 </Route>
               </Switch>

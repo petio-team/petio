@@ -58,6 +58,12 @@ class Settings extends React.Component {
             <Route path="/settings/sonarr">
               <Sonarr />
             </Route>
+            <Route path="*" exact>
+              <section>
+                <h1 className="main-title mb--1">Not found</h1>
+                <p>This page doesn't exist</p>
+              </section>
+            </Route>
           </Switch>
         </div>
       </div>
