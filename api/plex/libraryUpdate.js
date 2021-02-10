@@ -158,6 +158,7 @@ class LibraryUpdate {
           username: this.config.adminUsername,
           password: this.config.adminPass,
           altId: 1,
+          role: "admin",
         });
         await adminData.save();
       } catch (err) {
