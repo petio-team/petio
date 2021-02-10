@@ -13,6 +13,7 @@ services:
       - petio-network
     volumes:
       - ./config:/app/api/config
+      - ./logs:/app/logs
 
   mongo:
     image: mongo:latest
