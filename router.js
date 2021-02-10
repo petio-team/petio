@@ -32,7 +32,12 @@ router.use(
 logger.log("verbose", `ROUTER: API proxy setup - Proxying /api -> /`);
 
 router.get("*", function (req, res) {
-  logger.log("warn", `ROUTER: Route not found ${req.path}`);
+  logger.log(
+    "warn",
+    `ROUTER: Not found - ${req.path} | IP: ${
+      req.headers["x-forwarded-for"] || req.connection.remoteAddress
+    }`
+  );
   res.status(404).send(`Petio Router: not found - ${req.path}`);
 });
 
