@@ -102,7 +102,7 @@ class LibraryUpdate {
         } else {
           logger.log(
             "warn",
-            `LIB CRON: Partial scan type not found - ${JSON.stringify(obj)}`
+            `LIB CRON: Partial scan type not found - ${obj.type}`
           );
         }
       })

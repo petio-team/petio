@@ -39,6 +39,7 @@ import {
   deleteUser,
   removeRequest,
   updateRequest,
+  getConsole,
 } from "./actions";
 
 export default {
@@ -82,4 +83,5 @@ export default {
   deleteUser,
   removeRequest,
   updateRequest,
+  getConsole,
 };

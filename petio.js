@@ -35,6 +35,16 @@ class Wrapper {
 
   async init() {
     logger.log("info", `ROUTER: Starting Petio wrapper`);
+    process.on("uncaughtException", function (err) {
+      if (err.code === "EADDRINUSE") {
+        logger.error(
+          `Fatal Error: Port already in use ${err.port}. Petio may already be running or is in conflict with another service on the same port.`
+        );
+      } else {
+        logger.error(err.stack);
+      }
+      process.exit(1);
+    });
     try {
       let basePath = await this.getBase();
       logger.log("info", `ROUTER: Base path found - ${basePath}`);

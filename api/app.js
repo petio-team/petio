@@ -39,6 +39,7 @@ const mailRoute = require("./routes/mail");
 const issueRoute = require("./routes/issue");
 const profileRoute = require("./routes/profiles");
 const configRoute = require("./routes/config");
+const logsRoute = require("./routes/log");
 
 class Main {
   constructor() {
@@ -108,6 +109,7 @@ class Main {
       this.e.use("/issue", issueRoute);
       this.e.use("/profiles", profileRoute);
       this.e.use("/config", configRoute);
+      this.e.use("/logs", logsRoute);
       this.e.get("*", function (req, res) {
         logger.log("warn", `API: Route not found ${req.url}`);
         res.status(404).send(`Petio API: route not found - ${req.url}`);
@@ -119,7 +121,7 @@ class Main {
     logger.log("info", "API: Restarting server");
     this.cron.stop();
     logger.log("verbose", "API: Stopped crons");
-    await this.server.close();
+    this.server.close();
     logger.log("verbose", "API: Server stopped");
     this.config = getConfig();
     logger.log("verbose", "API: Config updated from file");
@@ -129,13 +131,22 @@ class Main {
   init() {
     logger.log("info", "API: Starting server");
     this.setRoutes();
-    this.server = this.e.listen(7778);
-    logger.log("info", "API: Server entering listening state");
-    if (!this.config) {
-      logger.log("warn", "API: No config, entering setup mode");
-    } else {
-      logger.log("info", "API: Connecting to Database...");
-      this.connectDb();
+    try {
+      this.server = this.e.listen(7778);
+      logger.log("info", "API: Server entering listening state");
+      if (!this.config) {
+        logger.log("warn", "API: No config, entering setup mode");
+      } else {
+        logger.log("info", "API: Connecting to Database...");
+        this.connectDb();
+      }
+    } catch (err) {
+      logger.error(err.stack);
+      logger.log("info", "API: Fatal error Stopping server");
+      this.cron.stop();
+      logger.log("verbose", "API: Stopped crons");
+      this.server.close();
+      logger.log("verbose", "API: Server stopped");
     }
   }
 
@@ -189,7 +200,6 @@ class Main {
           `API: Test Server success - ${server.protocol}://${server.host}:${server.port}?X-Plex-Token=${server.token}`
         );
       } catch (err) {
-        console.log(err);
         res.status(404).json({
           status: "failed",
           code: 404,
@@ -337,9 +347,9 @@ class Main {
       : path.join(project_folder, "./config/sonarr.json");
     let sonarrDefault = JSON.stringify([]);
     try {
-      await fs.writeFileSync(email, emailDefault);
-      await fs.writeFileSync(radarr, radarrDefault);
-      await fs.writeFileSync(sonarr, sonarrDefault);
+      fs.writeFileSync(email, emailDefault);
+      fs.writeFileSync(radarr, radarrDefault);
+      s.writeFileSync(sonarr, sonarrDefault);
       logger.log(
         "info",
         "API: Default config files for email, radarr, sonarr written to file"
@@ -348,7 +358,7 @@ class Main {
     } catch (err) {
       logger.log("error", "API: Fatal Error: Cannot create default configs");
       logger.error(err.stack);
-      throw err;
+      return;
     }
   }
 
