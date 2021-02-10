@@ -3,6 +3,7 @@ const router = express.Router();
 const getHistory = require("../plex/history");
 const getBandwidth = require("../plex/bandwidth");
 const getServerInfo = require("../plex/serverInfo");
+const logger = require("../util/logger");
 
 router.post("/", async (req, res) => {
   let id = req.body.id;
@@ -16,7 +17,8 @@ router.get("/bandwidth", async (req, res) => {
     let data = await getBandwidth();
     res.json(data.MediaContainer.StatisticsBandwidth);
   } catch (err) {
-    console.log(err);
+    logger.log("error", "ROUTE: Config error");
+    logger.error(err.stack);
     res.status(500).send();
   }
 });
@@ -26,7 +28,8 @@ router.get("/server", async (req, res) => {
     let data = await getServerInfo();
     res.json(data.MediaContainer);
   } catch (err) {
-    console.log(err);
+    logger.log("error", "ROUTE: Config error");
+    logger.error(err.stack);
     res.status(500).send();
   }
 });

@@ -130,3 +130,51 @@
     margin: 0;
   }
 }
+
+.console {
+  &--main {
+    background: rgba($dark-grey, 0.6);
+    border-radius: 10px;
+    padding: 20px;
+    max-height: 500px;
+    min-height: 500px;
+    overflow-y: scroll;
+    font-family: monospace;
+  }
+
+  &--item {
+    font-size: 12px;
+    margin-bottom: 5px;
+  }
+
+  &--type {
+    text-transform: uppercase;
+    font-size: 10px;
+    padding: 2px 5px;
+    border-radius: 5px;
+    font-weight: 500;
+    min-width: 55px;
+    text-align: center;
+    display: inline-flex;
+    line-height: 12px;
+    justify-content: center;
+
+    &__info {
+      background: $green;
+      color: $dark-grey;
+    }
+
+    &__verbose {
+      background: $purple;
+    }
+
+    &__warn {
+      background: $primary;
+      color: $dark-grey;
+    }
+
+    &__error {
+      background: $bad;
+    }
+  }
+}

@@ -3,16 +3,17 @@ const router = express.Router();
 const fs = require("fs");
 const path = require("path");
 const Mailer = require("../mail/mailer");
+const logger = require("../util/logger");
 
 router.post("/create", async (req, res) => {
   let email = req.body.email;
 
   if (!email) {
     res.status(500).send("Missing Fields");
-    console.log("Create email config failed");
+    logger.log("error", "MAILER: Create email config failed");
     return;
   }
-  console.log("Creating email config");
+  logger.log("info", "MAILER: Creating email config");
   let configData = {
     emailEnabled: email.enabled,
     emailUser: email.user,
@@ -24,7 +25,10 @@ router.post("/create", async (req, res) => {
   configData = JSON.stringify(configData);
   let config = await createConfig(configData);
   if (config) {
+    logger.log("info", "MAILER: Config created");
     res.json({ config: config });
+  } else {
+    logger.log("error", "MAILER: Config failed to create");
   }
 });
 
@@ -73,7 +77,7 @@ function getConfig() {
 
     fs.readFile(configFile, "utf8", (err, data) => {
       if (err) {
-        console.log(err);
+        logger.log("info", err);
         resolve(false);
         return;
       }
@@ -95,7 +99,7 @@ function createConfig(data) {
 
     fs.writeFile(configFile, data, (err) => {
       if (err) {
-        console.log(err);
+        logger.log("info", err);
         resolve(false);
       }
       resolve(true);

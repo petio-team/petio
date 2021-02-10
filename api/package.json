@@ -1,6 +1,6 @@
 {
   "name": "petio-rest",
-  "version": "0.3.10",
+  "version": "0.3.11",
   "description": "Rest Api for Petio",
   "main": "index.js",
   "scripts": {
@@ -28,6 +28,7 @@
     "sanitize-filename": "^1.6.3",
     "saslprep": "^1.0.3",
     "sonarr-api": "^0.2.0",
+    "winston": "^3.3.3",
     "xhr-request": "^1.1.0",
     "xml-js": "^1.6.11"
   },

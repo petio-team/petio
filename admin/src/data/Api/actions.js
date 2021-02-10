@@ -598,3 +598,13 @@ export async function updateRequest(request, servers) {
     return false;
   }
 }
+
+export async function getConsole() {
+  try {
+    let data = await api.getConsole();
+    return data;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}

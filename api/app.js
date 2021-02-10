@@ -8,6 +8,7 @@ const fs = require("fs");
 const path = require("path");
 const pjson = require("./package.json");
 require("./node_modules/cache-manager/lib/stores/memory.js");
+const logger = require("./util/logger");
 
 // Config
 const getConfig = require("./util/config");
@@ -38,33 +39,39 @@ const mailRoute = require("./routes/mail");
 const issueRoute = require("./routes/issue");
 const profileRoute = require("./routes/profiles");
 const configRoute = require("./routes/config");
+const logsRoute = require("./routes/log");
 
 class Main {
   constructor() {
+    logger.log("info", `API: Petio API Version ${pjson.version} alpha`);
+    logger.log("info", "API: API Starting");
     // Runs every night at 00:00
     this.cron = new CronJob("0 0 * * *", function () {
       const d = new Date();
-      console.log("Full Scan Started:", d);
+      logger.log("info", `CRON: Full Scan Started @ ${d.toDateString()}`);
       new LibraryUpdate().run();
     });
 
     // Runs every 30 mins
     this.partial = new CronJob("0 */30 * * * *", function () {
       const d = new Date();
-      console.log("Partial Scan Started:", d);
+      logger.log("info", `CRON: Partial Scan Started @ ${d.toDateString()}`);
       new LibraryUpdate().partial();
     });
 
     // Every Sunday at 11pm
     this.resetQuotas = new CronJob("0 11 * * sun", function () {
-      const d = new Date();
-      console.log("Quotas cleared:", d);
+      logger.log("info", "CRON: Quotas Cleared");
       new QuotaSystem().reset();
     });
 
     if (process.pkg) {
-      this.createConfigDir(path.join(path.dirname(process.execPath), "./config"));
+      logger.log("verbose", "API: Detected pkg env");
+      this.createConfigDir(
+        path.join(path.dirname(process.execPath), "./config")
+      );
     } else {
+      logger.log("verbose", "API: Non pkg env");
       this.createConfigDir(path.join(__dirname, "./config"));
     }
     this.config = getConfig();
@@ -77,7 +84,7 @@ class Main {
   }
 
   setRoutes() {
-    console.log("Setting up routes");
+    logger.log("info", "API: Setting up routes");
     this.e.get("/config", async (req, res) => {
       res.json(this.config ? { config: true } : { config: false });
     });
@@ -102,31 +109,44 @@ class Main {
       this.e.use("/issue", issueRoute);
       this.e.use("/profiles", profileRoute);
       this.e.use("/config", configRoute);
+      this.e.use("/logs", logsRoute);
       this.e.get("*", function (req, res) {
+        logger.log("warn", `API: Route not found ${req.url}`);
         res.status(404).send(`Petio API: route not found - ${req.url}`);
       });
     }
   }
 
   async restart() {
-    console.log("Restarting server");
+    logger.log("info", "API: Restarting server");
     this.cron.stop();
-    await this.server.close();
+    logger.log("verbose", "API: Stopped crons");
+    this.server.close();
+    logger.log("verbose", "API: Server stopped");
     this.config = getConfig();
+    logger.log("verbose", "API: Config updated from file");
     this.init();
   }
 
   init() {
+    logger.log("info", "API: Starting server");
     this.setRoutes();
-    console.log("Starting Server ");
-    console.log(`Petio API Version ${pjson.version} alpha`);
-    this.server = this.e.listen(7778);
-    console.log("Listening");
-    if (!this.config) {
-      console.log("No config, entering setup mode");
-    } else {
-      console.log("Connecting to Database, please wait....");
-      this.connectDb();
+    try {
+      this.server = this.e.listen(7778);
+      logger.log("info", "API: Server entering listening state");
+      if (!this.config) {
+        logger.log("warn", "API: No config, entering setup mode");
+      } else {
+        logger.log("info", "API: Connecting to Database...");
+        this.connectDb();
+      }
+    } catch (err) {
+      logger.error(err.stack);
+      logger.log("info", "API: Fatal error Stopping server");
+      this.cron.stop();
+      logger.log("verbose", "API: Stopped crons");
+      this.server.close();
+      logger.log("verbose", "API: Server stopped");
     }
   }
 
@@ -136,12 +156,13 @@ class Main {
         useNewUrlParser: true,
         useUnifiedTopology: true,
       });
-      console.log("Connected to Database ");
+      logger.log("info", "API: Connected to Database");
       this.start();
     } catch (err) {
-      console.log(err);
-      console.log("Fatal error - database misconfigured!");
-      console.log("Removing config please restart");
+      logger.log("error", "API: Error connecting to database");
+      logger.error(err.stack);
+      logger.log("error", "API: Fatal error - database misconfigured!");
+      logger.log("warn", "API: Removing config please restart");
       fs.unlinkSync("./config/config.json");
     }
   }
@@ -158,42 +179,56 @@ class Main {
     this.e.post("/setup/test_server", async (req, res) => {
       let server = req.body.server;
       if (!server) {
+        logger.log("warn", "API: Test Server bad request");
         res.status(400).send("Bad Request");
         return;
       }
       try {
-        let test = await testConnection(server.protocol, server.host, server.port, server.token);
+        let test = await testConnection(
+          server.protocol,
+          server.host,
+          server.port,
+          server.token
+        );
         let status = test !== 200 ? "failed" : "connected";
         res.status(200).json({
           status: status,
           code: test,
         });
+        logger.log(
+          "verbose",
+          `API: Test Server success - ${server.protocol}://${server.host}:${server.port}?X-Plex-Token=${server.token}`
+        );
       } catch (err) {
-        console.log(err);
         res.status(404).json({
           status: "failed",
           code: 404,
         });
+        logger.log(
+          "verbose",
+          `API: Test Server failed - ${server.protocol}://${server.host}:${server.port}?X-Plex-Token=${server.token}`
+        );
       }
     });
     this.e.post("/setup/test_mongo", async (req, res) => {
       let mongo = req.body.mongo;
-      console.log(`testing mongo connection: ${mongo}`);
+      logger.log("info", `API: testing mongo connection: ${mongo}`);
       if (!mongo) {
         res.status(400).send("Bad Request");
+        logger.log("warn", "API: Mongo test bad request");
         return;
       }
       try {
         // Ensure no db is passed
         if (mongo.split("@").length > 1) {
           if (mongo.split("@")[1].split("/").length > 1) {
-            console.log(mongo.split("@")[1]);
             res.status(401).json({
               status: "failed",
               error: "db path included",
               tried: mongo,
               l: mongo.split("@")[1].split("/").length,
             });
+            logger.log("warn", "API: Mongo test db path included");
             return;
           }
         }
@@ -206,18 +241,23 @@ class Main {
         res.status(200).json({
           status: "connected",
         });
+        logger.log("info", "API: Mongo test connection success");
       } catch (err) {
         res.status(401).json({
           status: "failed",
           error: err,
           tried: mongo,
         });
+        logger.log("warn", "API: Mongo test connection failed");
       }
     });
     this.e.post("/setup/set", async (req, res) => {
       if (this.config) {
         res.status(403).send("Config exists");
-        console.log("Error: Config creation blocked, config already exists, this is likely malicious");
+        logger.log(
+          "warn",
+          "API: Error: Config creation blocked, config already exists, this is likely malicious"
+        );
         return;
       }
       let user = req.body.user;
@@ -225,6 +265,7 @@ class Main {
       let db = req.body.db;
       if (!user || !server || !db) {
         res.status(500).send("Missing Fields");
+        logger.log("warn", "API: Config creation missing fields");
         return;
       }
 
@@ -249,13 +290,13 @@ class Main {
         await this.createConfig(JSON.stringify(configData, null, 2));
         await this.createDefaults();
         res.send("Config Created");
-        console.log("Config Created");
+        logger.log("info", "API: Config Created");
         this.restart();
         return;
       } catch (err) {
         res.status(500).send("Error Creating config");
-        console.log("Config creation error");
-        console.log(err);
+        logger.log("error", "API: Config creation error");
+        logger.error(err.stack);
       }
     });
   }
@@ -270,16 +311,14 @@ class Main {
         project_folder = __dirname;
         configFile = path.join(project_folder, "./config/config.json");
       }
-      console.log(configFile);
       fs.writeFile(configFile, data, (err) => {
         if (err) {
-          console.log(err);
+          logger.log("error", "API: Writing config to file failed");
+          logger.error(err.stack);
           reject(err);
-          console.log("Config Failed");
         } else {
-          console.log(data);
+          logger.log("info", "API: Config written to file");
           resolve();
-          console.log("Config Created");
         }
       });
     });
@@ -287,7 +326,9 @@ class Main {
 
   async createDefaults() {
     let project_folder = __dirname;
-    let email = process.pkg ? path.join(path.dirname(process.execPath), "./config/email.json") : path.join(project_folder, "./config/email.json");
+    let email = process.pkg
+      ? path.join(path.dirname(process.execPath), "./config/email.json")
+      : path.join(project_folder, "./config/email.json");
     let emailDefault = JSON.stringify({
       emailUser: "",
       emailPass: "",
@@ -296,32 +337,40 @@ class Main {
       emailSecure: false,
     });
 
-    let radarr = process.pkg ? path.join(path.dirname(process.execPath), "./config/radarr.json") : path.join(project_folder, "./config/radarr.json");
+    let radarr = process.pkg
+      ? path.join(path.dirname(process.execPath), "./config/radarr.json")
+      : path.join(project_folder, "./config/radarr.json");
     let radarrDefault = JSON.stringify([]);
 
-    let sonarr = process.pkg ? path.join(path.dirname(process.execPath), "./config/sonarr.json") : path.join(project_folder, "./config/sonarr.json");
+    let sonarr = process.pkg
+      ? path.join(path.dirname(process.execPath), "./config/sonarr.json")
+      : path.join(project_folder, "./config/sonarr.json");
     let sonarrDefault = JSON.stringify([]);
     try {
-      await fs.writeFileSync(email, emailDefault);
-      await fs.writeFileSync(radarr, radarrDefault);
-      await fs.writeFileSync(sonarr, sonarrDefault);
-
+      fs.writeFileSync(email, emailDefault);
+      fs.writeFileSync(radarr, radarrDefault);
+      s.writeFileSync(sonarr, sonarrDefault);
+      logger.log(
+        "info",
+        "API: Default config files for email, radarr, sonarr written to file"
+      );
       return;
     } catch (err) {
-      console.log("Fatal Error: Cannot create default configs");
-      throw err;
+      logger.log("error", "API: Fatal Error: Cannot create default configs");
+      logger.error(err.stack);
+      return;
     }
   }
 
   createConfigDir(dir) {
     return new Promise((resolve, reject) => {
-      console.log("Attempting to create config dir");
+      logger.log("info", "API: Attempting to create config dir");
       if (fs.existsSync(dir)) {
         resolve();
         return true;
       }
       fs.mkdirSync(dir);
-      console.log("Config Directory Created");
+      logger.log("info", "API: Config Directory Created");
       resolve();
     });
   }

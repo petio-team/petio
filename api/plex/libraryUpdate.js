@@ -11,6 +11,7 @@ const Profile = require("../models/profile");
 const Mailer = require("../mail/mailer");
 const getConfig = require("../util/config");
 const processRequest = require("../requests/process");
+const logger = require("../util/logger");
 
 class LibraryUpdate {
   constructor() {
@@ -25,15 +26,18 @@ class LibraryUpdate {
   }
 
   async partial() {
-    console.log(`LIB CRON: Running Partial`);
+    logger.log("info", `LIB CRON: Running Partial`);
     this.full = false;
     let recent = false;
     try {
       await this.updateFriends();
       recent = await this.getRecent();
     } catch (err) {
-      console.log(err);
-      console.log(`LIB CRON: Partial scan failed - unable to get recent`);
+      logger.log(
+        "warn",
+        `LIB CRON: Partial scan failed - unable to get recent`
+      );
+      logger.error(err.stack);
       return;
     }
     let matched = {};
@@ -46,7 +50,7 @@ class LibraryUpdate {
           if (!matched[obj.ratingKey]) {
             matched[obj.ratingKey] = true;
             await this.saveMovie(obj);
-            console.log(`LIB CRON: Partial scan - ${obj.title}`);
+            logger.log("info", `LIB CRON: Partial scan - ${obj.title}`);
           }
         } else if (obj.type === "artist") {
           if (!matched[obj.ratingKey]) {
@@ -57,7 +61,7 @@ class LibraryUpdate {
           if (matched[obj.ratingKey]) {
             matched[obj.ratingKey] = true;
             await this.saveShow(obj);
-            console.log(`LIB CRON: Partial scan - ${obj.title}`);
+            logger.log("info", `LIB CRON: Partial scan - ${obj.title}`);
           }
         } else if (obj.type === "season") {
           if (!matched[obj.parentRatingKey]) {
@@ -90,25 +94,32 @@ class LibraryUpdate {
             };
 
             await this.saveShow(parent);
-            console.log(`LIB CRON: Partial scan - ${parent.title} - Built from series`);
+            logger.log(
+              "info",
+              `LIB CRON: Partial scan - ${parent.title} - Built from series`
+            );
           }
         } else {
-          console.log(obj);
+          logger.log(
+            "warn",
+            `LIB CRON: Partial scan type not found - ${obj.type}`
+          );
         }
       })
     );
     this.execMail();
-    console.log("LIB CRON: Partial Scan Complete");
+    logger.log("info", "LIB CRON: Partial Scan Complete");
   }
 
   async scan() {
-    console.log(`LIB CRON: Running Full`);
+    logger.log("info", `LIB CRON: Running Full`);
     await this.createAdmin();
     let libraries = false;
     try {
       libraries = await this.getLibraries();
     } catch (err) {
-      console.log(`LIB CRON: ${err}`);
+      logger.log("error", `LIB CRON: Error`);
+      logger.error(err.stack);
     }
 
     if (libraries) {
@@ -116,9 +127,9 @@ class LibraryUpdate {
       await this.updateLibraryContent(libraries);
       await this.updateFriends();
       this.execMail();
-      console.log("LIB CRON: Full Scan Complete");
+      logger.log("info", "LIB CRON: Full Scan Complete");
     } else {
-      console.log("Couldn't update libraries");
+      logger.log("warn", "Couldn't update libraries");
     }
   }
 
@@ -127,7 +138,7 @@ class LibraryUpdate {
       id: this.config.adminId,
     });
     if (adminFound) {
-      console.log("LIB CRON: Admin Already Created, updating");
+      logger.log("info", "LIB CRON: Admin Already Created, updating");
       try {
         let adminData = await Admin.findOneAndUpdate(
           { id: this.config.adminId },
@@ -145,10 +156,11 @@ class LibraryUpdate {
           { new: true, useFindAndModify: false }
         );
       } catch (err) {
-        console.log(`LIB CRON: ${err}`);
+        logger.log("error", `LIB CRON: Error`);
+        logger.error(err.stack);
       }
     } else {
-      console.log("LIB CRON: Creating admin user");
+      logger.log("info", "LIB CRON: Creating admin user");
       try {
         let adminData = new Admin({
           id: this.config.adminId,
@@ -158,10 +170,12 @@ class LibraryUpdate {
           username: this.config.adminUsername,
           password: this.config.adminPass,
           altId: 1,
+          role: "admin",
         });
         await adminData.save();
       } catch (err) {
-        console.log(`LIB CRON: ${err}`);
+        logger.log("error", `LIB CRON: Error`);
+        logger.error(err.stack);
       }
     }
   }
@@ -177,16 +191,14 @@ class LibraryUpdate {
         },
         function (err, data) {
           if (err || !data) {
-            console.log(data);
-            console.log("LIB CRON: Library update failed!");
+            logger.log("warn", "LIB CRON: Library update failed!");
             reject("Unable to get library info");
           }
           if (data) {
-            console.log("LIB CRON: Found Libraries");
+            logger.log("info", "LIB CRON: Found Libraries");
             resolve(data.MediaContainer);
           } else {
-            console.log(data);
-            console.log("LIB CRON: Library update failed!");
+            logger.log("warn", "LIB CRON: Library update failed!");
             reject("Unable to get library info");
           }
         }
@@ -205,14 +217,14 @@ class LibraryUpdate {
         },
         function (err, data) {
           if (err || !data) {
-            console.log("LIB CRON: Recently added failed!");
+            logger.log("warn", "LIB CRON: Recently added failed!");
             reject();
           }
           if (data) {
-            console.log("LIB CRON: Recently Added received");
+            logger.log("info", "LIB CRON: Recently Added received");
             resolve(data.MediaContainer);
           } else {
-            console.log("LIB CRON: Recently added failed!");
+            logger.log("warn", "LIB CRON: Recently added failed!");
             reject();
           }
         }
@@ -233,7 +245,7 @@ class LibraryUpdate {
     try {
       libraryItem = await Library.findOne({ uuid: lib.uuid });
     } catch {
-      console.log("LIB CRON: Library Not found, attempting to create");
+      logger.log("info", "LIB CRON: Library Not found, attempting to create");
     }
     if (!libraryItem) {
       try {
@@ -261,7 +273,8 @@ class LibraryUpdate {
         });
         libraryItem = await newLibrary.save();
       } catch (err) {
-        console.log(`LIB CRON: ${err}`);
+        logger.log("error", `LIB CRON: Error`);
+        logger.error(err.stack);
       }
     } else {
       let updatedLibraryItem = false;
@@ -294,10 +307,11 @@ class LibraryUpdate {
           }
         );
       } catch (err) {
-        console.log(`LIB CRON: ${err}`);
+        logger.log("error", `LIB CRON: Error`);
+        logger.error(err.stack);
       }
       if (updatedLibraryItem) {
-        console.log("LIB CRON: Library Updated " + lib.title);
+        logger.log("info", "LIB CRON: Library Updated " + lib.title);
       }
     }
   }
@@ -317,12 +331,16 @@ class LibraryUpdate {
               } else if (obj.type === "show") {
                 await this.saveShow(obj);
               } else {
-                console.log(obj.type);
+                logger.log(
+                  "info",
+                  `LIB CRON: Unknown media type - ${obj.type}`
+                );
               }
             })
           );
         } catch (err) {
-          console.log(`LIB CRON: ${err}`);
+          logger.log("error", `LIB CRON: Unable to get library content`);
+          logger.error(err.stack);
         }
       })
     );
@@ -330,7 +348,6 @@ class LibraryUpdate {
 
   getLibrary(id) {
     let url = `${this.config.plexProtocol}://${this.config.plexIp}:${this.config.plexPort}/library/sections/${id}/all?X-Plex-Token=${this.config.plexToken}`;
-    // console.log(url);
     return new Promise((resolve, reject) => {
       request(
         url,
@@ -340,13 +357,11 @@ class LibraryUpdate {
         },
         function (err, data) {
           if (err || !data) {
-            console.log(data);
             reject("Unable to get library content");
           }
           if (data) {
             resolve(data.MediaContainer);
           } else {
-            console.log(data);
             reject("Unable to get library content");
           }
         }
@@ -365,13 +380,11 @@ class LibraryUpdate {
         },
         function (err, data) {
           if (err || !data) {
-            console.log(data);
             reject("Unable to get meta");
           }
           if (data) {
             resolve(data.MediaContainer.Metadata[0]);
           } else {
-            console.log(data);
             reject("Unable to get meta");
           }
         }
@@ -382,7 +395,9 @@ class LibraryUpdate {
   async saveMovie(movieObj) {
     let movieDb = false;
     try {
-      movieDb = await Movie.findOne({ ratingKey: parseInt(movieObj.ratingKey) });
+      movieDb = await Movie.findOne({
+        ratingKey: parseInt(movieObj.ratingKey),
+      });
       if (!this.full && movieDb) {
         return;
       }
@@ -390,7 +405,9 @@ class LibraryUpdate {
       movieDb = false;
     }
 
-    let idSource = movieObj.guid.replace("com.plexapp.agents.", "").split("://")[0];
+    let idSource = movieObj.guid
+      .replace("com.plexapp.agents.", "")
+      .split("://")[0];
     let externalId = false;
     let externalIds = {};
     if (idSource === "local") return;
@@ -403,7 +420,7 @@ class LibraryUpdate {
           externalIds[source[0] + "_id"] = source[1];
         }
       } catch (err) {
-        console.log(`Unable to fetch meta for ${title}`);
+        logger.log("warn", `LIB CRON: Unable to fetch meta for ${title}`);
         return;
       }
     } else {
@@ -412,15 +429,21 @@ class LibraryUpdate {
       }
 
       try {
-        externalId = movieObj.guid.replace("com.plexapp.agents.", "").split("://")[1].split("?")[0];
+        externalId = movieObj.guid
+          .replace("com.plexapp.agents.", "")
+          .split("://")[1]
+          .split("?")[0];
 
         externalIds = await this.externalIdMovie(externalId);
         externalIds.tmdb_id = externalIds.id ? externalIds.id : false;
       } catch (err) {
         if (!externalId) {
-          console.log(`Error - unable to parse id source from: ${movieObj.guid} - Movie: ${movieObj.title}`);
+          logger.log(
+            "warn",
+            `LIB CRON: Error - unable to parse id source from: ${movieObj.guid} - Movie: ${movieObj.title}`
+          );
         } else {
-          console.log(err);
+          logger.error(err.stack);
         }
       }
     }
@@ -456,14 +479,19 @@ class LibraryUpdate {
           Role: movieObj.Role,
           idSource: idSource,
           externalId: externalId,
-          imdb_id: externalIds.hasOwnProperty("imdb_id") ? externalIds.imdb_id : false,
-          tmdb_id: externalIds.hasOwnProperty("tmdb_id") ? externalIds.tmdb_id : false,
+          imdb_id: externalIds.hasOwnProperty("imdb_id")
+            ? externalIds.imdb_id
+            : false,
+          tmdb_id: externalIds.hasOwnProperty("tmdb_id")
+            ? externalIds.tmdb_id
+            : false,
         });
         movieDb = await newMovie.save();
         await this.mailAdded(movieObj, externalId);
-        console.log(`LIB CRON: Movie Added - ${movieObj.title}`);
+        logger.log("info", `LIB CRON: Movie Added - ${movieObj.title}`);
       } catch (err) {
-        console.log(`LIB CRON: ${err}`);
+        logger.log("warn", `LIB CRON: Error`);
+        logger.error(err.stack);
       }
     } else {
       try {
@@ -501,15 +529,19 @@ class LibraryUpdate {
               Role: movieObj.Role,
               idSource: idSource,
               externalId: externalId,
-              imdb_id: externalIds.hasOwnProperty("imdb_id") ? externalIds.imdb_id : false,
-              tmdb_id: externalIds.hasOwnProperty("tmdb_id") ? externalIds.tmdb_id : false,
+              imdb_id: externalIds.hasOwnProperty("imdb_id")
+                ? externalIds.imdb_id
+                : false,
+              tmdb_id: externalIds.hasOwnProperty("tmdb_id")
+                ? externalIds.tmdb_id
+                : false,
             },
           },
           { useFindAndModify: false }
         );
       } catch (err) {
         movieDb = false;
-        console.log(err);
+        logger.log("warn", err);
       }
     }
   }
@@ -517,7 +549,9 @@ class LibraryUpdate {
   async saveMusic(musicObj) {
     let musicDb = false;
     try {
-      musicDb = await Music.findOne({ ratingKey: parseInt(musicObj.ratingKey) });
+      musicDb = await Music.findOne({
+        ratingKey: parseInt(musicObj.ratingKey),
+      });
       if (!this.full && musicDb) {
         return;
       }
@@ -542,7 +576,8 @@ class LibraryUpdate {
         });
         musicDb = await newMusic.save();
       } catch (err) {
-        console.log(`LIB CRON: ${err}`);
+        logger.log("error", `LIB CRON: Error`);
+        logger.error(err.stack);
       }
     }
   }
@@ -559,7 +594,9 @@ class LibraryUpdate {
       showDb = false;
     }
 
-    let idSource = showObj.guid.replace("com.plexapp.agents.", "").split("://")[0];
+    let idSource = showObj.guid
+      .replace("com.plexapp.agents.", "")
+      .split("://")[0];
     let externalIds = {};
     let tmdbId = false;
     let externalId = false;
@@ -574,7 +611,7 @@ class LibraryUpdate {
           if (source[0] === "tmdb") tmdbId = source[1];
         }
       } catch (err) {
-        console.log(`Unable to fetch meta for ${title}`);
+        logger.log("warn", `LIB CRON: Unable to fetch meta for ${title}`);
         return;
       }
     } else {
@@ -584,7 +621,10 @@ class LibraryUpdate {
       if (idSource === "themoviedb") {
         idSource = "tmdb";
       }
-      externalId = showObj.guid.replace("com.plexapp.agents.", "").split("://")[1].split("?")[0];
+      externalId = showObj.guid
+        .replace("com.plexapp.agents.", "")
+        .split("://")[1]
+        .split("?")[0];
 
       if (idSource !== "tmdb") {
         try {
@@ -596,7 +636,7 @@ class LibraryUpdate {
         try {
           externalIds = await this.tmdbExternalIds(externalId);
         } catch (err) {
-          console.log(err);
+          logger.log("warn", err);
         }
       }
     }
@@ -636,9 +676,10 @@ class LibraryUpdate {
         });
         showDb = await newShow.save();
         await this.mailAdded(showObj, externalId);
-        console.log(`LIB CRON: Show Added - ${showObj.title}`);
+        logger.log("info", `LIB CRON: Show Added - ${showObj.title}`);
       } catch (err) {
-        console.log(`LIB CRON: ${err}`);
+        logger.log("error", `LIB CRON: Error`);
+        logger.error(err.stack);
       }
     } else {
       try {
@@ -692,7 +733,8 @@ class LibraryUpdate {
     try {
       friendList = await this.getFriends();
     } catch (err) {
-      console.log(`LIB CRON: ${err}`);
+      logger.log("error", `LIB CRON: Error getting friend list`);
+      logger.error(err.stack);
     }
     if (friendList) {
       Object.keys(friendList).map((item) => {
@@ -713,13 +755,16 @@ class LibraryUpdate {
         function (err, data) {
           if (err) {
             reject("Unable to get friends");
-            console.log("LIB CRON: Unable to get friends");
-            console.log(`LIB CRON: ${err}`);
+            logger.log("error", "LIB CRON: Unable to get friends");
+            logger.log("error", `LIB CRON: Error`);
+            logger.error(err.stack);
           }
           if (!data) {
             reject("no data");
           } else {
-            let dataParse = JSON.parse(xmlParser.xml2json(data, { compact: false }));
+            let dataParse = JSON.parse(
+              xmlParser.xml2json(data, { compact: false })
+            );
 
             if (dataParse.elements[0]) {
               resolve(dataParse.elements[0].elements);
@@ -758,12 +803,13 @@ class LibraryUpdate {
         }
         friendDb = await newFriend.save();
       } catch (err) {
-        console.log(`LIB CRON: ${err}`);
+        logger.log("error", `LIB CRON: Error`);
+        logger.error(err.stack);
       }
       if (friendDb) {
-        console.log(`LIB CRON: User Created ${obj.title}`);
+        logger.log("info", `LIB CRON: User Created ${obj.title}`);
       } else {
-        console.log(`LIB CRON: User Failed to Create ${obj.title}`);
+        logger.log("warn", `LIB CRON: User Failed to Create ${obj.title}`);
       }
     }
   }
@@ -788,11 +834,11 @@ class LibraryUpdate {
       userData = await Admin.findOne({ id: user });
     }
     if (!userData) {
-      console.log("LIB CRON: Err: No user data");
+      logger.log("error", "LIB CRON: Err: No user data");
       return;
     }
     if (!userData.email) {
-      console.log("LIB CRON: Err: User has no email");
+      logger.log("warn", "LIB CRON: Err: User has no email");
       return;
     }
 
@@ -805,13 +851,11 @@ class LibraryUpdate {
       [userData.title],
     ]);
 
-    console.log(`LIB CRON: Mailer updated`);
-    console.log(this.mailer);
+    logger.log("info", `LIB CRON: Mailer updated`);
   }
 
   execMail() {
-    console.log("MAILER: Parsing mail queue");
-    console.log(this.mailer);
+    logger.log("info", "MAILER: Parsing mail queue");
     this.mailer.forEach((mail, index) => {
       setTimeout(() => {
         new Mailer().mail(mail[0], mail[1], mail[2], mail[3], mail[4], mail[5]);

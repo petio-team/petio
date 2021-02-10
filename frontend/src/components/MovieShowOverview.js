@@ -31,6 +31,8 @@ import { ReactComponent as GenreWar } from "../assets/svg/genres/war.svg";
 import { ReactComponent as GenreWestern } from "../assets/svg/genres/western.svg";
 import { ReactComponent as GenreAnime } from "../assets/svg/genres/anime.svg";
 
+import { isIOS } from "react-device-detect";
+
 class MovieShowOverview extends React.Component {
   findNested(obj, key, value) {
     // Base case
@@ -143,14 +145,25 @@ class MovieShowOverview extends React.Component {
     let userRatingVal = 0;
 
     let requestBtn = this.props.mediaData.on_server ? (
-      <a
-        href={`plex://preplay/?metadataKey=%2Flibrary%2Fmetadata%2F${this.props.mediaData.on_server.ratingKey}&metadataType=1&server=${this.props.mediaData.on_server.serverKey}`}
-        target="_blank"
-        className="btn btn__square good"
-      >
-        <CheckIcon />
-        Watch now
-      </a>
+      isIOS ? (
+        <a
+          href={`plex://preplay/?metadataKey=%2Flibrary%2Fmetadata%2F${this.props.mediaData.on_server.ratingKey}&metadataType=1&server=${this.props.mediaData.on_server.serverKey}`}
+          target="_blank"
+          className="btn btn__square good"
+        >
+          <CheckIcon />
+          Watch now
+        </a>
+      ) : (
+        <a
+          href={`https://app.plex.tv/desktop#!/server/${this.props.mediaData.on_server.serverKey}/details?key=%2Flibrary%2Fmetadata%2F${this.props.mediaData.on_server.ratingKey}`}
+          target="_blank"
+          className="btn btn__square good"
+        >
+          <CheckIcon />
+          Watch now
+        </a>
+      )
     ) : this.props.requested ? (
       <button className="btn btn__square blue" onClick={this.props.request}>
         {`Requested by ${this.props.requested}

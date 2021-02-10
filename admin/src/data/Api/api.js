@@ -1,4 +1,9 @@
-const apiUrl = process.env.NODE_ENV === "development" ? "http://localhost:7778" : `${window.location.protocol}//${window.location.host}${window.location.pathname.replace("/admin/", "")}/api`;
+const apiUrl =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:7778"
+    : `${window.location.protocol}//${
+        window.location.host
+      }${window.location.pathname.replace("/admin/", "")}/api`;
 
 console.log(process.env);
 
@@ -327,6 +332,14 @@ export let updateReq = (req, servers) => {
   };
   let body = { request: req, servers: servers };
   return call(request, headers, "post", body);
+};
+
+export let getConsole = () => {
+  let request = `${apiUrl}/logs/stream`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  return call(request, headers, "get").then((res) => res.json());
 };
 
 function call(url, headers, method, body = null) {

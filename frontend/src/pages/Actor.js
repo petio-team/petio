@@ -38,7 +38,10 @@ class Actor extends React.Component {
   handleScroll(e) {
     let banner = e.currentTarget.querySelectorAll(".person--banner")[0];
     let poster = e.currentTarget.querySelectorAll(".person--thumb--inner")[0];
-    let offset = e.currentTarget.scrollTop > banner.offsetHeight ? 1 : e.currentTarget.scrollTop / banner.offsetHeight;
+    let offset =
+      e.currentTarget.scrollTop > banner.offsetHeight
+        ? 1
+        : e.currentTarget.scrollTop / banner.offsetHeight;
     let posterOffset = 10 * offset;
     offset = offset * 10 + 40;
     banner.style.backgroundPosition = `50% ${offset}%`;
@@ -179,7 +182,9 @@ class Actor extends React.Component {
             <div className="person--top">
               <div className="person--thumb">
                 <div className="person--thumb--inner">
-                  <img src={`https://image.tmdb.org/t/p/w1280/${personData.profile_path}`} />
+                  <img
+                    src={`https://image.tmdb.org/t/p/w1280/${personData.profile_path}`}
+                  />
                 </div>
               </div>
               <div className="person--details">
@@ -208,7 +213,14 @@ class Actor extends React.Component {
                   {Object.keys(moviesList).map((key, i) => {
                     let result = moviesList[key];
                     if (result.rating < 100) return null; // threshold to display
-                    return <MovieCard key={result.id + "-cast-" + i} movie={result} msg={this.props.msg} character={this.processCredit(result, personData)} />;
+                    return (
+                      <MovieCard
+                        key={result.id + "-cast-" + i}
+                        movie={result}
+                        msg={this.props.msg}
+                        character={this.processCredit(result, personData)}
+                      />
+                    );
                   })}
                 </Carousel>
               </section>
@@ -220,7 +232,14 @@ class Actor extends React.Component {
                   {Object.keys(showsList).map((key, i) => {
                     let result = showsList[key];
                     if (result.rating < 100) return null; // threshold to display
-                    return <TvCard key={result.id + "-cast-" + i} series={result} msg={this.props.msg} character={this.processCredit(result, personData)} />;
+                    return (
+                      <TvCard
+                        key={result.id + "-cast-" + i}
+                        series={result}
+                        msg={this.props.msg}
+                        character={this.processCredit(result, personData)}
+                      />
+                    );
                   })}
                 </Carousel>
               </section>
