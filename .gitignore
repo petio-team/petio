@@ -9,6 +9,7 @@ api/.DS_Store
 frontend/build
 admin/build
 api/config/
+api/logs/
 bin/
 *.zip
 views/
