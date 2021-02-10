@@ -111,14 +111,13 @@ class Main {
       this.e.use("/config", configRoute);
       this.e.use("/logs", logsRoute);
       this.e.get("*", function (req, res) {
-        logger.log("warn", `API: Route not found ${req.url}`);
-        res
-          .status(404)
-          .send(
-            `Petio API: route not found - ${req.url} | IP: ${
-              req.headers["x-forwarded-for"] || req.connection.remoteAddress
-            }`
-          );
+        logger.log(
+          "warn",
+          `API: Route not found ${req.url} | IP: ${
+            req.headers["x-forwarded-for"] || req.connection.remoteAddress
+          }`
+        );
+        res.status(404).send(`Petio API: route not found - ${req.url}`);
       });
     }
   }

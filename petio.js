@@ -54,14 +54,13 @@ class Wrapper {
       });
       app.use(basePath, router);
       app.get("*", function (req, res) {
-        logger.log("warn", `ROUTER: Not found - ${req.path}`);
-        res
-          .status(404)
-          .send(
-            `Petio Router: not found - ${req.path} | IP: ${
-              req.headers["x-forwarded-for"] || req.connection.remoteAddress
-            }`
-          );
+        logger.log(
+          "warn",
+          `ROUTER: Not found - ${req.path} | IP: ${
+            req.headers["x-forwarded-for"] || req.connection.remoteAddress
+          }`
+        );
+        res.status(404).send(`Petio Router: not found - ${req.path}`);
       });
       app.listen(7777);
     } catch (err) {
