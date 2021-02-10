@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const fs = require("fs");
 const path = require("path");
+const logger = require("../util/logger");
 
 router.post("/update", async (req, res) => {
   let body = req.body;
@@ -22,7 +23,7 @@ router.post("/update", async (req, res) => {
     let updatedConfig = JSON.stringify({ ...configParse, ...body });
     fs.writeFile(configFile, updatedConfig, (err) => {
       if (err) {
-        console.log(err);
+        logger.log("info", err);
         res.status(500).send("Error updating config");
       } else {
         res.status(200).send("Config updated");
@@ -30,7 +31,7 @@ router.post("/update", async (req, res) => {
     });
     // return JSON.parse(userConfig);
   } catch (err) {
-    console.log(err);
+    logger.log("info", err);
     res.status(500).send("Config Not Found");
   }
 });
@@ -59,7 +60,8 @@ router.get("/current", async (req, res) => {
     delete configParse.adminDisplayName;
     res.json(configParse);
   } catch (err) {
-    console.log(err);
+    logger.log("error", "ROUTE: Config error");
+    logger.error(err.stack);
     res.status(500).send("Config Not Found");
   }
 });

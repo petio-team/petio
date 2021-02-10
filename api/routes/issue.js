@@ -3,6 +3,7 @@
 const express = require("express");
 const router = express.Router();
 const Issue = require("../models/issue");
+const logger = require("../util/logger");
 
 router.post("/add", async (req, res) => {
   const newIssue = new Issue({
@@ -20,7 +21,8 @@ router.post("/add", async (req, res) => {
     const savedIssue = await newIssue.save();
     res.json(savedIssue);
   } catch (err) {
-    console.log(err);
+    logger.log("error", "ROUTE: Config error");
+    logger.log("info", err);
     res.status(500).json({ error: "error adding issue" });
   }
 });

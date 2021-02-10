@@ -7,10 +7,17 @@ const onServer = require("../plex/onServer");
 
 const ISO6391 = require("iso-639-1");
 
+const logger = require("../util/logger");
+
 const cacheManager = require("cache-manager");
-const memoryCache = cacheManager.caching({ store: "memory", max: 500, ttl: 86400 /*seconds*/ });
+const memoryCache = cacheManager.caching({
+  store: "memory",
+  max: 500,
+  ttl: 86400 /*seconds*/,
+});
 
 async function movieLookup(id, minified = false) {
+  logger.log("verbose", `TMDB Person Lookup ${id}`);
   let fanart = minified ? false : await fanartLookup(id, "movies");
   let movie = false;
   try {
@@ -51,8 +58,8 @@ async function movieLookup(id, minified = false) {
           collectionData.push(part.id);
         });
       } catch (err) {
-        console.log(err);
-        console.log(`Error getting collection data - ${movie.title}`);
+        logger.log("warn", `Error getting collection data - ${movie.title}`);
+        logger.log("warn", err);
       }
     }
 
@@ -62,7 +69,8 @@ async function movieLookup(id, minified = false) {
 
         movie.reviews = reviews.results;
       } catch (err) {
-        console.log(err);
+        logger.log("warn", `Error getting review data - ${movie.title}`);
+        logger.log("warn", err);
       }
     }
 
@@ -111,7 +119,8 @@ async function getMovieData(id) {
       return tmdbData(id);
     });
   } catch (err) {
-    console.log(err);
+    logger.log("warn", `Error getting movie data - ${id}`);
+    logger.log("warn", err);
   }
   return data;
 }
@@ -123,7 +132,8 @@ async function getRecommendations(id) {
       return recommendationData(id);
     });
   } catch (err) {
-    console.log(err);
+    logger.log("warn", `Error getting movie recommendations - ${id}`);
+    logger.log("warn", err);
   }
   return data;
 }
@@ -135,7 +145,8 @@ async function getReviews(id) {
       return reviewsData(id);
     });
   } catch (err) {
-    console.log(err);
+    logger.log("warn", `Error getting movie reviews - ${id}`);
+    logger.log("warn", err);
   }
   return data;
 }
@@ -147,7 +158,8 @@ async function getCollection(id) {
       return collectionData(id);
     });
   } catch (err) {
-    console.log(err);
+    logger.log("warn", `Error getting movie collections - ${id}`);
+    logger.log("warn", err);
   }
   return data;
 }

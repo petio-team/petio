@@ -6,6 +6,7 @@ const Profile = require("../models/profile");
 const Mailer = require("../mail/mailer");
 const Sonarr = require("../services/sonarr");
 const Radarr = require("../services/radarr");
+const logger = require("../util/logger");
 
 class processRequest {
   constructor(req = {}, usr = {}) {
@@ -24,13 +25,17 @@ class processRequest {
           out = await this.create();
         }
         if (quotaPass !== "admin") {
-          let updatedUser = await User.findOneAndUpdate({ id: this.user.id }, { $inc: { quotaCount: 1 } }, { new: true, useFindAndModify: false });
+          let updatedUser = await User.findOneAndUpdate(
+            { id: this.user.id },
+            { $inc: { quotaCount: 1 } },
+            { new: true, useFindAndModify: false }
+          );
           out.quota = updatedUser.quotaCount;
         }
         this.mailRequest();
       } catch (err) {
-        console.log("REQ: Error");
-        console.log(err);
+        logger.log("error", "REQ: Error");
+        logger.error(err.stack);
         out = {
           message: "failed",
           error: true,
@@ -54,11 +59,19 @@ class processRequest {
     if (!userDetails) {
       userDetails = await Admin.findOne({ id: this.user.id });
     }
-    let profile = userDetails.profile ? await Profile.findById(this.user.profile) : false;
+    let profile = userDetails.profile
+      ? await Profile.findById(this.user.profile)
+      : false;
     let autoApprove = profile ? profile.autoApprove : false;
-    await Request.updateOne({ requestId: this.request.id }, { $push: { users: this.user.id } });
+    await Request.updateOne(
+      { requestId: this.request.id },
+      { $push: { users: this.user.id } }
+    );
     if (autoApprove) {
-      await Request.updateOne({ requestId: this.request.id }, { $set: { approved: true } });
+      await Request.updateOne(
+        { requestId: this.request.id },
+        { $set: { approved: true } }
+      );
       this.sendToDvr(profile);
     }
     return {
@@ -73,7 +86,9 @@ class processRequest {
     if (!userDetails) {
       userDetails = await Admin.findOne({ id: this.user.id });
     }
-    let profile = userDetails.profile ? await Profile.findById(this.user.profile) : false;
+    let profile = userDetails.profile
+      ? await Profile.findById(this.user.profile)
+      : false;
     let autoApprove = profile ? profile.autoApprove : false;
 
     const newRequest = new Request({
@@ -92,7 +107,8 @@ class processRequest {
       await newRequest.save();
       this.sendToDvr(profile);
     } catch (err) {
-      console.log(err);
+      logger.log("error", `REQ: Unable to save request`);
+      logger.error(err.stack);
       return {
         message: "failed",
         error: true,
@@ -109,7 +125,7 @@ class processRequest {
   }
 
   async sendToDvr(profile) {
-    console.log("Sending to DVR");
+    logger.log("info", "REQ: Sending to DVR");
     // If profile is set use arrs from profile
     if (profile) {
       if (profile.radarr && this.request.type === "movie") {
@@ -130,9 +146,11 @@ class processRequest {
       }
     } else {
       // No profile set send to all arrs
-      console.log("No profile");
-      if (this.request.type === "tv") new Sonarr().processRequest(this.request.id);
-      if (this.request.type === "movie") new Radarr().processRequest(this.request.id);
+      logger.log("info", "REQ: No profile for DVR");
+      if (this.request.type === "tv")
+        new Sonarr().processRequest(this.request.id);
+      if (this.request.type === "movie")
+        new Radarr().processRequest(this.request.id);
     }
   }
 
@@ -146,9 +164,12 @@ class processRequest {
           let server = new Radarr(serverUuid);
           try {
             server.remove(rId);
-            console.log(`REQ: ${this.request.title} removed from Radarr server - ${serverUuid}`);
+            logger.log(
+              "info",
+              `REQ: ${this.request.title} removed from Radarr server - ${serverUuid}`
+            );
           } catch (err) {
-            console.log(`REQ: Error unable to remove from Radarr`, err);
+            logger.log("error", `REQ: Error unable to remove from Radarr`, err);
           }
         }
       }
@@ -160,9 +181,12 @@ class processRequest {
           let server = new Sonarr(serverUuid);
           try {
             server.remove(sId);
-            console.log(`REQ: ${this.request.title} removed from Sonarr server - ${serverUuid}`);
+            logger.log(
+              "info",
+              `REQ: ${this.request.title} removed from Sonarr server - ${serverUuid}`
+            );
           } catch (err) {
-            console.log(`REQ: Error unable to remove from Sonarr`, err);
+            logger.log("error", `REQ: Error unable to remove from Sonarr`, err);
           }
         }
       }
@@ -172,7 +196,7 @@ class processRequest {
   async mailRequest() {
     let userData = this.user;
     if (!userData.email) {
-      console.log("no user email");
+      logger.log("warn", "MAILER: No user email");
       return;
     }
     const requestData = this.request;
@@ -197,7 +221,9 @@ class processRequest {
       return false;
     }
     let userQuota = userDetails.quotaCount ? userDetails.quotaCount : 0;
-    let profile = userDetails.profile ? await Profile.findById(this.user.profile) : false;
+    let profile = userDetails.profile
+      ? await Profile.findById(this.user.profile)
+      : false;
     let quotaCap = profile ? profile.quota : 0;
 
     if (quotaCap > 0 && userQuota >= quotaCap) {
@@ -208,7 +234,6 @@ class processRequest {
   }
 
   async archive(complete = Boolean, removed = Boolean, reason = false) {
-    console.log(this.request);
     let archiveRequest = new Archive({
       requestId: this.request.requestId,
       type: this.request.type,
@@ -233,9 +258,10 @@ class processRequest {
       { useFindAndModify: false },
       function (err, data) {
         if (err) {
-          console.log(`REQ: Archive Error: ${err}`);
+          logger.log("error", `REQ: Archive Error`);
+          logger.error(err.stack);
         } else {
-          console.log("REQ: Request Archived!");
+          logger.log("info", "REQ: Request Archived!");
         }
       }
     );

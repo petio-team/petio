@@ -4,13 +4,16 @@ const app = express();
 const API = require("./api/app");
 const router = require("./router");
 const fs = require("fs");
+const logger = require("./api/util/logger");
 
 class Wrapper {
   // Start Main Wrapper
   async getBase() {
+    logger.log("verbose", `Getting base path from config`);
     try {
       let config = false;
       if (process.pkg) {
+        logger.log("verbose", `App is running from binary`);
         let project_folder = path.dirname(process.execPath);
         let configFile = path.join(project_folder, "./config/config.json");
         config = JSON.parse(fs.readFileSync(configFile));
@@ -18,36 +21,39 @@ class Wrapper {
         config = require("./api/config/config.json");
       }
       if (config.base_path) {
+        logger.log("verbose", `Config found base path returned from config`);
         return config.base_path;
       } else {
+        logger.log("verbose", `Config found base path not set`);
         return "/";
       }
     } catch {
+      logger.log("verbose", `Config not found base path not set`);
       return "/";
     }
   }
 
   async init() {
+    logger.log("info", `ROUTER: Starting Petio wrapper`);
     try {
       let basePath = await this.getBase();
-      console.log(`ROUTER: Base path found - ${basePath}`);
+      logger.log("info", `ROUTER: Base path found - ${basePath}`);
       app.use((req, res, next) => {
         req.basePath = basePath;
         next();
       });
       app.use(basePath, router);
+      app.get("*", function (req, res) {
+        logger.log("warn", `ROUTER: Not found - ${req.path}`);
+        res.status(404).send(`Petio Router: not found - ${req.path}`);
+      });
       app.listen(7777);
     } catch (err) {
-      console.log(err);
+      logger.error(err.stack);
     }
   }
 
   // Catch 404s at main router level
-  notfound() {
-    app.get("*", function (req, res) {
-      res.status(404).send(`Petio Router: not found - ${req.path}`);
-    });
-  }
 }
 
 const wrapper = new Wrapper();

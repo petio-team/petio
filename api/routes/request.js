@@ -9,6 +9,7 @@ const Radarr = require("../services/radarr");
 const { movieLookup } = require("../tmdb/movie");
 const { showLookup } = require("../tmdb/show");
 const processRequest = require("../requests/process");
+const logger = require("../util/logger");
 
 router.post("/add", async (req, res) => {
   let user = req.body.user;
@@ -45,8 +46,8 @@ router.get("/min", async (req, res) => {
       })
     );
   } catch (err) {
-    console.log(err);
-    console.log(`ERR: Error getting requests`);
+    logger.log("error", `ROUTE: Error getting requests`);
+    logger.error(err.stack);
   }
   res.json(data);
 });
@@ -134,8 +135,8 @@ router.get("/all", async (req, res) => {
       })
     );
   } catch (err) {
-    console.log(err);
-    console.log(`ERR: Error getting requests`);
+    logger.log("error", `ROUTE: Error getting requests`);
+    logger.error(err.stack);
   }
   res.json(data);
 });
@@ -161,9 +162,15 @@ router.post("/remove", async (req, res) => {
     })
   );
   new Mailer().mail(
-    `Your request was ${request.approved ? "removed" : "denied"} for ${request.title}`,
-    `Your request was ${request.approved ? "removed" : "denied"} for ${request.title}`,
-    `Unfortunately your request could not be processed.${reason ? ` This is because - ${reason}.` : ""} Thanks for your request anyway!`,
+    `Your request was ${request.approved ? "removed" : "denied"} for ${
+      request.title
+    }`,
+    `Your request was ${request.approved ? "removed" : "denied"} for ${
+      request.title
+    }`,
+    `Unfortunately your request could not be processed.${
+      reason ? ` This is because - ${reason}.` : ""
+    } Thanks for your request anyway!`,
     `https://image.tmdb.org/t/p/w500${request.thumb}`,
     emails,
     titles
@@ -189,7 +196,12 @@ router.post("/update", async (req, res) => {
         Object.keys(servers).map(async (r) => {
           let active = servers[r].active;
           if (active) {
-            await new Radarr(r, false, servers[r].profile, servers[r].path).processRequest(request.requestId);
+            await new Radarr(
+              r,
+              false,
+              servers[r].profile,
+              servers[r].path
+            ).processRequest(request.requestId);
           }
         })
       );
@@ -199,7 +211,12 @@ router.post("/update", async (req, res) => {
         Object.keys(servers).map(async (s) => {
           let active = servers[s].active;
           if (active) {
-            await new Sonarr(s, false, servers[s].profile, servers[s].path).processRequest(request.requestId);
+            await new Sonarr(
+              s,
+              false,
+              servers[s].profile,
+              servers[s].path
+            ).processRequest(request.requestId);
           }
         })
       );
@@ -231,7 +248,8 @@ router.post("/update", async (req, res) => {
       );
     }
   } catch (err) {
-    console.log(err);
+    logger.log("error", `ROUTE: Error updating requests`);
+    logger.error(err.stack);
     res.status(500).send();
   }
 });

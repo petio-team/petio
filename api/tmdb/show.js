@@ -6,10 +6,17 @@ const onServer = require("../plex/onServer");
 
 const ISO6391 = require("iso-639-1");
 
+const logger = require("../util/logger");
+
 const cacheManager = require("cache-manager");
-const memoryCache = cacheManager.caching({ store: "memory", max: 500, ttl: 86400 /*seconds*/ });
+const memoryCache = cacheManager.caching({
+  store: "memory",
+  max: 500,
+  ttl: 86400 /*seconds*/,
+});
 
 async function showLookup(id, minified = false) {
+  logger.log("verbose", `TMDB Show Lookup ${id}`);
   let external = await externalId(id);
   let fanart = minified ? false : await fanartLookup(external.tvdb_id, "tv");
   let show = false;
@@ -66,7 +73,8 @@ async function showLookup(id, minified = false) {
 
         show.reviews = reviews.results;
       } catch (err) {
-        console.log(err);
+        logger.log("warn", `Error getting review data - ${show.title}`);
+        logger.log("warn", err);
       }
     }
 
@@ -109,7 +117,8 @@ async function getShowData(id) {
       return tmdbData(id);
     });
   } catch (err) {
-    console.log(err);
+    logger.log("warn", `Error getting show data - ${id}`);
+    logger.log("warn", err);
   }
   return data;
 }
@@ -121,7 +130,8 @@ async function externalId(id) {
       return idLookup(id);
     });
   } catch (err) {
-    console.log(err);
+    logger.log("warn", `Error getting external ID - ${id}`);
+    logger.log("warn", err);
   }
   return data;
 }
@@ -133,7 +143,8 @@ async function getRecommendations(id) {
       return recommendationData(id);
     });
   } catch (err) {
-    console.log(err);
+    logger.log("warn", `Error getting recommendation data - ${id}`);
+    logger.log("warn", err);
   }
   return data;
 }
@@ -145,7 +156,8 @@ async function getReviews(id) {
       return reviewsData(id);
     });
   } catch (err) {
-    console.log(err);
+    logger.log("warn", `Error getting review data - ${id}`);
+    logger.log("warn", err);
   }
   return data;
 }
@@ -157,7 +169,8 @@ async function getSeasons(seasons, id) {
       return seasonsData(seasons, id);
     });
   } catch (err) {
-    console.log(err);
+    logger.log("warn", `Error getting season data - ${id}`);
+    logger.log("warn", err);
   }
   return data;
 }

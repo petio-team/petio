@@ -2,11 +2,18 @@ const express = require("express");
 const router = express();
 const path = require("path");
 const { createProxyMiddleware } = require("http-proxy-middleware");
+const logger = require("./api/util/logger");
 
-const adminPath = process.pkg ? path.join(path.dirname(process.execPath), "./views/admin") : path.join(__dirname, "./views/admin");
+const adminPath = process.pkg
+  ? path.join(path.dirname(process.execPath), "./views/admin")
+  : path.join(__dirname, "./views/admin");
+logger.log("verbose", `ROUTER: Serving admin route to ${adminPath}`);
 router.use("/admin/", express.static(adminPath));
 
-const fePath = process.pkg ? path.join(path.dirname(process.execPath), "./views/frontend") : path.join(__dirname, "./views/frontend");
+const fePath = process.pkg
+  ? path.join(path.dirname(process.execPath), "./views/frontend")
+  : path.join(__dirname, "./views/frontend");
+logger.log("verbose", `ROUTER: Serving frontend route to ${fePath}`);
 router.use("/", express.static(fePath));
 
 router.use(
@@ -22,8 +29,10 @@ router.use(
     },
   })
 );
+logger.log("verbose", `ROUTER: API proxy setup - Proxying /api -> /`);
 
 router.get("*", function (req, res) {
+  logger.log("warn", `ROUTER: Route not found ${req.path}`);
   res.status(404).send(`Petio Router: not found - ${req.path}`);
 });
 

@@ -1,8 +1,9 @@
 const User = require("../models/user");
+const logger = require("../util/logger");
 
 class QuotaSystem {
   async reset() {
-    console.log("QUOTA: Reseting Quotas");
+    logger.log("info", "QUOTA: Reseting Quotas");
     await User.updateMany({}, { $set: { quotaCount: 0 } });
   }
 }
