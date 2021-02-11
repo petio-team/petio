@@ -4,7 +4,6 @@ import { connect } from "react-redux";
 import Api from "../data/Api";
 
 import MovieShowTop from "../components/MovieShowTop";
-import MovieShowOverview from "../components/MovieShowOverview";
 import User from "../data/User";
 import Review from "../components/Review";
 import { ReactComponent as BackIcon } from "../assets/svg/back.svg";
@@ -30,7 +29,7 @@ class Season extends React.Component {
     page.scrollTop = 0;
     window.scrollTo(0, 0);
     let id = this.props.match.params.id;
-    let season = this.props.match.params.season;
+
     this.getReviews();
     this.getRequests();
 
@@ -114,7 +113,12 @@ class Season extends React.Component {
     var oneDay = 24 * 60 * 60 * 1000;
     var secondDate = new Date();
     var firstDate = new Date(airDate);
-    let days = Math.round(Math.abs((firstDate.setHours(0, 0, 0, 0) - secondDate.setHours(0, 0, 0, 0)) / oneDay));
+    let days = Math.round(
+      Math.abs(
+        (firstDate.setHours(0, 0, 0, 0) - secondDate.setHours(0, 0, 0, 0)) /
+          oneDay
+      )
+    );
 
     if (firstDate < secondDate) {
       return <span className="aired">Has aired on tv</span>;
@@ -133,8 +137,13 @@ class Season extends React.Component {
     let id = this.props.match.params.id;
     let season = this.props.match.params.season;
     let seriesData = Object.assign({}, this.props.api.series_lookup[id]);
-    let seasonData = this.props.api.series_lookup[id] ? this.props.api.series_lookup[id].seasonData[season] : false;
-    if (seriesData) seriesData.poster_path = seasonData ? seasonData.poster_path : seriesData.poster_path;
+    let seasonData = this.props.api.series_lookup[id]
+      ? this.props.api.series_lookup[id].seasonData[season]
+      : false;
+    if (seriesData)
+      seriesData.poster_path = seasonData
+        ? seasonData.poster_path
+        : seriesData.poster_path;
     console.log(seasonData);
     let now = new Date();
     now.setHours(0, 0, 0, 0);
@@ -146,9 +155,26 @@ class Season extends React.Component {
       );
     } else {
       return (
-        <div className="media-wrap" data-id={seriesData.imdb_id} key={`${seriesData.title}__wrap`}>
-          <Review id={this.props.match.params.id} user={this.props.user.current} active={this.state.reviewOpen} closeReview={this.closeReview} getReviews={this.getReviews} item={seriesData} />
-          <MovieShowTop mediaData={seriesData} trailer={this.state.trailer} requested={this.state.requested} request={this.request} openIssues={this.props.openIssues} />
+        <div
+          className="media-wrap"
+          data-id={seriesData.imdb_id}
+          key={`${seriesData.title}__wrap`}
+        >
+          <Review
+            id={this.props.match.params.id}
+            user={this.props.user.current}
+            active={this.state.reviewOpen}
+            closeReview={this.closeReview}
+            getReviews={this.getReviews}
+            item={seriesData}
+          />
+          <MovieShowTop
+            mediaData={seriesData}
+            trailer={this.state.trailer}
+            requested={this.state.requested}
+            request={this.request}
+            openIssues={this.props.openIssues}
+          />
           <div className="media-content">
             <section>
               <div className="quick-view">
@@ -183,15 +209,30 @@ class Season extends React.Component {
               <h3 className="sub-title mb--1">{`${seasonData.episodes.length} Episodes`}</h3>
               <div className="season-episodes">
                 {seasonData.episodes.map((episode) => {
-                  let airDate = episode.air_date ? Date.parse(episode.air_date) : false;
+                  let airDate = episode.air_date
+                    ? Date.parse(episode.air_date)
+                    : false;
                   return (
-                    <div className={"season-episode " + (airDate < now ? "aired" : "not-aired")}>
+                    <div
+                      key={`ep__s${episode.season_number}e${episode.episode_number}`}
+                      className={
+                        "season-episode " +
+                        (airDate < now ? "aired" : "not-aired")
+                      }
+                    >
                       <div className="season-episode--img">
-                        <img src={`https://image.tmdb.org/t/p/w500/${episode.still_path ? episode.still_path : seriesData.poster_path}`} />
+                        <img
+                          src={`https://image.tmdb.org/t/p/w500/${
+                            episode.still_path
+                              ? episode.still_path
+                              : seriesData.poster_path
+                          }`}
+                        />
                       </div>
                       <div className="season-episode--info">
                         <p className="upper small ep-num">
-                          Season {episode.season_number}: Episode {episode.episode_number} - {this.daysTillAir(airDate)}
+                          Season {episode.season_number}: Episode{" "}
+                          {episode.episode_number} - {this.daysTillAir(airDate)}
                         </p>
                         <h4 className="sub-title">{episode.name}</h4>
                         <p className="small detail">{episode.overview}</p>
@@ -266,7 +307,14 @@ class Season extends React.Component {
 Season = withRouter(Season);
 
 function SeasonContainer(props) {
-  return <Season api={props.api} user={props.user} openIssues={props.openIssues} msg={props.msg} />;
+  return (
+    <Season
+      api={props.api}
+      user={props.user}
+      openIssues={props.openIssues}
+      msg={props.msg}
+    />
+  );
 }
 
 const mapStateToProps = function (state) {

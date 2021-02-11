@@ -90,12 +90,13 @@ async function getAdmin(username, password, res, request_ip) {
 
   if (admin) {
     logger.log("info", `LOGIN: Admin user found`);
+    let token = createToken(admin, true);
     admin.password = "removed";
     res.json({
       admin: true,
       loggedIn: true,
       user: admin,
-      token: createToken(admin, true),
+      token: token,
     });
     try {
       await Admin.updateOne(
@@ -135,12 +136,13 @@ async function getFriend(username, res, request_ip) {
       return;
     }
     logger.log("info", `LOGIN: User found`);
+    let token = createToken(friend, false);
     friend.password = "removed";
     res.json({
       admin: false,
       loggedIn: true,
       user: friend,
-      token: createToken(friend, false),
+      token: token,
     });
     friend.lastIp = request_ip;
     friend.save();

@@ -233,7 +233,7 @@ export async function companyDetails(id) {
   });
 }
 
-export async function guideCalendar(id) {
+export async function guideCalendar() {
   return new Promise((resolve, reject) => {
     api
       .guideCalendar()

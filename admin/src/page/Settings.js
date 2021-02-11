@@ -102,7 +102,7 @@ class Settings extends React.Component {
             <Route path="*" exact>
               <section>
                 <h1 className="main-title mb--1">Not found</h1>
-                <p>This page doesn't exist</p>
+                <p>This page doesn&apos;t exist</p>
               </section>
             </Route>
           </Switch>

@@ -28,11 +28,8 @@ class Sonarr extends React.Component {
       profile_title: "",
       path: "",
       path_title: "",
-      active: false,
       base: "",
       apikey: "",
-      path: false,
-      profile: false,
       activeServer: false,
       uuid: false,
     };
@@ -213,14 +210,15 @@ class Sonarr extends React.Component {
         newServer: false,
         editWizardOpen: true,
         activeServer: id,
-        active: this.state.servers[id].active ? this.state.servers[id].active : false,
+        active: this.state.servers[id].active
+          ? this.state.servers[id].active
+          : false,
         title: this.state.servers[id].title,
         protocol: this.state.servers[id].protocol,
         host: this.state.servers[id].hostname,
         port: this.state.servers[id].port,
         base: this.state.servers[id].urlBase,
         apikey: this.state.servers[id].apiKey,
-        active: this.state.servers[id].active,
         profile: this.state.servers[id].profile,
         profile_title: this.state.servers[id].profile_title,
         path: this.state.servers[id].path,
@@ -247,7 +245,6 @@ class Sonarr extends React.Component {
       port: null,
       base: "",
       apikey: "",
-      active: false,
       profiles: false,
       paths: false,
       path: false,
@@ -276,7 +273,6 @@ class Sonarr extends React.Component {
       port: null,
       base: "",
       apikey: "",
-      active: false,
       profiles: false,
       paths: false,
       path: false,
@@ -357,28 +353,73 @@ class Sonarr extends React.Component {
           }
         >
           <label>Title</label>
-          <input className="styled-input--input" type="text" name="title" value={this.state.title} onChange={this.inputChange} />
+          <input
+            className="styled-input--input"
+            type="text"
+            name="title"
+            value={this.state.title}
+            onChange={this.inputChange}
+          />
           <label>Protocol</label>
           <div className="styled-input--select">
-            <select name="protocol" value={this.state.protocol} onChange={this.inputChange}>
+            <select
+              name="protocol"
+              value={this.state.protocol}
+              onChange={this.inputChange}
+            >
               <option value="http">HTTP</option>
               <option value="https">HTTPS</option>
             </select>
           </div>
           <label>Host</label>
-          <input className="styled-input--input" type="text" name="host" value={this.state.host} onChange={this.inputChange} />
+          <input
+            className="styled-input--input"
+            type="text"
+            name="host"
+            value={this.state.host}
+            onChange={this.inputChange}
+          />
           <label>Port</label>
-          <input className="styled-input--input" type="number" name="port" value={this.state.port ? this.state.port : false} onChange={this.inputChange} />
+          <input
+            className="styled-input--input"
+            type="number"
+            name="port"
+            value={this.state.port ? this.state.port : false}
+            onChange={this.inputChange}
+          />
           <label>URL Base</label>
-          <input className="styled-input--input" type="text" name="base" value={this.state.base} onChange={this.inputChange} />
+          <input
+            className="styled-input--input"
+            type="text"
+            name="base"
+            value={this.state.base}
+            onChange={this.inputChange}
+          />
           <label>API Key</label>
-          <input className="styled-input--input" type="text" name="apikey" value={this.state.apikey} onChange={this.inputChange} />
-          <button className="btn btn__square mb--1" onClick={() => this.test(this.state.uuid, true)}>
+          <input
+            className="styled-input--input"
+            type="text"
+            name="apikey"
+            value={this.state.apikey}
+            onChange={this.inputChange}
+          />
+          <button
+            className="btn btn__square mb--1"
+            onClick={() => this.test(this.state.uuid, true)}
+          >
             Test
           </button>
           <label>Profile</label>
-          <div className={`styled-input--select ${this.state.profiles ? "" : "disabled"}`}>
-            <select name="profile" value={this.state.profile} onChange={this.inputChange}>
+          <div
+            className={`styled-input--select ${
+              this.state.profiles ? "" : "disabled"
+            }`}
+          >
+            <select
+              name="profile"
+              value={this.state.profile}
+              onChange={this.inputChange}
+            >
               {this.state.profiles && !this.state.newServer ? (
                 <>
                   <option value="">Choose an option</option>
@@ -391,13 +432,25 @@ class Sonarr extends React.Component {
                   })}
                 </>
               ) : (
-                <option value="">{this.state.newServer ? "Please test connection" : "Loading..."}</option>
+                <option value="">
+                  {this.state.newServer
+                    ? "Please test connection"
+                    : "Loading..."}
+                </option>
               )}
             </select>
           </div>
           <label>Path</label>
-          <div className={`styled-input--select ${this.state.profiles ? "" : "disabled"}`}>
-            <select name="path" value={this.state.path} onChange={this.inputChange}>
+          <div
+            className={`styled-input--select ${
+              this.state.profiles ? "" : "disabled"
+            }`}
+          >
+            <select
+              name="path"
+              value={this.state.path}
+              onChange={this.inputChange}
+            >
               {this.state.paths ? (
                 <>
                   <option value="">Choose an option</option>
@@ -410,13 +463,22 @@ class Sonarr extends React.Component {
                   })}
                 </>
               ) : (
-                <option value="">{this.state.newServer ? "Please test connection" : "Loading..."}</option>
+                <option value="">
+                  {this.state.newServer
+                    ? "Please test connection"
+                    : "Loading..."}
+                </option>
               )}
             </select>
           </div>
           {!this.state.newServer && this.state.path && this.state.profile ? (
             <div className="checkbox-wrap mb--2">
-              <input type="checkbox" name="active" checked={this.state.active} onChange={this.inputChange} />
+              <input
+                type="checkbox"
+                name="active"
+                checked={this.state.active}
+                onChange={this.inputChange}
+              />
               <p>Enabled</p>
             </div>
           ) : null}
@@ -425,8 +487,11 @@ class Sonarr extends React.Component {
         <section>
           <p className="main-title mb--2">Sonarr</p>
           <p className="capped-width">
-            Sonarr is a PVR for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new episodes of your favorite shows and will grab, sort and rename them. It can also be configured to
-            automatically upgrade the quality of files already downloaded when a better quality format becomes available.
+            Sonarr is a PVR for Usenet and BitTorrent users. It can monitor
+            multiple RSS feeds for new episodes of your favorite shows and will
+            grab, sort and rename them. It can also be configured to
+            automatically upgrade the quality of files already downloaded when a
+            better quality format becomes available.
           </p>
         </section>
         <section>
@@ -435,15 +500,22 @@ class Sonarr extends React.Component {
             {this.state.servers.map((server, i) => {
               serverCount++;
               return (
-                <div className="sr--instance">
+                <div key={server.uuid} className="sr--instance">
                   <div className="sr--instance--inner">
                     <ServerIcon />
                     <p className="sr--title">{server.title}</p>
                     <p>{`${server.protocol}://${server.hostname}:${server.port}`}</p>
                     <p>Status: {server.active ? "Enabled" : "Disabled"}</p>
-                    <p>Profile: {server.profile_title ? server.profile_title : "Not set"}</p>
-                    <p>Path: {server.path_title ? server.path_title : "Not set"}</p>
-                    <p className="small">ID: {server.uuid ? server.uuid : "Error"}</p>
+                    <p>
+                      Profile:{" "}
+                      {server.profile_title ? server.profile_title : "Not set"}
+                    </p>
+                    <p>
+                      Path: {server.path_title ? server.path_title : "Not set"}
+                    </p>
+                    <p className="small">
+                      ID: {server.uuid ? server.uuid : "Error"}
+                    </p>
                     <div className="btn-wrap">
                       <button
                         className="btn btn__square"
@@ -454,7 +526,10 @@ class Sonarr extends React.Component {
                       >
                         Edit
                       </button>
-                      <button className="btn btn__square" onClick={() => this.test(server.uuid)}>
+                      <button
+                        className="btn btn__square"
+                        onClick={() => this.test(server.uuid)}
+                      >
                         Test
                       </button>
                     </div>

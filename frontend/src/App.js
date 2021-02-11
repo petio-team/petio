@@ -1,7 +1,6 @@
 import React from "react";
-import { HashRouter, Switch, Route, Link, withRouter, useHistory } from "react-router-dom";
+import { HashRouter, Switch, Route } from "react-router-dom";
 import { connect } from "react-redux";
-import Plex from "./data/Plex";
 import User from "./data/User";
 import Api from "./data/Api";
 import Sidebar from "./components/Sidebar";
@@ -169,10 +168,8 @@ class App extends React.Component {
     });
     Api.checkConfig()
       .then((res) => {
-        console.log(res);
         this.setState({
           config: res.config,
-          // loading: false,
         });
       })
       .catch(() => {
@@ -208,7 +205,7 @@ class App extends React.Component {
         </div>
       );
     }
-    let user = this.props.api.current_user;
+
     if (!this.state.isLoggedIn) {
       return (
         <div className="login-wrap">
@@ -218,22 +215,42 @@ class App extends React.Component {
                 <h1 className="logo">
                   Pet<span>io</span>
                 </h1>
-                <p className="main-title">{!this.state.adminLogin ? "Login" : "Admin Login"}</p>
+                <p className="main-title">
+                  {!this.state.adminLogin ? "Login" : "Admin Login"}
+                </p>
                 <form onSubmit={this.loginForm} autoComplete="on">
                   <p>Username / Email</p>
-                  <input type="text" name="username" value={this.state.username} onChange={this.inputChange} autoComplete="username" />
-                  {this.state.loginMsg ? <div className="msg msg__error msg__input">{this.state.loginMsg}</div> : null}
-                  {this.state.config === "failed" ? <div className="msg msg__error msg__input">API Not configured, please complete setup</div> : null}
+                  <input
+                    type="text"
+                    name="username"
+                    value={this.state.username}
+                    onChange={this.inputChange}
+                    autoComplete="username"
+                  />
+                  {this.state.loginMsg ? (
+                    <div className="msg msg__error msg__input">
+                      {this.state.loginMsg}
+                    </div>
+                  ) : null}
+                  {this.state.config === "failed" ? (
+                    <div className="msg msg__error msg__input">
+                      API Not configured, please complete setup
+                    </div>
+                  ) : null}
                   <button className="btn btn__square">Login</button>
                 </form>
               </div>
               <div className="credits">
-                <a href="https://fanart.tv/" target="_blank">
+                <a href="https://fanart.tv/" target="_blank" rel="noreferrer">
                   <p>
                     <strong>FAN</strong>ART<span>.TV</span>
                   </p>
                 </a>
-                <a href="https://www.themoviedb.org/" target="_blank">
+                <a
+                  href="https://www.themoviedb.org/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   <TmdbLogo />
                 </a>
               </div>
@@ -257,7 +274,12 @@ class App extends React.Component {
               {Object.keys(this.state.pushMsg).map((i) => {
                 let msg = this.state.pushMsg[i];
                 return (
-                  <div key={msg.timestamp} className={`push-msg--item ${msg.type !== "info" ? msg.type : ""}`}>
+                  <div
+                    key={msg.timestamp}
+                    className={`push-msg--item ${
+                      msg.type !== "info" ? msg.type : ""
+                    }`}
+                  >
                     {msg.message}
                   </div>
                 );
@@ -275,19 +297,31 @@ class App extends React.Component {
                 </div>
               </Route>
               <Route exact path="/movie/:id">
-                <Issues open={this.state.openIssues} close={this.closeIssues} msg={this.msg} />
+                <Issues
+                  open={this.state.openIssues}
+                  close={this.closeIssues}
+                  msg={this.msg}
+                />
                 <div className="page-wrap">
                   <Movie msg={this.msg} openIssues={this.openIssues} />
                 </div>
               </Route>
               <Route exact path="/series/:id">
-                <Issues open={this.state.openIssues} close={this.closeIssues} msg={this.msg} />
+                <Issues
+                  open={this.state.openIssues}
+                  close={this.closeIssues}
+                  msg={this.msg}
+                />
                 <div className="page-wrap">
                   <Series msg={this.msg} openIssues={this.openIssues} />
                 </div>
               </Route>
               <Route exact path="/series/:id/season/:season">
-                <Issues open={this.state.openIssues} close={this.closeIssues} msg={this.msg} />
+                <Issues
+                  open={this.state.openIssues}
+                  close={this.closeIssues}
+                  msg={this.msg}
+                />
                 <div className="page-wrap">
                   <Season openIssues={this.openIssues} msg={this.msg} />
                 </div>
@@ -329,7 +363,7 @@ class App extends React.Component {
               <Route path="*" exact>
                 <div className="page-wrap">
                   <h1 className="main-title mb--1">Not found</h1>
-                  <p>This page doesn't exist</p>
+                  <p>This page doesn&apos;t exist</p>
                 </div>
               </Route>
             </Switch>

@@ -137,9 +137,17 @@ class MovieShowOverview extends React.Component {
   render() {
     let criticRating = this.props.mediaData.vote_average;
 
-    let director = this.findNested(this.props.mediaData.credits.crew, "job", "Director");
+    let director = this.findNested(
+      this.props.mediaData.credits.crew,
+      "job",
+      "Director"
+    );
 
-    let screenplay = this.findNested(this.props.mediaData.credits.crew, "job", "Screenplay");
+    let screenplay = this.findNested(
+      this.props.mediaData.credits.crew,
+      "job",
+      "Screenplay"
+    );
 
     let userRating = "Not Reviewed";
     let userRatingVal = 0;
@@ -149,6 +157,7 @@ class MovieShowOverview extends React.Component {
         <a
           href={`plex://preplay/?metadataKey=%2Flibrary%2Fmetadata%2F${this.props.mediaData.on_server.ratingKey}&metadataType=1&server=${this.props.mediaData.on_server.serverKey}`}
           target="_blank"
+          rel="noreferrer"
           className="btn btn__square good"
         >
           <CheckIcon />
@@ -158,6 +167,7 @@ class MovieShowOverview extends React.Component {
         <a
           href={`https://app.plex.tv/desktop#!/server/${this.props.mediaData.on_server.serverKey}/details?key=%2Flibrary%2Fmetadata%2F${this.props.mediaData.on_server.ratingKey}`}
           target="_blank"
+          rel="noreferrer"
           className="btn btn__square good"
         >
           <CheckIcon />
@@ -185,22 +195,44 @@ class MovieShowOverview extends React.Component {
 
     let hasReviewed = false;
     if (this.props.user.reviews) {
-      if (this.props.user.reviews[this.props.match.params.id] || this.props.externalReviews) {
+      if (
+        this.props.user.reviews[this.props.match.params.id] ||
+        this.props.externalReviews
+      ) {
         let ratingsUser = 0;
         let ignore = 0;
         let total = 0;
         if (this.props.user.reviews[this.props.match.params.id]) {
-          for (var i = 0; i < this.props.user.reviews[this.props.match.params.id].length; i++) {
-            if (this.props.user.reviews[this.props.match.params.id][i].user == this.props.user.current.id) {
-              hasReviewed = this.props.user.reviews[this.props.match.params.id][i];
+          for (
+            var i = 0;
+            i < this.props.user.reviews[this.props.match.params.id].length;
+            i++
+          ) {
+            if (
+              this.props.user.reviews[this.props.match.params.id][i].user ==
+              this.props.user.current.id
+            ) {
+              hasReviewed = this.props.user.reviews[this.props.match.params.id][
+                i
+              ];
             }
           }
-          if (Object.keys(this.props.user.reviews[this.props.match.params.id]).length > 0) {
-            Object.keys(this.props.user.reviews[this.props.match.params.id]).map((r) => {
-              ratingsUser += (this.props.user.reviews[this.props.match.params.id][r].score / 10) * 100;
+          if (
+            Object.keys(this.props.user.reviews[this.props.match.params.id])
+              .length > 0
+          ) {
+            Object.keys(
+              this.props.user.reviews[this.props.match.params.id]
+            ).map((r) => {
+              ratingsUser +=
+                (this.props.user.reviews[this.props.match.params.id][r].score /
+                  10) *
+                100;
             });
           }
-          total += Object.keys(this.props.user.reviews[this.props.match.params.id]).length;
+          total += Object.keys(
+            this.props.user.reviews[this.props.match.params.id]
+          ).length;
         }
 
         if (this.props.externalReviews) {
@@ -214,13 +246,20 @@ class MovieShowOverview extends React.Component {
           total += this.props.externalReviews.length;
         }
 
-        userRating = ratingsUser ? `${(ratingsUser / (total - ignore)).toFixed(0)}% (${total - ignore} reviews)` : "Not Reviewed";
+        userRating = ratingsUser
+          ? `${(ratingsUser / (total - ignore)).toFixed(0)}% (${
+              total - ignore
+            } reviews)`
+          : "Not Reviewed";
 
         userRatingVal = ratingsUser / (total - ignore);
       }
     }
     let reviewBtn = (
-      <button className="btn btn__square" onClick={!hasReviewed ? this.props.openReview : null}>
+      <button
+        className="btn btn__square"
+        onClick={!hasReviewed ? this.props.openReview : null}
+      >
         {!hasReviewed ? (
           <>
             <StarIcon />
@@ -241,7 +280,10 @@ class MovieShowOverview extends React.Component {
           <div className="side-content">
             <div className="media-action">
               {this.props.video ? (
-                <button onClick={this.props.showTrailer} className="btn btn__square">
+                <button
+                  onClick={this.props.showTrailer}
+                  className="btn btn__square"
+                >
                   <TrailerIcon />
                   Trailer
                 </button>
@@ -249,9 +291,19 @@ class MovieShowOverview extends React.Component {
               {reviewBtn}
               {this.props.mediaData.available_resolutions ? (
                 <div className="resolutions">
-                  {this.props.mediaData.available_resolutions.includes("4k") ? <ResIconUHd /> : null}
-                  {this.props.mediaData.available_resolutions.includes("1080") ? <ResIconFHd /> : null}
-                  {this.props.mediaData.available_resolutions.includes("720") ? <ResIconHd /> : null}
+                  {this.props.mediaData.available_resolutions.includes("4k") ? (
+                    <ResIconUHd />
+                  ) : null}
+                  {this.props.mediaData.available_resolutions.includes(
+                    "1080"
+                  ) ? (
+                    <ResIconFHd />
+                  ) : null}
+                  {this.props.mediaData.available_resolutions.includes(
+                    "720"
+                  ) ? (
+                    <ResIconHd />
+                  ) : null}
                 </div>
               ) : null}
             </div>
@@ -260,8 +312,14 @@ class MovieShowOverview extends React.Component {
             <div className="detail--content">
               <div className="detail--bar">
                 <p>
-                  {this.props.mediaData.release_date ? new Date(this.props.mediaData.release_date).getFullYear() : null}
-                  {this.props.mediaData.first_air_date ? new Date(this.props.mediaData.first_air_date).getFullYear() : null}
+                  {this.props.mediaData.release_date
+                    ? new Date(this.props.mediaData.release_date).getFullYear()
+                    : null}
+                  {this.props.mediaData.first_air_date
+                    ? new Date(
+                        this.props.mediaData.first_air_date
+                      ).getFullYear()
+                    : null}
                 </p>
                 <div className="detail--bar--sep">·</div>
                 <p className="runtime" title="Running Time">
@@ -269,19 +327,47 @@ class MovieShowOverview extends React.Component {
                     ? this.timeConvert(this.props.mediaData.runtime)
                     : this.props.mediaData.episode_run_time
                     ? this.props.mediaData.episode_run_time.length > 0
-                      ? this.timeConvert(Array.isArray(this.props.mediaData.episode_run_time) ? this.props.mediaData.episode_run_time[0] : this.props.mediaData.episode_run_time)
+                      ? this.timeConvert(
+                          Array.isArray(this.props.mediaData.episode_run_time)
+                            ? this.props.mediaData.episode_run_time[0]
+                            : this.props.mediaData.episode_run_time
+                        )
                       : "Unknown"
                     : "Not Available"}
                 </p>
                 <div className="detail--bar--sep">·</div>
                 <p>
                   <span className="desktop-only">Rating: </span>
-                  <span className={`color-${criticRating > 7.9 ? "green" : criticRating > 6.9 ? "blue" : criticRating > 4.9 ? "orange" : "red"}`}>{criticRating}</span>
+                  <span
+                    className={`color-${
+                      criticRating > 7.9
+                        ? "green"
+                        : criticRating > 6.9
+                        ? "blue"
+                        : criticRating > 4.9
+                        ? "orange"
+                        : "red"
+                    }`}
+                  >
+                    {criticRating}
+                  </span>
                 </p>
                 <div className="detail--bar--sep">·</div>
                 <p>
                   <span className="desktop-only">User Rating: </span>
-                  <span className={`color-${userRatingVal > 79 ? "green" : userRatingVal > 69 ? "blue" : userRatingVal > 49 ? "orange" : "red"}`}>{userRating}</span>
+                  <span
+                    className={`color-${
+                      userRatingVal > 79
+                        ? "green"
+                        : userRatingVal > 69
+                        ? "blue"
+                        : userRatingVal > 49
+                        ? "orange"
+                        : "red"
+                    }`}
+                  >
+                    {userRating}
+                  </span>
                 </p>
                 {this.props.mediaData.original_language_format ? (
                   <>
@@ -294,20 +380,33 @@ class MovieShowOverview extends React.Component {
                 ) : null}
               </div>
               <div className="genre--wrap">
-                {this.props.mediaData.genres.map((genre, i) => {
+                {this.props.mediaData.genres.map((genre) => {
                   return (
-                    <Link to={`/genre/${this.props.mediaData.seasons ? "tv" : "movie"}/${genre.id}`} key={`genre_${genre.name}`} className="genre--item">
+                    <Link
+                      to={`/genre/${
+                        this.props.mediaData.seasons ? "tv" : "movie"
+                      }/${genre.id}`}
+                      key={`genre_${genre.name}`}
+                      className="genre--item"
+                    >
                       {this.genreIcon(genre.name)}
                       {genre.name}
                     </Link>
                   );
                 })}
                 {Object.keys(this.props.mediaData.keywords.results).length > 0
-                  ? this.props.mediaData.keywords.results.map((genre, i) => {
+                  ? this.props.mediaData.keywords.results.map((genre) => {
                       let customGenres = [210024];
                       if (customGenres.includes(genre.id))
                         return (
-                          <Link to={`/genre/${this.props.mediaData.seasons ? "tv" : "movie"}/${genre.id}`} key={`genre_${genre.name}`} className="genre--item" style={{ textTransform: "capitalize" }}>
+                          <Link
+                            to={`/genre/${
+                              this.props.mediaData.seasons ? "tv" : "movie"
+                            }/${genre.id}`}
+                            key={`genre_${genre.name}`}
+                            className="genre--item"
+                            style={{ textTransform: "capitalize" }}
+                          >
                             {this.genreIcon(genre.name)}
                             {genre.name}
                           </Link>
@@ -328,7 +427,9 @@ class MovieShowOverview extends React.Component {
                         return (
                           <div className="companies--item" key={`co__${co.id}`}>
                             <Link to={`/company/${co.id}`} title={co.name}>
-                              <img src={`https://image.tmdb.org/t/p/w500${co.logo_path}`} />
+                              <img
+                                src={`https://image.tmdb.org/t/p/w500${co.logo_path}`}
+                              />
                             </Link>
                           </div>
                         );
@@ -342,9 +443,17 @@ class MovieShowOverview extends React.Component {
                     ? this.props.mediaData.networks.map((network) => {
                         if (!network.logo_path) return;
                         return (
-                          <div className="networks--item" key={`net__${network.id}`}>
-                            <Link to={`/networks/${network.id}`} title={network.name}>
-                              <img src={`https://image.tmdb.org/t/p/w500${network.logo_path}`} />
+                          <div
+                            className="networks--item"
+                            key={`net__${network.id}`}
+                          >
+                            <Link
+                              to={`/networks/${network.id}`}
+                              title={network.name}
+                            >
+                              <img
+                                src={`https://image.tmdb.org/t/p/w500${network.logo_path}`}
+                              />
                             </Link>
                           </div>
                         );
@@ -364,7 +473,10 @@ class MovieShowOverview extends React.Component {
                 {screenplay ? (
                   <div className="media-crew--item">
                     <p className="sub-title">Screenplay</p>
-                    <Link to={`/person/${screenplay.id}`} className="crew-credit">
+                    <Link
+                      to={`/person/${screenplay.id}`}
+                      className="crew-credit"
+                    >
                       {screenplay.name}
                     </Link>
                   </div>

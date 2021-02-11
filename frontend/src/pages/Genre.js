@@ -185,12 +185,16 @@ class Genre extends React.Component {
       this.setState({
         scrollWatch: true,
       });
-      document.getElementsByClassName("page-wrap")[0].addEventListener("scroll", this.trackScrolling);
+      document
+        .getElementsByClassName("page-wrap")[0]
+        .addEventListener("scroll", this.trackScrolling);
     }
   }
 
   componentWillUnmount() {
-    document.getElementsByClassName("page-wrap")[0].removeEventListener("scroll", this.trackScrolling);
+    document
+      .getElementsByClassName("page-wrap")[0]
+      .removeEventListener("scroll", this.trackScrolling);
   }
 
   isBottom(el) {
@@ -225,7 +229,9 @@ class Genre extends React.Component {
         });
     if (data.results) {
       this.setState({
-        results: this.state.results ? [...this.state.results, ...data.results] : data.results,
+        results: this.state.results
+          ? [...this.state.results, ...data.results]
+          : data.results,
         page: page,
         paginating: false,
         totalPages: data.total_pages,
@@ -250,19 +256,33 @@ class Genre extends React.Component {
               this.state.results.map((result) => {
                 if (type === "TV") {
                   return (
-                    <div className="genre--grid--card" key={`gen__${result.id}`}>
-                      <TvCard series={result} msg={this.props.msg} view={true} />
+                    <div
+                      className="genre--grid--card"
+                      key={`gen__${result.id}`}
+                    >
+                      <TvCard
+                        series={result}
+                        msg={this.props.msg}
+                        view={true}
+                      />
                     </div>
                   );
                 }
                 if (type === "Movies") {
                   return (
-                    <div className="genre--grid--card" key={`gen__${result.id}`}>
-                      <MovieCard movie={result} view={true} msg={this.props.msg} />
+                    <div
+                      className="genre--grid--card"
+                      key={`gen__${result.id}`}
+                    >
+                      <MovieCard
+                        movie={result}
+                        view={true}
+                        msg={this.props.msg}
+                      />
                     </div>
                   );
                 }
-                return <p>{result.title}</p>;
+                return <p key={`gen__${result.title}`}>{result.title}</p>;
               })
             ) : this.state.results === "none" ? (
               <p>No results</p>
