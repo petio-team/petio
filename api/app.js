@@ -354,7 +354,7 @@ class Main {
     try {
       fs.writeFileSync(email, emailDefault);
       fs.writeFileSync(radarr, radarrDefault);
-      s.writeFileSync(sonarr, sonarrDefault);
+      fs.writeFileSync(sonarr, sonarrDefault);
       logger.log(
         "info",
         "API: Default config files for email, radarr, sonarr written to file"
