@@ -32,12 +32,15 @@ export function login(user, pass = false, cookie = false, admin) {
             });
             resolve(data);
           } else {
-            alert("Invalid Login");
             resolve({ error: "User not found" });
+            localStorage.removeItem("loggedin");
+            localStorage.removeItem("adminloggedin");
             return;
           }
         } else {
           resolve({ error: "User not found" });
+          localStorage.removeItem("loggedin");
+          localStorage.removeItem("adminloggedin");
         }
       })
       .catch((err) => {
