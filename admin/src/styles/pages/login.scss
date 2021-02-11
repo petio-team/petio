@@ -52,14 +52,74 @@
 
   .powered-by {
     position: absolute;
-    right: 50px;
+    right: 30px;
     bottom: 50px;
+    margin: 0;
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 500;
+    color: rgba(white, 0.3);
+
+    @include media-breakpoint-up(lg) {
+      right: 50px;
+    }
+
+    a {
+      color: $primary;
+    }
+  }
+
+  .credits {
+    position: absolute;
+    right: 30px;
+    bottom: 70px;
     margin: 0;
     font-size: 12px;
     line-height: 1;
 
     a {
-      color: $primary;
+      display: flex;
+      margin-top: 5px;
+      justify-content: flex-end;
+
+      @include media-breakpoint-up(lg) {
+        justify-content: flex-start;
+      }
+    }
+
+    @include media-breakpoint-up(lg) {
+      left: 50px;
+      bottom: 50px;
+      right: initial;
+    }
+
+    p {
+      margin: 0;
+      line-height: 1;
+      font-weight: 400;
+      width: 100%;
+      color: rgba(white, 0.3);
+      letter-spacing: 1px;
+
+      strong {
+        font-weight: 700;
+      }
+
+      span {
+        font-weight: 300;
+      }
+    }
+
+    svg {
+      height: 8px;
+
+      @include media-breakpoint-up(lg) {
+        height: 10px;
+      }
+
+      .cls-1 {
+        fill: rgba(white, 0.3);
+      }
     }
   }
 }

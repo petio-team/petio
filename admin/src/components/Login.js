@@ -2,6 +2,7 @@ import React from "react";
 import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
 import User from "../data/User";
 import pjson from "../../package.json";
+import { ReactComponent as TmdbLogo } from "../assets/svg/tmdb.svg";
 
 class Login extends React.Component {
   constructor(props) {
@@ -91,8 +92,18 @@ class Login extends React.Component {
                 <p>Password</p>
                 <input type="password" name="password" value={this.state.password} onChange={this.inputChange} autoComplete="current-password" />
 
-                <button className="btn">Login</button>
+                <button className="btn btn__square">Login</button>
               </form>
+            </div>
+            <div className="credits">
+              <a href="https://fanart.tv/" target="_blank">
+                <p>
+                  <strong>FAN</strong>ART<span>.TV</span>
+                </p>
+              </a>
+              <a href="https://www.themoviedb.org/" target="_blank">
+                <TmdbLogo />
+              </a>
             </div>
             <p className="powered-by">Petio Admin build (alpha) {pjson.version}</p>
           </>

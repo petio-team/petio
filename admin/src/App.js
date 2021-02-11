@@ -20,10 +20,18 @@ class App extends React.Component {
       loading: true,
       config: false,
       configChecked: true,
+      mobMenuOpen: false,
     };
 
     this.changeLogin = this.changeLogin.bind(this);
     this.checkConfig = this.checkConfig.bind(this);
+    this.toggleMobMenu = this.toggleMobMenu.bind(this);
+  }
+
+  toggleMobMenu() {
+    this.setState({
+      mobMenuOpen: this.state.mobMenuOpen ? false : true,
+    });
   }
 
   checkConfig() {
@@ -71,8 +79,8 @@ class App extends React.Component {
         <div className="app">
           <div className="setup--wrap">
             <p className="main-title">Error</p>
-            <p>Something's wrong I can feel it...</p>
-            <p>Ok, you've managed to get the admin front end to load. But it looks like I can't talk to the API service.</p>
+            <p>Something's wrong...</p>
+            <p>Ok, you've managed to get the admin front end to load. But it looks like the API service isn't accessible.</p>
             <p>
               Please make sure the API service has started and is still running without any errors. Just finished the setup wizard? If the API can't connect to the DB it will reject the configuration
               and needs a restart, so check the logs.
@@ -108,7 +116,19 @@ class App extends React.Component {
       return (
         <div className="app">
           <HashRouter>
-            <Sidebar changeLogin={this.changeLogin} />
+            <div className="mob-menu-top">
+              <div className="logo-wrap">
+                <div className="logo">
+                  Pet<span>io</span>
+                </div>
+              </div>
+              <button className={`nav-toggle ${this.state.mobMenuOpen ? "active" : ""}`} onClick={this.toggleMobMenu}>
+                <span></span>
+                <span></span>
+                <span></span>
+              </button>
+            </div>
+            <Sidebar mobOpen={this.state.mobMenuOpen} changeLogin={this.changeLogin} />
             <div className="view">
               <Switch>
                 <Route exact path="/">
@@ -129,6 +149,12 @@ class App extends React.Component {
                 <Route path="/users">
                   <div className="page-wrap">
                     <Users api={this.props.api} />
+                  </div>
+                </Route>
+                <Route path="*" exact>
+                  <div className="page-wrap">
+                    <h1 className="main-title mb--1">Not found</h1>
+                    <p>This page doesn't exist</p>
                   </div>
                 </Route>
               </Switch>

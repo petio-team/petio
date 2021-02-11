@@ -80,13 +80,16 @@ class Movie extends React.Component {
     }
   }
 
-  request() {
+  async request() {
     let id = this.props.match.params.id;
     let movie = this.props.api.movie_lookup[id];
     let requests = this.props.user.requests[id];
     if (requests) {
       if (requests.users.includes(this.props.user.current.id)) {
-        alert("Already Requested");
+        this.props.msg({
+          message: `Already Requested`,
+          type: "error",
+        });
         return;
       }
     }
@@ -99,11 +102,20 @@ class Movie extends React.Component {
       thumb: movie.poster_path,
       type: "movie",
     };
-    User.request(request, this.props.user.current).then(() => {
-      User.getRequests().then(() => {
-        this.getRequests();
+    try {
+      await User.request(request, this.props.user.current);
+      this.props.msg({
+        message: `New Request added: ${movie.title}`,
+        type: "good",
       });
-    });
+      await User.getRequests();
+      this.getRequests();
+    } catch (err) {
+      this.props.msg({
+        message: err,
+        type: "error",
+      });
+    }
   }
 
   openReview() {
@@ -160,7 +172,7 @@ class Movie extends React.Component {
     if (movieData.recommendations) {
       relatedItems = movieData.recommendations.map((key) => {
         // if (this.props.api.movie_lookup[id]) {
-        return <MovieCard key={`related-${key}`} movie={{ id: key }} />;
+        return <MovieCard key={`related-${key}`} msg={this.props.msg} movie={{ id: key }} />;
         // }
       });
       related = (
@@ -171,18 +183,28 @@ class Movie extends React.Component {
       );
     }
 
-    let video = movieData.videos.results ? movieData.videos.results[0] : false;
-
-    if (video) {
-      if (video.site !== "YouTube") {
-        video = false;
+    let video = false;
+    if (movieData.videos.results) {
+      for (let i = 0; i < movieData.videos.results.length; i++) {
+        let vid = movieData.videos.results[i];
+        if (vid.site === "YouTube" && !video) {
+          video = vid;
+        }
       }
     }
 
     return (
       <div className="media-wrap" data-id={movieData.imdb_id} key={`${movieData.title}__wrap`}>
-        <Review id={this.props.match.params.id} user={this.props.user.current} active={this.state.reviewOpen} closeReview={this.closeReview} getReviews={this.getReviews} item={movieData} />
-        <MovieShowTop mediaData={movieData} openIssues={this.props.openIssues} trailer={this.state.trailer} requested={this.state.requested} request={this.request} />
+        <Review
+          id={this.props.match.params.id}
+          msg={this.props.msg}
+          user={this.props.user.current}
+          active={this.state.reviewOpen}
+          closeReview={this.closeReview}
+          getReviews={this.getReviews}
+          item={movieData}
+        />
+        <MovieShowTop mediaData={movieData} video={video} openIssues={this.props.openIssues} trailer={this.state.trailer} requested={this.state.requested} request={this.request} />
         <div className="media-content">
           <MovieShowOverview
             mediaData={movieData}
@@ -208,9 +230,13 @@ class Movie extends React.Component {
             <section>
               <h3 className="sub-title mb--1">{movieData.belongs_to_collection.name}</h3>
               <Carousel>
-                {movieData.collection.map((key) => {
-                  return <MovieCard key={`collection-${key}`} movie={{ id: key }} />;
-                })}
+                {movieData.collection
+                  .sort(function (a, b) {
+                    return a - b;
+                  })
+                  .map((key) => {
+                    return <MovieCard key={`collection-${key}`} msg={this.props.msg} movie={{ id: key }} />;
+                  })}
               </Carousel>
             </section>
           ) : null}
@@ -228,7 +254,7 @@ class Movie extends React.Component {
 Movie = withRouter(Movie);
 
 function MovieContainer(props) {
-  return <Movie api={props.api} user={props.user} openIssues={props.openIssues} />;
+  return <Movie api={props.api} user={props.user} openIssues={props.openIssues} msg={props.msg} />;
 }
 
 const mapStateToProps = function (state) {

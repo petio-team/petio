@@ -96,13 +96,16 @@ class Series extends React.Component {
     }
   }
 
-  request() {
+  async request() {
     let id = this.props.match.params.id;
     let series = this.props.api.series_lookup[id];
     let requests = this.props.user.requests[id];
     if (requests) {
       if (requests.users.includes(this.props.user.current.id)) {
-        alert("Already Requested");
+        this.props.msg({
+          message: "Already Requested",
+          type: "error",
+        });
         return;
       }
     }
@@ -115,9 +118,21 @@ class Series extends React.Component {
       type: "tv",
       thumb: series.poster_path,
     };
-    User.request(request, this.props.user.current).then(() => {
-      User.getRequests();
-    });
+
+    try {
+      await User.request(request, this.props.user.current);
+      this.props.msg({
+        message: `New Request added: ${series.name}`,
+        type: "good",
+      });
+      await User.getRequests();
+      this.getRequests();
+    } catch (err) {
+      this.props.msg({
+        message: err,
+        type: "error",
+      });
+    }
   }
 
   getReviews() {
@@ -198,7 +213,7 @@ class Series extends React.Component {
     if (seriesData.recommendations) {
       relatedItems = seriesData.recommendations.map((key) => {
         // if (this.props.api.series_lookup[id]) {
-        return <TvCard key={`related-${key}`} series={{ id: key }} />;
+        return <TvCard key={`related-${key}`} msg={this.props.msg} series={{ id: key }} />;
         // }
       });
       related = (
@@ -260,18 +275,28 @@ class Series extends React.Component {
       }
     }
 
-    let video = seriesData.videos.results ? seriesData.videos.results[0] : false;
-
-    if (video) {
-      if (video.site !== "YouTube") {
-        video = false;
+    let video = false;
+    if (seriesData.videos.results) {
+      for (let i = 0; i < seriesData.videos.results.length; i++) {
+        let vid = seriesData.videos.results[i];
+        if (vid.site === "YouTube" && !video) {
+          video = vid;
+        }
       }
     }
 
     return (
       <div className="media-wrap" data-id={seriesData.imdb_id} key={`${seriesData.title}__wrap`}>
-        <Review id={this.props.match.params.id} user={this.props.user.current} active={this.state.reviewOpen} closeReview={this.closeReview} getReviews={this.getReviews} item={seriesData} />
-        <MovieShowTop mediaData={seriesData} trailer={this.state.trailer} requested={this.state.requested} request={this.request} openIssues={this.props.openIssues} />
+        <Review
+          id={this.props.match.params.id}
+          msg={this.props.msg}
+          user={this.props.user.current}
+          active={this.state.reviewOpen}
+          closeReview={this.closeReview}
+          getReviews={this.getReviews}
+          item={seriesData}
+        />
+        <MovieShowTop mediaData={seriesData} video={video} trailer={this.state.trailer} requested={this.state.requested} request={this.request} openIssues={this.props.openIssues} />
 
         <div className="media-content">
           <MovieShowOverview
@@ -323,9 +348,10 @@ class Series extends React.Component {
             </Carousel>
           </section>
           {related}
+
           <section>
             <h3 className="sub-title mb--1">Reviews</h3>
-            <ReviewsList reviews={this.props.user.reviews[id]} external={seriesData.reviews} />
+            {this.props.user.reviews ? <ReviewsList reviews={this.props.user.reviews[id]} external={seriesData.reviews} /> : null}
           </section>
         </div>
       </div>
@@ -336,7 +362,7 @@ class Series extends React.Component {
 Series = withRouter(Series);
 
 function SeriesContainer(props) {
-  return <Series api={props.api} user={props.user} openIssues={props.openIssues} />;
+  return <Series api={props.api} user={props.user} msg={props.msg} openIssues={props.openIssues} />;
 }
 
 const mapStateToProps = function (state) {

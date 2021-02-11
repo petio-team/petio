@@ -7,16 +7,26 @@ const onServer = require("../plex/onServer");
 
 const ISO6391 = require("iso-639-1");
 
+const logger = require("../util/logger");
+
 const cacheManager = require("cache-manager");
-const memoryCache = cacheManager.caching({ store: "memory", max: 500, ttl: 86400 /*seconds*/ });
+const memoryCache = cacheManager.caching({
+  store: "memory",
+  max: 500,
+  ttl: 86400 /*seconds*/,
+});
 
 async function movieLookup(id, minified = false) {
+  logger.log("verbose", `TMDB Person Lookup ${id}`);
   let fanart = minified ? false : await fanartLookup(id, "movies");
   let movie = false;
   try {
     data = await getMovieData(id);
     movie = Object.assign({}, data);
   } catch {
+    return { error: "not found" };
+  }
+  if (movie.success === false) {
     return { error: "not found" };
   }
   if (movie) {
@@ -48,8 +58,8 @@ async function movieLookup(id, minified = false) {
           collectionData.push(part.id);
         });
       } catch (err) {
-        console.log(err);
-        console.log(`Error getting collection data - ${movie.title}`);
+        logger.log("warn", `Error getting collection data - ${movie.title}`);
+        logger.log("warn", err);
       }
     }
 
@@ -59,18 +69,21 @@ async function movieLookup(id, minified = false) {
 
         movie.reviews = reviews.results;
       } catch (err) {
-        console.log(err);
+        logger.log("warn", `Error getting review data - ${movie.title}`);
+        logger.log("warn", err);
       }
     }
 
     movie.recommendations = recommendationsData;
     movie.collection = collectionData;
+    movie.keywords.results = movie.keywords.keywords;
+    movie.keywords.keywords = {};
 
     delete movie.production_countries;
     delete movie.budget;
     delete movie.adult;
     delete movie.original_title;
-    delete movie.production_companies;
+    // delete movie.production_companies;
     if (minified) {
       delete movie.credits;
       delete movie.backdrop_path;
@@ -106,7 +119,8 @@ async function getMovieData(id) {
       return tmdbData(id);
     });
   } catch (err) {
-    console.log(err);
+    logger.log("warn", `Error getting movie data - ${id}`);
+    logger.log("warn", err);
   }
   return data;
 }
@@ -118,7 +132,8 @@ async function getRecommendations(id) {
       return recommendationData(id);
     });
   } catch (err) {
-    console.log(err);
+    logger.log("warn", `Error getting movie recommendations - ${id}`);
+    logger.log("warn", err);
   }
   return data;
 }
@@ -130,7 +145,8 @@ async function getReviews(id) {
       return reviewsData(id);
     });
   } catch (err) {
-    console.log(err);
+    logger.log("warn", `Error getting movie reviews - ${id}`);
+    logger.log("warn", err);
   }
   return data;
 }
@@ -142,7 +158,8 @@ async function getCollection(id) {
       return collectionData(id);
     });
   } catch (err) {
-    console.log(err);
+    logger.log("warn", `Error getting movie collections - ${id}`);
+    logger.log("warn", err);
   }
   return data;
 }
@@ -153,7 +170,7 @@ function tmdbData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}movie/${id}?api_key=${tmdbApikey}&append_to_response=credits,videos`;
+  let url = `${tmdb}movie/${id}?api_key=${tmdbApikey}&append_to_response=credits,videos,keywords`;
   return new Promise((resolve, reject) => {
     request(
       url,
@@ -176,7 +193,7 @@ async function recommendationData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}movie/${id}/recommendations?api_key=${tmdbApikey}&append_to_response=credits,videos`;
+  let url = `${tmdb}movie/${id}/recommendations?api_key=${tmdbApikey}&append_to_response=credits,videos,keywords`;
 
   return new Promise((resolve, reject) => {
     request(
@@ -254,4 +271,58 @@ function findEnLogo(logos) {
   return logoUrl;
 }
 
-module.exports = movieLookup;
+function discoverMovie(page = 1, params = {}) {
+  const config = getConfig();
+  const tmdbApikey = config.tmdbApi;
+  const tmdb = "https://api.themoviedb.org/3/";
+  let par = "";
+  Object.keys(params).map((i) => {
+    par += `&${i}=${params[i]}`;
+  });
+  let url = `${tmdb}discover/movie?api_key=${tmdbApikey}${par}&page=${page}`;
+  return new Promise((resolve, reject) => {
+    request(
+      url,
+      {
+        method: "GET",
+        json: true,
+      },
+      function (err, data) {
+        if (err) {
+          reject(err);
+        }
+
+        resolve(data);
+      }
+    );
+  });
+}
+
+function company(id) {
+  const config = getConfig();
+  const tmdbApikey = config.tmdbApi;
+  const tmdb = "https://api.themoviedb.org/3/";
+  let url = `${tmdb}company/${id}?api_key=${tmdbApikey}`;
+  return new Promise((resolve, reject) => {
+    request(
+      url,
+      {
+        method: "GET",
+        json: true,
+      },
+      function (err, data) {
+        if (err) {
+          reject(err);
+        }
+
+        resolve(data);
+      }
+    );
+  });
+}
+
+module.exports = {
+  discoverMovie,
+  movieLookup,
+  company,
+};

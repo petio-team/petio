@@ -1,14 +1,6 @@
 const apiUrl = process.env.NODE_ENV === "development" ? "http://localhost:7778" : `${window.location.protocol}//${window.location.host}${window.location.pathname.replace("/admin/", "")}/api`;
 
 export async function login(username, password, admin = false, token = false) {
-  let IP = false;
-  try {
-    let lookup = await getIP();
-    IP = lookup.ip;
-  } catch {
-    console.log("Cannot get IP");
-  }
-  console.log(IP);
   let request = `${apiUrl}/login`;
   let headers = {
     "Content-Type": "application/json",
@@ -18,12 +10,7 @@ export async function login(username, password, admin = false, token = false) {
     password: password,
     admin: admin,
     authToken: token,
-    ip: IP,
   }).then((res) => res.json());
-}
-
-function getIP() {
-  return fetch("https://api.ipify.org/?format=json").then((resp) => resp.json());
 }
 
 export let getRequests = (min) => {

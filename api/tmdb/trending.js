@@ -4,9 +4,16 @@ const request = require("xhr-request");
 const onServer = require("../plex/onServer");
 
 const cacheManager = require("cache-manager");
-const memoryCache = cacheManager.caching({ store: "memory", max: 3, ttl: 86400 /*seconds*/ });
+const memoryCache = cacheManager.caching({
+  store: "memory",
+  max: 3,
+  ttl: 86400 /*seconds*/,
+});
+
+const logger = require("../util/logger");
 
 async function trending() {
+  logger.log("verbose", `TMDB Trending lookup`);
   let person = await getPerson();
   let movies = await getMovies();
   let tv = await getShows();
@@ -39,7 +46,8 @@ async function getPerson() {
       return personData();
     });
   } catch (err) {
-    console.log(err);
+    logger.log("warn", `Error getting trending people`);
+    logger.log("warn", err);
   }
   return data;
 }
@@ -51,7 +59,8 @@ async function getMovies() {
       return moviesData();
     });
   } catch (err) {
-    console.log(err);
+    logger.log("warn", `Error getting trending movies`);
+    logger.log("warn", err);
   }
   return data;
 }
@@ -63,7 +72,8 @@ async function getShows() {
       return showsData();
     });
   } catch (err) {
-    console.log(err);
+    logger.log("warn", `Error getting trending shows`);
+    logger.log("warn", err);
   }
   return data;
 }
@@ -71,7 +81,7 @@ async function getShows() {
 // Lookup layer
 
 function personData() {
-  console.log("Person from source");
+  logger.log("verbose", "Person from source not cache");
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
@@ -95,7 +105,7 @@ function personData() {
 }
 
 function moviesData() {
-  console.log("Movies from source");
+  logger.log("verbose", "Movies from source not cache");
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
@@ -119,7 +129,7 @@ function moviesData() {
 }
 
 function showsData() {
-  console.log("Shows from source");
+  logger.log("verbose", "Shows from source not cache");
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";

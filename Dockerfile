@@ -5,6 +5,7 @@ LABEL maintainer="Petio"
 RUN apk add --no-cache git
 
 COPY ./petio.js /app/petio.js
+COPY ./router.js /app/router.js
 COPY ./package.json /app/package.json
 WORKDIR /app
 RUN npm install

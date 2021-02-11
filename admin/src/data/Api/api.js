@@ -1,4 +1,9 @@
-const apiUrl = process.env.NODE_ENV === "development" ? "http://localhost:7778" : `${window.location.protocol}//${window.location.host}${window.location.pathname.replace("/admin/", "")}/api`;
+const apiUrl =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:7778"
+    : `${window.location.protocol}//${
+        window.location.host
+      }${window.location.pathname.replace("/admin/", "")}/api`;
 
 console.log(process.env);
 
@@ -105,6 +110,15 @@ export let saveConfig = (config) => {
   return call(request, headers, "post", body);
 };
 
+export let updateConfig = (config) => {
+  let request = `${apiUrl}/config/update`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  let body = config;
+  return call(request, headers, "post", body);
+};
+
 export function sonarrConfig() {
   let headers = { "Content-Type": "application/json" };
   let request = `${apiUrl}/services/sonarr/config`;
@@ -182,6 +196,14 @@ export let saveEmailConfig = (config) => {
 
 export let getEmailConfig = () => {
   let request = `${apiUrl}/mail/config`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  return call(request, headers, "get").then((res) => res.json());
+};
+
+export let getConfig = () => {
+  let request = `${apiUrl}/config/current`;
   let headers = {
     "Content-Type": "application/json",
   };
@@ -292,6 +314,32 @@ export let bulkEditUser = (data) => {
   };
   let body = data;
   return call(request, headers, "post", body).then((res) => res.json());
+};
+
+export let removeReq = (req, reason) => {
+  let request = `${apiUrl}/request/remove`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  let body = { request: req, reason: reason };
+  return call(request, headers, "post", body);
+};
+
+export let updateReq = (req, servers) => {
+  let request = `${apiUrl}/request/update`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  let body = { request: req, servers: servers };
+  return call(request, headers, "post", body);
+};
+
+export let getConsole = () => {
+  let request = `${apiUrl}/logs/stream`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  return call(request, headers, "get").then((res) => res.json());
 };
 
 function call(url, headers, method, body = null) {

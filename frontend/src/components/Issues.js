@@ -31,6 +31,10 @@ class Issues extends React.Component {
 
   async submit() {
     if (!this.state.option) {
+      this.props.msg({
+        message: `Please pick an option`,
+        type: "error",
+      });
       return;
     }
     let id = this.state.id;
@@ -64,8 +68,15 @@ class Issues extends React.Component {
         detail: "",
       });
       this.props.close();
+      this.props.msg({
+        message: `New Issue added`,
+        type: "good",
+      });
     } catch {
-      alert("Error adding issue, please try again later!");
+      this.props.msg({
+        message: "Error adding issue, please try again later!",
+        type: "error",
+      });
     }
   }
 
@@ -158,7 +169,7 @@ class Issues extends React.Component {
 Issues = withRouter(Issues);
 
 function IssuesContainer(props) {
-  return <Issues api={props.api} user={props.user} close={props.close} open={props.open} />;
+  return <Issues api={props.api} user={props.user} close={props.close} open={props.open} msg={props.msg} />;
 }
 
 const mapStateToProps = function (state) {

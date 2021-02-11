@@ -4,24 +4,21 @@
   }
 
   &--menu {
-    position: fixed;
-    top: 0px;
-    left: 250px;
-    width: 250px;
-    background: $black;
-    height: 100vh;
+    display: flex;
+    flex-wrap: nowrap;
+    border-bottom: solid 1px rgba(255, 255, 255, 0.1);
 
     &--item {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-top: solid 4px transparent;
       cursor: pointer;
+      padding: 0 10px;
+      margin-right: 20px;
 
       @include media-breakpoint-up(lg) {
-        padding-left: 20px;
-        border-top: none;
-        border-right: solid 4px transparent;
+        padding: 0 20px;
+        margin-right: 50px;
       }
 
       p {
@@ -41,15 +38,14 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        width: 50px;
+        padding-left: 0;
 
         @include media-breakpoint-up(lg) {
-          padding: 20px 0;
-          width: 60px;
+          padding-left: 20px;
         }
 
         img {
-          height: 20px;
+          height: 15px;
           width: auto;
           max-width: 100%;
 
@@ -59,11 +55,7 @@
         }
 
         svg {
-          height: 20px;
-
-          @include media-breakpoint-up(lg) {
-            height: 20px;
-          }
+          height: 15px;
 
           path {
             fill: $grey-light;
@@ -72,44 +64,33 @@
       }
 
       &:hover {
-        background: rgba(0, 0, 0, 0.2);
-        border-top: solid 4px rgba(255, 255, 255, 0.2);
-
-        @include media-breakpoint-up(lg) {
-          border-top: none;
-          border-right: solid 4px rgba(255, 255, 255, 0.2);
-        }
+        border-bottom: solid 1px white;
       }
 
       &.active {
-        background: $primaryDark;
-        border-top: solid 4px $grey-light;
-
-        @include media-breakpoint-up(lg) {
-          border-top: none;
-          border-right: solid 4px $grey-light;
-        }
+        border-bottom: solid 1px $primary;
 
         .icon {
           svg path {
-            fill: $grey-light;
+            fill: $primary;
           }
         }
 
         p {
-          color: $grey-light;
+          color: $primary;
         }
       }
     }
   }
 
   &--content {
-    margin-left: 250px;
     padding: 50px 0;
 
     section {
-      padding-left: 20px;
-      padding-right: 20px;
+      @include media-breakpoint-up(lg) {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
 
       label {
         margin-bottom: 10px;
@@ -121,12 +102,21 @@
 
 .setting-msg {
   position: fixed;
-  top: 0;
-  left: 500px;
-  width: calc(100% - 500px);
+  bottom: 60px;
+  right: 10px;
+  min-width: 200px;
+  max-width: 100%;
   background: $primary;
-  padding: 10px 40px;
+  padding: 10px 20px;
   z-index: 100;
+  border-radius: 5px;
+
+  @include media-breakpoint-up(lg) {
+    bottom: 50px;
+    right: 50px;
+    min-width: 300px;
+    padding: 20px 40px;
+  }
 
   &.good {
     background: $good;
@@ -138,5 +128,53 @@
 
   p {
     margin: 0;
+  }
+}
+
+.console {
+  &--main {
+    background: rgba($dark-grey, 0.6);
+    border-radius: 10px;
+    padding: 20px;
+    max-height: 500px;
+    min-height: 500px;
+    overflow-y: scroll;
+    font-family: monospace;
+  }
+
+  &--item {
+    font-size: 12px;
+    margin-bottom: 5px;
+  }
+
+  &--type {
+    text-transform: uppercase;
+    font-size: 10px;
+    padding: 2px 5px;
+    border-radius: 5px;
+    font-weight: 500;
+    min-width: 55px;
+    text-align: center;
+    display: inline-flex;
+    line-height: 12px;
+    justify-content: center;
+
+    &__info {
+      background: $green;
+      color: $dark-grey;
+    }
+
+    &__verbose {
+      background: $purple;
+    }
+
+    &__warn {
+      background: $primary;
+      color: $dark-grey;
+    }
+
+    &__error {
+      background: $bad;
+    }
   }
 }

@@ -6,6 +6,7 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/user");
 const Admin = require("../models/admin");
+const logger = require("../util/logger");
 
 router.post("/", async (req, res) => {
   const prefs = getConfig();
@@ -13,34 +14,35 @@ router.post("/", async (req, res) => {
   let authToken = req.body.authToken;
   let username = req.body.username;
   let password = req.body.password;
-  let request_ip = req.body.ip;
+  let request_ip =
+    req.headers["x-forwarded-for"] || req.connection.remoteAddress;
 
   if (!prefs) {
     res.status(500).send("This Petio API is not setup");
     return;
   }
 
-  console.log(`LOGIN: New login attempted`);
-  console.log(`LOGIN: Request User: ${username}`);
-  console.log(`LOGIN: Request IP: ${request_ip}`);
+  logger.log("info", `LOGIN: New login attempted`);
+  logger.log("info", `LOGIN: Request User: ${username}`);
+  logger.log("info", `LOGIN: Request IP: ${request_ip}`);
   if (authToken) {
-    console.log(`LOGIN: JWT Token Passed`);
+    logger.log("info", `LOGIN: JWT Token Passed`);
     try {
       let decoded = jwt.verify(authToken, prefs.plexToken);
       let user = decoded;
-      console.log(`LOGIN: Token fine`);
+      logger.log("info", `LOGIN: Token fine`);
       if (user.admin) {
-        console.log(`LOGIN: Token is admin`);
+        logger.log("info", `LOGIN: Token is admin`);
         getAdmin(user.username, user.password, res, request_ip);
       } else {
         if (!user.username) {
           throw "No username";
         }
-        console.log(`LOGIN: Token is user`);
+        logger.log("info", `LOGIN: Token is user`);
         getFriend(user.username, res, request_ip);
       }
     } catch {
-      console.log(`LOGIN: Invalid token, rejected`);
+      logger.log("warn", `LOGIN: Invalid token, rejected`);
       res.json({
         admin: false,
         loggedIn: false,
@@ -50,7 +52,7 @@ router.post("/", async (req, res) => {
       return;
     }
   } else {
-    console.log(`LOGIN: Standard auth`);
+    logger.log("info", `LOGIN: Standard auth`);
     if (!username || (!password && admin)) {
       res.json({
         admin: false,
@@ -61,10 +63,10 @@ router.post("/", async (req, res) => {
       return;
     }
     if (admin) {
-      console.log(`LOGIN: User is admin`);
+      logger.log("info", `LOGIN: User is admin`);
       getAdmin(username, password, res, request_ip);
     } else {
-      console.log(`LOGIN: User is standard`);
+      logger.log("info", `LOGIN: User is standard`);
       getFriend(username, res, request_ip);
     }
   }
@@ -72,7 +74,10 @@ router.post("/", async (req, res) => {
 
 function createToken(user, admin = false) {
   const prefs = getConfig();
-  return jwt.sign({ username: user.username, password: user.password, admin: admin }, prefs.plexToken);
+  return jwt.sign(
+    { username: user.username, password: user.password, admin: admin },
+    prefs.plexToken
+  );
 }
 
 async function getAdmin(username, password, res, request_ip) {
@@ -84,7 +89,8 @@ async function getAdmin(username, password, res, request_ip) {
   });
 
   if (admin) {
-    console.log(`LOGIN: Admin user found`);
+    logger.log("info", `LOGIN: Admin user found`);
+    admin.password = "removed";
     res.json({
       admin: true,
       loggedIn: true,
@@ -101,10 +107,15 @@ async function getAdmin(username, password, res, request_ip) {
         }
       );
     } catch (err) {
-      console.log(err);
+      logger.log("error", "LOGIN: Update IP failed");
+      logger.error(err);
     }
   } else {
-    console.log(`LOGIN: Admin user not found`);
+    logger.log("warn", `LOGIN: Admin user not found`);
+    logger.log(
+      "warn",
+      `Failed login with username: ${username} | IP: ${request_ip}`
+    );
     res.json({
       admin: false,
       loggedIn: false,
@@ -119,7 +130,12 @@ async function getFriend(username, res, request_ip) {
     $or: [{ username: username }, { email: username }, { title: username }],
   });
   if (friend) {
-    console.log(`LOGIN: User found`);
+    if (friend.disabled) {
+      res.json({ admin: false, loggedIn: false, token: false });
+      return;
+    }
+    logger.log("info", `LOGIN: User found`);
+    friend.password = "removed";
     res.json({
       admin: false,
       loggedIn: true,
@@ -133,8 +149,8 @@ async function getFriend(username, res, request_ip) {
       $or: [{ username: username }, { email: username }],
     });
     if (admin) {
-      console.log(`LOGIN: User found, is admin, returned as standard`);
-      admin.password = "";
+      logger.log("info", `LOGIN: User found, is admin, returned as standard`);
+      admin.password = "removed";
       res.json({
         admin: false,
         loggedIn: true,
@@ -151,10 +167,15 @@ async function getFriend(username, res, request_ip) {
           }
         );
       } catch (err) {
-        console.log(err);
+        logger.log("error", "LOGIN: Update IP failed");
+        logger.error(err);
       }
     } else {
-      console.log(`LOGIN: No user found`);
+      logger.log("warn", `LOGIN: No user found`);
+      logger.log(
+        "warn",
+        `Failed login with username: ${username} | IP: ${request_ip}`
+      );
       res.json({ admin: false, loggedIn: false, token: false });
     }
   }

@@ -6,10 +6,17 @@ const onServer = require("../plex/onServer");
 
 const ISO6391 = require("iso-639-1");
 
+const logger = require("../util/logger");
+
 const cacheManager = require("cache-manager");
-const memoryCache = cacheManager.caching({ store: "memory", max: 500, ttl: 86400 /*seconds*/ });
+const memoryCache = cacheManager.caching({
+  store: "memory",
+  max: 500,
+  ttl: 86400 /*seconds*/,
+});
 
 async function showLookup(id, minified = false) {
+  logger.log("verbose", `TMDB Show Lookup ${id}`);
   let external = await externalId(id);
   let fanart = minified ? false : await fanartLookup(external.tvdb_id, "tv");
   let show = false;
@@ -17,6 +24,9 @@ async function showLookup(id, minified = false) {
     data = await getShowData(id);
     show = Object.assign({}, data);
   } catch {
+    return { error: "not found" };
+  }
+  if (show.success === false) {
     return { error: "not found" };
   }
   if (show) {
@@ -63,7 +73,8 @@ async function showLookup(id, minified = false) {
 
         show.reviews = reviews.results;
       } catch (err) {
-        console.log(err);
+        logger.log("warn", `Error getting review data - ${show.title}`);
+        logger.log("warn", err);
       }
     }
 
@@ -106,7 +117,8 @@ async function getShowData(id) {
       return tmdbData(id);
     });
   } catch (err) {
-    console.log(err);
+    logger.log("warn", `Error getting show data - ${id}`);
+    logger.log("warn", err);
   }
   return data;
 }
@@ -118,7 +130,8 @@ async function externalId(id) {
       return idLookup(id);
     });
   } catch (err) {
-    console.log(err);
+    logger.log("warn", `Error getting external ID - ${id}`);
+    logger.log("warn", err);
   }
   return data;
 }
@@ -130,7 +143,8 @@ async function getRecommendations(id) {
       return recommendationData(id);
     });
   } catch (err) {
-    console.log(err);
+    logger.log("warn", `Error getting recommendation data - ${id}`);
+    logger.log("warn", err);
   }
   return data;
 }
@@ -142,7 +156,8 @@ async function getReviews(id) {
       return reviewsData(id);
     });
   } catch (err) {
-    console.log(err);
+    logger.log("warn", `Error getting review data - ${id}`);
+    logger.log("warn", err);
   }
   return data;
 }
@@ -154,7 +169,8 @@ async function getSeasons(seasons, id) {
       return seasonsData(seasons, id);
     });
   } catch (err) {
-    console.log(err);
+    logger.log("warn", `Error getting season data - ${id}`);
+    logger.log("warn", err);
   }
   return data;
 }
@@ -165,7 +181,7 @@ async function tmdbData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}tv/${id}?api_key=${tmdbApikey}&append_to_response=credits,videos`;
+  let url = `${tmdb}tv/${id}?api_key=${tmdbApikey}&append_to_response=credits,videos,keywords`;
 
   return new Promise((resolve, reject) => {
     request(
@@ -189,7 +205,7 @@ async function recommendationData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}tv/${id}/recommendations?api_key=${tmdbApikey}&append_to_response=credits,videos`;
+  let url = `${tmdb}tv/${id}/recommendations?api_key=${tmdbApikey}&append_to_response=credits,videos,keywords`;
 
   return new Promise((resolve, reject) => {
     request(
@@ -300,4 +316,58 @@ function idLookup(id) {
   });
 }
 
-module.exports = showLookup;
+function discoverSeries(page = 1, params = {}) {
+  const config = getConfig();
+  const tmdbApikey = config.tmdbApi;
+  const tmdb = "https://api.themoviedb.org/3/";
+  let par = "";
+  Object.keys(params).map((i) => {
+    par += `&${i}=${params[i]}`;
+  });
+  let url = `${tmdb}discover/tv?api_key=${tmdbApikey}${par}&page=${page}`;
+  return new Promise((resolve, reject) => {
+    request(
+      url,
+      {
+        method: "GET",
+        json: true,
+      },
+      function (err, data) {
+        if (err) {
+          reject(err);
+        }
+
+        resolve(data);
+      }
+    );
+  });
+}
+
+function network(id) {
+  const config = getConfig();
+  const tmdbApikey = config.tmdbApi;
+  const tmdb = "https://api.themoviedb.org/3/";
+  let url = `${tmdb}network/${id}?api_key=${tmdbApikey}`;
+  return new Promise((resolve, reject) => {
+    request(
+      url,
+      {
+        method: "GET",
+        json: true,
+      },
+      function (err, data) {
+        if (err) {
+          reject(err);
+        }
+
+        resolve(data);
+      }
+    );
+  });
+}
+
+module.exports = {
+  discoverSeries,
+  showLookup,
+  network,
+};

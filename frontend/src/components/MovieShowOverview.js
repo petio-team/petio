@@ -29,6 +29,9 @@ import { ReactComponent as GenreTvMovie } from "../assets/svg/genres/tv-movie.sv
 import { ReactComponent as GenreThriller } from "../assets/svg/genres/thriller.svg";
 import { ReactComponent as GenreWar } from "../assets/svg/genres/war.svg";
 import { ReactComponent as GenreWestern } from "../assets/svg/genres/western.svg";
+import { ReactComponent as GenreAnime } from "../assets/svg/genres/anime.svg";
+
+import { isIOS } from "react-device-detect";
 
 class MovieShowOverview extends React.Component {
   findNested(obj, key, value) {
@@ -124,6 +127,8 @@ class MovieShowOverview extends React.Component {
         return null;
       case "War & Politics ":
         return <GenreWar />;
+      case "anime":
+        return <GenreAnime />;
       default:
         return null;
     }
@@ -140,10 +145,25 @@ class MovieShowOverview extends React.Component {
     let userRatingVal = 0;
 
     let requestBtn = this.props.mediaData.on_server ? (
-      <div className="btn btn__square good">
-        <CheckIcon />
-        On Plex
-      </div>
+      isIOS ? (
+        <a
+          href={`plex://preplay/?metadataKey=%2Flibrary%2Fmetadata%2F${this.props.mediaData.on_server.ratingKey}&metadataType=1&server=${this.props.mediaData.on_server.serverKey}`}
+          target="_blank"
+          className="btn btn__square good"
+        >
+          <CheckIcon />
+          Watch now
+        </a>
+      ) : (
+        <a
+          href={`https://app.plex.tv/desktop#!/server/${this.props.mediaData.on_server.serverKey}/details?key=%2Flibrary%2Fmetadata%2F${this.props.mediaData.on_server.ratingKey}`}
+          target="_blank"
+          className="btn btn__square good"
+        >
+          <CheckIcon />
+          Watch now
+        </a>
+      )
     ) : this.props.requested ? (
       <button className="btn btn__square blue" onClick={this.props.request}>
         {`Requested by ${this.props.requested}
@@ -244,11 +264,14 @@ class MovieShowOverview extends React.Component {
                   {this.props.mediaData.first_air_date ? new Date(this.props.mediaData.first_air_date).getFullYear() : null}
                 </p>
                 <div className="detail--bar--sep">·</div>
-                <p className="runtime">
-                  {this.props.mediaData.runtime ? this.timeConvert(this.props.mediaData.runtime) : null}
-                  {this.props.mediaData.episode_run_time
-                    ? this.timeConvert(Array.isArray(this.props.mediaData.episode_run_time) ? this.props.mediaData.episode_run_time[0] : this.props.mediaData.episode_run_time)
-                    : null}
+                <p className="runtime" title="Running Time">
+                  {this.props.mediaData.runtime
+                    ? this.timeConvert(this.props.mediaData.runtime)
+                    : this.props.mediaData.episode_run_time
+                    ? this.props.mediaData.episode_run_time.length > 0
+                      ? this.timeConvert(Array.isArray(this.props.mediaData.episode_run_time) ? this.props.mediaData.episode_run_time[0] : this.props.mediaData.episode_run_time)
+                      : "Unknown"
+                    : "Not Available"}
                 </p>
                 <div className="detail--bar--sep">·</div>
                 <p>
@@ -272,19 +295,62 @@ class MovieShowOverview extends React.Component {
               </div>
               <div className="genre--wrap">
                 {this.props.mediaData.genres.map((genre, i) => {
-                  // if (i === this.props.mediaData.genres.length - 1) return genre.name;
                   return (
-                    <div key={`genre_${genre.name}`} className="genre--item">
+                    <Link to={`/genre/${this.props.mediaData.seasons ? "tv" : "movie"}/${genre.id}`} key={`genre_${genre.name}`} className="genre--item">
                       {this.genreIcon(genre.name)}
                       {genre.name}
-                    </div>
+                    </Link>
                   );
                 })}
+                {Object.keys(this.props.mediaData.keywords.results).length > 0
+                  ? this.props.mediaData.keywords.results.map((genre, i) => {
+                      let customGenres = [210024];
+                      if (customGenres.includes(genre.id))
+                        return (
+                          <Link to={`/genre/${this.props.mediaData.seasons ? "tv" : "movie"}/${genre.id}`} key={`genre_${genre.name}`} className="genre--item" style={{ textTransform: "capitalize" }}>
+                            {this.genreIcon(genre.name)}
+                            {genre.name}
+                          </Link>
+                        );
+                    })
+                  : null}
               </div>
               <div className="media--actions__mob">
                 {requestBtn}
                 {reportBtn}
                 {reviewBtn}
+              </div>
+              <div className="companies--wrap">
+                {this.props.mediaData.production_companies
+                  ? this.props.mediaData.production_companies.length > 0
+                    ? this.props.mediaData.production_companies.map((co) => {
+                        if (!co.logo_path) return;
+                        return (
+                          <div className="companies--item" key={`co__${co.id}`}>
+                            <Link to={`/company/${co.id}`} title={co.name}>
+                              <img src={`https://image.tmdb.org/t/p/w500${co.logo_path}`} />
+                            </Link>
+                          </div>
+                        );
+                      })
+                    : null
+                  : null}
+              </div>
+              <div className="networks--wrap">
+                {this.props.mediaData.networks
+                  ? this.props.mediaData.networks.length > 0
+                    ? this.props.mediaData.networks.map((network) => {
+                        if (!network.logo_path) return;
+                        return (
+                          <div className="networks--item" key={`net__${network.id}`}>
+                            <Link to={`/networks/${network.id}`} title={network.name}>
+                              <img src={`https://image.tmdb.org/t/p/w500${network.logo_path}`} />
+                            </Link>
+                          </div>
+                        );
+                      })
+                    : null
+                  : null}
               </div>
               <div className="media-crew">
                 {director ? (

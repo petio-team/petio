@@ -11,15 +11,19 @@ class Modal extends React.Component {
           <div className="modal--main">
             <section>{this.props.children}</section>
             <div className="modal-btns">
+              {this.props.submit ? (
+                <div className="btn btn__square save-modal" onClick={this.props.submit}>
+                  {this.props.submitText ? this.props.submitText : "Submit"}
+                </div>
+              ) : (
+                <div className="btn btn__square disabled">{this.props.submitText ? this.props.submitText : "Submit"}</div>
+              )}
               <div className="btn btn__square bad" onClick={this.props.close}>
                 Cancel
               </div>
-              <div className="btn btn__square save-modal" onClick={this.props.submit}>
-                Submit
-              </div>
               {this.props.delete ? (
                 <div className="btn btn__square bad delete-modal" onClick={this.props.delete}>
-                  Delete
+                  {this.props.deleteText ? this.props.deleteText : "Delete"}
                 </div>
               ) : null}
             </div>

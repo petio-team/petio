@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require("../models/user");
 const Admin = require("../models/admin");
 const http = require("follow-redirects").http;
+const logger = require("../util/logger");
 
 router.get("/thumb/:id", async (req, res) => {
   let userData = false;
@@ -40,7 +41,11 @@ router.get("/thumb/:id", async (req, res) => {
         response.pipe(res);
       })
       .on("error", function (e) {
-        console.log("Got error: " + e.message, e);
+        logger.log(
+          "warn",
+          "ROUTE: Unable to get user thumb - Got error: " + e.message,
+          e
+        );
       });
     request.end();
   }
@@ -59,7 +64,9 @@ router.get("/all", async (req, res) => {
     let data = Object.values(Object.assign(userData, adminData));
     Object.keys(data).map((u) => {
       let user = data[u];
-      if (user.password) user.password = "removed";
+      if (user) {
+        if (user.password) user.password = "removed";
+      }
     });
     res.json(data);
   } else {
@@ -98,10 +105,18 @@ router.post("/create_custom", async (req, res) => {
     });
   }
   let friend = await User.findOne({
-    $or: [{ username: user.username }, { email: user.email }, { title: user.username }],
+    $or: [
+      { username: user.username },
+      { email: user.email },
+      { title: user.username },
+    ],
   });
   let admin = await Admin.findOne({
-    $or: [{ username: user.username }, { email: user.email }, { title: user.username }],
+    $or: [
+      { username: user.username },
+      { email: user.email },
+      { title: user.username },
+    ],
   });
   if (friend || admin) {
     res.status(409).json({
@@ -124,7 +139,8 @@ router.post("/create_custom", async (req, res) => {
       await newUser.save();
       res.status(200).json(newUser);
     } catch (err) {
-      console.log(err);
+      logger.log("error", "ROUTE: Unable to create custom user");
+      logger.error(err.stack);
       res.status(500).json({
         error: "Error creating user",
       });

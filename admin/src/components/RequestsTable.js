@@ -82,7 +82,7 @@ class RequestsTable extends React.Component {
   cinemaWindow(diff) {
     var day = 1000 * 60 * 60 * 24;
     var days = Math.ceil(diff / day);
-    if (days >= 31) {
+    if (days >= 62) {
       return false;
     }
     return true;
@@ -127,7 +127,7 @@ class RequestsTable extends React.Component {
               <>
                 {row === 0 ? (
                   <tr className="sub">
-                    <td colSpan="5">
+                    <td colSpan="7">
                       <p>Server: {server.info.serverName}</p>
                     </td>
                   </tr>
@@ -169,6 +169,8 @@ class RequestsTable extends React.Component {
                     </div>
                   </td>
                   <td></td>
+                  <td></td>
+                  <td></td>
                 </tr>
               </>
             );
@@ -182,6 +184,9 @@ class RequestsTable extends React.Component {
   }
 
   reqState(req) {
+    if (!req.approved) {
+      return <span className="requests--status requests--status__pending">Pending</span>;
+    }
     if (req.children) {
       if (req.children.length > 0) {
         for (let r = 0; r < req.children.length; r++) {
@@ -274,6 +279,7 @@ class RequestsTable extends React.Component {
             <th>Type</th>
             <th>Status</th>
             <th>Users</th>
+            <th>Approved</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -281,6 +287,7 @@ class RequestsTable extends React.Component {
           {Object.keys(requestsSorted).length === 0 ? (
             <tr>
               <td>No requests</td>
+              <td></td>
               <td></td>
               <td></td>
               <td></td>
@@ -307,7 +314,17 @@ class RequestsTable extends React.Component {
                         return <p key={`${req.id}_${user}_${i}`}>{this.getUsername(user)}</p>;
                       })}
                     </td>
-                    <td></td>
+                    <td>{req.approved ? "Yes" : "No"}</td>
+                    <td>
+                      <p
+                        className="table-action"
+                        onClick={() => {
+                          this.props.editReq(req);
+                        }}
+                      >
+                        Edit
+                      </p>
+                    </td>
                   </tr>
                   {this.children(req)}
                 </React.Fragment>

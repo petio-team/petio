@@ -1,13 +1,15 @@
 const Movie = require("../models/movie");
 // const Music = require('../models/artist'); // to be added when music added
 const Show = require("../models/show");
+const getConfig = require("../util/config");
 
 async function onServer(type, imdb, tvdb, tmdb) {
+  let config = getConfig();
+  let clientId = config.plexClientID;
   if (type === "movie") {
     let foundItemsImdb = false;
     let foundItemsTvdb = false;
     let foundItemsTmdb = false;
-
     let found = false;
 
     if (imdb) {
@@ -40,8 +42,10 @@ async function onServer(type, imdb, tvdb, tmdb) {
             resolutions.push(item.Media[0].videoResolution);
           }
         });
+        return { exists: { ratingKey: found[0].ratingKey, serverKey: clientId }, resolutions: resolutions };
+      } else {
+        return { exists: false, resolutions: resolutions };
       }
-      return { exists: true, resolutions: resolutions };
     } else {
       return { exists: false, resolutions: [] };
     }
@@ -71,7 +75,9 @@ async function onServer(type, imdb, tvdb, tmdb) {
     }
 
     if (foundItemImdb || foundItemTvdb || foundItemTmdb) {
-      return { exists: true, resolutions: [] };
+      let found = foundItemImdb || foundItemTvdb || foundItemTmdb;
+      return { exists: { ratingKey: found.ratingKey, serverKey: clientId }, resolutions: [] };
+      // return { exists: true, resolutions: [] };
     } else {
       return { exists: false, resolutions: [] };
     }

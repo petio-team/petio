@@ -1,0 +1,54 @@
+.company {
+  &--title {
+    display: flex;
+    align-items: center;
+
+    img {
+      max-height: 50px;
+      filter: grayscale(1) invert(1);
+      max-width: 150px;
+
+      @include media-breakpoint-up(lg) {
+        max-height: 100px;
+        max-width: 300px;
+      }
+    }
+  }
+
+  &--grid {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: -5px;
+    margin-right: -5px;
+
+    &--card {
+      width: calc(100% / 4);
+      padding: 0 5px 5px;
+
+      @include media-breakpoint-up(md) {
+        width: calc(100% / 5);
+      }
+
+      @include media-breakpoint-up(lg) {
+        width: calc(100% / 5);
+        padding: 0 10px 10px;
+      }
+
+      @include media-breakpoint-up(xl) {
+        width: calc(100% / 6);
+      }
+
+      @include media-breakpoint-up(xxl) {
+        width: calc(100% / 7);
+      }
+
+      @include media-breakpoint-up(xxxl) {
+        width: calc(100% / 8);
+      }
+    }
+
+    .card {
+      margin: 0;
+    }
+  }
+}

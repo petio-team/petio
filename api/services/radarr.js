@@ -3,9 +3,10 @@ const Request = require("../models/request");
 const fs = require("fs");
 const path = require("path");
 var sanitize = require("sanitize-filename");
+const logger = require("../util/logger");
 
 class Radarr {
-  constructor(id = false) {
+  constructor(id = false, forced = false, profileOvr = false, pathOvr = false) {
     let project_folder, configFile;
     if (process.pkg) {
       project_folder = path.dirname(process.execPath);
@@ -17,8 +18,12 @@ class Radarr {
     const configData = fs.readFileSync(configFile);
     const configParse = JSON.parse(configData);
     this.fullConfig = configParse;
+    this.forced = forced;
     if (id !== false) {
       this.config = this.findUuid(id, configParse);
+      if (profileOvr) this.config.profile = profileOvr;
+      if (pathOvr) this.config.path_title = pathOvr;
+
       if (!this.config) {
         this.config = {};
         this.config.title = "Server Removed";
@@ -49,7 +54,9 @@ class Radarr {
         let key = val;
         paramsString += `${i === 0 ? "?" : "&"}${key}=${params[val]}`;
       });
-      let url = `${this.config.protocol}://${this.config.hostname}${this.config.port ? ":" + this.config.port : ""}${this.config.urlBase}/api/v3/${endpoint}${paramsString}`;
+      let url = `${this.config.protocol}://${this.config.hostname}${
+        this.config.port ? ":" + this.config.port : ""
+      }${this.config.urlBase}/api/v3/${endpoint}${paramsString}`;
       let args = {
         method: method,
         json: true,
@@ -79,6 +86,10 @@ class Radarr {
     return this.process("get", endpoint, params);
   }
 
+  async delete(endpoint, params = false) {
+    return this.process("delete", endpoint, params);
+  }
+
   async post(endpoint, params = false, body = {}) {
     return this.process("post", endpoint, params, body);
   }
@@ -88,23 +99,23 @@ class Radarr {
       return false;
     }
     if (!this.config.active && !test) {
-      console.log("SERVICE - RADARR: Radarr not enabled");
+      logger.log("warn", "SERVICE - RADARR: Radarr not enabled");
       return false;
     }
     try {
       let check = await this.get("system/status");
       if (check.error) {
-        console.log("SERVICE - RADARR: ERR Connection failed");
+        logger.log("warn", "SERVICE - RADARR: ERR Connection failed");
         return false;
       }
       if (check) {
         return check;
       } else {
-        console.log("SERVICE - RADARR: ERR Connection failed");
+        logger.log("warn", "SERVICE - RADARR: ERR Connection failed");
         return false;
       }
     } catch (err) {
-      console.log("SERVICE - RADARR: ERR Connection failed");
+      logger.log("warn", "SERVICE - RADARR: ERR Connection failed");
       return false;
     }
   }
@@ -137,6 +148,14 @@ class Radarr {
     return this.get(`movie/${id}`);
   }
 
+  async remove(id) {
+    const active = await this.connect();
+    if (!active) {
+      return false;
+    }
+    return this.delete(`movie/${id}`);
+  }
+
   async queue() {
     let queue = [];
     for (let i = 0; i < this.fullConfig.length; i++) {
@@ -160,7 +179,9 @@ class Radarr {
     let system = await this.get("system/status");
     let sep = system.isWindows ? "\\" : "/";
     movieData.qualityProfileId = parseInt(this.config.profile);
-    movieData.Path = `${this.config.path_title}${sep}${sanitize(movieData.title)} (${movieData.year})`;
+    movieData.Path = `${this.config.path_title}${sep}${sanitize(
+      movieData.title
+    )} (${movieData.year})`;
     movieData.addOptions = {
       searchForMovie: true,
     };
@@ -174,20 +195,16 @@ class Radarr {
       }
       return add.id;
     } catch (err) {
-      console.log(`SERVICE - RADARR: Unable to add movie ${err}`);
+      logger.log("warn", `SERVICE - RADARR: Unable to add movie`);
+      logger.error(err.stack);
       throw err;
     }
   }
 
   async processJobs(jobQ) {
     for (let job of jobQ) {
-      for (let server of this.fullConfig) {
-        if (!server.active) {
-          console.log(`SERVICE - RADARR: Server not active`);
-          return;
-        }
-
-        this.config = server;
+      // Target server
+      if (this.config) {
         try {
           let radarrData = await this.lookup(job.tmdb_id);
           let radarrId = await this.add(radarrData);
@@ -199,34 +216,114 @@ class Radarr {
             { useFindAndModify: false }
           );
           if (updatedRequest) {
-            console.log(`SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`);
+            logger.log(
+              "info",
+              `SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`
+            );
           }
         } catch (err) {
-          console.log(`SERVICE - RADARR: [${this.config.title}] Unable to add movie ${job.title} - ERR: ${err}`);
+          logger.log(
+            "warn",
+            `SERVICE - RADARR: [${this.config.title}] Unable to add movie ${job.title}`
+          );
+          logger.error(err.stack);
+        }
+      } else {
+        // Loop for all servers default
+        for (let server of this.fullConfig) {
+          if (!server.active) {
+            logger.log("warn", `SERVICE - RADARR: Server not active`);
+            return;
+          }
+
+          this.config = server;
+          try {
+            let radarrData = await this.lookup(job.tmdb_id);
+            let radarrId = await this.add(radarrData);
+            let updatedRequest = await Request.findOneAndUpdate(
+              {
+                requestId: job.requestId,
+              },
+              { $push: { radarrId: { [this.config.uuid]: radarrId } } },
+              { useFindAndModify: false }
+            );
+            if (updatedRequest) {
+              logger.log(
+                "info",
+                `SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`
+              );
+            }
+          } catch (err) {
+            logger.log(
+              "warn",
+              `SERVICE - RADARR: [${this.config.title}] Unable to add movie ${job.title}`
+            );
+            logger.error(err.stack);
+          }
         }
       }
     }
   }
 
-  async getRequests() {
-    console.log(`SERVICE - RADARR: Polling requests`);
+  async processRequest(id) {
+    logger.log("info", `SERVICE - RADARR: Processing request`);
     if (!this.fullConfig || this.fullConfig.length === 0) {
-      console.log(`SERVICE - RADARR: No active servers`);
+      logger.log("warn", `SERVICE - RADARR: No active servers`);
       return;
     }
-    const requests = await Request.find();
-    let jobQ = [];
-    for (let req of requests) {
-      if (req.type === "movie") {
-        if (!req.tmdb_id) {
-          console.log(`SERVICE - RADARR: TMDB ID not found for ${req.title}`);
-        } else if (req.radarrId.length === 0) {
-          jobQ.push(req);
-          console.log(`SERVICE - RADARR: ${req.title} added to job queue`);
+
+    const req = await Request.findOne({ requestId: id });
+    if (req.type === "movie") {
+      if (!req.tmdb_id) {
+        logger.log(
+          "warn",
+          `SERVICE - RADARR: TMDB ID not found for ${req.title}`
+        );
+      } else if (req.radarrId.length === 0) {
+        if (!req.approved) {
+          logger.log(
+            "warn",
+            `SERVICE - RADARR: Request requires approval - ${req.title}`
+          );
+        } else {
+          logger.log("info", "SERVICE - RADARR: Request passed to queue");
+          this.processJobs([req]);
         }
       }
     }
-    this.processJobs(jobQ);
+  }
+
+  async calendar() {
+    let mainCalendar = [];
+    let now = new Date();
+    for (let server of this.fullConfig) {
+      if (!server.active) {
+        this.config = server;
+
+        try {
+          let serverCal = await this.get("/calendar", {
+            unmonitored: true,
+            start: new Date(
+              now.getFullYear(),
+              now.getMonth() - 1,
+              1
+            ).toISOString(),
+            end: new Date(
+              now.getFullYear(),
+              now.getMonth() + 2,
+              1
+            ).toISOString(),
+          });
+
+          mainCalendar = [...mainCalendar, ...serverCal];
+        } catch (err) {
+          logger.log("error", "RADARR: Calendar error");
+          logger.error(err.stack);
+        }
+      }
+    }
+
+    return mainCalendar;
   }
 }
 

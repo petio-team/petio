@@ -286,6 +286,20 @@ export function saveConfig(config) {
   });
 }
 
+export function updateConfig(config) {
+  return new Promise((resolve, reject) => {
+    api
+      .updateConfig(config)
+      .then(() => {
+        resolve();
+      })
+      .catch((err) => {
+        console.log(err);
+        reject();
+      });
+  });
+}
+
 export async function sonarrConfig() {
   let config = await api.sonarrConfig();
 
@@ -392,6 +406,20 @@ export function getEmailConfig() {
   return new Promise((resolve, reject) => {
     api
       .getEmailConfig()
+      .then((data) => {
+        resolve(data);
+      })
+      .catch((err) => {
+        console.log(err);
+        reject();
+      });
+  });
+}
+
+export function getConfig() {
+  return new Promise((resolve, reject) => {
+    api
+      .getConfig()
       .then((data) => {
         resolve(data);
       })
@@ -545,6 +573,36 @@ export async function bulkEditUser(data) {
   try {
     let result = await api.bulkEditUser(data);
     return result;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+export async function removeRequest(request, reason) {
+  try {
+    await api.removeReq(request, reason);
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+export async function updateRequest(request, servers) {
+  try {
+    await api.updateReq(request, servers);
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+export async function getConsole() {
+  try {
+    let data = await api.getConsole();
+    return data;
   } catch (err) {
     console.log(err);
     return false;

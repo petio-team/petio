@@ -3,9 +3,10 @@ const Request = require("../models/request");
 const fs = require("fs");
 const path = require("path");
 var sanitize = require("sanitize-filename");
+const logger = require("../util/logger");
 
 class Sonarr {
-  constructor(id = false) {
+  constructor(id = false, forced = false, profileOvr = false, pathOvr = false) {
     let project_folder, configFile;
     if (process.pkg) {
       project_folder = path.dirname(process.execPath);
@@ -17,8 +18,11 @@ class Sonarr {
     const configData = fs.readFileSync(configFile);
     const configParse = JSON.parse(configData);
     this.fullConfig = configParse;
+    this.forced = forced;
     if (id !== false) {
       this.config = this.findUuid(id, configParse);
+      if (profileOvr) this.config.profile = profileOvr;
+      if (pathOvr) this.config.path_title = pathOvr;
 
       if (!this.config) {
         this.config = {};
@@ -50,7 +54,9 @@ class Sonarr {
         let key = val;
         paramsString += `${i === 0 ? "?" : "&"}${key}=${params[val]}`;
       });
-      let url = `${this.config.protocol}://${this.config.hostname}${this.config.port ? ":" + this.config.port : ""}${this.config.urlBase}/api/${endpoint}${paramsString}`;
+      let url = `${this.config.protocol}://${this.config.hostname}${
+        this.config.port ? ":" + this.config.port : ""
+      }${this.config.urlBase}/api/${endpoint}${paramsString}`;
       let args = {
         method: method,
         json: true,
@@ -80,6 +86,10 @@ class Sonarr {
     return this.process("get", endpoint, params);
   }
 
+  async delete(endpoint, params = false) {
+    return this.process("delete", endpoint, params);
+  }
+
   async post(endpoint, params = false, body = {}) {
     return this.process("post", endpoint, params, body);
   }
@@ -89,23 +99,23 @@ class Sonarr {
       return false;
     }
     if (!this.config.active && !test) {
-      console.log("SERVICE - SONARR: Sonarr not enabled");
+      logger.log("warn", "SERVICE - SONARR: Sonarr not enabled");
       return false;
     }
     try {
       let check = await this.get("system/status");
       if (check.error) {
-        console.log("SERVICE - SONARR: ERR Connection failed");
+        logger.log("warn", "SERVICE - SONARR: ERR Connection failed");
         return false;
       }
       if (check) {
         return true;
       } else {
-        console.log("SERVICE - SONARR: ERR Connection failed");
+        logger.log("warn", "SERVICE - SONARR: ERR Connection failed");
         return false;
       }
     } catch (err) {
-      console.log("SERVICE - SONARR: ERR Connection failed");
+      logger.log("warn", "SERVICE - SONARR: ERR Connection failed");
       return false;
     }
   }
@@ -132,6 +142,14 @@ class Sonarr {
     return this.get(`series/${id}`);
   }
 
+  async remove(id) {
+    const active = await this.connect();
+    if (!active) {
+      return false;
+    }
+    return this.delete(`series/${id}`);
+  }
+
   async queue() {
     let queue = [];
     for (let i = 0; i < this.fullConfig.length; i++) {
@@ -154,30 +172,27 @@ class Sonarr {
   async add(seriesData) {
     seriesData.ProfileId = this.config.profile;
     seriesData.seasonFolder = true;
-    seriesData.Path = `${this.config.path_title}${sanitize(seriesData.title)} (${seriesData.year})`;
+    seriesData.Path = `${this.config.path_title}${sanitize(
+      seriesData.title
+    )} (${seriesData.year})`;
     seriesData.addOptions = {
       searchForMissingEpisodes: true,
     };
 
     try {
       let add = await this.post("series", false, seriesData);
-      console.log(add);
       return add.id;
     } catch (err) {
-      console.log(err);
-      console.log(`SERVICE - SONARR: Unable to add series ${err}`);
+      logger.error(err.stack);
+      logger.log("error", `SERVICE - SONARR: Unable to add series`);
+      logger.error(err.stack);
       return false;
     }
   }
 
   async processJobs(jobQ) {
     for (let job of jobQ) {
-      for (let server of this.fullConfig) {
-        if (!server.active) {
-          return;
-        }
-
-        this.config = server;
+      if (this.config) {
         try {
           let sonarrData = await this.lookup(job.tvdb_id);
           let sonarrId = await this.add(sonarrData[0]);
@@ -189,35 +204,113 @@ class Sonarr {
             { useFindAndModify: false }
           );
           if (updatedRequest) {
-            console.log(`SERVICE - SONARR: [${this.config.title}] Sonnar job added for ${job.title}`);
+            logger.log(
+              "info",
+              `SERVICE - SONARR: [${this.config.title}] Sonnar job added for ${job.title}`
+            );
           }
         } catch (err) {
-          console.log(err);
-          console.log(`SERVICE - SONARR: [${this.config.title}] Unable to add series ${job.title}`);
+          logger.log("info", err);
+          logger.log(
+            "warn",
+            `SERVICE - SONARR: [${this.config.title}] Unable to add series ${job.title}`
+          );
+        }
+      } else {
+        for (let server of this.fullConfig) {
+          if (!server.active) {
+            return;
+          }
+
+          this.config = server;
+          try {
+            let sonarrData = await this.lookup(job.tvdb_id);
+            let sonarrId = await this.add(sonarrData[0]);
+            let updatedRequest = await Request.findOneAndUpdate(
+              {
+                requestId: job.requestId,
+              },
+              { $push: { sonarrId: { [this.config.uuid]: sonarrId } } },
+              { useFindAndModify: false }
+            );
+            if (updatedRequest) {
+              logger.log(
+                "info",
+                `SERVICE - SONARR: [${this.config.title}] Sonnar job added for ${job.title}`
+              );
+            }
+          } catch (err) {
+            logger.log("info", err);
+            logger.log(
+              "warn",
+              `SERVICE - SONARR: [${this.config.title}] Unable to add series ${job.title}`
+            );
+          }
         }
       }
     }
   }
 
-  async getRequests() {
-    console.log(`SERVICE - SONARR: Polling requests`);
+  async processRequest(id) {
+    logger.log("info", `SERVICE - SONARR: Processing request`);
     if (!this.fullConfig || this.fullConfig.length === 0) {
-      console.log(`SERVICE - SONARR: No active servers`);
+      logger.log("info", `SERVICE - SONARR: No active servers`);
       return;
     }
-    const requests = await Request.find();
-    let jobQ = [];
-    for (let req of requests) {
-      if (req.type === "tv") {
-        if (!req.tvdb_id) {
-          console.log(`SERVICE - SONARR: TVDB ID not found for ${req.title}`);
-        } else if (req.sonarrId.length === 0) {
-          jobQ.push(req);
-          console.log(`SERVICE - SONARR: ${req.title} added to job queue`);
+
+    const req = await Request.findOne({ requestId: id });
+    if (req.type === "tv") {
+      if (!req.tvdb_id) {
+        logger.log(
+          "warn",
+          `SERVICE - SONARR: TVDB ID not found for ${req.title}`
+        );
+      } else if (req.sonarrId.length === 0 || this.forced) {
+        if (!req.approved) {
+          logger.log(
+            "warn",
+            `SERVICE - SONARR: Request requires approval - ${req.title}`
+          );
+        } else {
+          logger.log("info", "SERVICE - SONARR: Request passed to queue");
+          this.processJobs([req]);
         }
       }
     }
-    this.processJobs(jobQ);
+  }
+
+  async calendar() {
+    let mainCalendar = [];
+    let now = new Date();
+    for (let server of this.fullConfig) {
+      if (server.active) {
+        this.config = server;
+
+        try {
+          let serverCal = await this.get("/calendar", {
+            unmonitored: true,
+            start: new Date(
+              now.getFullYear(),
+              now.getMonth() - 1,
+              1
+            ).toISOString(),
+            end: new Date(
+              now.getFullYear(),
+              now.getMonth() + 2,
+              1
+            ).toISOString(),
+          });
+          mainCalendar = [...mainCalendar, ...serverCal];
+        } catch (err) {
+          logger.log("error", "SONARR: Calendar error");
+          logger.error(err.stack);
+        }
+      }
+    }
+
+    logger.log("info", mainCalendar);
+
+    return mainCalendar;
   }
 }
 

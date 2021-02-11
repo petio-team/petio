@@ -7,10 +7,14 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 class MovieShowTop extends React.Component {
   render() {
     let requestBtn = this.props.mediaData.on_server ? (
-      <div className="btn btn__square good">
+      <a
+        href={`https://app.plex.tv/desktop#!/server/${this.props.mediaData.on_server.serverKey}/details?key=%2Flibrary%2Fmetadata%2F${this.props.mediaData.on_server.ratingKey}`}
+        target="_blank"
+        className="btn btn__square good"
+      >
         <CheckIcon />
-        On Plex
-      </div>
+        Watch now
+      </a>
     ) : this.props.requested ? (
       <button className="btn btn__square blue" onClick={this.props.request}>
         {`Requested by ${this.props.requested}
@@ -30,13 +34,7 @@ class MovieShowTop extends React.Component {
       </button>
     );
 
-    let video = this.props.mediaData.videos.results ? this.props.mediaData.videos.results[0] : false;
-
-    if (video) {
-      if (video.site !== "YouTube") {
-        video = false;
-      }
-    }
+    let video = this.props.video;
 
     return (
       <div className={`media-top ${this.props.trailer ? "show-trailer" : ""}`}>
@@ -59,12 +57,7 @@ class MovieShowTop extends React.Component {
               key={`${this.props.mediaData.title}__backdrop`}
             />
           ) : (
-            <div
-              className="no-backdrop"
-              style={{
-                backgroundImage: "url(/p-seamless.png)",
-              }}
-            ></div>
+            <div className="no-backdrop"></div>
           )}
         </div>
         <div className="media-poster">

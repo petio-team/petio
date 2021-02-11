@@ -4,6 +4,7 @@ const Sonarr = require("../services/sonarr");
 const Radarr = require("../services/radarr");
 const fs = require("fs");
 const path = require("path");
+const logger = require("../util/logger");
 
 // Sonnarr
 
@@ -54,7 +55,8 @@ router.post("/sonarr/config", async (req, res) => {
     res.json(data);
     return;
   } catch (err) {
-    console.log(err);
+    logger.log("error", `ROUTE: Error saving sonarr config`);
+    logger.error(err.stack);
     res.status(500).json({ error: err });
     return;
   }
@@ -72,15 +74,28 @@ function saveSonarrConfig(data) {
     }
     fs.writeFile(configFile, data, (err) => {
       if (err) {
-        console.log(err);
+        logger.log("error", `ROUTE: Error writing sonarr config`);
+        logger.error(err.stack);
         reject(err);
       } else {
-        console.log("Sonarr Config updated");
+        logger.log("info", "ROUTE: Sonarr Config updated");
         resolve(data);
       }
     });
   });
 }
+
+router.get("/calendar", async (req, res) => {
+  try {
+    let sonarr = await new Sonarr().calendar();
+    let radarr = await new Radarr().calendar();
+    let full = [...sonarr, ...radarr];
+    res.json(full);
+  } catch (err) {
+    console.trace(err);
+    res.json([]);
+  }
+});
 
 // Radarr
 
@@ -96,7 +111,8 @@ router.get("/radarr/paths/:id", async (req, res) => {
     });
     res.json(data);
   } catch (err) {
-    console.log(err);
+    logger.log("warn", `ROUTE: Enable to get Radarr paths`);
+    logger.error(err.stack);
     res.json([]);
   }
 });
@@ -139,7 +155,8 @@ router.post("/radarr/config", async (req, res) => {
     res.json(data);
     return;
   } catch (err) {
-    console.log(err);
+    logger.log("error", `ROUTE: Error saving radarr config`);
+    logger.error(err.stack);
     res.status(500).json({ error: err });
     return;
   }
@@ -157,10 +174,11 @@ function saveRadarrConfig(data) {
     }
     fs.writeFile(configFile, data, (err) => {
       if (err) {
-        console.log(err);
+        logger.log("error", `ROUTE: Error writing radarr config`);
+        logger.error(err.stack);
         reject(err);
       } else {
-        console.log("Radarr Config updated");
+        logger.log("info", "Radarr Config updated");
         resolve();
       }
     });

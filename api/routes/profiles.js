@@ -3,6 +3,7 @@ const router = express.Router();
 const Profile = require("../models/profile");
 const User = require("../models/user");
 const Admin = require("../models/admin");
+const logger = require("../util/logger");
 
 router.get("/all", async (req, res) => {
   try {
@@ -83,7 +84,8 @@ router.post("/save_profile", async (req, res) => {
       await newProfile.save();
       res.status(200).json(newProfile);
     } catch (err) {
-      console.log(err);
+      logger.log("error", "ROUTE: Profile failed to save");
+      logger.error(err.stack);
       res.status(500).json({
         error: "Error creating user",
       });
@@ -121,7 +123,8 @@ router.post("/delete_profile", async (req, res) => {
       }
     );
   } catch (err) {
-    console.log(err);
+    logger.log("error", "ROUTE: Profile failed to delete");
+    logger.error(err.stack);
   }
 
   try {

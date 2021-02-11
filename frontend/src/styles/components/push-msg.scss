@@ -1,0 +1,40 @@
+.push-msg {
+  &--wrap {
+    position: fixed;
+    bottom: 60px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    z-index: 100;
+    // width: 10px;
+    // height: 10px;
+
+    @include media-breakpoint-up(lg) {
+      bottom: 50px;
+      right: 50px;
+    }
+  }
+
+  &--item {
+    width: 200px;
+    padding: 10px 20px;
+    background: $blue;
+    border-radius: 5px;
+    margin-top: 5px;
+
+    @include media-breakpoint-up(lg) {
+      width: 300px;
+      padding: 20px 20px;
+      margin-top: 10px;
+    }
+
+    &.good {
+      background: $good;
+    }
+
+    &.error {
+      background: $bad;
+    }
+  }
+}

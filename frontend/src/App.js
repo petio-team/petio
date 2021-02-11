@@ -16,7 +16,11 @@ import Movies from "./pages/Movies";
 import Requests from "./pages/Requests";
 import Shows from "./pages/Shows";
 import { ReactComponent as Spinner } from "./assets/svg/spinner.svg";
+import { ReactComponent as TmdbLogo } from "./assets/svg/tmdb.svg";
 import pjson from "../package.json";
+import Genre from "./pages/Genre";
+import Networks from "./pages/Networks";
+import Company from "./pages/Company";
 
 class App extends React.Component {
   constructor(props) {
@@ -30,6 +34,7 @@ class App extends React.Component {
       loading: true,
       configChecked: false,
       loginMsg: false,
+      pushMsg: {},
     };
 
     this.openIssues = this.openIssues.bind(this);
@@ -37,6 +42,7 @@ class App extends React.Component {
     this.loginForm = this.loginForm.bind(this);
     this.inputChange = this.inputChange.bind(this);
     this.logout = this.logout.bind(this);
+    this.msg = this.msg.bind(this);
   }
 
   inputChange(e) {
@@ -47,6 +53,28 @@ class App extends React.Component {
     this.setState({
       [name]: value,
     });
+  }
+
+  msg(
+    data = {
+      message: String,
+      type: "info",
+    }
+  ) {
+    let timestamp = +new Date();
+    let msgs = { ...this.state.pushMsg };
+    msgs[timestamp] = data;
+    this.setState({
+      pushMsg: msgs,
+    });
+
+    setInterval(() => {
+      let msgs = { ...this.state.pushMsg };
+      delete msgs[timestamp];
+      this.setState({
+        pushMsg: msgs,
+      });
+    }, 3000);
   }
 
   loginForm(e) {
@@ -70,7 +98,10 @@ class App extends React.Component {
           loginMsg: false,
         });
         if (res.error) {
-          alert(res.error);
+          this.msg({
+            message: res.error,
+            type: "error",
+          });
           return;
         }
         if (res.loggedIn) {
@@ -193,8 +224,18 @@ class App extends React.Component {
                   <input type="text" name="username" value={this.state.username} onChange={this.inputChange} autoComplete="username" />
                   {this.state.loginMsg ? <div className="msg msg__error msg__input">{this.state.loginMsg}</div> : null}
                   {this.state.config === "failed" ? <div className="msg msg__error msg__input">API Not configured, please complete setup</div> : null}
-                  <button className="btn">Login</button>
+                  <button className="btn btn__square">Login</button>
                 </form>
+              </div>
+              <div className="credits">
+                <a href="https://fanart.tv/" target="_blank">
+                  <p>
+                    <strong>FAN</strong>ART<span>.TV</span>
+                  </p>
+                </a>
+                <a href="https://www.themoviedb.org/" target="_blank">
+                  <TmdbLogo />
+                </a>
               </div>
               <p className="powered-by">Petio build (alpha) {pjson.version}</p>
             </>
@@ -212,11 +253,20 @@ class App extends React.Component {
             <div className="sidebar">
               <Sidebar history={HashRouter.history} />
             </div>
-
+            <div className="push-msg--wrap">
+              {Object.keys(this.state.pushMsg).map((i) => {
+                let msg = this.state.pushMsg[i];
+                return (
+                  <div key={msg.timestamp} className={`push-msg--item ${msg.type !== "info" ? msg.type : ""}`}>
+                    {msg.message}
+                  </div>
+                );
+              })}
+            </div>
             <Switch>
               <Route exact path="/">
                 <div className="page-wrap">
-                  <Search />
+                  <Search msg={this.msg} />
                 </div>
               </Route>
               <Route exact path="/user">
@@ -225,25 +275,25 @@ class App extends React.Component {
                 </div>
               </Route>
               <Route exact path="/movie/:id">
-                <Issues open={this.state.openIssues} close={this.closeIssues} />
+                <Issues open={this.state.openIssues} close={this.closeIssues} msg={this.msg} />
                 <div className="page-wrap">
-                  <Movie openIssues={this.openIssues} />
+                  <Movie msg={this.msg} openIssues={this.openIssues} />
                 </div>
               </Route>
               <Route exact path="/series/:id">
-                <Issues open={this.state.openIssues} close={this.closeIssues} />
+                <Issues open={this.state.openIssues} close={this.closeIssues} msg={this.msg} />
                 <div className="page-wrap">
-                  <Series openIssues={this.openIssues} />
+                  <Series msg={this.msg} openIssues={this.openIssues} />
                 </div>
               </Route>
               <Route exact path="/series/:id/season/:season">
-                <Issues open={this.state.openIssues} close={this.closeIssues} />
+                <Issues open={this.state.openIssues} close={this.closeIssues} msg={this.msg} />
                 <div className="page-wrap">
-                  <Season openIssues={this.openIssues} />
+                  <Season openIssues={this.openIssues} msg={this.msg} />
                 </div>
               </Route>
               <Route path="/person/:id">
-                <Actor />
+                <Actor msg={this.msg} />
               </Route>
               <Route exact path="/requests">
                 <div className="page-wrap">
@@ -258,7 +308,28 @@ class App extends React.Component {
               </Route>
               <Route exact path="/tv">
                 <div className="page-wrap">
-                  <Shows />
+                  <Shows msg={this.msg} />
+                </div>
+              </Route>
+              <Route exact path="/genre/:type/:id">
+                <div className="page-wrap">
+                  <Genre msg={this.msg} />
+                </div>
+              </Route>
+              <Route exact path="/networks/:id">
+                <div className="page-wrap">
+                  <Networks msg={this.msg} />
+                </div>
+              </Route>
+              <Route exact path="/company/:id">
+                <div className="page-wrap">
+                  <Company msg={this.msg} />
+                </div>
+              </Route>
+              <Route path="*" exact>
+                <div className="page-wrap">
+                  <h1 className="main-title mb--1">Not found</h1>
+                  <p>This page doesn't exist</p>
                 </div>
               </Route>
             </Switch>

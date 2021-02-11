@@ -13,6 +13,7 @@ import {
   currentSessions,
   checkConfig,
   saveConfig,
+  updateConfig,
   sonarrConfig,
   sonarrOptions,
   saveSonarrConfig,
@@ -24,6 +25,7 @@ import {
   saveEmailConfig,
   getEmailConfig,
   testEmail,
+  getConfig,
   getUser,
   allUsers,
   testMongo,
@@ -35,6 +37,9 @@ import {
   editUser,
   bulkEditUser,
   deleteUser,
+  removeRequest,
+  updateRequest,
+  getConsole,
 } from "./actions";
 
 export default {
@@ -52,6 +57,7 @@ export default {
   currentSessions,
   checkConfig,
   saveConfig,
+  updateConfig,
   sonarrConfig,
   sonarrOptions,
   saveSonarrConfig,
@@ -63,6 +69,7 @@ export default {
   saveEmailConfig,
   getEmailConfig,
   testEmail,
+  getConfig,
   getUser,
   allUsers,
   testMongo,
@@ -74,4 +81,7 @@ export default {
   editUser,
   bulkEditUser,
   deleteUser,
+  removeRequest,
+  updateRequest,
+  getConsole,
 };
