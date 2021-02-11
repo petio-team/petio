@@ -31,12 +31,16 @@ class Company extends React.Component {
       this.setState({
         scrollWatch: true,
       });
-      document.getElementsByClassName("page-wrap")[0].addEventListener("scroll", this.trackScrolling);
+      document
+        .getElementsByClassName("page-wrap")[0]
+        .addEventListener("scroll", this.trackScrolling);
     }
   }
 
   componentWillUnmount() {
-    document.getElementsByClassName("page-wrap")[0].removeEventListener("scroll", this.trackScrolling);
+    document
+      .getElementsByClassName("page-wrap")[0]
+      .removeEventListener("scroll", this.trackScrolling);
   }
 
   isBottom(el) {
@@ -73,7 +77,9 @@ class Company extends React.Component {
     });
     if (data.results) {
       this.setState({
-        results: this.state.results ? [...this.state.results, ...data.results] : data.results,
+        results: this.state.results
+          ? [...this.state.results, ...data.results]
+          : data.results,
         page: page,
         paginating: false,
         totalPages: data.total_pages,
@@ -82,12 +88,16 @@ class Company extends React.Component {
   }
 
   render() {
-    let id = this.props.match.params.id;
     return (
       <>
         <section>
           <h1 className="main-title mb--1 company--title">
-            {this.state.details ? <img title={this.state.details.name} src={`https://image.tmdb.org/t/p/w500${this.state.details.logo_path}`} /> : null}
+            {this.state.details ? (
+              <img
+                title={this.state.details.name}
+                src={`https://image.tmdb.org/t/p/w500${this.state.details.logo_path}`}
+              />
+            ) : null}
           </h1>
         </section>
         <section>
@@ -95,8 +105,15 @@ class Company extends React.Component {
             {this.state.results ? (
               this.state.results.map((result) => {
                 return (
-                  <div className="company--grid--card" key={`gen__${result.id}`}>
-                    <MovieCard msg={this.props.msg} movie={result} view={true} />
+                  <div
+                    className="company--grid--card"
+                    key={`gen__${result.id}`}
+                  >
+                    <MovieCard
+                      msg={this.props.msg}
+                      movie={result}
+                      view={true}
+                    />
                   </div>
                 );
               })

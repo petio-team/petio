@@ -16,15 +16,36 @@ import pjson from "../../package.json";
 /* eslint-disable */
 const popupCenter = (url, title, w, h) => {
   // Fixes dual-screen position                             Most browsers      Firefox
-  var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : window.screenX;
-  var dualScreenTop = window.screenTop != undefined ? window.screenTop : window.screenY;
+  var dualScreenLeft =
+    window.screenLeft != undefined ? window.screenLeft : window.screenX;
+  var dualScreenTop =
+    window.screenTop != undefined ? window.screenTop : window.screenY;
 
-  var width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
-  var height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+  var width = window.innerWidth
+    ? window.innerWidth
+    : document.documentElement.clientWidth
+    ? document.documentElement.clientWidth
+    : screen.width;
+  var height = window.innerHeight
+    ? window.innerHeight
+    : document.documentElement.clientHeight
+    ? document.documentElement.clientHeight
+    : screen.height;
 
   var left = width / 2 - w / 2 + dualScreenLeft;
   var top = height / 2 - h / 2 + dualScreenTop;
-  var newWindow = window.open(url, title, "scrollbars=yes, width=" + w + ", height=" + h + ", top=" + top + ", left=" + left);
+  var newWindow = window.open(
+    url,
+    title,
+    "scrollbars=yes, width=" +
+      w +
+      ", height=" +
+      h +
+      ", top=" +
+      top +
+      ", left=" +
+      left
+  );
 
   if (window.focus) newWindow.focus();
   return newWindow;
@@ -176,7 +197,9 @@ class Setup extends React.Component {
         }, 10000);
       })
       .catch((err) => {
-        alert("Setup failed, check API is running and no errors, if this persists please contact the dev team.");
+        alert(
+          "Setup failed, check API is running and no errors, if this persists please contact the dev team."
+        );
         window.location.reload(false);
       });
   }
@@ -230,7 +253,10 @@ class Setup extends React.Component {
 
   changeMongoType() {
     this.setState({
-      mongoType: this.state.mongoType === "mongodb+srv://" ? "mongodb://" : "mongodb+srv://",
+      mongoType:
+        this.state.mongoType === "mongodb+srv://"
+          ? "mongodb://"
+          : "mongodb+srv://",
       mongoStatus: "",
     });
   }
@@ -245,21 +271,52 @@ class Setup extends React.Component {
     return (
       <div className="setup--wrap">
         <div className="setup--steps">
-          <div className={`setup--step ${this.state.step > 1 ? "complete" : ""} ${this.state.step === 1 ? "active" : ""}`}>1</div>
+          <div
+            className={`setup--step ${this.state.step > 1 ? "complete" : ""} ${
+              this.state.step === 1 ? "active" : ""
+            }`}
+          >
+            1
+          </div>
           <span></span>
-          <div className={`setup--step ${this.state.step > 2 ? "complete" : ""} ${this.state.step === 2 ? "active" : ""}`}>2</div>
+          <div
+            className={`setup--step ${this.state.step > 2 ? "complete" : ""} ${
+              this.state.step === 2 ? "active" : ""
+            }`}
+          >
+            2
+          </div>
           <span></span>
-          <div className={`setup--step ${this.state.step > 3 ? "complete" : ""} ${this.state.step === 3 ? "active" : ""}`}>3</div>
+          <div
+            className={`setup--step ${this.state.step > 3 ? "complete" : ""} ${
+              this.state.step === 3 ? "active" : ""
+            }`}
+          >
+            3
+          </div>
           <span></span>
-          <div className={`setup--step ${this.state.step > 4 ? "complete" : ""} ${this.state.step === 4 ? "active" : ""}`}>4</div>
+          <div
+            className={`setup--step ${this.state.step > 4 ? "complete" : ""} ${
+              this.state.step === 4 ? "active" : ""
+            }`}
+          >
+            4
+          </div>
           <span></span>
-          <div className={`setup--step ${this.state.step === 5 ? "active" : ""}`}>5</div>
+          <div
+            className={`setup--step ${this.state.step === 5 ? "active" : ""}`}
+          >
+            5
+          </div>
         </div>
         <div className="setup--content">
           <p className="main-title">Setup</p>
           {this.state.step === 1 ? (
             <div className="step-1">
-              <p>Welcome to Petio, firstly lets log in to Plex to get all of your user and server info</p>
+              <p>
+                Welcome to Petio, firstly lets log in to Plex to get all of your
+                user and server info
+              </p>
               <button className="btn btn__square" onClick={this.loginOauth}>
                 Login with plex
               </button>
@@ -267,13 +324,32 @@ class Setup extends React.Component {
           ) : null}
           {this.state.step === 2 ? (
             <div className="step-2">
-              <p>This is your Petio admin user details, we will use your Plex Username / Email, but a custom password just for Petio can be used.</p>
+              <p>
+                This is your Petio admin user details, we will use your Plex
+                Username / Email, but a custom password just for Petio can be
+                used.
+              </p>
               <p>Petio Admin Username</p>
-              <input type="text" name="username" value={this.props.plex.user.username} readOnly={true} />
+              <input
+                type="text"
+                name="username"
+                value={this.props.plex.user.username}
+                readOnly={true}
+              />
               <p>Petio Admin Email</p>
-              <input type="email" name="email" value={this.props.plex.user.email} readOnly={true} />
+              <input
+                type="email"
+                name="email"
+                value={this.props.plex.user.email}
+                readOnly={true}
+              />
               <p>Petio Admin Password</p>
-              <input type="password" name="password" value={this.state.password} onChange={this.inputChange} />
+              <input
+                type="password"
+                name="password"
+                value={this.state.password}
+                onChange={this.inputChange}
+              />
               <button className="btn btn__square" onClick={this.saveUser}>
                 Next
               </button>
@@ -283,32 +359,51 @@ class Setup extends React.Component {
             <div className="step-3">
               <p>Please select your server</p>
               {Object.keys(this.props.plex.servers).length === 0 ? (
-                <p>You don't own any servers. Only the server owner can setup a Petio instance.</p>
+                <p>
+                  You don't own any servers. Only the server owner can setup a
+                  Petio instance.
+                </p>
               ) : (
                 Object.keys(this.props.plex.servers).map((key) => {
                   let server = this.props.plex.servers[key];
                   return (
                     <div
                       key={key}
-                      className={`server-select-option ${this.state.selectedServer === key ? "selected" : ""} ${server.status !== "connected" ? "disabled" : ""}`}
+                      className={`server-select-option ${
+                        this.state.selectedServer === key ? "selected" : ""
+                      } ${server.status !== "connected" ? "disabled" : ""}`}
                       data-id={key}
                       onClick={this.selectServer}
                     >
-                      <div className="server-icon">{this.serverIcon(server.platform)}</div>
+                      <div className="server-icon">
+                        {this.serverIcon(server.platform)}
+                      </div>
                       <div className="server-name">
                         <p>{server.name}</p>
                         <p className="server-loc">{`${server.protocol}://${server.host}:${server.port}`}</p>
                       </div>
                       <div className="server-status">
-                        <div className={`server-status-item server-status-pending ${server.status === "pending" ? "active" : ""}`}>
+                        <div
+                          className={`server-status-item server-status-pending ${
+                            server.status === "pending" ? "active" : ""
+                          }`}
+                        >
                           <Spinner />
                         </div>
-                        <div className={`server-status-item server-status-good ${server.status === "connected" ? "active" : ""}`}>
+                        <div
+                          className={`server-status-item server-status-good ${
+                            server.status === "connected" ? "active" : ""
+                          }`}
+                        >
                           <span>
                             <Good />
                           </span>
                         </div>
-                        <div className={`server-status-item server-status-bad ${server.status === "failed" ? "active" : ""}`}>
+                        <div
+                          className={`server-status-item server-status-bad ${
+                            server.status === "failed" ? "active" : ""
+                          }`}
+                        >
                           <span>
                             <Bad />
                           </span>
@@ -318,15 +413,28 @@ class Setup extends React.Component {
                   );
                 })
               )}
-              <button className={"btn btn__square " + (this.state.selectedServer ? "" : "disabled")} style={{ marginTop: "10px" }} onClick={this.changeToDb}>
+              <button
+                className={
+                  "btn btn__square " +
+                  (this.state.selectedServer ? "" : "disabled")
+                }
+                style={{ marginTop: "10px" }}
+                onClick={this.changeToDb}
+              >
                 Next
               </button>
             </div>
           ) : null}
           {this.state.step === 4 ? (
             <div className="step-4">
-              <p>Mongo Database path, if using docker leave as default, otherwise specify your db path.</p>
-              <p>To switch between local / cloud db clusters click on the prefix to switch between the two.</p>
+              <p>
+                Mongo Database path, if using docker leave as default, otherwise
+                specify your db path.
+              </p>
+              <p>
+                To switch between local / cloud db clusters click on the prefix
+                to switch between the two.
+              </p>
               <div className="mongo-wrap">
                 <div className="mongo-icon">
                   <Server />
@@ -335,28 +443,62 @@ class Setup extends React.Component {
                   <div className="mongo-prefix" onClick={this.changeMongoType}>
                     {this.state.mongoType}
                   </div>
-                  <input style={this.state.mongoStatus === "pending" ? { pointerEvents: "none" } : { pointerEvents: "all" }} type="text" name="db" value={this.state.db} onChange={this.inputChange} />
+                  <input
+                    style={
+                      this.state.mongoStatus === "pending"
+                        ? { pointerEvents: "none" }
+                        : { pointerEvents: "all" }
+                    }
+                    type="text"
+                    name="db"
+                    value={this.state.db}
+                    onChange={this.inputChange}
+                  />
                 </div>
                 <div className="mongo-status">
-                  <div className={`mongo-status-item mongo-status-pending ${this.state.mongoStatus === "pending" ? "active" : ""}`}>
+                  <div
+                    className={`mongo-status-item mongo-status-pending ${
+                      this.state.mongoStatus === "pending" ? "active" : ""
+                    }`}
+                  >
                     <Spinner />
                   </div>
-                  <div className={`mongo-status-item mongo-status-good ${this.state.mongoStatus === "connected" ? "active" : ""}`}>
+                  <div
+                    className={`mongo-status-item mongo-status-good ${
+                      this.state.mongoStatus === "connected" ? "active" : ""
+                    }`}
+                  >
                     <span>
                       <Good />
                     </span>
                   </div>
-                  <div className={`mongo-status-item mongo-status-bad ${this.state.mongoStatus === "failed" ? "active" : ""}`}>
+                  <div
+                    className={`mongo-status-item mongo-status-bad ${
+                      this.state.mongoStatus === "failed" ? "active" : ""
+                    }`}
+                  >
                     <span>
                       <Bad />
                     </span>
                   </div>
                 </div>
               </div>
-              <button className={`btn btn__square ${this.state.mongoStatus === "pending" ? "disabled" : ""}`} style={{ marginTop: "10px", marginRight: "10px" }} onClick={this.testMongo}>
+              <button
+                className={`btn btn__square ${
+                  this.state.mongoStatus === "pending" ? "disabled" : ""
+                }`}
+                style={{ marginTop: "10px", marginRight: "10px" }}
+                onClick={this.testMongo}
+              >
                 Test
               </button>
-              <button className={`btn btn__square ${this.state.mongoStatus !== "connected" ? "disabled" : ""}`} style={{ marginTop: "10px" }} onClick={this.finalise}>
+              <button
+                className={`btn btn__square ${
+                  this.state.mongoStatus !== "connected" ? "disabled" : ""
+                }`}
+                style={{ marginTop: "10px" }}
+                onClick={this.finalise}
+              >
                 Finish
               </button>
             </div>
@@ -371,23 +513,36 @@ class Setup extends React.Component {
           ) : null}
         </div>
         <div className="credits">
-          <a href="https://fanart.tv/" target="_blank">
+          <a href="https://fanart.tv/" target="_blank" rel="noreferrer">
             <p>
               <strong>FAN</strong>ART<span>.TV</span>
             </p>
           </a>
-          <a href="https://www.themoviedb.org/" target="_blank">
+          <a
+            href="https://www.themoviedb.org/"
+            target="_blank"
+            rel="noreferrer"
+          >
             <TmdbLogo />
           </a>
         </div>
-        <p className="setup--version">Petio Admin build (alpha) {pjson.version}</p>
+        <p className="setup--version">
+          Petio Admin build (alpha) {pjson.version}
+        </p>
       </div>
     );
   }
 }
 
 function SetupContainer(props) {
-  return <Setup plex={props.plex} api={props.api} user={props.user} checkConfig={props.checkConfig} />;
+  return (
+    <Setup
+      plex={props.plex}
+      api={props.api}
+      user={props.user}
+      checkConfig={props.checkConfig}
+    />
+  );
 }
 
 const mapStateToProps = function (state) {

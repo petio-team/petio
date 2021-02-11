@@ -1,6 +1,5 @@
 import React from "react";
 import { ReactComponent as StarIcon } from "../assets/svg/star.svg";
-import User from "../data/User";
 import dateFormat from "dateformat";
 import { getAuth } from "../data/auth";
 
@@ -18,7 +17,12 @@ class ReviewsList extends React.Component {
                 let stars = [];
                 for (let i = 0; i < 10; i++) {
                   stars.push(
-                    <div key={`${review._id}__${i}`} className={`stars-1 star ${review.score > i ? "active" : ""}`}>
+                    <div
+                      key={`${review._id}__${i}`}
+                      className={`stars-1 star ${
+                        review.score > i ? "active" : ""
+                      }`}
+                    >
                       <StarIcon />
                     </div>
                   );
@@ -35,9 +39,13 @@ class ReviewsList extends React.Component {
                       ></div>
                     </div>
                     <div className="reviews-list--content">
-                      <p className="small">{dateFormat(review.date, "dddd, mmmm dS, yyyy, h:MMtt")}</p>
+                      <p className="small">
+                        {dateFormat(review.date, "dddd, mmmm dS, yyyy, h:MMtt")}
+                      </p>
                       <div className="stars-wrap">{stars}</div>
-                      <p className="small capped-width__wide content-cap">{review.comment}</p>
+                      <p className="small capped-width__wide content-cap">
+                        {review.comment}
+                      </p>
                     </div>
                   </div>
                 );
@@ -50,7 +58,12 @@ class ReviewsList extends React.Component {
               if (review.author_details.rating !== null) {
                 for (let i = 0; i < 10; i++) {
                   stars.push(
-                    <div key={`${review.id}__${i}`} className={`stars-1 star ${review.author_details.rating > i ? "active" : ""}`}>
+                    <div
+                      key={`${review.id}__${i}`}
+                      className={`stars-1 star ${
+                        review.author_details.rating > i ? "active" : ""
+                      }`}
+                    >
                       <StarIcon />
                     </div>
                   );
@@ -63,7 +76,10 @@ class ReviewsList extends React.Component {
                 : "";
 
               let text = review.content;
-              text = text.replace(/\*\*\*(.*?)\*\*\*/g, '<span style="display: block; margin: 0"><b>$1</b></span>');
+              text = text.replace(
+                /\*\*\*(.*?)\*\*\*/g,
+                '<span style="display: block; margin: 0"><b>$1</b></span>'
+              );
               text = text.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
               text = text.replace(/__(.*?)__/g, "<u>$1</u>");
               text = text.replace(/_/g, " ");
@@ -81,15 +97,28 @@ class ReviewsList extends React.Component {
                     ></div>
                   </div>
                   <div className="reviews-list--content">
-                    <p className="small">{dateFormat(review.updated_at, "dddd, mmmm dS, yyyy, h:MMtt")}</p>
+                    <p className="small">
+                      {dateFormat(
+                        review.updated_at,
+                        "dddd, mmmm dS, yyyy, h:MMtt"
+                      )}
+                    </p>
                     <div className="stars-wrap">{stars}</div>
-                    <p className="small capped-width__wide content-cap" dangerouslySetInnerHTML={{ __html: text }}></p>
+                    <p
+                      className="small capped-width__wide content-cap"
+                      dangerouslySetInnerHTML={{ __html: text }}
+                    ></p>
                   </div>
                 </div>
               );
             })
           : null}
-        {this.props.external ? this.props.external.length === 0 && this.props.reviews.length === 0 ? <p>No reviews</p> : null : null}
+        {this.props.external ? (
+          this.props.external.length === 0 &&
+          this.props.reviews.length === 0 ? (
+            <p>No reviews</p>
+          ) : null
+        ) : null}
       </div>
     );
   }

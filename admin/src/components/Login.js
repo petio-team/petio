@@ -87,25 +87,43 @@ class Login extends React.Component {
               <p>Log in with your Plex username / password</p>
               <form onSubmit={this.loginForm} autoComplete="on">
                 <p>Username</p>
-                <input type="text" name="username" value={this.state.username} onChange={this.inputChange} autoComplete="username" />
+                <input
+                  type="text"
+                  name="username"
+                  value={this.state.username}
+                  onChange={this.inputChange}
+                  autoComplete="username"
+                />
 
                 <p>Password</p>
-                <input type="password" name="password" value={this.state.password} onChange={this.inputChange} autoComplete="current-password" />
+                <input
+                  type="password"
+                  name="password"
+                  value={this.state.password}
+                  onChange={this.inputChange}
+                  autoComplete="current-password"
+                />
 
                 <button className="btn btn__square">Login</button>
               </form>
             </div>
             <div className="credits">
-              <a href="https://fanart.tv/" target="_blank">
+              <a href="https://fanart.tv/" target="_blank" rel="noreferrer">
                 <p>
                   <strong>FAN</strong>ART<span>.TV</span>
                 </p>
               </a>
-              <a href="https://www.themoviedb.org/" target="_blank">
+              <a
+                href="https://www.themoviedb.org/"
+                target="_blank"
+                rel="noreferrer"
+              >
                 <TmdbLogo />
               </a>
             </div>
-            <p className="powered-by">Petio Admin build (alpha) {pjson.version}</p>
+            <p className="powered-by">
+              Petio Admin build (alpha) {pjson.version}
+            </p>
           </>
         ) : (
           <div className="spinner">

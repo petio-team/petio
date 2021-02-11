@@ -10,6 +10,7 @@ class MovieShowTop extends React.Component {
       <a
         href={`https://app.plex.tv/desktop#!/server/${this.props.mediaData.on_server.serverKey}/details?key=%2Flibrary%2Fmetadata%2F${this.props.mediaData.on_server.ratingKey}`}
         target="_blank"
+        rel="noreferrer"
         className="btn btn__square good"
       >
         <CheckIcon />
@@ -38,7 +39,10 @@ class MovieShowTop extends React.Component {
 
     return (
       <div className={`media-top ${this.props.trailer ? "show-trailer" : ""}`}>
-        <div className="media-backdrop" key={`${this.props.mediaData.title}__backdrop`}>
+        <div
+          className="media-backdrop"
+          key={`${this.props.mediaData.title}__backdrop`}
+        >
           {video && this.props.trailer ? (
             <div className="media-trailer">
               <iframe
@@ -51,7 +55,10 @@ class MovieShowTop extends React.Component {
           ) : null}
           {this.props.mediaData.backdrop_path ? (
             <LazyLoadImage
-              src={"https://image.tmdb.org/t/p/w1280/" + this.props.mediaData.backdrop_path}
+              src={
+                "https://image.tmdb.org/t/p/w1280/" +
+                this.props.mediaData.backdrop_path
+              }
               alt={this.props.mediaData.title}
               effect="blur"
               key={`${this.props.mediaData.title}__backdrop`}
@@ -63,7 +70,15 @@ class MovieShowTop extends React.Component {
         <div className="media-poster">
           <div className="media-poster--inner">
             {this.props.mediaData.poster_path ? (
-              <LazyLoadImage src={"https://image.tmdb.org/t/p/w500/" + this.props.mediaData.poster_path} alt={this.props.mediaData.title} effect="blur" key={`${this.props.mediaData.title}__poster`} />
+              <LazyLoadImage
+                src={
+                  "https://image.tmdb.org/t/p/w500/" +
+                  this.props.mediaData.poster_path
+                }
+                alt={this.props.mediaData.title}
+                effect="blur"
+                key={`${this.props.mediaData.title}__poster`}
+              />
             ) : null}
           </div>
         </div>
@@ -71,9 +86,16 @@ class MovieShowTop extends React.Component {
           <span></span>
           <div className="media-details--top">
             {this.props.mediaData.logo ? (
-              <LazyLoadImage className="media-logo" src={this.props.mediaData.logo} />
+              <LazyLoadImage
+                className="media-logo"
+                src={this.props.mediaData.logo}
+              />
             ) : (
-              <h1 className="single-title">{this.props.mediaData.title ? this.props.mediaData.title : this.props.mediaData.name}</h1>
+              <h1 className="single-title">
+                {this.props.mediaData.title
+                  ? this.props.mediaData.title
+                  : this.props.mediaData.name}
+              </h1>
             )}
           </div>
           <div className="media--actions">

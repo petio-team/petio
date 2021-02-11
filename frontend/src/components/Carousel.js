@@ -41,8 +41,12 @@ class Carousel extends React.Component {
     let wrapper = this.wrapper.current;
     let cards = carousel.getElementsByClassName("card");
     let exampleCard = cards[0];
-    let style = exampleCard ? exampleCard.currentStyle || window.getComputedStyle(exampleCard) : null;
-    let cardWidth = exampleCard ? exampleCard.offsetWidth + parseFloat(style.marginRight) : 0;
+    let style = exampleCard
+      ? exampleCard.currentStyle || window.getComputedStyle(exampleCard)
+      : null;
+    let cardWidth = exampleCard
+      ? exampleCard.offsetWidth + parseFloat(style.marginRight)
+      : 0;
     let wrapperWidth = wrapper.offsetWidth;
     let cardsPerView = Math.floor(wrapperWidth / cardWidth);
     let max = carousel.scrollWidth - carousel.offsetWidth;
@@ -57,7 +61,7 @@ class Carousel extends React.Component {
     });
   }
 
-  scroll(e) {
+  scroll() {
     let carousel = this.carouselRef.current;
     let position = carousel.scrollLeft; //+ carousel.offsetWidth;
     let max = carousel.scrollWidth - carousel.offsetWidth;
@@ -72,7 +76,9 @@ class Carousel extends React.Component {
     let carousel = this.carouselRef.current;
     let scrollAmount = this.state.cardWidth * this.state.cardsPerView;
     let start = carousel.scrollLeft;
-    let movement = Math.floor((start + scrollAmount) / this.state.cardWidth) * this.state.cardWidth;
+    let movement =
+      Math.floor((start + scrollAmount) / this.state.cardWidth) *
+      this.state.cardWidth;
     carousel.scrollTo({
       top: 0,
       left: movement,
@@ -84,7 +90,9 @@ class Carousel extends React.Component {
     let carousel = this.carouselRef.current;
     let scrollAmount = this.state.cardWidth * this.state.cardsPerView;
     let start = carousel.scrollLeft;
-    let movement = Math.floor((start - scrollAmount) / this.state.cardWidth) * this.state.cardWidth;
+    let movement =
+      Math.floor((start - scrollAmount) / this.state.cardWidth) *
+      this.state.cardWidth;
     carousel.scrollTo({
       top: 0,
       left: movement,
@@ -93,23 +101,47 @@ class Carousel extends React.Component {
   }
 
   render() {
-    const childrenWithProps = React.Children.map(this.props.children, (child) => {
-      if (React.isValidElement(child)) {
-        return React.cloneElement(child, { pos: this.state.pos, width: this.state.width });
+    const childrenWithProps = React.Children.map(
+      this.props.children,
+      (child) => {
+        if (React.isValidElement(child)) {
+          return React.cloneElement(child, {
+            pos: this.state.pos,
+            width: this.state.width,
+          });
+        }
+        return child;
       }
-      return child;
-    });
+    );
     return (
-      <div className="carousel--wrap" ref={this.wrapper} data-width={this.state.width}>
+      <div
+        className="carousel--wrap"
+        ref={this.wrapper}
+        data-width={this.state.width}
+      >
         <div className="carousel--controls">
-          <div className={`carousel--controls--item carousel--prev ${this.state.pos > 0 ? "" : "disabled"}`} onClick={this.prev}>
+          <div
+            className={`carousel--controls--item carousel--prev ${
+              this.state.pos > 0 ? "" : "disabled"
+            }`}
+            onClick={this.prev}
+          >
             <LeftArrow />
           </div>
-          <div className={`carousel--controls--item carousel--next ${this.state.pos < this.state.max ? "" : "disabled"}`} onClick={this.next}>
+          <div
+            className={`carousel--controls--item carousel--next ${
+              this.state.pos < this.state.max ? "" : "disabled"
+            }`}
+            onClick={this.next}
+          >
             <RightArrow />
           </div>
         </div>
-        <div className={`carousel`} ref={this.carouselRef} onScroll={this.scroll}>
+        <div
+          className={`carousel`}
+          ref={this.carouselRef}
+          onScroll={this.scroll}
+        >
           <div className="carousel--inner">{childrenWithProps}</div>
         </div>
       </div>

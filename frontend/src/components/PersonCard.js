@@ -11,8 +11,12 @@ class PersonCard extends React.Component {
       return null;
     }
     if (person.known_for && person.known_for.length) {
-      person.known_for.map((item, key) => {
-        return <Link to={`/movie/${item.id}`}>{item.title}</Link>;
+      person.known_for.map((item) => {
+        return (
+          <Link key={`${item.id}__kf`} to={`/movie/${item.id}`}>
+            {item.title}
+          </Link>
+        );
       });
     }
     return (
@@ -33,7 +37,9 @@ class PersonCard extends React.Component {
           <div className="text-wrap">
             <p className="title">{person.name}</p>
             {knownFor ? <p className="known-for">{knownFor}</p> : null}
-            {this.props.character ? <p className="character">{this.props.character}</p> : null}
+            {this.props.character ? (
+              <p className="character">{this.props.character}</p>
+            ) : null}
           </div>
         </div>
       </div>

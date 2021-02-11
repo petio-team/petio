@@ -1,5 +1,5 @@
 import React from "react";
-import { withRouter, Link } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import User from "../data/User";
 
@@ -121,37 +121,75 @@ class Issues extends React.Component {
           <div className="issues--main">
             <section>
               <p style={{ margin: 0 }}>
-                We try our best to provide good quality content without any problems, but sometimes things go wrong. Please use this form to let us know of any issues you've had whilst watching Plex
+                We try our best to provide good quality content without any
+                problems, but sometimes things go wrong. Please use this form to
+                let us know of any issues you&apos;ve had whilst watching Plex
                 and we will do our best to fix them!
               </p>
             </section>
             <section>
               <p className="sub-title mb--1">Details</p>
-              <p>Please fill out the fields below relating to the issue you are having with this show / movie.</p>
-              <input type="hidden" name="id" defaultValue={this.state.id} readOnly />
-              <input type="hidden" name="type" defaultValue={this.state.type} readOnly />
-              <input type="hidden" name="user" value={this.props.user.current.id} readOnly />
+              <p>
+                Please fill out the fields below relating to the issue you are
+                having with this show / movie.
+              </p>
+              <input
+                type="hidden"
+                name="id"
+                defaultValue={this.state.id}
+                readOnly
+              />
+              <input
+                type="hidden"
+                name="type"
+                defaultValue={this.state.type}
+                readOnly
+              />
+              <input
+                type="hidden"
+                name="user"
+                value={this.props.user.current.id}
+                readOnly
+              />
               <div className="styled-input--select">
-                <select name="option" value={this.state.option} onChange={this.inputChange}>
+                <select
+                  name="option"
+                  value={this.state.option}
+                  onChange={this.inputChange}
+                >
                   <option value="">Choose an option</option>
                   {this.state.type === "movie" ? (
                     <>
                       <option value="subs">Missing Subtitles</option>
-                      <option value="bad-video">Bad Quality / Video Issue</option>
-                      <option value="bad-audio">Audio Issue / Audio Sync</option>
+                      <option value="bad-video">
+                        Bad Quality / Video Issue
+                      </option>
+                      <option value="bad-audio">
+                        Audio Issue / Audio Sync
+                      </option>
                     </>
                   ) : (
                     <>
                       <option value="episodes">Missing Episodes</option>
                       <option value="subs">Missing Subtitles</option>
-                      <option value="bad-video">Bad Quality / Video Issue</option>
-                      <option value="bad-audio">Audio Issue / Audio Sync</option>
+                      <option value="bad-video">
+                        Bad Quality / Video Issue
+                      </option>
+                      <option value="bad-audio">
+                        Audio Issue / Audio Sync
+                      </option>
                     </>
                   )}
                   <option value="other">Other, please specify</option>
                 </select>
               </div>
-              <textarea className="styled-input--textarea" value={this.state.detail} placeholder="Notes" name="detail" onChange={this.inputChange}></textarea>
+              <textarea
+                className="styled-input--textarea"
+                value={this.state.detail}
+                placeholder="Notes"
+                name="detail"
+                onChange={this.inputChange}
+              ></textarea>
             </section>
             <div className="btn btn__square bad" onClick={this.props.close}>
               Cancel
@@ -169,7 +207,15 @@ class Issues extends React.Component {
 Issues = withRouter(Issues);
 
 function IssuesContainer(props) {
-  return <Issues api={props.api} user={props.user} close={props.close} open={props.open} msg={props.msg} />;
+  return (
+    <Issues
+      api={props.api}
+      user={props.user}
+      close={props.close}
+      open={props.open}
+      msg={props.msg}
+    />
+  );
 }
 
 const mapStateToProps = function (state) {

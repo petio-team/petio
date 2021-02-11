@@ -1,5 +1,5 @@
 import React from "react";
-import { withRouter, Link } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import Api from "../data/Api";
 import Popular from "../components/Popular";
@@ -29,7 +29,13 @@ class Movies extends React.Component {
           <Carousel>
             {Object.keys(this.props.api.popular).length > 0
               ? this.props.api.popular.movies.map((movie) => {
-                  return <MovieCard key={movie.id} msg={this.props.msg} movie={movie} />;
+                  return (
+                    <MovieCard
+                      key={movie.id}
+                      msg={this.props.msg}
+                      movie={movie}
+                    />
+                  );
                 })
               : null}
           </Carousel>

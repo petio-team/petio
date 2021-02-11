@@ -190,38 +190,92 @@ class General extends React.Component {
           <p className="main-title mb--2">Plex</p>
           <p>If connection has been lost to Plex re-authenticate here.</p>
           <button className="btn btn__square disabled">Login with plex</button>
-          <button className="btn btn__square disabled" style={{ marginLeft: "10px" }}>
+          <button
+            className="btn btn__square disabled"
+            style={{ marginLeft: "10px" }}
+          >
             Test
           </button>
         </section>
         <section>
           <p className="main-title mb--2">Email</p>
           <label>Username</label>
-          <input type="text" name="email_user" value={this.state.email_user} onChange={this.inputChange} autoComplete="new-password" autoCorrect="off" spellCheck="off" />
+          <input
+            type="text"
+            name="email_user"
+            value={this.state.email_user}
+            onChange={this.inputChange}
+            autoComplete="new-password"
+            autoCorrect="off"
+            spellCheck="off"
+          />
           <label>Password</label>
-          <input type="password" name="email_pass" value={this.state.email_pass} onChange={this.inputChange} autoComplete="new-password" autoCorrect="off" spellCheck="off" />
+          <input
+            type="password"
+            name="email_pass"
+            value={this.state.email_pass}
+            onChange={this.inputChange}
+            autoComplete="new-password"
+            autoCorrect="off"
+            spellCheck="off"
+          />
           <label>SMTP Server</label>
-          <input type="text" name="email_server" value={this.state.email_server} onChange={this.inputChange} autoComplete="new-password" autoCorrect="off" spellCheck="off" />
+          <input
+            type="text"
+            name="email_server"
+            value={this.state.email_server}
+            onChange={this.inputChange}
+            autoComplete="new-password"
+            autoCorrect="off"
+            spellCheck="off"
+          />
           <label>Port</label>
-          <input type="number" name="email_port" value={this.state.email_port} onChange={this.inputChange} autoComplete="new-password" autoCorrect="off" spellCheck="off" />
+          <input
+            type="number"
+            name="email_port"
+            value={this.state.email_port}
+            onChange={this.inputChange}
+            autoComplete="new-password"
+            autoCorrect="off"
+            spellCheck="off"
+          />
           <div className="checkbox-wrap mb--2">
-            <input type="checkbox" name="email_secure" checked={this.state.email_secure} onChange={this.inputChange} />
+            <input
+              type="checkbox"
+              name="email_secure"
+              checked={this.state.email_secure}
+              onChange={this.inputChange}
+            />
             <p>
               Use Secure <small>(For port 587 or 25 use false)</small>
             </p>
           </div>
           <div className="checkbox-wrap mb--2">
-            <input type="checkbox" name="email_enabled" checked={this.state.email_enabled} onChange={this.inputChange} />
+            <input
+              type="checkbox"
+              name="email_enabled"
+              checked={this.state.email_enabled}
+              onChange={this.inputChange}
+            />
             <p>Enabled</p>
           </div>
           <p>
-            Using Gmail? Make sure to allow "less secure apps" to allow Petio to send emails on your behalf. You can change this setting{" "}
-            <a target="_blank" href="https://www.google.com/settings/security/lesssecureapps">
+            Using Gmail? Make sure to allow "less secure apps" to allow Petio to
+            send emails on your behalf. You can change this setting{" "}
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href="https://www.google.com/settings/security/lesssecureapps"
+            >
               here
             </a>
           </p>
 
-          <button className="btn btn__square" style={{ marginRight: "10px" }} onClick={this.saveEmail}>
+          <button
+            className="btn btn__square"
+            style={{ marginRight: "10px" }}
+            onClick={this.saveEmail}
+          >
             Save
           </button>
 
@@ -232,12 +286,23 @@ class General extends React.Component {
         <section>
           <p className="main-title mb--2">Base path</p>
           <p>
-            A base path can be applied to serve petio from a subdirectory. Any specified base must not include a trailing slash and will be applied to the end of the access URL. For example{" "}
-            <code>/petio</code> would become <code>localhost:7777/petio</code>
+            A base path can be applied to serve petio from a subdirectory. Any
+            specified base must not include a trailing slash and will be applied
+            to the end of the access URL. For example <code>/petio</code> would
+            become <code>localhost:7777/petio</code>
             <br></br>
-            <small>Warning! This will require a restart of Petio to take effect.</small>
+            <small>
+              Warning! This will require a restart of Petio to take effect.
+            </small>
           </p>
-          <input type="text" name="base_path" value={this.state.base_path} onChange={this.inputChange} autoCorrect="off" spellCheck="off" />
+          <input
+            type="text"
+            name="base_path"
+            value={this.state.base_path}
+            onChange={this.inputChange}
+            autoCorrect="off"
+            spellCheck="off"
+          />
           <button className="btn btn__square" onClick={this.saveBasePath}>
             Save
           </button>
