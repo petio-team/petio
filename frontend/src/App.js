@@ -168,10 +168,8 @@ class App extends React.Component {
     });
     Api.checkConfig()
       .then((res) => {
-        console.log(res);
         this.setState({
           config: res.config,
-          // loading: false,
         });
       })
       .catch(() => {

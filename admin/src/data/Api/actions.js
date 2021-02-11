@@ -1,7 +1,6 @@
 import { store } from "../store";
 import * as types from "../actionTypes";
 import * as api from "./api";
-import Api from ".";
 
 function finalise(data = false) {
   if (!data) return false;

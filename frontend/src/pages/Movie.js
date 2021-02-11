@@ -135,7 +135,6 @@ class Movie extends React.Component {
   }
 
   getReviews() {
-    console.log("reviews got");
     let id = this.props.match.params.id;
     User.getReviews(id);
   }

@@ -15,7 +15,7 @@ import pjson from "../../package.json";
 
 /* eslint-disable */
 const popupCenter = (url, title, w, h) => {
-  // Fixes dual-screen position                             Most browsers      Firefox
+  // Fixes dual-screen position | credit Tautulli
   var dualScreenLeft =
     window.screenLeft != undefined ? window.screenLeft : window.screenX;
   var dualScreenTop =
@@ -121,7 +121,7 @@ class Setup extends React.Component {
     }
   }
 
-  loginOauth(e) {
+  loginOauth() {
     let plexWindow = popupCenter("", "Login with Plex", 500, 500);
     Plex.plexAuth(plexWindow);
   }
@@ -196,7 +196,7 @@ class Setup extends React.Component {
           this.props.checkConfig();
         }, 10000);
       })
-      .catch((err) => {
+      .catch(() => {
         alert(
           "Setup failed, check API is running and no errors, if this persists please contact the dev team."
         );
@@ -360,8 +360,8 @@ class Setup extends React.Component {
               <p>Please select your server</p>
               {Object.keys(this.props.plex.servers).length === 0 ? (
                 <p>
-                  You don't own any servers. Only the server owner can setup a
-                  Petio instance.
+                  You don&apos;t own any servers. Only the server owner can
+                  setup a Petio instance.
                 </p>
               ) : (
                 Object.keys(this.props.plex.servers).map((key) => {

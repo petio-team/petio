@@ -39,7 +39,10 @@ class Console extends React.Component {
                 let type = log[timestamp].type;
                 let message = log[timestamp].log;
                 return (
-                  <p className={`console--item console--item__${type}`}>
+                  <p
+                    key={`con__${timestamp}_${message}`}
+                    className={`console--item console--item__${type}`}
+                  >
                     [{timestamp}] ::{" "}
                     <span className={`console--type console--type__${type}`}>
                       {type}

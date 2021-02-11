@@ -114,11 +114,7 @@ class Carousel extends React.Component {
       }
     );
     return (
-      <div
-        className="carousel--wrap"
-        ref={this.wrapper}
-        data-width={this.state.width}
-      >
+      <div className="carousel--wrap" ref={this.wrapper}>
         <div className="carousel--controls">
           <div
             className={`carousel--controls--item carousel--prev ${

@@ -45,7 +45,10 @@ class Login extends React.Component {
           loading: false,
         });
         if (res.error) {
-          alert(res.error);
+          this.props.displayMessage(
+            "error",
+            "Your session has expired please log in again"
+          );
           return;
         }
         if (res.loggedIn) {
@@ -55,7 +58,10 @@ class Login extends React.Component {
       .catch((error) => {
         console.log(error);
         // Move this to error message
-        alert("There has been an error, Petio may be temporarily unavailable");
+        this.props.displayMessage(
+          "error",
+          "There has been an error, Petio may be temporarily unavailable"
+        );
         localStorage.removeItem("loggedin");
       });
   }

@@ -260,8 +260,9 @@ class General extends React.Component {
             <p>Enabled</p>
           </div>
           <p>
-            Using Gmail? Make sure to allow "less secure apps" to allow Petio to
-            send emails on your behalf. You can change this setting{" "}
+            Using Gmail? Make sure to allow &quot;less secure apps&quot; to
+            allow Petio to send emails on your behalf. You can change this
+            setting{" "}
             <a
               target="_blank"
               rel="noreferrer"
