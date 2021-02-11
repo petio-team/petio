@@ -323,6 +323,8 @@ class Radarr {
       }
     }
 
+    logger.log("verbose", "RADARR: Calendar returned");
+
     return mainCalendar;
   }
 }

@@ -308,7 +308,7 @@ class Sonarr {
       }
     }
 
-    logger.log("info", mainCalendar);
+    logger.log("verbose", "SONARR: Calendar returned");
 
     return mainCalendar;
   }

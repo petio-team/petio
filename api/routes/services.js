@@ -178,7 +178,7 @@ function saveRadarrConfig(data) {
         logger.error(err.stack);
         reject(err);
       } else {
-        logger.log("info", "Radarr Config updated");
+        logger.log("info", "ROUTE: Radarr Config updated");
         resolve();
       }
     });
