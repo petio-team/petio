@@ -1,5 +1,5 @@
 import React from "react";
-import { withRouter, Link } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 
 class RequestCard extends React.Component {
@@ -25,11 +25,6 @@ class RequestCard extends React.Component {
         className={"card type--movie-tv"}
       >
         <div className="card--inner">
-          <Link
-            to={`/${type === "tv" ? "series" : "movie"}/${request.id}`}
-            className="full-link"
-          ></Link>
-
           <div className="request-count">
             {Object.keys(this.props.user.requests[request.id].users).length}
           </div>

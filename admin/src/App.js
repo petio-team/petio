@@ -11,6 +11,7 @@ import Settings from "./page/Settings";
 import Requests from "./page/Requests";
 import Users from "./page/Users";
 import Issues from "./page/Issues";
+import Reviews from "./page/Reviews";
 
 class App extends React.Component {
   constructor(props) {
@@ -236,6 +237,11 @@ class App extends React.Component {
                 <Route path="/issues">
                   <div className="page-wrap">
                     <Issues user={this.props.user} api={this.props.api} />
+                  </div>
+                </Route>
+                <Route path="/reviews">
+                  <div className="page-wrap">
+                    <Reviews user={this.props.user} api={this.props.api} />
                   </div>
                 </Route>
                 <Route path="/users">

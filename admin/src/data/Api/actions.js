@@ -607,3 +607,13 @@ export async function getConsole() {
     return false;
   }
 }
+
+export async function getReviews() {
+  try {
+    let data = await api.getReviews();
+    return data;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
