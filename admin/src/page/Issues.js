@@ -58,6 +58,7 @@ class Issues extends React.Component {
         icon = <MovieIcon />;
         break;
       case "tv":
+      case "series":
         icon = <TvIcon />;
         break;
       default:
