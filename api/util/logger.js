@@ -36,7 +36,7 @@ const logger = winston.createLogger({
     new winston.transports.File({
       filename: liveLogfile,
       level: "silly",
-      maxsize: 10000,
+      maxsize: 100000,
       maxFiles: 1,
       tailable: true,
       format: winston.format.combine(

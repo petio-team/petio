@@ -177,4 +177,40 @@
       background: $bad;
     }
   }
+
+  &--filter {
+    display: flex;
+    margin-bottom: 10px;
+
+    &--item {
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 10px;
+      margin-right: 10px;
+      text-transform: uppercase;
+      cursor: pointer;
+
+      &.disabled {
+        opacity: 0.5;
+      }
+
+      &__info {
+        background: $green;
+        color: $dark-grey;
+      }
+
+      &__verbose {
+        background: $purple;
+      }
+
+      &__warn {
+        background: $primary;
+        color: $dark-grey;
+      }
+
+      &__error {
+        background: $bad;
+      }
+    }
+  }
 }
