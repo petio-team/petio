@@ -472,8 +472,12 @@ export async function allUsers() {
   try {
     let userData = await api.allUsers();
     let data = {};
-    userData.map((user) => {
-      data[user.id] = user;
+    userData.map((user, i) => {
+      if (user) {
+        data[user.id] = user;
+      } else {
+        console.log(`User ${i} didn't return any data, this is unusual`);
+      }
     });
     finalise({
       type: types.ALL_USERS,
