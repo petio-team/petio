@@ -1,6 +1,6 @@
 {
   "name": "petio",
-  "version": "0.3.13",
+  "version": "0.3.14",
   "description": "Request Platform for Plex",
   "main": "petio.js",
   "author": "",
