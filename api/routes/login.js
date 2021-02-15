@@ -22,6 +22,9 @@ router.post("/", async (req, res) => {
     return;
   }
 
+  if (!prefs.login_type) {
+    prefs.login_type = 1;
+  }
   logger.log("info", `LOGIN: New login attempted`);
   logger.log("info", `LOGIN: Request User: ${user.username}`);
   logger.log("info", `LOGIN: Request IP: ${request_ip}`);
