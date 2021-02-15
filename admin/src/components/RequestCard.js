@@ -8,6 +8,12 @@ class RequestCard extends React.Component {
     if (!request) {
       return null;
     }
+
+    if (!this.props.user.requests[request.id]) {
+      console.log(this.props);
+      return null;
+    }
+
     let img = request.poster_path ? (
       <img
         src={`https://image.tmdb.org/t/p/w200/${request.poster_path}`}
@@ -71,6 +77,7 @@ function RequestCardContainer(props) {
       user={props.user}
       users={props.users}
       request={props.request}
+      keyData={props.keyData}
     />
   );
 }

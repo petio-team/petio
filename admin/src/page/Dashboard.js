@@ -246,7 +246,12 @@ class Dashboard extends React.Component {
                   }
                   if (!request) return null;
                   return (
-                    <RequestCard key={key} users={users} request={request} />
+                    <RequestCard
+                      key={key}
+                      keyData={key}
+                      users={users}
+                      request={request}
+                    />
                   );
                 })}
               </Carousel>
