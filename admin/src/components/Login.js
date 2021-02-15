@@ -44,13 +44,19 @@ class Login extends React.Component {
         this.setState({
           loading: false,
         });
-        if (res.error) {
+        if (res.error && cookie) {
           this.props.displayMessage(
             "error",
             "Your session has expired please log in again"
           );
           return;
         }
+
+        if (res.error) {
+          this.props.displayMessage("error", "User not found");
+          return;
+        }
+
         if (res.loggedIn) {
           this.props.changeLogin(true);
         }
