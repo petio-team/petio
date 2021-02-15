@@ -398,9 +398,6 @@ class LibraryUpdate {
       movieDb = await Movie.findOne({
         ratingKey: parseInt(movieObj.ratingKey),
       });
-      if (!this.full && movieDb) {
-        return;
-      }
     } catch {
       movieDb = false;
     }
@@ -495,7 +492,7 @@ class LibraryUpdate {
       }
     } else {
       try {
-        let updatedMovie = await Movie.findOneAndUpdate(
+        await Movie.findOneAndUpdate(
           {
             ratingKey: movieObj.ratingKey,
           },
@@ -539,6 +536,7 @@ class LibraryUpdate {
           },
           { useFindAndModify: false }
         );
+        logger.log("verbose", `LIB CRON: Show Updated - ${movieObj.title}`);
       } catch (err) {
         movieDb = false;
         logger.log("warn", err);
@@ -587,9 +585,6 @@ class LibraryUpdate {
 
     try {
       showDb = await Show.findOne({ ratingKey: parseInt(showObj.ratingKey) });
-      if (!this.full && showDb) {
-        return;
-      }
     } catch {
       showDb = false;
     }
@@ -683,7 +678,7 @@ class LibraryUpdate {
       }
     } else {
       try {
-        let updatedShow = await Show.findOneAndUpdate(
+        await Show.findOneAndUpdate(
           {
             ratingKey: showObj.ratingKey,
           },
@@ -722,6 +717,7 @@ class LibraryUpdate {
           },
           { useFindAndModify: false }
         );
+        logger.log("verbose", `LIB CRON: Show Updated - ${showObj.title}`);
       } catch {
         showDb = false;
       }
