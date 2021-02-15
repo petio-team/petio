@@ -60,7 +60,7 @@ class Sonarr {
       let args = {
         method: method,
         json: true,
-        timeout: 3000,
+        timeout: 10000,
       };
       if (method === "post" && body) {
         args = {

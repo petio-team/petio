@@ -67,7 +67,7 @@ class Radarr {
           method: method,
           json: true,
           body: body,
-          timeout: 3000,
+          timeout: 10000,
         };
       }
       request(url, args, function (err, data) {
