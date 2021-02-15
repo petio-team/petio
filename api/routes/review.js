@@ -22,6 +22,8 @@ router.post("/add", async (req, res) => {
       comment: review.comment,
       user: userData.id,
       date: new Date(),
+      type: item.type,
+      title: item.title,
     });
 
     const savedReview = await newReview.save();

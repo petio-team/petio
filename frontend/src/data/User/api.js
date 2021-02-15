@@ -28,7 +28,8 @@ export let review = (item, id, review) => {
     "Content-Type": "application/json",
   };
   let itemMin = {
-    title: item.title,
+    title: item.title ? item.title : item.name,
+    type: item.episode_run_time ? "tv" : "movie",
     thumb: item.thumb,
     id: item.id,
   };

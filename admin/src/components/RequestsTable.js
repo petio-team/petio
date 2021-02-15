@@ -17,10 +17,16 @@ class RequestsTable extends React.Component {
 
   sortBy(a, b) {
     let sortVal = this.state.sortBy;
-    if (a[sortVal].toLowerCase() > b[sortVal].toLowerCase()) {
+    let av = a[sortVal];
+    let bv = b[sortVal];
+    if (!av) av = "";
+    if (!bv) bv = "";
+    if (typeof av === "string") av = av.toLowerCase();
+    if (typeof bv === "string") bv = bv.toLowerCase();
+    if (av > bv) {
       return this.state.dir === "DESC" ? 1 : -1;
     }
-    if (a[sortVal].toLowerCase() < b[sortVal].toLowerCase()) {
+    if (av < bv) {
       return this.state.dir === "DESC" ? -1 : 1;
     }
     return 0;
