@@ -171,7 +171,7 @@ function plexAuth(username, password) {
           "X-Plex-Platform-Version": "1.0",
           "X-Plex-Device-Name": "Petio API",
           "X-Plex-Version": "1.0",
-          "X-Plex-Client-Identifier": "df9e71a5-a6cd-488e-8730-aaa9195f7435",
+          "X-Plex-Client-Identifier": "067e602b-1e86-4739-900d-1abdf8f6da71",
           Authorization:
             "Basic " +
             Buffer.from(`${username}:${password}`).toString("base64"),
