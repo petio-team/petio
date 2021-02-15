@@ -1,12 +1,12 @@
 import { getAuth } from "../auth";
 
-export async function login(username, token = false) {
+export async function login(user, token = false) {
   let request = `${getAuth().api}/login`;
   let headers = {
     "Content-Type": "application/json",
   };
   return process(request, "post", headers, {
-    username: username,
+    user: user,
     authToken: token,
   }).then((res) => res.json());
 }

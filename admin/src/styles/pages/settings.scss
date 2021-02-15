@@ -86,6 +86,11 @@
   &--content {
     padding: 50px 0;
 
+    p {
+      width: 600px;
+      max-width: 100%;
+    }
+
     section {
       @include media-breakpoint-up(lg) {
         padding-left: 20px;
@@ -128,6 +133,8 @@
 
   p {
     margin: 0;
+    width: auto;
+    max-width: auto;
   }
 }
 

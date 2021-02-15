@@ -15,6 +15,7 @@ class General extends React.Component {
       email_secure: false,
       email_enabled: false,
       base_path: "",
+      login_type: false,
     };
 
     this.inputChange = this.inputChange.bind(this);
@@ -23,6 +24,7 @@ class General extends React.Component {
     this.loadConfigs = this.loadConfigs.bind(this);
     this.testEmail = this.testEmail.bind(this);
     this.saveBasePath = this.saveBasePath.bind(this);
+    this.saveLoginType = this.saveLoginType.bind(this);
   }
 
   inputChange(e) {
@@ -79,6 +81,23 @@ class General extends React.Component {
     }, 3000);
   }
 
+  async saveLoginType() {
+    await Api.updateConfig({
+      login_type: this.state.login_type,
+    });
+    this.setState({
+      isError: false,
+      isMsg: "Login Type Updated",
+    });
+    clearInterval(this.closeMsg);
+    this.closeMsg = setInterval(() => {
+      this.setState({
+        isError: false,
+        isMsg: false,
+      });
+    }, 3000);
+  }
+
   async loadConfigs() {
     try {
       let email = await Api.getEmailConfig();
@@ -91,15 +110,16 @@ class General extends React.Component {
         email_port: email.config.emailPort,
         email_secure: email.config.emailSecure,
         base_path: config.base_path ? config.base_path : "",
+        login_type: config.login_type ? config.login_type : 1,
         loading: false,
         isError: false,
-        isMsg: "Email config loaded",
+        isMsg: "Config loaded",
       });
     } catch (err) {
       console.log(err);
       this.setState({
         loading: false,
-        isError: "Error getting email config",
+        isError: "Error getting config",
       });
     }
     clearInterval(this.closeMsg);
@@ -305,6 +325,30 @@ class General extends React.Component {
             spellCheck="off"
           />
           <button className="btn btn__square" onClick={this.saveBasePath}>
+            Save
+          </button>
+        </section>
+        <section>
+          <p className="main-title mb--2">User login</p>
+          <p>
+            Logging into the admin panel in Petio will always require a
+            Username/Email &amp; Password, however the standard user panel can
+            be customised for <strong>Fast Login</strong> (where a user only
+            needs to provide their Username / Email) or{" "}
+            <strong>Standard Login</strong> (a user is required to enter a
+            username and password)
+          </p>
+          <div className="select-wrap">
+            <select
+              name="login_type"
+              value={this.state.login_type}
+              onChange={this.inputChange}
+            >
+              <option value="1">Standard Login</option>
+              <option value="2">Fast Login</option>
+            </select>
+          </div>
+          <button className="btn btn__square" onClick={this.saveLoginType}>
             Save
           </button>
         </section>

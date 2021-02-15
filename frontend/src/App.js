@@ -34,6 +34,7 @@ class App extends React.Component {
       configChecked: false,
       loginMsg: false,
       pushMsg: {},
+      login_type: false,
     };
 
     this.openIssues = this.openIssues.bind(this);
@@ -83,45 +84,51 @@ class App extends React.Component {
     this.login(username);
   }
 
-  login(username, cookie = false) {
+  async login(username, cookie = false) {
+    let password = this.state.password;
+    let type = this.state.login_type;
+    let user = {
+      username: username,
+      password: password,
+      type: type,
+    };
     if (!this.props.user.credentials || this.state.config === "failed") {
       return;
     }
     this.setState({
       loading: true,
     });
-    User.login(username, cookie)
-      .then((res) => {
-        this.setState({
-          loading: false,
-          loginMsg: false,
-        });
-        if (res.error) {
-          this.msg({
-            message: res.error,
-            type: "error",
-          });
-          return;
-        }
-        if (res.loggedIn) {
-          this.setState({
-            isLoggedIn: true,
-          });
-        }
-        if (res.admin) {
-          this.setState({
-            isAdmin: true,
-          });
-        }
-        User.getRequests();
-      })
-      .catch((error) => {
-        this.setState({
-          loginMsg: error,
-          loading: false,
-        });
-        localStorage.removeItem("loggedin");
+    try {
+      let res = await User.login(user, cookie);
+      this.setState({
+        loading: false,
+        loginMsg: false,
       });
+      if (res.error) {
+        this.msg({
+          message: res.error,
+          type: "error",
+        });
+        return;
+      }
+      if (res.loggedIn) {
+        this.setState({
+          isLoggedIn: true,
+        });
+      }
+      if (res.admin) {
+        this.setState({
+          isAdmin: true,
+        });
+      }
+      User.getRequests();
+    } catch (error) {
+      this.setState({
+        loginMsg: error,
+        loading: false,
+      });
+      localStorage.removeItem("loggedin");
+    }
   }
 
   logout() {
@@ -132,6 +139,7 @@ class App extends React.Component {
       isLoggedIn: false,
       isAdmin: false,
     });
+    this.msg({ message: "User logged out", type: "info" });
   }
 
   loginLocal() {
@@ -162,22 +170,23 @@ class App extends React.Component {
     });
   }
 
-  checkConfig() {
+  async checkConfig() {
     this.setState({
       configChecked: true,
     });
-    Api.checkConfig()
-      .then((res) => {
-        this.setState({
-          config: res.config,
-        });
-      })
-      .catch(() => {
-        this.setState({
-          error: true,
-          config: "failed",
-        });
+    try {
+      let res = await Api.checkConfig();
+      this.setState({
+        config: res.config,
+        login_type: parseInt(res.login_type),
       });
+    } catch {
+      this.msg({ message: "API not configured", type: "error" });
+      this.setState({
+        error: true,
+        config: "failed",
+      });
+    }
   }
 
   componentDidUpdate() {
@@ -209,6 +218,21 @@ class App extends React.Component {
     if (!this.state.isLoggedIn) {
       return (
         <div className="login-wrap">
+          <div className="push-msg--wrap">
+            {Object.keys(this.state.pushMsg).map((i) => {
+              let msg = this.state.pushMsg[i];
+              return (
+                <div
+                  key={msg.timestamp}
+                  className={`push-msg--item ${
+                    msg.type !== "info" ? msg.type : ""
+                  }`}
+                >
+                  {msg.message}
+                </div>
+              );
+            })}
+          </div>
           {!this.state.loading || !this.props.user.credentials ? (
             <>
               <div className="login--inner">
@@ -227,6 +251,18 @@ class App extends React.Component {
                     onChange={this.inputChange}
                     autoComplete="username"
                   />
+                  {this.state.login_type === 1 ? (
+                    <>
+                      <p>Password</p>
+                      <input
+                        type="password"
+                        name="password"
+                        value={this.state.password}
+                        onChange={this.inputChange}
+                        autoComplete="password"
+                      />
+                    </>
+                  ) : null}
                   {this.state.loginMsg ? (
                     <div className="msg msg__error msg__input">
                       {this.state.loginMsg}

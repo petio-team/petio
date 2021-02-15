@@ -86,7 +86,15 @@ class Main {
   setRoutes() {
     logger.log("info", "API: Setting up routes");
     this.e.get("/config", async (req, res) => {
-      res.json(this.config ? { config: true } : { config: false });
+      let config = getConfig();
+      res.json(
+        config
+          ? {
+              config: true,
+              login_type: config.login_type ? config.login_type : 1,
+            }
+          : { config: false, login_type: 1 }
+      );
     });
     this.setup();
     if (this.config) {
