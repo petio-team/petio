@@ -152,6 +152,8 @@
   &--item {
     font-size: 12px;
     margin-bottom: 5px;
+    max-width: initial;
+    width: auto;
   }
 
   &--type {
