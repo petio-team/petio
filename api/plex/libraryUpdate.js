@@ -12,6 +12,7 @@ const Mailer = require("../mail/mailer");
 const getConfig = require("../util/config");
 const processRequest = require("../requests/process");
 const logger = require("../util/logger");
+const bcrypt = require("bcrypt");
 
 class LibraryUpdate {
   constructor() {
@@ -135,47 +136,25 @@ class LibraryUpdate {
   }
 
   async createAdmin() {
-    let adminFound = await Admin.findOne({
+    let adminFound = await User.findOne({
       id: this.config.adminId,
     });
-    if (adminFound) {
-      logger.log("info", "LIB CRON: Admin Already Created, updating");
-      try {
-        let adminData = await Admin.findOneAndUpdate(
-          { id: this.config.adminId },
-          {
-            $set: {
-              email: this.config.adminEmail,
-              thumb: this.config.adminThumb,
-              title: this.config.adminDisplayName,
-              username: this.config.adminUsername,
-              password: this.config.adminPass,
-              altId: 1,
-              role: "admin",
-            },
-          },
-          { new: true, useFindAndModify: false }
-        );
-      } catch (err) {
-        logger.log("error", `LIB CRON: Error`);
-        logger.error(err.stack);
-      }
-    } else {
+    if (!adminFound) {
       logger.log("info", "LIB CRON: Creating admin user");
       try {
-        let adminData = new Admin({
+        let adminData = new User({
           id: this.config.adminId,
           email: this.config.adminEmail,
           thumb: this.config.adminThumb,
           title: this.config.adminDisplayName,
           username: this.config.adminUsername,
-          password: this.config.adminPass,
+          password: bcrypt.hashSync(this.config.adminPass, 10),
           altId: 1,
           role: "admin",
         });
         await adminData.save();
       } catch (err) {
-        logger.log("error", `LIB CRON: Error`);
+        logger.log("error", `LIB CRON: Error creating admin user`);
         logger.error(err.stack);
       }
     }

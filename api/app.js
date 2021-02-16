@@ -189,15 +189,15 @@ class Main {
   }
 
   async start() {
-    const libUpdate = new LibraryUpdate();
-    logger.log("verbose", `API: Registering Full Scan job`);
-    this.cron.start();
-    logger.log("verbose", `API: Registering Partial Scan job`);
-    this.partial.start();
-    logger.log("verbose", `API: Registering Quota reset job`);
-    this.resetQuotas.start();
-    logger.log("verbose", `API: Running init scan`);
-    libUpdate.run();
+    // const libUpdate = new LibraryUpdate();
+    // logger.log("verbose", `API: Registering Full Scan job`);
+    // this.cron.start();
+    // logger.log("verbose", `API: Registering Partial Scan job`);
+    // this.partial.start();
+    // logger.log("verbose", `API: Registering Quota reset job`);
+    // this.resetQuotas.start();
+    // logger.log("verbose", `API: Running init scan`);
+    // libUpdate.run();
   }
 
   setup() {
