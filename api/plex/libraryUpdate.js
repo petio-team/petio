@@ -537,7 +537,6 @@ class LibraryUpdate {
           },
           { useFindAndModify: false }
         );
-        logger.log("verbose", `LIB CRON: Show Updated - ${movieObj.title}`);
       } catch (err) {
         movieDb = false;
         logger.log("warn", err);
@@ -718,7 +717,6 @@ class LibraryUpdate {
           },
           { useFindAndModify: false }
         );
-        logger.log("verbose", `LIB CRON: Show Updated - ${showObj.title}`);
       } catch {
         showDb = false;
       }
