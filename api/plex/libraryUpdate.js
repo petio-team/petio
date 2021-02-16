@@ -128,6 +128,7 @@ class LibraryUpdate {
       await this.updateFriends();
       this.execMail();
       logger.log("info", "LIB CRON: Full Scan Complete");
+      this.checkOldRequests();
     } else {
       logger.log("warn", "Couldn't update libraries");
     }
@@ -921,6 +922,47 @@ class LibraryUpdate {
         }
       );
     });
+  }
+
+  async checkOldRequests() {
+    logger.info("LIB CRON: Checking old requests");
+    let requests = await Request.find();
+    for (let i = 0; i < requests.length; i++) {
+      let onServer = false;
+      let request = requests[i];
+      if (request.type === "tv") {
+        onServer = await Show.findOne({ tmdb_id: request.tmdb_id });
+      }
+      if (request.type === "movie") {
+        onServer = await Movie.findOne({ tmdb_id: request.tmdb_id });
+      }
+
+      if (onServer) {
+        logger.verbose(`LIB CRON: Found missed request - ${request.title}`);
+        new processRequest(request, false).archive(true, false, false);
+        let emails = [];
+        let titles = [];
+        await Promise.all(
+          request.users.map(async (user) => {
+            let userData = await User.findOne({ id: user });
+            if (!userData) {
+              userData = await Admin.findOne({ id: user });
+            }
+            if (!userData) return;
+            emails.push(userData.email);
+            titles.push(userData.title);
+          })
+        );
+        new Mailer().mail(
+          `${request.title} added to Plex!`,
+          `${request.title} added to Plex!`,
+          "Your request has now been processed and is ready to watch on Plex, thanks for your request!",
+          `https://image.tmdb.org/t/p/w500${request.thumb}`,
+          emails,
+          titles
+        );
+      }
+    }
   }
 }
 

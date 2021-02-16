@@ -234,6 +234,7 @@ class processRequest {
   }
 
   async archive(complete = Boolean, removed = Boolean, reason = false) {
+    let oldReq = this.request;
     let archiveRequest = new Archive({
       requestId: this.request.requestId,
       type: this.request.type,
@@ -261,7 +262,7 @@ class processRequest {
           logger.log("error", `REQ: Archive Error`);
           logger.error(err.stack);
         } else {
-          logger.log("info", "REQ: Request Archived!");
+          logger.log("info", `REQ: Request ${oldReq.title} Archived!`);
         }
       }
     );
