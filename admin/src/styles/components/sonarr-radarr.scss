@@ -29,8 +29,8 @@
       p {
         color: inherit;
         margin: 0;
-        max-width: initial;
-        width: auto;
+        max-width: initial !important;
+        width: auto !important;
       }
 
       svg {
