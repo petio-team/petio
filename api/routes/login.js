@@ -59,8 +59,9 @@ router.post("/", async (req, res) => {
       });
       if (!dbUser.disabled) {
         // Check if user is disabled
-        if (admin && dbUser.role !== "admin") {
-          console.log("here");
+        let hasAdmin =
+          dbUser.role === "admin" || dbUser.role === "moderator" ? true : false;
+        if (admin && !hasAdmin) {
           throw "User is not admin";
         }
         token = createToken(username, password, admin);
