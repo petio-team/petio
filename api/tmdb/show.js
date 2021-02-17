@@ -19,7 +19,6 @@ const memoryCache = cacheManager.caching({
 async function showLookup(id, minified = false) {
   logger.log("verbose", `TMDB Show Lookup ${id}`);
   let external = await externalId(id);
-  let fanart = minified ? false : await fanartLookup(external.tvdb_id, "tv");
   let show = false;
   try {
     data = await getShowData(id);
@@ -31,84 +30,101 @@ async function showLookup(id, minified = false) {
     return { error: "not found" };
   }
   if (show) {
-    if (fanart) {
-      if (fanart.hdtvlogo) {
-        show.logo = findEnLogo(fanart.hdtvlogo);
-      }
-      if (fanart.tvthumb) {
-        show.tile = findEnLogo(fanart.tvthumb);
-      }
-    }
-    if (!minified && external.imdb_id) {
-      show.imdb_data = await imdb(external.imdb_id);
-    }
-    show.imdb_id = external.imdb_id;
-    show.tvdb_id = external.tvdb_id;
-    delete show.production_companies;
-    delete show.homepage;
-    delete show.languages;
-    if (!minified) {
-      let recommendations = await getRecommendations(id);
-      let seasonsLookup = await getSeasons(show.seasons, id);
-      let seasons = Object.assign({}, seasonsLookup);
-      let seasonData = {};
-      let recommendationsData = [];
-      Object.keys(seasons).map((key) => {
-        let season = seasons[key];
-        Object.keys(season.episodes).map((ep) => {
-          delete season.episodes[ep].guest_stars;
-          delete season.episodes[ep].crew;
-          delete season.episodes[ep].production_code;
-          delete season.episodes[ep].show_id;
-        });
-        seasonData[season.season_number] = season;
-      });
-      Object.keys(recommendations.results).map((key) => {
-        let recommendation = recommendations.results[key];
-        recommendationsData.push(recommendation.id);
-      });
-      show.seasonData = seasonData;
-      show.recommendations = recommendationsData;
-    }
-
-    if (!minified) {
-      try {
-        let reviews = await getReviews(id);
-
-        show.reviews = reviews.results;
-      } catch (err) {
-        logger.log("warn", `Error getting review data - ${show.title}`);
-        logger.log("warn", err);
-      }
-    }
-
-    if (minified) {
-      delete show.created_by;
-      delete show.credits;
-      delete show.genres;
-      delete show.in_production;
-      delete show.last_air_date;
-      delete show.next_episode_to_air;
-      delete show.number_of_episodes;
-      delete show.number_of_seasons;
-      delete show.origin_country;
-      delete show.original_name;
-      delete show.overview;
-      delete show.popularity;
-      delete show.status;
-      delete show.videos;
-      delete show.vote_average;
-      delete show.vote_count;
-      delete show.seasons;
-    } else {
-      show.original_language_format = ISO6391.getName(show.original_language);
-    }
-    let onPlex = await onServer("show", show.imdb_id, show.tvdb_id, id);
-    show.on_server = onPlex.exists;
     if (!show.id) {
       return { error: "no id returned" };
     }
-    return show;
+
+    if (minified) {
+      // Pre-fetch IMDB on minfied lookup but don't wait or return
+      imdb(external.imdb_id);
+    }
+
+    try {
+      let [
+        imdb_data,
+        fanart,
+        recommendations,
+        seasonsLookup,
+        reviews,
+        onPlex,
+      ] = await Promise.all([
+        !minified && external.imdb_id ? imdb(external.imdb_id) : false,
+        minified ? false : fanartLookup(external.tvdb_id, "tv"),
+        !minified ? getRecommendations(id) : false,
+        !minified ? getSeasons(show.seasons, id) : false,
+        !minified ? getReviews(id) : false,
+        onServer("show", external.imdb_id, external.tvdb_id, id),
+      ]);
+
+      if (fanart) {
+        if (fanart.hdtvlogo) {
+          show.logo = findEnLogo(fanart.hdtvlogo);
+        }
+        if (fanart.tvthumb) {
+          show.tile = findEnLogo(fanart.tvthumb);
+        }
+      }
+
+      show.imdb_data = imdb_data;
+      show.imdb_id = external.imdb_id;
+      show.tvdb_id = external.tvdb_id;
+      show.on_server = onPlex.exists;
+      delete show.production_companies;
+      delete show.homepage;
+      delete show.languages;
+      if (!minified) {
+        let seasons = Object.assign({}, seasonsLookup);
+        let seasonData = {};
+        let recommendationsData = [];
+        Object.keys(seasons).map((key) => {
+          let season = seasons[key];
+          Object.keys(season.episodes).map((ep) => {
+            delete season.episodes[ep].guest_stars;
+            delete season.episodes[ep].crew;
+            delete season.episodes[ep].production_code;
+            delete season.episodes[ep].show_id;
+          });
+          seasonData[season.season_number] = season;
+        });
+        if (recommendations)
+          Object.keys(recommendations.results).map((key) => {
+            let recommendation = recommendations.results[key];
+            recommendationsData.push(recommendation.id);
+          });
+        show.seasonData = seasonData;
+        show.recommendations = recommendationsData;
+        show.reviews = reviews.results;
+      }
+
+      if (minified) {
+        delete show.created_by;
+        delete show.credits;
+        delete show.genres;
+        delete show.in_production;
+        delete show.last_air_date;
+        delete show.next_episode_to_air;
+        delete show.number_of_episodes;
+        delete show.number_of_seasons;
+        delete show.origin_country;
+        delete show.original_name;
+        delete show.overview;
+        delete show.popularity;
+        delete show.status;
+        delete show.videos;
+        delete show.vote_average;
+        delete show.vote_count;
+        delete show.seasons;
+      } else {
+        show.original_language_format = ISO6391.getName(show.original_language);
+      }
+
+      return show;
+    } catch (err) {
+      logger.log("warn", `Error processing show data - ${id}`);
+      logger.log("warn", err);
+      console.log(err);
+      return { error: "not found" };
+    }
   }
 }
 

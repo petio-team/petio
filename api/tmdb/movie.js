@@ -118,7 +118,6 @@ async function movieLookup(id, minified = false) {
     } catch (err) {
       logger.log("warn", `Error processing movie data - ${id}`);
       logger.log("warn", err);
-      console.log(err);
       return { error: "not found" };
     }
   }

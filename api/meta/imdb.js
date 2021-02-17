@@ -1,6 +1,7 @@
 // https://www.imdb.com/title/tt6475714/
 const axios = require("axios");
 const cheerio = require("cheerio");
+const logger = require("../util/logger");
 
 const cacheManager = require("cache-manager");
 const memoryCache = cacheManager.caching({
