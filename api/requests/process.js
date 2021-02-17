@@ -1,7 +1,6 @@
 const Request = require("../models/request");
 const Archive = require("../models/archive");
 const User = require("../models/user");
-const Admin = require("../models/admin");
 const Profile = require("../models/profile");
 const Mailer = require("../mail/mailer");
 const Sonarr = require("../services/sonarr");
@@ -56,9 +55,6 @@ class processRequest {
 
   async existing() {
     let userDetails = await User.findOne({ id: this.user.id });
-    if (!userDetails) {
-      userDetails = await Admin.findOne({ id: this.user.id });
-    }
     let profile = userDetails.profile
       ? await Profile.findById(this.user.profile)
       : false;
@@ -83,9 +79,6 @@ class processRequest {
 
   async create() {
     let userDetails = await User.findOne({ id: this.user.id });
-    if (!userDetails) {
-      userDetails = await Admin.findOne({ id: this.user.id });
-    }
     let profile = userDetails.profile
       ? await Profile.findById(this.user.profile)
       : false;
@@ -213,13 +206,9 @@ class processRequest {
 
   async checkQuota() {
     let userDetails = await User.findOne({ id: this.user.id });
-    if (!userDetails) {
-      let admin = await Admin.findOne({ id: this.user.id });
-      if (admin) {
-        return "admin";
-      }
-      return false;
-    }
+    if (!userDetails) return false;
+    if (userData.role === "admin") return "admin";
+
     let userQuota = userDetails.quotaCount ? userDetails.quotaCount : 0;
     let profile = userDetails.profile
       ? await Profile.findById(this.user.profile)

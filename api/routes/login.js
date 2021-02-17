@@ -6,7 +6,6 @@ const getConfig = require("../util/config");
 const express = require("express");
 const router = express.Router();
 const User = require("../models/user");
-const Admin = require("../models/admin");
 const logger = require("../util/logger");
 const bcrypt = require("bcrypt");
 
@@ -39,7 +38,6 @@ router.post("/", async (req, res) => {
   if (authToken) {
     try {
       let jwtUser = jwt.verify(authToken, prefs.plexToken);
-      console.log(jwtUser);
       if (!jwtUser.username) {
         throw "No username";
       }
@@ -96,6 +94,7 @@ router.post("/", async (req, res) => {
     loggedIn: loggedIn,
     user: userData,
     token: token,
+    admin: admin ? true : false,
   });
 });
 

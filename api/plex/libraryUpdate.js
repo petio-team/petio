@@ -1,4 +1,3 @@
-const Admin = require("../models/admin");
 const request = require("xhr-request");
 const xmlParser = require("xml-js");
 const Library = require("../models/library");
@@ -805,9 +804,6 @@ class LibraryUpdate {
   async sendMail(user, i, request) {
     let userData = await User.findOne({ id: user });
     if (!userData) {
-      userData = await Admin.findOne({ id: user });
-    }
-    if (!userData) {
       logger.log("error", "LIB CRON: Err: No user data");
       return;
     }
@@ -922,9 +918,6 @@ class LibraryUpdate {
         await Promise.all(
           request.users.map(async (user) => {
             let userData = await User.findOne({ id: user });
-            if (!userData) {
-              userData = await Admin.findOne({ id: user });
-            }
             if (!userData) return;
             emails.push(userData.email);
             titles.push(userData.title);

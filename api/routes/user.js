@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/user");
-const Admin = require("../models/admin");
 const http = require("follow-redirects").http;
 const logger = require("../util/logger");
+const bcrypt = require("bcrypt");
 
 router.get("/thumb/:id", async (req, res) => {
   let userData = false;
@@ -13,14 +13,7 @@ router.get("/thumb/:id", async (req, res) => {
     res.json({ error: err });
     return;
   }
-  if (!userData) {
-    try {
-      userData = await Admin.findOne({ id: req.params.id });
-    } catch (err) {
-      res.json({ error: err });
-      return;
-    }
-  }
+
   if (userData) {
     let url = userData.thumb;
 
@@ -54,14 +47,13 @@ router.get("/thumb/:id", async (req, res) => {
 router.get("/all", async (req, res) => {
   try {
     userData = await User.find();
-    adminData = await Admin.find();
   } catch (err) {
     res.json({ error: err });
     return;
   }
 
   if (userData) {
-    let data = Object.values(Object.assign(userData, adminData));
+    let data = Object.values(Object.assign(userData));
     Object.keys(data).map((u) => {
       let user = data[u];
       if (user) {
@@ -81,14 +73,6 @@ router.get("/:id", async (req, res) => {
     res.json({ error: err });
     return;
   }
-  if (!userData) {
-    try {
-      userData = await Admin.findOne({ id: req.params.id });
-    } catch (err) {
-      res.json({ error: err });
-      return;
-    }
-  }
   if (userData) {
     if (userData.password) userData.password = "removed";
     res.json(userData);
@@ -104,21 +88,14 @@ router.post("/create_custom", async (req, res) => {
       error: "No user details",
     });
   }
-  let friend = await User.findOne({
+  let dbUser = await User.findOne({
     $or: [
       { username: user.username },
       { email: user.email },
       { title: user.username },
     ],
   });
-  let admin = await Admin.findOne({
-    $or: [
-      { username: user.username },
-      { email: user.email },
-      { title: user.username },
-    ],
-  });
-  if (friend || admin) {
+  if (dbUser) {
     res.status(409).json({
       error: "User exists, please change the username or email",
     });
@@ -132,7 +109,7 @@ router.post("/create_custom", async (req, res) => {
         email: user.email,
         recommendationsPlaylistId: false,
         thumb: false,
-        password: user.password,
+        password: bcrypt.hashSync(user.password, 10),
         altId: user.linked,
         custom: true,
       });
@@ -156,32 +133,19 @@ router.post("/edit", async (req, res) => {
     });
   }
   try {
-    if (user.role === "admin") {
-      await Admin.findOneAndUpdate(
-        { _id: user.id },
-        {
-          $set: {
-            email: user.email,
-            profile: user.profile,
-            disabled: user.disabled,
-          },
+    await User.findOneAndUpdate(
+      { _id: user.id },
+      {
+        $set: {
+          email: user.email,
+          role: user.role,
+          profile: user.profile,
+          disabled: user.disabled,
         },
-        { new: true, useFindAndModify: false }
-      );
-    } else {
-      await User.findOneAndUpdate(
-        { _id: user.id },
-        {
-          $set: {
-            email: user.email,
-            role: user.role,
-            profile: user.profile,
-            disabled: user.disabled,
-          },
-        },
-        { new: true, useFindAndModify: false }
-      );
-    }
+      },
+      { new: true, useFindAndModify: false }
+    );
+
     res.json({
       message: "User edited",
     });
@@ -215,16 +179,6 @@ router.post("/bulk_edit", async (req, res) => {
             $set: {
               profile: profile,
               disabled: enabled ? false : true,
-            },
-          }
-        );
-        await Admin.updateMany(
-          {
-            _id: user,
-          },
-          {
-            $set: {
-              profile: profile,
             },
           }
         );

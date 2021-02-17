@@ -189,29 +189,29 @@ class Main {
   }
 
   async start() {
-    // const libUpdate = new LibraryUpdate();
-    // logger.log("verbose", `API: Registering Full Scan job`);
-    // this.cron.start();
-    // logger.log("verbose", `API: Registering Partial Scan job`);
-    // this.partial.start();
-    // logger.log("verbose", `API: Registering Quota reset job`);
-    // this.resetQuotas.start();
-    // logger.log("verbose", `API: Running init scan`);
-    // libUpdate.run();
+    const libUpdate = new LibraryUpdate();
+    logger.log("verbose", `API: Registering Full Scan job`);
+    this.cron.start();
+    logger.log("verbose", `API: Registering Partial Scan job`);
+    this.partial.start();
+    logger.log("verbose", `API: Registering Quota reset job`);
+    this.resetQuotas.start();
+    logger.log("verbose", `API: Running init scan`);
+    libUpdate.run();
   }
 
   setup() {
     this.e.post("/setup/test_server", async (req, res) => {
-      logger.log(
-        "verbose",
-        `API: Testing Server ${server.protocol}://${server.host}:${server.port}?X-Plex-Token=${server.token}`
-      );
       let server = req.body.server;
       if (!server) {
         logger.log("warn", "API: Test Server bad request");
         res.status(400).send("Bad Request");
         return;
       }
+      logger.log(
+        "verbose",
+        `API: Testing Server ${server.protocol}://${server.host}:${server.port}?X-Plex-Token=${server.token}`
+      );
       try {
         let test = await testConnection(
           server.protocol,
