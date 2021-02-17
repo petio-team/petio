@@ -31,6 +31,9 @@ async function movieLookup(id, minified = false) {
     return { error: "not found" };
   }
   if (movie) {
+    if (!movie.id) {
+      return { error: "no id returned" };
+    }
     if (fanart) {
       if (fanart.hdmovielogo) {
         movie.logo = findEnLogo(fanart.hdmovielogo);
@@ -38,6 +41,10 @@ async function movieLookup(id, minified = false) {
       if (fanart.moviethumb) {
         movie.tile = findEnLogo(fanart.moviethumb);
       }
+    }
+    if (minified) {
+      // Pre-fetch IMDB on minfied lookup but don't wait or return
+      imdb(movie.imdb_id);
     }
     try {
       let collectionData = false;
@@ -47,7 +54,7 @@ async function movieLookup(id, minified = false) {
         imdb_data,
         collection,
         reviews,
-      ] = await promise.all([
+      ] = await Promise.all([
         onServer("movie", movie.imdb_id, false, id),
         getRecommendations(id),
         !minified && movie.imdb_id ? imdb(movie.imdb_id) : false,
@@ -106,13 +113,12 @@ async function movieLookup(id, minified = false) {
           movie.original_language
         );
       }
-      if (!movie.id) {
-        return { error: "no id returned" };
-      }
+
       return movie;
     } catch (err) {
       logger.log("warn", `Error processing movie data - ${id}`);
       logger.log("warn", err);
+      console.log(err);
       return { error: "not found" };
     }
   }
