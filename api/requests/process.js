@@ -211,7 +211,7 @@ class processRequest {
   async checkQuota() {
     let userDetails = await User.findOne({ id: this.user.id });
     if (!userDetails) return false;
-    if (userData.role === "admin") return "admin";
+    if (userDetails.role === "admin") return "admin";
 
     let userQuota = userDetails.quotaCount ? userDetails.quotaCount : 0;
     let profile = userDetails.profile
