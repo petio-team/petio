@@ -4,6 +4,7 @@ const getConfig = require("../util/config");
 const fanartLookup = require("../fanart");
 const request = require("xhr-request");
 const onServer = require("../plex/onServer");
+const imdb = require("../meta/imdb");
 
 const ISO6391 = require("iso-639-1");
 
@@ -38,75 +39,82 @@ async function movieLookup(id, minified = false) {
         movie.tile = findEnLogo(fanart.moviethumb);
       }
     }
-    let collectionData = false;
-    let onPlex = await onServer("movie", movie.imdb_id, false, id);
-    let recommendations = await getRecommendations(id);
-    let recommendationsData = [];
-    movie.on_server = onPlex.exists;
-    movie.available_resolutions = onPlex.resolutions;
-    if (recommendations.results) {
-      Object.keys(recommendations.results).map((key) => {
-        let recommendation = recommendations.results[key];
-        recommendationsData.push(recommendation.id);
-      });
-    }
-    if (!minified && movie.belongs_to_collection) {
-      try {
-        let collection = await getCollection(movie.belongs_to_collection.id);
+    try {
+      let collectionData = false;
+      let [
+        onPlex,
+        recommendations,
+        imdb_data,
+        collection,
+        reviews,
+      ] = await promise.all([
+        onServer("movie", movie.imdb_id, false, id),
+        getRecommendations(id),
+        !minified && movie.imdb_id ? imdb(movie.imdb_id) : false,
+        !minified && movie.belongs_to_collection
+          ? getCollection(movie.belongs_to_collection.id)
+          : false,
+        !minified ? getReviews(id) : false,
+      ]);
+
+      let recommendationsData = [];
+      movie.on_server = onPlex.exists;
+      movie.available_resolutions = onPlex.resolutions;
+      movie.imdb_data = imdb_data;
+      movie.reviews = reviews.results;
+      if (recommendations.results) {
+        Object.keys(recommendations.results).map((key) => {
+          let recommendation = recommendations.results[key];
+          recommendationsData.push(recommendation.id);
+        });
+      }
+      if (!minified && movie.belongs_to_collection) {
         collectionData = [];
         collection.parts.map((part) => {
           collectionData.push(part.id);
         });
-      } catch (err) {
-        logger.log("warn", `Error getting collection data - ${movie.title}`);
-        logger.log("warn", err);
       }
-    }
 
-    if (!minified) {
-      try {
-        let reviews = await getReviews(id);
+      movie.recommendations = recommendationsData;
+      movie.collection = collectionData;
+      movie.keywords.results = movie.keywords.keywords;
+      movie.keywords.keywords = {};
 
-        movie.reviews = reviews.results;
-      } catch (err) {
-        logger.log("warn", `Error getting review data - ${movie.title}`);
-        logger.log("warn", err);
+      delete movie.production_countries;
+      delete movie.budget;
+      delete movie.adult;
+      delete movie.original_title;
+      // delete movie.production_companies;
+      if (minified) {
+        delete movie.credits;
+        delete movie.backdrop_path;
+        delete movie.belongs_to_collection;
+        delete movie.genres;
+        delete movie.homepage;
+        delete movie.popularity;
+        delete movie.recommendations;
+        delete movie.revenue;
+        delete movie.runtime;
+        delete movie.spoken_languages;
+        delete movie.status;
+        delete movie.tagline;
+        delete movie.videos;
+        delete movie.vote_average;
+        delete movie.vote_count;
+      } else {
+        movie.original_language_format = ISO6391.getName(
+          movie.original_language
+        );
       }
+      if (!movie.id) {
+        return { error: "no id returned" };
+      }
+      return movie;
+    } catch (err) {
+      logger.log("warn", `Error processing movie data - ${id}`);
+      logger.log("warn", err);
+      return { error: "not found" };
     }
-
-    movie.recommendations = recommendationsData;
-    movie.collection = collectionData;
-    movie.keywords.results = movie.keywords.keywords;
-    movie.keywords.keywords = {};
-
-    delete movie.production_countries;
-    delete movie.budget;
-    delete movie.adult;
-    delete movie.original_title;
-    // delete movie.production_companies;
-    if (minified) {
-      delete movie.credits;
-      delete movie.backdrop_path;
-      delete movie.belongs_to_collection;
-      delete movie.genres;
-      delete movie.homepage;
-      delete movie.popularity;
-      delete movie.recommendations;
-      delete movie.revenue;
-      delete movie.runtime;
-      delete movie.spoken_languages;
-      delete movie.status;
-      delete movie.tagline;
-      delete movie.videos;
-      delete movie.vote_average;
-      delete movie.vote_count;
-    } else {
-      movie.original_language_format = ISO6391.getName(movie.original_language);
-    }
-    if (!movie.id) {
-      return { error: "no id returned" };
-    }
-    return movie;
   }
 }
 

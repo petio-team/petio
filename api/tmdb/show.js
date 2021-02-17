@@ -3,6 +3,7 @@ const getConfig = require("../util/config");
 const fanartLookup = require("../fanart");
 const request = require("xhr-request");
 const onServer = require("../plex/onServer");
+const imdb = require("../meta/imdb");
 
 const ISO6391 = require("iso-639-1");
 
@@ -37,6 +38,9 @@ async function showLookup(id, minified = false) {
       if (fanart.tvthumb) {
         show.tile = findEnLogo(fanart.tvthumb);
       }
+    }
+    if (!minified && external.imdb_id) {
+      show.imdb_data = await imdb(external.imdb_id);
     }
     show.imdb_id = external.imdb_id;
     show.tvdb_id = external.tvdb_id;

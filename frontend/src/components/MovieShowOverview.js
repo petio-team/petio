@@ -31,6 +31,9 @@ import { ReactComponent as GenreWar } from "../assets/svg/genres/war.svg";
 import { ReactComponent as GenreWestern } from "../assets/svg/genres/western.svg";
 import { ReactComponent as GenreAnime } from "../assets/svg/genres/anime.svg";
 
+import { ReactComponent as ImdbIcon } from "../assets/svg/imdb.svg";
+import { ReactComponent as TmdbIcon } from "../assets/svg/tmdb-sm.svg";
+
 import { isIOS } from "react-device-detect";
 
 class MovieShowOverview extends React.Component {
@@ -337,9 +340,11 @@ class MovieShowOverview extends React.Component {
                 </p>
                 <div className="detail--bar--sep">·</div>
                 <p>
-                  <span className="desktop-only">Rating: </span>
+                  <span className="rating-icon">
+                    <TmdbIcon />
+                  </span>
                   <span
-                    className={`color-${
+                    className={`rating color-${
                       criticRating > 7.9
                         ? "green"
                         : criticRating > 6.9
@@ -352,11 +357,37 @@ class MovieShowOverview extends React.Component {
                     {criticRating}
                   </span>
                 </p>
+                {this.props.mediaData.imdb_data.rating ? (
+                  <>
+                    <div className="detail--bar--sep">·</div>
+                    <p>
+                      <span className="rating-icon">
+                        <ImdbIcon />
+                      </span>
+                      <span
+                        className={`rating color-${
+                          this.props.mediaData.imdb_data.rating.ratingValue >
+                          7.9
+                            ? "green"
+                            : this.props.mediaData.imdb_data.rating
+                                .ratingValue > 6.9
+                            ? "blue"
+                            : this.props.mediaData.imdb_data.rating
+                                .ratingValue > 4.9
+                            ? "orange"
+                            : "red"
+                        }`}
+                      >
+                        {this.props.mediaData.imdb_data.rating.ratingValue}
+                      </span>
+                    </p>
+                  </>
+                ) : null}
                 <div className="detail--bar--sep">·</div>
                 <p>
-                  <span className="desktop-only">User Rating: </span>
+                  <span className="desktop-only">Petio: </span>
                   <span
-                    className={`color-${
+                    className={`rating d-nm color-${
                       userRatingVal > 79
                         ? "green"
                         : userRatingVal > 69
@@ -374,7 +405,9 @@ class MovieShowOverview extends React.Component {
                     <div className="detail--bar--sep">·</div>
                     <p>
                       <span className="desktop-only">Language: </span>
-                      {this.props.mediaData.original_language_format}
+                      <span className="item-val">
+                        {this.props.mediaData.original_language_format}
+                      </span>
                     </p>
                   </>
                 ) : null}
