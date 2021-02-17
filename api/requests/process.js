@@ -84,6 +84,10 @@ class processRequest {
       : false;
     let autoApprove = profile ? profile.autoApprove : false;
 
+    if (userDetails.role === "admin") {
+      autoApprove = true;
+    }
+
     const newRequest = new Request({
       requestId: this.request.id,
       type: this.request.type,
