@@ -48,7 +48,7 @@ router.post("/", async (req, res) => {
         if (admin && !hasAdmin) {
           throw "User is not admin";
         }
-        token = createToken(username, password, admin);
+        token = createToken(username, admin);
         if (
           (dbUser.password && parseInt(prefs.login_type) === 1) ||
           (admin && dbUser.password)
