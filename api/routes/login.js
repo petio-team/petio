@@ -35,22 +35,6 @@ router.post("/", async (req, res) => {
   logger.log("info", `LOGIN: Request User: ${username}`);
   logger.log("info", `LOGIN: Request IP: ${request_ip}`);
 
-  if (authToken) {
-    try {
-      let jwtUser = jwt.verify(authToken, prefs.plexToken);
-      if (!jwtUser.username) {
-        throw "No username";
-      }
-
-      logger.log("verbose", `LOGIN: Token fine`);
-      username = jwtUser.username;
-      password = jwtUser.password;
-    } catch (err) {
-      logger.log("warn", `LOGIN: Invalid token, rejected`);
-      logger.warn(err);
-    }
-  }
-
   if (username) {
     try {
       // Find user in db
@@ -99,15 +83,12 @@ router.post("/", async (req, res) => {
   });
 });
 
-function createToken(username, password, admin = false) {
+function createToken(username, admin = false) {
   const prefs = getConfig();
   if (!prefs.login_type) {
     prefs.login_type = 1;
   }
-  if (parseInt(prefs.login_type) === 2 && !admin) {
-    password = "";
-  }
-  return jwt.sign({ username: username, password: password }, prefs.plexToken);
+  return jwt.sign({ username, admin }, prefs.plexToken);
 }
 
 function plexAuth(username, password) {
