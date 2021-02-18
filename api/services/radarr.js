@@ -60,14 +60,14 @@ class Radarr {
       let args = {
         method: method,
         json: true,
-        timeout: 3000,
+        timeout: 30000,
       };
       if (method === "post" && body) {
         args = {
           method: method,
           json: true,
           body: body,
-          timeout: 10000,
+          timeout: 30000,
         };
       }
       request(url, args, function (err, data) {
