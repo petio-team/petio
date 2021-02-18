@@ -22,7 +22,7 @@
     "iso-639-1": "^2.1.5",
     "joi": "^17.3.0",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.11.6",
+    "mongoose": "^5.11.17",
     "nodejs-nodemailer-outlook": "^1.2.3",
     "nodemailer": "^6.4.16",
     "sanitize-filename": "^1.6.3",
