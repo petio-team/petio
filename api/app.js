@@ -40,6 +40,7 @@ const issueRoute = require("./routes/issue");
 const profileRoute = require("./routes/profiles");
 const configRoute = require("./routes/config");
 const logsRoute = require("./routes/log");
+const { authRequired } = require("./middleware/auth");
 
 class Main {
   constructor() {
@@ -105,25 +106,25 @@ class Main {
         next();
       });
       this.e.use("/login", loginRoute);
-      this.e.use("/movie", movieRoute);
-      this.e.use("/show", showRoute);
-      this.e.use("/person", personRoute);
-      this.e.use("/search", searchRoute);
-      this.e.use("/trending", trendingRoute);
-      this.e.use("/request", requestRoute);
-      this.e.use("/top", topRoute);
-      this.e.use("/history", historyRoute);
-      this.e.use("/plex", plexRoute);
-      this.e.use("/review", reviewRoute);
-      this.e.use("/user", userRoute);
-      this.e.use("/genie", genieRoute);
-      this.e.use("/sessions", sessionsRoute);
-      this.e.use("/services", servicesRoute);
-      this.e.use("/mail", mailRoute);
-      this.e.use("/issue", issueRoute);
-      this.e.use("/profiles", profileRoute);
-      this.e.use("/config", configRoute);
-      this.e.use("/logs", logsRoute);
+      this.e.use("/movie", authRequired, movieRoute);
+      this.e.use("/show", authRequired, showRoute);
+      this.e.use("/person", authRequired, personRoute);
+      this.e.use("/search", authRequired, searchRoute);
+      this.e.use("/trending", authRequired, trendingRoute);
+      this.e.use("/request", authRequired, requestRoute);
+      this.e.use("/top", authRequired, topRoute);
+      this.e.use("/history", authRequired, historyRoute);
+      this.e.use("/plex", authRequired, plexRoute);
+      this.e.use("/review", authRequired, reviewRoute);
+      this.e.use("/user", authRequired, userRoute);
+      this.e.use("/genie", authRequired, genieRoute);
+      this.e.use("/sessions", authRequired, sessionsRoute);
+      this.e.use("/services", authRequired, servicesRoute);
+      this.e.use("/mail", authRequired, mailRoute);
+      this.e.use("/issue", authRequired, issueRoute);
+      this.e.use("/profiles", authRequired, profileRoute);
+      this.e.use("/config", authRequired, configRoute);
+      this.e.use("/logs", authRequired, logsRoute);
       this.e.get("*", function (req, res) {
         logger.log(
           "warn",
