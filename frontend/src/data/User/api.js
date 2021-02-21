@@ -1,4 +1,4 @@
-import { post } from "../http";
+import { get, post } from "../http";
 
 export async function login(user, token = false) {
   return post("/login", { user, authToken: token });

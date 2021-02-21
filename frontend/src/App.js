@@ -127,12 +127,12 @@ class App extends React.Component {
         loginMsg: error,
         loading: false,
       });
-      localStorage.removeItem("loggedin");
+      localStorage.removeItem("petio_jwt");
     }
   }
 
   logout() {
-    localStorage.removeItem("loggedin");
+    localStorage.removeItem("petio_jwt");
     localStorage.removeItem("adminloggedin");
     User.logout();
     this.setState({
@@ -143,7 +143,7 @@ class App extends React.Component {
   }
 
   loginLocal() {
-    if (localStorage.getItem("loggedin")) {
+    if (localStorage.getItem("petio_jwt")) {
       if (this.props.user.credentials) {
         this.login("", true);
       } else {

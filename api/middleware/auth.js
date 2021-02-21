@@ -1,26 +1,44 @@
 const jwt = require("jsonwebtoken");
 
+const logger = require("../util/logger");
+
 const getConfig = require("../util/config");
+
+function authenticate(req) {
+  const prefs = getConfig();
+  const { authorization: header } = req.headers;
+  let petioJwt;
+  if (req.cookies && req.cookies.petio_jwt) {
+    petioJwt = req.cookies.petio_jwt;
+  } else if (header && /^Bearer (.*)$/.test(header)) {
+    const match = /^Bearer (.*)$/.exec(header);
+    petioJwt = match[1];
+  } else {
+    throw "No auth token provided";
+  }
+  req.jwtUser = jwt.verify(petioJwt, prefs.plexToken);
+  console.log(req.jwtUser);
+  return req.jwtUser;
+}
+
+exports.authenticate = authenticate;
+
 exports.authRequired = (req, res, next) => {
   try {
-    const prefs = getConfig();
-    const { petio_jwt } = req.cookies;
-    const jwtUser = jwt.verify(petio_jwt, prefs.plexToken);
-    if (!jwtUser.username) {
-      throw "no username";
-    }
-    logger.log("verbose", `AUTH: Token fine for ${jwtUser.username}`);
-    req.jwtUser = jwtUser;
-    next();
-  } catch (error) {
+    authenticate(req);
+  } catch (e) {
+    logger.log("warn", `AUTH: user is not logged in`);
+    logger.warn(e);
     res.sendStatus(401);
-    logger.log("warn", `AUTH: Invalid token, rejected`);
-    logger.warn(error);
+    return;
   }
+  console.log(req.jwtUser);
+  logger.log("verbose", `AUTH: Token fine for ${req.jwtUser.username}`);
+  next();
 };
 
 exports.adminRequired = (req, res, next) => {
-  if (jwtUser && jwtUser.admin) {
+  if (req.jwtUser && req.jwtUser.admin) {
     logger.log("verbose", `AUTH: Admin check for ${jwtUser.username} passed`);
     next();
   } else {

@@ -1,7 +1,16 @@
 const isDev = process.env.NODE_ENV === "development";
 const origin = isDev ? "http://localhost:7778" : "";
 const basePath = window.location.pathname.replace(/\/$/, "");
-const API_URL = `${origin}${basePath}/api`;
+const API_URL = `${origin}${basePath}${isDev ? "" : "/api"}`;
+
+function maybeGetAuthHeader() {
+  let petioJwt = localStorage.getItem("petio_jwt");
+  if (petioJwt) {
+    return { Authorization: `Bearer ${petioJwt}` };
+  } else {
+    return {};
+  }
+}
 
 export class HttpError extends Error {
   constructor(statusCode) {
@@ -24,6 +33,10 @@ export function get(path, options = {}) {
   const mergedOptions = {
     credentials: "include",
     ...options,
+    headers: {
+      ...maybeGetAuthHeader(),
+      ...options.headers,
+    },
   };
   return fetch(API_URL + path, mergedOptions).then(parseResponse);
 }
@@ -35,6 +48,7 @@ export function post(path, data, options = {}) {
     ...options,
     headers: {
       "Content-Type": "application/json",
+      ...maybeGetAuthHeader(),
       ...options.headers,
     },
     body: JSON.stringify(data),
@@ -49,6 +63,7 @@ export function put(path, data, options = {}) {
     ...options,
     headers: {
       "Content-Type": "application/json",
+      ...maybeGetAuthHeader(),
       ...options.headers,
     },
     body: JSON.stringify(data),
@@ -61,6 +76,10 @@ export function del(path, options = {}) {
     credentials: "include",
     method: "DELETE",
     ...options,
+    headers: {
+      ...maybeGetAuthHeader(),
+      ...options.headers,
+    },
   };
   return fetch(API_URL + path, mergedOptions).then(parseResponse);
 }

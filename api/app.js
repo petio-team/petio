@@ -78,8 +78,20 @@ class Main {
     this.config = getConfig();
     this.e = app;
     this.server = null;
-    this.e.use(cors());
-    this.e.options("*", cors());
+    this.e.use(
+      cors({
+        origin: (origin, callback) => {
+          if (
+            ["http://localhost:3000", "http://localhost:3001"].includes(origin)
+          ) {
+            callback(null, true);
+          } else {
+            callback(new Error());
+          }
+        },
+        credentials: true,
+      })
+    );
     this.e.use(express.json());
     this.e.use(express.urlencoded({ extended: true }));
   }

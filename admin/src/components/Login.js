@@ -68,16 +68,16 @@ class Login extends React.Component {
           "error",
           "There has been an error, Petio may be temporarily unavailable"
         );
-        localStorage.removeItem("loggedin");
+        localStorage.removeItem("petio_jwt");
       });
   }
 
   loginLocal() {
-    if (localStorage.getItem("loggedin")) {
+    if (localStorage.getItem("petio_jwt")) {
       if (localStorage.getItem("adminloggedin") === "true") {
         this.login("", false, true, true);
       } else {
-        localStorage.removeItem("loggedin");
+        localStorage.removeItem("petio_jwt");
       }
     }
   }

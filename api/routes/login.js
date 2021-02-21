@@ -8,19 +8,16 @@ const router = express.Router();
 const User = require("../models/user");
 const logger = require("../util/logger");
 const bcrypt = require("bcrypt");
+const { authenticate } = require("../middleware/auth");
 
 router.post("/", async (req, res) => {
   const prefs = getConfig();
-  const admin = req.body.admin;
-  const authToken = req.body.authToken;
-  const user = req.body.user;
   const request_ip =
     req.headers["x-forwarded-for"] || req.connection.remoteAddress;
-  let userData = false;
-  let token = false;
-  let loggedIn = false;
-  let username = user.username;
-  let password = user.password;
+  const {
+    user: { username, password },
+    admin: adminRequested,
+  } = req.body || { user: {} };
 
   if (!prefs) {
     res.status(500).send("This Petio API is not setup");
@@ -35,61 +32,70 @@ router.post("/", async (req, res) => {
   logger.log("info", `LOGIN: Request User: ${username}`);
   logger.log("info", `LOGIN: Request IP: ${request_ip}`);
 
-  if (username) {
-    try {
-      // Find user in db
-      let dbUser = await User.findOne({
-        $or: [{ username: username }, { email: username }, { title: username }],
+  function success(user) {
+    user.password = null;
+    const isAdmin = ["admin", "moderator"].includes(user.role);
+    const token = jwt.sign({ ...user, admin: isAdmin }, prefs.plexToken);
+    res
+      .cookie("petio_jwt", token, {
+        path: "/",
+        httpOnly: true,
+        maxAge: 2419200000,
+        sameSite: "none",
+        secure: true,
+      })
+      .json({
+        loggedIn: true,
+        user,
+        token,
+        admin: isAdmin,
       });
-      if (!dbUser.disabled) {
-        // Check if user is disabled
-        let hasAdmin =
-          dbUser.role === "admin" || dbUser.role === "moderator" ? true : false;
-        if (admin && !hasAdmin) {
-          throw "User is not admin";
+  }
+
+  // check for existing jwt
+  try {
+    const user = authenticate(req);
+    console.log("jwtUser", user);
+    success(user);
+    return;
+  } catch (e) {
+    // if existing jwt failed, continue onto normal login flow
+  }
+
+  try {
+    // Find user in db
+    let dbUser = await User.findOne({
+      $or: [{ username: username }, { email: username }, { title: username }],
+    });
+    if (!dbUser) throw "User not found";
+
+    if (dbUser.disabled) throw "User is disabled";
+
+    let isAdmin = dbUser.role === "admin" || dbUser.role === "moderator";
+
+    // TODO: do we need these adminRequested checks in the login flow now that we have properly secured routes?
+    if (adminRequested && !isAdmin) throw "User is not admin";
+
+    if (adminRequested || parseInt(prefs.login_type) === 1) {
+      if (dbUser.password) {
+        if (!bcrypt.compareSync(password, dbUser.password)) {
+          throw "Password is incorrect";
         }
-        token = createToken(username, admin);
-        if (
-          (dbUser.password && parseInt(prefs.login_type) === 1) ||
-          (admin && dbUser.password)
-        ) {
-          // If standard auth and db user has password or is admin panel
-          let checkPass =
-            dbUser.password && password
-              ? bcrypt.compareSync(password, dbUser.password)
-              : false;
-          if (!checkPass) throw "Password hash failed";
-        } else if (parseInt(prefs.login_type) === 1 || admin) {
-          // Auth against plex, standard login and is plex user
-          await plexAuth(username, password);
-        }
-        saveRequestIp(dbUser, request_ip);
-        userData = dbUser;
-        userData.password = "";
-        loggedIn = true;
+      } else {
+        // throws on invalid credentials
+        await plexAuth(username, password);
       }
-    } catch (err) {
-      logger.log("warn", `LOGIN: User not found ${username} - ${request_ip}`);
-      logger.warn(err);
-      token = false;
+    } else {
+      // passwordless login, no check required
     }
+    success(dbUser.toObject());
+    saveRequestIp(dbUser, request_ip);
+  } catch (err) {
+    logger.log("warn", `LOGIN: User not found ${username} - ${request_ip}`);
+    logger.warn(err);
+    res.json({ loggedIn: false, user: null, admin: false, token: null });
   }
-
-  res.json({
-    loggedIn: loggedIn,
-    user: userData,
-    token: token,
-    admin: admin ? true : false,
-  });
 });
-
-function createToken(username, admin = false) {
-  const prefs = getConfig();
-  if (!prefs.login_type) {
-    prefs.login_type = 1;
-  }
-  return jwt.sign({ username, admin }, prefs.plexToken);
-}
 
 function plexAuth(username, password) {
   return new Promise((resolve, reject) => {
@@ -115,10 +121,9 @@ function plexAuth(username, password) {
         }
         if (!data) {
           reject("Failed Plex Auth");
+        } else if (data.error) {
+          reject("Failed Plex Auth");
         } else {
-          if (data.error) {
-            reject("Failed Plex Auth");
-          }
           resolve(data);
         }
       }
