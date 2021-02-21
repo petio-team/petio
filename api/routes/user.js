@@ -4,6 +4,7 @@ const User = require("../models/user");
 const http = require("follow-redirects").http;
 const logger = require("../util/logger");
 const bcrypt = require("bcrypt");
+const { adminRequired } = require("../middleware/auth");
 
 router.get("/thumb/:id", async (req, res) => {
   let userData = false;
@@ -44,7 +45,7 @@ router.get("/thumb/:id", async (req, res) => {
   }
 });
 
-router.get("/all", async (req, res) => {
+router.get("/all", adminRequired, async (req, res) => {
   try {
     userData = await User.find();
   } catch (err) {
@@ -66,7 +67,7 @@ router.get("/all", async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", adminRequired, async (req, res) => {
   try {
     userData = await User.findOne({ id: req.params.id });
   } catch (err) {
@@ -81,7 +82,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.post("/create_custom", async (req, res) => {
+router.post("/create_custom", adminRequired, async (req, res) => {
   let user = req.body.user;
   if (!user) {
     res.status(500).json({
@@ -125,7 +126,7 @@ router.post("/create_custom", async (req, res) => {
   }
 });
 
-router.post("/edit", async (req, res) => {
+router.post("/edit", adminRequired, async (req, res) => {
   let user = req.body.user;
   if (!user) {
     res.status(500).json({
@@ -156,7 +157,7 @@ router.post("/edit", async (req, res) => {
   }
 });
 
-router.post("/bulk_edit", async (req, res) => {
+router.post("/bulk_edit", adminRequired, async (req, res) => {
   let users = req.body.users;
   let enabled = req.body.enabled;
   let profile = req.body.profile;
@@ -194,7 +195,7 @@ router.post("/bulk_edit", async (req, res) => {
   }
 });
 
-router.post("/delete_user", async (req, res) => {
+router.post("/delete_user", adminRequired, async (req, res) => {
   let user = req.body.user;
   if (!user) {
     res.status(500).json({
