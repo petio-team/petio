@@ -11,7 +11,6 @@ import {
 
 export default {
   login,
-  // loginAdmin,
   logout,
   request,
   getRequests,

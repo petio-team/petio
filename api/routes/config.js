@@ -3,7 +3,9 @@ const router = express.Router();
 const fs = require("fs");
 const path = require("path");
 const logger = require("../util/logger");
+const { adminRequired } = require("../middleware/auth");
 
+router.use(adminRequired);
 router.post("/update", async (req, res) => {
   let body = req.body;
 

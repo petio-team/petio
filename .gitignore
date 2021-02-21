@@ -1,4 +1,4 @@
-
+.idea/
 api/node_modules/
 admin/node_modules/
 frontend/node_modules/
@@ -15,3 +15,4 @@ bin/
 views/
 frontend/.eslintcache
 admin/.eslintcache
+/logs

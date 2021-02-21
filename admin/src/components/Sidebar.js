@@ -35,7 +35,15 @@ class Sidebar extends React.Component {
         </div>
 
         <div className="menu--items">
-          <Link to="/user" className={"menu--item user-profile " + (current === "/user" || current.startsWith("/user/") ? "active" : "")}>
+          <Link
+            to="/user"
+            className={
+              "menu--item user-profile " +
+              (current === "/user" || current.startsWith("/user/")
+                ? "active"
+                : "")
+            }
+          >
             <p>{user.title}</p>
             <div className="icon">
               <div
@@ -47,37 +55,80 @@ class Sidebar extends React.Component {
               ></div>
             </div>
           </Link>
-          <Link to="/" className={"menu--item " + (current === "/" ? "active" : "")}>
+          <Link
+            to="/"
+            className={"menu--item " + (current === "/" ? "active" : "")}
+          >
             <p>Dashboard</p>
             <div className="icon">
               <DashIcon />
             </div>
           </Link>
-          <Link to="/requests" className={"menu--item " + (current === "/requests" || current.startsWith("/requests/") ? "active" : "")}>
+          <Link
+            to="/requests"
+            className={
+              "menu--item " +
+              (current === "/requests" || current.startsWith("/requests/")
+                ? "active"
+                : "")
+            }
+          >
             <p>Requests</p>
             <div className="icon">
               <RequestIcon />
             </div>
           </Link>
-          <Link to="/issues" className={"menu--item " + (current === "/issues" || current.startsWith("/issues/") ? "active" : "")}>
+          <Link
+            to="/issues"
+            className={
+              "menu--item " +
+              (current === "/issues" || current.startsWith("/issues/")
+                ? "active"
+                : "")
+            }
+          >
             <p>Issues</p>
             <div className="icon">
               <IssueIcon />
             </div>
           </Link>
-          <Link to="/reviews" className={"menu--item " + (current === "/reviews" || current.startsWith("/reviews/") ? "active" : "")}>
+          <Link
+            to="/reviews"
+            className={
+              "menu--item " +
+              (current === "/reviews" || current.startsWith("/reviews/")
+                ? "active"
+                : "")
+            }
+          >
             <p>Reviews</p>
             <div className="icon">
               <ReviewIcon />
             </div>
           </Link>
-          <Link to="/users" className={"menu--item " + (current === "/users" || current.startsWith("/users/") ? "active" : "")}>
+          <Link
+            to="/users"
+            className={
+              "menu--item " +
+              (current === "/users" || current.startsWith("/users/")
+                ? "active"
+                : "")
+            }
+          >
             <p>Users</p>
             <div className="icon">
               <PersonIcon />
             </div>
           </Link>
-          <Link to="/settings" className={"menu--item " + (current === "/settings" || current.startsWith("/settings/") ? "active" : "")}>
+          <Link
+            to="/settings"
+            className={
+              "menu--item " +
+              (current === "/settings" || current.startsWith("/settings/")
+                ? "active"
+                : "")
+            }
+          >
             <p>Settings</p>
             <div className="icon">
               <SettingsIcon />
@@ -89,7 +140,12 @@ class Sidebar extends React.Component {
               <CloseIcon />
             </div>
           </div>
-          <a className="menu--item" href={`${window.location.protocol}//${window.location.host}${window.location.pathname.replace("/admin/", "")}`}>
+          <a
+            className="menu--item"
+            href={`${window.location.protocol}//${
+              window.location.host
+            }${window.location.pathname.replace("/admin/", "")}`}
+          >
             <p>Exit Admin</p>
             <div className="icon">
               <AdminIcon />
@@ -105,7 +161,13 @@ class Sidebar extends React.Component {
 Sidebar = withRouter(Sidebar);
 
 function SidebarContainer(props) {
-  return <Sidebar user={props.user} changeLogin={props.changeLogin} mobOpen={props.mobOpen} />;
+  return (
+    <Sidebar
+      user={props.user}
+      changeLogin={props.changeLogin}
+      mobOpen={props.mobOpen}
+    />
+  );
 }
 
 const mapStateToProps = function (state) {

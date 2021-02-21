@@ -2,7 +2,9 @@ const express = require("express");
 const router = express.Router();
 const getSessions = require("../plex/sessions");
 const logger = require("../util/logger");
+const { adminRequired } = require("../middleware/auth");
 
+router.use(adminRequired);
 router.get("/", async (req, res) => {
   try {
     let data = await getSessions();

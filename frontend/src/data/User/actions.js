@@ -7,7 +7,7 @@ export function login(user, cookie = false) {
   return new Promise((resolve, reject) => {
     let authToken = false;
     if (cookie) {
-      authToken = localStorage.getItem("loggedin");
+      authToken = localStorage.getItem("petio_jwt");
     }
 
     api
@@ -17,7 +17,7 @@ export function login(user, cookie = false) {
           let ls_user = data.token;
           if (data.loggedIn) {
             if (!cookie) {
-              localStorage.setItem("loggedin", ls_user);
+              localStorage.setItem("petio_jwt", ls_user);
             }
             finalise({
               type: types.LOGIN,
