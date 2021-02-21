@@ -40,7 +40,7 @@ const issueRoute = require("./routes/issue");
 const profileRoute = require("./routes/profiles");
 const configRoute = require("./routes/config");
 const logsRoute = require("./routes/log");
-const { authRequired, adminRequired } = require("./middleware/auth");
+const { authRequired } = require("./middleware/auth");
 
 class Main {
   constructor() {

@@ -17,7 +17,6 @@ function authenticate(req) {
     throw "No auth token provided";
   }
   req.jwtUser = jwt.verify(petioJwt, prefs.plexToken);
-  console.log(req.jwtUser);
   return req.jwtUser;
 }
 
@@ -32,14 +31,16 @@ exports.authRequired = (req, res, next) => {
     res.sendStatus(401);
     return;
   }
-  console.log(req.jwtUser);
   logger.log("verbose", `AUTH: Token fine for ${req.jwtUser.username}`);
   next();
 };
 
 exports.adminRequired = (req, res, next) => {
   if (req.jwtUser && req.jwtUser.admin) {
-    logger.log("verbose", `AUTH: Admin check for ${jwtUser.username} passed`);
+    logger.log(
+      "verbose",
+      `AUTH: Admin check for ${req.jwtUser.username} passed`
+    );
     next();
   } else {
     res.sendStatus(403);

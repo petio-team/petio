@@ -55,7 +55,6 @@ router.post("/", async (req, res) => {
   // check for existing jwt
   try {
     const user = authenticate(req);
-    console.log("jwtUser", user);
     success(user);
     return;
   } catch (e) {
