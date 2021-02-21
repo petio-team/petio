@@ -2,7 +2,7 @@ const isDev = process.env.NODE_ENV === "development";
 const origin = isDev ? "http://localhost:7778" : "";
 const basePath = isDev
   ? ""
-  : window.location.pathname.replace(/\/adminRequested$/, "");
+  : window.location.pathname.replace(/\/admin\/$/, "");
 const API_URL = `${origin}${basePath}${isDev ? "" : "/api"}`;
 
 function maybeGetAuthHeader() {

@@ -5,11 +5,11 @@ export async function popular() {
 }
 
 export async function top(type) {
-  return get(`/top${type === "movie" ? "movies" : "shows"}`);
+  return get(`/top/${type === "movie" ? "movies" : "shows"}`);
 }
 
 export async function history(user_id, type) {
-  return post("/history", "post", { id: user_id, type });
+  return post("/history", { id: user_id, type });
 }
 
 export async function get_plex_media(id, type) {

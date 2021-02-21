@@ -81,13 +81,7 @@ class Main {
     this.e.use(
       cors({
         origin: (origin, callback) => {
-          if (
-            ["http://localhost:3000", "http://localhost:3001"].includes(origin)
-          ) {
-            callback(null, true);
-          } else {
-            callback(new Error());
-          }
+          callback(null, true);
         },
         credentials: true,
       })

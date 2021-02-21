@@ -8,7 +8,7 @@ const adminPath = process.pkg
   ? path.join(path.dirname(process.execPath), "./views/admin")
   : path.join(__dirname, "./views/admin");
 logger.log("verbose", `ROUTER: Serving admin route to ${adminPath}`);
-router.use("/admin", express.static(adminPath));
+router.use("/admin/", express.static(adminPath));
 
 const fePath = process.pkg
   ? path.join(path.dirname(process.execPath), "./views/frontend")
