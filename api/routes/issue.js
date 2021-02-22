@@ -62,7 +62,7 @@ router.get("/all", async (req, res) => {
 async function mailIssue(user_id, media_id, type, title) {
   let userData = await User.findOne({ id: user_id });
   let media = false;
-  if (type === "tv") {
+  if (type === "series") {
     media = await showLookup(media_id, true);
   } else {
     media = await movieLookup(media_id, true);
@@ -93,7 +93,7 @@ async function mailIssue(user_id, media_id, type, title) {
 async function mailIssueResolve(user_id, media_id, type, title, message) {
   let userData = await User.findOne({ id: user_id });
   let media = false;
-  if (type === "tv") {
+  if (type === "series") {
     media = await showLookup(media_id, true);
   } else {
     media = await movieLookup(media_id, true);
