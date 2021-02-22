@@ -41,6 +41,7 @@ import {
   updateRequest,
   getConsole,
   getReviews,
+  removeIssue,
 } from "./actions";
 
 export default {
@@ -86,4 +87,5 @@ export default {
   updateRequest,
   getConsole,
   getReviews,
+  removeIssue,
 };

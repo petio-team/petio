@@ -183,3 +183,7 @@ export function getConsole() {
 export function getReviews() {
   return get(`/review/all`);
 }
+
+export function removeIssue(id, message) {
+  return post(`/issue/remove`, { id, message });
+}

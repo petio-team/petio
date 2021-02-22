@@ -621,3 +621,13 @@ export async function getReviews() {
     return false;
   }
 }
+
+export async function removeIssue(id, message) {
+  try {
+    await api.removeIssue(id, message);
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
