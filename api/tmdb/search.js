@@ -4,6 +4,8 @@ const request = require("xhr-request");
 const onServer = require("../plex/onServer");
 var sanitize = require("sanitize-filename");
 const logger = require("../util/logger");
+const { movieLookup } = require("../tmdb/movie");
+const { showLookup } = require("../tmdb/show");
 
 async function search(term) {
   logger.log("verbose", `TMDB Search ${term}`);
@@ -12,11 +14,13 @@ async function search(term) {
   let people = await searchPeople(sanitize(term));
 
   for (let i = 0; i < movies.results.length; i++) {
+    movieLookup(movies.results[i].id, true);
     let res = await onServer("movie", false, false, movies.results[i].id);
     movies.results[i].on_server = res.exists;
   }
 
   for (let i = 0; i < shows.results.length; i++) {
+    showLookup(tv.results[i].id, true);
     let res = await onServer("show", false, false, shows.results[i].id);
     shows.results[i].on_server = res.exists;
   }
