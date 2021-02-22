@@ -40,6 +40,8 @@ class Issues extends React.Component {
     switch (issue) {
       case "episodes":
         return "Missing Episodes";
+      case "season":
+        return "Missing Season";
       case "subs":
         return "Missing / Wrong Subtitles";
       case "bad-video":

@@ -12,7 +12,12 @@ router.get("/:id/movie", async (req, res) => {
   let data = await buildData(id);
   Object.keys(data.movie.genre).map((i) => {
     let genre = data.movie.genre[i];
+    if (genre.count === 1) delete data.movie.genre[i];
     genre.avgRating = genre.totalRating / genre.count;
+  });
+  Object.keys(data.movie.actor).map((i) => {
+    let actor = data.movie.actor[i];
+    if (actor.count === 1) delete data.movie.actor[i];
   });
   res.json(data);
 });
@@ -28,6 +33,8 @@ async function buildData(id) {
     movie: {
       count: 0,
       genre: {},
+      actor: {},
+      director: {},
     },
   };
 
@@ -42,6 +49,20 @@ async function buildData(id) {
           let movieData = await movieLookup(dbItem.tmdb_id);
           // output.raw[movieData.id] = movieData;
           output.movie.count += 1;
+          if (movieData.credits.cast) {
+            if (movieData.credits.cast.length > 10)
+              movieData.credits.cast.length = 10;
+            for (let p = 0; p < movieData.credits.cast.length; p++) {
+              let actor = movieData.credits.cast[p];
+              if (!output.movie.actor[actor.id]) {
+                output.movie.actor[actor.id] = {
+                  name: actor.name,
+                  count: 0,
+                };
+              }
+              output.movie.actor[actor.id].count += 1;
+            }
+          }
           for (let g = 0; g < movieData.genres.length; g++) {
             let genre = movieData.genres[g];
             if (!output.movie.genre[genre.name]) {
@@ -49,6 +70,7 @@ async function buildData(id) {
                 name: genre.name,
                 totalRating: 0,
                 count: 0,
+                id: genre.id,
               };
             }
 
