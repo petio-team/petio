@@ -22,6 +22,7 @@ run:
 	rm -rf ./views && mkdir ./views
 	cd frontend && npm install && REACT_APP_ENV=pkg npm run build && mv build ../views/frontend
 	cd admin && npm install && REACT_APP_ENV=pkg npm run build && mv build ../views/admin
+	npm install
 
 
 docker-stop:
