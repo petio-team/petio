@@ -1,12 +1,11 @@
 import React from "react";
-import { withRouter, Link } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import Api from "../data/Api";
 import RequestCard from "../components/RequestCard";
 import Carousel from "../components/Carousel";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
-import MovieCard from "../components/MovieCard";
 import { ReactComponent as MovieIcon } from "../assets/svg/movie.svg";
 import { ReactComponent as TvIcon } from "../assets/svg/tv.svg";
 
@@ -83,10 +82,13 @@ class Requests extends React.Component {
         if (item.series) {
           let time = new Date(item.airDateUtc);
           calendarData.push({
-            title: `${item.series.title} - s${item.seasonNumber.toLocaleString("en-US", {
-              minimumIntegerDigits: 2,
-              useGrouping: false,
-            })}e${item.episodeNumber.toLocaleString("en-US", {
+            title: `${item.series.title} - s${item.seasonNumber.toLocaleString(
+              "en-US",
+              {
+                minimumIntegerDigits: 2,
+                useGrouping: false,
+              }
+            )}e${item.episodeNumber.toLocaleString("en-US", {
               minimumIntegerDigits: 2,
               useGrouping: false,
             })}`,
@@ -118,14 +120,6 @@ class Requests extends React.Component {
       );
     }
     let requests = this.props.user.requests;
-    let pending = Object.keys(requests).map((key) => {
-      let request = this.props.api.movie_lookup[key];
-      if (requests[key].type === "tv") {
-        request = this.props.api.series_lookup[key];
-      }
-      if (!request) return null;
-      return <RequestCard key={key} request={request} />;
-    });
     requests = this.props.user.requests;
     let yourRequests = Object.keys(requests).map((key) => {
       let request = this.props.api.movie_lookup[key];
@@ -142,11 +136,19 @@ class Requests extends React.Component {
       return (
         <div className="calendar--event--wrap">
           <div
-            className={`calendar--event ${event.resource.hasFile ? "recorded" : ""} ${this.isToday(new Date(event.resource.airDateUtc)) ? "airsToday" : ""} ${
+            className={`calendar--event ${
+              event.resource.hasFile ? "recorded" : ""
+            } ${
+              this.isToday(new Date(event.resource.airDateUtc))
+                ? "airsToday"
+                : ""
+            } ${
               new Date(event.resource.airDateUtc) < new Date() ? "hasAired" : ""
             }`}
           >
-            <div className="calendar--event--icon">{event.resource.series ? <TvIcon /> : <MovieIcon />}</div>
+            <div className="calendar--event--icon">
+              {event.resource.series ? <TvIcon /> : <MovieIcon />}
+            </div>
             <p>{event.title}</p>
           </div>
         </div>
@@ -156,12 +158,6 @@ class Requests extends React.Component {
     return (
       <div className="requests-page">
         <h1 className="main-title mb--1">Requests</h1>
-        {/* <div className="request-section">
-          <section>
-            <h3 className="sub-title mb--1">Pending Requests</h3>
-            <Carousel>{pending}</Carousel>
-          </section>
-        </div> */}
         <div className="request-section">
           <section>
             <h3 className="sub-title mb--1">Your Requests</h3>

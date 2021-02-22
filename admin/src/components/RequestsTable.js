@@ -17,10 +17,16 @@ class RequestsTable extends React.Component {
 
   sortBy(a, b) {
     let sortVal = this.state.sortBy;
-    if (a[sortVal].toLowerCase() > b[sortVal].toLowerCase()) {
+    let av = a[sortVal];
+    let bv = b[sortVal];
+    if (!av) av = "";
+    if (!bv) bv = "";
+    if (typeof av === "string") av = av.toLowerCase();
+    if (typeof bv === "string") bv = bv.toLowerCase();
+    if (av > bv) {
       return this.state.dir === "DESC" ? 1 : -1;
     }
-    if (a[sortVal].toLowerCase() < b[sortVal].toLowerCase()) {
+    if (av < bv) {
       return this.state.dir === "DESC" ? -1 : 1;
     }
     return 0;
@@ -92,9 +98,13 @@ class RequestsTable extends React.Component {
     if (req.media)
       if (Object.keys(req.media).length > 0) {
         if (req.type === "movie") {
-          return req.media.release_date ? new Date(req.media.release_date).getFullYear() : null;
+          return req.media.release_date
+            ? new Date(req.media.release_date).getFullYear()
+            : null;
         } else {
-          return req.media.first_air_date ? new Date(req.media.first_air_date).getFullYear() : null;
+          return req.media.first_air_date
+            ? new Date(req.media.first_air_date).getFullYear()
+            : null;
         }
       } else {
         return null;
@@ -136,14 +146,17 @@ class RequestsTable extends React.Component {
                   <td>
                     {type === "tv" ? (
                       <p>
-                        Series: {child.episode.seasonNumber} Episode: {child.episode.episodeNumber}
+                        Series: {child.episode.seasonNumber} Episode:{" "}
+                        {child.episode.episodeNumber}
                       </p>
                     ) : null}
                     {type === "movie" ? <p>Movie</p> : null}
                   </td>
                   <td></td>
                   <td>
-                    <span className="requests--quality">{child.quality.quality.name}</span>
+                    <span className="requests--quality">
+                      {child.quality.quality.name}
+                    </span>
                   </td>
                   <td>
                     {" "}
@@ -157,7 +170,9 @@ class RequestsTable extends React.Component {
                         ></span>
                       </div>
 
-                      {(child.status !== "Downloading" && child.status !== "downloading") || !child.timeleft ? (
+                      {(child.status !== "Downloading" &&
+                        child.status !== "downloading") ||
+                      !child.timeleft ? (
                         <p>
                           <strong className="capitalise">{child.status}</strong>
                         </p>
@@ -184,27 +199,55 @@ class RequestsTable extends React.Component {
   }
 
   reqState(req) {
+    let diff;
     if (!req.approved) {
-      return <span className="requests--status requests--status__pending">Pending</span>;
+      return (
+        <span className="requests--status requests--status__pending">
+          Pending
+        </span>
+      );
     }
     if (req.children) {
       if (req.children.length > 0) {
         for (let r = 0; r < req.children.length; r++) {
           if (req.children[r].status.length > 0) {
-            return <span className="requests--status requests--status__orange">Downloading</span>;
+            return (
+              <span className="requests--status requests--status__orange">
+                Downloading
+              </span>
+            );
           }
 
-          if (req.children[r].info.downloaded || req.children[r].info.movieFile) {
-            return <span className="requests--status requests--status__good">Downloaded</span>;
+          if (
+            req.children[r].info.downloaded ||
+            req.children[r].info.movieFile
+          ) {
+            return (
+              <span className="requests--status requests--status__good">
+                Downloaded
+              </span>
+            );
           }
 
           if (req.children[r].info.message === "NotFound") {
-            return <span className="requests--status requests--status__bad">Removed</span>;
+            return (
+              <span className="requests--status requests--status__bad">
+                Removed
+              </span>
+            );
           }
 
           if (req.type === "tv" && req.children[r].info) {
-            if (req.children[r].info.episodeCount === req.children[r].info.episodeFileCount && req.children[r].info.episodeCount > 0) {
-              return <span className="requests--status requests--status__good">Downloaded</span>;
+            if (
+              req.children[r].info.episodeCount ===
+                req.children[r].info.episodeFileCount &&
+              req.children[r].info.episodeCount > 0
+            ) {
+              return (
+                <span className="requests--status requests--status__good">
+                  Downloaded
+                </span>
+              );
             }
 
             if (req.children[r].info.seasons) {
@@ -214,45 +257,88 @@ class RequestsTable extends React.Component {
               }
 
               if (!missing) {
-                return <span className="requests--status requests--status__good">Downloaded</span>;
+                return (
+                  <span className="requests--status requests--status__good">
+                    Downloaded
+                  </span>
+                );
               } else {
                 let airDate = req.children[r].info.firstAired;
-                var diff = Math.ceil(new Date(airDate) - new Date());
+                diff = Math.ceil(new Date(airDate) - new Date());
                 if (diff > 0) {
-                  return <span className="requests--status requests--status__blue">~{this.calcDate(diff)}</span>;
+                  return (
+                    <span className="requests--status requests--status__blue">
+                      ~{this.calcDate(diff)}
+                    </span>
+                  );
                 } else {
                   if (req.children[r].info.episodeFileCount > 0) {
-                    return <span className="requests--status requests--status__blue">Partially Downloaded</span>;
+                    return (
+                      <span className="requests--status requests--status__blue">
+                        Partially Downloaded
+                      </span>
+                    );
                   }
-                  return <span className="requests--status requests--status__bad">Unavailable</span>;
+                  return (
+                    <span className="requests--status requests--status__bad">
+                      Unavailable
+                    </span>
+                  );
                 }
               }
             }
           }
 
           if (req.type === "movie" && req.children[r].info) {
-            if (req.children[r].info.inCinemas || req.children[r].info.digitalRelease) {
+            if (
+              req.children[r].info.inCinemas ||
+              req.children[r].info.digitalRelease
+            ) {
               if (req.children[r].info.inCinemas) {
-                var diff = Math.ceil(new Date(req.children[r].info.inCinemas) - new Date());
+                diff = Math.ceil(
+                  new Date(req.children[r].info.inCinemas) - new Date()
+                );
                 if (diff > 0) {
-                  return <span className="requests--status requests--status__blue">~{this.calcDate(diff)}</span>;
+                  return (
+                    <span className="requests--status requests--status__blue">
+                      ~{this.calcDate(diff)}
+                    </span>
+                  );
                 }
               }
               if (req.children[r].info.digitalRelease) {
                 let digitalDate = new Date(req.children[r].info.digitalRelease);
                 if (new Date() - digitalDate < 0) {
-                  return <span className="requests--status requests--status__cinema">In Cinemas</span>;
+                  return (
+                    <span className="requests--status requests--status__cinema">
+                      In Cinemas
+                    </span>
+                  );
                 } else {
-                  return <span className="requests--status requests--status__bad">Unavailable</span>;
+                  return (
+                    <span className="requests--status requests--status__bad">
+                      Unavailable
+                    </span>
+                  );
                 }
               } else {
                 if (req.children[r].info.inCinemas) {
-                  var diff = Math.ceil(new Date() - new Date(req.children[r].info.inCinemas));
+                  diff = Math.ceil(
+                    new Date() - new Date(req.children[r].info.inCinemas)
+                  );
                   if (this.cinemaWindow(diff)) {
-                    return <span className="requests--status requests--status__cinema">In Cinemas</span>;
+                    return (
+                      <span className="requests--status requests--status__cinema">
+                        In Cinemas
+                      </span>
+                    );
                   }
                 }
-                return <span className="requests--status requests--status__bad">Unavailable</span>;
+                return (
+                  <span className="requests--status requests--status__bad">
+                    Unavailable
+                  </span>
+                );
               }
             }
           }
@@ -260,7 +346,11 @@ class RequestsTable extends React.Component {
       }
     }
 
-    return <span className="requests--status requests--status__manual">No status</span>;
+    return (
+      <span className="requests--status requests--status__manual">
+        No status
+      </span>
+    );
   }
 
   render() {
@@ -271,7 +361,12 @@ class RequestsTable extends React.Component {
       <table className="generic-table generic-table__rounded">
         <thead>
           <tr>
-            <th className={`fixed sortable ${this.state.sortBy === "title" ? "active" : ""} ${this.state.dir}`} onClick={() => this.sortCol("title")}>
+            <th
+              className={`fixed sortable ${
+                this.state.sortBy === "title" ? "active" : ""
+              } ${this.state.dir}`}
+              onClick={() => this.sortCol("title")}
+            >
               Title
               <Arrow />
             </th>
@@ -306,12 +401,24 @@ class RequestsTable extends React.Component {
                     <td>{this.typeIcon(req.type)}</td>
                     <td>
                       {this.reqState(req)}
-                      {req.sonarrId.length > 0 ? <span className="requests--status requests--status__sonarr">Sonarr</span> : null}
-                      {req.radarrId.length > 0 ? <span className="requests--status requests--status__radarr">Radarr</span> : null}
+                      {req.sonarrId.length > 0 ? (
+                        <span className="requests--status requests--status__sonarr">
+                          Sonarr
+                        </span>
+                      ) : null}
+                      {req.radarrId.length > 0 ? (
+                        <span className="requests--status requests--status__radarr">
+                          Radarr
+                        </span>
+                      ) : null}
                     </td>
                     <td>
                       {req.users.map((user, i) => {
-                        return <p key={`${req.id}_${user}_${i}`}>{this.getUsername(user)}</p>;
+                        return (
+                          <p key={`${req.id}_${user}_${i}`}>
+                            {this.getUsername(user)}
+                          </p>
+                        );
                       })}
                     </td>
                     <td>{req.approved ? "Yes" : "No"}</td>

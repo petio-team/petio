@@ -5,14 +5,6 @@ import PersonCard from "../components/PersonCard";
 import TvCard from "../components/TvCard";
 import Api from "../data/Api";
 import Carousel from "../components/Carousel";
-import { ReactComponent as RequestIcon } from "../assets/svg/request.svg";
-import { ReactComponent as ReportIcon } from "../assets/svg/report.svg";
-import { ReactComponent as WatchIcon } from "../assets/svg/play.svg";
-import { ReactComponent as CheckIcon } from "../assets/svg/check.svg";
-import { ReactComponent as StarIcon } from "../assets/svg/star.svg";
-import { ReactComponent as TrailerIcon } from "../assets/svg/video.svg";
-import { ReactComponent as PersonCircleIcon } from "../assets/svg/person-circle.svg";
-import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import User from "../data/User";
 import Review from "../components/Review";
@@ -213,7 +205,13 @@ class Series extends React.Component {
     if (seriesData.recommendations) {
       relatedItems = seriesData.recommendations.map((key) => {
         // if (this.props.api.series_lookup[id]) {
-        return <TvCard key={`related-${key}`} msg={this.props.msg} series={{ id: key }} />;
+        return (
+          <TvCard
+            key={`related-${key}`}
+            msg={this.props.msg}
+            series={{ id: key }}
+          />
+        );
         // }
       });
       related = (
@@ -224,56 +222,24 @@ class Series extends React.Component {
       );
     }
 
-    let reviewBtn = null;
-
     if (this.props.user.reviews) {
       if (this.props.user.reviews[this.props.match.params.id]) {
-        var hasReviewed = false;
-        for (var i = 0; i < this.props.user.reviews[this.props.match.params.id].length; i++) {
-          if (this.props.user.reviews[this.props.match.params.id][i].user == this.props.user.current._id) {
-            hasReviewed = this.props.user.reviews[this.props.match.params.id][i];
+        for (
+          var i = 0;
+          i < this.props.user.reviews[this.props.match.params.id].length;
+          i++
+        ) {
+          if (
+            this.props.user.reviews[this.props.match.params.id][i].user ==
+            this.props.user.current._id
+          ) {
             break;
           }
         }
-        reviewBtn = (
-          <button className="btn btn__square" onClick={this.openReview}>
-            {!hasReviewed ? (
-              <>
-                <StarIcon />
-                Review
-              </>
-            ) : (
-              <>
-                <StarIcon />
-                Reviewed {(hasReviewed.score / 10) * 100}%
-              </>
-            )}
-          </button>
-        );
       }
     }
 
     let seasons = seriesData.seasons;
-
-    let userRating = "Not Reviewed";
-    let userRatingVal = 0;
-
-    if (this.props.user.reviews) {
-      if (this.props.user.reviews[this.props.match.params.id]) {
-        if (Object.keys(this.props.user.reviews[this.props.match.params.id]).length) {
-          let ratingsUser = 0;
-
-          Object.keys(this.props.user.reviews[this.props.match.params.id]).map((r) => {
-            ratingsUser += (this.props.user.reviews[this.props.match.params.id][r].score / 10) * 100;
-          });
-
-          userRating = `${(ratingsUser / Object.keys(this.props.user.reviews[this.props.match.params.id]).length).toFixed(0)}% (${
-            Object.keys(this.props.user.reviews[this.props.match.params.id]).length
-          } reviews)`;
-          userRatingVal = ratingsUser / Object.keys(this.props.user.reviews[this.props.match.params.id]).length;
-        }
-      }
-    }
 
     let video = false;
     if (seriesData.videos.results) {
@@ -286,7 +252,11 @@ class Series extends React.Component {
     }
 
     return (
-      <div className="media-wrap" data-id={seriesData.imdb_id} key={`${seriesData.title}__wrap`}>
+      <div
+        className="media-wrap"
+        data-id={seriesData.imdb_id}
+        key={`${seriesData.title}__wrap`}
+      >
         <Review
           id={this.props.match.params.id}
           msg={this.props.msg}
@@ -296,7 +266,14 @@ class Series extends React.Component {
           getReviews={this.getReviews}
           item={seriesData}
         />
-        <MovieShowTop mediaData={seriesData} video={video} trailer={this.state.trailer} requested={this.state.requested} request={this.request} openIssues={this.props.openIssues} />
+        <MovieShowTop
+          mediaData={seriesData}
+          video={video}
+          trailer={this.state.trailer}
+          requested={this.state.requested}
+          request={this.request}
+          openIssues={this.props.openIssues}
+        />
 
         <div className="media-content">
           <MovieShowOverview
@@ -317,20 +294,38 @@ class Series extends React.Component {
             <Carousel>
               {seasons.map((season) => {
                 return (
-                  <div className="card type--movie-tv" key={`season--${season.season_number}${id}`}>
+                  <div
+                    className="card type--movie-tv"
+                    key={`season--${season.season_number}${id}`}
+                  >
                     <div className="card--inner">
-                      <Link to={`/series/${id}/season/${season.season_number}`} className="full-link"></Link>
+                      <Link
+                        to={`/series/${id}/season/${season.season_number}`}
+                        className="full-link"
+                      ></Link>
                       <div className="image-wrap">
                         {season.poster_path ? (
-                          <img src={`https://image.tmdb.org/t/p/w200/${season.poster_path}`} alt={season.name} />
+                          <img
+                            src={`https://image.tmdb.org/t/p/w200/${season.poster_path}`}
+                            alt={season.name}
+                          />
                         ) : seriesData.poster_path ? (
-                          <img src={`https://image.tmdb.org/t/p/w500/${seriesData.poster_path}`} alt={season.name} />
+                          <img
+                            src={`https://image.tmdb.org/t/p/w500/${seriesData.poster_path}`}
+                            alt={season.name}
+                          />
                         ) : null}
                       </div>
                       <div className="text-wrap">
                         <p className="title">
                           {season.name}
-                          <span className="year">{season.air_date ? "(" + new Date(season.air_date).getFullYear() + ")" : ""}</span>
+                          <span className="year">
+                            {season.air_date
+                              ? "(" +
+                                new Date(season.air_date).getFullYear() +
+                                ")"
+                              : ""}
+                          </span>
                         </p>
                       </div>
                     </div>
@@ -342,8 +337,14 @@ class Series extends React.Component {
           <section>
             <h3 className="sub-title mb--1">Cast</h3>
             <Carousel>
-              {seriesData.credits.cast.map((cast, key) => {
-                return <PersonCard key={`${cast.name}--${cast.character}`} person={cast} character={cast.character} />;
+              {seriesData.credits.cast.map((cast) => {
+                return (
+                  <PersonCard
+                    key={`${cast.name}--${cast.character}`}
+                    person={cast}
+                    character={cast.character}
+                  />
+                );
               })}
             </Carousel>
           </section>
@@ -351,7 +352,12 @@ class Series extends React.Component {
 
           <section>
             <h3 className="sub-title mb--1">Reviews</h3>
-            {this.props.user.reviews ? <ReviewsList reviews={this.props.user.reviews[id]} external={seriesData.reviews} /> : null}
+            {this.props.user.reviews ? (
+              <ReviewsList
+                reviews={this.props.user.reviews[id]}
+                external={seriesData.reviews}
+              />
+            ) : null}
           </section>
         </div>
       </div>
@@ -362,7 +368,14 @@ class Series extends React.Component {
 Series = withRouter(Series);
 
 function SeriesContainer(props) {
-  return <Series api={props.api} user={props.user} msg={props.msg} openIssues={props.openIssues} />;
+  return (
+    <Series
+      api={props.api}
+      user={props.user}
+      msg={props.msg}
+      openIssues={props.openIssues}
+    />
+  );
 }
 
 const mapStateToProps = function (state) {

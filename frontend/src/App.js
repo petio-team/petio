@@ -1,7 +1,6 @@
 import React from "react";
-import { HashRouter, Switch, Route, Link, withRouter, useHistory } from "react-router-dom";
+import { HashRouter, Switch, Route } from "react-router-dom";
 import { connect } from "react-redux";
-import Plex from "./data/Plex";
 import User from "./data/User";
 import Api from "./data/Api";
 import Sidebar from "./components/Sidebar";
@@ -35,6 +34,7 @@ class App extends React.Component {
       configChecked: false,
       loginMsg: false,
       pushMsg: {},
+      login_type: false,
     };
 
     this.openIssues = this.openIssues.bind(this);
@@ -84,45 +84,51 @@ class App extends React.Component {
     this.login(username);
   }
 
-  login(username, cookie = false) {
+  async login(username, cookie = false) {
+    let password = this.state.password;
+    let type = this.state.login_type;
+    let user = {
+      username: username,
+      password: password,
+      type: type,
+    };
     if (!this.props.user.credentials || this.state.config === "failed") {
       return;
     }
     this.setState({
       loading: true,
     });
-    User.login(username, cookie)
-      .then((res) => {
-        this.setState({
-          loading: false,
-          loginMsg: false,
-        });
-        if (res.error) {
-          this.msg({
-            message: res.error,
-            type: "error",
-          });
-          return;
-        }
-        if (res.loggedIn) {
-          this.setState({
-            isLoggedIn: true,
-          });
-        }
-        if (res.admin) {
-          this.setState({
-            isAdmin: true,
-          });
-        }
-        User.getRequests();
-      })
-      .catch((error) => {
-        this.setState({
-          loginMsg: error,
-          loading: false,
-        });
-        localStorage.removeItem("loggedin");
+    try {
+      let res = await User.login(user, cookie);
+      this.setState({
+        loading: false,
+        loginMsg: false,
       });
+      if (res.error) {
+        this.msg({
+          message: res.error,
+          type: "error",
+        });
+        return;
+      }
+      if (res.loggedIn) {
+        this.setState({
+          isLoggedIn: true,
+        });
+      }
+      if (res.admin) {
+        this.setState({
+          isAdmin: true,
+        });
+      }
+      User.getRequests();
+    } catch (error) {
+      this.setState({
+        loginMsg: error,
+        loading: false,
+      });
+      localStorage.removeItem("loggedin");
+    }
   }
 
   logout() {
@@ -133,6 +139,7 @@ class App extends React.Component {
       isLoggedIn: false,
       isAdmin: false,
     });
+    this.msg({ message: "User logged out", type: "info" });
   }
 
   loginLocal() {
@@ -163,24 +170,23 @@ class App extends React.Component {
     });
   }
 
-  checkConfig() {
+  async checkConfig() {
     this.setState({
       configChecked: true,
     });
-    Api.checkConfig()
-      .then((res) => {
-        console.log(res);
-        this.setState({
-          config: res.config,
-          // loading: false,
-        });
-      })
-      .catch(() => {
-        this.setState({
-          error: true,
-          config: "failed",
-        });
+    try {
+      let res = await Api.checkConfig();
+      this.setState({
+        config: res.config,
+        login_type: parseInt(res.login_type),
       });
+    } catch {
+      this.msg({ message: "API not configured", type: "error" });
+      this.setState({
+        error: true,
+        config: "failed",
+      });
+    }
   }
 
   componentDidUpdate() {
@@ -208,32 +214,79 @@ class App extends React.Component {
         </div>
       );
     }
-    let user = this.props.api.current_user;
+
     if (!this.state.isLoggedIn) {
       return (
         <div className="login-wrap">
+          <div className="push-msg--wrap">
+            {Object.keys(this.state.pushMsg).map((i) => {
+              let msg = this.state.pushMsg[i];
+              return (
+                <div
+                  key={msg.timestamp}
+                  className={`push-msg--item ${
+                    msg.type !== "info" ? msg.type : ""
+                  }`}
+                >
+                  {msg.message}
+                </div>
+              );
+            })}
+          </div>
           {!this.state.loading || !this.props.user.credentials ? (
             <>
               <div className="login--inner">
                 <h1 className="logo">
                   Pet<span>io</span>
                 </h1>
-                <p className="main-title">{!this.state.adminLogin ? "Login" : "Admin Login"}</p>
+                <p className="main-title">
+                  {!this.state.adminLogin ? "Login" : "Admin Login"}
+                </p>
                 <form onSubmit={this.loginForm} autoComplete="on">
                   <p>Username / Email</p>
-                  <input type="text" name="username" value={this.state.username} onChange={this.inputChange} autoComplete="username" />
-                  {this.state.loginMsg ? <div className="msg msg__error msg__input">{this.state.loginMsg}</div> : null}
-                  {this.state.config === "failed" ? <div className="msg msg__error msg__input">API Not configured, please complete setup</div> : null}
+                  <input
+                    type="text"
+                    name="username"
+                    value={this.state.username}
+                    onChange={this.inputChange}
+                    autoComplete="username"
+                  />
+                  {this.state.login_type === 1 ? (
+                    <>
+                      <p>Password</p>
+                      <input
+                        type="password"
+                        name="password"
+                        value={this.state.password}
+                        onChange={this.inputChange}
+                        autoComplete="password"
+                      />
+                    </>
+                  ) : null}
+                  {this.state.loginMsg ? (
+                    <div className="msg msg__error msg__input">
+                      {this.state.loginMsg}
+                    </div>
+                  ) : null}
+                  {this.state.config === "failed" ? (
+                    <div className="msg msg__error msg__input">
+                      API Not configured, please complete setup
+                    </div>
+                  ) : null}
                   <button className="btn btn__square">Login</button>
                 </form>
               </div>
               <div className="credits">
-                <a href="https://fanart.tv/" target="_blank">
+                <a href="https://fanart.tv/" target="_blank" rel="noreferrer">
                   <p>
                     <strong>FAN</strong>ART<span>.TV</span>
                   </p>
                 </a>
-                <a href="https://www.themoviedb.org/" target="_blank">
+                <a
+                  href="https://www.themoviedb.org/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   <TmdbLogo />
                 </a>
               </div>
@@ -257,7 +310,12 @@ class App extends React.Component {
               {Object.keys(this.state.pushMsg).map((i) => {
                 let msg = this.state.pushMsg[i];
                 return (
-                  <div key={msg.timestamp} className={`push-msg--item ${msg.type !== "info" ? msg.type : ""}`}>
+                  <div
+                    key={msg.timestamp}
+                    className={`push-msg--item ${
+                      msg.type !== "info" ? msg.type : ""
+                    }`}
+                  >
                     {msg.message}
                   </div>
                 );
@@ -275,19 +333,31 @@ class App extends React.Component {
                 </div>
               </Route>
               <Route exact path="/movie/:id">
-                <Issues open={this.state.openIssues} close={this.closeIssues} msg={this.msg} />
+                <Issues
+                  open={this.state.openIssues}
+                  close={this.closeIssues}
+                  msg={this.msg}
+                />
                 <div className="page-wrap">
                   <Movie msg={this.msg} openIssues={this.openIssues} />
                 </div>
               </Route>
               <Route exact path="/series/:id">
-                <Issues open={this.state.openIssues} close={this.closeIssues} msg={this.msg} />
+                <Issues
+                  open={this.state.openIssues}
+                  close={this.closeIssues}
+                  msg={this.msg}
+                />
                 <div className="page-wrap">
                   <Series msg={this.msg} openIssues={this.openIssues} />
                 </div>
               </Route>
               <Route exact path="/series/:id/season/:season">
-                <Issues open={this.state.openIssues} close={this.closeIssues} msg={this.msg} />
+                <Issues
+                  open={this.state.openIssues}
+                  close={this.closeIssues}
+                  msg={this.msg}
+                />
                 <div className="page-wrap">
                   <Season openIssues={this.openIssues} msg={this.msg} />
                 </div>
@@ -329,7 +399,7 @@ class App extends React.Component {
               <Route path="*" exact>
                 <div className="page-wrap">
                   <h1 className="main-title mb--1">Not found</h1>
-                  <p>This page doesn't exist</p>
+                  <p>This page doesn&apos;t exist</p>
                 </div>
               </Route>
             </Switch>

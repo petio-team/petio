@@ -28,13 +28,11 @@ class Radarr extends React.Component {
       profile_title: "",
       path: "",
       path_title: "",
-      active: false,
       base: "",
       apikey: "",
-      path: false,
-      profile: false,
       activeServer: false,
       uuid: false,
+      needsTest: false,
     };
 
     this.inputChange = this.inputChange.bind(this);
@@ -51,7 +49,7 @@ class Radarr extends React.Component {
     this.closeMsg = false;
   }
 
-  async saveServer() {
+  async saveServer(silent = false) {
     if (this.state.activeServer === false) {
       console.log("error");
       return;
@@ -78,21 +76,23 @@ class Radarr extends React.Component {
     await Api.saveRadarrConfig(servers);
     await this.getRadarr(true);
 
-    this.setState({
-      isError: false,
-      isMsg: "Radarr settings saved!",
-    });
-
-    clearInterval(this.closeMsg);
-    this.closeMsg = setInterval(() => {
+    if (!silent) {
       this.setState({
         isError: false,
-        isMsg: false,
+        isMsg: "Radarr settings saved!",
       });
-    }, 3000);
+
+      clearInterval(this.closeMsg);
+      this.closeMsg = setInterval(() => {
+        this.setState({
+          isError: false,
+          isMsg: false,
+        });
+      }, 3000);
+    }
   }
 
-  async deleteServer() {
+  async deleteServer(silent = false) {
     if (this.state.activeServer === false) {
       console.log("error");
       return;
@@ -106,26 +106,28 @@ class Radarr extends React.Component {
     // return;
     await Api.saveRadarrConfig(servers);
     this.getRadarr(true);
-    this.closeModal("addServer");
-    this.closeWizard();
+    if (!silent) {
+      this.closeModal("addServer");
+      this.closeWizard();
 
-    this.setState({
-      isError: false,
-      isMsg: "Radarr Server Removed",
-    });
-
-    clearInterval(this.closeMsg);
-    this.closeMsg = setInterval(() => {
       this.setState({
         isError: false,
-        isMsg: false,
+        isMsg: "Radarr Server Removed",
       });
-    }, 3000);
+
+      clearInterval(this.closeMsg);
+      this.closeMsg = setInterval(() => {
+        this.setState({
+          isError: false,
+          isMsg: false,
+        });
+      }, 3000);
+    }
   }
 
   async test(id, add = false) {
     if (add) {
-      await this.saveServer();
+      await this.saveServer(true);
     }
     try {
       let result = await Api.testRadarr(id);
@@ -134,6 +136,7 @@ class Radarr extends React.Component {
           isError: false,
           isMsg: "Radarr Test Connection success!",
           newServer: false,
+          needsTest: false,
         });
         await this.getRadarr(true);
         await this.getSettings(id);
@@ -142,6 +145,7 @@ class Radarr extends React.Component {
           isError: "Radarr Test Connection failed!",
           isMsg: false,
         });
+        this.deleteServer(true);
       }
     } catch (err) {
       this.setState({
@@ -149,6 +153,7 @@ class Radarr extends React.Component {
         isMsg: false,
       });
     }
+
     clearInterval(this.closeMsg);
     this.closeMsg = setInterval(() => {
       this.setState({
@@ -163,11 +168,16 @@ class Radarr extends React.Component {
     const name = target.name;
     let value = target.value;
 
+    if (target.classList.contains("frt")) {
+      this.setState({
+        needsTest: true,
+        active: false,
+      });
+    }
+
     if (target.type === "checkbox") {
       value = target.checked;
     }
-
-    console.log(target.type);
 
     if (target.type === "select-one") {
       let title = target.options[target.selectedIndex].text;
@@ -214,19 +224,21 @@ class Radarr extends React.Component {
         newServer: false,
         editWizardOpen: true,
         activeServer: id,
-        active: this.state.servers[id].active ? this.state.servers[id].active : false,
+        active: this.state.servers[id].active
+          ? this.state.servers[id].active
+          : false,
         title: this.state.servers[id].title,
         protocol: this.state.servers[id].protocol,
         host: this.state.servers[id].hostname,
         port: this.state.servers[id].port,
         base: this.state.servers[id].urlBase,
         apikey: this.state.servers[id].apiKey,
-        active: this.state.servers[id].active,
         profile: this.state.servers[id].profile,
         profile_title: this.state.servers[id].profile_title,
         path: this.state.servers[id].path,
         path_title: this.state.servers[id].path_title,
         uuid: this.state.servers[id].uuid,
+        needsTest: false,
       });
       this.getSettings(this.state.servers[id].uuid);
     } else {
@@ -235,6 +247,7 @@ class Radarr extends React.Component {
         wizardOpen: true,
         activeServer: id,
         uuid: uuidv4(),
+        needsTest: true,
       });
     }
   }
@@ -248,7 +261,6 @@ class Radarr extends React.Component {
       port: null,
       base: "",
       apikey: "",
-      active: false,
       profiles: false,
       paths: false,
       path: false,
@@ -264,6 +276,7 @@ class Radarr extends React.Component {
   openModal(id) {
     this.setState({
       [`${id}Open`]: true,
+      needsTest: false,
     });
   }
 
@@ -277,7 +290,6 @@ class Radarr extends React.Component {
       port: null,
       base: "",
       apikey: "",
-      active: false,
       profiles: false,
       paths: false,
       path: false,
@@ -343,10 +355,14 @@ class Radarr extends React.Component {
           title="Add new server"
           open={this.state.addServerOpen}
           submitText="Save"
-          submit={() => {
-            this.saveServer();
-            this.closeModal("addServer");
-          }}
+          submit={
+            this.state.needsTest
+              ? false
+              : () => {
+                  this.saveServer();
+                  this.closeModal("addServer");
+                }
+          }
           close={() => this.closeModal("addServer")}
           delete={
             this.state.newServer
@@ -358,29 +374,77 @@ class Radarr extends React.Component {
           }
         >
           <label>Title</label>
-          <input className="styled-input--input" type="text" name="title" value={this.state.title} onChange={this.inputChange} />
+          <input
+            className="styled-input--input"
+            type="text"
+            name="title"
+            value={this.state.title}
+            onChange={this.inputChange}
+          />
           <label>Protocol</label>
           <div className="styled-input--select">
-            <select name="protocol" value={this.state.protocol} onChange={this.inputChange}>
+            <select
+              name="protocol"
+              value={this.state.protocol}
+              onChange={this.inputChange}
+              className="frt"
+            >
               <option value="http">HTTP</option>
               <option value="https">HTTPS</option>
             </select>
           </div>
           <label>Host</label>
-          <input className="styled-input--input" type="text" name="host" value={this.state.host} onChange={this.inputChange} />
+          <input
+            className="styled-input--input frt"
+            type="text"
+            name="host"
+            value={this.state.host}
+            onChange={this.inputChange}
+          />
           <label>Port</label>
-          <input className="styled-input--input" type="number" name="port" value={this.state.port ? this.state.port : false} onChange={this.inputChange} />
+          <input
+            className="styled-input--input frt"
+            type="number"
+            name="port"
+            value={this.state.port ? this.state.port : false}
+            onChange={this.inputChange}
+          />
           <label>URL Base</label>
-          <input className="styled-input--input" type="text" name="base" value={this.state.base} onChange={this.inputChange} />
+          <input
+            className="styled-input--input frt"
+            type="text"
+            name="base"
+            value={this.state.base}
+            onChange={this.inputChange}
+          />
           <label>API Key</label>
-          <input className="styled-input--input" type="text" name="apikey" value={this.state.apikey} onChange={this.inputChange} />
-          <button className="btn btn__square mb--1" onClick={() => this.test(this.state.uuid, true)}>
+          <input
+            className="styled-input--input frt"
+            type="text"
+            name="apikey"
+            value={this.state.apikey}
+            onChange={this.inputChange}
+          />
+          <button
+            className="btn btn__square mb--1"
+            onClick={() => this.test(this.state.uuid, true)}
+          >
             Test
           </button>
           <label>Profile</label>
-          <div className={`styled-input--select ${this.state.profiles ? "" : "disabled"}`}>
-            <select name="profile" value={this.state.profile} onChange={this.inputChange}>
-              {this.state.profiles && !this.state.newServer ? (
+          <div
+            className={`styled-input--select ${
+              this.state.profiles ? "" : "disabled"
+            }`}
+          >
+            <select
+              name="profile"
+              value={this.state.profile}
+              onChange={this.inputChange}
+            >
+              {this.state.profiles &&
+              !this.state.newServer &&
+              !this.state.needsTest ? (
                 <>
                   <option value="">Choose an option</option>
                   {this.state.profiles.map((item) => {
@@ -392,14 +456,26 @@ class Radarr extends React.Component {
                   })}
                 </>
               ) : (
-                <option value="">{this.state.newServer ? "Please test connection" : "Loading..."}</option>
+                <option value="">
+                  {this.state.newServer || this.state.needsTest
+                    ? "Please test connection"
+                    : "Loading..."}
+                </option>
               )}
             </select>
           </div>
           <label>Path</label>
-          <div className={`styled-input--select ${this.state.profiles ? "" : "disabled"}`}>
-            <select name="path" value={this.state.path} onChange={this.inputChange}>
-              {this.state.paths ? (
+          <div
+            className={`styled-input--select ${
+              this.state.profiles ? "" : "disabled"
+            }`}
+          >
+            <select
+              name="path"
+              value={this.state.path}
+              onChange={this.inputChange}
+            >
+              {this.state.paths && !this.state.needsTest ? (
                 <>
                   <option value="">Choose an option</option>
                   {this.state.paths.map((item) => {
@@ -411,13 +487,25 @@ class Radarr extends React.Component {
                   })}
                 </>
               ) : (
-                <option value="">{this.state.newServer ? "Please test connection" : "Loading..."}</option>
+                <option value="">
+                  {this.state.newServer || this.state.needsTest
+                    ? "Please test connection"
+                    : "Loading..."}
+                </option>
               )}
             </select>
           </div>
-          {!this.state.newServer && this.state.path && this.state.profile ? (
+          {!this.state.newServer &&
+          this.state.path &&
+          this.state.profile &&
+          !this.state.needsTest ? (
             <div className="checkbox-wrap mb--2">
-              <input type="checkbox" name="active" checked={this.state.active} onChange={this.inputChange} />
+              <input
+                type="checkbox"
+                name="active"
+                checked={this.state.active}
+                onChange={this.inputChange}
+              />
               <p>Enabled</p>
             </div>
           ) : null}
@@ -426,8 +514,12 @@ class Radarr extends React.Component {
         <section>
           <p className="main-title mb--2">Radarr</p>
           <p className="capped-width">
-            Radarr is a movie collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new movies and will interface with clients and indexers to grab, sort, and
-            rename them. It can also be configured to automatically upgrade the quality of existing files in the library when a better quality format becomes available.
+            Radarr is a movie collection manager for Usenet and BitTorrent
+            users. It can monitor multiple RSS feeds for new movies and will
+            interface with clients and indexers to grab, sort, and rename them.
+            It can also be configured to automatically upgrade the quality of
+            existing files in the library when a better quality format becomes
+            available.
           </p>
         </section>
         <section>
@@ -436,15 +528,22 @@ class Radarr extends React.Component {
             {this.state.servers.map((server, i) => {
               serverCount++;
               return (
-                <div className="sr--instance">
+                <div key={server.uuid} className="sr--instance">
                   <div className="sr--instance--inner">
                     <ServerIcon />
                     <p className="sr--title">{server.title}</p>
                     <p>{`${server.protocol}://${server.hostname}:${server.port}`}</p>
                     <p>Status: {server.active ? "Enabled" : "Disabled"}</p>
-                    <p>Profile: {server.profile_title ? server.profile_title : "Not set"}</p>
-                    <p>Path: {server.path_title ? server.path_title : "Not set"}</p>
-                    <p className="small">ID: {server.uuid ? server.uuid : "Error"}</p>
+                    <p>
+                      Profile:{" "}
+                      {server.profile_title ? server.profile_title : "Not set"}
+                    </p>
+                    <p>
+                      Path: {server.path_title ? server.path_title : "Not set"}
+                    </p>
+                    <p className="small">
+                      ID: {server.uuid ? server.uuid : "Error"}
+                    </p>
                     <div className="btn-wrap">
                       <button
                         className="btn btn__square"
@@ -455,7 +554,10 @@ class Radarr extends React.Component {
                       >
                         Edit
                       </button>
-                      <button className="btn btn__square" onClick={() => this.test(server.uuid)}>
+                      <button
+                        className="btn btn__square"
+                        onClick={() => this.test(server.uuid)}
+                      >
                         Test
                       </button>
                     </div>

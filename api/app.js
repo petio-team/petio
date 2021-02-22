@@ -86,10 +86,24 @@ class Main {
   setRoutes() {
     logger.log("info", "API: Setting up routes");
     this.e.get("/config", async (req, res) => {
-      res.json(this.config ? { config: true } : { config: false });
+      let config = getConfig();
+      res.json(
+        config
+          ? {
+              config: true,
+              login_type: config.login_type ? config.login_type : 1,
+            }
+          : { config: false, login_type: 1 }
+      );
     });
     this.setup();
     if (this.config) {
+      logger.log("verbose", `API: Config found setting routes`);
+      this.e.use((req, res, next) => {
+        if (req.path !== "/logs/stream")
+          logger.log("verbose", `API: Route ${req.path}`);
+        next();
+      });
       this.e.use("/login", loginRoute);
       this.e.use("/movie", movieRoute);
       this.e.use("/show", showRoute);
@@ -138,6 +152,7 @@ class Main {
     this.setRoutes();
     try {
       this.server = this.e.listen(7778);
+      logger.log("verbose", `API: Listening on 7778 internally`);
       logger.log("info", "API: Server entering listening state");
       if (!this.config) {
         logger.log("warn", "API: No config, entering setup mode");
@@ -156,6 +171,7 @@ class Main {
   }
 
   async connectDb() {
+    logger.log("verbose", `API: Attempting database connection`);
     try {
       await mongoose.connect(this.config.DB_URL, {
         useNewUrlParser: true,
@@ -174,10 +190,14 @@ class Main {
 
   async start() {
     const libUpdate = new LibraryUpdate();
+    logger.log("verbose", `API: Registering Full Scan job`);
     this.cron.start();
+    logger.log("verbose", `API: Registering Partial Scan job`);
     this.partial.start();
-    libUpdate.run();
+    logger.log("verbose", `API: Registering Quota reset job`);
     this.resetQuotas.start();
+    logger.log("verbose", `API: Running init scan`);
+    libUpdate.run();
   }
 
   setup() {
@@ -188,6 +208,10 @@ class Main {
         res.status(400).send("Bad Request");
         return;
       }
+      logger.log(
+        "verbose",
+        `API: Testing Server ${server.protocol}://${server.host}:${server.port}?X-Plex-Token=${server.token}`
+      );
       try {
         let test = await testConnection(
           server.protocol,
@@ -237,6 +261,7 @@ class Main {
             return;
           }
         }
+        logger.log("verbose", "API: Attempting mongo connection");
         await mongoose.connect(mongo + "/petio", {
           useNewUrlParser: true,
           useUnifiedTopology: true,
@@ -257,6 +282,7 @@ class Main {
       }
     });
     this.e.post("/setup/set", async (req, res) => {
+      logger.log("verbose", "API: Attempting to create config file");
       if (this.config) {
         res.status(403).send("Config exists");
         logger.log(
@@ -308,6 +334,7 @@ class Main {
 
   createConfig(data) {
     return new Promise((resolve, reject) => {
+      logger.log("verbose", "API: Attempting to write config to file");
       let project_folder, configFile;
       if (process.pkg) {
         project_folder = path.dirname(process.execPath);
@@ -316,6 +343,10 @@ class Main {
         project_folder = __dirname;
         configFile = path.join(project_folder, "./config/config.json");
       }
+      logger.log(
+        "verbose",
+        `API: Attempting to write config file at - ${configFile}`
+      );
       fs.writeFile(configFile, data, (err) => {
         if (err) {
           logger.log("error", "API: Writing config to file failed");
@@ -330,6 +361,10 @@ class Main {
   }
 
   async createDefaults() {
+    logger.log(
+      "verbose",
+      "API: Attempting to create default configs for Sonarr / Radarr / Email"
+    );
     let project_folder = __dirname;
     let email = process.pkg
       ? path.join(path.dirname(process.execPath), "./config/email.json")
@@ -352,8 +387,20 @@ class Main {
       : path.join(project_folder, "./config/sonarr.json");
     let sonarrDefault = JSON.stringify([]);
     try {
+      logger.log(
+        "verbose",
+        `API: Attempting to write email config to file at - ${email}`
+      );
       fs.writeFileSync(email, emailDefault);
+      logger.log(
+        "verbose",
+        `API: Attempting to write radarr config to file at - ${radarr}`
+      );
       fs.writeFileSync(radarr, radarrDefault);
+      logger.log(
+        "verbose",
+        `API: Attempting to write sonarr config to file at - ${sonarr}`
+      );
       fs.writeFileSync(sonarr, sonarrDefault);
       logger.log(
         "info",
@@ -369,8 +416,9 @@ class Main {
 
   createConfigDir(dir) {
     return new Promise((resolve, reject) => {
-      logger.log("info", "API: Attempting to create config dir");
+      logger.log("verbose", "API: Attempting to create config dir");
       if (fs.existsSync(dir)) {
+        logger.log("verbose", `API: config directory found`);
         resolve();
         return true;
       }

@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const Request = require("../models/request");
 const User = require("../models/user");
-const Admin = require("../models/admin");
 const Mailer = require("../mail/mailer");
 const Sonarr = require("../services/sonarr");
 const Radarr = require("../services/radarr");
@@ -153,9 +152,6 @@ router.post("/remove", async (req, res) => {
   await Promise.all(
     request.users.map(async (user) => {
       let userData = await User.findOne({ id: user });
-      if (!userData) {
-        userData = await Admin.findOne({ id: user });
-      }
       if (!userData) return;
       emails.push(userData.email);
       titles.push(userData.title);
@@ -228,9 +224,6 @@ router.post("/update", async (req, res) => {
       await Promise.all(
         request.users.map(async (user) => {
           let userData = await User.findOne({ id: user });
-          if (!userData) {
-            userData = await Admin.findOne({ id: user });
-          }
           if (!userData) return;
           emails.push(userData.email);
           titles.push(userData.title);

@@ -4,16 +4,12 @@ const express = require("express");
 const router = express.Router();
 const Review = require("../models/review");
 const User = require("../models/user");
-const Admin = require("../models/admin");
 
 router.post("/add", async (req, res) => {
   let item = req.body.item;
   let review = req.body.review;
   let user = req.body.user;
   let userData = await User.findOne({ id: user });
-  if (!userData) {
-    userData = await Admin.findOne({ id: user });
-  }
 
   try {
     const newReview = new Review({
@@ -22,6 +18,8 @@ router.post("/add", async (req, res) => {
       comment: review.comment,
       user: userData.id,
       date: new Date(),
+      type: item.type,
+      title: item.title,
     });
 
     const savedReview = await newReview.save();

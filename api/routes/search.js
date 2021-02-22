@@ -14,6 +14,8 @@ const cacheMiddleware = new ExpressCache(
   })
 );
 
+// Caching not applied needs setting up
+
 router.get("/:term", async (req, res) => {
   try {
     let data = await search(req.params.term.replace(/[^a-zA-Z ]/g, ""));

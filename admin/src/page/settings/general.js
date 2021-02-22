@@ -15,6 +15,7 @@ class General extends React.Component {
       email_secure: false,
       email_enabled: false,
       base_path: "",
+      login_type: false,
     };
 
     this.inputChange = this.inputChange.bind(this);
@@ -23,6 +24,7 @@ class General extends React.Component {
     this.loadConfigs = this.loadConfigs.bind(this);
     this.testEmail = this.testEmail.bind(this);
     this.saveBasePath = this.saveBasePath.bind(this);
+    this.saveLoginType = this.saveLoginType.bind(this);
   }
 
   inputChange(e) {
@@ -79,6 +81,23 @@ class General extends React.Component {
     }, 3000);
   }
 
+  async saveLoginType() {
+    await Api.updateConfig({
+      login_type: this.state.login_type,
+    });
+    this.setState({
+      isError: false,
+      isMsg: "Login Type Updated",
+    });
+    clearInterval(this.closeMsg);
+    this.closeMsg = setInterval(() => {
+      this.setState({
+        isError: false,
+        isMsg: false,
+      });
+    }, 3000);
+  }
+
   async loadConfigs() {
     try {
       let email = await Api.getEmailConfig();
@@ -91,15 +110,16 @@ class General extends React.Component {
         email_port: email.config.emailPort,
         email_secure: email.config.emailSecure,
         base_path: config.base_path ? config.base_path : "",
+        login_type: config.login_type ? config.login_type : 1,
         loading: false,
         isError: false,
-        isMsg: "Email config loaded",
+        isMsg: "Config loaded",
       });
     } catch (err) {
       console.log(err);
       this.setState({
         loading: false,
-        isError: "Error getting email config",
+        isError: "Error getting config",
       });
     }
     clearInterval(this.closeMsg);
@@ -190,38 +210,101 @@ class General extends React.Component {
           <p className="main-title mb--2">Plex</p>
           <p>If connection has been lost to Plex re-authenticate here.</p>
           <button className="btn btn__square disabled">Login with plex</button>
-          <button className="btn btn__square disabled" style={{ marginLeft: "10px" }}>
+          <button
+            className="btn btn__square disabled"
+            style={{ marginLeft: "10px" }}
+          >
             Test
           </button>
         </section>
         <section>
           <p className="main-title mb--2">Email</p>
           <label>Username</label>
-          <input type="text" name="email_user" value={this.state.email_user} onChange={this.inputChange} autoComplete="new-password" autoCorrect="off" spellCheck="off" />
+          <input
+            type="text"
+            name="email_user"
+            value={this.state.email_user}
+            onChange={this.inputChange}
+            autoComplete="new-password"
+            autoCorrect="off"
+            spellCheck="off"
+          />
           <label>Password</label>
-          <input type="password" name="email_pass" value={this.state.email_pass} onChange={this.inputChange} autoComplete="new-password" autoCorrect="off" spellCheck="off" />
+          <input
+            type="password"
+            name="email_pass"
+            value={this.state.email_pass}
+            onChange={this.inputChange}
+            autoComplete="new-password"
+            autoCorrect="off"
+            spellCheck="off"
+          />
           <label>SMTP Server</label>
-          <input type="text" name="email_server" value={this.state.email_server} onChange={this.inputChange} autoComplete="new-password" autoCorrect="off" spellCheck="off" />
+          <input
+            type="text"
+            name="email_server"
+            value={this.state.email_server}
+            onChange={this.inputChange}
+            autoComplete="new-password"
+            autoCorrect="off"
+            spellCheck="off"
+          />
           <label>Port</label>
-          <input type="number" name="email_port" value={this.state.email_port} onChange={this.inputChange} autoComplete="new-password" autoCorrect="off" spellCheck="off" />
+          <input
+            type="number"
+            name="email_port"
+            value={this.state.email_port}
+            onChange={this.inputChange}
+            autoComplete="new-password"
+            autoCorrect="off"
+            spellCheck="off"
+          />
           <div className="checkbox-wrap mb--2">
-            <input type="checkbox" name="email_secure" checked={this.state.email_secure} onChange={this.inputChange} />
+            <input
+              type="checkbox"
+              name="email_secure"
+              checked={this.state.email_secure}
+              onChange={this.inputChange}
+            />
             <p>
               Use Secure <small>(For port 587 or 25 use false)</small>
             </p>
           </div>
           <div className="checkbox-wrap mb--2">
-            <input type="checkbox" name="email_enabled" checked={this.state.email_enabled} onChange={this.inputChange} />
+            <input
+              type="checkbox"
+              name="email_enabled"
+              checked={this.state.email_enabled}
+              onChange={this.inputChange}
+            />
             <p>Enabled</p>
           </div>
           <p>
-            Using Gmail? Make sure to allow "less secure apps" to allow Petio to send emails on your behalf. You can change this setting{" "}
-            <a target="_blank" href="https://www.google.com/settings/security/lesssecureapps">
-              here
-            </a>
+            Using Gmail? You can either create a{" "}
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href="https://support.google.com/accounts/answer/185833"
+            >
+              One Time App Password
+            </a>{" "}
+            or you can choose to allow
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href="https://www.google.com/settings/security/lesssecureapps"
+            >
+              {" "}
+              Less Secure Apps
+            </a>{" "}
+            to allow Petio to send emails on your behalf.
           </p>
 
-          <button className="btn btn__square" style={{ marginRight: "10px" }} onClick={this.saveEmail}>
+          <button
+            className="btn btn__square"
+            style={{ marginRight: "10px" }}
+            onClick={this.saveEmail}
+          >
             Save
           </button>
 
@@ -232,13 +315,48 @@ class General extends React.Component {
         <section>
           <p className="main-title mb--2">Base path</p>
           <p>
-            A base path can be applied to serve petio from a subdirectory. Any specified base must not include a trailing slash and will be applied to the end of the access URL. For example{" "}
-            <code>/petio</code> would become <code>localhost:7777/petio</code>
+            A base path can be applied to serve petio from a subdirectory. Any
+            specified base must not include a trailing slash and will be applied
+            to the end of the access URL. For example <code>/petio</code> would
+            become <code>localhost:7777/petio</code>
             <br></br>
-            <small>Warning! This will require a restart of Petio to take effect.</small>
+            <small>
+              Warning! This will require a restart of Petio to take effect.
+            </small>
           </p>
-          <input type="text" name="base_path" value={this.state.base_path} onChange={this.inputChange} autoCorrect="off" spellCheck="off" />
+          <input
+            type="text"
+            name="base_path"
+            value={this.state.base_path}
+            onChange={this.inputChange}
+            autoCorrect="off"
+            spellCheck="off"
+          />
           <button className="btn btn__square" onClick={this.saveBasePath}>
+            Save
+          </button>
+        </section>
+        <section>
+          <p className="main-title mb--2">User login</p>
+          <p>
+            Logging into the admin panel in Petio will always require a
+            Username/Email &amp; Password, however the standard user panel can
+            be customised for <strong>Fast Login</strong> (where a user only
+            needs to provide their Username / Email) or{" "}
+            <strong>Standard Login</strong> (a user is required to enter a
+            username and password)
+          </p>
+          <div className="select-wrap">
+            <select
+              name="login_type"
+              value={this.state.login_type}
+              onChange={this.inputChange}
+            >
+              <option value="1">Standard Login</option>
+              <option value="2">Fast Login</option>
+            </select>
+          </div>
+          <button className="btn btn__square" onClick={this.saveLoginType}>
             Save
           </button>
         </section>

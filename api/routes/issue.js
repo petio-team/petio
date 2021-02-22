@@ -21,7 +21,7 @@ router.post("/add", async (req, res) => {
     const savedIssue = await newIssue.save();
     res.json(savedIssue);
   } catch (err) {
-    logger.log("error", "ROUTE: Config error");
+    logger.log("warn", "ROUTE: Error addding issue");
     logger.log("info", err);
     res.status(500).json({ error: "error adding issue" });
   }

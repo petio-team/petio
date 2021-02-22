@@ -1,5 +1,5 @@
 import React from "react";
-import { withRouter, Link } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import Api from "../data/Api";
 // import User from '../data/User'
@@ -48,7 +48,12 @@ class History extends React.Component {
     this.setState({
       historyData: [],
     });
-    Api.history(this.props.user.current.altId ? this.props.user.current.altId : this.props.user.current.id, this.props.type)
+    Api.history(
+      this.props.user.current.altId
+        ? this.props.user.current.altId
+        : this.props.user.current.id,
+      this.props.type
+    )
       .then((res) => {
         if (Object.keys(res).length === 0) {
           this.setState({
@@ -77,12 +82,18 @@ class History extends React.Component {
         <>
           <section>
             <h3 className="sub-title mb--1">Recently Viewed by You</h3>
-            <p>Be sure to review movies you watched to help other users decide what to watch!</p>
+            <p>
+              Be sure to review movies you watched to help other users decide
+              what to watch!
+            </p>
             {Object.keys(this.state.historyData).length > 0 ? (
               <Carousel>
                 {Object.keys(this.state.historyData).map((t) => {
                   // console.log(this.state.historyData[t]);
-                  if (!this.state.historyData[t].id || this.state.historyData[t].id === "false") {
+                  if (
+                    !this.state.historyData[t].id ||
+                    this.state.historyData[t].id === "false"
+                  ) {
                     return null;
                   }
                   return (
@@ -109,12 +120,18 @@ class History extends React.Component {
         <>
           <section>
             <h3 className="sub-title mb--1">Recently Viewed by You</h3>
-            <p>Be sure to review shows you watched to help other users decide what to watch!</p>
+            <p>
+              Be sure to review shows you watched to help other users decide
+              what to watch!
+            </p>
             {Object.keys(this.state.historyData).length > 0 ? (
               <Carousel>
                 {Object.keys(this.state.historyData).map((t) => {
                   // console.log(this.state.historyData[t]);
-                  if (!this.state.historyData[t].id || this.state.historyData[t].id === "false") {
+                  if (
+                    !this.state.historyData[t].id ||
+                    this.state.historyData[t].id === "false"
+                  ) {
                     return null;
                   }
                   return (

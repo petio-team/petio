@@ -1,7 +1,6 @@
 import { store } from "../store";
 import * as types from "../actionTypes";
 import * as api from "./api";
-import Api from ".";
 
 function finalise(data = false) {
   if (!data) return false;
@@ -473,8 +472,12 @@ export async function allUsers() {
   try {
     let userData = await api.allUsers();
     let data = {};
-    userData.map((user) => {
-      data[user.id] = user;
+    userData.map((user, i) => {
+      if (user) {
+        data[user.id] = user;
+      } else {
+        console.log(`User ${i} didn't return any data, this is unusual`);
+      }
     });
     finalise({
       type: types.ALL_USERS,
@@ -602,6 +605,16 @@ export async function updateRequest(request, servers) {
 export async function getConsole() {
   try {
     let data = await api.getConsole();
+    return data;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+export async function getReviews() {
+  try {
+    let data = await api.getReviews();
     return data;
   } catch (err) {
     console.log(err);

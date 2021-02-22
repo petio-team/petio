@@ -1,5 +1,4 @@
 import React from "react";
-import { connect } from "react-redux";
 import Api from "../data/Api";
 import User from "../data/User";
 import Carousel from "../components/Carousel";
@@ -72,7 +71,6 @@ class Dashboard extends React.Component {
     previous = new Date(previous);
     var msPerMinute = 60;
     var msPerHour = msPerMinute * 60;
-    var msPerDay = msPerHour * 24;
 
     var elapsed = current - previous;
 
@@ -213,7 +211,9 @@ class Dashboard extends React.Component {
           <div className="widget--item--inner">
             <div className="widget--title">Bandwidth</div>
             <hr />
-            {this.state.bandwidth ? <Bandwidth bandwidth={this.state.bandwidth} /> : null}
+            {this.state.bandwidth ? (
+              <Bandwidth bandwidth={this.state.bandwidth} />
+            ) : null}
           </div>
         </div>
         <div className="widget--item widget--item__30">
@@ -245,14 +245,26 @@ class Dashboard extends React.Component {
                     request = this.props.api.series_lookup[key];
                   }
                   if (!request) return null;
-                  return <RequestCard key={key} users={users} request={request} />;
+                  return (
+                    <RequestCard
+                      key={key}
+                      keyData={key}
+                      users={users}
+                      request={request}
+                    />
+                  );
                 })}
               </Carousel>
             )}
           </div>
         </div>
 
-        <div className={"widget--item widget--item__50 " + (this.state.sessionsCollapsed ? "collapsed" : "")}>
+        <div
+          className={
+            "widget--item widget--item__50 " +
+            (this.state.sessionsCollapsed ? "collapsed" : "")
+          }
+        >
           <div className="widget--item--inner">
             <div className="session--toggle" onClick={this.toggleSessions}>
               {this.state.sessionsCollapsed ? "Details" : "Overview"}

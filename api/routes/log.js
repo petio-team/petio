@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const fs = require("fs");
 const path = require("path");
-const logger = require("../util/logger");
 
 let liveLogfile = process.pkg
   ? path.join(path.dirname(process.execPath), "./logs/live1.log")
@@ -30,13 +29,6 @@ router.get("/stream", async (req, res) => {
 
   let data = [...dataNew, ...dataOld];
   res.json(data);
-
-  // data.sort();
-
-  // } catch (err) {
-  //   console.log(err);
-  //   logger.log("error", "ROUTE: Unable to get logs");
-  // }
 });
 
 module.exports = router;

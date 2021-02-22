@@ -342,6 +342,14 @@ export let getConsole = () => {
   return call(request, headers, "get").then((res) => res.json());
 };
 
+export let getReviews = () => {
+  let request = `${apiUrl}/review/all`;
+  let headers = {
+    "Content-Type": "application/json",
+  };
+  return call(request, headers, "get").then((res) => res.json());
+};
+
 function call(url, headers, method, body = null) {
   let args = {
     method: method,

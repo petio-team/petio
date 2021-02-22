@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const Profile = require("../models/profile");
 const User = require("../models/user");
-const Admin = require("../models/admin");
 const logger = require("../util/logger");
 
 router.get("/all", async (req, res) => {
@@ -103,16 +102,6 @@ router.post("/delete_profile", async (req, res) => {
 
   try {
     await User.updateMany(
-      {
-        profile: profile.id,
-      },
-      {
-        $unset: {
-          profile: "",
-        },
-      }
-    );
-    await Admin.updateMany(
       {
         profile: profile.id,
       },

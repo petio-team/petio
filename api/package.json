@@ -1,6 +1,6 @@
 {
   "name": "petio-rest",
-  "version": "0.3.11",
+  "version": "0.3.16",
   "description": "Rest Api for Petio",
   "main": "index.js",
   "scripts": {
@@ -9,8 +9,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.21.1",
     "bcrypt": "^5.0.0",
     "cache-manager": "^3.4.0",
+    "cheerio": "^1.0.0-rc.5",
     "cors": "^2.8.5",
     "cron": "^1.8.2",
     "express": "^4.17.1",

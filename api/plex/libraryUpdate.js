@@ -1,4 +1,3 @@
-const Admin = require("../models/admin");
 const request = require("xhr-request");
 const xmlParser = require("xml-js");
 const Library = require("../models/library");
@@ -12,6 +11,7 @@ const Mailer = require("../mail/mailer");
 const getConfig = require("../util/config");
 const processRequest = require("../requests/process");
 const logger = require("../util/logger");
+const bcrypt = require("bcrypt");
 
 class LibraryUpdate {
   constructor() {
@@ -128,53 +128,32 @@ class LibraryUpdate {
       await this.updateFriends();
       this.execMail();
       logger.log("info", "LIB CRON: Full Scan Complete");
+      this.checkOldRequests();
     } else {
       logger.log("warn", "Couldn't update libraries");
     }
   }
 
   async createAdmin() {
-    let adminFound = await Admin.findOne({
+    let adminFound = await User.findOne({
       id: this.config.adminId,
     });
-    if (adminFound) {
-      logger.log("info", "LIB CRON: Admin Already Created, updating");
-      try {
-        let adminData = await Admin.findOneAndUpdate(
-          { id: this.config.adminId },
-          {
-            $set: {
-              email: this.config.adminEmail,
-              thumb: this.config.adminThumb,
-              title: this.config.adminDisplayName,
-              username: this.config.adminUsername,
-              password: this.config.adminPass,
-              altId: 1,
-              role: "admin",
-            },
-          },
-          { new: true, useFindAndModify: false }
-        );
-      } catch (err) {
-        logger.log("error", `LIB CRON: Error`);
-        logger.error(err.stack);
-      }
-    } else {
+    if (!adminFound) {
       logger.log("info", "LIB CRON: Creating admin user");
       try {
-        let adminData = new Admin({
+        let adminData = new User({
           id: this.config.adminId,
           email: this.config.adminEmail,
           thumb: this.config.adminThumb,
           title: this.config.adminDisplayName,
           username: this.config.adminUsername,
-          password: this.config.adminPass,
+          password: bcrypt.hashSync(this.config.adminPass, 10),
           altId: 1,
           role: "admin",
         });
         await adminData.save();
       } catch (err) {
-        logger.log("error", `LIB CRON: Error`);
+        logger.log("error", `LIB CRON: Error creating admin user`);
         logger.error(err.stack);
       }
     }
@@ -398,9 +377,6 @@ class LibraryUpdate {
       movieDb = await Movie.findOne({
         ratingKey: parseInt(movieObj.ratingKey),
       });
-      if (!this.full && movieDb) {
-        return;
-      }
     } catch {
       movieDb = false;
     }
@@ -495,7 +471,7 @@ class LibraryUpdate {
       }
     } else {
       try {
-        let updatedMovie = await Movie.findOneAndUpdate(
+        await Movie.findOneAndUpdate(
           {
             ratingKey: movieObj.ratingKey,
           },
@@ -587,9 +563,6 @@ class LibraryUpdate {
 
     try {
       showDb = await Show.findOne({ ratingKey: parseInt(showObj.ratingKey) });
-      if (!this.full && showDb) {
-        return;
-      }
     } catch {
       showDb = false;
     }
@@ -683,7 +656,7 @@ class LibraryUpdate {
       }
     } else {
       try {
-        let updatedShow = await Show.findOneAndUpdate(
+        await Show.findOneAndUpdate(
           {
             ratingKey: showObj.ratingKey,
           },
@@ -831,9 +804,6 @@ class LibraryUpdate {
   async sendMail(user, i, request) {
     let userData = await User.findOne({ id: user });
     if (!userData) {
-      userData = await Admin.findOne({ id: user });
-    }
-    if (!userData) {
       logger.log("error", "LIB CRON: Err: No user data");
       return;
     }
@@ -925,6 +895,44 @@ class LibraryUpdate {
         }
       );
     });
+  }
+
+  async checkOldRequests() {
+    logger.info("LIB CRON: Checking old requests");
+    let requests = await Request.find();
+    for (let i = 0; i < requests.length; i++) {
+      let onServer = false;
+      let request = requests[i];
+      if (request.type === "tv") {
+        onServer = await Show.findOne({ tmdb_id: request.tmdb_id });
+      }
+      if (request.type === "movie") {
+        onServer = await Movie.findOne({ tmdb_id: request.tmdb_id });
+      }
+
+      if (onServer) {
+        logger.verbose(`LIB CRON: Found missed request - ${request.title}`);
+        new processRequest(request, false).archive(true, false, false);
+        let emails = [];
+        let titles = [];
+        await Promise.all(
+          request.users.map(async (user) => {
+            let userData = await User.findOne({ id: user });
+            if (!userData) return;
+            emails.push(userData.email);
+            titles.push(userData.title);
+          })
+        );
+        new Mailer().mail(
+          `${request.title} added to Plex!`,
+          `${request.title} added to Plex!`,
+          "Your request has now been processed and is ready to watch on Plex, thanks for your request!",
+          `https://image.tmdb.org/t/p/w500${request.thumb}`,
+          emails,
+          titles
+        );
+      }
+    }
   }
 }
 

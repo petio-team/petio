@@ -135,7 +135,6 @@ class Movie extends React.Component {
   }
 
   getReviews() {
-    console.log("reviews got");
     let id = this.props.match.params.id;
     User.getReviews(id);
   }
@@ -161,9 +160,15 @@ class Movie extends React.Component {
   render() {
     let id = this.state.id;
     let movieData = null;
-    if (this.props.api.movie_lookup[id]) movieData = this.props.api.movie_lookup[id];
+    if (this.props.api.movie_lookup[id])
+      movieData = this.props.api.movie_lookup[id];
 
-    if (!movieData || movieData.isMinified || !this.props.user || movieData.error) {
+    if (
+      !movieData ||
+      movieData.isMinified ||
+      !this.props.user ||
+      movieData.error
+    ) {
       return <MovieShowLoading />;
     }
 
@@ -172,7 +177,13 @@ class Movie extends React.Component {
     if (movieData.recommendations) {
       relatedItems = movieData.recommendations.map((key) => {
         // if (this.props.api.movie_lookup[id]) {
-        return <MovieCard key={`related-${key}`} msg={this.props.msg} movie={{ id: key }} />;
+        return (
+          <MovieCard
+            key={`related-${key}`}
+            msg={this.props.msg}
+            movie={{ id: key }}
+          />
+        );
         // }
       });
       related = (
@@ -194,7 +205,11 @@ class Movie extends React.Component {
     }
 
     return (
-      <div className="media-wrap" data-id={movieData.imdb_id} key={`${movieData.title}__wrap`}>
+      <div
+        className="media-wrap"
+        data-id={movieData.imdb_id}
+        key={`${movieData.title}__wrap`}
+      >
         <Review
           id={this.props.match.params.id}
           msg={this.props.msg}
@@ -204,7 +219,14 @@ class Movie extends React.Component {
           getReviews={this.getReviews}
           item={movieData}
         />
-        <MovieShowTop mediaData={movieData} video={video} openIssues={this.props.openIssues} trailer={this.state.trailer} requested={this.state.requested} request={this.request} />
+        <MovieShowTop
+          mediaData={movieData}
+          video={video}
+          openIssues={this.props.openIssues}
+          trailer={this.state.trailer}
+          requested={this.state.requested}
+          request={this.request}
+        />
         <div className="media-content">
           <MovieShowOverview
             mediaData={movieData}
@@ -221,21 +243,36 @@ class Movie extends React.Component {
           <section>
             <h3 className="sub-title mb--1">Cast</h3>
             <Carousel>
-              {movieData.credits.cast.map((cast, key) => {
-                return <PersonCard key={`person--${cast.name}`} person={cast} character={cast.character} />;
+              {movieData.credits.cast.map((cast) => {
+                return (
+                  <PersonCard
+                    key={`person--${cast.name}`}
+                    person={cast}
+                    character={cast.character}
+                  />
+                );
               })}
             </Carousel>
           </section>
-          {movieData.belongs_to_collection && movieData.collection.length > 0 ? (
+          {movieData.belongs_to_collection &&
+          movieData.collection.length > 0 ? (
             <section>
-              <h3 className="sub-title mb--1">{movieData.belongs_to_collection.name}</h3>
+              <h3 className="sub-title mb--1">
+                {movieData.belongs_to_collection.name}
+              </h3>
               <Carousel>
                 {movieData.collection
                   .sort(function (a, b) {
                     return a - b;
                   })
                   .map((key) => {
-                    return <MovieCard key={`collection-${key}`} msg={this.props.msg} movie={{ id: key }} />;
+                    return (
+                      <MovieCard
+                        key={`collection-${key}`}
+                        msg={this.props.msg}
+                        movie={{ id: key }}
+                      />
+                    );
                   })}
               </Carousel>
             </section>
@@ -243,7 +280,12 @@ class Movie extends React.Component {
           {related}
           <section>
             <h3 className="sub-title mb--1">Reviews</h3>
-            {this.props.user.reviews ? <ReviewsList reviews={this.props.user.reviews[id]} external={movieData.reviews} /> : null}
+            {this.props.user.reviews ? (
+              <ReviewsList
+                reviews={this.props.user.reviews[id]}
+                external={movieData.reviews}
+              />
+            ) : null}
           </section>
         </div>
       </div>
@@ -254,7 +296,14 @@ class Movie extends React.Component {
 Movie = withRouter(Movie);
 
 function MovieContainer(props) {
-  return <Movie api={props.api} user={props.user} openIssues={props.openIssues} msg={props.msg} />;
+  return (
+    <Movie
+      api={props.api}
+      user={props.user}
+      openIssues={props.openIssues}
+      msg={props.msg}
+    />
+  );
 }
 
 const mapStateToProps = function (state) {

@@ -32,6 +32,8 @@ export default function (
   },
   action
 ) {
+  let creditCache = {};
+  let creditCacheS = {};
   switch (action.type) {
     case types.POPULAR:
       return {
@@ -51,12 +53,12 @@ export default function (
       };
 
     case types.MOVIE_LOOKUP:
-      let creditCache = {};
       if (action.movie) {
         if (action.movie.credits) {
           Object.keys(action.movie.credits).forEach((key) => {
             Object.keys(action.movie.credits[key]).forEach((skey) => {
-              creditCache[action.movie.credits[key][skey].id] = action.movie.credits[key][skey];
+              creditCache[action.movie.credits[key][skey].id] =
+                action.movie.credits[key][skey];
             });
           });
         }
@@ -85,12 +87,12 @@ export default function (
       };
 
     case types.SERIES_LOOKUP:
-      let creditCacheS = {};
       if (action.series)
         if (action.series.credits) {
           Object.keys(action.series.credits).forEach((key) => {
             Object.keys(action.series.credits[key]).forEach((skey) => {
-              creditCacheS[action.series.credits[key][skey].id] = action.series.credits[key][skey];
+              creditCacheS[action.series.credits[key][skey].id] =
+                action.series.credits[key][skey];
             });
           });
         }

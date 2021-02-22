@@ -50,7 +50,7 @@ export function series(id = false, minified) {
   return process(request).then((res) => res.json());
 }
 
-export function person(id = false, name = false) {
+export function person(id = false) {
   if (!id) {
     return false;
   }

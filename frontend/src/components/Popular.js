@@ -1,7 +1,6 @@
 import React from "react";
-import { withRouter, Link } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
-import Plex from "../data/Plex";
 import Api from "../data/Api";
 // import User from '../data/User'
 import MovieCard from "./MovieCard";
@@ -27,10 +26,6 @@ class Popular extends React.Component {
     this.init();
   }
 
-  // componentDidUpdate() {
-  // 	this.init();
-  // }
-
   init() {
     if (!this.state.topData) {
       this.getTop("movies");
@@ -55,17 +50,22 @@ class Popular extends React.Component {
         <>
           <section>
             <h3 className="sub-title mb--1">Popular on Plex</h3>
-            <p>What's popular on Plex right now. The numbers indicate number of plays in the past month.</p>
+            <p>
+              What&apos;s popular on Plex right now. The numbers indicate number
+              of plays in the past month.
+            </p>
             {this.state.topData ? (
               <Carousel>
                 {Object.keys(this.state.topData).map((t) => {
-                  if (!this.state.topData[t].item.tmdb_id || this.state.topData[t].item.tmdb_id === "false") {
+                  if (
+                    !this.state.topData[t].item.tmdb_id ||
+                    this.state.topData[t].item.tmdb_id === "false"
+                  ) {
                     return null;
                   }
                   return (
                     <MovieCard
-                      key={t}
-                      key={this.state.topData[t].item.tmdb_id}
+                      key={`${this.state.topData[t].item.tmdb_id}__top`}
                       movie={{
                         id: this.state.topData[t].item.tmdb_id,
                       }}
@@ -86,11 +86,17 @@ class Popular extends React.Component {
         <>
           <section>
             <h3 className="sub-title mb--1">Popular on Plex</h3>
-            <p>What's popular on Plex right now. The numbers indicate number of plays in the past month.</p>
+            <p>
+              What&apos;s popular on Plex right now. The numbers indicate number
+              of plays in the past month.
+            </p>
             {this.state.topData ? (
               <Carousel>
                 {Object.keys(this.state.topData).map((t) => {
-                  if (!this.state.topData[t].item.tmdb_id || this.state.topData[t].item.tmdb_id === "false") {
+                  if (
+                    !this.state.topData[t].item.tmdb_id ||
+                    this.state.topData[t].item.tmdb_id === "false"
+                  ) {
                     return null;
                   }
                   return (

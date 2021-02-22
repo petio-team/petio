@@ -128,7 +128,10 @@ class Requests extends React.Component {
 
   async getArrOptions(uuid, type) {
     try {
-      let settings = type === "radarr" ? await Api.radarrOptions(uuid) : await Api.sonarrOptions(uuid);
+      let settings =
+        type === "radarr"
+          ? await Api.radarrOptions(uuid)
+          : await Api.sonarrOptions(uuid);
       if (settings.profiles.error || settings.paths.error) {
         return;
       }
@@ -155,7 +158,11 @@ class Requests extends React.Component {
           edit_radarr[uuid] = {
             active: true,
             profile: child.qualityProfileId ? child.qualityProfileId : false,
-            path: child.path ? child.path.replace(`/${req.title} (${child.year})`, "").replace(`\\${req.title} (${child.year})`, "") : false,
+            path: child.path
+              ? child.path
+                  .replace(`/${req.title} (${child.year})`, "")
+                  .replace(`\\${req.title} (${child.year})`, "")
+              : false,
           };
         });
       }
@@ -168,7 +175,11 @@ class Requests extends React.Component {
           edit_sonarr[uuid] = {
             active: true,
             profile: child.qualityProfileId ? child.qualityProfileId : false,
-            path: child.path ? child.path.replace(`${req.title} (${child.year})`, "").replace(`${req.title} (${child.year})`, "") : false,
+            path: child.path
+              ? child.path
+                  .replace(`${req.title} (${child.year})`, "")
+                  .replace(`${req.title} (${child.year})`, "")
+              : false,
           };
         });
       }
@@ -221,14 +232,23 @@ class Requests extends React.Component {
   renderReqEdit(server, type) {
     let editable = this.state.activeRequest[`${type}Id`].length === 0;
     return (
-      <div className="request-edit--server--wrap" key={`${type}_server_${server.uuid}`}>
-        <p className="request-edit--server--title">Server name: {server.title}</p>
+      <div
+        className="request-edit--server--wrap"
+        key={`${type}_server_${server.uuid}`}
+      >
+        <p className="request-edit--server--title">
+          Server name: {server.title}
+        </p>
         <label key={server.uuid} className={editable ? "" : "disabled"}>
           <input
             data-type={type}
             data-id={server.uuid}
             type="checkbox"
-            checked={this.state[`edit_${type}`][server.uuid] ? this.state[`edit_${type}`][server.uuid].active : false}
+            checked={
+              this.state[`edit_${type}`][server.uuid]
+                ? this.state[`edit_${type}`][server.uuid].active
+                : false
+            }
             name={"active"}
             onChange={this.changeServerSettings}
           />
@@ -238,19 +258,28 @@ class Requests extends React.Component {
         {server.options ? (
           <>
             <p className="request-edit--server--subtitle">Profile</p>
-            <div className={`styled-input--select ${editable ? "" : "disabled"}`}>
+            <div
+              className={`styled-input--select ${editable ? "" : "disabled"}`}
+            >
               <select
                 data-type={type}
                 data-id={server.uuid}
                 name="profile"
-                value={this.state[`edit_${type}`][server.uuid] ? this.state[`edit_${type}`][server.uuid].profile : false}
+                value={
+                  this.state[`edit_${type}`][server.uuid]
+                    ? this.state[`edit_${type}`][server.uuid].profile
+                    : false
+                }
                 onChange={this.changeServerSettings}
               >
                 <option value="">Please choose</option>
                 {server.options.profiles ? (
-                  server.options.profiles.map((profile, i) => {
+                  server.options.profiles.map((profile) => {
                     return (
-                      <option key={`${type}_profile_${server.uuid}_${profile.id}`} value={profile.id}>
+                      <option
+                        key={`${type}_profile_${server.uuid}_${profile.id}`}
+                        value={profile.id}
+                      >
                         {profile.name}
                       </option>
                     );
@@ -261,19 +290,28 @@ class Requests extends React.Component {
               </select>
             </div>
             <p className="request-edit--server--subtitle">Root Path</p>
-            <div className={`styled-input--select ${editable ? "" : "disabled"}`}>
+            <div
+              className={`styled-input--select ${editable ? "" : "disabled"}`}
+            >
               <select
                 data-type={type}
                 data-id={server.uuid}
                 name="path"
-                value={this.state[`edit_${type}`][server.uuid] ? this.state[`edit_${type}`][server.uuid].path : false}
+                value={
+                  this.state[`edit_${type}`][server.uuid]
+                    ? this.state[`edit_${type}`][server.uuid].path
+                    : false
+                }
                 onChange={this.changeServerSettings}
               >
                 <option value="">Please choose</option>
                 {server.options.paths ? (
-                  server.options.paths.map((path, i) => {
+                  server.options.paths.map((path) => {
                     return (
-                      <option key={`${type}_profile_${server.uuid}_${path.id}`} value={path.path}>
+                      <option
+                        key={`${type}_profile_${server.uuid}_${path.id}`}
+                        value={path.path}
+                      >
                         {path.path}
                       </option>
                     );
@@ -353,7 +391,10 @@ class Requests extends React.Component {
   }
 
   async removeReq() {
-    let reason = this.state.req_delete_reason.length > 0 ? this.state.req_delete_reason : false;
+    let reason =
+      this.state.req_delete_reason.length > 0
+        ? this.state.req_delete_reason
+        : false;
     let remove = await Api.removeRequest(this.state.activeRequest, reason);
     if (remove) {
       this.closeModal("deleteRequest");
@@ -366,8 +407,16 @@ class Requests extends React.Component {
   render() {
     return (
       <>
-        <Modal title="Remove Request" open={this.state.deleteRequestOpen} close={() => this.closeModal("deleteRequest")} submit={this.removeReq}>
-          <p className="sub-title mb--1">Removing {this.state.activeRequest ? this.state.activeRequest.title : ""}</p>
+        <Modal
+          title="Remove Request"
+          open={this.state.deleteRequestOpen}
+          close={() => this.closeModal("deleteRequest")}
+          submit={this.removeReq}
+        >
+          <p className="sub-title mb--1">
+            Removing{" "}
+            {this.state.activeRequest ? this.state.activeRequest.title : ""}
+          </p>
           <textarea
             className="styled-input--textarea"
             value={this.state.req_delete_reason}
@@ -376,22 +425,49 @@ class Requests extends React.Component {
             onChange={this.inputChange}
           ></textarea>
           <p style={{ margin: 0 }}>
-            <small>Note: This is final and cannot be undone, this will also remove the request from Sonarr / Radarr if applicable.</small>
+            <small>
+              Note: This is final and cannot be undone, this will also remove
+              the request from Sonarr / Radarr if applicable.
+            </small>
           </p>
         </Modal>
         <Modal
           title="Edit Request"
           open={this.state.editRequestOpen}
           close={() => this.closeModal("editRequest")}
-          submitText={this.state.activeRequest ? (this.state.activeRequest.approved ? "Save" : "Save & Approve") : false}
-          deleteText={this.state.activeRequest ? (this.state.activeRequest.approved ? "Delete" : "Deny") : false}
+          submitText={
+            this.state.activeRequest
+              ? this.state.activeRequest.approved
+                ? "Save"
+                : "Save & Approve"
+              : false
+          }
+          deleteText={
+            this.state.activeRequest
+              ? this.state.activeRequest.approved
+                ? "Delete"
+                : "Deny"
+              : false
+          }
           delete={this.deleteReq}
-          submit={this.state.activeRequest ? (this.state.activeRequest.sonarrId.length > 0 || this.state.activeRequest.radarrId.length > 0 ? false : this.approveReq) : false}
+          submit={
+            this.state.activeRequest
+              ? this.state.activeRequest.sonarrId.length > 0 ||
+                this.state.activeRequest.radarrId.length > 0
+                ? false
+                : this.approveReq
+              : false
+          }
         >
           {this.state.activeRequest ? (
             <>
-              <p className="sub-title mb--1">{this.state.activeRequest.title}</p>
-              <p className="sub-title mt--2 mb--1">Edit {this.state.activeRequest.type === "tv" ? "Sonarr" : "Radarr"}</p>
+              <p className="sub-title mb--1">
+                {this.state.activeRequest.title}
+              </p>
+              <p className="sub-title mt--2 mb--1">
+                Edit{" "}
+                {this.state.activeRequest.type === "tv" ? "Sonarr" : "Radarr"}
+              </p>
               {this.state.activeRequest.type === "tv" ? (
                 this.state.s_servers ? (
                   this.state.s_servers.map((server) => {
@@ -407,7 +483,11 @@ class Requests extends React.Component {
               ) : (
                 <p>No Radarr Servers</p>
               )}
-              {this.state.activeRequest.approved ? null : <p style={{ margin: 0 }}>Submitting will also immediately approve this request</p>}
+              {this.state.activeRequest.approved ? null : (
+                <p style={{ margin: 0 }}>
+                  Submitting will also immediately approve this request
+                </p>
+              )}
             </>
           ) : null}
         </Modal>
@@ -422,7 +502,11 @@ class Requests extends React.Component {
                 <p className="main-title">Requests</p>
               </section>
               <section>
-                <RequestsTable requests={this.state.requests} api={this.props.api} editReq={this.editReq} />
+                <RequestsTable
+                  requests={this.state.requests}
+                  api={this.props.api}
+                  editReq={this.editReq}
+                />
               </section>
             </>
           )}

@@ -1,5 +1,5 @@
 import React from "react";
-import { withRouter, Link } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import Api from "../data/Api";
 import { ReactComponent as SearchIcon } from "../assets/svg/search.svg";
@@ -78,7 +78,13 @@ class Search extends React.Component {
           {this.props.api.search_results.movies.length > 0 ? (
             <Carousel>
               {this.props.api.search_results.movies.map((movie) => {
-                return <MovieCard key={movie.id} movie={movie} msg={this.props.msg} />;
+                return (
+                  <MovieCard
+                    key={movie.id}
+                    movie={movie}
+                    msg={this.props.msg}
+                  />
+                );
               })}
             </Carousel>
           ) : this.state.isLoading ? (
@@ -92,7 +98,13 @@ class Search extends React.Component {
           {this.props.api.search_results.series.length > 0 ? (
             <Carousel>
               {this.props.api.search_results.series.map((series) => {
-                return <TvCard key={series.id} series={series} msg={this.props.msg} />;
+                return (
+                  <TvCard
+                    key={series.id}
+                    series={series}
+                    msg={this.props.msg}
+                  />
+                );
               })}
             </Carousel>
           ) : this.state.isLoading ? (
@@ -139,7 +151,13 @@ class Search extends React.Component {
             <Carousel>
               {Object.keys(this.props.api.popular).length > 0
                 ? this.props.api.popular.tv.map((series) => {
-                    return <TvCard key={series.id} series={series} msg={this.props.msg} />;
+                    return (
+                      <TvCard
+                        key={series.id}
+                        series={series}
+                        msg={this.props.msg}
+                      />
+                    );
                   })
                 : null}
             </Carousel>
@@ -164,7 +182,12 @@ class Search extends React.Component {
         <section>
           <h1 className="main-title mb--1">Search</h1>
           <div className="search-form">
-            <input type="text" placeholder="Search" value={this.state.searchTerm} onChange={this.handleChange} />
+            <input
+              type="text"
+              placeholder="Search"
+              value={this.state.searchTerm}
+              onChange={this.handleChange}
+            />
             <button className="search-btn">
               <SearchIcon />
             </button>

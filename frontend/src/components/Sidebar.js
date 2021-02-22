@@ -1,5 +1,5 @@
 import React from "react";
-import { withRouter, Link, Router } from "react-router-dom";
+import { withRouter, Link } from "react-router-dom";
 import { connect } from "react-redux";
 import { ReactComponent as SearchIcon } from "../assets/svg/search.svg";
 import { ReactComponent as MovieIcon } from "../assets/svg/movie.svg";
@@ -54,7 +54,15 @@ class Sidebar extends React.Component {
           </div>
         </Link>
         <div className="sidebar--scroll">
-          <Link to="/user" className={"sidebar--item user-profile " + (current === "/user" || current.startsWith("/user/") ? "active" : "")}>
+          <Link
+            to="/user"
+            className={
+              "sidebar--item user-profile " +
+              (current === "/user" || current.startsWith("/user/")
+                ? "active"
+                : "")
+            }
+          >
             <p>{user.title}</p>
             <div className="icon">
               <div
@@ -66,31 +74,71 @@ class Sidebar extends React.Component {
               ></div>
             </div>
           </Link>
-          <Link to="/" className={"sidebar--item " + (current === "/" || current.startsWith("/search/") ? "active" : "")}>
+          <Link
+            to="/"
+            className={
+              "sidebar--item " +
+              (current === "/" || current.startsWith("/search/")
+                ? "active"
+                : "")
+            }
+          >
             <p>Search</p>
             <div className="icon">
               <SearchIcon />
             </div>
           </Link>
-          <Link to="/movies" className={"sidebar--item " + (current === "/movies" || current.startsWith("/movie/") ? "active" : "")}>
+          <Link
+            to="/movies"
+            className={
+              "sidebar--item " +
+              (current === "/movies" || current.startsWith("/movie/")
+                ? "active"
+                : "")
+            }
+          >
             <p>Movies</p>
             <div className="icon">
               <MovieIcon />
             </div>
           </Link>
-          <Link to="/tv" className={"sidebar--item " + (current === "/tv" || current.startsWith("/series/") ? "active" : "")}>
+          <Link
+            to="/tv"
+            className={
+              "sidebar--item " +
+              (current === "/tv" || current.startsWith("/series/")
+                ? "active"
+                : "")
+            }
+          >
             <p>TV Shows</p>
             <div className="icon">
               <TvIcon />
             </div>
           </Link>
-          <Link to="/people" className={"sidebar--item " + (current === "/people" || current.startsWith("/person/") ? "active" : "")}>
+          <Link
+            to="/people"
+            className={
+              "sidebar--item " +
+              (current === "/people" || current.startsWith("/person/")
+                ? "active"
+                : "")
+            }
+          >
             <p>People</p>
             <div className="icon">
               <PersonIcon />
             </div>
           </Link>
-          <Link to="/requests" className={"sidebar--item " + (current === "/requests" || current.startsWith("/requests/") ? "active" : "")}>
+          <Link
+            to="/requests"
+            className={
+              "sidebar--item " +
+              (current === "/requests" || current.startsWith("/requests/")
+                ? "active"
+                : "")
+            }
+          >
             <p>Requests</p>
             <div className="icon">
               <RequestIcon />
@@ -99,7 +147,11 @@ class Sidebar extends React.Component {
           {user.role === "admin" ? (
             <a
               className="sidebar--item"
-              href={`${window.location.protocol}//${window.location.host}${window.location.pathname === "/" ? "" : this.stripTrailingSlash(window.location.pathname)}/admin/`}
+              href={`${window.location.protocol}//${window.location.host}${
+                window.location.pathname === "/"
+                  ? ""
+                  : this.stripTrailingSlash(window.location.pathname)
+              }/admin/`}
             >
               <p>Admin</p>
               <div className="icon">

@@ -60,12 +60,14 @@ class Sonarr {
       let args = {
         method: method,
         json: true,
+        timeout: 30000,
       };
       if (method === "post" && body) {
         args = {
           method: method,
           json: true,
           body: body,
+          timeout: 30000,
         };
       }
       request(url, args, function (err, data) {
@@ -308,7 +310,7 @@ class Sonarr {
       }
     }
 
-    logger.log("info", mainCalendar);
+    logger.log("verbose", "SONARR: Calendar returned");
 
     return mainCalendar;
   }

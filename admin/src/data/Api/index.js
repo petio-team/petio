@@ -40,6 +40,7 @@ import {
   removeRequest,
   updateRequest,
   getConsole,
+  getReviews,
 } from "./actions";
 
 export default {
@@ -84,4 +85,5 @@ export default {
   removeRequest,
   updateRequest,
   getConsole,
+  getReviews,
 };
