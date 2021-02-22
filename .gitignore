@@ -16,3 +16,4 @@ views/
 frontend/.eslintcache
 admin/.eslintcache
 /logs
+api/.DS_Store

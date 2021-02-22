@@ -7,7 +7,7 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/user");
 const logger = require("../util/logger");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const { authenticate } = require("../middleware/auth");
 
 router.post("/", async (req, res) => {

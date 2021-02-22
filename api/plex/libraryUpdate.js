@@ -11,7 +11,7 @@ const Mailer = require("../mail/mailer");
 const getConfig = require("../util/config");
 const processRequest = require("../requests/process");
 const logger = require("../util/logger");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 class LibraryUpdate {
   constructor() {

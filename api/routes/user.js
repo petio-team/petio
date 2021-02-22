@@ -3,7 +3,7 @@ const router = express.Router();
 const User = require("../models/user");
 const http = require("follow-redirects").http;
 const logger = require("../util/logger");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const { adminRequired } = require("../middleware/auth");
 
 router.get("/thumb/:id", async (req, res) => {
