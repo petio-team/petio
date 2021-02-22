@@ -134,7 +134,7 @@
         padding-bottom: 0;
         position: relative;
         padding-bottom: 150%;
-        border-radius: 0;
+        border-radius: 5px;
       }
     }
 
@@ -155,6 +155,7 @@
         height: calc(100% - 100px);
         box-shadow: 0 0 14px 0 rgba(0, 0, 0, 0.5);
         z-index: -1;
+        border-radius: 5px;
       }
     }
   }

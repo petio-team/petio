@@ -14,7 +14,7 @@ function authenticate(req) {
     const match = /^Bearer (.*)$/.exec(header);
     petioJwt = match[1];
   } else {
-    throw "No auth token provided";
+    throw `AUTH: No auth token provided - route ${req.path}`;
   }
   req.jwtUser = jwt.verify(petioJwt, prefs.plexToken);
   return req.jwtUser;

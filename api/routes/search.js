@@ -20,7 +20,8 @@ router.get("/:term", async (req, res) => {
   try {
     let data = await search(req.params.term.replace(/[^a-zA-Z ]/g, ""));
     res.json(data);
-  } catch {
+  } catch (err) {
+    console.log(err);
     res.json({
       movies: [],
       people: [],

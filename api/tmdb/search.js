@@ -20,7 +20,7 @@ async function search(term) {
   }
 
   for (let i = 0; i < shows.results.length; i++) {
-    showLookup(tv.results[i].id, true);
+    showLookup(shows.results[i].id, true);
     let res = await onServer("show", false, false, shows.results[i].id);
     shows.results[i].on_server = res.exists;
   }

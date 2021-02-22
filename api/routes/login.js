@@ -29,7 +29,6 @@ router.post("/", async (req, res) => {
   }
 
   logger.log("info", `LOGIN: New login attempted`);
-  logger.log("info", `LOGIN: Request User: ${username}`);
   logger.log("info", `LOGIN: Request IP: ${request_ip}`);
 
   function success(user) {
@@ -56,10 +55,13 @@ router.post("/", async (req, res) => {
   try {
     const user = authenticate(req);
     success(user);
+    logger.log("info", `LOGIN: Request User: ${user.username}`);
     return;
   } catch (e) {
     // if existing jwt failed, continue onto normal login flow
   }
+
+  logger.log("info", `LOGIN: Request User: ${username}`);
 
   try {
     // Find user in db

@@ -8,8 +8,14 @@ const logger = require("../util/logger");
 router.post("/", async (req, res) => {
   let id = req.body.id;
   if (id === "admin") id = 1;
-  let data = await getHistory(id, req.body.type);
-  res.json(data);
+  try {
+    let data = await getHistory(id, req.body.type);
+    res.json(data);
+  } catch (err) {
+    logger.log("warn", "ROUTE: Error getting history");
+    logger.error(err.stack);
+    res.status(500).send();
+  }
 });
 
 router.get("/bandwidth", async (req, res) => {
