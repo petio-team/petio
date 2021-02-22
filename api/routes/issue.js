@@ -79,7 +79,7 @@ async function mailIssue(user_id, media_id, type, title) {
     logger.log("warn", "MAILER: No user email");
     return;
   }
-  let typeF = type === "tv" ? "TV Show" : "Movie";
+  let typeF = type === "series" ? "TV Show" : "Movie";
   new Mailer().mail(
     `Issue reported for the ${type} ${title}`,
     `Issue reported for ${typeF}: ${title}`,
@@ -110,9 +110,9 @@ async function mailIssueResolve(user_id, media_id, type, title, message) {
     logger.log("warn", "MAILER: No user email");
     return;
   }
-  let typeF = type === "tv" ? "TV Show" : "Movie";
+  let typeF = type === "series" ? "TV Show" : "Movie";
   new Mailer().mail(
-    `Issue closed for the ${type} ${title}`,
+    `Issue closed for the ${typeF} ${title}`,
     `Issue closed for ${typeF}: ${title}`,
     `The issue you reported has now been closed. ${message}`,
     `https://image.tmdb.org/t/p/w500${media.poster_path}`,
