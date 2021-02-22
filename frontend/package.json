@@ -10,7 +10,7 @@
     "axios": "^0.21.0",
     "dateformat": "^3.0.3",
     "moment": "^2.29.1",
-    "node-sass": "^4.14.1",
+    "node-sass": "^5.0.0",
     "react": "^16.13.1",
     "react-big-calendar": "^0.31.0",
     "react-device-detect": "^1.15.0",
