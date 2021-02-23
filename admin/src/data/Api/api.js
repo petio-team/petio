@@ -69,7 +69,7 @@ export async function sonarrConfig() {
 }
 
 export async function saveSonarrConfig(config) {
-  return get(`/services/sonarr/config`, config);
+  return post(`/services/sonarr/config`, config);
 }
 
 export async function testSonarr(id) {
