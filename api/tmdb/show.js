@@ -226,9 +226,9 @@ async function tmdbData(id) {
               name: item.name,
               profile_path: item.profile_path,
               character: character,
+              id: item.id,
             };
           });
-          // data.credits.cast = data.aggregate_credits.cast;
           delete data.aggregate_credits;
         }
         if (data.content_ratings) {
