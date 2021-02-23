@@ -201,7 +201,7 @@ async function tmdbData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}tv/${id}?api_key=${tmdbApikey}&append_to_response=credits,videos,keywords`;
+  let url = `${tmdb}tv/${id}?api_key=${tmdbApikey}&append_to_response=aggregate_credits,videos,keywords,content_ratings,credits`;
 
   return new Promise((resolve, reject) => {
     request(
@@ -215,6 +215,26 @@ async function tmdbData(id) {
           reject(err);
         }
 
+        if (data.aggregate_credits) {
+          if (data.aggregate_credits.cast.length > 50)
+            data.aggregate_credits.cast.length = 50;
+          data.credits.cast = [];
+          data.aggregate_credits.cast.map((item, i) => {
+            let character =
+              item.roles.length > 0 ? item.roles[0].character : false;
+            data.credits.cast[i] = {
+              name: item.name,
+              profile_path: item.profile_path,
+              character: character,
+            };
+          });
+          // data.credits.cast = data.aggregate_credits.cast;
+          delete data.aggregate_credits;
+        }
+        if (data.content_ratings) {
+          data.age_rating = findEnRating(data.content_ratings.results);
+          delete data.content_ratings;
+        }
         resolve(data);
       }
     );
@@ -225,7 +245,7 @@ async function recommendationData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}tv/${id}/recommendations?api_key=${tmdbApikey}&append_to_response=credits,videos,keywords`;
+  let url = `${tmdb}tv/${id}/recommendations?api_key=${tmdbApikey}`;
 
   return new Promise((resolve, reject) => {
     request(
@@ -304,6 +324,7 @@ async function reviewsData(id) {
   });
 }
 
+// Lets i18n this soon
 function findEnLogo(logos) {
   let logoUrl = false;
   logos.forEach((logo) => {
@@ -312,6 +333,17 @@ function findEnLogo(logos) {
     }
   });
   return logoUrl;
+}
+
+// Lets i18n this soon
+function findEnRating(data) {
+  let rating = false;
+  data.forEach((item) => {
+    if (item.iso_3166_1 === "US") {
+      rating = item.rating;
+    }
+  });
+  return rating;
 }
 
 function idLookup(id) {

@@ -183,7 +183,7 @@ function tmdbData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}movie/${id}?api_key=${tmdbApikey}&append_to_response=credits,videos,keywords`;
+  let url = `${tmdb}movie/${id}?api_key=${tmdbApikey}&append_to_response=credits,videos,keywords,release_dates`;
   return new Promise((resolve, reject) => {
     request(
       url,
@@ -196,6 +196,10 @@ function tmdbData(id) {
           reject();
         }
         data.timestamp = new Date();
+        if (data.release_dates) {
+          data.age_rating = findEnRating(data.release_dates.results);
+          delete data.release_dates;
+        }
         resolve(data);
       }
     );
@@ -206,7 +210,7 @@ async function recommendationData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}movie/${id}/recommendations?api_key=${tmdbApikey}&append_to_response=credits,videos,keywords`;
+  let url = `${tmdb}movie/${id}/recommendations?api_key=${tmdbApikey}`;
 
   return new Promise((resolve, reject) => {
     request(
@@ -274,6 +278,7 @@ async function reviewsData(id) {
   });
 }
 
+// Lets i18n this soon
 function findEnLogo(logos) {
   let logoUrl = false;
   logos.forEach((logo) => {
@@ -282,6 +287,17 @@ function findEnLogo(logos) {
     }
   });
   return logoUrl;
+}
+
+// Lets i18n this soon
+function findEnRating(data) {
+  let rating = false;
+  data.forEach((item) => {
+    if (item.iso_3166_1 === "US") {
+      rating = item.release_dates[0].certification;
+    }
+  });
+  return rating;
 }
 
 function discoverMovie(page = 1, params = {}) {
