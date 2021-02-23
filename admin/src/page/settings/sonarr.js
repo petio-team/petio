@@ -135,7 +135,7 @@ class Sonarr extends React.Component {
           isError: false,
           isMsg: "Sonarr Test Connection success!",
           newServer: false,
-          needsTest: true,
+          needsTest: false,
         });
         await this.getSonarr(true);
         await this.getSettings(id);
