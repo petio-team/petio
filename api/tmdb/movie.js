@@ -86,7 +86,8 @@ async function movieLookup(id, minified = false) {
       if (recommendations.results) {
         Object.keys(recommendations.results).map((key) => {
           let recommendation = recommendations.results[key];
-          recommendationsData.push(recommendation.id);
+          if (recommendation.id !== parseInt(id))
+            recommendationsData.push(recommendation.id);
         });
       }
       if (!minified && movie.belongs_to_collection) {

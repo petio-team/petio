@@ -101,7 +101,8 @@ async function showLookup(id, minified = false) {
         if (recommendations)
           Object.keys(recommendations.results).map((key) => {
             let recommendation = recommendations.results[key];
-            recommendationsData.push(recommendation.id);
+            if (recommendation.id !== parseInt(id))
+              recommendationsData.push(recommendation.id);
           });
         show.seasonData = seasonData;
         show.recommendations = recommendationsData;
