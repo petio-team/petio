@@ -99,6 +99,7 @@ router.post("/", async (req, res) => {
 });
 
 function plexAuth(username, password) {
+  logger.info(`LOGIN: Using Plex Auth for ${username}`);
   return new Promise((resolve, reject) => {
     request(
       "https://plex.tv/users/sign_in.json",
@@ -118,13 +119,17 @@ function plexAuth(username, password) {
       },
       function (err, data) {
         if (err) {
+          logger.warn(`LOGIN: Plex auth failed for ${username}`);
           reject();
         }
         if (!data) {
-          reject("Failed Plex Auth");
+          logger.warn(`LOGIN: Plex auth error ${username}`);
+          reject("LOGIN: Failed Plex Auth");
         } else if (data.error) {
-          reject("Failed Plex Auth");
+          logger.warn(`LOGIN: Plex auth error ${username}`);
+          reject("LOGIN: Failed Plex Auth");
         } else {
+          logger.info(`LOGIN: Plex auth passed ${username}`);
           resolve(data);
         }
       }

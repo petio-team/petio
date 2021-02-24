@@ -563,6 +563,7 @@
     display: flex;
     align-items: center;
     margin-bottom: 10px;
+    flex-wrap: wrap;
 
     @include media-breakpoint-up(lg) {
       margin-bottom: 30px;

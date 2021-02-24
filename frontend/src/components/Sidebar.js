@@ -144,7 +144,7 @@ class Sidebar extends React.Component {
               <RequestIcon />
             </div>
           </Link>
-          {user.role === "admin" ? (
+          {user.role === "admin" || user.role === "moderator" ? (
             <a
               className="sidebar--item"
               href={`${window.location.protocol}//${window.location.host}${

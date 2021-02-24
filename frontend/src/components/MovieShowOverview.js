@@ -411,6 +411,17 @@ class MovieShowOverview extends React.Component {
                     </p>
                   </>
                 ) : null}
+                {this.props.mediaData.age_rating ? (
+                  <>
+                    <div className="detail--bar--sep">·</div>
+                    <p>
+                      <span className="desktop-only">Rated </span>
+                      <span className="item-val">
+                        {this.props.mediaData.age_rating}
+                      </span>
+                    </p>
+                  </>
+                ) : null}
               </div>
               <div className="genre--wrap">
                 {this.props.mediaData.genres.map((genre) => {
@@ -495,6 +506,24 @@ class MovieShowOverview extends React.Component {
                   : null}
               </div>
               <div className="media-crew">
+                {this.props.mediaData.created_by
+                  ? this.props.mediaData.created_by.map((creator) => {
+                      return (
+                        <div
+                          key={`cb__${creator.id}`}
+                          className="media-crew--item"
+                        >
+                          <p className="sub-title">Created By</p>
+                          <Link
+                            to={`/person/${creator.id}`}
+                            className="crew-credit"
+                          >
+                            {creator.name}
+                          </Link>
+                        </div>
+                      );
+                    })
+                  : null}
                 {director ? (
                   <div className="media-crew--item">
                     <p className="sub-title">Director</p>
