@@ -23,6 +23,7 @@ class Networks extends React.Component {
 
   componentDidMount() {
     this.getResults();
+    this.getResults(2);
     this.getDetails();
   }
 
