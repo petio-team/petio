@@ -122,7 +122,7 @@ class Main {
       this.e.use("/history", authRequired, historyRoute);
       this.e.use("/plex", authRequired, plexRoute);
       this.e.use("/review", authRequired, reviewRoute);
-      this.e.use("/user", authRequired, userRoute);
+      this.e.use("/user", userRoute);
       this.e.use("/genie", authRequired, genieRoute);
       this.e.use("/sessions", authRequired, sessionsRoute);
       this.e.use("/services", authRequired, servicesRoute);
