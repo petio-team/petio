@@ -116,6 +116,11 @@
       margin-top: 0;
     }
 
+    @include media-breakpoint-up(xxl) {
+      max-width: 500px;
+      min-width: 0;
+    }
+
     &--inner {
       padding-bottom: 150%;
       position: relative;
@@ -353,6 +358,10 @@
         margin-top: 100px;
       }
 
+      @include media-breakpoint-up(xxl) {
+        max-width: 500px;
+      }
+
       .resolutions {
         display: flex;
         justify-content: center;
@@ -447,6 +456,11 @@
 
       @include media-breakpoint-up(xl) {
         padding-right: 100px;
+      }
+
+      @include media-breakpoint-up(xxl) {
+        width: 1000px;
+        max-width: 100%;
       }
     }
   }
