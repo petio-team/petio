@@ -340,9 +340,16 @@ class MovieShowOverview extends React.Component {
                 </p>
                 <div className="detail--bar--sep">·</div>
                 <p>
-                  <span className="rating-icon">
+                  <a
+                    href={`https://www.themoviedb.org/${
+                      this.props.mediaData.seasons ? "tv" : "movie"
+                    }/${this.props.mediaData.id}`}
+                    className="rating-icon"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     <TmdbIcon />
-                  </span>
+                  </a>
                   <span
                     className={`rating color-${
                       criticRating > 7.9
@@ -361,9 +368,14 @@ class MovieShowOverview extends React.Component {
                   <>
                     <div className="detail--bar--sep">·</div>
                     <p>
-                      <span className="rating-icon">
+                      <a
+                        href={`https://www.imdb.com/title/${this.props.mediaData.imdb_id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="rating-icon"
+                      >
                         <ImdbIcon />
-                      </span>
+                      </a>
                       <span
                         className={`rating color-${
                           this.props.mediaData.imdb_data.rating.ratingValue >
