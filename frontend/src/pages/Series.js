@@ -288,6 +288,7 @@ class Series extends React.Component {
             request={this.request}
             externalReviews={seriesData.reviews}
             openIssues={this.props.openIssues}
+            trailer={this.state.trailer}
           />
 
           <section>

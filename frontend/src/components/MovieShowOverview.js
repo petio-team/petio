@@ -277,20 +277,19 @@ class MovieShowOverview extends React.Component {
       </button>
     );
 
+    let trailerBtn = this.props.video ? (
+      <button onClick={this.props.showTrailer} className="btn btn__square">
+        <TrailerIcon />
+        {this.props.trailer ? "Close Trailer" : "Trailer"}
+      </button>
+    ) : null;
+
     return (
       <section>
         <div className="quick-view">
           <div className="side-content">
             <div className="media-action">
-              {this.props.video ? (
-                <button
-                  onClick={this.props.showTrailer}
-                  className="btn btn__square"
-                >
-                  <TrailerIcon />
-                  Trailer
-                </button>
-              ) : null}
+              {trailerBtn}
               {reviewBtn}
               {this.props.mediaData.available_resolutions ? (
                 <div className="resolutions">
@@ -474,6 +473,7 @@ class MovieShowOverview extends React.Component {
                 {requestBtn}
                 {reportBtn}
                 {reviewBtn}
+                {trailerBtn}
               </div>
               <div className="companies--wrap">
                 {this.props.mediaData.production_companies

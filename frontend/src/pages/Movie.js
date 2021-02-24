@@ -240,6 +240,7 @@ class Movie extends React.Component {
             openIssues={this.props.openIssues}
             requested={this.state.requested}
             request={this.request}
+            trailer={this.state.trailer}
           />
           <section>
             <h3 className="sub-title mb--1">Cast</h3>

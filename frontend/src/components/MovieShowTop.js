@@ -49,11 +49,14 @@ class MovieShowTop extends React.Component {
           {video && this.props.trailer ? (
             <div className="media-trailer">
               <ReactPlayer
-                url={`https://youtube.com/embed/${video.key}?autoplay=1&controls=0&showinfo=0&autohide=1&loop=1&modestbranding=1&playsinline=1&rel=0`}
+                url={`https://www.youtube.com/watch?v=${video.key}`}
                 playing={true}
                 width="100%"
                 height="100%"
+                playsinline={true}
                 onEnded={() => this.props.showTrailer()}
+                onPause={() => this.props.showTrailer()}
+                onError={(error) => console.log(error)}
               />
             </div>
           ) : null}
