@@ -16,7 +16,7 @@
     transform: translateX(-250px);
     transition: transform 0.3s ease;
     padding-top: 55px;
-    padding-top: calc(55px + env(safe-area-inset-bottom));
+    padding-top: calc(55px + env(safe-area-inset-top));
 
     &.open {
       transform: translateX(0);
@@ -197,8 +197,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-top: env(safe-area-inset-bottom);
-  height: calc(55px + env(safe-area-inset-bottom));
+  padding-top: env(safe-area-inset-top);
+  height: calc(55px + env(safe-area-inset-top));
 
   @include media-breakpoint-up(lg) {
     display: none;
@@ -231,7 +231,7 @@
     position: absolute;
     right: 15px;
     top: 18px;
-    top: calc(18px + env(safe-area-inset-bottom));
+    top: calc(18px + env(safe-area-inset-top));
 
     span {
       position: absolute;

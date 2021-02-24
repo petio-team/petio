@@ -22,7 +22,7 @@ body {
   // margin-left: 50px;
   // padding: 10px;
   padding-top: 55px;
-  padding-top: calc(55px + env(safe-area-inset-bottom));
+  padding-top: calc(55px + env(safe-area-inset-top));
 
   @include media-breakpoint-up(lg) {
     margin-left: 250px;
