@@ -228,6 +228,8 @@ async function tmdbData(id) {
           reject(err);
         }
 
+        if (!data) reject();
+
         if (data.aggregate_credits) {
           if (data.aggregate_credits.cast.length > 50)
             data.aggregate_credits.cast.length = 50;

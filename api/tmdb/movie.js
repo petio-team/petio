@@ -210,6 +210,7 @@ function tmdbData(id) {
         if (err) {
           reject();
         }
+        if (!data) reject();
         data.timestamp = new Date();
         if (data.release_dates) {
           data.age_rating = findEnRating(data.release_dates.results);

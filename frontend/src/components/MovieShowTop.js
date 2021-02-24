@@ -6,6 +6,39 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 import ReactPlayer from "react-player";
 
 class MovieShowTop extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      width: 0,
+    };
+
+    this.resize = this.resize.bind(this);
+  }
+  componentDidMount() {
+    window.addEventListener("resize", this.resize.bind(this));
+    this.resize();
+  }
+
+  resize() {
+    let size = "/w300";
+    let width = window.innerWidth;
+    if (width > 300) {
+      size = "/w780";
+    }
+    if (width > 780) {
+      size = "/w1280";
+    }
+    // if (width > 1280) {
+    //   size = "/original";
+    // }
+    this.setState({ bgSize: size });
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.resize.bind(this));
+  }
+
   render() {
     let requestBtn = this.props.mediaData.on_server ? (
       <a
@@ -62,10 +95,8 @@ class MovieShowTop extends React.Component {
           ) : null}
           {this.props.mediaData.backdrop_path ? (
             <LazyLoadImage
-              src={
-                "https://image.tmdb.org/t/p/w1280/" +
-                this.props.mediaData.backdrop_path
-              }
+              src={`https://image.tmdb.org/t/p${this.state.bgSize}/${this.props.mediaData.backdrop_path}
+              `}
               alt={this.props.mediaData.title}
               effect="blur"
               key={`${this.props.mediaData.title}__backdrop`}
