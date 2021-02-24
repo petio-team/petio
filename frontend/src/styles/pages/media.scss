@@ -503,6 +503,13 @@
     padding-bottom: 56.25%;
     transform: translateY(-50%);
 
+    & > div {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
+
     iframe {
       object-fit: cover;
       width: 100%;

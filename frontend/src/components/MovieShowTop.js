@@ -3,6 +3,7 @@ import { ReactComponent as RequestIcon } from "../assets/svg/request.svg";
 import { ReactComponent as ReportIcon } from "../assets/svg/report.svg";
 import { ReactComponent as CheckIcon } from "../assets/svg/check.svg";
 import { LazyLoadImage } from "react-lazy-load-image-component";
+import ReactPlayer from "react-player";
 
 class MovieShowTop extends React.Component {
   render() {
@@ -47,13 +48,13 @@ class MovieShowTop extends React.Component {
         >
           {video && this.props.trailer ? (
             <div className="media-trailer">
-              <iframe
-                key={`trailer__${video.key}`}
-                frameBorder="0"
-                height="100%"
+              <ReactPlayer
+                url={`https://youtube.com/embed/${video.key}?autoplay=1&controls=0&showinfo=0&autohide=1&loop=1&modestbranding=1&playsinline=1&rel=0`}
+                playing={true}
                 width="100%"
-                src={`https://youtube.com/embed/${video.key}?autoplay=1&controls=0&showinfo=0&autohide=1&loop=1&modestbranding=1&playsinline=1&rel=0`}
-              ></iframe>
+                height="100%"
+                onEnded={() => this.props.showTrailer()}
+              />
             </div>
           ) : null}
           {this.props.mediaData.backdrop_path ? (

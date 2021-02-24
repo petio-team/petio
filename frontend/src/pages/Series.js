@@ -273,6 +273,7 @@ class Series extends React.Component {
           requested={this.state.requested}
           request={this.request}
           openIssues={this.props.openIssues}
+          showTrailer={this.showTrailer}
         />
 
         <div className="media-content">

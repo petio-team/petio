@@ -107,7 +107,7 @@ class Carousel extends React.Component {
         if (React.isValidElement(child)) {
           return React.cloneElement(child, {
             pos: this.state.pos,
-            width: this.state.width,
+            width: this.state.width ? this.state.width : 0,
           });
         }
         return child;

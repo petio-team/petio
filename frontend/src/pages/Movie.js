@@ -226,6 +226,7 @@ class Movie extends React.Component {
           trailer={this.state.trailer}
           requested={this.state.requested}
           request={this.request}
+          showTrailer={this.showTrailer}
         />
         <div className="media-content">
           <MovieShowOverview
