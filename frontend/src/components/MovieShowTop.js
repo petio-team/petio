@@ -41,11 +41,14 @@ class MovieShowTop extends React.Component {
       <div className={`media-top ${this.props.trailer ? "show-trailer" : ""}`}>
         <div
           className="media-backdrop"
-          key={`${this.props.mediaData.title}__backdrop`}
+          key={`${this.props.mediaData.title}__backdrop__${
+            this.props.trailer ? "trailer" : "n_trailer"
+          }`}
         >
           {video && this.props.trailer ? (
             <div className="media-trailer">
               <iframe
+                key={`trailer__${video.key}`}
                 frameBorder="0"
                 height="100%"
                 width="100%"
