@@ -69,6 +69,20 @@ async function movieLookup(id, minified = false) {
       movie.available_resolutions = onPlex.resolutions;
       movie.imdb_data = imdb_data;
       movie.reviews = reviews.results;
+      if (!minified) {
+        if (recommendations.results.length === 0) {
+          let params = {};
+          if (movie.genres) {
+            let genres = "";
+            for (let i = 0; i < movie.genres.length; i++) {
+              genres += `${movie.genres[i].id},`;
+            }
+
+            params.with_genres = genres;
+          }
+          recommendations = await discoverMovie(1, params);
+        }
+      }
       if (recommendations.results) {
         Object.keys(recommendations.results).map((key) => {
           let recommendation = recommendations.results[key];

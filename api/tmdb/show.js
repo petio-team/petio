@@ -86,6 +86,18 @@ async function showLookup(id, minified = false) {
           });
           seasonData[season.season_number] = season;
         });
+        if (recommendations.results.length === 0) {
+          let params = {};
+          if (show.genres) {
+            let genres = "";
+            for (let i = 0; i < show.genres.length; i++) {
+              genres += `${show.genres[i].id},`;
+            }
+
+            params.with_genres = genres;
+          }
+          recommendations = await discoverSeries(1, params);
+        }
         if (recommendations)
           Object.keys(recommendations.results).map((key) => {
             let recommendation = recommendations.results[key];

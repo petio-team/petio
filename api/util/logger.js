@@ -10,23 +10,11 @@ let liveLogfile = process.pkg
 
 const enumerateErrorFormat = winston.format((info) => {
   if (info.message instanceof Error) {
-    info.message = Object.assign(
-      {
-        message: info.message.message,
-        stack: info.message.stack,
-      },
-      info.message
-    );
+    info.message = JSON.stringify(info.message);
   }
 
   if (info instanceof Error) {
-    return Object.assign(
-      {
-        message: info.message,
-        stack: info.stack,
-      },
-      info
-    );
+    info = JSON.stringify(info);
   }
 
   return info;
@@ -36,13 +24,13 @@ const logger = winston.createLogger({
   transports: [
     new winston.transports.Console({
       format: winston.format.combine(
-        enumerateErrorFormat(),
         winston.format.colorize(),
         winston.format.timestamp({
           format: "YYYY-MM-DD HH:mm:ss",
         }),
         winston.format.printf(
-          (info) => `${info.timestamp} ${info.level}: ${info.message}`
+          (info) =>
+            `${info.timestamp} ${info.level}: ${info.message.toString()}`
         )
       ),
     }),
@@ -52,10 +40,10 @@ const logger = winston.createLogger({
       maxsize: 1000000,
       maxFiles: 10,
       format: winston.format.combine(
-        enumerateErrorFormat(),
         winston.format.timestamp(),
         winston.format.printf(
-          (info) => `${info.timestamp} ${info.level}: ${info.message}`
+          (info) =>
+            `${info.timestamp} ${info.level}: ${info.message.toString()}`
         )
       ),
     }),
@@ -66,13 +54,12 @@ const logger = winston.createLogger({
       maxFiles: 1,
       tailable: true,
       format: winston.format.combine(
-        enumerateErrorFormat(),
         winston.format.timestamp(),
         winston.format.printf((info) => {
           return `${JSON.stringify({
             [info.timestamp]: {
               type: info.level,
-              log: info.message,
+              log: info.message.toString(),
             },
           })},`;
         })
