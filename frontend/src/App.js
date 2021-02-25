@@ -20,6 +20,7 @@ import pjson from "../package.json";
 import Genre from "./pages/Genre";
 import Networks from "./pages/Networks";
 import Company from "./pages/Company";
+import People from "./pages/People";
 
 class App extends React.Component {
   constructor(props) {
@@ -413,6 +414,13 @@ class App extends React.Component {
                 <div className="page-wrap">
                   <div className="generic-wrap">
                     <Company msg={this.msg} />
+                  </div>
+                </div>
+              </Route>
+              <Route exact path="/people">
+                <div className="page-wrap">
+                  <div className="generic-wrap">
+                    <People />
                   </div>
                 </div>
               </Route>
