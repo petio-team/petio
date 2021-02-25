@@ -34,3 +34,7 @@ export async function getReviews(id) {
 export async function addIssue(issue) {
   return post("/issue/add", issue);
 }
+
+export async function myRequests() {
+  return get("/request/me");
+}

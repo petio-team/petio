@@ -2,12 +2,14 @@ import React from "react";
 import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import Api from "../data/Api";
-import RequestCard from "../components/RequestCard";
-import Carousel from "../components/Carousel";
+// import RequestCard from "../components/RequestCard";
+// import Carousel from "../components/Carousel";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import { ReactComponent as MovieIcon } from "../assets/svg/movie.svg";
 import { ReactComponent as TvIcon } from "../assets/svg/tv.svg";
+import User from "../data/User";
+import MyRequests from "../components/MyRequests";
 
 class Requests extends React.Component {
   constructor(props) {
@@ -31,13 +33,6 @@ class Requests extends React.Component {
     this.getCalendar();
   }
 
-  componentDidUpdate() {
-    let requests = this.state.requests;
-    if (!requests) {
-      this.getRequests();
-    }
-  }
-
   async getCalendar() {
     try {
       let data = await Api.guideCalendar();
@@ -49,21 +44,17 @@ class Requests extends React.Component {
     }
   }
 
-  getRequests() {
-    let requests = this.props.user.requests;
-    if (!requests) return;
-    this.setState({
-      requests: true,
-      loaded: true,
-    });
+  async getRequests() {
+    let requests;
+    try {
+      requests = await User.myRequests();
+    } catch {
+      requests = {};
+    }
 
-    Object.keys(requests).map((key) => {
-      let request = requests[key];
-      if (request.type === "movie") {
-        Api.movie(key);
-      } else {
-        Api.series(key);
-      }
+    this.setState({
+      requests: requests,
+      loaded: true,
     });
   }
 
@@ -119,18 +110,6 @@ class Requests extends React.Component {
         </div>
       );
     }
-    let requests = this.props.user.requests;
-    requests = this.props.user.requests;
-    let yourRequests = Object.keys(requests).map((key) => {
-      let request = this.props.api.movie_lookup[key];
-      if (requests[key].type === "tv") {
-        request = this.props.api.series_lookup[key];
-      }
-      let user = this.props.user.current.id;
-
-      if (!request || !requests[key].users.includes(user)) return null;
-      return <RequestCard key={key + "_your"} request={request} />;
-    });
 
     const MonthEvent = ({ event }) => {
       return (
@@ -161,7 +140,29 @@ class Requests extends React.Component {
         <div className="request-section">
           <section>
             <h3 className="sub-title mb--1">Your Requests</h3>
-            <Carousel>{yourRequests}</Carousel>
+            <p>
+              Track the progress of your requests. See the legend below to
+              understand the current status of your requests.
+            </p>
+            <div className="requests-legend">
+              <p>
+                <span className="request-status manual">No Status</span> - This
+                means the request cannot be tracked by Petio
+              </p>
+              <p>
+                <span className="request-status bad">Unavailable</span> -
+                Currently this item cannot be downloaded
+              </p>
+              <p>
+                <span className="request-status orange">Downloading</span> -
+                Your request is currently downloading
+              </p>
+              <p>
+                <span className="request-status good">Downloaded</span> - The
+                item has been downloaded but is waiting for Plex to import
+              </p>
+            </div>
+            <MyRequests requests={this.state.requests} />
           </section>
         </div>
         <section className="request-guide">

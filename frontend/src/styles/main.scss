@@ -9,6 +9,8 @@ $primaryDark: #c78c0d;
 $green: #98dd32;
 $good: $green;
 $blue: #3d85b8;
+$purple: rgb(104, 16, 175);
+$teal: #1f7979;
 
 // breakpoints /////////////////////////////////////////////
 
@@ -67,6 +69,7 @@ $grid-breakpoints: $breakpoints;
 @import "components/input";
 @import "components/table";
 @import "components/calendar";
+@import "components/my-requests";
 @import "components/push-msg";
 
 // pages

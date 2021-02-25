@@ -1,0 +1,127 @@
+// background: rgba($grey-light, 0.1);
+.myrequests {
+  &--grid {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: -5px;
+    margin-bottom: -5px;
+
+    @include media-breakpoint-up(md) {
+      margin-left: -5px;
+      margin-right: -5px;
+      margin-top: -5px;
+      margin-bottom: -5px;
+    }
+
+    @include media-breakpoint-up(xl) {
+      margin-left: -10px;
+      margin-right: -10px;
+      margin-top: -10px;
+      margin-bottom: -10px;
+    }
+  }
+
+  &--item {
+    background: rgba($grey-light, 0.1);
+    padding: 20px;
+    border-radius: 5px;
+    display: flex;
+    width: 100%;
+    margin: 5px 0;
+
+    @include media-breakpoint-up(md) {
+      width: calc((100% / 2) - 10px);
+      margin: 5px;
+    }
+
+    @include media-breakpoint-up(xl) {
+      width: calc((100% / 3) - 20px);
+      margin: 10px;
+    }
+
+    @include media-breakpoint-up(xxxl) {
+      width: calc(25% - 20px);
+      margin: 10px;
+    }
+
+    &--thumb {
+      width: 70px;
+      height: 70px;
+      min-width: 70px;
+      min-height: 70px;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-right: 20px;
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-color: $dark-grey;
+    }
+
+    &--details {
+      .detail-title {
+        font-size: 15px;
+        line-height: 20px;
+        font-weight: 700;
+        margin-bottom: 0;
+      }
+
+      .detail-text {
+        font-size: 12px;
+        line-height: 15px;
+        margin: 0;
+      }
+    }
+  }
+}
+
+.request-status {
+  padding: 1px 3px;
+  border-radius: 4px;
+  font-size: 10px;
+  line-height: 15px;
+  font-weight: 700;
+
+  &.manual {
+    background: $grey-medium;
+  }
+
+  &.bad {
+    background: $bad;
+  }
+
+  &.blue {
+    background: $blue;
+  }
+
+  &.orange {
+    background: $primary;
+  }
+
+  &.good {
+    background: $good;
+    color: $black;
+  }
+
+  &.cinema {
+    background: $purple;
+  }
+
+  &.pending {
+    background: $teal;
+  }
+}
+
+.requests-legend {
+  margin-bottom: 15px;
+  p {
+    margin: 0;
+    font-size: 12px;
+
+    .request-status {
+      border-radius: 4px;
+      font-size: 10px;
+      line-height: 15px;
+    }
+  }
+}

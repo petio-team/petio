@@ -7,6 +7,7 @@ import {
   review,
   getReviews,
   addIssue,
+  myRequests,
 } from "./actions";
 
 export default {
@@ -17,4 +18,5 @@ export default {
   review,
   getReviews,
   addIssue,
+  myRequests,
 };

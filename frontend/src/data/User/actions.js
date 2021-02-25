@@ -127,6 +127,15 @@ export function addIssue(issue) {
   });
 }
 
+export async function myRequests() {
+  try {
+    let data = await api.myRequests();
+    return data;
+  } catch {
+    return false;
+  }
+}
+
 function finalise(data = false) {
   if (!data) return false;
   return store.dispatch(data);

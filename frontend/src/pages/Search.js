@@ -137,7 +137,13 @@ class Search extends React.Component {
             <Carousel>
               {Object.keys(this.props.api.popular).length > 0
                 ? this.props.api.popular.movies.map((movie) => {
-                    return <MovieCard key={movie.id} movie={movie} />;
+                    return (
+                      <MovieCard
+                        key={movie.id}
+                        movie={movie}
+                        msg={this.props.msg}
+                      />
+                    );
                   })
                 : null}
             </Carousel>
