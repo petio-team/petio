@@ -2,7 +2,7 @@ import React from "react";
 
 class MyRequests extends React.Component {
   render() {
-    if (this.props.requests.length !== 0) {
+    if (this.props.requests.length === 0) {
       return (
         <div className="myrequests--wrap">
           <div className="myrequests--none">
