@@ -3,6 +3,7 @@ const { showLookup } = require("../tmdb/show");
 const Request = require("../models/request");
 const Sonarr = require("../services/sonarr");
 const Radarr = require("../services/radarr");
+const logger = require("../util/logger");
 
 async function getRequests(user = false, all = false) {
   const requests = await Request.find();
