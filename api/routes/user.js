@@ -4,7 +4,7 @@ const User = require("../models/user");
 const http = require("follow-redirects").http;
 const logger = require("../util/logger");
 const bcrypt = require("bcryptjs");
-const { adminRequired } = require("../middleware/auth");
+const { adminRequired, authRequired } = require("../middleware/auth");
 
 router.get("/thumb/:id", async (req, res) => {
   let userData = false;
@@ -44,6 +44,8 @@ router.get("/thumb/:id", async (req, res) => {
     request.end();
   }
 });
+
+router.use(authRequired);
 
 router.get("/all", adminRequired, async (req, res) => {
   try {
