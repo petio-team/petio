@@ -114,9 +114,17 @@
       max-height: calc(18px * 10);
       transition: max-height 0.4s ease;
 
+      p {
+        margin-bottom: 18px;
+      }
+
       @include media-breakpoint-up(lg) {
         width: 600px;
         max-height: calc(22px * 10);
+
+        p {
+          margin-bottom: 22px;
+        }
       }
 
       &.open {

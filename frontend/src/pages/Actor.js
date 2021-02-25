@@ -172,78 +172,83 @@ class Actor extends React.Component {
     return (
       <>
         <div className="page-wrap" onScroll={this.handleScroll}>
-          <div className="person--wrap">
-            <div
-              className="person--banner"
-              style={{
-                backgroundImage: `url(https://image.tmdb.org/t/p/original/${banner.file_path})`,
-              }}
-            ></div>
-            <div className="person--top">
-              <div className="person--thumb">
-                <div className="person--thumb--inner">
-                  <img
-                    src={`https://image.tmdb.org/t/p/w1280/${personData.profile_path}`}
-                  />
+          <div className="generic-wrap">
+            <div className="person--wrap">
+              <div
+                className="person--banner"
+                style={{
+                  backgroundImage: `url(https://image.tmdb.org/t/p/original/${banner.file_path})`,
+                }}
+              ></div>
+              <div className="person--top">
+                <div className="person--thumb">
+                  <div className="person--thumb--inner">
+                    <img
+                      src={`https://image.tmdb.org/t/p/w1280/${personData.profile_path}`}
+                    />
+                  </div>
+                </div>
+                <div className="person--details">
+                  <h1 className="single-title">{personData.name}</h1>
+                  <p>{personData.place_of_birth}</p>
+                  <p>{personData.known_for_department}</p>
                 </div>
               </div>
-              <div className="person--details">
-                <h1 className="single-title">{personData.name}</h1>
-                <p>{personData.place_of_birth}</p>
-                <p>{personData.known_for_department}</p>
-              </div>
+              <section>
+                <div className="person--bio">
+                  <h3 className="sub-title mb--1">Biography</h3>
+                  <div className={`bio ${this.state.bioOpen ? "open" : ""}`}>
+                    {personData.biography.split("\n").map((str, i) => (
+                      <p key={`bio-${i}`}>{str}</p>
+                    ))}
+                  </div>
+                  <p
+                    onClick={this.toggleBio}
+                    className="person--bio--read-more"
+                  >
+                    {this.state.bioOpen ? "Read less" : "Read more"}
+                  </p>
+                </div>
+              </section>
+              {moviesList.length > 0 ? (
+                <section>
+                  <h3 className="sub-title mb--1">Movies</h3>
+                  <Carousel>
+                    {Object.keys(moviesList).map((key, i) => {
+                      let result = moviesList[key];
+                      if (result.rating < 100) return null; // threshold to display
+                      return (
+                        <MovieCard
+                          key={result.id + "-cast-" + i}
+                          movie={result}
+                          msg={this.props.msg}
+                          character={this.processCredit(result, personData)}
+                        />
+                      );
+                    })}
+                  </Carousel>
+                </section>
+              ) : null}
+              {showsList.length > 0 ? (
+                <section>
+                  <h3 className="sub-title mb--1">TV</h3>
+                  <Carousel>
+                    {Object.keys(showsList).map((key, i) => {
+                      let result = showsList[key];
+                      if (result.rating < 100) return null; // threshold to display
+                      return (
+                        <TvCard
+                          key={result.id + "-cast-" + i}
+                          series={result}
+                          msg={this.props.msg}
+                          character={this.processCredit(result, personData)}
+                        />
+                      );
+                    })}
+                  </Carousel>
+                </section>
+              ) : null}
             </div>
-            <section>
-              <div className="person--bio">
-                <h3 className="sub-title mb--1">Biography</h3>
-                <div className={`bio ${this.state.bioOpen ? "open" : ""}`}>
-                  {personData.biography.split("\n").map((str, i) => (
-                    <p key={`bio-${i}`}>{str}</p>
-                  ))}
-                </div>
-                <p onClick={this.toggleBio} className="person--bio--read-more">
-                  {this.state.bioOpen ? "Read less" : "Read more"}
-                </p>
-              </div>
-            </section>
-            {moviesList.length > 0 ? (
-              <section>
-                <h3 className="sub-title mb--1">Movies</h3>
-                <Carousel>
-                  {Object.keys(moviesList).map((key, i) => {
-                    let result = moviesList[key];
-                    if (result.rating < 100) return null; // threshold to display
-                    return (
-                      <MovieCard
-                        key={result.id + "-cast-" + i}
-                        movie={result}
-                        msg={this.props.msg}
-                        character={this.processCredit(result, personData)}
-                      />
-                    );
-                  })}
-                </Carousel>
-              </section>
-            ) : null}
-            {showsList.length > 0 ? (
-              <section>
-                <h3 className="sub-title mb--1">TV</h3>
-                <Carousel>
-                  {Object.keys(showsList).map((key, i) => {
-                    let result = showsList[key];
-                    if (result.rating < 100) return null; // threshold to display
-                    return (
-                      <TvCard
-                        key={result.id + "-cast-" + i}
-                        series={result}
-                        msg={this.props.msg}
-                        character={this.processCredit(result, personData)}
-                      />
-                    );
-                  })}
-                </Carousel>
-              </section>
-            ) : null}
           </div>
         </div>
       </>
