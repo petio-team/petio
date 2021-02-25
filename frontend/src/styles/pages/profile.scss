@@ -5,41 +5,52 @@
   }
 
   .profile {
+    &-block {
+      background: rgba(white, 0.1);
+      border-radius: 5px;
+      padding: 10px;
+
+      @include media-breakpoint-up(lg) {
+        padding: 20px;
+      }
+
+      &.mb-1 {
+        margin-bottom: 15px;
+      }
+    }
+
     &-overview {
       display: flex;
       flex-direction: row;
 
-      @include media-breakpoint-up(lg) {
-        flex-direction: row;
-      }
+      align-items: center;
     }
 
     &-logout {
       margin-left: auto;
-
-      @include media-breakpoint-down(md) {
-        position: absolute;
-        top: 90px;
-        right: 20px;
-      }
     }
 
     &-thumb {
       margin-right: 20px;
       position: relative;
-      height: 100px;
+      height: 50px;
 
-      @include media-breakpoint-down(md) {
-        margin-bottom: 20px;
+      @include media-breakpoint-up(lg) {
+        height: 75px;
       }
 
       .thumb {
-        width: 100px;
-        height: 100px;
+        width: 50px;
+        height: 50px;
         background-size: cover;
         background-position: center;
         border-radius: 50%;
         display: block;
+
+        @include media-breakpoint-up(lg) {
+          width: 75px;
+          height: 75px;
+        }
       }
 
       .hover {
@@ -77,11 +88,7 @@
     }
 
     &-info {
-      padding-right: 50px;
-
-      @include media-breakpoint-down(md) {
-        margin-bottom: 20px;
-      }
+      margin: 0;
 
       p {
         margin: 0;

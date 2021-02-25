@@ -28,10 +28,6 @@ class History extends React.Component {
     this.init();
   }
 
-  // componentDidUpdate() {
-  // 	this.init();
-  // }
-
   init() {
     if (!this.state.historyData) {
       this.getHistory();
@@ -76,12 +72,11 @@ class History extends React.Component {
   }
 
   render() {
-    // let libraries = this.props.user.library_index;
     if (this.props.type === "movie") {
       let historyData = (
         <>
           <section>
-            <h3 className="sub-title mb--1">Recently Viewed by You</h3>
+            <h3 className="sub-title mb--1">Recently Viewed Movies by You</h3>
             <p>
               Be sure to review movies you watched to help other users decide
               what to watch!
@@ -89,7 +84,6 @@ class History extends React.Component {
             {Object.keys(this.state.historyData).length > 0 ? (
               <Carousel>
                 {Object.keys(this.state.historyData).map((t) => {
-                  // console.log(this.state.historyData[t]);
                   if (
                     !this.state.historyData[t].id ||
                     this.state.historyData[t].id === "false"
@@ -119,7 +113,7 @@ class History extends React.Component {
       let showHistory = (
         <>
           <section>
-            <h3 className="sub-title mb--1">Recently Viewed by You</h3>
+            <h3 className="sub-title mb--1">Recently Viewed TV Shows by You</h3>
             <p>
               Be sure to review shows you watched to help other users decide
               what to watch!

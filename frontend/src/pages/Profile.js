@@ -35,42 +35,9 @@ class Profile extends React.Component {
   render() {
     return (
       <div className="profile-page">
-        <div
-          className={`modal-4k-request ${this.state.open4kmodal ? "open" : ""}`}
-        >
-          <div className="modal-4k-request--top">
-            <h3>Request 4K / UHD Access</h3>
-          </div>
-          <div className="modal-4k-request--content">
-            <p>
-              Access to 4K / UHD content is limited to users who have both the
-              internet speed and devices to watch 4K without buffering or the
-              server trying to convert down to a lower resolution.
-            </p>
-            <p>
-              Before processing your request make sure your device can play HEVC
-              (aka h.265) and your internet speed is above 50mbps. Check your TV
-              / device manual for information on video codecs and perform a
-              speed test below.
-            </p>
-            <div className="modal-4k-request--speed">
-              <iframe src="https://www.metercustom.net/plugin/" />
-            </div>
-            <p>Passed both criteria? Click below to request access.</p>
-            <div
-              className="btn btn__square bad modal-4k-request--cancel"
-              onClick={this.close4k}
-            >
-              Cancel
-            </div>
-            <button className="modal-4k-request--submit btn btn__square">
-              Request Access
-            </button>
-          </div>
-        </div>
         <h1 className="main-title mb--2">Your Account</h1>
         <section>
-          <div className="profile-overview">
+          <div className="profile-overview profile-block">
             <div className="profile-thumb">
               <a
                 href="https://app.plex.tv/desktop#!/settings/account"
