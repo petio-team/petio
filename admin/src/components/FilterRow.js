@@ -178,12 +178,19 @@ class FilterRow extends React.Component {
             <p className="filter--row--item--title">Value</p>
             {this.props.data.condition === "genre" ? (
               <div className="select-wrap">
-                <select>
+                <select
+                  data-type={this.props.type}
+                  data-row={this.props.row}
+                  data-item={this.props.item}
+                  name="genre"
+                  onChange={this.props.inputChange}
+                  value={this.props.data.genre}
+                >
                   <option value="">Select genre</option>
                   {genres.map((genre) => {
                     return (
                       <option
-                        key={`${fs}__${this.props.item}__o_${genre.id}`}
+                        key={`${fs}__${this.props.item}__g_${genre.id}`}
                         value={genre.id}
                       >
                         {genre.name}

@@ -56,7 +56,7 @@ export async function series(id, minified = false) {
   let series = await api.series(id, minified);
 
   if (!series.id) {
-    return false;
+    throw "Unable to get series info";
   }
 
   series.isMinified = minified;
@@ -518,7 +518,7 @@ export async function createUser(user) {
     return result;
   } catch (err) {
     console.log(err);
-    return false;
+    throw err;
   }
 }
 
@@ -528,7 +528,7 @@ export async function getProfiles() {
     return result;
   } catch (err) {
     console.log(err);
-    return false;
+    throw err;
   }
 }
 
@@ -538,7 +538,7 @@ export async function saveProfile(profile) {
     return result;
   } catch (err) {
     console.log(err);
-    return false;
+    throw err;
   }
 }
 
@@ -548,7 +548,7 @@ export async function deleteProfile(profile) {
     return result;
   } catch (err) {
     console.log(err);
-    return false;
+    throw err;
   }
 }
 
@@ -558,7 +558,7 @@ export async function editUser(user) {
     return result;
   } catch (err) {
     console.log(err);
-    return false;
+    throw err;
   }
 }
 
@@ -568,7 +568,7 @@ export async function deleteUser(user) {
     return result;
   } catch (err) {
     console.log(err);
-    return false;
+    throw err;
   }
 }
 
@@ -578,7 +578,7 @@ export async function bulkEditUser(data) {
     return result;
   } catch (err) {
     console.log(err);
-    return false;
+    throw err;
   }
 }
 
@@ -588,7 +588,7 @@ export async function removeRequest(request, reason) {
     return true;
   } catch (err) {
     console.log(err);
-    return false;
+    throw err;
   }
 }
 
@@ -598,7 +598,7 @@ export async function updateRequest(request, servers) {
     return true;
   } catch (err) {
     console.log(err);
-    return false;
+    throw err;
   }
 }
 
@@ -608,7 +608,7 @@ export async function getConsole() {
     return data;
   } catch (err) {
     console.log(err);
-    return false;
+    throw err;
   }
 }
 
@@ -618,7 +618,7 @@ export async function getReviews() {
     return data;
   } catch (err) {
     console.log(err);
-    return false;
+    throw err;
   }
 }
 
@@ -628,7 +628,7 @@ export async function removeIssue(id, message) {
     return true;
   } catch (err) {
     console.log(err);
-    return false;
+    throw err;
   }
 }
 
@@ -638,6 +638,16 @@ export async function updateFilters(movies, tv) {
     return true;
   } catch (err) {
     console.log(err);
-    return false;
+    throw err;
+  }
+}
+
+export async function getFilters() {
+  try {
+    let data = await api.getFilters();
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw err;
   }
 }

@@ -23,6 +23,7 @@ class Filter extends React.Component {
     this.addRow = this.addRow.bind(this);
     this.collapse = this.collapse.bind(this);
     this.saveFilters = this.saveFilters.bind(this);
+    this.getFilters = this.getFilters.bind(this);
   }
 
   addFilter(type) {
@@ -174,8 +175,32 @@ class Filter extends React.Component {
     });
   }
 
+  async getFilters() {
+    try {
+      let data = await Api.getFilters();
+      console.log(data);
+      console.log(data);
+      let filters = {};
+      data.map((item) => {
+        filters[item.id] = item.data;
+      });
+
+      console.log(filters);
+
+      this.setState({
+        movie_filters: filters.movie_filters ? filters.movie_filters : [],
+        tv_filters: filters.tv_filters ? filters.tv_filters : [],
+      });
+      // this.setState({})
+    } catch (err) {
+      console.log(err);
+      console.log("Unable to get filters");
+    }
+  }
+
   componentDidMount() {
     this.getArrs();
+    this.getFilters();
   }
 
   async saveFilters() {

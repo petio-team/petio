@@ -43,6 +43,7 @@ import {
   getReviews,
   removeIssue,
   updateFilters,
+  getFilters,
 } from "./actions";
 
 export default {
@@ -90,4 +91,5 @@ export default {
   getReviews,
   removeIssue,
   updateFilters,
+  getFilters,
 };

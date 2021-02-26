@@ -191,3 +191,7 @@ export function removeIssue(id, message) {
 export function updateFilters(movie, tv) {
   return post(`/filter/update`, { movie, tv });
 }
+
+export function getFilters() {
+  return get(`/filter`);
+}

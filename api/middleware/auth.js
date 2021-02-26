@@ -31,16 +31,11 @@ exports.authRequired = (req, res, next) => {
     res.sendStatus(401);
     return;
   }
-  logger.log("verbose", `AUTH: Token fine for ${req.jwtUser.username}`);
   next();
 };
 
 exports.adminRequired = (req, res, next) => {
   if (req.jwtUser && req.jwtUser.admin) {
-    logger.log(
-      "verbose",
-      `AUTH: Admin check for ${req.jwtUser.username} passed`
-    );
     next();
   } else {
     res.sendStatus(403);
