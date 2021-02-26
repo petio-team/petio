@@ -513,7 +513,7 @@ class Radarr extends React.Component {
 
         <section>
           <p className="main-title mb--2">Radarr</p>
-          <p className="capped-width">
+          <p className="description">
             Radarr is a movie collection manager for Usenet and BitTorrent
             users. It can monitor multiple RSS feeds for new movies and will
             interface with clients and indexers to grab, sort, and rename them.

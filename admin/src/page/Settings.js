@@ -4,10 +4,12 @@ import { withRouter, Link, Switch, Route } from "react-router-dom";
 
 import { ReactComponent as GeneralIcon } from "../assets/svg/settings-general.svg";
 import { ReactComponent as ConsoleIcon } from "../assets/svg/console.svg";
+import { ReactComponent as FilterIcon } from "../assets/svg/filter.svg";
 import Console from "./settings/console";
 import General from "./settings/general";
 import Radarr from "./settings/radarr";
 import Sonarr from "./settings/sonarr";
+import Filter from "./settings/filter";
 
 class Settings extends React.Component {
   constructor(props) {
@@ -84,6 +86,18 @@ class Settings extends React.Component {
               <ConsoleIcon />
             </div>
           </Link>
+          <Link
+            to="/settings/filter"
+            className={
+              "settings--menu--item " +
+              (current === "/settings/filter" ? "active" : "")
+            }
+          >
+            <p>Filter</p>
+            <div className="icon">
+              <FilterIcon />
+            </div>
+          </Link>
         </div>
         <div className="settings--content">
           <Switch>
@@ -98,6 +112,9 @@ class Settings extends React.Component {
             </Route>
             <Route path="/settings/console">
               <Console />
+            </Route>
+            <Route path="/settings/filter">
+              <Filter />
             </Route>
             <Route path="*" exact>
               <section>

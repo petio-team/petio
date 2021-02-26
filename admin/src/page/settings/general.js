@@ -208,7 +208,9 @@ class General extends React.Component {
         </section>
         <section>
           <p className="main-title mb--2">Plex</p>
-          <p>If connection has been lost to Plex re-authenticate here.</p>
+          <p className="description">
+            If connection has been lost to Plex re-authenticate here.
+          </p>
           <button className="btn btn__square disabled">Login with plex</button>
           <button
             className="btn btn__square disabled"
@@ -279,7 +281,7 @@ class General extends React.Component {
             />
             <p>Enabled</p>
           </div>
-          <p>
+          <p className="description">
             Using Gmail? You can either create a{" "}
             <a
               target="_blank"
@@ -314,7 +316,7 @@ class General extends React.Component {
         </section>
         <section>
           <p className="main-title mb--2">Base path</p>
-          <p>
+          <p className="description">
             A base path can be applied to serve petio from a subdirectory. Any
             specified base must not include a trailing slash and will be applied
             to the end of the access URL. For example <code>/petio</code> would
@@ -338,7 +340,7 @@ class General extends React.Component {
         </section>
         <section>
           <p className="main-title mb--2">User login</p>
-          <p>
+          <p className="description">
             Logging into the admin panel in Petio will always require a
             Username/Email &amp; Password, however the standard user panel can
             be customised for <strong>Fast Login</strong> (where a user only

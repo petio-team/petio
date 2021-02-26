@@ -510,7 +510,7 @@ class Sonarr extends React.Component {
 
         <section>
           <p className="main-title mb--2">Sonarr</p>
-          <p className="capped-width">
+          <p className="description">
             Sonarr is a PVR for Usenet and BitTorrent users. It can monitor
             multiple RSS feeds for new episodes of your favorite shows and will
             grab, sort and rename them. It can also be configured to
