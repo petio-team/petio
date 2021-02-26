@@ -85,7 +85,7 @@ class Mailer {
       }
     } catch (err) {
       logger.log("warn", "MAILER: Verification failed");
-      logger.error(err.stack);
+      logger.log({ level: "error", message: err });
       return { result: false, error: err };
     }
   }
@@ -133,7 +133,7 @@ class Mailer {
       });
     } catch (err) {
       logger.log("warn", "MAILER: Email failed");
-      logger.error(err.stack);
+      logger.log({ level: "error", message: err });
     }
   }
 }

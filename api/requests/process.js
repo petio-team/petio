@@ -34,7 +34,7 @@ class processRequest {
         this.mailRequest();
       } catch (err) {
         logger.log("error", "REQ: Error");
-        logger.error(err.stack);
+        logger.log({ level: "error", message: err });
         out = {
           message: "failed",
           error: true,
@@ -105,7 +105,7 @@ class processRequest {
       this.sendToDvr(profile);
     } catch (err) {
       logger.log("error", `REQ: Unable to save request`);
-      logger.error(err.stack);
+      logger.log({ level: "error", message: err });
       return {
         message: "failed",
         error: true,
@@ -253,7 +253,7 @@ class processRequest {
       function (err, data) {
         if (err) {
           logger.log("error", `REQ: Archive Error`);
-          logger.error(err.stack);
+          logger.log({ level: "error", message: err });
         } else {
           logger.log("info", `REQ: Request ${oldReq.title} Archived!`);
         }

@@ -41,7 +41,7 @@ class Wrapper {
           `Fatal Error: Port already in use ${err.port}. Petio may already be running or is in conflict with another service on the same port.`
         );
       } else {
-        logger.error(err.stack);
+        logger.log({ level: "error", message: err });
       }
       process.exit(1);
     });
@@ -64,7 +64,7 @@ class Wrapper {
       });
       app.listen(7777);
     } catch (err) {
-      logger.error(err.stack);
+      logger.log({ level: "error", message: err });
     }
   }
 

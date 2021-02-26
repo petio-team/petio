@@ -63,7 +63,7 @@ router.get("/current", async (req, res) => {
     res.json(configParse);
   } catch (err) {
     logger.log("error", "ROUTE: Config error");
-    logger.error(err.stack);
+    logger.log({ level: "error", message: err });
     res.status(500).send("Config Not Found");
   }
 });

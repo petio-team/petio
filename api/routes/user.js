@@ -120,7 +120,7 @@ router.post("/create_custom", adminRequired, async (req, res) => {
       res.status(200).json(newUser);
     } catch (err) {
       logger.log("error", "ROUTE: Unable to create custom user");
-      logger.error(err.stack);
+      logger.log({ level: "error", message: err });
       res.status(500).json({
         error: "Error creating user",
       });

@@ -46,7 +46,7 @@ router.get("/min", async (req, res) => {
     );
   } catch (err) {
     logger.log("error", `ROUTE: Error getting requests`);
-    logger.error(err.stack);
+    logger.log({ level: "error", message: err });
   }
   res.json(data);
 });
@@ -167,7 +167,7 @@ router.post("/update", async (req, res) => {
     }
   } catch (err) {
     logger.log("error", `ROUTE: Error updating requests`);
-    logger.error(err.stack);
+    logger.log({ level: "error", message: err });
     res.status(500).send();
   }
 });

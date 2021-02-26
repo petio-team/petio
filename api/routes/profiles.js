@@ -86,7 +86,7 @@ router.post("/save_profile", async (req, res) => {
       res.status(200).json(newProfile);
     } catch (err) {
       logger.log("error", "ROUTE: Profile failed to save");
-      logger.error(err.stack);
+      logger.log({ level: "error", message: err });
       res.status(500).json({
         error: "Error creating user",
       });
@@ -115,7 +115,7 @@ router.post("/delete_profile", async (req, res) => {
     );
   } catch (err) {
     logger.log("error", "ROUTE: Profile failed to delete");
-    logger.error(err.stack);
+    logger.log({ level: "error", message: err });
   }
 
   try {

@@ -56,7 +56,7 @@ router.post("/sonarr/config", adminRequired, async (req, res) => {
     return;
   } catch (err) {
     logger.log("error", `ROUTE: Error saving sonarr config`);
-    logger.error(err.stack);
+    logger.log({ level: "error", message: err });
     res.status(500).json({ error: err });
     return;
   }
@@ -75,7 +75,7 @@ function saveSonarrConfig(data) {
     fs.writeFile(configFile, data, (err) => {
       if (err) {
         logger.log("error", `ROUTE: Error writing sonarr config`);
-        logger.error(err.stack);
+        logger.log({ level: "error", message: err });
         reject(err);
       } else {
         logger.log("info", "ROUTE: Sonarr Config updated");
@@ -112,7 +112,7 @@ router.get("/radarr/paths/:id", adminRequired, async (req, res) => {
     res.json(data);
   } catch (err) {
     logger.log("warn", `ROUTE: Enable to get Radarr paths`);
-    logger.error(err.stack);
+    logger.log({ level: "error", message: err });
     res.json([]);
   }
 });
@@ -156,7 +156,7 @@ router.post("/radarr/config", adminRequired, async (req, res) => {
     return;
   } catch (err) {
     logger.log("error", `ROUTE: Error saving radarr config`);
-    logger.error(err.stack);
+    logger.log({ level: "error", message: err });
     res.status(500).json({ error: err });
     return;
   }
@@ -175,7 +175,7 @@ function saveRadarrConfig(data) {
     fs.writeFile(configFile, data, (err) => {
       if (err) {
         logger.log("error", `ROUTE: Error writing radarr config`);
-        logger.error(err.stack);
+        logger.log({ level: "error", message: err });
         reject(err);
       } else {
         logger.log("info", "ROUTE: Radarr Config updated");

@@ -149,7 +149,7 @@ async function saveRequestIp(user, request_ip) {
     );
   } catch (err) {
     logger.log("error", "LOGIN: Update IP failed");
-    logger.error(err);
+    logger.log({ level: "error", message: err });
   }
 }
 

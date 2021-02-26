@@ -13,7 +13,7 @@ router.post("/", async (req, res) => {
     res.json(data);
   } catch (err) {
     logger.log("warn", "ROUTE: Error getting history");
-    logger.error(err.stack);
+    logger.log({ level: "error", message: err });
     res.status(500).send();
   }
 });
@@ -24,7 +24,7 @@ router.get("/bandwidth", async (req, res) => {
     res.json(data.MediaContainer.StatisticsBandwidth);
   } catch (err) {
     logger.log("warn", "ROUTE: Error getting bandwidth");
-    logger.error(err.stack);
+    logger.log({ level: "error", message: err });
     res.status(500).send();
   }
 });
@@ -35,7 +35,7 @@ router.get("/server", async (req, res) => {
     res.json(data.MediaContainer);
   } catch (err) {
     logger.log("warn", "ROUTE: Error getting server info");
-    logger.error(err.stack);
+    logger.log({ level: "error", message: err });
     res.status(500).send();
   }
 });

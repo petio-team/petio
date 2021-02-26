@@ -8,18 +8,6 @@ let liveLogfile = process.pkg
   ? path.join(path.dirname(process.execPath), "./logs/live.log")
   : "./logs/live.log";
 
-const enumerateErrorFormat = winston.format((info) => {
-  if (info.message instanceof Error) {
-    info.message = JSON.stringify(info.message);
-  }
-
-  if (info instanceof Error) {
-    info = JSON.stringify(info);
-  }
-
-  return info;
-});
-
 const logger = winston.createLogger({
   transports: [
     new winston.transports.Console({
@@ -30,9 +18,7 @@ const logger = winston.createLogger({
         }),
         winston.format.printf(
           (info) =>
-            `${info.timestamp} ${info.level}: ${
-              info.message ? info.message.toString() : "No output"
-            }`
+            `${info.timestamp} ${info.level}: ${info.message.toString()}`
         )
       ),
     }),
@@ -45,9 +31,7 @@ const logger = winston.createLogger({
         winston.format.timestamp(),
         winston.format.printf(
           (info) =>
-            `${info.timestamp} ${info.level}: ${
-              info.message ? info.message.toString() : "No output"
-            }`
+            `${info.timestamp} ${info.level}: ${info.message.toString()}`
         )
       ),
     }),
@@ -63,7 +47,7 @@ const logger = winston.createLogger({
           return `${JSON.stringify({
             [info.timestamp]: {
               type: info.level,
-              log: info.message ? info.message.toString() : "No output",
+              log: info.message.toString(),
             },
           })},`;
         })

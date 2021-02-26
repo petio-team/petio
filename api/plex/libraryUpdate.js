@@ -37,7 +37,7 @@ class LibraryUpdate {
         "warn",
         `LIB CRON: Partial scan failed - unable to get recent`
       );
-      logger.error(err.stack);
+      logger.log({ level: "error", message: err });
       return;
     }
     let matched = {};
@@ -119,7 +119,7 @@ class LibraryUpdate {
       libraries = await this.getLibraries();
     } catch (err) {
       logger.log("error", `LIB CRON: Error`);
-      logger.error(err.stack);
+      logger.log({ level: "error", message: err });
     }
 
     if (libraries) {
@@ -154,7 +154,7 @@ class LibraryUpdate {
         await adminData.save();
       } catch (err) {
         logger.log("error", `LIB CRON: Error creating admin user`);
-        logger.error(err.stack);
+        logger.log({ level: "error", message: err });
       }
     }
   }
@@ -253,7 +253,7 @@ class LibraryUpdate {
         libraryItem = await newLibrary.save();
       } catch (err) {
         logger.log("error", `LIB CRON: Error`);
-        logger.error(err.stack);
+        logger.log({ level: "error", message: err });
       }
     } else {
       let updatedLibraryItem = false;
@@ -287,7 +287,7 @@ class LibraryUpdate {
         );
       } catch (err) {
         logger.log("error", `LIB CRON: Error`);
-        logger.error(err.stack);
+        logger.log({ level: "error", message: err });
       }
       if (updatedLibraryItem) {
         logger.log("info", "LIB CRON: Library Updated " + lib.title);
@@ -319,7 +319,7 @@ class LibraryUpdate {
           );
         } catch (err) {
           logger.log("error", `LIB CRON: Unable to get library content`);
-          logger.error(err.stack);
+          logger.log({ level: "error", message: err });
         }
       })
     );
@@ -419,7 +419,7 @@ class LibraryUpdate {
             `LIB CRON: Error - unable to parse id source from: ${movieObj.guid} - Movie: ${movieObj.title}`
           );
         } else {
-          logger.error(err.stack);
+          logger.log({ level: "error", message: err });
         }
       }
     }
@@ -467,7 +467,7 @@ class LibraryUpdate {
         logger.log("info", `LIB CRON: Movie Added - ${movieObj.title}`);
       } catch (err) {
         logger.log("warn", `LIB CRON: Error`);
-        logger.error(err.stack);
+        logger.log({ level: "error", message: err });
       }
     } else {
       try {
@@ -553,7 +553,7 @@ class LibraryUpdate {
         musicDb = await newMusic.save();
       } catch (err) {
         logger.log("error", `LIB CRON: Error`);
-        logger.error(err.stack);
+        logger.log({ level: "error", message: err });
       }
     }
   }
@@ -652,7 +652,7 @@ class LibraryUpdate {
         logger.log("info", `LIB CRON: Show Added - ${showObj.title}`);
       } catch (err) {
         logger.log("error", `LIB CRON: Error`);
-        logger.error(err.stack);
+        logger.log({ level: "error", message: err });
       }
     } else {
       try {
@@ -707,7 +707,7 @@ class LibraryUpdate {
       friendList = await this.getFriends();
     } catch (err) {
       logger.log("error", `LIB CRON: Error getting friend list`);
-      logger.error(err.stack);
+      logger.log({ level: "error", message: err });
     }
     if (friendList) {
       Object.keys(friendList).map((item) => {
@@ -730,7 +730,7 @@ class LibraryUpdate {
             reject("Unable to get friends");
             logger.log("error", "LIB CRON: Unable to get friends");
             logger.log("error", `LIB CRON: Error`);
-            logger.error(err.stack);
+            logger.log({ level: "error", message: err });
           }
           if (!data) {
             reject("no data");
@@ -777,7 +777,7 @@ class LibraryUpdate {
         friendDb = await newFriend.save();
       } catch (err) {
         logger.log("error", `LIB CRON: Error`);
-        logger.error(err.stack);
+        logger.log({ level: "error", message: err });
       }
       if (friendDb) {
         logger.log("info", `LIB CRON: User Created ${obj.title}`);

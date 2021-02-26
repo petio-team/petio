@@ -35,7 +35,7 @@ router.post("/update", async (req, res) => {
     res.sendStatus(200);
   } catch (err) {
     logger.error("FILTER: Error saving filters");
-    logger.error(err);
+    logger.log({ level: "error", message: err });
     res.sendStatus(500);
   }
 });

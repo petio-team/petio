@@ -170,7 +170,7 @@ class Main {
         this.connectDb();
       }
     } catch (err) {
-      logger.error(err.stack);
+      logger.log({ level: "error", message: err });
       logger.log("info", "API: Fatal error Stopping server");
       this.cron.stop();
       logger.log("verbose", "API: Stopped crons");
@@ -190,7 +190,7 @@ class Main {
       this.start();
     } catch (err) {
       logger.log("error", "API: Error connecting to database");
-      logger.error(err.stack);
+      logger.log({ level: "error", message: err });
       logger.log("error", "API: Fatal error - database misconfigured!");
       logger.log("warn", "API: Removing config please restart");
       fs.unlinkSync("./config/config.json");
@@ -336,7 +336,7 @@ class Main {
       } catch (err) {
         res.status(500).send("Error Creating config");
         logger.log("error", "API: Config creation error");
-        logger.error(err.stack);
+        logger.log({ level: "error", message: err });
       }
     });
   }
@@ -359,7 +359,7 @@ class Main {
       fs.writeFile(configFile, data, (err) => {
         if (err) {
           logger.log("error", "API: Writing config to file failed");
-          logger.error(err.stack);
+          logger.log({ level: "error", message: err });
           reject(err);
         } else {
           logger.log("info", "API: Config written to file");
@@ -418,7 +418,7 @@ class Main {
       return;
     } catch (err) {
       logger.log("error", "API: Fatal Error: Cannot create default configs");
-      logger.error(err.stack);
+      logger.log({ level: "error", message: err });
       return;
     }
   }

@@ -185,9 +185,9 @@ class Sonarr {
       let add = await this.post("series", false, seriesData);
       return add.id;
     } catch (err) {
-      logger.error(err.stack);
+      logger.log({ level: "error", message: err });
       logger.log("error", `SERVICE - SONARR: Unable to add series`);
-      logger.error(err.stack);
+      logger.log({ level: "error", message: err });
       return false;
     }
   }
@@ -305,7 +305,7 @@ class Sonarr {
           mainCalendar = [...mainCalendar, ...serverCal];
         } catch (err) {
           logger.log("error", "SONARR: Calendar error");
-          logger.error(err.stack);
+          logger.log({ level: "error", message: err });
         }
       }
     }

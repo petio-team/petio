@@ -198,7 +198,7 @@ class Radarr {
       return add.id;
     } catch (err) {
       logger.log("warn", `SERVICE - RADARR: Unable to add movie`);
-      logger.error(err.stack);
+      logger.log({ level: "error", message: err });
       throw err;
     }
   }
@@ -228,7 +228,7 @@ class Radarr {
             "warn",
             `SERVICE - RADARR: [${this.config.title}] Unable to add movie ${job.title}`
           );
-          logger.error(err.stack);
+          logger.log({ level: "error", message: err });
         }
       } else {
         // Loop for all servers default
@@ -260,7 +260,7 @@ class Radarr {
               "warn",
               `SERVICE - RADARR: [${this.config.title}] Unable to add movie ${job.title}`
             );
-            logger.error(err.stack);
+            logger.log({ level: "error", message: err });
           }
         }
       }
@@ -320,7 +320,7 @@ class Radarr {
           mainCalendar = [...mainCalendar, ...serverCal];
         } catch (err) {
           logger.log("error", "RADARR: Calendar error");
-          logger.error(err.stack);
+          logger.log({ level: "error", message: err });
         }
       }
     }
