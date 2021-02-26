@@ -63,7 +63,6 @@ class Filter extends React.Component {
   }
 
   addRow(type, i) {
-    console.log(type, i);
     let filters = this.state[type];
     filters[i].rows.push({
       condition: false,
@@ -77,7 +76,6 @@ class Filter extends React.Component {
   }
 
   removeRow(type, i, r) {
-    console.log(type, i, r);
     let filters = this.state[type];
     filters[i].rows = this.removeFromArray(filters[i].rows, r);
 
@@ -154,7 +152,6 @@ class Filter extends React.Component {
 
     if (target.dataset.type) {
       let current = this.state[target.dataset.type];
-      console.log(typeof target.dataset.row);
       if (target.dataset.row === "action") {
         current[target.dataset.item][target.dataset.row][name] = value;
       } else {
@@ -181,14 +178,10 @@ class Filter extends React.Component {
   async getFilters() {
     try {
       let data = await Api.getFilters();
-      console.log(data);
-      console.log(data);
       let filters = {};
       data.map((item) => {
         filters[item.id] = item.data;
       });
-
-      console.log(filters);
 
       this.setState({
         movie_filters: filters.movie_filters ? filters.movie_filters : [],

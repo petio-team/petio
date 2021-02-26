@@ -155,7 +155,6 @@ class FilterRow extends React.Component {
                     {Object.keys(operators).map((i) => {
                       let operator = operators[i];
                       let type = conditionType;
-                      console.log(operator.type === "any", type);
                       if (operator.type === "any" || operator.type === type) {
                         return (
                           <option
