@@ -24,6 +24,8 @@ class Filter extends React.Component {
     this.collapse = this.collapse.bind(this);
     this.saveFilters = this.saveFilters.bind(this);
     this.getFilters = this.getFilters.bind(this);
+    this.removeRow = this.removeRow.bind(this);
+    this.removeFilter = this.removeFilter.bind(this);
   }
 
   addFilter(type) {
@@ -75,6 +77,7 @@ class Filter extends React.Component {
   }
 
   removeRow(type, i, r) {
+    console.log(type, i, r);
     let filters = this.state[type];
     filters[i].rows = this.removeFromArray(filters[i].rows, r);
 
