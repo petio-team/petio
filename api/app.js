@@ -40,6 +40,7 @@ const issueRoute = require("./routes/issue");
 const profileRoute = require("./routes/profiles");
 const configRoute = require("./routes/config");
 const logsRoute = require("./routes/log");
+const filterRoute = require("./routes/filter");
 const { authRequired } = require("./middleware/auth");
 
 class Main {
@@ -131,6 +132,7 @@ class Main {
       this.e.use("/profiles", authRequired, profileRoute);
       this.e.use("/config", authRequired, configRoute);
       this.e.use("/logs", authRequired, logsRoute);
+      this.e.use("/filter", authRequired, filterRoute);
       this.e.get("*", function (req, res) {
         logger.log(
           "warn",

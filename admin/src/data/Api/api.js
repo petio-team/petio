@@ -187,3 +187,7 @@ export function getReviews() {
 export function removeIssue(id, message) {
   return post(`/issue/remove`, { id, message });
 }
+
+export function updateFilters(movie, tv) {
+  return post(`/filter/update`, { movie, tv });
+}

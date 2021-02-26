@@ -631,3 +631,13 @@ export async function removeIssue(id, message) {
     return false;
   }
 }
+
+export async function updateFilters(movies, tv) {
+  try {
+    await api.updateFilters(movies, tv);
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}

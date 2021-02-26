@@ -22,6 +22,7 @@ class Filter extends React.Component {
     this.inputChange = this.inputChange.bind(this);
     this.addRow = this.addRow.bind(this);
     this.collapse = this.collapse.bind(this);
+    this.saveFilters = this.saveFilters.bind(this);
   }
 
   addFilter(type) {
@@ -177,8 +178,14 @@ class Filter extends React.Component {
     this.getArrs();
   }
 
-  saveFilters() {
-    alert("this would save all filters as they are set now");
+  async saveFilters() {
+    try {
+      await Api.updateFilters(this.state.movie_filters, this.state.tv_filters);
+      alert("saved");
+    } catch (err) {
+      console.log(err);
+      alert("failed");
+    }
   }
 
   render() {

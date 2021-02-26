@@ -55,6 +55,7 @@ class FilterRow extends React.Component {
             { id: 28, name: "Action" },
             { id: 12, name: "Adventure" },
             { id: 16, name: "Animation" },
+            { id: "anime", name: "Anime" },
             { id: 35, name: "Comedy" },
             { id: 80, name: "Crime" },
             { id: 99, name: "Documentary" },
@@ -75,6 +76,7 @@ class FilterRow extends React.Component {
         : [
             { id: 10759, name: "Action & Adventure" },
             { id: 16, name: "Animation" },
+            { id: "anime", name: "Anime" },
             { id: 35, name: "Comedy" },
             { id: 80, name: "Crime" },
             { id: 99, name: "Documentary" },

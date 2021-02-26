@@ -42,6 +42,7 @@ import {
   getConsole,
   getReviews,
   removeIssue,
+  updateFilters,
 } from "./actions";
 
 export default {
@@ -88,4 +89,5 @@ export default {
   getConsole,
   getReviews,
   removeIssue,
+  updateFilters,
 };
