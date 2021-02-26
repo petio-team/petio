@@ -3,6 +3,7 @@ const { showLookup } = require("../tmdb/show");
 const Request = require("../models/request");
 const Sonarr = require("../services/sonarr");
 const Radarr = require("../services/radarr");
+const logger = require("../util/logger");
 
 async function getRequests(user = false, all = false) {
   const requests = await Request.find();
@@ -82,7 +83,7 @@ async function getRequests(user = false, all = false) {
             radarrId: request.radarrId,
             media: media,
             approved: request.approved,
-            process_stage: reqState(request),
+            process_stage: reqState(request, children),
           };
         }
       })
@@ -94,7 +95,7 @@ async function getRequests(user = false, all = false) {
   return data;
 }
 
-function reqState(req) {
+function reqState(req, children) {
   let diff;
   if (!req.approved) {
     return {
@@ -102,35 +103,35 @@ function reqState(req) {
       message: "Pending",
     };
   }
-  if (req.children) {
-    if (req.children.length > 0) {
-      for (let r = 0; r < req.children.length; r++) {
-        if (req.children[r].status.length > 0) {
+  if (children) {
+    if (children.length > 0) {
+      for (let r = 0; r < children.length; r++) {
+        if (children[r].status.length > 0) {
           return {
             status: "orange",
             message: "Downloading",
           };
         }
 
-        if (req.children[r].info.downloaded || req.children[r].info.movieFile) {
+        if (children[r].info.downloaded || children[r].info.movieFile) {
           return {
             status: "good",
             message: "Downloaded",
           };
         }
 
-        if (req.children[r].info.message === "NotFound") {
+        if (children[r].info.message === "NotFound") {
           return {
             status: "bad",
             message: "Removed",
           };
         }
 
-        if (req.type === "tv" && req.children[r].info) {
+        if (req.type === "tv" && children[r].info) {
           if (
-            req.children[r].info.episodeCount ===
-              req.children[r].info.episodeFileCount &&
-            req.children[r].info.episodeCount > 0
+            children[r].info.episodeCount ===
+              children[r].info.episodeFileCount &&
+            children[r].info.episodeCount > 0
           ) {
             return {
               status: "good",
@@ -138,9 +139,9 @@ function reqState(req) {
             };
           }
 
-          if (req.children[r].info.seasons) {
+          if (children[r].info.seasons) {
             let missing = false;
-            for (let season of req.children[r].info.seasons) {
+            for (let season of children[r].info.seasons) {
               if (season.statistics.percentOfEpisodes !== 100) missing = true;
             }
 
@@ -150,7 +151,7 @@ function reqState(req) {
                 message: "Downloaded",
               };
             } else {
-              let airDate = req.children[r].info.firstAired;
+              let airDate = children[r].info.firstAired;
               diff = Math.ceil(new Date(airDate) - new Date());
               if (diff > 0) {
                 return {
@@ -158,7 +159,7 @@ function reqState(req) {
                   message: `~${calcDate(diff)}`,
                 };
               } else {
-                if (req.children[r].info.episodeFileCount > 0) {
+                if (children[r].info.episodeFileCount > 0) {
                   return {
                     status: "blue",
                     message: "Partially Downloaded",
@@ -173,14 +174,11 @@ function reqState(req) {
           }
         }
 
-        if (req.type === "movie" && req.children[r].info) {
-          if (
-            req.children[r].info.inCinemas ||
-            req.children[r].info.digitalRelease
-          ) {
-            if (req.children[r].info.inCinemas) {
+        if (req.type === "movie" && children[r].info) {
+          if (children[r].info.inCinemas || children[r].info.digitalRelease) {
+            if (children[r].info.inCinemas) {
               diff = Math.ceil(
-                new Date(req.children[r].info.inCinemas) - new Date()
+                new Date(children[r].info.inCinemas) - new Date()
               );
               if (diff > 0) {
                 return {
@@ -189,8 +187,8 @@ function reqState(req) {
                 };
               }
             }
-            if (req.children[r].info.digitalRelease) {
-              let digitalDate = new Date(req.children[r].info.digitalRelease);
+            if (children[r].info.digitalRelease) {
+              let digitalDate = new Date(children[r].info.digitalRelease);
               if (new Date() - digitalDate < 0) {
                 return {
                   status: "cinema",
@@ -203,9 +201,9 @@ function reqState(req) {
                 };
               }
             } else {
-              if (req.children[r].info.inCinemas) {
+              if (children[r].info.inCinemas) {
                 diff = Math.ceil(
-                  new Date() - new Date(req.children[r].info.inCinemas)
+                  new Date() - new Date(children[r].info.inCinemas)
                 );
                 if (cinemaWindow(diff)) {
                   return {

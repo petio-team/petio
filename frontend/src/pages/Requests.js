@@ -146,6 +146,10 @@ class Requests extends React.Component {
             </p>
             <div className="requests-legend">
               <p>
+                <span className="request-status pending">Pending</span> - Your
+                request is pending approval
+              </p>
+              <p>
                 <span className="request-status manual">No Status</span> - This
                 means the request cannot be tracked by Petio
               </p>
@@ -160,6 +164,12 @@ class Requests extends React.Component {
               <p>
                 <span className="request-status good">Downloaded</span> - The
                 item has been downloaded but is waiting for Plex to import
+              </p>
+              <p>
+                <span className="request-status blue">~1 m 2 d</span> /{" "}
+                <span className="request-status cinema">In Cinemas</span> - Not
+                yet released, the approximate time to release (Years, Months,
+                Days) or still in cinemas.
               </p>
             </div>
             <MyRequests requests={this.state.requests} />
