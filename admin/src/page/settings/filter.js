@@ -129,6 +129,7 @@ class Filter extends React.Component {
         current[uuid] = {
           profiles: settings.profiles.length > 0 ? settings.profiles : false,
           paths: settings.paths.length > 0 ? settings.paths : false,
+          tags: settings.tags.length > 0 ? settings.tags : false,
         };
       }
       if (type === "radarr") {

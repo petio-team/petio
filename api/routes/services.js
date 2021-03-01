@@ -36,6 +36,18 @@ router.get("/sonarr/profiles/:id", adminRequired, async (req, res) => {
   }
 });
 
+router.get("/sonarr/tags/:id", adminRequired, async (req, res) => {
+  if (!req.params.id) {
+    res.status(404).send();
+  }
+  try {
+    let data = await new Sonarr(req.params.id).getTags();
+    res.json(data);
+  } catch {
+    res.json([]);
+  }
+});
+
 router.get("/sonarr/test/:id", adminRequired, async (req, res) => {
   let data = {
     connection: await new Sonarr(req.params.id).test(),
@@ -123,6 +135,18 @@ router.get("/radarr/profiles/:id", adminRequired, async (req, res) => {
   }
   try {
     let data = await new Radarr(req.params.id).getProfiles();
+    res.json(data);
+  } catch {
+    res.json([]);
+  }
+});
+
+router.get("/radarr/tags/:id", adminRequired, async (req, res) => {
+  if (!req.params.id) {
+    res.status(404).send();
+  }
+  try {
+    let data = await new Radarr(req.params.id).getTags();
     res.json(data);
   } catch {
     res.json([]);

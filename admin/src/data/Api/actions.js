@@ -306,12 +306,16 @@ export async function sonarrConfig() {
 }
 
 export async function sonarrOptions(id) {
-  let paths = await api.sonarrPaths(id);
-  let profiles = await api.sonarrProfiles(id);
+  let [paths, profiles, tags] = await Promise.all([
+    api.sonarrPaths(id),
+    api.sonarrProfiles(id),
+    api.sonarrTags(id),
+  ]);
 
   return {
     paths: paths,
     profiles: profiles,
+    tags: tags,
   };
 }
 
@@ -322,12 +326,16 @@ export async function radarrConfig() {
 }
 
 export async function radarrOptions(id) {
-  let paths = await api.radarrPaths(id);
-  let profiles = await api.radarrProfiles(id);
+  let [paths, profiles, tags] = await Promise.all([
+    api.radarrPaths(id),
+    api.radarrProfiles(id),
+    api.radarrTags(id),
+  ]);
 
   return {
     paths: paths,
     profiles: profiles,
+    tags: tags,
   };
 }
 

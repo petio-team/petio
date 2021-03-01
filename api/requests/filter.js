@@ -15,8 +15,9 @@ async function filter(item) {
   let filterId = item.type === "movie" ? "movie_filters" : "tv_filters";
   let filters = await Filter.findOne({ id: filterId });
   if (!mediaDetails || !filters) return false;
-  filters.data.map((f) => {
+  filters.data.map((f, i) => {
     let compulsoryPass = true;
+    let optionalMatch = 0;
     f.rows.map((row) => {
       if (row.comparison === "and") {
         // must match
@@ -26,7 +27,6 @@ async function filter(item) {
           row.operator,
           mediaDetails
         );
-        console.log(filterMatch, row.value);
         if (!filterMatch) {
           compulsoryPass = false;
         }
@@ -38,9 +38,16 @@ async function filter(item) {
           row.operator,
           mediaDetails
         );
+        if (filterMatch) optionalMatch++;
       }
     });
-    if (filterMatch && compulsoryPass) {
+    if (
+      filterMatch &&
+      compulsoryPass &&
+      (optionalMatch > 0 || f.rows.length === 1)
+    ) {
+      console.log(filterMatch, compulsoryPass, optionalMatch, f.rows.length);
+      console.log(`Match on filter ${i + 1}`);
       action = f.action;
     }
   });
@@ -78,9 +85,10 @@ function getValue(condition, media) {
       media.genres.map((genre) => {
         values.push(genre.id);
       });
-      media.keywords.results.map((kw) => {
-        if (kw.id === 210024) values.push("anime");
-      });
+      if (media.keywords.results)
+        media.keywords.results.map((kw) => {
+          if (kw.id === 210024) values.push("anime");
+        });
       break;
     case "year":
       values = [];

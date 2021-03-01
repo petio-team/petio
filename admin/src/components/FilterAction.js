@@ -110,15 +110,42 @@ class FilterAction extends React.Component {
           </div>
           <div className="filter--row--item">
             <p className="filter--row--item--title">Tag</p>
-            <input
-              data-type={this.props.type}
-              data-row="action"
-              data-item={this.props.item}
-              name="tag"
-              onChange={this.props.inputChange}
-              value={!this.props.data.tag ? "" : this.props.data.tag}
-              type="text"
-            />
+            <div className="select-wrap">
+              <select
+                data-type={this.props.type}
+                data-row="action"
+                data-item={this.props.item}
+                name="tag"
+                onChange={this.props.inputChange}
+                value={this.props.data.tag}
+              >
+                {this.props.data.server &&
+                this.props.settings[this.props.data.server] ? (
+                  this.props.settings[this.props.data.server].tags.length >
+                  0 ? (
+                    <>
+                      <option value="">Don&apos;t set tag</option>
+                      {this.props.settings[this.props.data.server].tags.map(
+                        (tag) => {
+                          return (
+                            <option
+                              value={tag.id}
+                              key={`${fs}__${this.props.item}__pf_${tag.id}`}
+                            >
+                              {tag.label}
+                            </option>
+                          );
+                        }
+                      )}
+                    </>
+                  ) : (
+                    <option value="">No tags</option>
+                  )
+                ) : (
+                  <option value="">Choose Server</option>
+                )}
+              </select>
+            </div>
           </div>
           {this.props.type === "tv_filters" ? (
             <div className="filter--row--item">

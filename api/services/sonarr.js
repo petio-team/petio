@@ -130,6 +130,10 @@ class Sonarr {
     return await this.get("profile");
   }
 
+  async getTags() {
+    return await this.get("tag");
+  }
+
   lookup(id) {
     return this.get("series/lookup", {
       term: `tvdb:${id}`,
@@ -171,7 +175,13 @@ class Sonarr {
     return await this.connect(true);
   }
 
-  async add(seriesData, path = false, profile = false) {
+  async add(
+    seriesData,
+    path = false,
+    profile = false,
+    type = "standard",
+    tag = false
+  ) {
     seriesData.ProfileId = profile ? profile : this.config.profile;
     seriesData.seasonFolder = true;
     seriesData.Path = `${path ? path : this.config.path_title}${sanitize(
@@ -180,11 +190,15 @@ class Sonarr {
     seriesData.addOptions = {
       searchForMissingEpisodes: true,
     };
+    seriesData.seriesType = type;
+    if (tag) seriesData.tags = [tag];
 
     try {
       let add = await this.post("series", false, seriesData);
+      if (!add.id) throw add.message;
       return add.id;
     } catch (err) {
+      console.log(err);
       logger.log({ level: "error", message: err });
       logger.log("error", `SERVICE - SONARR: Unable to add series`);
       logger.log({ level: "error", message: err });
@@ -197,20 +211,28 @@ class Sonarr {
       if (this.config) {
         try {
           let sonarrData = await this.lookup(job.tvdb_id);
-          let sonarrId = await this.add(sonarrData[0]);
-          let updatedRequest = await Request.findOneAndUpdate(
+          let sonarrId = false;
+          if (sonarrData[0].id) {
+            logger.log(
+              "warn",
+              `SERVICE - SONARR: [${this.config.title}] Job skipped already found for ${job.title}`
+            );
+            sonarrId = sonarrData[0].id;
+          } else {
+            sonarrId = await this.add(sonarrData[0]);
+            logger.log(
+              "info",
+              `SERVICE - SONARR: [${this.config.title}] Sonnar job added for ${job.title}`
+            );
+          }
+
+          await Request.findOneAndUpdate(
             {
               requestId: job.requestId,
             },
             { $push: { sonarrId: { [this.config.uuid]: sonarrId } } },
             { useFindAndModify: false }
           );
-          if (updatedRequest) {
-            logger.log(
-              "info",
-              `SERVICE - SONARR: [${this.config.title}] Sonnar job added for ${job.title}`
-            );
-          }
         } catch (err) {
           logger.log("info", err);
           logger.log(
@@ -227,20 +249,28 @@ class Sonarr {
           this.config = server;
           try {
             let sonarrData = await this.lookup(job.tvdb_id);
-            let sonarrId = await this.add(sonarrData[0]);
-            let updatedRequest = await Request.findOneAndUpdate(
+            let sonarrId = false;
+            if (sonarrData[0].id) {
+              logger.log(
+                "warn",
+                `SERVICE - SONARR: [${this.config.title}] Job skipped already found for ${job.title}`
+              );
+              sonarrId = sonarrData[0].id;
+            } else {
+              sonarrId = await this.add(sonarrData[0]);
+              logger.log(
+                "info",
+                `SERVICE - SONARR: [${this.config.title}] Sonnar job added for ${job.title}`
+              );
+            }
+
+            await Request.findOneAndUpdate(
               {
                 requestId: job.requestId,
               },
               { $push: { sonarrId: { [this.config.uuid]: sonarrId } } },
               { useFindAndModify: false }
             );
-            if (updatedRequest) {
-              logger.log(
-                "info",
-                `SERVICE - SONARR: [${this.config.title}] Sonnar job added for ${job.title}`
-              );
-            }
           } catch (err) {
             logger.log("info", err);
             logger.log(
@@ -256,27 +286,37 @@ class Sonarr {
   async manualAdd(job, manual) {
     if (this.config) {
       try {
-        let sonarrData = await this.lookup(job.id);
-        let sonarrId = await this.add(
-          sonarrData[0],
-          manual.path,
-          manual.profile
-        );
-        let updatedRequest = await Request.findOneAndUpdate(
+        let sonarrData = await this.lookup(job.tvdb_id);
+        let sonarrId = false;
+        if (sonarrData[0].id) {
+          logger.log(
+            "warn",
+            `SERVICE - SONARR: [${this.config.title}] Job skipped already found for ${job.title}`
+          );
+          sonarrId = sonarrData[0].id;
+        } else {
+          sonarrId = await this.add(
+            sonarrData[0],
+            manual.path,
+            manual.profile,
+            manual.type,
+            manual.tag
+          );
+          logger.log(
+            "info",
+            `SERVICE - SONARR: [${this.config.title}] Sonnar job added for ${job.title}`
+          );
+        }
+        await Request.findOneAndUpdate(
           {
             requestId: job.id,
           },
           { $push: { sonarrId: { [this.config.uuid]: sonarrId } } },
           { useFindAndModify: false }
         );
-        if (updatedRequest) {
-          logger.log(
-            "info",
-            `SERVICE - SONARR: [${this.config.title}] Sonnar job added for ${job.title}`
-          );
-        }
       } catch (err) {
-        logger.log("info", err);
+        console.log(err);
+        logger.log({ level: "error", message: err });
         logger.log(
           "warn",
           `SERVICE - SONARR: [${this.config.title}] Unable to add series ${job.title}`

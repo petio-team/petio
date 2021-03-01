@@ -142,6 +142,7 @@ class processRequest {
     if (profile) {
       if (profile.radarr && this.request.type === "movie") {
         Object.keys(profile.radarr).map((r) => {
+          console.log(r, profile.radarr[r]);
           let active = profile.radarr[r];
           if (active) {
             new Radarr(r).processRequest(this.request.id);

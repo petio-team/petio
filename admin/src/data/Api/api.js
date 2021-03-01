@@ -84,6 +84,10 @@ export async function sonarrProfiles(id) {
   return get(`/services/sonarr/profiles/${id}`);
 }
 
+export async function sonarrTags(id) {
+  return get(`/services/sonarr/tags/${id}`);
+}
+
 export async function radarrConfig() {
   return get(`/services/radarr/config`);
 }
@@ -94,6 +98,10 @@ export async function radarrPaths(id) {
 
 export async function radarrProfiles(id) {
   return get(`/services/radarr/profiles/${id}`);
+}
+
+export async function radarrTags(id) {
+  return get(`/services/radarr/tags/${id}`);
 }
 
 export async function testRadarr(id) {

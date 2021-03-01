@@ -130,9 +130,13 @@ class Radarr {
     return await this.get("qualityProfile");
   }
 
+  async getTags() {
+    return await this.get("tag");
+  }
+
   lookup(id) {
-    return this.get("movie/lookup/tmdb", {
-      tmdbId: id,
+    return this.get("movie/lookup", {
+      term: `tmdb:${id}`,
     });
   }
 
@@ -177,7 +181,7 @@ class Radarr {
     return await this.connect(true);
   }
 
-  async add(movieData, path = false, profile = false) {
+  async add(movieData, path = false, profile = false, tag = false) {
     let system = await this.get("system/status");
     let sep = system.isWindows ? "\\" : "/";
     movieData.qualityProfileId = parseInt(
@@ -190,6 +194,7 @@ class Radarr {
       searchForMovie: true,
     };
     movieData.monitored = true;
+    if (tag) movieData.tags = [tag];
 
     try {
       let add = await this.post("movie", false, movieData);
@@ -211,15 +216,15 @@ class Radarr {
       if (this.config) {
         try {
           let radarrData = await this.lookup(job.tmdb_id);
-          let radarrId = await this.add(radarrData);
-          let updatedRequest = await Request.findOneAndUpdate(
-            {
-              requestId: job.requestId,
-            },
-            { $push: { radarrId: { [this.config.uuid]: radarrId } } },
-            { useFindAndModify: false }
-          );
-          if (updatedRequest) {
+          let radarrId = false;
+          if (radarrData[0].id) {
+            logger.log(
+              "warn",
+              `SERVICE - RADARR: [${this.config.title}] Job skipped already found for ${job.title}`
+            );
+            radarrId = radarrData[0].id;
+          } else {
+            radarrId = await this.add(radarrData[0]);
             logger.log(
               "info",
               `SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`
@@ -243,20 +248,28 @@ class Radarr {
           this.config = server;
           try {
             let radarrData = await this.lookup(job.tmdb_id);
-            let radarrId = await this.add(radarrData);
-            let updatedRequest = await Request.findOneAndUpdate(
+            let radarrId = false;
+            if (radarrData[0].id) {
+              logger.log(
+                "warn",
+                `SERVICE - RADARR: [${this.config.title}] Job skipped already found for ${job.title}`
+              );
+              radarrId = radarrData[0].id;
+            } else {
+              radarrId = await this.add(radarrData[0]);
+              logger.log(
+                "info",
+                `SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`
+              );
+            }
+
+            await Request.findOneAndUpdate(
               {
                 requestId: job.requestId,
               },
               { $push: { radarrId: { [this.config.uuid]: radarrId } } },
               { useFindAndModify: false }
             );
-            if (updatedRequest) {
-              logger.log(
-                "info",
-                `SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`
-              );
-            }
           } catch (err) {
             logger.log(
               "warn",
@@ -273,20 +286,32 @@ class Radarr {
     if (this.config) {
       try {
         let radarrData = await this.lookup(job.id);
-        let radarrId = await this.add(radarrData, manual.path, manual.profile);
-        let updatedRequest = await Request.findOneAndUpdate(
+        let radarrId = false;
+        if (radarrData[0].id) {
+          logger.log(
+            "warn",
+            `SERVICE - RADARR: [${this.config.title}] Job skipped already found for ${job.title}`
+          );
+          radarrId = radarrData[0].id;
+        } else {
+          radarrId = await this.add(
+            radarrData[0],
+            manual.path,
+            manual.profile,
+            manual.tag
+          );
+          logger.log(
+            "info",
+            `SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`
+          );
+        }
+        await Request.findOneAndUpdate(
           {
             requestId: job.id,
           },
           { $push: { radarrId: { [this.config.uuid]: radarrId } } },
           { useFindAndModify: false }
         );
-        if (updatedRequest) {
-          logger.log(
-            "info",
-            `SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`
-          );
-        }
       } catch (err) {
         logger.log(
           "warn",
