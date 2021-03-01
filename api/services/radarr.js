@@ -177,11 +177,13 @@ class Radarr {
     return await this.connect(true);
   }
 
-  async add(movieData) {
+  async add(movieData, path = false, profile = false) {
     let system = await this.get("system/status");
     let sep = system.isWindows ? "\\" : "/";
-    movieData.qualityProfileId = parseInt(this.config.profile);
-    movieData.Path = `${this.config.path_title}${sep}${sanitize(
+    movieData.qualityProfileId = parseInt(
+      profile ? profile : this.config.profile
+    );
+    movieData.Path = `${path ? path : this.config.path_title}${sep}${sanitize(
       movieData.title
     )} (${movieData.year})`;
     movieData.addOptions = {
@@ -263,6 +265,34 @@ class Radarr {
             logger.log({ level: "error", message: err });
           }
         }
+      }
+    }
+  }
+
+  async manualAdd(job, manual) {
+    if (this.config) {
+      try {
+        let radarrData = await this.lookup(job.id);
+        let radarrId = await this.add(radarrData, manual.path, manual.profile);
+        let updatedRequest = await Request.findOneAndUpdate(
+          {
+            requestId: job.id,
+          },
+          { $push: { radarrId: { [this.config.uuid]: radarrId } } },
+          { useFindAndModify: false }
+        );
+        if (updatedRequest) {
+          logger.log(
+            "info",
+            `SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`
+          );
+        }
+      } catch (err) {
+        logger.log(
+          "warn",
+          `SERVICE - RADARR: [${this.config.title}] Unable to add movie ${job.title}`
+        );
+        logger.log({ level: "error", message: err });
       }
     }
   }

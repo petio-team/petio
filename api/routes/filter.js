@@ -9,8 +9,8 @@ router.use(adminRequired);
 router.post("/update", async (req, res) => {
   let movie_filter = req.body.movie;
   let tv_filter = req.body.tv;
-  let existingMovie = await Filter.findOne({ id: "movie_filter" });
-  let existingTv = await Filter.findOne({ id: "tv_filter" });
+  let existingMovie = await Filter.findOne({ id: "movie_filters" });
+  let existingTv = await Filter.findOne({ id: "tv_filters" });
   try {
     if (existingMovie) {
       await Filter.findOneAndUpdate(

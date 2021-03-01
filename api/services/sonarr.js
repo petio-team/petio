@@ -171,10 +171,10 @@ class Sonarr {
     return await this.connect(true);
   }
 
-  async add(seriesData) {
-    seriesData.ProfileId = this.config.profile;
+  async add(seriesData, path = false, profile = false) {
+    seriesData.ProfileId = profile ? profile : this.config.profile;
     seriesData.seasonFolder = true;
-    seriesData.Path = `${this.config.path_title}${sanitize(
+    seriesData.Path = `${path ? path : this.config.path_title}${sanitize(
       seriesData.title
     )} (${seriesData.year})`;
     seriesData.addOptions = {
@@ -249,6 +249,38 @@ class Sonarr {
             );
           }
         }
+      }
+    }
+  }
+
+  async manualAdd(job, manual) {
+    if (this.config) {
+      try {
+        let sonarrData = await this.lookup(job.id);
+        let sonarrId = await this.add(
+          sonarrData[0],
+          manual.path,
+          manual.profile
+        );
+        let updatedRequest = await Request.findOneAndUpdate(
+          {
+            requestId: job.id,
+          },
+          { $push: { sonarrId: { [this.config.uuid]: sonarrId } } },
+          { useFindAndModify: false }
+        );
+        if (updatedRequest) {
+          logger.log(
+            "info",
+            `SERVICE - SONARR: [${this.config.title}] Sonnar job added for ${job.title}`
+          );
+        }
+      } catch (err) {
+        logger.log("info", err);
+        logger.log(
+          "warn",
+          `SERVICE - SONARR: [${this.config.title}] Unable to add series ${job.title}`
+        );
       }
     }
   }

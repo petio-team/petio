@@ -49,6 +49,8 @@ input[type="checkbox"] {
   &.checkbox-small {
     width: 15px;
     height: 15px;
+    min-width: 15px;
+    min-height: 15px;
   }
 }
 
@@ -102,6 +104,10 @@ input[type="checkbox"] {
     background: rgba($grey-medium, 0.3);
     border: none;
     color: white;
+  }
+  select:focus::-ms-value {
+    color: white;
+    background: $primary;
   }
 }
 

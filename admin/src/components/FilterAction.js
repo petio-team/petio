@@ -60,7 +60,7 @@ class FilterAction extends React.Component {
                         return (
                           <option
                             key={`${fs}__${this.props.item}__p_${i}`}
-                            value={path.id}
+                            value={path.path}
                           >
                             {path.path}
                           </option>

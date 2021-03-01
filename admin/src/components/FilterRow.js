@@ -181,9 +181,9 @@ class FilterRow extends React.Component {
                   data-type={this.props.type}
                   data-row={this.props.row}
                   data-item={this.props.item}
-                  name="genre"
+                  name="value"
                   onChange={this.props.inputChange}
-                  value={this.props.data.genre}
+                  value={this.props.data.value}
                 >
                   <option value="">Select genre</option>
                   {genres.map((genre) => {

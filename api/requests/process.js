@@ -6,6 +6,7 @@ const Mailer = require("../mail/mailer");
 const Sonarr = require("../services/sonarr");
 const Radarr = require("../services/radarr");
 const logger = require("../util/logger");
+const filter = require("./filter");
 
 class processRequest {
   constructor(req = {}, usr = {}) {
@@ -122,6 +123,20 @@ class processRequest {
   }
 
   async sendToDvr(profile) {
+    let filterMatch = await filter(this.request);
+    if (filterMatch) {
+      logger.log(
+        "info",
+        "REQ: Matched on custom filter, sending to specified server"
+      );
+      logger.log("info", "REQ: Sending to DVR");
+      if (this.request.type === "movie") {
+        new Radarr(filterMatch.server).manualAdd(this.request, filterMatch);
+      } else {
+        new Sonarr(filterMatch.server).manualAdd(this.request, filterMatch);
+      }
+      return;
+    }
     logger.log("info", "REQ: Sending to DVR");
     // If profile is set use arrs from profile
     if (profile) {
