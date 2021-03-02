@@ -6,7 +6,7 @@ on:
       - dev
 jobs:
   docker-aio:
-    name: Build Full Docker
+    name: Docker Dev Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

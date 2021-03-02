@@ -3,16 +3,16 @@ name: Docker Build Dev
 on:
   push:
     branches:
-      - master
+      - dev
 jobs:
   docker-aio:
-    name: Docker Master Build
+    name: Docker Preview Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Build Docker image
-        run: docker build -t ghcr.io/${{ github.repository }}:latest -t ghcr.io/${{ github.repository }}:latest-${GITHUB_SHA::8} .
+        run: docker build -t ghcr.io/${{ github.repository }}:preview -t ghcr.io/${{ github.repository }}:preview-${GITHUB_SHA::8} .
       - name: Docker login
         run: echo ${{ secrets.GHCR_TOKEN }} | docker login -u ${{ github.repository_owner }} --password-stdin ghcr.io
       - name: Push docker image
-        run: docker push ghcr.io/${{ github.repository }}:latest
+        run: docker push ghcr.io/${{ github.repository }}:preview
