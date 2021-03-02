@@ -109,6 +109,10 @@ input[type="checkbox"] {
     color: white;
     background: $primary;
   }
+
+  option {
+    background: $black;
+  }
 }
 
 .styled-input {
