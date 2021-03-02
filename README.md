@@ -20,8 +20,9 @@ Allow your users to interact with media both on and off your server with this ap
 
 <h4>1. Instalation</h4>
 This application can be installed to run in docker or as a standalone binary that can be configured to run as a service. See our docs below for guides on different setup methods.
-
+<ul><li>
 <p><a target="_blank" href="https://github.com/petio-team/petio-docs/wiki/Docker">Docker installation</a></p>
+  </li></ul>
 
 Binary (executable file) guides
 **note:** this method requires a local mongodb instance to be installed
