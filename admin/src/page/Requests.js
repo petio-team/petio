@@ -198,15 +198,6 @@ class Requests extends React.Component {
         requests: this.props.user.requests,
       });
     }
-    if (Object.keys(this.state.requests).length > 0)
-      Object.keys(this.state.requests).map((key) => {
-        let req = this.state.requests[key];
-        for (let i = 0; i < req.users.length; i++) {
-          if (!this.props.api.users[req.users[i]]) {
-            Api.getUser(req.users[i]);
-          }
-        }
-      });
   }
 
   componentWillUnmount() {
