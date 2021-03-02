@@ -665,7 +665,10 @@ export async function uploadThumb(post, id) {
     let data = await api.uploadThumb(post, id);
     return data;
   } catch (err) {
-    console.log(err);
-    throw err;
+    if (err.message === "API returned status code 413") {
+      throw "File Exceeds Upload Limit!";
+    } else {
+      throw "Failed to Upload Thumb";
+    }
   }
 }

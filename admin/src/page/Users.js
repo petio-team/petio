@@ -94,6 +94,7 @@ class Users extends React.Component {
       eu_enabled: false,
       bu_error: false,
       eu_error: false,
+      custom_user_thumb: false,
     });
   }
 
@@ -363,7 +364,9 @@ class Users extends React.Component {
               this.state.activeUser.id +
               "?update=" +
               Date.now(),
+        custom_user_thumb: false,
       });
+      document.getElementById("custom_thumb_upload").value = "";
       this.props.msg({
         message: `User Thumb Updated: ${this.state.activeUser.username}`,
         type: "good",
@@ -373,6 +376,10 @@ class Users extends React.Component {
         message: err,
         type: "error",
       });
+      this.setState({
+        custom_user_thumb: false,
+      });
+      document.getElementById("custom_thumb_upload").value = "";
     }
   }
 
