@@ -190,7 +190,7 @@ class Sonarr {
     seriesData.addOptions = {
       searchForMissingEpisodes: true,
     };
-    seriesData.seriesType = type;
+    if (type) seriesData.seriesType = type;
     if (tag) seriesData.tags = [tag];
 
     try {
@@ -295,6 +295,7 @@ class Sonarr {
           );
           sonarrId = sonarrData[0].id;
         } else {
+          console.log(manual.type);
           sonarrId = await this.add(
             sonarrData[0],
             manual.path,

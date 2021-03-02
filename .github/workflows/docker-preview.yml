@@ -1,4 +1,4 @@
-name: Docker Build Dev
+name: Docker Preview Build
 
 on:
   push:
