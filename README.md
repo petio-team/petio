@@ -21,17 +21,19 @@ Allow your users to interact with media both on and off your server with this ap
 <h4>1. Instalation</h4>
 This application can be installed to run in docker or as a standalone binary that can be configured to run as a service. See our docs below for guides on different setup methods.
 
-<a target="_blank" href="https://github.com/petio-team/petio-docs/wiki/Docker">Docker installation</a> 
+<p><a target="_blank" href="https://github.com/petio-team/petio-docs/wiki/Docker">Docker installation</a></p>
 
 Binary (executable file) guides
 **note:** this method requires a local mongodb instance to be installed
-<a target="_blank" href="https://github.com/petio-team/petio-docs/wiki/Windows">Windows</a> 
-<a target="_blank" href="https://github.com/petio-team/petio-docs/wiki/Linux">Linux</a> 
-<a target="_blank" href="https://github.com/petio-team/petio-docs/wiki/MacOS">MacOS</a> 
+<ul>
+<li><a target="_blank" href="https://github.com/petio-team/petio-docs/wiki/Windows">Windows</a> </li>
+<li><a target="_blank" href="https://github.com/petio-team/petio-docs/wiki/Linux">Linux</a> </li>
+  <li><a target="_blank" href="https://github.com/petio-team/petio-docs/wiki/MacOS">MacOS</a></li>
+</ul>
 
 <h4>2. Configuring Petio</h4>
 Configuring Petio is fairly straight forward but our docs cover the process, from initial server conenction to email / Sonarr / Radarr.
-<a target="_blank" href="https://github.com/petio-team/petio-docs/wiki/Configuration">How to configure Petio</a>
+<p><a target="_blank" href="https://github.com/petio-team/petio-docs/wiki/Configuration">How to configure Petio</a></p>
 
 <h2>Frequently Asked Questions</h2>
 
