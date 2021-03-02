@@ -92,6 +92,51 @@ class FilterRow extends React.Component {
             { id: 10768, name: "War & Politics" },
             { id: 37, name: "Western" },
           ];
+    const ageRatings =
+      this.props.type === "movie_filters"
+        ? [
+            {
+              certification: "G",
+            },
+            {
+              certification: "PG-13",
+            },
+            {
+              certification: "R",
+            },
+            {
+              certification: "NC-17",
+            },
+            {
+              certification: "NR",
+            },
+            {
+              certification: "PG",
+            },
+          ]
+        : [
+            {
+              certification: "NR",
+            },
+            {
+              certification: "TV-Y",
+            },
+            {
+              certification: "TV-Y7",
+            },
+            {
+              certification: "TV-G",
+            },
+            {
+              certification: "TV-PG",
+            },
+            {
+              certification: "TV-14",
+            },
+            {
+              certification: "TV-MA",
+            },
+          ];
     let conditionType = conditions[this.props.data.condition]
       ? conditions[this.props.data.condition].type
       : "text";
@@ -185,7 +230,7 @@ class FilterRow extends React.Component {
                   onChange={this.props.inputChange}
                   value={this.props.data.value}
                 >
-                  <option value="">Select genre</option>
+                  <option value="">Select Genre</option>
                   {genres.map((genre) => {
                     return (
                       <option
@@ -193,6 +238,29 @@ class FilterRow extends React.Component {
                         value={genre.id}
                       >
                         {genre.name}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+            ) : this.props.data.condition === "age_rating" ? (
+              <div className="select-wrap">
+                <select
+                  data-type={this.props.type}
+                  data-row={this.props.row}
+                  data-item={this.props.item}
+                  name="value"
+                  onChange={this.props.inputChange}
+                  value={this.props.data.value}
+                >
+                  <option value="">Select Rating</option>
+                  {ageRatings.map((ar, i) => {
+                    return (
+                      <option
+                        key={`${fs}__${this.props.item}__ar_${i}`}
+                        value={ar.certification}
+                      >
+                        {ar.certification}
                       </option>
                     );
                   })}

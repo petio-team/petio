@@ -18,6 +18,7 @@ async function filter(item) {
   filters.data.map((f, i) => {
     let compulsoryPass = true;
     let optionalMatch = 0;
+    let hasMatched = false;
     f.rows.map((row) => {
       if (row.comparison === "and") {
         // must match
@@ -27,22 +28,30 @@ async function filter(item) {
           row.operator,
           mediaDetails
         );
+        if (filterMatch) {
+          hasMatched = true;
+        }
         if (!filterMatch) {
           compulsoryPass = false;
         }
       } else {
         // can match
+
         filterMatch = filterCompare(
           row.condition,
           row.value,
           row.operator,
           mediaDetails
         );
-        if (filterMatch) optionalMatch++;
+        if (filterMatch) {
+          hasMatched = true;
+          optionalMatch++;
+        }
       }
     });
+    console.log(hasMatched, compulsoryPass, optionalMatch, f.rows.length);
     if (
-      filterMatch &&
+      hasMatched &&
       compulsoryPass &&
       (optionalMatch > 0 || f.rows.length === 1)
     ) {
@@ -98,7 +107,7 @@ function getValue(condition, media) {
         values.push(new Date(media.release_date).getFullYear());
       break;
     case "age_rating":
-      values = false;
+      values = [media.age_rating];
       break;
     case "keyword":
       values = [];
