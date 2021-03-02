@@ -16,6 +16,7 @@ async function filter(item) {
   let filters = await Filter.findOne({ id: filterId });
   if (!mediaDetails || !filters) return false;
   filters.data.map((f, i) => {
+    if (action) return;
     let compulsoryPass = true;
     let optionalMatch = 0;
     let hasMatched = false;
