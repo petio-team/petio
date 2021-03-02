@@ -10,6 +10,7 @@
   <a href="https://discord.gg/bseGmrUd3N" target="_blank"><img src="https://img.shields.io/discord/722180802871427104?label=Discord"></a>
   <img src="https://img.shields.io/github/all-contributors/petio-team/petio?label=Contributors">
   <a href="https://www.reddit.com/r/Petio/" target="_blank"><img src="https://img.shields.io/reddit/subreddit-subscribers/petio?label=Reddit"></a>
+  <img src="https://img.shields.io/github/all-contributors/petio-team/petio?label=Contributors">
 </p>
 
 Request, review and discover companion app for plex.
