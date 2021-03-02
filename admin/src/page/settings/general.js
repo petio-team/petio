@@ -42,60 +42,60 @@ class General extends React.Component {
   }
 
   async saveEmail() {
-    await Api.saveEmailConfig({
-      user: this.state.email_user,
-      pass: this.state.email_pass,
-      server: this.state.email_server,
-      port: this.state.email_port,
-      secure: this.state.email_secure,
-      enabled: this.state.email_enabled,
-    });
-
-    this.setState({
-      isError: false,
-      isMsg: "Email settings saved!",
-    });
-    clearInterval(this.closeMsg);
-    this.closeMsg = setInterval(() => {
-      this.setState({
-        isError: false,
-        isMsg: false,
+    try {
+      await Api.saveEmailConfig({
+        user: this.state.email_user,
+        pass: this.state.email_pass,
+        server: this.state.email_server,
+        port: this.state.email_port,
+        secure: this.state.email_secure,
+        enabled: this.state.email_enabled,
       });
-    }, 3000);
+
+      this.props.msg({ message: "Email Settings Saved!", type: "good" });
+    } catch (err) {
+      console.log(err);
+      this.props.msg({
+        message: "Failed to Save Email Settings",
+        type: "error",
+      });
+    }
   }
 
   async saveBasePath() {
-    await Api.updateConfig({
-      base_path: this.state.base_path,
-    });
-    this.setState({
-      isError: false,
-      isMsg: "Base Path saved, please restart Petio!",
-    });
-    clearInterval(this.closeMsg);
-    this.closeMsg = setInterval(() => {
-      this.setState({
-        isError: false,
-        isMsg: false,
+    try {
+      await Api.updateConfig({
+        base_path: this.state.base_path,
       });
-    }, 3000);
+      this.props.msg({
+        message: "Base Path Saved, Please restart!",
+        type: "good",
+      });
+    } catch (err) {
+      console.log(err);
+      this.props.msg({
+        message: "Failed to Save Base Path",
+        type: "error",
+      });
+    }
   }
 
   async saveLoginType() {
-    await Api.updateConfig({
-      login_type: this.state.login_type,
-    });
-    this.setState({
-      isError: false,
-      isMsg: "Login Type Updated",
-    });
-    clearInterval(this.closeMsg);
-    this.closeMsg = setInterval(() => {
-      this.setState({
-        isError: false,
-        isMsg: false,
+    try {
+      await Api.updateConfig({
+        login_type: this.state.login_type,
       });
-    }, 3000);
+      this.props.msg({
+        message: "Login Type Updated",
+        type: "good",
+      });
+    } catch (err) {
+      console.log(err);
+      this.props.msg({
+        message: "Failed to Change Login Type",
+        type: "error",
+      });
+    }
   }
 
   async loadConfigs() {
@@ -112,23 +112,17 @@ class General extends React.Component {
         base_path: config.base_path ? config.base_path : "",
         login_type: config.login_type ? config.login_type : 1,
         loading: false,
-        isError: false,
-        isMsg: "Config loaded",
+      });
+      this.props.msg({
+        message: "Config Loaded",
       });
     } catch (err) {
       console.log(err);
-      this.setState({
-        loading: false,
-        isError: "Error getting config",
+      this.props.msg({
+        message: "Failed to Load Config",
+        type: "good",
       });
     }
-    clearInterval(this.closeMsg);
-    this.closeMsg = setInterval(() => {
-      this.setState({
-        isError: false,
-        isMsg: false,
-      });
-    }, 3000);
   }
 
   async testEmail() {
@@ -137,30 +131,23 @@ class General extends React.Component {
       let test = await Api.testEmail();
       console.log(test);
       if (test.result) {
-        this.setState({
-          isMsg: "Email test passed",
-          isError: false,
+        this.props.msg({
+          message: "Email Test Passed!",
+          type: "good",
         });
       } else {
-        this.setState({
-          isMsg: false,
-          isError: "Email test Failed",
+        this.props.msg({
+          message: "Email Test Failed",
+          type: "error",
         });
       }
     } catch (err) {
       console.log(err);
-      this.setState({
-        isMsg: false,
-        isError: "Email test Failed",
+      this.props.msg({
+        message: "Email Test Failed",
+        type: "error",
       });
     }
-    clearInterval(this.closeMsg);
-    this.closeMsg = setInterval(() => {
-      this.setState({
-        isError: false,
-        isMsg: false,
-      });
-    }, 3000);
   }
 
   componentDidMount() {
@@ -175,16 +162,6 @@ class General extends React.Component {
     if (this.state.loading) {
       return (
         <>
-          {this.state.isError ? (
-            <div className="setting-msg error">
-              <p>{this.state.isError}</p>
-            </div>
-          ) : null}
-          {this.state.isMsg ? (
-            <div className="setting-msg good">
-              <p>{this.state.isMsg}</p>
-            </div>
-          ) : null}
           <div className="spinner--settings">
             <Spinner />
           </div>
@@ -193,16 +170,6 @@ class General extends React.Component {
     }
     return (
       <>
-        {this.state.isError ? (
-          <div className="setting-msg error">
-            <p>{this.state.isError}</p>
-          </div>
-        ) : null}
-        {this.state.isMsg ? (
-          <div className="setting-msg good">
-            <p>{this.state.isMsg}</p>
-          </div>
-        ) : null}
         <section>
           <p className="main-title">General</p>
         </section>

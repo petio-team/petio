@@ -49,6 +49,7 @@ class Issues extends React.Component {
 
   async getIssues() {
     let issues = await Api.getIssues();
+    this.props.msg({ message: "Issues loaded" });
     this.setState({
       issues: issues,
     });
@@ -112,10 +113,17 @@ class Issues extends React.Component {
     let message = this.state.resolve_issue_comment;
     let remove = await Api.removeIssue(this.state.activeIssue._id, message);
     if (remove) {
+      this.props.msg({
+        message: `Issue Removed: ${this.state.activeIssue.title}`,
+        type: "good",
+      });
       this.closeModal("resolveIssue");
       this.getIssues();
     } else {
-      alert("Failed to remove request");
+      this.props.msg({
+        message: `Failed to Remove Issue: ${this.state.activeIssue.title}`,
+        type: "error",
+      });
     }
   }
 

@@ -23,13 +23,14 @@ class App extends React.Component {
       config: false,
       configChecked: true,
       mobMenuOpen: false,
+      pushMsg: {},
     };
 
     this.closeMsg = false;
     this.changeLogin = this.changeLogin.bind(this);
     this.checkConfig = this.checkConfig.bind(this);
     this.toggleMobMenu = this.toggleMobMenu.bind(this);
-    this.displayMessage = this.displayMessage.bind(this);
+    this.msg = this.msg.bind(this);
   }
 
   toggleMobMenu() {
@@ -80,23 +81,45 @@ class App extends React.Component {
     this.checkConfig();
   }
 
-  displayMessage(type = "msg", message = "") {
-    if (type === "msg") {
-      this.setState({
-        isError: false,
-        isMsg: message,
-      });
-    } else {
-      this.setState({
-        isError: message,
-        isMsg: false,
-      });
+  // displayMessage(type = "msg", message = "") {
+  //   if (type === "msg") {
+  //     this.setState({
+  //       isError: false,
+  //       isMsg: message,
+  //     });
+  //   } else {
+  //     this.setState({
+  //       isError: message,
+  //       isMsg: false,
+  //     });
+  //   }
+  //   clearInterval(this.closeMsg);
+  //   this.closeMsg = setInterval(() => {
+  //     this.setState({
+  //       isError: false,
+  //       isMsg: false,
+  //     });
+  //   }, 3000);
+  // }
+
+  msg(
+    data = {
+      message: String,
+      type: "info",
     }
-    clearInterval(this.closeMsg);
-    this.closeMsg = setInterval(() => {
+  ) {
+    let timestamp = +new Date();
+    let msgs = { ...this.state.pushMsg };
+    msgs[timestamp] = data;
+    this.setState({
+      pushMsg: msgs,
+    });
+
+    setInterval(() => {
+      let msgs = { ...this.state.pushMsg };
+      delete msgs[timestamp];
       this.setState({
-        isError: false,
-        isMsg: false,
+        pushMsg: msgs,
       });
     }, 3000);
   }
@@ -105,16 +128,21 @@ class App extends React.Component {
     if (this.state.error) {
       return (
         <div className="app">
-          {this.state.isError ? (
-            <div className="setting-msg error">
-              <p>{this.state.isError}</p>
-            </div>
-          ) : null}
-          {this.state.isMsg ? (
-            <div className="setting-msg good">
-              <p>{this.state.isMsg}</p>
-            </div>
-          ) : null}
+          <div className="push-msg--wrap">
+            {Object.keys(this.state.pushMsg).map((i) => {
+              let msg = this.state.pushMsg[i];
+              return (
+                <div
+                  key={msg.timestamp}
+                  className={`push-msg--item ${
+                    msg.type !== "info" ? msg.type : ""
+                  }`}
+                >
+                  {msg.message}
+                </div>
+              );
+            })}
+          </div>
           <div className="setup--wrap">
             <p className="main-title">Error</p>
             <p>Something&apos;s wrong...</p>
@@ -146,16 +174,21 @@ class App extends React.Component {
     if (this.state.config === false) {
       return (
         <div className="app">
-          {this.state.isError ? (
-            <div className="setting-msg error">
-              <p>{this.state.isError}</p>
-            </div>
-          ) : null}
-          {this.state.isMsg ? (
-            <div className="setting-msg good">
-              <p>{this.state.isMsg}</p>
-            </div>
-          ) : null}
+          <div className="push-msg--wrap">
+            {Object.keys(this.state.pushMsg).map((i) => {
+              let msg = this.state.pushMsg[i];
+              return (
+                <div
+                  key={msg.timestamp}
+                  className={`push-msg--item ${
+                    msg.type !== "info" ? msg.type : ""
+                  }`}
+                >
+                  {msg.message}
+                </div>
+              );
+            })}
+          </div>
           <div className="page-wrap">
             <Setup checkConfig={this.checkConfig} />
           </div>
@@ -165,18 +198,23 @@ class App extends React.Component {
     if (!this.state.isLoggedIn) {
       return (
         <div className="app">
-          {this.state.isError ? (
-            <div className="setting-msg error">
-              <p>{this.state.isError}</p>
-            </div>
-          ) : null}
-          {this.state.isMsg ? (
-            <div className="setting-msg good">
-              <p>{this.state.isMsg}</p>
-            </div>
-          ) : null}
+          <div className="push-msg--wrap">
+            {Object.keys(this.state.pushMsg).map((i) => {
+              let msg = this.state.pushMsg[i];
+              return (
+                <div
+                  key={msg.timestamp}
+                  className={`push-msg--item ${
+                    msg.type !== "info" ? msg.type : ""
+                  }`}
+                >
+                  {msg.message}
+                </div>
+              );
+            })}
+          </div>
           <Login
-            displayMessage={this.displayMessage}
+            msg={this.msg}
             logged_in={this.state.isLoggedIn}
             changeLogin={this.changeLogin}
           />
@@ -185,16 +223,21 @@ class App extends React.Component {
     } else {
       return (
         <div className="app">
-          {this.state.isError ? (
-            <div className="setting-msg error">
-              <p>{this.state.isError}</p>
-            </div>
-          ) : null}
-          {this.state.isMsg ? (
-            <div className="setting-msg good">
-              <p>{this.state.isMsg}</p>
-            </div>
-          ) : null}
+          <div className="push-msg--wrap">
+            {Object.keys(this.state.pushMsg).map((i) => {
+              let msg = this.state.pushMsg[i];
+              return (
+                <div
+                  key={msg.timestamp}
+                  className={`push-msg--item ${
+                    msg.type !== "info" ? msg.type : ""
+                  }`}
+                >
+                  {msg.message}
+                </div>
+              );
+            })}
+          </div>
           <HashRouter>
             <div className="mob-menu-top">
               <div className="logo-wrap">
@@ -221,32 +264,48 @@ class App extends React.Component {
               <Switch>
                 <Route exact path="/">
                   <div className="page-wrap">
-                    <Dashboard user={this.props.user} api={this.props.api} />
+                    <Dashboard
+                      user={this.props.user}
+                      api={this.props.api}
+                      msg={this.msg}
+                    />
                   </div>
                 </Route>
                 <Route path="/settings">
                   <div className="page-wrap">
-                    <Settings />
+                    <Settings msg={this.msg} />
                   </div>
                 </Route>
                 <Route path="/requests">
                   <div className="page-wrap">
-                    <Requests user={this.props.user} api={this.props.api} />
+                    <Requests
+                      user={this.props.user}
+                      api={this.props.api}
+                      msg={this.msg}
+                    />
                   </div>
                 </Route>
                 <Route path="/issues">
                   <div className="page-wrap">
-                    <Issues user={this.props.user} api={this.props.api} />
+                    <Issues
+                      user={this.props.user}
+                      api={this.props.api}
+                      msg={this.msg}
+                    />
                   </div>
                 </Route>
                 <Route path="/reviews">
                   <div className="page-wrap">
-                    <Reviews user={this.props.user} api={this.props.api} />
+                    <Reviews
+                      user={this.props.user}
+                      api={this.props.api}
+                      msg={this.msg}
+                    />
                   </div>
                 </Route>
                 <Route path="/users">
                   <div className="page-wrap">
-                    <Users api={this.props.api} />
+                    <Users api={this.props.api} msg={this.msg} />
                   </div>
                 </Route>
                 <Route path="*" exact>

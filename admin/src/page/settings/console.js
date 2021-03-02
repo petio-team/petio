@@ -95,6 +95,8 @@ class Console extends React.Component {
                     let timestamp = ts;
                     let type = data.type;
                     let message = data.log;
+                    if (typeof message === "object" && message !== null)
+                      message = JSON.stringify(message);
                     if (filterActive && !this.state[`filter_${type}`])
                       return null;
                     return (

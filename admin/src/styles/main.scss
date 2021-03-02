@@ -69,6 +69,7 @@ $grid-breakpoints: $breakpoints;
 @import "components/sessions";
 @import "components/table";
 @import "components/sonarr-radarr";
+@import "components/messages";
 
 // pages
 @import "pages/login";

@@ -26,6 +26,7 @@ class Filter extends React.Component {
     this.getFilters = this.getFilters.bind(this);
     this.removeRow = this.removeRow.bind(this);
     this.removeFilter = this.removeFilter.bind(this);
+    this.getFilters = this.getFilters.bind(this);
   }
 
   addFilter(type) {
@@ -51,6 +52,9 @@ class Filter extends React.Component {
     this.setState({
       [type]: filters,
     });
+    this.props.msg({
+      message: "New Filter Added",
+    });
   }
 
   removeFilter(type, i) {
@@ -59,6 +63,10 @@ class Filter extends React.Component {
 
     this.setState({
       [type]: filters,
+    });
+
+    this.props.msg({
+      message: "Filter Removed",
     });
   }
 
@@ -73,6 +81,9 @@ class Filter extends React.Component {
     this.setState({
       [type]: filters,
     });
+    this.props.msg({
+      message: "Condition Added",
+    });
   }
 
   removeRow(type, i, r) {
@@ -81,6 +92,10 @@ class Filter extends React.Component {
 
     this.setState({
       [type]: filters,
+    });
+
+    this.props.msg({
+      message: "Condition Removed",
     });
   }
 
@@ -188,14 +203,21 @@ class Filter extends React.Component {
         movie_filters: filters.movie_filters ? filters.movie_filters : [],
         tv_filters: filters.tv_filters ? filters.tv_filters : [],
       });
+      this.props.msg({
+        message: "Filters Loaded",
+      });
       // this.setState({})
     } catch (err) {
       console.log(err);
-      console.log("Unable to get filters");
+      this.props.msg({
+        message: "Unable to Load Filters",
+        type: "error",
+      });
     }
   }
 
   componentDidMount() {
+    console.log(this.props);
     this.getArrs();
     this.getFilters();
   }
@@ -203,10 +225,16 @@ class Filter extends React.Component {
   async saveFilters() {
     try {
       await Api.updateFilters(this.state.movie_filters, this.state.tv_filters);
-      alert("saved");
+
+      this.props.msg({
+        message: "Filters Saved",
+        type: "good",
+      });
     } catch (err) {
-      console.log(err);
-      alert("failed");
+      this.props.msg({
+        message: "Failed to Save Filters",
+        type: "error",
+      });
     }
   }
 

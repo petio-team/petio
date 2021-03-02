@@ -148,7 +148,12 @@ class Users extends React.Component {
         r_servers: radarr,
         s_servers: sonarr,
       });
+      this.props.msg({ message: "Radarr / Sonarr Configs loaded" });
     } catch (err) {
+      this.props.msg({
+        message: "Failed to load Radarr / Sonarr Configs",
+        type: "error",
+      });
       console.log(err);
       this.setState({
         r_servers: false,
@@ -170,7 +175,15 @@ class Users extends React.Component {
       this.setState({
         cu_error: newUser.error,
       });
+      this.props.msg({
+        message: `Failed to add user ${this.state.activeUser.username}`,
+        type: "error",
+      });
     } else {
+      this.props.msg({
+        message: `User added ${this.state.activeUser.username}`,
+        type: "good",
+      });
       this.closeModal("addUser");
       Api.allUsers();
     }
@@ -217,8 +230,15 @@ class Users extends React.Component {
       this.setState({
         profiles: profiles,
       });
+      this.props.msg({
+        message: `Profiles Loaded`,
+      });
     } catch (err) {
       console.log(err);
+      this.props.msg({
+        message: `Failed to Load Profiles`,
+        type: "error",
+      });
       this.setState({
         profiles: [],
       });
@@ -238,7 +258,15 @@ class Users extends React.Component {
       this.setState({
         eu_error: edited.error,
       });
+      this.props.msg({
+        message: `Failed to Update User: ${this.state.activeUser.username}`,
+        type: "error",
+      });
     } else {
+      this.props.msg({
+        message: `User Updated: ${this.state.activeUser.username}`,
+        type: "good",
+      });
       this.closeModal("editUser");
       Api.allUsers();
     }
@@ -251,7 +279,15 @@ class Users extends React.Component {
       this.setState({
         eu_error: del.error,
       });
+      this.props.msg({
+        message: `Failed to Delete User: ${this.state.activeUser.username}`,
+        type: "error",
+      });
     } else {
+      this.props.msg({
+        message: `User Deleted: ${this.state.activeUser.username}`,
+        type: "good",
+      });
       this.closeModal("editUser");
       Api.allUsers();
     }
@@ -285,7 +321,15 @@ class Users extends React.Component {
       this.setState({
         bu_error: upd.error,
       });
+      this.props.msg({
+        message: `Failed to Save Users`,
+        type: "error",
+      });
     } else {
+      this.props.msg({
+        message: `Users Bulk Updated ${this.state.activeUser.username}`,
+        type: "error",
+      });
       this.closeModal("bulkUsers");
       Api.allUsers();
     }
@@ -297,9 +341,11 @@ class Users extends React.Component {
     var fileName = this.state.custom_user_thumb.name;
     var fileNameExt = fileName.substr(fileName.lastIndexOf(".") + 1);
     if (!validExtensions.includes(fileNameExt)) {
-      alert(
-        "Only these file types are accepted : " + validExtensions.join(", ")
-      );
+      this.props.msg({
+        message:
+          "Only these file types are accepted : " + validExtensions.join(", "),
+        type: "error",
+      });
       return;
     }
     try {
@@ -318,8 +364,15 @@ class Users extends React.Component {
               "?update=" +
               Date.now(),
       });
+      this.props.msg({
+        message: `User Thumb Updated: ${this.state.activeUser.username}`,
+        type: "good",
+      });
     } catch (err) {
-      alert(err);
+      this.props.msg({
+        message: err,
+        type: "error",
+      });
     }
   }
 
@@ -470,32 +523,36 @@ class Users extends React.Component {
             ) : null
           ) : null}
           {this.state.activeUser ? (
-            this.state.activeUser.custom ? (
-              <form
-                onSubmit={this.fileUpload}
-                encType="multipart/form-data"
-                className="image-upload--wrap"
+            // this.state.activeUser.custom ? (
+            <form
+              onSubmit={this.fileUpload}
+              encType="multipart/form-data"
+              className="image-upload--wrap"
+            >
+              <div className="image-upload--inner">
+                <div
+                  className="image-upload--current"
+                  style={{
+                    backgroundImage: 'url("' + this.state.thumb_path + '")',
+                  }}
+                ></div>
+                <input
+                  type="file"
+                  id="custom_thumb_upload"
+                  name="custom_user_thumb"
+                  onChange={this.inputChange}
+                />
+              </div>
+              <button
+                className={`image-upload--submit btn btn__square ${
+                  this.state.custom_user_thumb ? "" : "disabled"
+                }`}
               >
-                <div className="image-upload--inner">
-                  <div
-                    className="image-upload--current"
-                    style={{
-                      backgroundImage: 'url("' + this.state.thumb_path + '")',
-                    }}
-                  ></div>
-                  <input
-                    type="file"
-                    id="custom_thumb_upload"
-                    name="custom_user_thumb"
-                    onChange={this.inputChange}
-                  />
-                </div>
-                <button className="image-upload--submit btn btn__square">
-                  Upload
-                </button>
-              </form>
-            ) : null
-          ) : null}
+                Upload
+              </button>
+            </form>
+          ) : // ) : null
+          null}
           {this.state.eu_error ? <p>{this.state.eu_error}</p> : null}
         </Modal>
 
@@ -560,6 +617,7 @@ class Users extends React.Component {
           profiles={this.state.profiles}
           getProfiles={this.getProfiles}
           findProfile={this.findProfile}
+          msg={this.props.msg}
         />
 
         <section>

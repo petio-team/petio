@@ -102,19 +102,19 @@ class Settings extends React.Component {
         <div className="settings--content">
           <Switch>
             <Route exact path="/settings">
-              <General />
+              <General msg={this.props.msg} />
             </Route>
             <Route path="/settings/radarr">
-              <Radarr />
+              <Radarr msg={this.props.msg} />
             </Route>
             <Route path="/settings/sonarr">
-              <Sonarr />
+              <Sonarr msg={this.props.msg} />
             </Route>
             <Route path="/settings/console">
-              <Console />
+              <Console msg={this.props.msg} />
             </Route>
             <Route path="/settings/filter">
-              <Filter />
+              <Filter msg={this.props.msg} />
             </Route>
             <Route path="*" exact>
               <section>
@@ -138,6 +138,7 @@ function SettingsContainer(props) {
       api={props.api}
       user={props.user}
       checkConfig={props.checkConfig}
+      msg={props.msg}
     />
   );
 }

@@ -45,7 +45,13 @@ class RequestCard extends React.Component {
                     className="request-user"
                   >
                     <div className="user-thumb">
-                      <img src={`/api/user/thumb/${user_id}`} />
+                      <img
+                        src={
+                          process.env.NODE_ENV === "development"
+                            ? `http://localhost:7778/user/thumb/${user_id}`
+                            : `/api/user/thumb/${user_id}`
+                        }
+                      />
                     </div>
                   </div>
                 );

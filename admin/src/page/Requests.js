@@ -344,8 +344,11 @@ class Requests extends React.Component {
   }
 
   updateReq() {
+    this.props.msg({
+      message: `Request Updated: ${this.state.activeRequest.title}`,
+      type: "good",
+    });
     this.closeModal("editRequest");
-    alert("req updated");
   }
 
   async approveReq() {
@@ -370,15 +373,34 @@ class Requests extends React.Component {
       });
     }
 
+    if (
+      this.state.activeRequest.type === "tv" &&
+      servers &&
+      !this.state.activeRequest.tvdb_id
+    ) {
+      err = "No TVDb ID Cannot add to Sonarr";
+    }
+
+    if (
+      this.state.activeRequest.type === "movie" &&
+      servers &&
+      !this.state.activeRequest.tmdb_id
+    ) {
+      err = "No TMDb ID Cannot add to Radarr";
+    }
+
     if (err) {
-      alert(err);
+      this.props.msg({ message: err, type: "error" });
       return;
     }
 
-    console.log(this.state.activeRequest, servers);
     await Api.updateRequest(this.state.activeRequest, servers);
     this.closeModal("editRequest");
     this.getRequests(true);
+    this.props.msg({
+      message: `Request Approved: ${this.state.activeRequest.title}`,
+      type: "good",
+    });
   }
 
   async removeReq() {
@@ -390,8 +412,12 @@ class Requests extends React.Component {
     if (remove) {
       this.closeModal("deleteRequest");
       this.getRequests(true);
+      this.props.msg({
+        message: `Request removed - ${this.state.activeRequest.title}`,
+        type: "good",
+      });
     } else {
-      alert("Failed to remove request");
+      this.props.msg({ message: "Failed to remove request", type: "error" });
     }
   }
 
