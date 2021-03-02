@@ -1,0 +1,23 @@
+.image-upload {
+  &--wrap {
+    padding: 10px;
+    background: rgba($grey-light, 0.1);
+    border-radius: 5px;
+  }
+
+  &--inner {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  &--current {
+    min-width: 50px;
+    min-height: 50px;
+    border-radius: 50px;
+    background: $dark-grey;
+    margin-right: 20px;
+    background-position: center;
+    background-size: cover;
+  }
+}

@@ -5,6 +5,12 @@ const http = require("follow-redirects").http;
 const logger = require("../util/logger");
 const bcrypt = require("bcryptjs");
 const { adminRequired, authRequired } = require("../middleware/auth");
+var multer = require("multer");
+const fs = require("fs");
+const path = require("path");
+const uploadPath = process.pkg
+  ? path.join(path.dirname(process.execPath), `./config/uploads`)
+  : path.join(__dirname, `../config/uploads`);
 
 router.get("/thumb/:id", async (req, res) => {
   let userData = false;
@@ -12,6 +18,11 @@ router.get("/thumb/:id", async (req, res) => {
     userData = await User.findOne({ id: req.params.id });
   } catch (err) {
     res.json({ error: err });
+    return;
+  }
+
+  if (userData.custom_thumb) {
+    res.sendFile(`${uploadPath}/${userData.custom_thumb}`);
     return;
   }
 
@@ -222,6 +233,72 @@ router.post("/delete_user", adminRequired, async (req, res) => {
     res.status(500).json({
       error: "Error deleting user",
     });
+  }
+});
+
+let storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadPath);
+  },
+  filename: function (req, file, cb) {
+    req.newThumb =
+      file.fieldname + "-" + Date.now() + path.extname(file.originalname);
+    cb(null, req.newThumb);
+  },
+});
+
+router.use((req, res, next) => {
+  if (fs.existsSync(uploadPath)) {
+    next();
+    return;
+  }
+  logger.info("ROUTE: Creating upload dir");
+  fs.mkdirSync(uploadPath);
+  logger.info("ROUTE: Upload dir created");
+  next();
+});
+
+var upload = multer({ storage }).single("thumb");
+
+router.use((req, res, next) => {
+  upload(req, res, function (err) {
+    if (err instanceof multer.MulterError) {
+      logger.log({ level: "error", message: err });
+      logger.warn("ROUTE: A Multer error occurred when uploading.");
+      res.sendStatus(500);
+      return;
+    } else if (err) {
+      logger.log({ level: "error", message: err });
+      logger.warn("ROUTE: An unknown error occurred when uploading.");
+      res.sendStatus(500);
+      return;
+    }
+    logger.verbose("ROUTE: Multer image parsed");
+    next();
+  });
+});
+
+router.post("/thumb/:id", adminRequired, async (req, res) => {
+  if (!req.params.id) {
+    logger.warn("ROUTE: No user ID");
+    res.sendStatus(400);
+    return;
+  }
+  try {
+    await User.findOneAndUpdate(
+      { id: req.params.id },
+      {
+        $set: {
+          custom_thumb: req.newThumb,
+        },
+      },
+      { useFindAndModify: false }
+    );
+    res.sendStatus(200);
+  } catch (err) {
+    logger.log({ level: "error", message: err });
+    logger.warn("ROUTE: Failed to update user thumb in db");
+    res.sendStatus(500);
   }
 });
 

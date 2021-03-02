@@ -283,7 +283,8 @@ class LibraryUpdate {
               contentChangedAt: lib.contentChangedAt,
               hidden: lib.hidden,
             },
-          }
+          },
+          { useFindAndModify: false }
         );
       } catch (err) {
         logger.log("error", `LIB CRON: Error`);

@@ -87,3 +87,17 @@ export function del(path, options = {}) {
   };
   return fetch(API_URL + path, mergedOptions).then(parseResponse);
 }
+
+export function upload(path, data, options = {}) {
+  const mergedOptions = {
+    credentials: "include",
+    method: "POST",
+    ...options,
+    headers: {
+      ...maybeGetAuthHeader(),
+      ...options.headers,
+    },
+    body: data,
+  };
+  return fetch(API_URL + path, mergedOptions).then(parseResponse);
+}

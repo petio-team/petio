@@ -45,7 +45,14 @@ class Profile extends React.Component {
                 rel="noreferrer"
                 className="thumb"
                 style={{
-                  backgroundImage: "url(" + this.props.user.current.thumb + ")",
+                  backgroundImage:
+                    process.env.NODE_ENV === "development"
+                      ? 'url("http://localhost:7778/user/thumb/' +
+                        this.props.user.current.id +
+                        '")'
+                      : 'url("/api/user/thumb/' +
+                        this.props.user.current.id +
+                        '")',
                   color: "red",
                 }}
               ></a>

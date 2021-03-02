@@ -53,7 +53,7 @@ router.post("/", async (req, res) => {
 
   // check for existing jwt
   try {
-    const user = authenticate(req);
+    const user = await authenticate(req);
     success(user);
     logger.log("info", `LOGIN: Request User: ${user.username}`);
     return;

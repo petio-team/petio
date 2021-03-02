@@ -17,6 +17,7 @@ const FriendSchema = mongoose.Schema(
     custom: Boolean,
     disabled: Boolean,
     quotaCount: Number,
+    custom_thumb: String,
   },
   { collection: "friends" }
 );

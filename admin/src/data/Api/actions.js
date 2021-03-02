@@ -659,3 +659,13 @@ export async function getFilters() {
     throw err;
   }
 }
+
+export async function uploadThumb(post, id) {
+  try {
+    let data = await api.uploadThumb(post, id);
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+}

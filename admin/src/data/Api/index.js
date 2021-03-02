@@ -44,6 +44,7 @@ import {
   removeIssue,
   updateFilters,
   getFilters,
+  uploadThumb,
 } from "./actions";
 
 export default {
@@ -92,4 +93,5 @@ export default {
   removeIssue,
   updateFilters,
   getFilters,
+  uploadThumb,
 };

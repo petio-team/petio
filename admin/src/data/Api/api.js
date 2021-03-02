@@ -1,4 +1,4 @@
-import { get, post } from "../http";
+import { get, post, upload } from "../http";
 
 export async function popular() {
   return get("/trending");
@@ -202,4 +202,8 @@ export function updateFilters(movie, tv) {
 
 export function getFilters() {
   return get(`/filter`);
+}
+
+export function uploadThumb(data, id) {
+  return upload(`/user/thumb/${id}`, data);
 }
