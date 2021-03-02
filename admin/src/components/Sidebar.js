@@ -49,7 +49,12 @@ class Sidebar extends React.Component {
               <div
                 className="thumb"
                 style={{
-                  backgroundImage: "url(" + user.thumb + ")",
+                  backgroundImage:
+                    process.env.NODE_ENV === "development"
+                      ? 'url("http://localhost:7778/user/thumb/' +
+                        user.id +
+                        '")'
+                      : 'url("/api/user/thumb/' + user.id + '")',
                   color: "red",
                 }}
               ></div>
