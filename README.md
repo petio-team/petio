@@ -33,10 +33,6 @@ Binary (executable file) guides
 Configuring Petio is fairly straight forward but our docs cover the process, from initial server conenction to email / Sonarr / Radarr.
 <a target="_blank" href="https://github.com/petio-team/petio-docs/wiki/Configuration">How to configure Petio</a>
 
-Read our install instructions and then visit `http://localhost:7777/admin/` to begin the setup wizard.
-
-To build from source run `make run` requires node 14 or higher
-
 <h2>Frequently Asked Questions</h2>
 
 <h2>Credits</h2>
