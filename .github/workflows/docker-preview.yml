@@ -3,7 +3,7 @@ name: Docker Build Dev
 on:
   push:
     branches:
-      - dev
+      - preview
 jobs:
   docker-aio:
     name: Docker Preview Build
