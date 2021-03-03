@@ -101,23 +101,35 @@ class Sonarr {
       return false;
     }
     if (!this.config.active && !test) {
-      logger.log("warn", "SERVICE - SONARR: Sonarr not enabled");
+      logger.log(
+        "warn",
+        `SERVICE - SONARR: [${this.config.title}] Sonarr not enabled`
+      );
       return false;
     }
     try {
       let check = await this.get("system/status");
       if (check.error) {
-        logger.log("warn", "SERVICE - SONARR: ERR Connection failed");
+        logger.log(
+          "warn",
+          `SERVICE - SONARR: [${this.config.title}] ERR Connection failed`
+        );
         return false;
       }
       if (check) {
         return true;
       } else {
-        logger.log("warn", "SERVICE - SONARR: ERR Connection failed");
+        logger.log(
+          "warn",
+          `SERVICE - SONARR: [${this.config.title}] ERR Connection failed`
+        );
         return false;
       }
     } catch (err) {
-      logger.log("warn", "SERVICE - SONARR: ERR Connection failed");
+      logger.log(
+        "warn",
+        `SERVICE - SONARR: [${this.config.title}] ERR Connection failed`
+      );
       return false;
     }
   }
@@ -200,7 +212,10 @@ class Sonarr {
     } catch (err) {
       console.log(err);
       logger.log({ level: "error", message: err });
-      logger.log("error", `SERVICE - SONARR: Unable to add series`);
+      logger.log(
+        "error",
+        `SERVICE - SONARR: [${this.config.title}] Unable to add series`
+      );
       logger.log({ level: "error", message: err });
       return false;
     }

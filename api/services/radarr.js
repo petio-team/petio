@@ -107,17 +107,26 @@ class Radarr {
     try {
       let check = await this.get("system/status");
       if (check.error) {
-        logger.log("warn", "SERVICE - RADARR: ERR Connection failed");
+        logger.log(
+          "warn",
+          `SERVICE - RADARR: [${this.config.title}] ERR Connection failed`
+        );
         return false;
       }
       if (check) {
         return check;
       } else {
-        logger.log("warn", "SERVICE - RADARR: ERR Connection failed");
+        logger.log(
+          "warn",
+          `SERVICE - RADARR: [${this.config.title}] ERR Connection failed`
+        );
         return false;
       }
     } catch (err) {
-      logger.log("warn", "SERVICE - RADARR: ERR Connection failed");
+      logger.log(
+        "warn",
+        `SERVICE - RADARR: [${this.config.title}] ERR Connection failed`
+      );
       return false;
     }
   }
@@ -204,7 +213,10 @@ class Radarr {
       }
       return add.id;
     } catch (err) {
-      logger.log("warn", `SERVICE - RADARR: Unable to add movie`);
+      logger.log(
+        "warn",
+        `SERVICE - RADARR: [${this.config.title}] Unable to add movie`
+      );
       logger.log({ level: "error", message: err });
       throw err;
     }
@@ -241,7 +253,10 @@ class Radarr {
         // Loop for all servers default
         for (let server of this.fullConfig) {
           if (!server.active) {
-            logger.log("warn", `SERVICE - RADARR: Server not active`);
+            logger.log(
+              "warn",
+              `SERVICE - RADARR: [${this.config.title}] Server not active`
+            );
             return;
           }
 
