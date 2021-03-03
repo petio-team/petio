@@ -25,4 +25,5 @@ CMD [ "node", "petio.js" ]
 VOLUME /app/api/config
 EXPOSE 7777
 COPY --from=builder /app /app
+WORKDIR /app
 LABEL org.opencontainers.image.vendor=Petio
