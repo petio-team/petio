@@ -33,8 +33,10 @@ export function getUser(token) {
     .then((str) => new window.DOMParser().parseFromString(str, "text/xml"));
 }
 
-export function getServers(token) {
-  let url = `https://plex.tv/pms/resources?includeHttps=1&X-Plex-Token=${token}`;
+export function getServers(token, ssl = false) {
+  let url = `https://plex.tv/pms/resources?${
+    ssl ? "includeHttps=1&" : ""
+  }X-Plex-Token=${token}`;
   let method = "get";
   let headers = plexHeaders;
   return process(url, headers, method)

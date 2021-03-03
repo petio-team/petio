@@ -31,6 +31,22 @@
       pointer-events: none;
     }
 
+    .server-lock {
+      margin-left: 10px;
+
+      svg {
+        height: 12px;
+      }
+
+      &.secure {
+        color: $good;
+      }
+
+      &.insecure {
+        color: $bad;
+      }
+    }
+
     .server-icon {
       height: 40px;
       width: 40px;
@@ -103,8 +119,11 @@
       pointer-events: none;
 
       &.server-loc {
-        font-size: 12px;
+        font-size: 10px;
         text-transform: none;
+        word-break: break-all;
+        line-height: 1.1;
+        max-width: 150px;
       }
     }
 
