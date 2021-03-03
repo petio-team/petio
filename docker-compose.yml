@@ -14,6 +14,7 @@ services:
     volumes:
       - ./config:/app/api/config
       - ./logs:/app/logs
+    user: "1000:1000"
 
   mongo:
     image: mongo:latest
@@ -25,3 +26,4 @@ services:
       - petio-network
     volumes:
       - ./db:/data/db
+    user: "1000:1000"
