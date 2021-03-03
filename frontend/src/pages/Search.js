@@ -24,7 +24,7 @@ class Search extends React.Component {
   }
 
   handleChange(e) {
-    if (e.currentTarget.value.length > 2) {
+    if (e.currentTarget.value.length > 1) {
       let term = e.currentTarget.value;
       this.setState({
         isLoading: true,

@@ -18,7 +18,7 @@ const cacheMiddleware = new ExpressCache(
 
 router.get("/:term", async (req, res) => {
   try {
-    let data = await search(req.params.term.replace(/[^a-zA-Z ]/g, ""));
+    let data = await search(req.params.term.replace(/[^a-zA-Z0-9 ]/g, ""));
     res.json(data);
   } catch (err) {
     console.log(err);
