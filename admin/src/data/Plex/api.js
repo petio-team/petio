@@ -34,7 +34,7 @@ export function getUser(token) {
 }
 
 export function getServers(token) {
-  let url = `https://plex.tv/pms/resources?X-Plex-Token=${token}`;
+  let url = `https://plex.tv/pms/resources?includeHttps=1&X-Plex-Token=${token}`;
   let method = "get";
   let headers = plexHeaders;
   return process(url, headers, method)
