@@ -1,5 +1,5 @@
 import React from "react";
-import { withRouter, Link } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import Api from "../data/Api";
 import { LazyLoadImage } from "react-lazy-load-image-component";
@@ -49,7 +49,6 @@ class TvCard extends React.Component {
           className={"card type--movie-tv "}
         >
           <div className="card--inner">
-            <Link to={`/series/${id}`} className="full-link"></Link>
             <div className="image-wrap">
               <div className="no-poster"></div>
             </div>
@@ -97,8 +96,6 @@ class TvCard extends React.Component {
         }
       >
         <div className="card--inner">
-          <Link to={`/series/${series.id}`} className="full-link"></Link>
-
           <div className="image-wrap">
             {this.props.progress ? (
               <div className="session--duration">

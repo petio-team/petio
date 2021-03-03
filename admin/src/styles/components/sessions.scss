@@ -2,6 +2,10 @@
   display: flex;
   width: 100%;
   margin-bottom: 20px;
+  background: rgba($grey-light, 0.1);
+  padding: 10px;
+  border-radius: 5px;
+  transition: background 0.3s ease;
 
   &--media {
     width: 100px;
@@ -97,7 +101,7 @@
     width: 100%;
 
     @include media-breakpoint-up(lg) {
-      padding-left: 20px;
+      padding-left: 10px;
     }
 
     p:not(.session--title) {
@@ -105,11 +109,12 @@
       font-size: 10px;
       font-weight: 500;
       line-height: 1.2;
+      display: flex;
+      flex-wrap: wrap;
     }
 
     p {
       strong {
-        margin-top: 10px;
         font-size: 12px;
         display: block;
       }
@@ -144,14 +149,41 @@
     font-size: 14px;
     font-weight: 600;
     margin: 0;
+    width: 100%;
   }
 
   &--playback {
     margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+
+    &--video {
+      width: calc(50% - 5px);
+      margin-right: 5px;
+      margin-bottom: 10px;
+    }
+    &--audio {
+      width: calc(50% - 5px);
+      margin-left: 5px;
+      margin-bottom: 10px;
+    }
+
+    &--player {
+      width: 100%;
+    }
+
+    &--video,
+    &--audio,
+    &--player {
+      padding: 8px;
+      background: rgba($grey-light, 0.1);
+      border-radius: 5px;
+    }
   }
 
   &--label {
     margin-right: 5px;
+    font-weight: 700;
   }
 
   &--toggle {
@@ -194,6 +226,8 @@
 .collapsed {
   .session {
     width: auto;
+    padding: 0;
+    background: rgba($grey-light, 0);
     &--info {
       display: none;
     }
