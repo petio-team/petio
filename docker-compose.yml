@@ -26,4 +26,3 @@ services:
       - petio-network
     volumes:
       - ./db:/data/db
-    user: "1000:1000"
