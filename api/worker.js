@@ -16,7 +16,7 @@ class Worker {
     });
 
     // Runs every 30 mins
-    this.partial = new CronJob("0 */1 * * * *", function () {
+    this.partial = new CronJob("0 */30 * * * *", function () {
       const d = new Date();
       logger.log("info", `CRONW: Partial Scan Started @ ${d.toDateString()}`);
       run(2);

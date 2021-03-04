@@ -127,9 +127,6 @@ class Main {
   }
 
   async restart() {
-    // logger.log("info", "API: Restarting server");
-    // this.cron.stop();
-    // logger.log("verbose", "API: Stopped crons");
     this.server.close();
     logger.log("verbose", "API: Server stopped");
     this.config = getConfig();
@@ -180,13 +177,6 @@ class Main {
 
   async start() {
     const libUpdate = new LibraryUpdate();
-    // logger.log("verbose", `API: Registering Full Scan job`);
-    // this.cron.start();
-    // logger.log("verbose", `API: Registering Partial Scan job`);
-    // this.partial.start();
-    // logger.log("verbose", `API: Registering Quota reset job`);
-    // this.resetQuotas.start();
-    // logger.log("verbose", `API: Running init scan`);
     libUpdate.run();
   }
 
