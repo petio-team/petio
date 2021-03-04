@@ -197,11 +197,13 @@ class Actor extends React.Component {
               <section>
                 <div className="person--bio">
                   <h3 className="sub-title mb--1">Biography</h3>
-                  <div className={`bio ${this.state.bioOpen ? "open" : ""}`}>
-                    {personData.biography.split("\n").map((str, i) => (
-                      <p key={`bio-${i}`}>{str}</p>
-                    ))}
-                  </div>
+                  {personData.biography ? (
+                    <div className={`bio ${this.state.bioOpen ? "open" : ""}`}>
+                      {personData.biography.split("\n").map((str, i) => (
+                        <p key={`bio-${i}`}>{str}</p>
+                      ))}
+                    </div>
+                  ) : null}
                   <p
                     onClick={this.toggleBio}
                     className="person--bio--read-more"
