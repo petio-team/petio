@@ -1,7 +1,9 @@
 version: "3"
+
 networks:
   petio-network:
     driver: bridge
+
 services:
   petio:
     image: ghcr.io/petio-team/petio:latest
@@ -11,18 +13,19 @@ services:
       - "7777:7777"
     networks:
       - petio-network
+    user: "1000:1000"
+    environment:
+      - TZ=Etc/UTC
     volumes:
       - ./config:/app/api/config
       - ./logs:/app/logs
-    user: "1000:1000"
 
   mongo:
     image: mongo:latest
     container_name: "mongo"
     hostname: mongo
-    ports:
-      - "27017:27017"
     networks:
       - petio-network
+    user: "1000:1000"
     volumes:
       - ./db:/data/db

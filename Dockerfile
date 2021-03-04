@@ -1,29 +1,42 @@
-FROM node:14.15.1-alpine3.12 as builder
+FROM --platform=linux/amd64 node:14.15.1-alpine3.12 as builder
 
 RUN apk add --no-cache git
-COPY ./petio.js /app/petio.js
-COPY ./router.js /app/router.js
-COPY ./package.json /app/package.json
-WORKDIR /app
-RUN npm install
-COPY ./frontend/ /app/frontend/
-COPY ./admin/ /app/admin/
-COPY ./api/ /app/api/
-WORKDIR /app/frontend
-RUN npm ci \
-  && npm run build
-WORKDIR /app/admin
-RUN npm ci \
-  && npm run build
-WORKDIR /app/api
-RUN npm install
-WORKDIR /app
-RUN mkdir views && mv frontend/build views/frontend && mv admin/build views/admin && rm -rf frontend && rm -rf admin
+COPY ./ /source/
+RUN mkdir /build && \
+    cp /source/petio.js /build/ && \
+    cp /source/router.js /build/ && \
+    cp /source/package.json /build/ && \
+    cd /build && \
+    npm install && \
+    cp -R /source/frontend /build/ && \
+    cp -R /source/admin /build/ && \
+    cp -R /source/api /build/ && \
+    cd /build/frontend && \
+    npm ci && npm run build && \
+    cd /build/admin && \
+    npm ci && npm run build && \
+    cd /build/api && \
+    npm install && \
+    cd /build && \
+    mkdir /build/views && \
+    mv /build/frontend/build /build/views/frontend && rm -rf /build/frontend && \
+    mv /build/admin/build /build/views/admin && rm -rf /build/admin && \
+    chmod -R u=rwX,go=rX /build
 
-FROM node:14.15.1-alpine3.12
-CMD [ "node", "petio.js" ]
-VOLUME /app/api/config
+
+FROM alpine:3.13
+
 EXPOSE 7777
-COPY --from=builder /app /app
+VOLUME ["/app/api/config", "/app/logs"]
 WORKDIR /app
-LABEL org.opencontainers.image.vendor=Petio
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD [ "node", "petio.js" ]
+
+RUN apk add --no-cache nodejs tzdata tini
+
+COPY --from=builder /build/ /app/
+
+LABEL org.opencontainers.image.vendor="petio-team"
+LABEL org.opencontainers.image.url="https://github.com/petio-team/petio"
+LABEL org.opencontainers.image.documentation="https://github.com/petio-team/petio-docs/wiki"
+LABEL org.opencontainers.image.licenses="MIT"
