@@ -1,10 +1,11 @@
 const express = require("express");
 const path = require("path");
 const app = express();
-const API = require("./api/app");
-const router = require("./router");
 const fs = require("fs");
 const logger = require("./api/util/logger");
+const cluster = require("cluster");
+const numCPUs = require("os").cpus().length;
+const Worker = require("./api/worker");
 
 class Wrapper {
   // Start Main Wrapper
@@ -33,8 +34,22 @@ class Wrapper {
     }
   }
 
+  async workers() {
+    if (cluster.isMaster) {
+      logger.log("info", `WRAPPER: Starting Master Worker - ${process.pid}`);
+      this.init();
+      cluster.fork();
+    } else {
+      logger.log("info", `WRAPPER: Starting Cron Worker - ${process.pid}`);
+      new Worker().startCrons();
+    }
+  }
+
   async init() {
-    logger.log("info", `ROUTER: Starting Petio wrapper`);
+    logger.log("info", `WRAPPER: Starting Petio wrapper`);
+    logger.log("info", `WRAPPER: OS has ${numCPUs} CPU(s)`);
+    const API = require("./api/app");
+    const router = require("./router");
     process.on("uncaughtException", function (err) {
       if (err.code === "EADDRINUSE") {
         logger.error(
@@ -72,4 +87,4 @@ class Wrapper {
 }
 
 const wrapper = new Wrapper();
-wrapper.init();
+wrapper.workers();

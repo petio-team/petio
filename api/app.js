@@ -47,25 +47,6 @@ class Main {
   constructor() {
     logger.log("info", `API: Petio API Version ${pjson.version} alpha`);
     logger.log("info", "API: API Starting");
-    // Runs every night at 00:00
-    this.cron = new CronJob("0 0 * * *", function () {
-      const d = new Date();
-      logger.log("info", `CRON: Full Scan Started @ ${d.toDateString()}`);
-      new LibraryUpdate().run();
-    });
-
-    // Runs every 30 mins
-    this.partial = new CronJob("0 */30 * * * *", function () {
-      const d = new Date();
-      logger.log("info", `CRON: Partial Scan Started @ ${d.toDateString()}`);
-      new LibraryUpdate().partial();
-    });
-
-    // Every Sunday at 11pm
-    this.resetQuotas = new CronJob("0 11 * * sun", function () {
-      logger.log("info", "CRON: Quotas Cleared");
-      new QuotaSystem().reset();
-    });
 
     if (process.pkg) {
       logger.log("verbose", "API: Detected pkg env");
@@ -146,9 +127,9 @@ class Main {
   }
 
   async restart() {
-    logger.log("info", "API: Restarting server");
-    this.cron.stop();
-    logger.log("verbose", "API: Stopped crons");
+    // logger.log("info", "API: Restarting server");
+    // this.cron.stop();
+    // logger.log("verbose", "API: Stopped crons");
     this.server.close();
     logger.log("verbose", "API: Server stopped");
     this.config = getConfig();
@@ -199,13 +180,13 @@ class Main {
 
   async start() {
     const libUpdate = new LibraryUpdate();
-    logger.log("verbose", `API: Registering Full Scan job`);
-    this.cron.start();
-    logger.log("verbose", `API: Registering Partial Scan job`);
-    this.partial.start();
-    logger.log("verbose", `API: Registering Quota reset job`);
-    this.resetQuotas.start();
-    logger.log("verbose", `API: Running init scan`);
+    // logger.log("verbose", `API: Registering Full Scan job`);
+    // this.cron.start();
+    // logger.log("verbose", `API: Registering Partial Scan job`);
+    // this.partial.start();
+    // logger.log("verbose", `API: Registering Quota reset job`);
+    // this.resetQuotas.start();
+    // logger.log("verbose", `API: Running init scan`);
     libUpdate.run();
   }
 

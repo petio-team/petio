@@ -109,6 +109,7 @@ class LibraryUpdate {
     );
     this.execMail();
     logger.log("info", "LIB CRON: Partial Scan Complete");
+    return;
   }
 
   async scan() {
