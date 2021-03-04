@@ -93,7 +93,12 @@ class TvCard extends React.Component {
     let series = this.props.api.series_lookup[id];
     if (!series) {
       return (
-        <div ref={this.card} key={id} data-key={id} className={"card type--movie-tv "}>
+        <div
+          ref={this.card}
+          key={id}
+          data-key={id}
+          className={"card type--movie-tv "}
+        >
           <div className="card--inner">
             <Link to={`/series/${id}`} className="full-link"></Link>
             <div className="image-wrap">
@@ -119,22 +124,41 @@ class TvCard extends React.Component {
       <div className="no-poster"></div>
     );
     return (
-      <div ref={this.card} key={series.id} data-key={series.id} className={`card type--movie-tv ${series.on_server ? "on-server" : ""} ${this.props.user.requests[series.id] ? "requested" : ""}`}>
+      <div
+        ref={this.card}
+        key={series.id}
+        data-key={series.id}
+        className={`card type--movie-tv ${
+          series.on_server ? "on-server" : ""
+        } ${this.props.user.requests[series.id] ? "requested" : ""}`}
+      >
         <div className="card--inner">
           <Link to={`/series/${series.id}`} className="full-link"></Link>
           {!this.props.user.requests[series.id] && !series.on_server ? (
-            <div className="quick-req" title="Request now" onClick={this.request}>
+            <div
+              className="quick-req"
+              title="Request now"
+              onClick={this.request}
+            >
               <RequestIcon />
             </div>
           ) : null}
           <div className="image-wrap">
-            {this.props.popular_count ? <p className="popular-card--count">{this.props.popular_count}</p> : null}
+            {this.props.popular_count ? (
+              <p className="popular-card--count">{this.props.popular_count}</p>
+            ) : null}
             {img}
           </div>
           <div className="text-wrap">
             <p className="title">
               {series.name}
-              <span className="year">{this.props.character ? this.props.character : "(" + new Date(series.first_air_date).getFullYear() + ")"}</span>
+              <span className="year">
+                {this.props.character
+                  ? this.props.character
+                  : series.first_air_date
+                  ? "(" + new Date(series.first_air_date).getFullYear() + ")"
+                  : null}
+              </span>
             </p>
           </div>
         </div>

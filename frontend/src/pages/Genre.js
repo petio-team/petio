@@ -180,7 +180,7 @@ class Genre extends React.Component {
     this.getResults();
     setTimeout(() => {
       this.getResults(2);
-    }, 1000);
+    }, 200);
   }
 
   componentDidUpdate() {
