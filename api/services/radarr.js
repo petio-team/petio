@@ -242,6 +242,13 @@ class Radarr {
               `SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`
             );
           }
+          await Request.findOneAndUpdate(
+            {
+              requestId: job.requestId,
+            },
+            { $push: { radarrId: { [this.config.uuid]: radarrId } } },
+            { useFindAndModify: false }
+          );
         } catch (err) {
           logger.log(
             "warn",
