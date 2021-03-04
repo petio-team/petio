@@ -2,8 +2,7 @@ import React from "react";
 import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import Api from "../data/Api";
-// import RequestCard from "../components/RequestCard";
-// import Carousel from "../components/Carousel";
+import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import { ReactComponent as MovieIcon } from "../assets/svg/movie.svg";
@@ -104,8 +103,8 @@ class Requests extends React.Component {
       return (
         <div className="requests-page">
           <h1 className="main-title">Requests</h1>
-          <div className="request-section">
-            <p className="sub-title">Loading...</p>
+          <div className="spinner">
+            <Spinner />
           </div>
         </div>
       );

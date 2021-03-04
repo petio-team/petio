@@ -112,9 +112,10 @@ function getValue(condition, media) {
       break;
     case "keyword":
       values = [];
-      media.keywords.results.map((kw) => {
-        values.push(kw.name);
-      });
+      if (media.keywords.results)
+        media.keywords.results.map((kw) => {
+          values.push(kw.name);
+        });
   }
   return values;
 }

@@ -1,11 +1,15 @@
 import React from "react";
 import CarouselLoading from "../components/CarouselLoading";
 import CarouselLoadingPerson from "../components/CarouselLoadingPerson";
+import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
 
 class MovieShowLoading extends React.Component {
   render() {
     return (
       <div className="media-wrap">
+        <div className="spinner">
+          <Spinner />
+        </div>
         <div className="media-top">
           <div className="media-backdrop">
             <div className="no-backdrop"></div>

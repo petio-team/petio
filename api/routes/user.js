@@ -21,12 +21,11 @@ router.get("/thumb/:id", async (req, res) => {
     return;
   }
 
-  if (userData.custom_thumb) {
-    res.sendFile(`${uploadPath}/${userData.custom_thumb}`);
-    return;
-  }
-
   if (userData) {
+    if (userData.custom_thumb) {
+      res.sendFile(`${uploadPath}/${userData.custom_thumb}`);
+      return;
+    }
     let url = userData.thumb;
 
     var options = {
