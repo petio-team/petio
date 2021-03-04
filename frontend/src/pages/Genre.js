@@ -178,7 +178,9 @@ class Genre extends React.Component {
 
   componentDidMount() {
     this.getResults();
-    this.getResults(2);
+    setTimeout(() => {
+      this.getResults(2);
+    }, 1000);
   }
 
   componentDidUpdate() {

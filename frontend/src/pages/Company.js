@@ -23,8 +23,10 @@ class Company extends React.Component {
 
   componentDidMount() {
     this.getResults();
-    this.getResults(2);
     this.getDetails();
+    setTimeout(() => {
+      this.getResults(2);
+    }, 1000);
   }
 
   componentDidUpdate() {
