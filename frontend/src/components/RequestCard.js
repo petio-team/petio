@@ -14,7 +14,7 @@ class RequestCard extends React.Component {
         alt={request.title}
       />
     ) : (
-      <div className="no-poster"></div>
+      <img src={`/images/no-poster.jpg`} alt={request.title} />
     );
     let type = this.props.user.requests[request.id].type;
 

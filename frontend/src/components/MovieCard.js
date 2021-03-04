@@ -93,7 +93,12 @@ class MovieCard extends React.Component {
     // Loading state
     if (!movie) {
       return (
-        <div ref={this.card} key={id} data-key={id} className={"card type--movie-tv "}>
+        <div
+          ref={this.card}
+          key={id}
+          data-key={id}
+          className={"card type--movie-tv "}
+        >
           <div className="card--inner">
             <Link to={`/movie/${id}`} className="full-link"></Link>
             <div className="image-wrap">
@@ -116,26 +121,45 @@ class MovieCard extends React.Component {
         // effect="blur"
       />
     ) : (
-      <div className="no-poster"></div>
+      <LazyLoadImage src={"/images/no-poster.jpg"} alt={movie.title} />
     );
     // Final render
     return (
-      <div ref={this.card} key={movie.id} data-key={movie.id} className={`card type--movie-tv ${movie.on_server ? "on-server" : ""} ${this.props.user.requests[movie.id] ? "requested" : ""}`}>
+      <div
+        ref={this.card}
+        key={movie.id}
+        data-key={movie.id}
+        className={`card type--movie-tv ${movie.on_server ? "on-server" : ""} ${
+          this.props.user.requests[movie.id] ? "requested" : ""
+        }`}
+      >
         <div className="card--inner">
           <Link to={`/movie/${movie.id}`} className="full-link"></Link>
           {!this.props.user.requests[movie.id] && !movie.on_server ? (
-            <div className="quick-req" title="Request now" onClick={this.request}>
+            <div
+              className="quick-req"
+              title="Request now"
+              onClick={this.request}
+            >
               <RequestIcon />
             </div>
           ) : null}
           <div className="image-wrap">
-            {this.props.popular_count ? <p className="popular-card--count">{this.props.popular_count}</p> : null}
+            {this.props.popular_count ? (
+              <p className="popular-card--count">{this.props.popular_count}</p>
+            ) : null}
             {img}
           </div>
           <div className="text-wrap">
             <p className="title" title={movie.title}>
               {movie.title}
-              <span className="year">{this.props.character ? this.props.character : movie.release_date ? "(" + new Date(movie.release_date).getFullYear() + ")" : null}</span>
+              <span className="year">
+                {this.props.character
+                  ? this.props.character
+                  : movie.release_date
+                  ? "(" + new Date(movie.release_date).getFullYear() + ")"
+                  : null}
+              </span>
             </p>
           </div>
         </div>

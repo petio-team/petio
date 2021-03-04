@@ -121,7 +121,7 @@ class TvCard extends React.Component {
         // effect="blur"
       />
     ) : (
-      <div className="no-poster"></div>
+      <LazyLoadImage src={"/images/no-poster.jpg"} alt={series.title} />
     );
     return (
       <div

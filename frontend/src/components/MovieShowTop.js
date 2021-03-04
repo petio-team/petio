@@ -123,7 +123,14 @@ class MovieShowTop extends React.Component {
                 effect="blur"
                 key={`${this.props.mediaData.title}__poster`}
               />
-            ) : null}
+            ) : (
+              <LazyLoadImage
+                src={"/images/no-poster.jpg"}
+                alt={this.props.mediaData.title}
+                effect="blur"
+                key={`${this.props.mediaData.title}__nposter`}
+              />
+            )}
           </div>
         </div>
         <div className="media-details">
