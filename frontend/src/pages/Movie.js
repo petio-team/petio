@@ -23,6 +23,7 @@ class Movie extends React.Component {
       related: false,
       trailer: false,
       reviewOpen: false,
+      requestPending: false,
     };
 
     this.getMovie = this.getMovie.bind(this);
@@ -93,6 +94,9 @@ class Movie extends React.Component {
         return;
       }
     }
+    this.setState({
+      requestPending: true,
+    });
     let request = {
       id: movie.id,
       imdb_id: movie.imdb_id,
@@ -116,6 +120,9 @@ class Movie extends React.Component {
         type: "error",
       });
     }
+    this.setState({
+      requestPending: false,
+    });
   }
 
   openReview() {
@@ -227,6 +234,7 @@ class Movie extends React.Component {
           requested={this.state.requested}
           request={this.request}
           showTrailer={this.showTrailer}
+          requestPending={this.state.requestPending}
         />
         <div className="media-content">
           <MovieShowOverview
@@ -241,6 +249,7 @@ class Movie extends React.Component {
             requested={this.state.requested}
             request={this.request}
             trailer={this.state.trailer}
+            requestPending={this.state.requestPending}
           />
           <section>
             <h3 className="sub-title mb--1">Cast</h3>

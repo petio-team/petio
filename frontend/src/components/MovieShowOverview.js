@@ -5,6 +5,7 @@ import { ReactComponent as ResIconHd } from "../assets/svg/720p.svg";
 import { ReactComponent as ResIconFHd } from "../assets/svg/1080p.svg";
 import { ReactComponent as ResIconUHd } from "../assets/svg/4k.svg";
 import { ReactComponent as StarIcon } from "../assets/svg/star.svg";
+import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
 
 import { ReactComponent as RequestIcon } from "../assets/svg/request.svg";
 import { ReactComponent as ReportIcon } from "../assets/svg/report.svg";
@@ -155,7 +156,12 @@ class MovieShowOverview extends React.Component {
     let userRating = "Not Reviewed";
     let userRatingVal = 0;
 
-    let requestBtn = this.props.mediaData.on_server ? (
+    let requestBtn = this.props.requestPending ? (
+      <button className="btn btn__square pending">
+        <Spinner />
+        Request
+      </button>
+    ) : this.props.mediaData.on_server ? (
       isIOS ? (
         <a
           href={`plex://preplay/?metadataKey=%2Flibrary%2Fmetadata%2F${this.props.mediaData.on_server.ratingKey}&metadataType=1&server=${this.props.mediaData.on_server.serverKey}`}

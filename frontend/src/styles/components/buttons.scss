@@ -123,6 +123,21 @@ button {
     }
   }
 
+  &.pending {
+    svg {
+      filter: brightness(0);
+      margin-right: 5px !important;
+      height: 15px;
+      width: 15px;
+
+      @include media-breakpoint-up(lg) {
+        height: 20px;
+        width: 20px;
+        margin-right: 10px !important;
+      }
+    }
+  }
+
   &.updating {
     pointer-events: none;
     background: $primary;

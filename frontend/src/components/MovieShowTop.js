@@ -2,6 +2,7 @@ import React from "react";
 import { ReactComponent as RequestIcon } from "../assets/svg/request.svg";
 import { ReactComponent as ReportIcon } from "../assets/svg/report.svg";
 import { ReactComponent as CheckIcon } from "../assets/svg/check.svg";
+import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import ReactPlayer from "react-player";
 
@@ -40,7 +41,12 @@ class MovieShowTop extends React.Component {
   }
 
   render() {
-    let requestBtn = this.props.mediaData.on_server ? (
+    let requestBtn = this.props.requestPending ? (
+      <button className="btn btn__square pending">
+        <Spinner />
+        Request
+      </button>
+    ) : this.props.mediaData.on_server ? (
       <a
         href={`https://app.plex.tv/desktop#!/server/${this.props.mediaData.on_server.serverKey}/details?key=%2Flibrary%2Fmetadata%2F${this.props.mediaData.on_server.ratingKey}`}
         target="_blank"
