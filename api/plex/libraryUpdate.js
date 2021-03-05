@@ -465,7 +465,7 @@ class LibraryUpdate {
             : false,
         });
         movieDb = await newMovie.save();
-        await this.mailAdded(movieObj, externalId);
+        await this.mailAdded(movieObj, newMovie.tmdb_id);
         logger.log("info", `LIB CRON: Movie Added - ${movieObj.title}`);
       } catch (err) {
         logger.log("warn", `LIB CRON: Error`);
@@ -611,7 +611,7 @@ class LibraryUpdate {
         try {
           externalIds = await this.tmdbExternalIds(externalId);
         } catch (err) {
-          logger.log("warn", err);
+          logger.log({ level: "warn", message: err });
         }
       }
     }
@@ -650,7 +650,7 @@ class LibraryUpdate {
           tmdb_id: idSource === "tmdb" ? externalId : tmdbId,
         });
         showDb = await newShow.save();
-        await this.mailAdded(showObj, externalId);
+        await this.mailAdded(showObj, newShow.tmdb_id);
         logger.log("info", `LIB CRON: Show Added - ${showObj.title}`);
       } catch (err) {
         logger.log("error", `LIB CRON: Error`);
@@ -790,9 +790,7 @@ class LibraryUpdate {
   }
 
   async mailAdded(plexData, ref_id) {
-    let request = await Request.findOne({
-      $or: [{ imdb_id: ref_id }, { tmdb_id: ref_id }, { tvdb_id: ref_id }],
-    });
+    let request = await Request.findOne({ tmdb_id: ref_id });
     if (request) {
       await Promise.all(
         request.users.map(async (user, i) => {
