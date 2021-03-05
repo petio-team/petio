@@ -88,6 +88,7 @@ router.post("/", async (req, res) => {
       }
     } else {
       // passwordless login, no check required
+      isAdmin = false;
     }
     success(dbUser.toObject());
     saveRequestIp(dbUser, request_ip);

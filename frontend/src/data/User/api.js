@@ -38,3 +38,7 @@ export async function addIssue(issue) {
 export async function myRequests() {
   return get("/request/me");
 }
+
+export async function quota() {
+  return get("/user/quota");
+}

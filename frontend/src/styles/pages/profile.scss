@@ -26,6 +26,10 @@
       align-items: center;
     }
 
+    &-quota {
+      margin-top: 15px;
+    }
+
     &-logout {
       margin-left: auto;
     }
@@ -34,6 +38,7 @@
       margin-right: 20px;
       position: relative;
       height: 50px;
+      pointer-events: none;
 
       @include media-breakpoint-up(lg) {
         height: 75px;
@@ -89,6 +94,10 @@
 
     &-info {
       margin: 0;
+
+      .role {
+        text-transform: capitalize;
+      }
 
       p {
         margin: 0;

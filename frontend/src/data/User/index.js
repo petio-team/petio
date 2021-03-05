@@ -8,6 +8,7 @@ import {
   getReviews,
   addIssue,
   myRequests,
+  quota,
 } from "./actions";
 
 export default {
@@ -19,4 +20,5 @@ export default {
   getReviews,
   addIssue,
   myRequests,
+  quota,
 };

@@ -144,3 +144,13 @@ function finalise(data = false) {
 export function review(item, id, review) {
   api.review(item, id, review);
 }
+
+export async function quota() {
+  try {
+    let data = await api.quota();
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw "Unable to get Quota";
+  }
+}

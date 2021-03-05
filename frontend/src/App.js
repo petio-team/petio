@@ -312,7 +312,7 @@ class App extends React.Component {
                 let msg = this.state.pushMsg[i];
                 return (
                   <div
-                    key={msg.timestamp}
+                    key={`msg__${msg.timestamp}__${i}`}
                     className={`push-msg--item ${
                       msg.type !== "info" ? msg.type : ""
                     }`}
@@ -333,7 +333,7 @@ class App extends React.Component {
               <Route exact path="/user">
                 <div className="page-wrap">
                   <div className="generic-wrap">
-                    <Profile logout={this.logout} />
+                    <Profile logout={this.logout} msg={this.msg} />
                   </div>
                 </div>
               </Route>

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/user");
+const Profile = require("../models/profile");
 const http = require("follow-redirects").http;
 const logger = require("../util/logger");
 const bcrypt = require("bcryptjs");
@@ -53,6 +54,29 @@ router.get("/thumb/:id", async (req, res) => {
       });
     request.end();
   }
+});
+
+router.get("/quota", authRequired, async (req, res) => {
+  if (!req.jwtUser) {
+    res.sendStatus(404);
+    return;
+  }
+  const user = await User.findOne({ id: req.jwtUser.id });
+
+  if (!user) {
+    res.sendStatus(404);
+    return;
+  }
+  const profile = user.profile ? await Profile.findById(user.profile) : false;
+  let total = 0;
+  let current = user.quotaCount ? user.quotaCount : 0;
+  if (profile) {
+    total = profile.quota ? profile.quota : 0;
+  }
+  res.json({
+    current: current,
+    total: total,
+  });
 });
 
 router.use(authRequired);
