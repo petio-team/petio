@@ -4,6 +4,7 @@ const LibraryUpdate = require("./plex/libraryUpdate");
 const QuotaSystem = require("./requests/quotas");
 const getConfig = require("./util/config");
 const mongoose = require("mongoose");
+const buildDiscovery = require("./discovery/build");
 
 class Worker {
   startCrons() {
@@ -34,6 +35,25 @@ class Worker {
     this.partial.start();
     logger.log("verbose", `API: Registering Quota reset job`);
     this.resetQuotas.start();
+    this.discovery();
+  }
+
+  async discovery() {
+    const config = getConfig();
+    if (!config) {
+      return;
+    }
+
+    await mongoose.connect(config.DB_URL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    logger.log("info", "CRONW: Connected to Database");
+    await buildDiscovery();
+    setTimeout(() => {
+      mongoose.connection.close();
+      logger.log("info", "CRONW: Connected to Database Closed");
+    }, 1000);
   }
 
   async runCron(type = 1) {
@@ -62,8 +82,10 @@ class Worker {
         logger.log("warn", "CRONW: Invalid cron");
     }
     mongoose.connection.close();
-    logger.log("info", "CRONW: Connected to Database Closed");
+    logger.log("info", "CRONW: Connection to Database Closed");
   }
 }
+
+new Worker().startCrons();
 
 module.exports = Worker;
