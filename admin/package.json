@@ -1,6 +1,6 @@
 {
   "name": "petio-admin",
-  "version": "0.3.25",
+  "version": "0.3.26",
   "private": true,
   "homepage": ".",
   "dependencies": {
