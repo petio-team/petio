@@ -89,7 +89,7 @@ async function getRequests(user = false, all = false) {
       })
     );
   } catch (err) {
-    logger.log("error", `ROUTE: Error getting requests`);
+    logger.log("error", `ROUTE: Error getting requests display`);
     logger.log({ level: "error", message: err });
   }
   return data;

@@ -51,7 +51,7 @@ class Worker {
 
     switch (type) {
       case 1:
-        await LibraryUpdate().run();
+        await new LibraryUpdate().run();
         break;
       case 2:
         await new LibraryUpdate().partial();
