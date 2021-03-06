@@ -181,8 +181,12 @@ class App extends React.Component {
         config: res.config,
         login_type: parseInt(res.login_type),
       });
+      if (res.config === false) {
+        this.msg({ message: "Petio is not setup redirecting", type: "error" });
+        window.location.href = "/admin/";
+      }
     } catch {
-      this.msg({ message: "API not configured", type: "error" });
+      this.msg({ message: "API not reachable", type: "error" });
       this.setState({
         error: true,
         config: "failed",
