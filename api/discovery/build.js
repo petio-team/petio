@@ -4,12 +4,18 @@ const Movie = require("../models/movie");
 const request = require("xhr-request");
 const { movieLookup, discoverMovie } = require("../tmdb/movie");
 const getConfig = require("../util/config");
+const logger = require("../util/logger");
+const movie = require("../models/movie");
 
 module.exports = async function buildDiscovery() {
-  let users = await User.find();
+  let users = await User.find({ id: "11397307" });
   let userIds = [];
   Object.keys(users).map((i) => {
-    userIds.push(users[i].id);
+    if (users[i].altId) {
+      userIds.push(users[i].altId);
+    } else {
+      userIds.push(users[i].id);
+    }
   });
   await Promise.all(
     userIds.map(async (i) => {
@@ -28,29 +34,26 @@ function userBuild(id) {
 }
 
 async function create(id) {
+  console.log(id);
   try {
-    let data = await buildData(id);
-    if (data.error) return;
+    let data = await buildGenres(id);
     console.log(data);
     let existing = await Discovery.findOne({ id: id });
     if (existing) {
       existing.id = id;
       existing.movie = {
-        genres: data.movie.genre,
-        history: data.movie.history,
+        genres: data.movie.genres,
       };
       existing.save();
     } else {
       let newDiscover = new Discovery({
         id: id,
         movie: {
-          genres: data.movie.genre,
-          history: data.movie.history,
+          genres: data.movie.genres,
         },
       });
       newDiscover.save();
     }
-    console.log(id);
   } catch (err) {
     //
     console.log(err);
@@ -58,8 +61,45 @@ async function create(id) {
   return;
 }
 
+async function buildGenres(id) {
+  let movie = {
+    genres: {},
+  };
+  let data = await getHistory(id, 1);
+  if (data.MediaContainer.size === 0) {
+    logger.warn(`DISC: No hist ${id}`);
+    return;
+  }
+  let items = data.MediaContainer.Metadata;
+  for (let i = 0; i < items.length; i++) {
+    let listItem = items[i];
+    let dbItem = await Movie.findOne({ ratingKey: listItem.ratingKey });
+    if (dbItem && dbItem.tmdb_id) {
+      let movieData = await movieLookup(dbItem.tmdb_id);
+      if (movieData) {
+        if (movieData.genres)
+          for (let g = 0; g < movieData.genres.length; g++) {
+            let genre = movieData.genres[g];
+            if (!movie.genres[genre.id]) {
+              movie.genres[genre.id] = {
+                count: 1,
+                name: genre.name,
+              };
+            } else {
+              movie.genres[genre.id].count = movie.genres[genre.id].count + 1;
+            }
+          }
+      }
+    }
+  }
+  return {
+    movie: movie,
+  };
+}
+
 async function buildData(id) {
-  let data = await getHistory(id);
+  let data = await getHistory(id, 1);
+  console.log(data);
   if (data.MediaContainer.size === 0) {
     return { error: "No History" };
   }
@@ -139,10 +179,17 @@ async function buildData(id) {
   return output;
 }
 
-function getHistory(id) {
+function getHistory(id, library = false) {
   const prefs = getConfig();
   return new Promise((resolve, reject) => {
-    let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/status/sessions/history/all?sort=viewedAt%3Adesc&accountID=${id}&viewedAt>=0&limit=50&X-Plex-Token=${prefs.plexToken}`;
+    let url = `${prefs.plexProtocol}://${prefs.plexIp}:${
+      prefs.plexPort
+    }/status/sessions/history/all?sort=viewedAt%3Adesc&accountID=${id}&viewedAt>=0${
+      library ? "&librarySectionID=" + library : ""
+    }&X-Plex-Container-Start=0&X-Plex-Container-Size=50&X-Plex-Token=${
+      prefs.plexToken
+    }`;
+    console.log(url);
     request(
       url,
       {

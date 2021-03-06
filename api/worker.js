@@ -10,6 +10,7 @@ class Worker {
   async connnectDb() {
     const config = getConfig();
     if (!config) {
+      logger.log("info", "CRONW: Failed to connect to DB");
       throw "Failed to connect to DB";
     }
 
@@ -74,10 +75,15 @@ class Worker {
   }
 
   async discovery() {
-    await buildDiscovery();
+    try {
+      await this.connnectDb();
+      await buildDiscovery();
+    } catch (err) {
+      console.log(err);
+    }
   }
 }
 
-new Worker().startCrons();
+new Worker().discovery();
 
 module.exports = Worker;
