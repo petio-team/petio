@@ -12,6 +12,8 @@ import Requests from "./page/Requests";
 import Users from "./page/Users";
 import Issues from "./page/Issues";
 import Reviews from "./page/Reviews";
+import Profile from "./page/Profile";
+import User from "./data/User";
 
 class App extends React.Component {
   constructor(props) {
@@ -31,6 +33,7 @@ class App extends React.Component {
     this.checkConfig = this.checkConfig.bind(this);
     this.toggleMobMenu = this.toggleMobMenu.bind(this);
     this.msg = this.msg.bind(this);
+    this.logout = this.logout.bind(this);
   }
 
   toggleMobMenu() {
@@ -81,27 +84,6 @@ class App extends React.Component {
     this.checkConfig();
   }
 
-  // displayMessage(type = "msg", message = "") {
-  //   if (type === "msg") {
-  //     this.setState({
-  //       isError: false,
-  //       isMsg: message,
-  //     });
-  //   } else {
-  //     this.setState({
-  //       isError: message,
-  //       isMsg: false,
-  //     });
-  //   }
-  //   clearInterval(this.closeMsg);
-  //   this.closeMsg = setInterval(() => {
-  //     this.setState({
-  //       isError: false,
-  //       isMsg: false,
-  //     });
-  //   }, 3000);
-  // }
-
   msg(
     data = {
       message: String,
@@ -122,6 +104,11 @@ class App extends React.Component {
         pushMsg: msgs,
       });
     }, 3000);
+  }
+
+  logout() {
+    User.logout();
+    this.changeLogin(false);
   }
 
   render() {
@@ -269,6 +256,11 @@ class App extends React.Component {
                       api={this.props.api}
                       msg={this.msg}
                     />
+                  </div>
+                </Route>
+                <Route path="/user">
+                  <div className="page-wrap">
+                    <Profile logout={this.logout} />
                   </div>
                 </Route>
                 <Route path="/settings">
