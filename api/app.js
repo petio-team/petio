@@ -9,9 +9,11 @@ const path = require("path");
 const pjson = require("./package.json");
 require("./node_modules/cache-manager/lib/stores/memory.js");
 const logger = require("./util/logger");
+const cluster = require("cluster");
 
 // Config
 const getConfig = require("./util/config");
+const Worker = require("./worker");
 
 // Plex
 const LibraryUpdate = require("./plex/libraryUpdate");
@@ -135,25 +137,31 @@ class Main {
   }
 
   init() {
-    logger.log("info", "API: Starting server");
-    this.setRoutes();
-    try {
-      this.server = this.e.listen(7778);
-      logger.log("verbose", `API: Listening on 7778 internally`);
-      logger.log("info", "API: Server entering listening state");
-      if (!this.config) {
-        logger.log("warn", "API: No config, entering setup mode");
-      } else {
-        logger.log("info", "API: Connecting to Database...");
-        this.connectDb();
+    if (cluster.isMaster) {
+      logger.log("info", "API: Starting server");
+      this.setRoutes();
+      try {
+        this.server = this.e.listen(7778);
+        logger.log("verbose", `API: Listening on 7778 internally`);
+        logger.log("info", "API: Server entering listening state");
+        if (!this.config) {
+          logger.log("warn", "API: No config, entering setup mode");
+        } else {
+          logger.log("info", "API: Connecting to Database...");
+          this.connectDb();
+          cluster.fork();
+        }
+      } catch (err) {
+        logger.log({ level: "error", message: err });
+        logger.log("info", "API: Fatal error Stopping server");
+        this.cron.stop();
+        logger.log("verbose", "API: Stopped crons");
+        this.server.close();
+        logger.log("verbose", "API: Server stopped");
       }
-    } catch (err) {
-      logger.log({ level: "error", message: err });
-      logger.log("info", "API: Fatal error Stopping server");
-      this.cron.stop();
-      logger.log("verbose", "API: Stopped crons");
-      this.server.close();
-      logger.log("verbose", "API: Server stopped");
+    } else {
+      logger.log("info", `API: Starting Cron Worker - ${process.pid}`);
+      new Worker().startCrons();
     }
   }
 
@@ -165,7 +173,7 @@ class Main {
         useUnifiedTopology: true,
       });
       logger.log("info", "API: Connected to Database");
-      this.start();
+      // this.start();
     } catch (err) {
       logger.log("error", "API: Error connecting to database");
       logger.log({ level: "error", message: err });
