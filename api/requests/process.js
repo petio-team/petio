@@ -7,6 +7,8 @@ const Sonarr = require("../services/sonarr");
 const Radarr = require("../services/radarr");
 const logger = require("../util/logger");
 const filter = require("./filter");
+const getConfig = require("../util/config");
+const mongoose = require("mongoose");
 
 class processRequest {
   constructor(req = {}, usr = {}) {
@@ -243,6 +245,17 @@ class processRequest {
   }
 
   async archive(complete = Boolean, removed = Boolean, reason = false) {
+    const config = getConfig();
+    if (!config) {
+      return;
+    }
+
+    await mongoose.connect(config.DB_URL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
+    logger.log("info", "REQ: Archive Job Connected to Database");
     let oldReq = this.request;
     let archiveRequest = new Archive({
       requestId: this.request.requestId,
@@ -273,6 +286,8 @@ class processRequest {
         } else {
           logger.log("info", `REQ: Request ${oldReq.title} Archived!`);
         }
+        mongoose.connection.close();
+        logger.log("info", "REQ: Archive Job Database Closed");
       }
     );
   }

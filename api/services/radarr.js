@@ -203,7 +203,7 @@ class Radarr {
       searchForMovie: true,
     };
     movieData.monitored = true;
-    if (tag) movieData.tags = [tag];
+    if (tag) movieData.tags = [parseInt(tag)];
 
     try {
       let add = await this.post("movie", false, movieData);

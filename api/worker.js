@@ -62,7 +62,7 @@ class Worker {
         logger.log("warn", "CRONW: Invalid cron");
     }
     mongoose.connection.close();
-    logger.log("info", "CRONW: Connected to Database Closed");
+    logger.log("info", "CRONW: Connection to Database Closed");
   }
 }
 
