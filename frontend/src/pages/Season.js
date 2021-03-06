@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import Api from "../data/Api";
 
 import MovieShowTop from "../components/MovieShowTop";
+import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
 import User from "../data/User";
 import Review from "../components/Review";
 import { ReactComponent as BackIcon } from "../assets/svg/back.svg";
@@ -150,7 +151,9 @@ class Season extends React.Component {
     if (!seriesData || !seasonData) {
       return (
         <div className="page-wrap">
-          <p>Loading...</p>
+          <div className="spinner">
+            <Spinner />
+          </div>
         </div>
       );
     } else {

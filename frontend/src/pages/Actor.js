@@ -130,6 +130,18 @@ class Actor extends React.Component {
       );
     }
 
+    if (personData.success === false) {
+      return (
+        <div className="page-wrap">
+          <p className="main-title">Person Not Found</p>
+          <p>
+            This person may have been removed from TMDb or the link you&apos;ve
+            followed is invalid
+          </p>
+        </div>
+      );
+    }
+
     let banner = false;
     let bWidth = 0;
 
