@@ -7,8 +7,6 @@ const Sonarr = require("../services/sonarr");
 const Radarr = require("../services/radarr");
 const logger = require("../util/logger");
 const filter = require("./filter");
-const getConfig = require("../util/config");
-const mongoose = require("mongoose");
 
 class processRequest {
   constructor(req = {}, usr = {}) {
@@ -286,8 +284,6 @@ class processRequest {
         } else {
           logger.log("info", `REQ: Request ${oldReq.title} Archived!`);
         }
-        mongoose.connection.close();
-        logger.log("info", "REQ: Archive Job Database Closed");
       }
     );
   }
