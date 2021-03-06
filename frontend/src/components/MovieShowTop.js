@@ -3,6 +3,7 @@ import { ReactComponent as RequestIcon } from "../assets/svg/request.svg";
 import { ReactComponent as ReportIcon } from "../assets/svg/report.svg";
 import { ReactComponent as CheckIcon } from "../assets/svg/check.svg";
 import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
+import { ReactComponent as CloseIcon } from "../assets/svg/close.svg";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import ReactPlayer from "react-player";
 
@@ -85,6 +86,12 @@ class MovieShowTop extends React.Component {
             this.props.trailer ? "trailer" : "n_trailer"
           }`}
         >
+          <div
+            className="media-trailer--close"
+            onClick={() => this.props.showTrailer()}
+          >
+            <CloseIcon />
+          </div>
           {video && this.props.trailer ? (
             <div className="media-trailer">
               <ReactPlayer
@@ -96,6 +103,7 @@ class MovieShowTop extends React.Component {
                 onEnded={() => this.props.showTrailer()}
                 onPause={() => this.props.showTrailer()}
                 onError={(error) => console.log(error)}
+                playIcon={<button className="media-trailer--play">Play</button>}
               />
             </div>
           ) : null}

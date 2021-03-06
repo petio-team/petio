@@ -44,6 +44,10 @@
       .media-poster {
         transform: translateX(-100%);
       }
+
+      .media-trailer--close {
+        transform: translateX(0);
+      }
     }
   }
 
@@ -528,6 +532,37 @@
       position: absolute;
       top: 0;
       left: 0;
+    }
+
+    &--close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 200;
+      background: $primary;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 5px;
+      cursor: pointer;
+      transform: translateX(100px);
+      transition: transform 0.3s ease;
+
+      @include media-breakpoint-up(lg) {
+        width: 40px;
+        height: 40px;
+      }
+
+      svg {
+        height: 20px;
+        color: black;
+
+        @include media-breakpoint-up(lg) {
+          height: 30px;
+        }
+      }
     }
   }
 }
