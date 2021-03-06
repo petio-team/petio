@@ -203,7 +203,7 @@ class Sonarr {
       searchForMissingEpisodes: true,
     };
     if (type) seriesData.seriesType = type;
-    if (tag) seriesData.tags = [tag];
+    if (tag) seriesData.tags = [parseInt(tag)];
 
     try {
       let add = await this.post("series", false, seriesData);

@@ -3,9 +3,9 @@ const path = require("path");
 const app = express();
 const fs = require("fs");
 const logger = require("./api/util/logger");
-const cluster = require("cluster");
 const numCPUs = require("os").cpus().length;
-const Worker = require("./api/worker");
+const cluster = require("cluster");
+const API = require("./api/app");
 
 class Wrapper {
   // Start Main Wrapper
@@ -34,52 +34,50 @@ class Wrapper {
     }
   }
 
-  async workers() {
-    if (cluster.isMaster) {
-      logger.log("info", `WRAPPER: Starting Master Worker - ${process.pid}`);
-      this.init();
-      cluster.fork();
-    } else {
-      logger.log("info", `WRAPPER: Starting Cron Worker - ${process.pid}`);
-      new Worker().startCrons();
-    }
-  }
-
   async init() {
-    logger.log("info", `WRAPPER: Starting Petio wrapper`);
-    logger.log("info", `WRAPPER: OS has ${numCPUs} CPU(s)`);
-    const API = require("./api/app");
-    const router = require("./router");
-    process.on("uncaughtException", function (err) {
-      if (err.code === "EADDRINUSE") {
-        logger.error(
-          `Fatal Error: Port already in use ${err.port}. Petio may already be running or is in conflict with another service on the same port.`
+    if (cluster.isMaster) {
+      logger.log("info", `WRAPPER: Starting Petio wrapper`);
+      logger.log("info", `WRAPPER: OS has ${numCPUs} CPU(s)`);
+      if (numCPUs < 2)
+        logger.warn(
+          "WRAPPER: Warning Petio Requires 2 CPU threads! Please allocate more resources!"
         );
-      } else {
+      new API().init();
+      const router = require("./router");
+      process.on("uncaughtException", function (err) {
+        if (err.code === "EADDRINUSE") {
+          logger.error(
+            `Fatal Error: Port already in use ${err.port}. Petio may already be running or is in conflict with another service on the same port.`
+          );
+        } else {
+          logger.log({ level: "error", message: err });
+        }
+        process.exit(1);
+      });
+      try {
+        let basePath = await this.getBase();
+        logger.log("info", `ROUTER: Base path found - ${basePath}`);
+        app.use((req, res, next) => {
+          req.basePath = basePath;
+          next();
+        });
+        app.use(basePath, router);
+        app.get("*", function (req, res) {
+          logger.log(
+            "warn",
+            `ROUTER: Not found - ${req.path} | IP: ${
+              req.headers["x-forwarded-for"] || req.connection.remoteAddress
+            }`
+          );
+          res.status(404).send(`Petio Router: not found - ${req.path}`);
+        });
+        app.listen(7777);
+      } catch (err) {
         logger.log({ level: "error", message: err });
       }
-      process.exit(1);
-    });
-    try {
-      let basePath = await this.getBase();
-      logger.log("info", `ROUTER: Base path found - ${basePath}`);
-      app.use((req, res, next) => {
-        req.basePath = basePath;
-        next();
-      });
-      app.use(basePath, router);
-      app.get("*", function (req, res) {
-        logger.log(
-          "warn",
-          `ROUTER: Not found - ${req.path} | IP: ${
-            req.headers["x-forwarded-for"] || req.connection.remoteAddress
-          }`
-        );
-        res.status(404).send(`Petio Router: not found - ${req.path}`);
-      });
-      app.listen(7777);
-    } catch (err) {
-      logger.log({ level: "error", message: err });
+    } else {
+      logger.log("info", `API: Starting Cron Worker - ${process.pid}`);
+      new API().init();
     }
   }
 
@@ -87,4 +85,4 @@ class Wrapper {
 }
 
 const wrapper = new Wrapper();
-wrapper.workers();
+wrapper.init();

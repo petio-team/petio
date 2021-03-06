@@ -9,9 +9,11 @@ const path = require("path");
 const pjson = require("./package.json");
 require("./node_modules/cache-manager/lib/stores/memory.js");
 const logger = require("./util/logger");
+const cluster = require("cluster");
 
 // Config
 const getConfig = require("./util/config");
+const Worker = require("./worker");
 
 // Plex
 const LibraryUpdate = require("./plex/libraryUpdate");
@@ -45,31 +47,33 @@ const { authRequired } = require("./middleware/auth");
 
 class Main {
   constructor() {
-    logger.log("info", `API: Petio API Version ${pjson.version} alpha`);
-    logger.log("info", "API: API Starting");
+    if (cluster.isMaster) {
+      logger.log("info", `API: Petio API Version ${pjson.version} alpha`);
+      logger.log("info", "API: API Starting");
 
-    if (process.pkg) {
-      logger.log("verbose", "API: Detected pkg env");
-      this.createConfigDir(
-        path.join(path.dirname(process.execPath), "./config")
+      if (process.pkg) {
+        logger.log("verbose", "API: Detected pkg env");
+        this.createConfigDir(
+          path.join(path.dirname(process.execPath), "./config")
+        );
+      } else {
+        logger.log("verbose", "API: Non pkg env");
+        this.createConfigDir(path.join(__dirname, "./config"));
+      }
+      this.e = app;
+      this.server = null;
+      this.e.use(
+        cors({
+          origin: (origin, callback) => {
+            callback(null, true);
+          },
+          credentials: true,
+        })
       );
-    } else {
-      logger.log("verbose", "API: Non pkg env");
-      this.createConfigDir(path.join(__dirname, "./config"));
+      this.e.use(express.json());
+      this.e.use(express.urlencoded({ extended: true }));
     }
     this.config = getConfig();
-    this.e = app;
-    this.server = null;
-    this.e.use(
-      cors({
-        origin: (origin, callback) => {
-          callback(null, true);
-        },
-        credentials: true,
-      })
-    );
-    this.e.use(express.json());
-    this.e.use(express.urlencoded({ extended: true }));
   }
 
   setRoutes() {
@@ -135,25 +139,32 @@ class Main {
   }
 
   init() {
-    logger.log("info", "API: Starting server");
-    this.setRoutes();
-    try {
-      this.server = this.e.listen(7778);
-      logger.log("verbose", `API: Listening on 7778 internally`);
-      logger.log("info", "API: Server entering listening state");
-      if (!this.config) {
-        logger.log("warn", "API: No config, entering setup mode");
-      } else {
-        logger.log("info", "API: Connecting to Database...");
-        this.connectDb();
+    if (cluster.isMaster) {
+      // Main API worker
+      logger.log("info", "API: Starting server");
+      this.setRoutes();
+      try {
+        this.server = this.e.listen(7778);
+        logger.log("verbose", `API: Listening on 7778 internally`);
+        logger.log("info", "API: Server entering listening state");
+        if (!this.config) {
+          logger.log("warn", "API: No config, entering setup mode");
+        } else {
+          logger.log("info", "API: Connecting to Database...");
+          this.connectDb();
+          cluster.fork();
+        }
+      } catch (err) {
+        logger.log({ level: "error", message: err });
+        logger.log("info", "API: Fatal error Stopping server");
+        this.cron.stop();
+        logger.log("verbose", "API: Stopped crons");
+        this.server.close();
+        logger.log("verbose", "API: Server stopped");
       }
-    } catch (err) {
-      logger.log({ level: "error", message: err });
-      logger.log("info", "API: Fatal error Stopping server");
-      this.cron.stop();
-      logger.log("verbose", "API: Stopped crons");
-      this.server.close();
-      logger.log("verbose", "API: Server stopped");
+    } else {
+      // Cron Worker on sub thread
+      new Worker().startCrons();
     }
   }
 
@@ -165,7 +176,6 @@ class Main {
         useUnifiedTopology: true,
       });
       logger.log("info", "API: Connected to Database");
-      this.start();
     } catch (err) {
       logger.log("error", "API: Error connecting to database");
       logger.log({ level: "error", message: err });
@@ -173,12 +183,6 @@ class Main {
       logger.log("warn", "API: Removing config please restart");
       fs.unlinkSync("./config/config.json");
     }
-  }
-
-  async start() {
-    const libUpdate = new LibraryUpdate();
-    libUpdate.run();
-    // libUpdate.partial();
   }
 
   setup() {
@@ -410,7 +414,7 @@ class Main {
   }
 }
 
-const API = new Main();
-API.init();
+// const API = new Main();
+// API.init();
 
-module.exports = API;
+module.exports = Main;
