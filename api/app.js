@@ -47,31 +47,33 @@ const { authRequired } = require("./middleware/auth");
 
 class Main {
   constructor() {
-    logger.log("info", `API: Petio API Version ${pjson.version} alpha`);
-    logger.log("info", "API: API Starting");
+    if (cluster.isMaster) {
+      logger.log("info", `API: Petio API Version ${pjson.version} alpha`);
+      logger.log("info", "API: API Starting");
 
-    if (process.pkg) {
-      logger.log("verbose", "API: Detected pkg env");
-      this.createConfigDir(
-        path.join(path.dirname(process.execPath), "./config")
+      if (process.pkg) {
+        logger.log("verbose", "API: Detected pkg env");
+        this.createConfigDir(
+          path.join(path.dirname(process.execPath), "./config")
+        );
+      } else {
+        logger.log("verbose", "API: Non pkg env");
+        this.createConfigDir(path.join(__dirname, "./config"));
+      }
+      this.e = app;
+      this.server = null;
+      this.e.use(
+        cors({
+          origin: (origin, callback) => {
+            callback(null, true);
+          },
+          credentials: true,
+        })
       );
-    } else {
-      logger.log("verbose", "API: Non pkg env");
-      this.createConfigDir(path.join(__dirname, "./config"));
+      this.e.use(express.json());
+      this.e.use(express.urlencoded({ extended: true }));
     }
     this.config = getConfig();
-    this.e = app;
-    this.server = null;
-    this.e.use(
-      cors({
-        origin: (origin, callback) => {
-          callback(null, true);
-        },
-        credentials: true,
-      })
-    );
-    this.e.use(express.json());
-    this.e.use(express.urlencoded({ extended: true }));
   }
 
   setRoutes() {

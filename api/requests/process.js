@@ -243,17 +243,6 @@ class processRequest {
   }
 
   async archive(complete = Boolean, removed = Boolean, reason = false) {
-    const config = getConfig();
-    if (!config) {
-      return;
-    }
-
-    await mongoose.connect(config.DB_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-
-    logger.log("info", "REQ: Archive Job Connected to Database");
     let oldReq = this.request;
     let archiveRequest = new Archive({
       requestId: this.request.requestId,
