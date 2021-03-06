@@ -5,7 +5,6 @@ const fs = require("fs");
 const logger = require("./api/util/logger");
 const numCPUs = require("os").cpus().length;
 const cluster = require("cluster");
-const API = require("./api/app");
 
 class Wrapper {
   // Start Main Wrapper
@@ -42,7 +41,8 @@ class Wrapper {
         logger.warn(
           "WRAPPER: Warning Petio Requires 2 CPU threads! Please allocate more resources!"
         );
-      new API().init();
+      let API = require("./api/app");
+      // new API().init();
       const router = require("./router");
       process.on("uncaughtException", function (err) {
         if (err.code === "EADDRINUSE") {
@@ -77,7 +77,7 @@ class Wrapper {
       }
     } else {
       logger.log("info", `API: Starting Cron Worker - ${process.pid}`);
-      new API().init();
+      let API = require("./api/app");
     }
   }
 

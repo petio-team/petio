@@ -416,7 +416,4 @@ class Main {
   }
 }
 
-const API = new Main();
-API.init();
-
-module.exports = Main;
+module.exports = new Main().init();
