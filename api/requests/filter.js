@@ -95,10 +95,11 @@ function getValue(condition, media) {
       media.genres.map((genre) => {
         values.push(genre.id);
       });
-      if (media.keywords.results)
-        media.keywords.results.map((kw) => {
-          if (kw.id === 210024) values.push("anime");
-        });
+      if (media.keywords && Array.isArray(media.keywords.results))
+        if (media.keywords.results)
+          media.keywords.results.map((kw) => {
+            if (kw.id === 210024) values.push("anime");
+          });
       break;
     case "year":
       values = [];
@@ -112,7 +113,7 @@ function getValue(condition, media) {
       break;
     case "keyword":
       values = [];
-      if (Array.isArray(media.keywords.results))
+      if (media.keywords && Array.isArray(media.keywords.results))
         media.keywords.results.map((kw) => {
           values.push(kw.name);
         });
