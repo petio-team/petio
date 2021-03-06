@@ -140,6 +140,7 @@ class Main {
 
   init() {
     if (cluster.isMaster) {
+      // Main API worker
       logger.log("info", "API: Starting server");
       this.setRoutes();
       try {
@@ -162,7 +163,7 @@ class Main {
         logger.log("verbose", "API: Server stopped");
       }
     } else {
-      logger.log("info", `API: Starting Cron Worker - ${process.pid}`);
+      // Cron Worker on sub thread
       new Worker().startCrons();
     }
   }
@@ -175,7 +176,6 @@ class Main {
         useUnifiedTopology: true,
       });
       logger.log("info", "API: Connected to Database");
-      // this.start();
     } catch (err) {
       logger.log("error", "API: Error connecting to database");
       logger.log({ level: "error", message: err });
@@ -183,12 +183,6 @@ class Main {
       logger.log("warn", "API: Removing config please restart");
       fs.unlinkSync("./config/config.json");
     }
-  }
-
-  async start() {
-    const libUpdate = new LibraryUpdate();
-    libUpdate.run();
-    // libUpdate.partial();
   }
 
   setup() {
@@ -420,7 +414,7 @@ class Main {
   }
 }
 
-const API = new Main();
-API.init();
+// const API = new Main();
+// API.init();
 
-module.exports = API;
+module.exports = Main;
