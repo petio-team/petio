@@ -103,7 +103,6 @@ class MovieShowTop extends React.Component {
                 onEnded={() => this.props.showTrailer()}
                 onPause={() => this.props.showTrailer()}
                 onError={(error) => console.log(error)}
-                playIcon={<button className="media-trailer--play">Play</button>}
               />
             </div>
           ) : null}

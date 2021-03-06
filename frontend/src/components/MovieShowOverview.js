@@ -402,7 +402,13 @@ class MovieShowOverview extends React.Component {
                 ) : null}
                 <div className="detail--bar--sep">·</div>
                 <p>
-                  <span className="desktop-only">Petio: </span>
+                  <span
+                    className="desktop-only"
+                    style={{ cursor: "help" }}
+                    title="Petio reviews are a combination of Petio users on this server and external user reviews."
+                  >
+                    Petio:{" "}
+                  </span>
                   <span
                     className={`rating d-nm color-${
                       userRatingVal > 79
