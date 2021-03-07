@@ -16,7 +16,6 @@ router.post("/", async (req, res) => {
     req.headers["x-forwarded-for"] || req.connection.remoteAddress;
   const {
     user: { username, password },
-    admin: adminRequested,
   } = req.body || { user: {} };
 
   if (!prefs) {
@@ -31,17 +30,16 @@ router.post("/", async (req, res) => {
   logger.log("info", `LOGIN: New login attempted`);
   logger.log("info", `LOGIN: Request IP: ${request_ip}`);
 
-  function success(user) {
+  function success(user, isAdmin = false) {
     user.password = null;
-    const isAdmin = ["admin", "moderator"].includes(user.role);
     const token = jwt.sign({ ...user, admin: isAdmin }, prefs.plexToken);
     res
       .cookie("petio_jwt", token, {
         path: "/",
         httpOnly: true,
         maxAge: 2419200000,
-        sameSite: "none",
-        secure: true,
+        sameSite: "strict",
+        secure: false,
       })
       .json({
         loggedIn: true,
@@ -54,7 +52,7 @@ router.post("/", async (req, res) => {
   // check for existing jwt
   try {
     const user = await authenticate(req);
-    success(user);
+    success(user, user.admin);
     logger.log("info", `LOGIN: Request User: ${user.username}`);
     return;
   } catch (e) {
@@ -74,10 +72,7 @@ router.post("/", async (req, res) => {
 
     let isAdmin = dbUser.role === "admin" || dbUser.role === "moderator";
 
-    // TODO: do we need these adminRequested checks in the login flow now that we have properly secured routes?
-    if (adminRequested && !isAdmin) throw "User is not admin";
-
-    if (adminRequested || parseInt(prefs.login_type) === 1) {
+    if (parseInt(prefs.login_type) === 1 || password) {
       if (dbUser.password) {
         if (!bcrypt.compareSync(password, dbUser.password)) {
           throw "Password is incorrect";
@@ -86,11 +81,11 @@ router.post("/", async (req, res) => {
         // throws on invalid credentials
         await plexAuth(username, password);
       }
+      success(dbUser.toObject(), isAdmin);
     } else {
-      // passwordless login, no check required
-      isAdmin = false;
+      // passwordless login, no check required. But we downgrade admin perms
+      success(dbUser.toObject(), false);
     }
-    success(dbUser.toObject());
     saveRequestIp(dbUser, request_ip);
   } catch (err) {
     logger.log("warn", `LOGIN: User not found ${username} - ${request_ip}`);
