@@ -72,13 +72,13 @@ class Requests extends React.Component {
         if (item.series) {
           let time = new Date(item.airDateUtc);
           calendarData.push({
-            title: `${item.series.title} - s${item.seasonNumber.toLocaleString(
+            title: `${item.series.title} - S${item.seasonNumber.toLocaleString(
               "en-US",
               {
                 minimumIntegerDigits: 2,
                 useGrouping: false,
               }
-            )}e${item.episodeNumber.toLocaleString("en-US", {
+            )}E${item.episodeNumber.toLocaleString("en-US", {
               minimumIntegerDigits: 2,
               useGrouping: false,
             })}`,
