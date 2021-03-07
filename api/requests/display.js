@@ -142,7 +142,11 @@ function reqState(req, children) {
           if (children[r].info.seasons) {
             let missing = false;
             for (let season of children[r].info.seasons) {
-              if (season.statistics.percentOfEpisodes !== 100) missing = true;
+              if (
+                season.statistics &&
+                season.statistics.percentOfEpisodes !== 100
+              )
+                missing = true;
             }
 
             if (!missing) {
