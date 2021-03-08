@@ -27,6 +27,7 @@ class Worker {
       await this.connnectDb();
       const libUpdate = new LibraryUpdate();
       libUpdate.run();
+      buildDiscovery();
       const run = this.runCron;
       // Runs every night at 00:00
       this.cron = new CronJob("0 0 * * *", function () {
@@ -62,28 +63,18 @@ class Worker {
   async runCron(type = 1) {
     switch (type) {
       case 1:
-        await new LibraryUpdate().run();
+        new LibraryUpdate().run();
+        buildDiscovery();
         break;
       case 2:
-        await new LibraryUpdate().partial();
+        new LibraryUpdate().partial();
         break;
       case 3:
-        await new QuotaSystem().reset();
+        new QuotaSystem().reset();
       default:
         logger.log("warn", "CRONW: Invalid cron");
     }
   }
-
-  async discovery() {
-    try {
-      await this.connnectDb();
-      await buildDiscovery();
-    } catch (err) {
-      console.log(err);
-    }
-  }
 }
-
-new Worker().discovery();
 
 module.exports = Worker;

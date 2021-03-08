@@ -6,8 +6,18 @@ import Popular from "../components/Popular";
 import History from "../components/History";
 import MovieCard from "../components/MovieCard";
 import Carousel from "../components/Carousel";
+import User from "../data/User";
 
 class Movies extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      personalised: false,
+    };
+
+    this.getPersonalised = this.getPersonalised.bind(this);
+  }
   componentDidMount() {
     let page = document.querySelectorAll(".page-wrap")[0];
     page.scrollTop = 0;
@@ -16,7 +26,20 @@ class Movies extends React.Component {
     if (!Object.keys(this.props.api.popular).length > 0) {
       Api.getPopular();
     }
+    this.getPersonalised();
   }
+
+  async getPersonalised() {
+    try {
+      let personalised = await User.discoveryMovies();
+      this.setState({
+        personalised: personalised,
+      });
+    } catch {
+      console.log("Couldn't load user personalised");
+    }
+  }
+
   render() {
     return (
       <>
@@ -40,6 +63,30 @@ class Movies extends React.Component {
               : null}
           </Carousel>
         </section>
+        {this.state.personalised && this.state.personalised.length > 0
+          ? this.state.personalised.map((row, r) => {
+              if (!row) return null;
+              return (
+                <section key={`psn__${r}`}>
+                  <h3 className="sub-title mb--1">{row.title}</h3>
+                  <Carousel>
+                    {row.results.length > 0
+                      ? row.results.map((movie) => {
+                          if (!movie.id) return null;
+                          return (
+                            <MovieCard
+                              key={`psn__${r}__${movie.id}`}
+                              msg={this.props.msg}
+                              movie={movie}
+                            />
+                          );
+                        })
+                      : null}
+                  </Carousel>
+                </section>
+              );
+            })
+          : null}
       </>
     );
   }

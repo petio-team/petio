@@ -3,8 +3,8 @@ const router = express.Router();
 const logger = require("../util/logger");
 const getDiscovery = require("../discovery/display");
 
-router.get("/me", async (req, res) => {
-  let userId = req.jwtUser.id;
+router.get("/movies", async (req, res) => {
+  let userId = req.jwtUser.altId ? req.jwtUser.altId : req.jwtUser.id;
   if (!userId) {
     res.sendStatus(404);
   }

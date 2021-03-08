@@ -1,6 +1,5 @@
 import {
   login,
-  // loginAdmin,
   logout,
   request,
   getRequests,
@@ -9,6 +8,7 @@ import {
   addIssue,
   myRequests,
   quota,
+  discoveryMovies,
 } from "./actions";
 
 export default {
@@ -21,4 +21,5 @@ export default {
   addIssue,
   myRequests,
   quota,
+  discoveryMovies,
 };

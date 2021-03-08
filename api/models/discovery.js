@@ -8,7 +8,7 @@ const DiscoverySchema = mongoose.Schema({
       cast: Object,
       director: Object,
     },
-    history: Array,
+    history: Object,
   },
   series: {
     genres: Object,
@@ -16,7 +16,7 @@ const DiscoverySchema = mongoose.Schema({
       cast: Object,
       director: Object,
     },
-    history: Array,
+    history: Object,
   },
 });
 

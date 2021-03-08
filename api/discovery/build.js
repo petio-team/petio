@@ -8,7 +8,8 @@ const Movie = require("../models/movie");
 const Show = require("../models/show");
 
 module.exports = async function buildDiscovery() {
-  let users = await User.find({ id: "13699112" });
+  logger.info("DISC: Started building discovery profiles");
+  let users = await User.find();
   let userIds = [];
   Object.keys(users).map((i) => {
     if (users[i].altId) {
@@ -22,6 +23,7 @@ module.exports = async function buildDiscovery() {
       await userBuild(i);
     })
   );
+  logger.info("DISC: Finished building discovery profiles");
 };
 
 function userBuild(id) {
@@ -31,18 +33,18 @@ function userBuild(id) {
 }
 
 async function create(id) {
-  console.log(id);
   try {
-    let data = await buildGenres(id);
-    console.log(data);
+    let data = await build(id);
     let existing = await Discovery.findOne({ id: id });
     if (existing) {
       existing.id = id;
       existing.movie = {
         genres: data.movie.genres,
+        history: data.movie.history,
       };
       existing.series = {
         genres: data.series.genres,
+        history: data.series.history,
       };
       existing.save();
     } else {
@@ -50,9 +52,11 @@ async function create(id) {
         id: id,
         movie: {
           genres: data.movie.genres,
+          history: data.movie.history,
         },
         series: {
           genres: data.series.genres,
+          history: data.series.history,
         },
       });
       newDiscover.save();
@@ -64,16 +68,18 @@ async function create(id) {
   return;
 }
 
-async function buildGenres(id) {
+async function build(id) {
   let movie = {
+    history: {},
     genres: {},
   };
   let series = {
+    history: {},
     genres: {},
   };
   let data = await getHistory(id);
   if (data.MediaContainer.size === 0) {
-    logger.warn(`DISC: No hist ${id}`);
+    logger.verbose(`DISC: No history for user - ${id}`);
     return {
       movie: movie,
       series: series,
@@ -85,6 +91,7 @@ async function buildGenres(id) {
     if (listItem.type === "movie") {
       let dbItem = await Movie.findOne({ ratingKey: listItem.ratingKey });
       if (dbItem) {
+        if (dbItem.tmdb_id) movie.history[dbItem.tmdb_id] = dbItem.tmdb_id;
         if (dbItem.Genre) {
           for (let g = 0; g < dbItem.Genre.length; g++) {
             let genre = dbItem.Genre[g];
@@ -104,6 +111,7 @@ async function buildGenres(id) {
         let key = listItem.grandparentKey.replace("/library/metadata/", "");
         let dbItem = await Show.findOne({ ratingKey: key });
         if (dbItem) {
+          if (dbItem.tmdb_id) series.history[dbItem.tmdb_id] = dbItem.tmdb_id;
           if (dbItem.Genre) {
             for (let g = 0; g < dbItem.Genre.length; g++) {
               let genre = dbItem.Genre[g];
@@ -138,7 +146,6 @@ function getHistory(id, library = false) {
     }&X-Plex-Container-Start=0&X-Plex-Container-Size=300&X-Plex-Token=${
       prefs.plexToken
     }`;
-    console.log(url);
     request(
       url,
       {

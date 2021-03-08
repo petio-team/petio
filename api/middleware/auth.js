@@ -30,7 +30,6 @@ async function authenticate(req) {
 exports.authenticate = authenticate;
 
 exports.authRequired = async (req, res, next) => {
-  console.log("auth req");
   try {
     await authenticate(req);
   } catch (e) {
