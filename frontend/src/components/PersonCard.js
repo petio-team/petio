@@ -24,15 +24,15 @@ class PersonCard extends React.Component {
         <div className="card--inner">
           <Link to={`/person/${person.id}`} className="full-link"></Link>
           <div className="image-wrap">
-            {person.profile_path ? (
-              <LazyLoadImage
-                alt={person.name}
-                src={`https://image.tmdb.org/t/p/w200/${person.profile_path}`}
-                // effect="blur"
-              />
-            ) : (
-              <div className="no-poster"></div>
-            )}
+            <LazyLoadImage
+              alt={person.name}
+              src={
+                person.profile_path
+                  ? `https://image.tmdb.org/t/p/w200/${person.profile_path}`
+                  : "/images/no-poster-person.jpg"
+              }
+              // effect="blur"
+            />
           </div>
           <div className="text-wrap">
             <p className="title">{person.name}</p>

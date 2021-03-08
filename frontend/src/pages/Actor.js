@@ -195,9 +195,13 @@ class Actor extends React.Component {
               <div className="person--top">
                 <div className="person--thumb">
                   <div className="person--thumb--inner">
-                    <img
-                      src={`https://image.tmdb.org/t/p/w1280/${personData.profile_path}`}
-                    />
+                    {personData.profile_path ? (
+                      <img
+                        src={`https://image.tmdb.org/t/p/w1280/${personData.profile_path}`}
+                      />
+                    ) : (
+                      <img src="/images/no-poster-person.jpg" />
+                    )}
                   </div>
                 </div>
                 <div className="person--details">
