@@ -29,9 +29,10 @@ async function authenticate(req) {
 
 exports.authenticate = authenticate;
 
-exports.authRequired = (req, res, next) => {
+exports.authRequired = async (req, res, next) => {
+  console.log("auth req");
   try {
-    authenticate(req);
+    await authenticate(req);
   } catch (e) {
     logger.log("warn", `AUTH: user is not logged in`);
     logger.warn(e);
