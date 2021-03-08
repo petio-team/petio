@@ -198,12 +198,20 @@ class Season extends React.Component {
                       </Link>
                     </div>
                     <div className="detail--bar">
-                      <p>{new Date(seasonData.air_date).getFullYear()}</p>
+                      <p>
+                        {seasonData.air_date
+                          ? new Date(seasonData.air_date).getFullYear()
+                          : "Unknown"}
+                      </p>
                       <div className="detail--bar--sep">·</div>
                       <p>{seasonData.name}</p>
                     </div>
                     <p className="sub-title mb--1">Overview</p>
-                    <p className="overview">{seasonData.overview}</p>
+                    <p className="overview">
+                      {seasonData.overview
+                        ? seasonData.overview
+                        : seriesData.overview}
+                    </p>
                   </div>
                 </div>
               </div>
