@@ -10,6 +10,7 @@ const pjson = require("./package.json");
 require("./node_modules/cache-manager/lib/stores/memory.js");
 const logger = require("./util/logger");
 const cluster = require("cluster");
+const trending = require("./tmdb/trending");
 
 // Config
 const getConfig = require("./util/config");
@@ -154,6 +155,7 @@ class Main {
         } else {
           logger.log("info", "API: Connecting to Database...");
           this.connectDb();
+          trending();
           cluster.fork();
         }
       } catch (err) {
@@ -416,7 +418,4 @@ class Main {
   }
 }
 
-// const API = new Main();
-// API.init();
-
-module.exports = Main;
+module.exports = new Main().init();

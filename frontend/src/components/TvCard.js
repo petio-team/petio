@@ -135,13 +135,15 @@ class TvCard extends React.Component {
         <div className="card--inner">
           <Link to={`/series/${series.id}`} className="full-link"></Link>
           {!this.props.user.requests[series.id] && !series.on_server ? (
-            <div
-              className="quick-req"
-              title="Request now"
-              onClick={this.request}
-            >
-              <RequestIcon />
-            </div>
+            series.tvdb_id ? (
+              <div
+                className="quick-req"
+                title="Request now"
+                onClick={this.request}
+              >
+                <RequestIcon />
+              </div>
+            ) : null
           ) : null}
           <div className="image-wrap">
             {this.props.popular_count ? (

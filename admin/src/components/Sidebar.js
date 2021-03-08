@@ -6,22 +6,11 @@ import { ReactComponent as PersonIcon } from "../assets/svg/people.svg";
 import { ReactComponent as ReviewIcon } from "../assets/svg/star.svg";
 import { ReactComponent as RequestIcon } from "../assets/svg/bookmark.svg";
 import { ReactComponent as SettingsIcon } from "../assets/svg/settings.svg";
-import { ReactComponent as CloseIcon } from "../assets/svg/close.svg";
 import { ReactComponent as AdminIcon } from "../assets/svg/admin.svg";
 import { ReactComponent as IssueIcon } from "../assets/svg/issue.svg";
-import User from "../data/User";
 import pjson from "../../package.json";
 
 class Sidebar extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.logout = this.logout.bind(this);
-  }
-  logout() {
-    User.logout();
-    this.props.changeLogin(false);
-  }
   render() {
     let current = this.props.location.pathname;
     let user = this.props.user.current;
@@ -139,12 +128,6 @@ class Sidebar extends React.Component {
               <SettingsIcon />
             </div>
           </Link>
-          <div className="menu--item logout" onClick={this.logout}>
-            <p>Logout</p>
-            <div className="icon">
-              <CloseIcon />
-            </div>
-          </div>
           <a
             className="menu--item"
             href={`${window.location.protocol}//${

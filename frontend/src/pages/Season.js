@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import Api from "../data/Api";
 
 import MovieShowTop from "../components/MovieShowTop";
+import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
 import User from "../data/User";
 import Review from "../components/Review";
 import { ReactComponent as BackIcon } from "../assets/svg/back.svg";
@@ -150,7 +151,9 @@ class Season extends React.Component {
     if (!seriesData || !seasonData) {
       return (
         <div className="page-wrap">
-          <p>Loading...</p>
+          <div className="spinner">
+            <Spinner />
+          </div>
         </div>
       );
     } else {
@@ -195,12 +198,20 @@ class Season extends React.Component {
                       </Link>
                     </div>
                     <div className="detail--bar">
-                      <p>{new Date(seasonData.air_date).getFullYear()}</p>
+                      <p>
+                        {seasonData.air_date
+                          ? new Date(seasonData.air_date).getFullYear()
+                          : "Unknown"}
+                      </p>
                       <div className="detail--bar--sep">·</div>
                       <p>{seasonData.name}</p>
                     </div>
                     <p className="sub-title mb--1">Overview</p>
-                    <p className="overview">{seasonData.overview}</p>
+                    <p className="overview">
+                      {seasonData.overview
+                        ? seasonData.overview
+                        : seriesData.overview}
+                    </p>
                   </div>
                 </div>
               </div>

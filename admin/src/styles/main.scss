@@ -11,6 +11,7 @@ $good: $green;
 $blue: #3d85b8;
 $purple: rgb(104, 16, 175);
 $teal: #1f7979;
+$yellow: #ebe723;
 
 // breakpoints /////////////////////////////////////////////
 
@@ -77,3 +78,4 @@ $grid-breakpoints: $breakpoints;
 @import "pages/dashboard";
 @import "pages/settings";
 @import "pages/requests";
+@import "pages/profile";

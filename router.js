@@ -20,6 +20,9 @@ router.use(
   "/api",
   createProxyMiddleware({
     target: "http://localhost:7778",
+    logProvider: function (provider) {
+      return logger;
+    },
     pathRewrite: function (path, req) {
       if (req.basePath !== "/") {
         return path.replace("//", "/").replace(`${req.basePath}/api/`, "/");

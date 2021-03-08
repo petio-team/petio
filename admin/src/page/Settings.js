@@ -75,18 +75,6 @@ class Settings extends React.Component {
             </div>
           </Link>
           <Link
-            to="/settings/console"
-            className={
-              "settings--menu--item " +
-              (current === "/settings/console" ? "active" : "")
-            }
-          >
-            <p>Console</p>
-            <div className="icon">
-              <ConsoleIcon />
-            </div>
-          </Link>
-          <Link
             to="/settings/filter"
             className={
               "settings--menu--item " +
@@ -96,6 +84,18 @@ class Settings extends React.Component {
             <p>Filter</p>
             <div className="icon">
               <FilterIcon />
+            </div>
+          </Link>
+          <Link
+            to="/settings/console"
+            className={
+              "settings--menu--item " +
+              (current === "/settings/console" ? "active" : "")
+            }
+          >
+            <p>Console</p>
+            <div className="icon">
+              <ConsoleIcon />
             </div>
           </Link>
         </div>

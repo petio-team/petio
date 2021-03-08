@@ -55,10 +55,6 @@ export async function movie(id, minified = false) {
 export async function series(id, minified = false) {
   let series = await api.series(id, minified);
 
-  if (!series.id) {
-    return false;
-  }
-
   series.isMinified = minified;
 
   finalise({

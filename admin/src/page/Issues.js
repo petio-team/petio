@@ -13,6 +13,7 @@ class Issues extends React.Component {
       resolveIssueOpen: false,
       activeIssue: false,
       resolve_issue_comment: "",
+      issuesLoaded: false,
     };
 
     this.getIssues = this.getIssues.bind(this);
@@ -52,6 +53,7 @@ class Issues extends React.Component {
     this.props.msg({ message: "Issues loaded" });
     this.setState({
       issues: issues,
+      issuesLoaded: true,
     });
   }
 
@@ -177,30 +179,39 @@ class Issues extends React.Component {
                 </tr>
               </thead>
               <tbody>
-                {this.state.issues
-                  ? this.state.issues.map((issue) => {
-                      return (
-                        <tr key={issue._id}>
-                          <td>{issue.title}</td>
-                          <td>{this.typeIcon(issue.type)}</td>
-                          <td>{this.formatIssue(issue.issue)}</td>
-                          <td>{issue.comment}</td>
-                          <td>{this.getUsername(issue.user)}</td>
-                          <td>
-                            <p
-                              className="table-action"
-                              onClick={() => {
-                                this.openModal("resolveIssue");
-                                this.setActive(issue);
-                              }}
-                            >
-                              Resolve
-                            </p>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  : null}
+                {this.state.issues && this.state.issues.length > 0 ? (
+                  this.state.issues.map((issue) => {
+                    return (
+                      <tr key={issue._id}>
+                        <td>{issue.title}</td>
+                        <td>{this.typeIcon(issue.type)}</td>
+                        <td>{this.formatIssue(issue.issue)}</td>
+                        <td>{issue.comment}</td>
+                        <td>{this.getUsername(issue.user)}</td>
+                        <td>
+                          <p
+                            className="table-action"
+                            onClick={() => {
+                              this.openModal("resolveIssue");
+                              this.setActive(issue);
+                            }}
+                          >
+                            Resolve
+                          </p>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : this.state.issuesLoaded ? (
+                  <tr>
+                    <td>No issues</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                ) : null}
               </tbody>
             </table>
           </section>

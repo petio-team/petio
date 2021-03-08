@@ -200,6 +200,18 @@ class Series extends React.Component {
       return <MovieShowLoading />;
     }
 
+    if (seriesData.error) {
+      return (
+        <div className="media-wrap">
+          <p className="main-title">Series Not Found</p>
+          <p>
+            This show may have been removed from TMDb or the link you&apos;ve
+            followed is invalid
+          </p>
+        </div>
+      );
+    }
+
     let related = null;
     let relatedItems = null;
     if (seriesData.recommendations) {

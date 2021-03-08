@@ -170,13 +170,20 @@ class Movie extends React.Component {
     if (this.props.api.movie_lookup[id])
       movieData = this.props.api.movie_lookup[id];
 
-    if (
-      !movieData ||
-      movieData.isMinified ||
-      !this.props.user ||
-      movieData.error
-    ) {
+    if (!movieData || movieData.isMinified || !this.props.user) {
       return <MovieShowLoading />;
+    }
+
+    if (movieData.error) {
+      return (
+        <div className="media-wrap">
+          <p className="main-title">Movie Not Found</p>
+          <p>
+            This movie may have been removed from TMDb or the link you&apos;ve
+            followed is invalid
+          </p>
+        </div>
+      );
     }
 
     let related = null;
