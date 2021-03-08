@@ -149,7 +149,7 @@ function reqState(req, children) {
                 missing = true;
             }
 
-            if (!missing) {
+            if (!missing && children[r].info.totalEpisodeCount > 0) {
               return {
                 status: "good",
                 message: "Downloaded",
