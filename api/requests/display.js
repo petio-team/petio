@@ -156,6 +156,11 @@ function reqState(req, children) {
               };
             } else {
               let airDate = children[r].info.firstAired;
+              if (!airDate)
+                return {
+                  status: "blue",
+                  message: "Awaiting Info",
+                };
               diff = Math.ceil(new Date(airDate) - new Date());
               if (diff > 0) {
                 return {
