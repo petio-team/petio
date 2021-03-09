@@ -1,6 +1,7 @@
 import React from "react";
 import { ReactComponent as LeftArrow } from "../assets/svg/back.svg";
 import { ReactComponent as RightArrow } from "../assets/svg/forward.svg";
+import CarouselLoading from "./CarouselLoading";
 
 class Carousel extends React.Component {
   constructor(props) {
@@ -81,7 +82,7 @@ class Carousel extends React.Component {
       });
     } else {
       this.setState({
-        inView: false,
+        inView: this.state.inView ? true : false,
       });
     }
   }
@@ -170,7 +171,9 @@ class Carousel extends React.Component {
         >
           {this.state.inView ? (
             <div className="carousel--inner">{childrenWithProps}</div>
-          ) : null}
+          ) : (
+            <CarouselLoading />
+          )}
         </div>
       </div>
     );

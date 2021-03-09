@@ -164,3 +164,13 @@ export async function discoveryMovies() {
     throw "Unable to get Discovery Movies";
   }
 }
+
+export async function discoveryShows() {
+  try {
+    let data = await api.discoveryShows();
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw "Unable to get Discovery Shows";
+  }
+}

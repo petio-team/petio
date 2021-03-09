@@ -437,4 +437,5 @@ module.exports = {
   discoverSeries,
   showLookup,
   network,
+  getRecommendations,
 };

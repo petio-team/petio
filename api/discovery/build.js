@@ -10,6 +10,10 @@ const Show = require("../models/show");
 module.exports = async function buildDiscovery() {
   logger.info("DISC: Started building discovery profiles");
   let users = await User.find();
+  if (!users || users.length === 0) {
+    logger.warn("DISC: No Users");
+    return;
+  }
   let userIds = [];
   Object.keys(users).map((i) => {
     if (users[i].altId) {
@@ -95,13 +99,34 @@ async function build(id) {
         if (dbItem.Genre) {
           for (let g = 0; g < dbItem.Genre.length; g++) {
             let genre = dbItem.Genre[g];
+            let cr = cert(dbItem.contentRating, "movie");
             if (!movie.genres[genre.tag]) {
               movie.genres[genre.tag] = {
                 count: 1,
                 name: genre.tag,
+                cert: {},
+                lowestRating: dbItem.rating ? dbItem.rating : 0,
+                highestRating: dbItem.rating ? dbItem.rating : 10,
               };
+              if (cr) movie.genres[genre.tag].cert[cr] = 1;
             } else {
               movie.genres[genre.tag].count = movie.genres[genre.tag].count + 1;
+              if (cr) {
+                let certCount = movie.genres[genre.tag].cert[cr] || 0;
+                movie.genres[genre.tag].cert[cr] = certCount + 1;
+              }
+              if (
+                dbItem.rating &&
+                movie.genres[genre.tag].lowestRating > dbItem.rating
+              ) {
+                movie.genres[genre.tag].lowestRating = dbItem.rating;
+              }
+              if (
+                dbItem.rating &&
+                movie.genres[genre.tag].highestRating < dbItem.rating
+              ) {
+                movie.genres[genre.tag].highestRating = dbItem.rating;
+              }
             }
           }
         }
@@ -115,14 +140,35 @@ async function build(id) {
           if (dbItem.Genre) {
             for (let g = 0; g < dbItem.Genre.length; g++) {
               let genre = dbItem.Genre[g];
+              let cr = cert(dbItem.contentRating, "show");
               if (!series.genres[genre.tag]) {
                 series.genres[genre.tag] = {
                   count: 1,
                   name: genre.tag,
+                  cert: {},
+                  lowestRating: dbItem.rating ? dbItem.rating : 0,
+                  highestRating: dbItem.rating ? dbItem.rating : 10,
                 };
+                if (cr) series.genres[genre.tag].cert[cr] = 1;
               } else {
                 series.genres[genre.tag].count =
                   series.genres[genre.tag].count + 1;
+                if (cr) {
+                  let certCount = series.genres[genre.tag].cert[cr] || 0;
+                  series.genres[genre.tag].cert[cr] = certCount + 1;
+                }
+                if (
+                  dbItem.rating &&
+                  series.genres[genre.tag].lowestRating > dbItem.rating
+                ) {
+                  series.genres[genre.tag].lowestRating = dbItem.rating;
+                }
+                if (
+                  dbItem.rating &&
+                  series.genres[genre.tag].highestRating < dbItem.rating
+                ) {
+                  series.genres[genre.tag].highestRating = dbItem.rating;
+                }
               }
             }
           }
@@ -134,6 +180,66 @@ async function build(id) {
     movie: movie,
     series: series,
   };
+}
+
+function cert(cert, type) {
+  if (!cert) return false;
+  if (cert.includes("/")) cert = cert.split("/")[1];
+  cert = cert.toLowerCase();
+  switch (cert) {
+    case "u":
+    case "g":
+    case "gp":
+    case "0":
+    case "1":
+    case "2":
+    case "3":
+    case "tv-y":
+    case "tv-y7":
+    case "tv-g":
+    case "approved":
+    case "passed":
+      if (type === "movie") return "G";
+      return "TV-Y";
+
+    case "pg":
+    case "tv-pg":
+    case "6":
+    case "7":
+      if (type === "movie") return "PG";
+      return "TV-PG";
+
+    case "11":
+    case "12":
+    case "pg-12":
+    case "pg-13":
+    case "12a":
+    case "tv-14":
+      if (type === "movie") return "PG-13";
+      return "TV-14";
+
+    case "15":
+    case "16":
+    case "17":
+    case "r":
+      if (type === "movie") return "R";
+      return "TV-14";
+
+    case "nc-17":
+    case "tv-ma":
+    case "m":
+    case "18":
+      if (type === "movie") return "NC-17";
+      return "TV-MA";
+
+    case "not rated":
+    case "nr":
+      return false;
+
+    default:
+      console.log(cert);
+      return false;
+  }
 }
 
 function getHistory(id, library = false) {

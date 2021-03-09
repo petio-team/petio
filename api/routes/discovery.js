@@ -11,9 +11,27 @@ router.get("/movies", async (req, res) => {
   try {
     logger.log({
       level: "info",
-      message: `Discovery Profile returned for ${userId}`,
+      message: `ROUTE: Movie Discovery Profile returned for ${userId}`,
     });
-    let data = await getDiscovery(userId);
+    let data = await getDiscovery(userId, "movie");
+    res.json(data);
+  } catch (err) {
+    logger.log({ level: "error", message: err });
+    res.sendStatus(500);
+  }
+});
+
+router.get("/shows", async (req, res) => {
+  let userId = req.jwtUser.altId ? req.jwtUser.altId : req.jwtUser.id;
+  if (!userId) {
+    res.sendStatus(404);
+  }
+  try {
+    logger.log({
+      level: "info",
+      message: `ROUTE: TV Discovery Profile returned for ${userId}`,
+    });
+    let data = await getDiscovery(userId, "show");
     res.json(data);
   } catch (err) {
     logger.log({ level: "error", message: err });

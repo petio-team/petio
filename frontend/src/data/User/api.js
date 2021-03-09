@@ -46,3 +46,7 @@ export async function quota() {
 export async function discoveryMovies() {
   return get("/discovery/movies");
 }
+
+export async function discoveryShows() {
+  return get("/discovery/shows");
+}
