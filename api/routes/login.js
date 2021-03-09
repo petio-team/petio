@@ -52,7 +52,7 @@ router.post("/", async (req, res) => {
   // check for existing jwt
   try {
     const user = await authenticate(req);
-    success(user, user.admin);
+    success(user, req.jwtUser.admin);
     logger.log("info", `LOGIN: Request User: ${user.username}`);
     return;
   } catch (e) {

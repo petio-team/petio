@@ -21,7 +21,7 @@ async function authenticate(req) {
 
   try {
     let userData = await User.findOne({ id: req.jwtUser.id });
-    return userData;
+    return userData.toObject();
   } catch {
     throw `AUTH: User ${req.jwtUser.id} not found in DB - route ${req.path}`;
   }
@@ -30,7 +30,6 @@ async function authenticate(req) {
 exports.authenticate = authenticate;
 
 exports.authRequired = async (req, res, next) => {
-  console.log("auth req");
   try {
     await authenticate(req);
   } catch (e) {
