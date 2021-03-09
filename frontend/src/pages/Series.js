@@ -320,12 +320,12 @@ class Series extends React.Component {
                       <div className="image-wrap">
                         {season.poster_path ? (
                           <img
-                            src={`https://image.tmdb.org/t/p/w200/${season.poster_path}`}
+                            src={`https://image.tmdb.org/t/p/w200${season.poster_path}`}
                             alt={season.name}
                           />
                         ) : seriesData.poster_path ? (
                           <img
-                            src={`https://image.tmdb.org/t/p/w500/${seriesData.poster_path}`}
+                            src={`https://image.tmdb.org/t/p/w500${seriesData.poster_path}`}
                             alt={season.name}
                           />
                         ) : null}

@@ -117,7 +117,7 @@ class TvCard extends React.Component {
     let img = series.poster_path ? (
       <LazyLoadImage
         alt={series.title}
-        src={`https://image.tmdb.org/t/p/w200/${series.poster_path}`}
+        src={`https://image.tmdb.org/t/p/w200${series.poster_path}`}
         // effect="blur"
       />
     ) : (

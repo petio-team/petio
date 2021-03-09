@@ -28,7 +28,7 @@ class PersonCard extends React.Component {
               alt={person.name}
               src={
                 person.profile_path
-                  ? `https://image.tmdb.org/t/p/w200/${person.profile_path}`
+                  ? `https://image.tmdb.org/t/p/w200${person.profile_path}`
                   : "/images/no-poster-person.jpg"
               }
               // effect="blur"
