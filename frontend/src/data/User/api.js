@@ -42,3 +42,7 @@ export async function myRequests() {
 export async function quota() {
   return get("/user/quota");
 }
+
+export async function discoveryMovies() {
+  return get("/discovery/movies");
+}

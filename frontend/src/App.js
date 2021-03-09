@@ -389,7 +389,7 @@ class App extends React.Component {
               <Route exact path="/movies">
                 <div className="page-wrap">
                   <div className="generic-wrap">
-                    <Movies />
+                    <Movies msg={this.msg} />
                   </div>
                 </div>
               </Route>

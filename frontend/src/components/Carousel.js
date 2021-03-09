@@ -11,6 +11,7 @@ class Carousel extends React.Component {
       pos: 0,
       init: false,
       width: false,
+      inView: false,
     };
 
     this.carouselRef = React.createRef();
@@ -19,11 +20,17 @@ class Carousel extends React.Component {
     this.prev = this.prev.bind(this);
     this.init = this.init.bind(this);
     this.scroll = this.scroll.bind(this);
+    this.isInViewport = this.isInViewport.bind(this);
   }
 
   componentDidMount() {
+    let page = document.querySelectorAll(".page-wrap")[0];
+    page.scrollTop = 0;
+    window.scrollTo(0, 0);
     this.init();
     window.addEventListener("resize", this.init);
+    page.addEventListener("scroll", this.isInViewport);
+    this.isInViewport();
   }
 
   componentDidUpdate(prevProps) {
@@ -34,6 +41,7 @@ class Carousel extends React.Component {
 
   componentWillUnmount() {
     window.removeEventListener("resize", this.init);
+    window.removeEventListener("resize", this.isInViewport);
   }
 
   init() {
@@ -59,6 +67,23 @@ class Carousel extends React.Component {
       width: carousel.offsetWidth,
       max: max,
     });
+  }
+
+  isInViewport() {
+    let carousel = this.wrapper.current;
+    if (!carousel) return;
+    const top = carousel.getBoundingClientRect().top;
+    const wH = window.innerHeight;
+    console.log(top, wH);
+    if (top <= wH) {
+      this.setState({
+        inView: true,
+      });
+    } else {
+      this.setState({
+        inView: false,
+      });
+    }
   }
 
   scroll() {
@@ -114,7 +139,12 @@ class Carousel extends React.Component {
       }
     );
     return (
-      <div className="carousel--wrap" ref={this.wrapper}>
+      <div
+        className={`carousel--wrap ${
+          this.state.inView ? "visible" : "not-visible"
+        }`}
+        ref={this.wrapper}
+      >
         <div className="carousel--controls">
           <div
             className={`carousel--controls--item carousel--prev ${
@@ -138,7 +168,9 @@ class Carousel extends React.Component {
           ref={this.carouselRef}
           onScroll={this.scroll}
         >
-          <div className="carousel--inner">{childrenWithProps}</div>
+          {this.state.inView ? (
+            <div className="carousel--inner">{childrenWithProps}</div>
+          ) : null}
         </div>
       </div>
     );

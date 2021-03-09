@@ -108,7 +108,7 @@ class MovieShowTop extends React.Component {
           ) : null}
           {this.props.mediaData.backdrop_path ? (
             <LazyLoadImage
-              src={`https://image.tmdb.org/t/p${this.state.bgSize}/${this.props.mediaData.backdrop_path}
+              src={`https://image.tmdb.org/t/p${this.state.bgSize}${this.props.mediaData.backdrop_path}
               `}
               alt={this.props.mediaData.title}
               effect="blur"
@@ -123,7 +123,7 @@ class MovieShowTop extends React.Component {
             {this.props.mediaData.poster_path ? (
               <LazyLoadImage
                 src={
-                  "https://image.tmdb.org/t/p/w500/" +
+                  "https://image.tmdb.org/t/p/w500" +
                   this.props.mediaData.poster_path
                 }
                 alt={this.props.mediaData.title}

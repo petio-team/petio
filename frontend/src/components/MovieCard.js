@@ -117,7 +117,7 @@ class MovieCard extends React.Component {
     let img = movie.poster_path ? (
       <LazyLoadImage
         alt={movie.title}
-        src={`https://image.tmdb.org/t/p/w200/${movie.poster_path}`}
+        src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
         // effect="blur"
       />
     ) : (

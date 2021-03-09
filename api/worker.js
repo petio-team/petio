@@ -4,11 +4,13 @@ const LibraryUpdate = require("./plex/libraryUpdate");
 const QuotaSystem = require("./requests/quotas");
 const getConfig = require("./util/config");
 const mongoose = require("mongoose");
+const buildDiscovery = require("./discovery/build");
 
 class Worker {
   async connnectDb() {
     const config = getConfig();
     if (!config) {
+      logger.log("info", "CRONW: Failed to connect to DB");
       throw "Failed to connect to DB";
     }
 
@@ -25,6 +27,7 @@ class Worker {
       await this.connnectDb();
       const libUpdate = new LibraryUpdate();
       libUpdate.run();
+      buildDiscovery();
       const run = this.runCron;
       // Runs every night at 00:00
       this.cron = new CronJob("0 0 * * *", function () {
@@ -60,13 +63,14 @@ class Worker {
   async runCron(type = 1) {
     switch (type) {
       case 1:
-        await new LibraryUpdate().run();
+        new LibraryUpdate().run();
+        buildDiscovery();
         break;
       case 2:
-        await new LibraryUpdate().partial();
+        new LibraryUpdate().partial();
         break;
       case 3:
-        await new QuotaSystem().reset();
+        new QuotaSystem().reset();
       default:
         logger.log("warn", "CRONW: Invalid cron");
     }

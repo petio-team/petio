@@ -370,4 +370,5 @@ module.exports = {
   discoverMovie,
   movieLookup,
   company,
+  getRecommendations,
 };

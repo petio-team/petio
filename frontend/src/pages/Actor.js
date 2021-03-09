@@ -189,7 +189,7 @@ class Actor extends React.Component {
               <div
                 className="person--banner"
                 style={{
-                  backgroundImage: `url(https://image.tmdb.org/t/p/original/${banner.file_path})`,
+                  backgroundImage: `url(https://image.tmdb.org/t/p/original${banner.file_path})`,
                 }}
               ></div>
               <div className="person--top">
@@ -197,7 +197,7 @@ class Actor extends React.Component {
                   <div className="person--thumb--inner">
                     {personData.profile_path ? (
                       <img
-                        src={`https://image.tmdb.org/t/p/w1280/${personData.profile_path}`}
+                        src={`https://image.tmdb.org/t/p/w500${personData.profile_path}`}
                       />
                     ) : (
                       <img src="/images/no-poster-person.jpg" />
