@@ -82,9 +82,7 @@ module.exports = async function getDiscovery(id, type = "movie") {
               ? await Movie.getRecommendations(recent.id)
               : await Show.getRecommendations(recent.id);
           if (related.results.length === 0) {
-            console.log(recent);
             let showLookup = await Show.showLookup(recent.id);
-            console.log(showLookup);
             if (!showLookup) return null;
             let params = {};
             if (showLookup.genres) {

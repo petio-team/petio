@@ -26,8 +26,8 @@ class Worker {
     try {
       await this.connnectDb();
       const libUpdate = new LibraryUpdate();
-      // await libUpdate.scan();
-      // buildDiscovery();
+      await libUpdate.scan();
+      buildDiscovery();
       const run = this.runCron;
       // Runs every night at 00:00
       this.cron = new CronJob("0 0 * * *", function () {
