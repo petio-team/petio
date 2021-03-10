@@ -30,6 +30,7 @@ async function getDiscoveryData(id, type = "movie") {
   if (!id) throw "No user";
   logger.log("info", `Discovery built fresh - ${id} - ${type}`);
   const discoveryPrefs = await Discovery.findOne({ id: id });
+  if (!discoveryPrefs) throw "No user profile created";
   const watchHistory =
     type === "movie"
       ? discoveryPrefs.movie.history
