@@ -63,7 +63,7 @@ class Shows extends React.Component {
         </section>
         {this.state.personalised && this.state.personalised.length > 0
           ? this.state.personalised.map((row, r) => {
-              if (!row) return null;
+              if (!row || row.results.length < 4) return null;
               return (
                 <section key={`psn__${r}`}>
                   <h3 className="sub-title mb--1">{row.title}</h3>

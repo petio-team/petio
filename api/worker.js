@@ -26,7 +26,7 @@ class Worker {
     try {
       await this.connnectDb();
       const libUpdate = new LibraryUpdate();
-      await libUpdate.scan();
+      // await libUpdate.scan();
       buildDiscovery();
       const run = this.runCron;
       // Runs every night at 00:00

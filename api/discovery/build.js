@@ -44,11 +44,17 @@ async function create(id) {
       existing.id = id;
       existing.movie = {
         genres: data.movie.genres,
+        people: {
+          cast: data.movie.actors,
+        },
         history: data.movie.history,
       };
       existing.series = {
         genres: data.series.genres,
         history: data.series.history,
+        people: {
+          cast: data.series.actors,
+        },
       };
       existing.save();
     } else {
@@ -56,11 +62,17 @@ async function create(id) {
         id: id,
         movie: {
           genres: data.movie.genres,
+          people: {
+            cast: data.movie.actors,
+          },
           history: data.movie.history,
         },
         series: {
           genres: data.series.genres,
           history: data.series.history,
+          people: {
+            cast: data.series.actors,
+          },
         },
       });
       newDiscover.save();
@@ -76,6 +88,7 @@ async function build(id) {
   let movie = {
     history: {},
     genres: {},
+    actors: {},
   };
   let series = {
     history: {},
@@ -130,6 +143,14 @@ async function build(id) {
             }
           }
         }
+        if (dbItem.Role) {
+          for (let r = 0; r < dbItem.Role.length; r++) {
+            let actor = dbItem.Role[r].tag;
+            movie.actors[actor] = movie.actors[actor]
+              ? movie.actors[actor] + 1
+              : 1;
+          }
+        }
       }
     } else if (listItem.type === "episode") {
       if (listItem.grandparentKey) {
@@ -172,10 +193,24 @@ async function build(id) {
               }
             }
           }
+
+          if (dbItem.Role) {
+            for (let r = 0; r < dbItem.Role.length; r++) {
+              let actor = dbItem.Role[r].tag;
+              series.actors[actor] = series.actors[actor]
+                ? series.actors[actor] + 1
+                : 1;
+            }
+          }
         }
       }
     }
   }
+  Object.keys(movie.actors).map((key) => {
+    if (movie.actors[key] < 2) {
+      delete movie.actors[key];
+    }
+  });
   return {
     movie: movie,
     series: series,

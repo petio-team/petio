@@ -9,30 +9,54 @@ const getHistory = require("../plex/history");
 module.exports = async function getDiscovery(id, type = "movie") {
   if (!id) throw "No user";
   const discoveryPrefs = await Discovery.findOne({ id: id });
+  const watchHistory =
+    type === "movie"
+      ? discoveryPrefs.movie.history
+      : discoveryPrefs.series.history;
   if (!discoveryPrefs) throw "User not found in discovery";
-  let movieGenres = discoveryPrefs.movie.genres;
+  let mediaGenres =
+    type === "movie"
+      ? discoveryPrefs.movie.genres
+      : discoveryPrefs.series.genres;
+  let mediaActors =
+    type === "movie"
+      ? discoveryPrefs.movie.people.cast
+      : discoveryPrefs.series.people.cast;
   let genresSorted = [];
-  for (var genre in movieGenres) {
-    genresSorted.push(movieGenres[genre]);
+  let actorsSorted = [];
+  for (var genre in mediaGenres) {
+    genresSorted.push(mediaGenres[genre]);
   }
   genresSorted.sort(function (a, b) {
     if (a.count > b.count) {
       return -1;
     }
   });
-  genresSorted.length = 3;
-  let data = await Promise.all(
+  // genresSorted.length = 3;
+  let genreList = [];
+  let genresData = await Promise.all(
     genresSorted.map(async (genre) => {
       let id = genreID(genre.name, type);
-      if (!id) return null;
+      if (!id || genreList.includes(id)) {
+        return null;
+      }
+      genreList.push(id);
       let args = {
         with_genres: id,
         sort_by: type === "movie" ? "revenue.desc" : "popularity.desc",
-        "vote_count.gte": 500,
+        "vote_count.gte": 1500,
         certification_country: "US",
-        "vote_average.lte": genre.highestRating - 0.5,
-        "vote_average.gte": genre.lowestRating + 0.5,
+        "vote_average.gte":
+          genre.lowestRating > 0.5
+            ? genre.lowestRating - 0.5
+            : genre.lowestRating,
       };
+      if (type === "movie") {
+        args["vote_average.lte"] =
+          genre.highestRating < 9.5
+            ? genre.highestRating + 0.5
+            : genre.highestRating;
+      }
       let certifications = [];
       if (Object.keys(genre.cert).length > 0) {
         Object.keys(genre.cert).map((cert) => {
@@ -48,13 +72,19 @@ module.exports = async function getDiscovery(id, type = "movie") {
         type === "movie"
           ? await discoverMovie(1, args)
           : await discoverShow(1, args);
+
+      // if (!discData || discData.results.length === 0) {
+      //   return null;
+      // }
+
       discData.results.sort(function (a, b) {
-        if (a.vote_average > b.vote_average) {
+        if (a.vote_count > b.vote_count) {
           return -1;
         }
       });
+
       discData.results.map((result, i) => {
-        if (result.id.toString() in discoveryPrefs.movie.history) {
+        if (result.id.toString() in watchHistory) {
           discData.results[i] = "watched";
         }
       });
@@ -70,6 +100,52 @@ module.exports = async function getDiscovery(id, type = "movie") {
       };
     })
   );
+  for (var actor in mediaActors) {
+    actorsSorted.push({ name: actor, count: mediaActors[actor] });
+  }
+  actorsSorted.sort(function (a, b) {
+    if (a.count > b.count) {
+      return -1;
+    }
+  });
+  let peopleData = await Promise.all(
+    actorsSorted.map(async (actor) => {
+      let lookup = await searchPeople(actor.name);
+      if (lookup.results && lookup.results.length > 0) {
+        let match = lookup.results[0];
+        let args = {
+          sort_by: type === "movie" ? "revenue.desc" : "popularity.desc",
+          "vote_count.gte": 500,
+          with_people: match.id,
+        };
+        let discData =
+          type === "movie"
+            ? await discoverMovie(1, args)
+            : await discoverShow(1, args);
+
+        // if (!discData || discData.results.length === 0) {
+        //   return null;
+        // }
+
+        discData.results.sort(function (a, b) {
+          if (a.vote_average > b.vote_average) {
+            return -1;
+          }
+        });
+
+        discData.results.map((result, i) => {
+          if (result.id.toString() in watchHistory) {
+            discData.results[i] = "watched";
+          }
+        });
+
+        return {
+          title: `"${actor.name}" ${type === "movie" ? "movies" : "shows"}`,
+          results: discData.results,
+        };
+      }
+    })
+  );
   let recentlyViewed = await getHistory(id, type);
   let recentData = await Promise.all(
     Object.keys(recentlyViewed)
@@ -82,18 +158,24 @@ module.exports = async function getDiscovery(id, type = "movie") {
               ? await Movie.getRecommendations(recent.id)
               : await Show.getRecommendations(recent.id);
           if (related.results.length === 0) {
-            let showLookup = await Show.showLookup(recent.id);
-            if (!showLookup) return null;
+            let lookup =
+              type === "movie"
+                ? await Movie.movieLookup(recent.id)
+                : await Show.showLookup(recent.id);
+            if (!lookup) return null;
             let params = {};
-            if (showLookup.genres) {
+            if (lookup.genres) {
               let genres = "";
-              for (let i = 0; i < showLookup.genres.length; i++) {
-                genres += `${showLookup.genres[i].id},`;
+              for (let i = 0; i < lookup.genres.length; i++) {
+                genres += `${lookup.genres[i].id},`;
               }
 
               params.with_genres = genres;
             }
-            recommendations = await discoverShow(1, params);
+            recommendations =
+              type === "movie"
+                ? await discoverMovie(1, params)
+                : await discoverShow(1, params);
             if (recommendations.results.length === 0) return null;
             return {
               title: `Because you watched "${recent.name}"`,
@@ -108,113 +190,121 @@ module.exports = async function getDiscovery(id, type = "movie") {
         }
       })
   );
-  data = [...recentData, ...data];
+  let now = new Date().toISOString().split("T")[0];
+  let upcoming =
+    type === "movie"
+      ? await discoverMovie(1, {
+          sort_by: "popularity.desc",
+          "primary_release_date.gte": now,
+        })
+      : await discoverShow(1, {
+          sort_by: "popularity.desc",
+          "first_air_date.gte": now,
+        });
+  let data = [...peopleData, ...recentData, ...genresData];
   data = shuffle(data);
-  return data;
+  return [
+    {
+      title: type === "movie" ? "Movies coming soon" : "Shows coming soon",
+      results: upcoming.results,
+    },
+    ...data,
+  ];
 };
 
 function genreID(genreName, type) {
-  // split types here
   if (type === "movie") {
     switch (genreName) {
+      case "Action":
+        return 28;
       case "Adventure":
       case "Action/Adventure":
         return 12;
-      case "Fantasy":
-        return 14;
       case "Animation":
         return 16;
-      case "Drama":
-        return 18;
-      case "Horror":
-        return 27;
-      case "Action":
-        return 28;
       case "Comedy":
         return 35;
-      case "History":
-      case "Biography":
-        return 36;
-      case "Western":
-        return 37;
-      case "Thriller":
-        return 53;
       case "Crime":
+      case "Film-Noir":
         return 80;
       case "Documentary":
       case "Factual":
         return 99;
-      case "Science Fiction":
-        return 878;
+      case "Drama":
+        return 18;
+      case "Family":
+      case "Kids":
+      case "Children":
+        return 10751;
+      case "Fantasy":
+        return 14;
+      case "History":
+      case "Biography":
+        return 36;
+      case "Horror":
+        return 27;
+      case "Music":
+      case "Musical":
+        return 10402;
       case "Mystery":
         return 9648;
-      case "Music":
-        return 10402;
-      case "War":
-        return 10752;
-      case "TV Movie":
-        return 10770;
       case "Romance":
         return 10749;
-      case "Family":
-        return 10751;
-      case "Action & Adventure":
-        return 10759;
-      case "Kids":
-        return 10762;
-      case "News":
-        return 10763;
-      case "Reality":
-      case "Reality-TV":
-        return 10764;
-      case "Sci-Fi & Fantasy":
-        return 10765;
-      case "Soap":
-        return 10766;
-      case "Talk":
-        return 10767;
-      case "War & Politics":
-        return 10768;
+      case "Science Fiction":
+      case "Sci-Fi":
+        return 878;
+      case "TV Movie":
+        return 10770;
+      case "Thriller":
+        return 53;
+      case "War":
+        return 10752;
+      case "Western":
+        return 37;
+
       default:
         logger.warn(`DISC: Genre not mapped ${genreName}`);
         return false;
     }
   } else {
     switch (genreName) {
+      case "Action & Adventure":
       case "Adventure":
       case "Action/Adventure":
       case "Action":
-      case "Action & Adventure":
         return 10759;
-      case "Fantasy":
-      case "Science Fiction":
-      case "Sci-Fi":
-      case "Sci-Fi & Fantasy":
-        return 10765;
       case "Animation":
         return 16;
-      case "Drama":
-        return 18;
       case "Comedy":
         return 35;
-      case "Western":
-        return 37;
       case "Crime":
         return 80;
       case "Documentary":
       case "Factual":
+      case "Biography":
         return 99;
-      case "News":
-        return 10763;
+      case "Drama":
+        return 18;
       case "Family":
         return 10751;
       case "Kids":
+      case "Children":
         return 10762;
+      case "Mystery":
+      case "Horror":
+      case "Thriller":
+      case "Suspense":
+        return 9648;
       case "News":
         return 10763;
       case "Reality":
       case "Reality-TV":
         return 10764;
+      case "Sci-Fi & Fantasy":
+      case "Science Fiction":
+      case "Fantasy":
+      case "Sci-Fi":
+        return 10765;
       case "Soap":
         return 10766;
       case "Talk":
@@ -222,6 +312,8 @@ function genreID(genreName, type) {
       case "War":
       case "War & Politics":
         return 10768;
+      case "Western":
+        return 37;
       default:
         logger.warn(`DISC: Genre not mapped ${genreName}`);
         return false;
@@ -265,6 +357,29 @@ function discoverShow(page = 1, params = {}) {
     par += `&${i}=${params[i]}`;
   });
   let url = `${tmdb}discover/tv?api_key=${tmdbApikey}${par}&page=${page}`;
+  return new Promise((resolve, reject) => {
+    request(
+      url,
+      {
+        method: "GET",
+        json: true,
+      },
+      function (err, data) {
+        if (err) {
+          reject(err);
+        }
+
+        resolve(data);
+      }
+    );
+  });
+}
+
+function searchPeople(term) {
+  const config = getConfig();
+  const tmdbApikey = config.tmdbApi;
+  const tmdb = "https://api.themoviedb.org/3/";
+  let url = `${tmdb}search/person?query=${term}&include_adult=false&api_key=${tmdbApikey}`;
   return new Promise((resolve, reject) => {
     request(
       url,
