@@ -134,7 +134,7 @@ async function showLookup(id, minified = false) {
       return show;
     } catch (err) {
       logger.log("warn", `Error processing show data - ${id}`);
-      logger.log("warn", err);
+      logger.log({ level: "error", message: err });
       console.log(err);
       return { error: "not found" };
     }
@@ -151,7 +151,7 @@ async function getShowData(id) {
     });
   } catch (err) {
     logger.log("warn", `Error getting show data - ${id}`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 }
@@ -164,7 +164,7 @@ async function externalId(id) {
     });
   } catch (err) {
     logger.log("warn", `Error getting external ID - ${id}`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 }
@@ -177,7 +177,7 @@ async function getRecommendations(id, page = 1) {
     });
   } catch (err) {
     logger.log("warn", `Error getting recommendation data - ${id}`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 }
@@ -190,7 +190,7 @@ async function getReviews(id) {
     });
   } catch (err) {
     logger.log("warn", `Error getting review data - ${id}`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 }
@@ -203,7 +203,7 @@ async function getSeasons(seasons, id) {
     });
   } catch (err) {
     logger.log("warn", `Error getting season data - ${id}`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 }

@@ -21,7 +21,7 @@ module.exports = async function getDiscovery(id, type = "movie") {
     });
   } catch (err) {
     logger.log("warn", `Error getting discovery data - ${id}`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 };

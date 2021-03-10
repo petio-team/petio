@@ -47,7 +47,7 @@ async function getPerson() {
     });
   } catch (err) {
     logger.log("warn", `Error getting trending people`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 }
@@ -60,7 +60,7 @@ async function getMovies() {
     });
   } catch (err) {
     logger.log("warn", `Error getting trending movies`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 }
@@ -73,7 +73,7 @@ async function getShows() {
     });
   } catch (err) {
     logger.log("warn", `Error getting trending shows`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 }

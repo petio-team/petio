@@ -132,7 +132,7 @@ async function movieLookup(id, minified = false) {
       return movie;
     } catch (err) {
       logger.log("warn", `Error processing movie data - ${id}`);
-      logger.log("warn", err);
+      logger.log({ level: "error", message: err });
       return { error: "not found" };
     }
   }
@@ -148,7 +148,7 @@ async function getMovieData(id) {
     });
   } catch (err) {
     logger.log("warn", `Error getting movie data - ${id}`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 }
@@ -161,7 +161,7 @@ async function getRecommendations(id, page = 1) {
     });
   } catch (err) {
     logger.log("warn", `Error getting movie recommendations - ${id}`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 }
@@ -174,7 +174,7 @@ async function getReviews(id) {
     });
   } catch (err) {
     logger.log("warn", `Error getting movie reviews - ${id}`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 }
@@ -187,7 +187,7 @@ async function getCollection(id) {
     });
   } catch (err) {
     logger.log("warn", `Error getting movie collections - ${id}`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 }

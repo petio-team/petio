@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
     res.json(data.MediaContainer);
   } catch (err) {
     logger.log("warn", "ROUTE: Unable to get sessions");
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
     res.status(500).send();
   }
 });

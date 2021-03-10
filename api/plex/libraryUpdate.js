@@ -519,7 +519,7 @@ class LibraryUpdate {
         );
       } catch (err) {
         movieDb = false;
-        logger.log("warn", err);
+        logger.log({ level: "error", message: err });
       }
     }
   }

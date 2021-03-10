@@ -145,7 +145,7 @@ async function build(id) {
         }
         if (dbItem.Role) {
           for (let r = 0; r < dbItem.Role.length; r++) {
-            let actor = dbItem.Role[r].tag;
+            let actor = dbItem.Role[r].tag.replace(/[^a-zA-Z0-9 ]/g, "");
             movie.actors[actor] = movie.actors[actor]
               ? movie.actors[actor] + 1
               : 1;

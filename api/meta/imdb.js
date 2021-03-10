@@ -34,7 +34,7 @@ async function getRaw(id) {
     });
   } catch (err) {
     logger.log("warn", `Error crawling imdb - ${id}`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 }
