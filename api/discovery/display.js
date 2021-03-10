@@ -95,6 +95,8 @@ async function getDiscoveryData(id, type = "movie") {
           ? await Promise.all([discoverMovie(1, args), discoverMovie(2, args)])
           : await Promise.all([discoverShow(1, args), discoverShow(2, args)]);
 
+      if (!discData[0].results) discData[0].results = [];
+      if (!discData[1].results) discData[1].results = [];
       discData = {
         results: [...discData[0].results, ...discData[1].results],
       };
@@ -150,6 +152,8 @@ async function getDiscoveryData(id, type = "movie") {
               ])
             : await Promise.all([discoverShow(1, args), discoverShow(2, args)]);
 
+        if (!discData[0].results) discData[0].results = [];
+        if (!discData[1].results) discData[1].results = [];
         discData = {
           results: [...discData[0].results, ...discData[1].results],
         };
@@ -180,25 +184,27 @@ async function getDiscoveryData(id, type = "movie") {
       .slice(0, 5)
       .map(async (r) => {
         let recent = recentlyViewed[r];
-        if (recent.id) {
+        if (recent.tmdb_id) {
           let related =
             type === "movie"
               ? await Promise.all([
-                  Movie.getRecommendations(recent.id, 1),
-                  Movie.getRecommendations(recent.id, 2),
+                  Movie.getRecommendations(recent.tmdb_id, 1),
+                  Movie.getRecommendations(recent.tmdb_id, 2),
                 ])
               : await Promise.all([
-                  Show.getRecommendations(recent.id, 1),
-                  Show.getRecommendations(recent.id, 2),
+                  Show.getRecommendations(recent.tmdb_id, 1),
+                  Show.getRecommendations(recent.tmdb_id, 2),
                 ]);
+          if (!related[0].results) related[0].results = [];
+          if (!related[1].results) related[1].results = [];
           related = {
             results: [...related[0].results, ...related[1].results],
           };
           if (related.results.length === 0) {
             let lookup =
               type === "movie"
-                ? await Movie.movieLookup(recent.id)
-                : await Show.showLookup(recent.id);
+                ? await Movie.movieLookup(recent.tmdb_id)
+                : await Show.showLookup(recent.tmdb_id);
             if (!lookup) return null;
             let params = {};
             if (lookup.genres) {
