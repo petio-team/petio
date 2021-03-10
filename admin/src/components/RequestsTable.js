@@ -2,6 +2,7 @@ import React from "react";
 import { ReactComponent as MovieIcon } from "../assets/svg/movie.svg";
 import { ReactComponent as TvIcon } from "../assets/svg/tv.svg";
 import { ReactComponent as Arrow } from "../assets/svg/arrow-left.svg";
+import { ReactComponent as WarningIcon } from "../assets/svg/warning.svg";
 
 class RequestsTable extends React.Component {
   constructor(props) {
@@ -252,7 +253,17 @@ class RequestsTable extends React.Component {
               return (
                 <React.Fragment key={key}>
                   <tr>
-                    <td>{req.title}</td>
+                    <td>
+                      {req.title}{" "}
+                      {req.type === "tv" && !req.tvdb_id ? (
+                        <span
+                          className="no-id warning"
+                          title="No TVDb ID for this request"
+                        >
+                          <WarningIcon />
+                        </span>
+                      ) : null}
+                    </td>
                     <td>{this.getYear(req)}</td>
                     <td>{this.typeIcon(req.type)}</td>
                     <td>

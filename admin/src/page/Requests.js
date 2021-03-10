@@ -4,6 +4,7 @@ import User from "../data/User";
 import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
 import RequestsTable from "../components/RequestsTable";
 import Modal from "../components/Modal";
+import { ReactComponent as WarningIcon } from "../assets/svg/warning.svg";
 
 class Requests extends React.Component {
   constructor(props) {
@@ -331,7 +332,10 @@ class Requests extends React.Component {
         )}
         {editable ? null : (
           <p style={{ margin: 0 }}>
-            <small>{`These settings cannot be edited once sent to ${type}`}</small>
+            <small>
+              {`These settings cannot be edited once sent to`}
+              <span style={{ textTransform: "capitalize" }}>{type}</span>
+            </small>
           </p>
         )}
       </div>
@@ -478,6 +482,12 @@ class Requests extends React.Component {
         >
           {this.state.activeRequest ? (
             <>
+              {this.state.activeRequest.type === "tv" &&
+              !this.state.activeRequest.tvdb_id ? (
+                <p className="warning-text">
+                  <WarningIcon /> No TVDb ID
+                </p>
+              ) : null}
               <p className="sub-title mb--1">
                 {this.state.activeRequest.title}
               </p>

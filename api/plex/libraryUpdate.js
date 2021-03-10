@@ -21,9 +21,9 @@ class LibraryUpdate {
     this.full = true;
   }
 
-  run() {
-    this.scan();
-  }
+  // async run() {
+  //   await this.scan();
+  // }
 
   async partial() {
     logger.log("info", `LIB CRON: Running Partial`);
@@ -712,9 +712,11 @@ class LibraryUpdate {
       logger.log({ level: "error", message: err });
     }
     if (friendList) {
-      Object.keys(friendList).map((item) => {
-        this.saveFriend(friendList[item].attributes);
-      });
+      await Promise.all(
+        Object.keys(friendList).map(async (item) => {
+          await this.saveFriend(friendList[item].attributes);
+        })
+      );
     }
   }
 

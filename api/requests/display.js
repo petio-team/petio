@@ -142,16 +142,25 @@ function reqState(req, children) {
           if (children[r].info.seasons) {
             let missing = false;
             for (let season of children[r].info.seasons) {
-              if (season.statistics.percentOfEpisodes !== 100) missing = true;
+              if (
+                season.statistics &&
+                season.statistics.percentOfEpisodes !== 100
+              )
+                missing = true;
             }
 
-            if (!missing) {
+            if (!missing && children[r].info.totalEpisodeCount > 0) {
               return {
                 status: "good",
                 message: "Downloaded",
               };
             } else {
               let airDate = children[r].info.firstAired;
+              if (!airDate)
+                return {
+                  status: "blue",
+                  message: "Awaiting Info",
+                };
               diff = Math.ceil(new Date(airDate) - new Date());
               if (diff > 0) {
                 return {

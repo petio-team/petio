@@ -24,7 +24,7 @@ class MyRequests extends React.Component {
                   className="myrequests--item--thumb"
                   style={{
                     backgroundImage:
-                      "url(https://image.tmdb.org/t/p/w200/" +
+                      "url(https://image.tmdb.org/t/p/w200" +
                       request.thumb +
                       ")",
                   }}

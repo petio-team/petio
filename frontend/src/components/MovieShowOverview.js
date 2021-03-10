@@ -328,6 +328,10 @@ class MovieShowOverview extends React.Component {
                         this.props.mediaData.first_air_date
                       ).getFullYear()
                     : null}
+                  {!this.props.mediaData.release_date &&
+                  !this.props.mediaData.first_air_date
+                    ? "Unknown"
+                    : null}
                 </p>
                 <div className="detail--bar--sep">·</div>
                 <p className="runtime" title="Running Time">

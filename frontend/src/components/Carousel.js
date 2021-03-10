@@ -1,6 +1,7 @@
 import React from "react";
 import { ReactComponent as LeftArrow } from "../assets/svg/back.svg";
 import { ReactComponent as RightArrow } from "../assets/svg/forward.svg";
+import CarouselLoading from "./CarouselLoading";
 
 class Carousel extends React.Component {
   constructor(props) {
@@ -11,6 +12,7 @@ class Carousel extends React.Component {
       pos: 0,
       init: false,
       width: false,
+      inView: false,
     };
 
     this.carouselRef = React.createRef();
@@ -19,24 +21,34 @@ class Carousel extends React.Component {
     this.prev = this.prev.bind(this);
     this.init = this.init.bind(this);
     this.scroll = this.scroll.bind(this);
+    this.isInViewport = this.isInViewport.bind(this);
   }
 
   componentDidMount() {
+    let page = document.querySelectorAll(".page-wrap")[0];
+    page.scrollTop = 0;
+    window.scrollTo(0, 0);
     this.init();
     window.addEventListener("resize", this.init);
+    page.addEventListener("scroll", this.isInViewport);
+    this.isInViewport();
   }
 
   componentDidUpdate(prevProps) {
     if (this.props !== prevProps) {
+      this.init();
+    } else if (this.state.inView && !this.state.init) {
       this.init();
     }
   }
 
   componentWillUnmount() {
     window.removeEventListener("resize", this.init);
+    window.removeEventListener("resize", this.isInViewport);
   }
 
   init() {
+    if (!this.state.inView) return;
     let carousel = this.carouselRef.current;
     let wrapper = this.wrapper.current;
     let cards = carousel.getElementsByClassName("card");
@@ -59,6 +71,22 @@ class Carousel extends React.Component {
       width: carousel.offsetWidth,
       max: max,
     });
+  }
+
+  isInViewport() {
+    let carousel = this.wrapper.current;
+    if (!carousel) return;
+    const top = carousel.getBoundingClientRect().top;
+    const wH = window.innerHeight;
+    if (top <= wH) {
+      this.setState({
+        inView: true,
+      });
+    } else {
+      this.setState({
+        inView: this.state.inView ? true : false,
+      });
+    }
   }
 
   scroll() {
@@ -114,7 +142,12 @@ class Carousel extends React.Component {
       }
     );
     return (
-      <div className="carousel--wrap" ref={this.wrapper}>
+      <div
+        className={`carousel--wrap ${
+          this.state.inView ? "visible" : "not-visible"
+        }`}
+        ref={this.wrapper}
+      >
         <div className="carousel--controls">
           <div
             className={`carousel--controls--item carousel--prev ${
@@ -138,7 +171,11 @@ class Carousel extends React.Component {
           ref={this.carouselRef}
           onScroll={this.scroll}
         >
-          <div className="carousel--inner">{childrenWithProps}</div>
+          {this.state.inView ? (
+            <div className="carousel--inner">{childrenWithProps}</div>
+          ) : (
+            <CarouselLoading />
+          )}
         </div>
       </div>
     );

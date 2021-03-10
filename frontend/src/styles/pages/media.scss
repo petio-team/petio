@@ -548,11 +548,15 @@
       border-radius: 5px;
       cursor: pointer;
       transform: translateX(100px);
-      transition: transform 0.3s ease;
+      transition: transform 0.3s ease, background 0.3s ease;
 
       @include media-breakpoint-up(lg) {
         width: 40px;
         height: 40px;
+
+        &:hover {
+          background: $primaryDark;
+        }
       }
 
       svg {
