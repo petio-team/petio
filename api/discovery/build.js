@@ -284,7 +284,7 @@ function getHistory(id, library = false) {
       prefs.plexPort
     }/status/sessions/history/all?sort=viewedAt%3Adesc&accountID=${id}&viewedAt>=0${
       library ? "&librarySectionID=" + library : ""
-    }&X-Plex-Container-Start=0&X-Plex-Container-Size=300&X-Plex-Token=${
+    }&X-Plex-Container-Start=0&X-Plex-Container-Size=1000&X-Plex-Token=${
       prefs.plexToken
     }`;
     request(

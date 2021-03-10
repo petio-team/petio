@@ -107,7 +107,7 @@ class MovieCard extends React.Component {
             <div className="text-wrap">
               <p className="title">
                 Loading...
-                <span className="year"></span>
+                <span className="year">&nbsp;</span>
               </p>
             </div>
           </div>

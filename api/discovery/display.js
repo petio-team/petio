@@ -214,14 +214,26 @@ async function getDiscoveryData(id, type = "movie") {
                 ? await discoverMovie(1, params)
                 : await discoverShow(1, params);
             if (recommendations.results.length === 0) return null;
+            let newRelated = [];
+            recommendations.results.map((result, i) => {
+              if (!(result.id.toString() in watchHistory)) {
+                newRelated.push(recommendations.results[i]);
+              }
+            });
             return {
               title: `Because you watched "${recent.name}"`,
               results: recommendations.results,
             };
           } else {
+            let newRelated = [];
+            related.results.map((result, i) => {
+              if (!(result.id.toString() in watchHistory)) {
+                newRelated.push(related.results[i]);
+              }
+            });
             return {
               title: `Because you watched "${recent.name}"`,
-              results: related.results,
+              results: newRelated,
             };
           }
         }
