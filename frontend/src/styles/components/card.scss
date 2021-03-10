@@ -50,7 +50,11 @@
       left: 0;
       height: 100%;
       width: 100%;
-      background: radial-gradient(farthest-corner at 50% 50%, rgba(50, 50, 50, 0.5) 50%, #323232 100%);
+      background: radial-gradient(
+        farthest-corner at 50% 50%,
+        rgba(50, 50, 50, 0.5) 50%,
+        #323232 100%
+      );
       z-index: 3;
       opacity: 0;
       transition: opacity 0.3s ease;
@@ -264,6 +268,7 @@
     align-items: center;
     border-radius: 50px;
     font-weight: bold;
+    display: none;
   }
 }
 

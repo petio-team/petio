@@ -54,7 +54,7 @@ async function getDiscoveryData(id, type = "movie") {
       return -1;
     }
   });
-  // genresSorted.length = 3;
+  genresSorted.length = 4;
   let genreList = [];
   let genresData = await Promise.all(
     genresSorted.map(async (genre) => {
@@ -105,9 +105,10 @@ async function getDiscoveryData(id, type = "movie") {
         }
       });
 
+      let newDisc = [];
       discData.results.map((result, i) => {
-        if (result.id.toString() in watchHistory) {
-          discData.results[i] = "watched";
+        if (!(result.id.toString() in watchHistory)) {
+          newDisc.push(discData.results[i]);
         }
       });
 
@@ -115,7 +116,7 @@ async function getDiscoveryData(id, type = "movie") {
         title: `${genre.name} ${
           type === "movie" ? "movies" : "shows"
         } you might like`,
-        results: discData.results,
+        results: newDisc,
         genre_id: id,
         certifications: certifications,
         ratings: `${genre.lowestRating} - ${genre.highestRating}`,
@@ -130,6 +131,7 @@ async function getDiscoveryData(id, type = "movie") {
       return -1;
     }
   });
+  actorsSorted.length = 4;
   let peopleData = await Promise.all(
     actorsSorted.map(async (actor) => {
       let lookup = await searchPeople(actor.name);
@@ -137,17 +139,20 @@ async function getDiscoveryData(id, type = "movie") {
         let match = lookup.results[0];
         let args = {
           sort_by: type === "movie" ? "revenue.desc" : "popularity.desc",
-          "vote_count.gte": 500,
+          "vote_count.gte": 100,
           with_people: match.id,
         };
         let discData =
           type === "movie"
-            ? await discoverMovie(1, args)
-            : await discoverShow(1, args);
+            ? await Promise.all([
+                discoverMovie(1, args),
+                discoverMovie(2, args),
+              ])
+            : await Promise.all([discoverShow(1, args), discoverShow(2, args)]);
 
-        // if (!discData || discData.results.length === 0) {
-        //   return null;
-        // }
+        discData = {
+          results: [...discData[0].results, ...discData[1].results],
+        };
 
         discData.results.sort(function (a, b) {
           if (a.vote_average > b.vote_average) {
@@ -155,15 +160,16 @@ async function getDiscoveryData(id, type = "movie") {
           }
         });
 
+        let newDisc = [];
         discData.results.map((result, i) => {
-          if (result.id.toString() in watchHistory) {
-            discData.results[i] = "watched";
+          if (!(result.id.toString() in watchHistory)) {
+            newDisc.push(discData.results[i]);
           }
         });
 
         return {
-          title: `"${actor.name}" ${type === "movie" ? "movies" : "shows"}`,
-          results: discData.results,
+          title: `"${match.name}" ${type === "movie" ? "movies" : "shows"}`,
+          results: newDisc,
         };
       }
     })
