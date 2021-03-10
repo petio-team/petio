@@ -94,10 +94,6 @@ async function getDiscoveryData(id, type = "movie") {
           ? await Promise.all([discoverMovie(1, args), discoverMovie(2, args)])
           : await Promise.all([discoverShow(1, args), discoverShow(2, args)]);
 
-      // if (!discData || discData.results.length === 0) {
-      //   return null;
-      // }
-
       discData = {
         results: [...discData[0].results, ...discData[1].results],
       };
@@ -180,8 +176,17 @@ async function getDiscoveryData(id, type = "movie") {
         if (recent.id) {
           let related =
             type === "movie"
-              ? await Movie.getRecommendations(recent.id)
-              : await Show.getRecommendations(recent.id);
+              ? await Promise.all([
+                  Movie.getRecommendations(recent.id, 1),
+                  Movie.getRecommendations(recent.id, 2),
+                ])
+              : await Promise.all([
+                  Show.getRecommendations(recent.id, 1),
+                  Show.getRecommendations(recent.id, 2),
+                ]);
+          related = {
+            results: [...related[0].results, ...related[1].results],
+          };
           if (related.results.length === 0) {
             let lookup =
               type === "movie"

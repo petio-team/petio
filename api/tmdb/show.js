@@ -169,11 +169,11 @@ async function externalId(id) {
   return data;
 }
 
-async function getRecommendations(id) {
+async function getRecommendations(id, page = 1) {
   let data = false;
   try {
-    data = await memoryCache.wrap(`rec_${id}`, function () {
-      return recommendationData(id);
+    data = await memoryCache.wrap(`rec_${id}__${page}`, function () {
+      return recommendationData(id, page);
     });
   } catch (err) {
     logger.log("warn", `Error getting recommendation data - ${id}`);
@@ -256,11 +256,11 @@ async function tmdbData(id) {
   });
 }
 
-async function recommendationData(id) {
+async function recommendationData(id, page = 1) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}tv/${id}/recommendations?api_key=${tmdbApikey}`;
+  let url = `${tmdb}tv/${id}/recommendations?api_key=${tmdbApikey}&page=${page}`;
 
   return new Promise((resolve, reject) => {
     request(
