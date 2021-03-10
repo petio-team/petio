@@ -6,8 +6,29 @@ const Movie = require("../tmdb/movie");
 const Show = require("../tmdb/show");
 const getHistory = require("../plex/history");
 
+const cacheManager = require("cache-manager");
+const memoryCache = cacheManager.caching({
+  store: "memory",
+  max: 500,
+  ttl: 3600 /*seconds*/,
+});
+
 module.exports = async function getDiscovery(id, type = "movie") {
+  let data = false;
+  try {
+    data = await memoryCache.wrap(`disc__${id}__${type}`, function () {
+      return getDiscoveryData(id, type);
+    });
+  } catch (err) {
+    logger.log("warn", `Error getting discovery data - ${id}`);
+    logger.log("warn", err);
+  }
+  return data;
+};
+
+async function getDiscoveryData(id, type = "movie") {
   if (!id) throw "No user";
+  logger.log("info", `Discovery built fresh - ${id} - ${type}`);
   const discoveryPrefs = await Discovery.findOne({ id: id });
   const watchHistory =
     type === "movie"
@@ -210,7 +231,7 @@ module.exports = async function getDiscovery(id, type = "movie") {
     },
     ...data,
   ];
-};
+}
 
 function genreID(genreName, type) {
   if (type === "movie") {
