@@ -37,6 +37,8 @@ class Carousel extends React.Component {
   componentDidUpdate(prevProps) {
     if (this.props !== prevProps) {
       this.init();
+    } else if (this.state.inView && !this.state.init) {
+      this.init();
     }
   }
 
@@ -46,6 +48,7 @@ class Carousel extends React.Component {
   }
 
   init() {
+    if (!this.state.inView) return;
     let carousel = this.carouselRef.current;
     let wrapper = this.wrapper.current;
     let cards = carousel.getElementsByClassName("card");
@@ -75,7 +78,6 @@ class Carousel extends React.Component {
     if (!carousel) return;
     const top = carousel.getBoundingClientRect().top;
     const wH = window.innerHeight;
-    console.log(top, wH);
     if (top <= wH) {
       this.setState({
         inView: true,
