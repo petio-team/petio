@@ -91,12 +91,16 @@ async function getDiscoveryData(id, type = "movie") {
         args.certification = certifications.join("|");
       let discData =
         type === "movie"
-          ? await discoverMovie(1, args)
-          : await discoverShow(1, args);
+          ? await Promise.all([discoverMovie(1, args), discoverMovie(2, args)])
+          : await Promise.all([discoverShow(1, args), discoverShow(2, args)]);
 
       // if (!discData || discData.results.length === 0) {
       //   return null;
       // }
+
+      discData = {
+        results: [...discData[0].results, ...discData[1].results],
+      };
 
       discData.results.sort(function (a, b) {
         if (a.vote_count > b.vote_count) {

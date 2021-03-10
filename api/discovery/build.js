@@ -18,7 +18,7 @@ module.exports = async function buildDiscovery() {
   Object.keys(users).map((i) => {
     if (users[i].altId) {
       userIds.push(users[i].altId);
-    } else {
+    } else if (!users[i].custom) {
       userIds.push(users[i].id);
     }
   });
@@ -295,6 +295,7 @@ function getHistory(id, library = false) {
       },
       function (err, data) {
         if (err) {
+          console.log(url);
           reject(err);
         }
         resolve(data);
