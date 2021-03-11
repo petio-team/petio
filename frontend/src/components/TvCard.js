@@ -17,11 +17,13 @@ class TvCard extends React.Component {
       imdbId: false,
       tmdbId: false,
       inView: false,
+      imgLoaded: false,
     };
     this.getMovie = this.getSeries.bind(this);
     this.card = React.createRef();
     this.inView = this.inView.bind(this);
     this.request = this.request.bind(this);
+    this.imgLoaded = this.imgLoaded.bind(this);
   }
 
   componentDidMount() {
@@ -85,6 +87,12 @@ class TvCard extends React.Component {
     }
   }
 
+  imgLoaded() {
+    this.setState({
+      imgLoaded: true,
+    });
+  }
+
   render() {
     let id = this.props.series.id;
     if (!id || id === "false") {
@@ -119,9 +127,14 @@ class TvCard extends React.Component {
         alt={series.title}
         src={`https://image.tmdb.org/t/p/w200${series.poster_path}`}
         // effect="blur"
+        onLoad={this.imgLoaded}
       />
     ) : (
-      <LazyLoadImage src={"/images/no-poster.jpg"} alt={series.title} />
+      <LazyLoadImage
+        src={"/images/no-poster.jpg"}
+        alt={series.title}
+        onLoad={this.imgLoaded}
+      />
     );
     return (
       <div
@@ -130,7 +143,9 @@ class TvCard extends React.Component {
         data-key={series.id}
         className={`card type--movie-tv ${
           series.on_server ? "on-server" : ""
-        } ${this.props.user.requests[series.id] ? "requested" : ""}`}
+        } ${this.props.user.requests[series.id] ? "requested" : ""} ${
+          this.state.imgLoaded ? "img-loaded" : "img-not-loaded"
+        }`}
       >
         <div className="card--inner">
           <Link to={`/series/${series.id}`} className="full-link"></Link>

@@ -6,6 +6,7 @@ import Popular from "../components/Popular";
 import History from "../components/History";
 import MovieCard from "../components/MovieCard";
 import Carousel from "../components/Carousel";
+import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
 // import User from "../data/User";
 
 class Movies extends React.Component {
@@ -35,13 +36,24 @@ class Movies extends React.Component {
       let personalised = await Api.discoveryMovies();
       this.setState({
         personalised: personalised,
+        loading: false,
       });
     } catch {
       console.log("Couldn't load user personalised");
+      this.setState({
+        loading: false,
+      });
     }
   }
 
   render() {
+    if (this.state.loading) {
+      return (
+        <div className="spinner">
+          <Spinner />
+        </div>
+      );
+    }
     return (
       <>
         <h1 className="main-title mb--1">Movies</h1>

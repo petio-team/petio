@@ -96,6 +96,7 @@
       height: 100%;
       object-fit: cover;
       pointer-events: none;
+      opacity: 0;
     }
 
     .no-poster {
@@ -215,6 +216,19 @@
   &:hover {
     .quick-req {
       opacity: 1;
+    }
+  }
+
+  &.img-not-loaded {
+    img {
+      opacity: 0;
+    }
+  }
+
+  &.img-loaded {
+    img {
+      opacity: 1;
+      transition: opacity 0.4s ease;
     }
   }
 }
