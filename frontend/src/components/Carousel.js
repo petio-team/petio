@@ -78,7 +78,7 @@ class Carousel extends React.Component {
     if (!carousel) return;
     const top = carousel.getBoundingClientRect().top;
     const wH = window.innerHeight;
-    if (top <= wH) {
+    if (top <= wH * 1.5) {
       this.setState({
         inView: true,
       });

@@ -6,7 +6,7 @@ import Popular from "../components/Popular";
 import History from "../components/History";
 import ShowCard from "../components/TvCard";
 import Carousel from "../components/Carousel";
-import User from "../data/User";
+// import User from "../data/User";
 
 class Shows extends React.Component {
   constructor(props) {
@@ -33,7 +33,7 @@ class Shows extends React.Component {
 
   async getPersonalised() {
     try {
-      let personalised = await User.discoveryShows();
+      let personalised = await Api.discoveryShows();
       this.setState({
         personalised: personalised,
       });

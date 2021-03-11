@@ -107,7 +107,7 @@ class TvCard extends React.Component {
             <div className="text-wrap">
               <p className="title">
                 Loading...
-                <span className="year">&nbsp;</span>
+                <span className="year"></span>
               </p>
             </div>
           </div>

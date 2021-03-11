@@ -184,16 +184,16 @@ async function getDiscoveryData(id, type = "movie") {
       .slice(0, 5)
       .map(async (r) => {
         let recent = recentlyViewed[r];
-        if (recent.tmdb_id) {
+        if (recent.id) {
           let related =
             type === "movie"
               ? await Promise.all([
-                  Movie.getRecommendations(recent.tmdb_id, 1),
-                  Movie.getRecommendations(recent.tmdb_id, 2),
+                  Movie.getRecommendations(recent.id, 1),
+                  Movie.getRecommendations(recent.id, 2),
                 ])
               : await Promise.all([
-                  Show.getRecommendations(recent.tmdb_id, 1),
-                  Show.getRecommendations(recent.tmdb_id, 2),
+                  Show.getRecommendations(recent.id, 1),
+                  Show.getRecommendations(recent.id, 2),
                 ]);
           if (!related[0].results) related[0].results = [];
           if (!related[1].results) related[1].results = [];
@@ -203,8 +203,8 @@ async function getDiscoveryData(id, type = "movie") {
           if (related.results.length === 0) {
             let lookup =
               type === "movie"
-                ? await Movie.movieLookup(recent.tmdb_id)
-                : await Show.showLookup(recent.tmdb_id);
+                ? await Movie.movieLookup(recent.id, true)
+                : await Show.showLookup(recent.id, true);
             if (!lookup) return null;
             let params = {};
             if (lookup.genres) {

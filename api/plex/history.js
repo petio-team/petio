@@ -1,10 +1,32 @@
 const request = require("xhr-request");
 const plexLookup = require("../plex/plexLookup");
+const Movie = require("../tmdb/movie");
+const Show = require("../tmdb/show");
 
 // Config
 const getConfig = require("../util/config");
 
-function getHistory(id, type) {
+const cacheManager = require("cache-manager");
+const memoryCache = cacheManager.caching({
+  store: "memory",
+  max: 500,
+  ttl: 3600 /*seconds*/,
+});
+
+async function getHistory(id, type) {
+  let data = false;
+  try {
+    data = await memoryCache.wrap(`hist__${id}__${type}`, function () {
+      return getHistoryData(id, type);
+    });
+  } catch (err) {
+    logger.log("warn", `Error getting history data - ${id}`);
+    logger.log({ level: "error", message: err });
+  }
+  return data;
+}
+
+function getHistoryData(id, type) {
   const prefs = getConfig();
   return new Promise((resolve, reject) => {
     let d = new Date();
@@ -12,7 +34,8 @@ function getHistory(id, type) {
     d.setHours(0, 0, 0);
     d.setMilliseconds(0);
     let timestamp = (d / 1000) | 0;
-    let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/status/sessions/history/all?sort=viewedAt%3Adesc&accountID=${id}&viewedAt>=0&limit=20&X-Plex-Token=${prefs.plexToken}`;
+    let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/status/sessions/history/all?sort=viewedAt%3Adesc&accountID=${id}&viewedAt>=0&X-Plex-Container-Start=0&X-Plex-Container-Size=500&X-Plex-Token=${prefs.plexToken}`;
+    console.log(url);
     request(
       url,
       {
@@ -70,10 +93,14 @@ async function parseHistory(data, type) {
 
         histArr.push(key);
 
-        if (media_type === type) {
+        if (media_type === type && Object.keys(output).length < 19) {
           output[i] = {
             id: media_id,
             name: media_title,
+            data:
+              type === "movie"
+                ? await Movie.movieLookup(media_id, true)
+                : await Show.showLookup(media_id, true),
           };
         }
       }

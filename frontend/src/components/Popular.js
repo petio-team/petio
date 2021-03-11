@@ -50,10 +50,6 @@ class Popular extends React.Component {
         <>
           <section>
             <h3 className="sub-title mb--1">Popular on Plex</h3>
-            <p>
-              What&apos;s popular on Plex right now. The numbers indicate number
-              of plays in the past month.
-            </p>
             {this.state.topData ? (
               <Carousel>
                 {Object.keys(this.state.topData).map((t) => {
@@ -86,10 +82,6 @@ class Popular extends React.Component {
         <>
           <section>
             <h3 className="sub-title mb--1">Popular on Plex</h3>
-            <p>
-              What&apos;s popular on Plex right now. The numbers indicate number
-              of plays in the past month.
-            </p>
             {this.state.topData ? (
               <Carousel>
                 {Object.keys(this.state.topData).map((t) => {

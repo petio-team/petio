@@ -154,23 +154,3 @@ export async function quota() {
     throw "Unable to get Quota";
   }
 }
-
-export async function discoveryMovies() {
-  try {
-    let data = await api.discoveryMovies();
-    return data;
-  } catch (err) {
-    console.log(err);
-    throw "Unable to get Discovery Movies";
-  }
-}
-
-export async function discoveryShows() {
-  try {
-    let data = await api.discoveryShows();
-    return data;
-  } catch (err) {
-    console.log(err);
-    throw "Unable to get Discovery Shows";
-  }
-}

@@ -59,3 +59,11 @@ export async function guideCalendar() {
 export let checkConfig = () => {
   return get("/config");
 };
+
+export async function discoveryMovies() {
+  return get("/discovery/movies");
+}
+
+export async function discoveryShows() {
+  return get("/discovery/shows");
+}

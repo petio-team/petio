@@ -155,36 +155,80 @@ export function clearSearch() {
   });
 }
 
-export let top = (type) => {
-  return new Promise((resolve, reject) => {
-    api
-      .top(type)
-      .then((data) => {
-        const sorted = Object.values(data)
-          .sort((a, b) => a.globalViewCount - b.globalViewCount)
-          .reverse();
+export async function top(type) {
+  try {
+    let data = await api.top(type);
+    Object.keys(data).map((key) => {
+      let item = data[key];
+      if (item.data) {
+        let result = item.data;
+        result.isMinified = true;
+        if (type === "movie") {
+          finalise({
+            type: types.MOVIE_LOOKUP,
+            movie: result,
+            id: result.id,
+          });
+        } else {
+          finalise({
+            type: types.SERIES_LOOKUP,
+            series: result,
+            id: result.id,
+          });
+        }
+      }
+    });
+    const sorted = Object.values(data)
+      .sort((a, b) => a.globalViewCount - b.globalViewCount)
+      .reverse();
+    return sorted;
+  } catch (err) {
+    console.log(err);
+    throw "Error getting plex movies";
+  }
+}
 
-        resolve(sorted);
-      })
-      .catch((err) => {
-        console.log(err);
-        reject("Error getting plex movies");
-      });
-  });
-};
+// export async function top(type) {
+//   try {
+//     let data = await api.top(type);
+//     const sorted = Object.values(data)
+//       .sort((a, b) => a.globalViewCount - b.globalViewCount)
+//       .reverse();
+//     return sorted;
+//   } catch (err) {
+//     console.log(err);
+//     throw "Error getting plex movies";
+//   }
+// }
 
 export async function history(user_id, type) {
-  return new Promise((resolve, reject) => {
-    api
-      .history(user_id, type)
-      .then((data) => {
-        resolve(data);
-      })
-      .catch((err) => {
-        console.log(err);
-        reject("Error getting plex movies");
-      });
-  });
+  try {
+    let data = await api.history(user_id, type);
+    Object.keys(data).map((key) => {
+      let item = data[key];
+      if (item.data) {
+        let result = item.data;
+        result.isMinified = true;
+        if (type === "movie") {
+          finalise({
+            type: types.MOVIE_LOOKUP,
+            movie: result,
+            id: result.id,
+          });
+        } else {
+          finalise({
+            type: types.SERIES_LOOKUP,
+            series: result,
+            id: result.id,
+          });
+        }
+      }
+    });
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw "Unable to get History";
+  }
 }
 
 export async function discover(type, page, params) {
@@ -268,4 +312,46 @@ export function checkConfig() {
         reject();
       });
   });
+}
+
+export async function discoveryMovies() {
+  try {
+    let data = await api.discoveryMovies();
+    data.map((section) => {
+      if (section && section.results && section.results.length > 0)
+        section.results.map((result) => {
+          result.isMinified = true;
+          finalise({
+            type: types.MOVIE_LOOKUP,
+            movie: result,
+            id: result.id,
+          });
+        });
+    });
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw "Unable to get Discovery Movies";
+  }
+}
+
+export async function discoveryShows() {
+  try {
+    let data = await api.discoveryShows();
+    data.map((section) => {
+      if (section && section.results && section.results.length > 0)
+        section.results.map((result) => {
+          result.isMinified = true;
+          finalise({
+            type: types.SERIES_LOOKUP,
+            series: result,
+            id: result.id,
+          });
+        });
+    });
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw "Unable to get Discovery Shows";
+  }
 }

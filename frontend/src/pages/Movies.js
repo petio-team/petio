@@ -6,7 +6,7 @@ import Popular from "../components/Popular";
 import History from "../components/History";
 import MovieCard from "../components/MovieCard";
 import Carousel from "../components/Carousel";
-import User from "../data/User";
+// import User from "../data/User";
 
 class Movies extends React.Component {
   constructor(props) {
@@ -14,6 +14,7 @@ class Movies extends React.Component {
 
     this.state = {
       personalised: false,
+      loading: true,
     };
 
     this.getPersonalised = this.getPersonalised.bind(this);
@@ -31,7 +32,7 @@ class Movies extends React.Component {
 
   async getPersonalised() {
     try {
-      let personalised = await User.discoveryMovies();
+      let personalised = await Api.discoveryMovies();
       this.setState({
         personalised: personalised,
       });

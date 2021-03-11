@@ -8,8 +8,6 @@ import {
   addIssue,
   myRequests,
   quota,
-  discoveryMovies,
-  discoveryShows,
 } from "./actions";
 
 export default {
@@ -22,6 +20,4 @@ export default {
   addIssue,
   myRequests,
   quota,
-  discoveryMovies,
-  discoveryShows,
 };
