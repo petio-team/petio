@@ -33,7 +33,11 @@ async function onServer(type, imdb, tvdb, tmdb) {
       found = foundItemsTmdb;
     }
 
-    if (foundItemsImdb.length || foundItemsTvdb.length || foundItemsTmdb.length) {
+    if (
+      foundItemsImdb.length ||
+      foundItemsTvdb.length ||
+      foundItemsTmdb.length
+    ) {
       let resolutions = [];
       if (found) {
         Object.keys(found).map((i) => {
@@ -42,7 +46,10 @@ async function onServer(type, imdb, tvdb, tmdb) {
             resolutions.push(item.Media[0].videoResolution);
           }
         });
-        return { exists: { ratingKey: found[0].ratingKey, serverKey: clientId }, resolutions: resolutions };
+        return {
+          exists: { ratingKey: found[0].ratingKey, serverKey: clientId },
+          resolutions: resolutions,
+        };
       } else {
         return { exists: false, resolutions: resolutions };
       }
@@ -51,7 +58,7 @@ async function onServer(type, imdb, tvdb, tmdb) {
     }
   }
 
-  if (type === "show") {
+  if (type === "show" || type === "tv") {
     let foundItemImdb = false;
     let foundItemTvdb = false;
     let foundItemTmdb = false;
@@ -76,7 +83,10 @@ async function onServer(type, imdb, tvdb, tmdb) {
 
     if (foundItemImdb || foundItemTvdb || foundItemTmdb) {
       let found = foundItemImdb || foundItemTvdb || foundItemTmdb;
-      return { exists: { ratingKey: found.ratingKey, serverKey: clientId }, resolutions: [] };
+      return {
+        exists: { ratingKey: found.ratingKey, serverKey: clientId },
+        resolutions: [],
+      };
       // return { exists: true, resolutions: [] };
     } else {
       return { exists: false, resolutions: [] };

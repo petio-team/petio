@@ -5,6 +5,7 @@ const request = require("xhr-request");
 const Movie = require("../tmdb/movie");
 const Show = require("../tmdb/show");
 const getHistory = require("../plex/history");
+const onServer = require("../plex/onServer");
 
 const cacheManager = require("cache-manager");
 const memoryCache = cacheManager.caching({
@@ -108,8 +109,10 @@ async function getDiscoveryData(id, type = "movie") {
       });
 
       let newDisc = [];
-      discData.results.map((result, i) => {
+      discData.results.map(async (result, i) => {
         if (!(result.id.toString() in watchHistory)) {
+          let onPlex = await onServer(type, false, false, result.id);
+          discData.results[i].on_server = onPlex.exists;
           newDisc.push(discData.results[i]);
         }
       });
@@ -165,8 +168,10 @@ async function getDiscoveryData(id, type = "movie") {
         });
 
         let newDisc = [];
-        discData.results.map((result, i) => {
+        discData.results.map(async (result, i) => {
           if (!(result.id.toString() in watchHistory)) {
+            let onPlex = await onServer(type, false, false, result.id);
+            discData.results[i].on_server = onPlex.exists;
             newDisc.push(discData.results[i]);
           }
         });
@@ -221,8 +226,10 @@ async function getDiscoveryData(id, type = "movie") {
                 : await discoverShow(1, params);
             if (recommendations.results.length === 0) return null;
             let newRelated = [];
-            recommendations.results.map((result, i) => {
+            recommendations.results.map(async (result, i) => {
               if (!(result.id.toString() in watchHistory)) {
+                let onPlex = await onServer(type, false, false, result.id);
+                recommendations.results[i].on_server = onPlex.exists;
                 newRelated.push(recommendations.results[i]);
               }
             });
@@ -232,8 +239,10 @@ async function getDiscoveryData(id, type = "movie") {
             };
           } else {
             let newRelated = [];
-            related.results.map((result, i) => {
+            related.results.map(async (result, i) => {
               if (!(result.id.toString() in watchHistory)) {
+                let onPlex = await onServer(type, false, false, result.id);
+                related.results[i].on_server = onPlex.exists;
                 newRelated.push(related.results[i]);
               }
             });
