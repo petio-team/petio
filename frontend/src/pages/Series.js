@@ -309,7 +309,7 @@ class Series extends React.Component {
               {seasons.map((season) => {
                 return (
                   <div
-                    className="card type--movie-tv"
+                    className="card type--movie-tv img-loaded"
                     key={`season--${season.season_number}${id}`}
                   >
                     <div className="card--inner">
