@@ -194,11 +194,9 @@ class Sonarr {
     type = "standard",
     tag = false
   ) {
-    seriesData.ProfileId = profile ? profile : this.config.profile;
+    seriesData.qualityProfileId = profile ? profile : this.config.profile;
     seriesData.seasonFolder = true;
-    seriesData.Path = `${path ? path : this.config.path_title}${sanitize(
-      seriesData.title
-    )} (${seriesData.year})`;
+    seriesData.rootFolderPath = `${path ? path : this.config.path_title}`;
     seriesData.addOptions = {
       searchForMissingEpisodes: true,
     };
