@@ -191,14 +191,10 @@ class Radarr {
   }
 
   async add(movieData, path = false, profile = false, tag = false) {
-    let system = await this.get("system/status");
-    let sep = system.isWindows ? "\\" : "/";
     movieData.qualityProfileId = parseInt(
       profile ? profile : this.config.profile
     );
-    movieData.Path = `${path ? path : this.config.path_title}${sep}${sanitize(
-      movieData.title
-    )} (${movieData.year})`;
+    movieData.rootFolderPath = `${path ? path : this.config.path_title}`;
     movieData.addOptions = {
       searchForMovie: true,
     };
