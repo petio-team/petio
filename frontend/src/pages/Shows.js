@@ -52,7 +52,10 @@ class Shows extends React.Component {
     if (this.state.loading) {
       return (
         <div className="spinner">
-          <Spinner />
+          <div>
+            <p>Building your personalised TV Discovery...</p>
+            <Spinner />
+          </div>
         </div>
       );
     }
