@@ -10,7 +10,7 @@ pkg :
 	cd admin && npm install && REACT_APP_ENV=pkg npm run build && mv build ../bin/views/admin
 	zip -r petio.zip ./bin
 	rm -rf ./bin
-	npm run stamp-version-a
+	npm run stamp-version
 
 clean:
 	rm -rf ./bin

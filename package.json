@@ -1,6 +1,6 @@
 {
   "name": "petio",
-  "version": "0.3.29",
+  "version": "0.3.30-alpha",
   "description": "Request Platform for Plex",
   "main": "petio.js",
   "author": "",
@@ -16,7 +16,6 @@
   "scripts": {
     "start": "node petio.js",
     "version": "npm -s run env echo '$npm_package_version'",
-    "stamp-version": "mv petio.zip petio-${npm_package_version}.zip",
-    "stamp-version-a": "mv petio.zip petio-${npm_package_version}-alpha.zip"
+    "stamp-version": "mv petio.zip petio-${npm_package_version}.zip"
   }
 }
