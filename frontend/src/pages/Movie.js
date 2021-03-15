@@ -148,12 +148,14 @@ class Movie extends React.Component {
 
   getMovie() {
     let id = this.props.match.params.id;
-
+    console.log("checking movie");
     // this.getRelated();
     if (!this.props.api.movie_lookup[id]) {
       // check for cached
+      console.log("no movie in redux");
       Api.movie(id);
     } else if (this.props.api.movie_lookup[id].isMinified) {
+      console.log("redux is min");
       Api.movie(id);
     }
   }
@@ -209,7 +211,7 @@ class Movie extends React.Component {
     }
 
     let video = false;
-    if (movieData.videos.results) {
+    if (movieData.videos && movieData.videos.results) {
       for (let i = 0; i < movieData.videos.results.length; i++) {
         let vid = movieData.videos.results[i];
         if (vid.site === "YouTube" && !video) {

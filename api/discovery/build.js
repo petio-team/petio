@@ -295,7 +295,6 @@ function getHistory(id, library = false) {
       },
       function (err, data) {
         if (err) {
-          console.log(url);
           reject(err);
         }
         resolve(data);

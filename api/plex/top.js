@@ -66,17 +66,11 @@ async function parseTop(data, type) {
       plexData = await plexLookup(ratingKey, "movie");
     }
     if (plexData.tmdb_id)
-      output[item.ratingKey] = {
-        item: {
-          tmdb_id: plexData.tmdb_id,
-        },
-        globalViewCount: globalViewCount,
-        userCount: userCount,
-        data:
-          type === 2
-            ? await Show.showLookup(plexData.tmdb_id, true)
-            : await Movie.movieLookup(plexData.tmdb_id, true),
-      };
+      output[plexData.tmdb_id] =
+        type === 2
+          ? await Show.showLookup(plexData.tmdb_id, true)
+          : await Movie.movieLookup(plexData.tmdb_id, true);
+    output[plexData.tmdb_id].globalViewCount = globalViewCount;
   }
   return output;
 }

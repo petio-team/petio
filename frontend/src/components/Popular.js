@@ -61,7 +61,7 @@ class Popular extends React.Component {
                   }
                   return (
                     <MovieCard
-                      key={`${this.state.topData[t].item.tmdb_id}__top`}
+                      key={`${this.state.topData[t].item.tmdb_id}__top_movie`}
                       movie={{
                         id: this.state.topData[t].item.tmdb_id,
                       }}
@@ -93,7 +93,7 @@ class Popular extends React.Component {
                   }
                   return (
                     <TvCard
-                      key={this.state.topData[t].id}
+                      key={`${this.state.topData[t].item.tmdb_id}__top_tv`}
                       series={{
                         id: this.state.topData[t].item.tmdb_id,
                       }}

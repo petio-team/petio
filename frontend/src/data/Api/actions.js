@@ -11,8 +11,15 @@ export async function getPopular() {
   let popular = await api.popular();
 
   if (popular) {
-    popular.movies.forEach((movie) => {
-      movie.isMinified = true;
+    popular.movies.forEach((result) => {
+      let movie = {
+        isMinified: true,
+        id: result.id,
+        title: result.title,
+        release_date: result.release_date,
+        on_server: result.on_server ? true : false,
+        poster_path: result.poster_path,
+      };
       finalise({
         type: types.MOVIE_LOOKUP,
         movie: movie,
@@ -20,8 +27,15 @@ export async function getPopular() {
       });
     });
 
-    popular.tv.forEach((series) => {
-      series.isMinified = true;
+    popular.tv.forEach((result) => {
+      let series = {
+        isMinified: true,
+        id: result.id,
+        name: result.name,
+        first_air_date: result.first_air_date,
+        on_server: result.on_server ? true : false,
+        poster_path: result.poster_path,
+      };
       finalise({
         type: types.SERIES_LOOKUP,
         series: series,
@@ -116,8 +130,15 @@ export async function search(term) {
     if (!searchResults) {
       reject();
     }
-    searchResults.movies.forEach((movie) => {
-      movie.isMinified = true;
+    searchResults.movies.forEach((result) => {
+      let movie = {
+        isMinified: true,
+        id: result.id,
+        title: result.title,
+        release_date: result.release_date,
+        on_server: result.on_server ? true : false,
+        poster_path: result.poster_path,
+      };
       finalise({
         type: types.MOVIE_LOOKUP,
         movie: movie,
@@ -125,9 +146,15 @@ export async function search(term) {
       });
     });
 
-    searchResults.shows.forEach((series) => {
-      // console.log(series);
-      series.isMinified = true;
+    searchResults.shows.forEach((result) => {
+      let series = {
+        isMinified: true,
+        id: result.id,
+        name: result.name,
+        first_air_date: result.first_air_date,
+        on_server: result.on_server ? true : false,
+        poster_path: result.poster_path,
+      };
       finalise({
         type: types.SERIES_LOOKUP,
         series: series,
@@ -162,18 +189,33 @@ export async function top(type) {
       let item = data[key];
       if (item.data) {
         let result = item.data;
-        result.isMinified = true;
         if (type === "movie") {
+          let movie = {
+            isMinified: true,
+            id: result.id,
+            title: result.title,
+            release_date: result.release_date,
+            on_server: result.on_server ? true : false,
+            poster_path: result.poster_path,
+          };
           finalise({
             type: types.MOVIE_LOOKUP,
-            movie: result,
-            id: result.id,
+            movie: movie,
+            id: movie.id,
           });
         } else {
+          let series = {
+            isMinified: true,
+            id: result.id,
+            name: result.name,
+            first_air_date: result.first_air_date,
+            on_server: result.on_server ? true : false,
+            poster_path: result.poster_path,
+          };
           finalise({
             type: types.SERIES_LOOKUP,
-            series: result,
-            id: result.id,
+            series: series,
+            id: series.id,
           });
         }
       }
@@ -188,40 +230,39 @@ export async function top(type) {
   }
 }
 
-// export async function top(type) {
-//   try {
-//     let data = await api.top(type);
-//     const sorted = Object.values(data)
-//       .sort((a, b) => a.globalViewCount - b.globalViewCount)
-//       .reverse();
-//     return sorted;
-//   } catch (err) {
-//     console.log(err);
-//     throw "Error getting plex movies";
-//   }
-// }
-
 export async function history(user_id, type) {
   try {
     let data = await api.history(user_id, type);
     Object.keys(data).map((key) => {
-      let item = data[key];
-      if (item.data) {
-        let result = item.data;
-        result.isMinified = true;
-        if (type === "movie") {
-          finalise({
-            type: types.MOVIE_LOOKUP,
-            movie: result,
-            id: result.id,
-          });
-        } else {
-          finalise({
-            type: types.SERIES_LOOKUP,
-            series: result,
-            id: result.id,
-          });
-        }
+      let result = data[key];
+      if (type === "movie") {
+        let movie = {
+          isMinified: true,
+          id: result.id,
+          title: result.title,
+          release_date: result.release_date,
+          on_server: result.on_server ? true : false,
+          poster_path: result.poster_path,
+        };
+        finalise({
+          type: types.MOVIE_LOOKUP,
+          movie: movie,
+          id: movie.id,
+        });
+      } else {
+        let series = {
+          isMinified: true,
+          id: result.id,
+          name: result.name,
+          first_air_date: result.first_air_date,
+          on_server: result.on_server ? true : false,
+          poster_path: result.poster_path,
+        };
+        finalise({
+          type: types.SERIES_LOOKUP,
+          series: series,
+          id: series.id,
+        });
       }
     });
     return data;
@@ -320,11 +361,18 @@ export async function discoveryMovies() {
     data.map((section) => {
       if (section && section.results && section.results.length > 0)
         section.results.map((result) => {
-          result.isMinified = true;
+          let movie = {
+            isMinified: true,
+            id: result.id,
+            title: result.title,
+            release_date: result.release_date,
+            on_server: result.on_server ? true : false,
+            poster_path: result.poster_path,
+          };
           finalise({
             type: types.MOVIE_LOOKUP,
-            movie: result,
-            id: result.id,
+            movie: movie,
+            id: movie.id,
           });
         });
     });
@@ -341,11 +389,18 @@ export async function discoveryShows() {
     data.map((section) => {
       if (section && section.results && section.results.length > 0)
         section.results.map((result) => {
-          result.isMinified = true;
+          let series = {
+            isMinified: true,
+            id: result.id,
+            name: result.name,
+            first_air_date: result.first_air_date,
+            on_server: result.on_server ? true : false,
+            poster_path: result.poster_path,
+          };
           finalise({
             type: types.SERIES_LOOKUP,
-            series: result,
-            id: result.id,
+            series: series,
+            id: series.id,
           });
         });
     });

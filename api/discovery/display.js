@@ -8,14 +8,16 @@ const getHistory = require("../plex/history");
 const onServer = require("../plex/onServer");
 
 const cacheManager = require("cache-manager");
+const getTop = require("../plex/top");
 const memoryCache = cacheManager.caching({
   store: "memory",
-  max: 500,
+  // max: 500,
   ttl: 3600 /*seconds*/,
 });
 
 module.exports = async function getDiscovery(id, type = "movie") {
   let data = false;
+  logger.log("info", `Getting Discovery Data for user - ${id} - type: ${type}`);
   try {
     data = await memoryCache.wrap(`disc__${id}__${type}`, function () {
       return getDiscoveryData(id, type);
@@ -31,6 +33,11 @@ async function getDiscoveryData(id, type = "movie") {
   if (!id) throw "No user";
   logger.log("info", `Discovery built fresh - ${id} - ${type}`);
   const discoveryPrefs = await Discovery.findOne({ id: id });
+  const popularData = await getTop(type === "movie" ? 1 : 2);
+  let popular = [];
+  for (p in popularData) {
+    popular.push(popularData[p]);
+  }
   if (!discoveryPrefs) throw "No user profile created";
   const watchHistory =
     type === "movie"
@@ -112,6 +119,7 @@ async function getDiscoveryData(id, type = "movie") {
       discData.results.map(async (result, i) => {
         if (!(result.id.toString() in watchHistory)) {
           let onPlex = await onServer(type, false, false, result.id);
+          if (!onPlex) onPlex = { exists: false };
           discData.results[i].on_server = onPlex.exists;
           newDisc.push(discData.results[i]);
         }
@@ -268,6 +276,11 @@ async function getDiscoveryData(id, type = "movie") {
   let data = [...peopleData, ...recentData, ...genresData];
   data = shuffle(data);
   return [
+    {
+      title:
+        type === "movie" ? "Popular Movies on Plex" : "Popular Shows on Plex",
+      results: popular,
+    },
     {
       title: type === "movie" ? "Movies coming soon" : "Shows coming soon",
       results: upcoming.results,

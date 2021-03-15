@@ -9,6 +9,9 @@ const User = require("../models/user");
 const logger = require("../util/logger");
 const bcrypt = require("bcryptjs");
 const { authenticate } = require("../middleware/auth");
+const getDiscovery = require("../discovery/display");
+const getHistory = require("../plex/history");
+const getTop = require("../plex/top");
 
 router.post("/", async (req, res) => {
   const prefs = getConfig();
@@ -47,6 +50,12 @@ router.post("/", async (req, res) => {
         token,
         admin: isAdmin,
       });
+    getTop(1);
+    getTop(2);
+    let userId = user.altId ? user.altId : user.id;
+    getHistory(userId);
+    getDiscovery(userId, "movie");
+    getDiscovery(userId, "shows");
   }
 
   // check for existing jwt

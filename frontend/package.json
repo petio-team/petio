@@ -9,6 +9,7 @@
     "@testing-library/user-event": "^12.7.2",
     "axios": "^0.21.1",
     "dateformat": "^3.0.3",
+    "lodash": "^4.17.21",
     "moment": "^2.29.1",
     "node-sass": "^5.0.0",
     "react": "^16.13.1",

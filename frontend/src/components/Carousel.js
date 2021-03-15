@@ -1,7 +1,9 @@
 import React from "react";
 import { ReactComponent as LeftArrow } from "../assets/svg/back.svg";
 import { ReactComponent as RightArrow } from "../assets/svg/forward.svg";
+import { throttle } from "lodash";
 import CarouselLoading from "./CarouselLoading";
+// import CarouselLoading from "./CarouselLoading";
 
 class Carousel extends React.Component {
   constructor(props) {
@@ -20,8 +22,8 @@ class Carousel extends React.Component {
     this.next = this.next.bind(this);
     this.prev = this.prev.bind(this);
     this.init = this.init.bind(this);
-    this.scroll = this.scroll.bind(this);
-    this.isInViewport = this.isInViewport.bind(this);
+    this.scroll = throttle(this.scroll.bind(this), 1000);
+    this.isInViewport = throttle(this.isInViewport.bind(this), 1000);
   }
 
   componentDidMount() {
@@ -48,7 +50,9 @@ class Carousel extends React.Component {
   }
 
   init() {
-    if (!this.state.inView) return;
+    if (!this.state.inView) {
+      return;
+    }
     let carousel = this.carouselRef.current;
     let wrapper = this.wrapper.current;
     let cards = carousel.getElementsByClassName("card");
@@ -74,6 +78,11 @@ class Carousel extends React.Component {
   }
 
   isInViewport() {
+    if (this.state.inView) {
+      let page = document.querySelectorAll(".page-wrap")[0];
+      page.removeEventListener("scroll", this.isInViewport);
+      return;
+    }
     let carousel = this.wrapper.current;
     if (!carousel) return;
     const top = carousel.getBoundingClientRect().top;

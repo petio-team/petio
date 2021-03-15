@@ -2,8 +2,8 @@ import React from "react";
 import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import Api from "../data/Api";
-import Popular from "../components/Popular";
-import History from "../components/History";
+// import Popular from "../components/Popular";
+// import History from "../components/History";
 import ShowCard from "../components/TvCard";
 import Carousel from "../components/Carousel";
 import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
@@ -62,8 +62,8 @@ class Shows extends React.Component {
     return (
       <>
         <h1 className="main-title mb--1">TV Shows</h1>
-        <Popular type="show" />
-        <History type="show" />
+        {/* <Popular type="show" />
+        <History type="show" /> */}
         <section>
           <h3 className="sub-title mb--1">Trending Shows</h3>
           <p>Shows trending online right now</p>
