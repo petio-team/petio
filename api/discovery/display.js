@@ -61,67 +61,27 @@ module.exports = async function getDiscoveryData(id, type = "movie") {
         return null;
       }
       genreList.push(id);
-      let args = {
-        with_genres: id,
-        sort_by: type === "movie" ? "revenue.desc" : "popularity.desc",
-        "vote_count.gte": 1500,
-        certification_country: "US",
-        "vote_average.gte":
-          genre.lowestRating > 0.5
-            ? genre.lowestRating - 0.5
-            : genre.lowestRating,
-      };
-      if (type === "movie") {
-        args["vote_average.lte"] =
-          genre.highestRating < 9.5
-            ? genre.highestRating + 0.5
-            : genre.highestRating;
-      }
-      let certifications = [];
-      if (Object.keys(genre.cert).length > 0) {
-        Object.keys(genre.cert).map((cert) => {
-          // 10% threshold
-          if (genre.count * 0.1 < genre.cert[cert]) {
-            certifications.push(cert);
+      let discData = await genreLookup(id, genre, type);
+
+      let results = await Promise.all(
+        discData.map(async (result, i) => {
+          if (!watchHistory[result.id]) {
+            let onPlex = await onServer(type, false, false, result.id);
+            if (!onPlex) onPlex = { exists: false };
+            result.on_server = onPlex.exists;
+            return result;
+          } else {
+            return "watched";
           }
-        });
-      }
-      if (certifications.length > 0)
-        args.certification = certifications.join("|");
-      let discData =
-        type === "movie"
-          ? await Promise.all([discoverMovie(1, args), discoverMovie(2, args)])
-          : await Promise.all([discoverShow(1, args), discoverShow(2, args)]);
-
-      if (!discData[0].results) discData[0].results = [];
-      if (!discData[1].results) discData[1].results = [];
-      discData = {
-        results: [...discData[0].results, ...discData[1].results],
-      };
-
-      discData.results.sort(function (a, b) {
-        if (a.vote_count > b.vote_count) {
-          return -1;
-        }
-      });
-
-      let newDisc = [];
-      discData.results.map(async (result, i) => {
-        if (!watchHistory[result.id]) {
-          let onPlex = await onServer(type, false, false, result.id);
-          if (!onPlex) onPlex = { exists: false };
-          discData.results[i].on_server = onPlex.exists;
-          newDisc.push(discData.results[i]);
-        }
-      });
+        })
+      );
 
       return {
         title: `${genre.name} ${
           type === "movie" ? "movies" : "shows"
         } you might like`,
-        results: newDisc,
+        results: results,
         genre_id: id,
-        certifications: certifications,
         ratings: `${genre.lowestRating} - ${genre.highestRating}`,
       };
     })
@@ -140,33 +100,10 @@ module.exports = async function getDiscoveryData(id, type = "movie") {
       let lookup = await searchPeople(actor.name);
       if (lookup.results && lookup.results.length > 0) {
         let match = lookup.results[0];
-        let args = {
-          sort_by: type === "movie" ? "revenue.desc" : "popularity.desc",
-          "vote_count.gte": 100,
-          with_people: match.id,
-        };
-        let discData =
-          type === "movie"
-            ? await Promise.all([
-                discoverMovie(1, args),
-                discoverMovie(2, args),
-              ])
-            : await Promise.all([discoverShow(1, args), discoverShow(2, args)]);
-
-        if (!discData[0].results) discData[0].results = [];
-        if (!discData[1].results) discData[1].results = [];
-        discData = {
-          results: [...discData[0].results, ...discData[1].results],
-        };
-
-        discData.results.sort(function (a, b) {
-          if (a.vote_average > b.vote_average) {
-            return -1;
-          }
-        });
+        let discData = await actorLookup(match, type);
 
         let newDisc = await Promise.all(
-          discData.results.map(async (result, i) => {
+          discData.map(async (result, i) => {
             if (!watchHistory[result.id]) {
               let onPlex = await onServer(type, false, false, result.id);
               result.on_server = onPlex.exists;
@@ -199,33 +136,10 @@ module.exports = async function getDiscoveryData(id, type = "movie") {
       let lookup = await searchPeople(director.name);
       if (lookup.results && lookup.results.length > 0) {
         let match = lookup.results[0];
-        let args = {
-          sort_by: type === "movie" ? "revenue.desc" : "popularity.desc",
-          "vote_count.gte": 100,
-          with_people: match.id,
-        };
-        let discData =
-          type === "movie"
-            ? await Promise.all([
-                discoverMovie(1, args),
-                discoverMovie(2, args),
-              ])
-            : await Promise.all([discoverShow(1, args), discoverShow(2, args)]);
-
-        if (!discData[0].results) discData[0].results = [];
-        if (!discData[1].results) discData[1].results = [];
-        discData = {
-          results: [...discData[0].results, ...discData[1].results],
-        };
-
-        discData.results.sort(function (a, b) {
-          if (a.vote_average > b.vote_average) {
-            return -1;
-          }
-        });
+        let discData = await actorLookup(match, type);
 
         let newDisc = await Promise.all(
-          discData.results.map(async (result, i) => {
+          discData.map(async (result, i) => {
             if (!watchHistory[result.id]) {
               let onPlex = await onServer(type, false, false, result.id);
               result.on_server = onPlex.exists;
@@ -340,6 +254,107 @@ module.exports = async function getDiscoveryData(id, type = "movie") {
     ...data,
   ];
 };
+
+// Caching layer
+
+async function genreLookup(id, genre, type) {
+  let data = false;
+  try {
+    data = await memoryCache.wrap(`gl__${id}__${type}`, function () {
+      return genreLookupData(id, genre, type);
+    });
+  } catch (err) {
+    logger.log("warn", `Error getting genre data`);
+    logger.log({ level: "error", message: err });
+  }
+  return data;
+}
+
+async function actorLookup(match, type) {
+  let data = false;
+  try {
+    data = await memoryCache.wrap(`al__${match.id}__${type}`, function () {
+      return actorLookupData(match, type);
+    });
+  } catch (err) {
+    logger.log("warn", `Error getting actor data`);
+    logger.log({ level: "error", message: err });
+  }
+  return data;
+}
+
+// Data layer
+
+async function actorLookupData(match, type) {
+  let args = {
+    sort_by: type === "movie" ? "revenue.desc" : "popularity.desc",
+    "vote_count.gte": 100,
+    with_people: match.id,
+  };
+  let discData =
+    type === "movie"
+      ? await Promise.all([discoverMovie(1, args), discoverMovie(2, args)])
+      : await Promise.all([discoverShow(1, args), discoverShow(2, args)]);
+
+  if (!discData[0].results) discData[0].results = [];
+  if (!discData[1].results) discData[1].results = [];
+  discData = {
+    results: [...discData[0].results, ...discData[1].results],
+  };
+
+  discData.results.sort(function (a, b) {
+    if (a.vote_average > b.vote_average) {
+      return -1;
+    }
+  });
+
+  return discData.results;
+}
+
+async function genreLookupData(id, genre, type) {
+  let args = {
+    with_genres: id,
+    sort_by: type === "movie" ? "revenue.desc" : "popularity.desc",
+    "vote_count.gte": 1500,
+    certification_country: "US",
+    "vote_average.gte":
+      genre.lowestRating > 0.5 ? genre.lowestRating - 0.5 : genre.lowestRating,
+  };
+  if (type === "movie") {
+    args["vote_average.lte"] =
+      genre.highestRating < 9.5
+        ? genre.highestRating + 0.5
+        : genre.highestRating;
+  }
+  let certifications = [];
+  if (Object.keys(genre.cert).length > 0) {
+    Object.keys(genre.cert).map((cert) => {
+      // 10% threshold
+      if (genre.count * 0.1 < genre.cert[cert]) {
+        certifications.push(cert);
+      }
+    });
+  }
+  if (certifications.length > 0) args.certification = certifications.join("|");
+  let discData =
+    type === "movie"
+      ? await Promise.all([discoverMovie(1, args), discoverMovie(2, args)])
+      : await Promise.all([discoverShow(1, args), discoverShow(2, args)]);
+
+  if (!discData[0].results) discData[0].results = [];
+  if (!discData[1].results) discData[1].results = [];
+  discData = {
+    results: [...discData[0].results, ...discData[1].results],
+  };
+
+  discData.results.sort(function (a, b) {
+    if (a.vote_count > b.vote_count) {
+      return -1;
+    }
+  });
+
+  return discData.results;
+}
 
 function genreID(genreName, type) {
   if (type === "movie") {
