@@ -15,23 +15,8 @@ const memoryCache = cacheManager.caching({
   ttl: 3600 /*seconds*/,
 });
 
-module.exports = async function getDiscovery(id, type = "movie") {
-  let data = false;
-  logger.log("info", `Getting Discovery Data for user - ${id} - type: ${type}`);
-  try {
-    data = await memoryCache.wrap(`disc__${id}__${type}`, function () {
-      return getDiscoveryData(id, type);
-    });
-  } catch (err) {
-    logger.log("warn", `Error getting discovery data - ${id}`);
-    logger.log({ level: "error", message: err });
-  }
-  return data;
-};
-
-async function getDiscoveryData(id, type = "movie") {
+module.exports = async function getDiscoveryData(id, type = "movie") {
   if (!id) throw "No user";
-  logger.log("info", `Discovery built fresh - ${id} - ${type}`);
   const discoveryPrefs = await Discovery.findOne({ id: id });
   const popularData = await getTop(type === "movie" ? 1 : 2);
   let popular = [];
@@ -52,8 +37,13 @@ async function getDiscoveryData(id, type = "movie") {
     type === "movie"
       ? discoveryPrefs.movie.people.cast
       : discoveryPrefs.series.people.cast;
+  let mediaDirectors =
+    type === "movie"
+      ? discoveryPrefs.movie.people.director
+      : discoveryPrefs.series.people.director;
   let genresSorted = [];
   let actorsSorted = [];
+  let directorsSorted = [];
   for (var genre in mediaGenres) {
     genresSorted.push(mediaGenres[genre]);
   }
@@ -117,7 +107,7 @@ async function getDiscoveryData(id, type = "movie") {
 
       let newDisc = [];
       discData.results.map(async (result, i) => {
-        if (!(result.id.toString() in watchHistory)) {
+        if (!watchHistory[result.id]) {
           let onPlex = await onServer(type, false, false, result.id);
           if (!onPlex) onPlex = { exists: false };
           discData.results[i].on_server = onPlex.exists;
@@ -144,7 +134,7 @@ async function getDiscoveryData(id, type = "movie") {
       return -1;
     }
   });
-  actorsSorted.length = 4;
+  if (actorsSorted.length > 4) actorsSorted.length = 4;
   let peopleData = await Promise.all(
     actorsSorted.map(async (actor) => {
       let lookup = await searchPeople(actor.name);
@@ -175,14 +165,76 @@ async function getDiscoveryData(id, type = "movie") {
           }
         });
 
-        let newDisc = [];
-        discData.results.map(async (result, i) => {
-          if (!(result.id.toString() in watchHistory)) {
-            let onPlex = await onServer(type, false, false, result.id);
-            discData.results[i].on_server = onPlex.exists;
-            newDisc.push(discData.results[i]);
+        let newDisc = await Promise.all(
+          discData.results.map(async (result, i) => {
+            if (!watchHistory[result.id]) {
+              let onPlex = await onServer(type, false, false, result.id);
+              result.on_server = onPlex.exists;
+              return result;
+            } else {
+              return "watched";
+            }
+          })
+        );
+
+        return {
+          title: `"${match.name}" ${type === "movie" ? "movies" : "shows"}`,
+          results: newDisc,
+        };
+      }
+    })
+  );
+
+  for (var director in mediaDirectors) {
+    directorsSorted.push({ name: director, count: mediaDirectors[director] });
+  }
+  directorsSorted.sort(function (a, b) {
+    if (a.count > b.count) {
+      return -1;
+    }
+  });
+  if (directorsSorted.length > 4) directorsSorted.length = 4;
+  let directorData = await Promise.all(
+    directorsSorted.map(async (director) => {
+      let lookup = await searchPeople(director.name);
+      if (lookup.results && lookup.results.length > 0) {
+        let match = lookup.results[0];
+        let args = {
+          sort_by: type === "movie" ? "revenue.desc" : "popularity.desc",
+          "vote_count.gte": 100,
+          with_people: match.id,
+        };
+        let discData =
+          type === "movie"
+            ? await Promise.all([
+                discoverMovie(1, args),
+                discoverMovie(2, args),
+              ])
+            : await Promise.all([discoverShow(1, args), discoverShow(2, args)]);
+
+        if (!discData[0].results) discData[0].results = [];
+        if (!discData[1].results) discData[1].results = [];
+        discData = {
+          results: [...discData[0].results, ...discData[1].results],
+        };
+
+        discData.results.sort(function (a, b) {
+          if (a.vote_average > b.vote_average) {
+            return -1;
           }
         });
+
+        let newDisc = await Promise.all(
+          discData.results.map(async (result, i) => {
+            if (!watchHistory[result.id]) {
+              let onPlex = await onServer(type, false, false, result.id);
+              result.on_server = onPlex.exists;
+              return result;
+            } else {
+              return "watched";
+            }
+          })
+        );
 
         return {
           title: `"${match.name}" ${type === "movie" ? "movies" : "shows"}`,
@@ -242,7 +294,7 @@ async function getDiscoveryData(id, type = "movie") {
               }
             });
             return {
-              title: `Because you watched "${recent.name}"`,
+              title: `Because you watched "${recent.title || recent.name}"`,
               results: recommendations.results,
             };
           } else {
@@ -255,7 +307,7 @@ async function getDiscoveryData(id, type = "movie") {
               }
             });
             return {
-              title: `Because you watched "${recent.name}"`,
+              title: `Because you watched "${recent.title || recent.name}"`,
               results: newRelated,
             };
           }
@@ -273,7 +325,7 @@ async function getDiscoveryData(id, type = "movie") {
           sort_by: "popularity.desc",
           "first_air_date.gte": now,
         });
-  let data = [...peopleData, ...recentData, ...genresData];
+  let data = [...peopleData, ...directorData, ...recentData, ...genresData];
   data = shuffle(data);
   return [
     {
@@ -287,7 +339,7 @@ async function getDiscoveryData(id, type = "movie") {
     },
     ...data,
   ];
-}
+};
 
 function genreID(genreName, type) {
   if (type === "movie") {

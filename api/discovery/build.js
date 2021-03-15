@@ -46,6 +46,7 @@ async function create(id) {
         genres: data.movie.genres,
         people: {
           cast: data.movie.actors,
+          director: data.movie.directors,
         },
         history: data.movie.history,
       };
@@ -64,6 +65,7 @@ async function create(id) {
           genres: data.movie.genres,
           people: {
             cast: data.movie.actors,
+            director: data.movie.directors,
           },
           history: data.movie.history,
         },
@@ -89,6 +91,7 @@ async function build(id) {
     history: {},
     genres: {},
     actors: {},
+    directors: {},
   };
   let series = {
     history: {},
@@ -151,6 +154,15 @@ async function build(id) {
               : 1;
           }
         }
+
+        if (dbItem.Director) {
+          for (let r = 0; r < dbItem.Director.length; r++) {
+            let director = dbItem.Director[r].tag.replace(/[^a-zA-Z0-9 ]/g, "");
+            movie.directors[director] = movie.directors[director]
+              ? movie.directors[director] + 1
+              : 1;
+          }
+        }
       }
     } else if (listItem.type === "episode") {
       if (listItem.grandparentKey) {
@@ -209,6 +221,11 @@ async function build(id) {
   Object.keys(movie.actors).map((key) => {
     if (movie.actors[key] < 2) {
       delete movie.actors[key];
+    }
+  });
+  Object.keys(movie.directors).map((key) => {
+    if (movie.directors[key] < 2) {
+      delete movie.directors[key];
     }
   });
   return {

@@ -236,8 +236,8 @@
 .person-card {
   .image-wrap {
     padding-bottom: 100%;
-    border-radius: 500px;
-    overflow: hidden;
+    border-radius: 500px !important;
+    overflow: hidden !important;
   }
 
   .text-wrap {

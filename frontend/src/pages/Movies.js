@@ -7,6 +7,7 @@ import Api from "../data/Api";
 import MovieCard from "../components/MovieCard";
 import Carousel from "../components/Carousel";
 import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
+import CarouselLoading from "../components/CarouselLoading";
 // import User from "../data/User";
 
 class Movies extends React.Component {
@@ -66,17 +67,19 @@ class Movies extends React.Component {
           <h3 className="sub-title mb--1">Trending Movies</h3>
           <p>Movies trending online right now</p>
           <Carousel>
-            {Object.keys(this.props.api.popular).length > 0
-              ? this.props.api.popular.movies.map((movie) => {
-                  return (
-                    <MovieCard
-                      key={movie.id}
-                      msg={this.props.msg}
-                      movie={movie}
-                    />
-                  );
-                })
-              : null}
+            {Object.keys(this.props.api.popular).length > 0 ? (
+              this.props.api.popular.movies.map((movie) => {
+                return (
+                  <MovieCard
+                    key={movie.id}
+                    msg={this.props.msg}
+                    movie={movie}
+                  />
+                );
+              })
+            ) : (
+              <CarouselLoading />
+            )}
           </Carousel>
         </section>
         {this.state.personalised && this.state.personalised.length > 0
@@ -86,18 +89,20 @@ class Movies extends React.Component {
                 <section key={`psn__${r}`}>
                   <h3 className="sub-title mb--1">{row.title}</h3>
                   <Carousel>
-                    {row.results.length > 0
-                      ? row.results.map((movie) => {
-                          if (!movie.id) return null;
-                          return (
-                            <MovieCard
-                              key={`psn__${r}__${movie.id}`}
-                              msg={this.props.msg}
-                              movie={movie}
-                            />
-                          );
-                        })
-                      : null}
+                    {row.results.length > 0 ? (
+                      row.results.map((movie) => {
+                        if (!movie.id) return null;
+                        return (
+                          <MovieCard
+                            key={`psn__${r}__${movie.id}`}
+                            msg={this.props.msg}
+                            movie={movie}
+                          />
+                        );
+                      })
+                    ) : (
+                      <CarouselLoading />
+                    )}
                   </Carousel>
                 </section>
               );

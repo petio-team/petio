@@ -53,9 +53,10 @@ router.post("/", async (req, res) => {
     getTop(1);
     getTop(2);
     let userId = user.altId ? user.altId : user.id;
-    getHistory(userId);
+    getHistory(userId, "movie");
+    getHistory(userId, "show");
     getDiscovery(userId, "movie");
-    getDiscovery(userId, "shows");
+    getDiscovery(userId, "show");
   }
 
   // check for existing jwt
