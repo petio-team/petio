@@ -697,6 +697,7 @@ class Users extends React.Component {
                 <th>Profile</th>
                 <th>Active</th>
                 <th>Last IP</th>
+                <th>Last Login</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -738,6 +739,11 @@ class Users extends React.Component {
                       </div>
                     </td>
                     <td>{user.lastIp ? user.lastIp : "n/a"}</td>
+                    <td>
+                      {user.lastLogin
+                        ? `${new Date(user.lastLogin).toDateString()}`
+                        : "n/a"}
+                    </td>
                     <td>
                       <p
                         className="table-action"

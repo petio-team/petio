@@ -150,6 +150,7 @@ async function saveRequestIp(user, request_ip) {
       {
         $set: {
           lastIp: request_ip,
+          lastLogin: new Date(),
         },
       }
     );
