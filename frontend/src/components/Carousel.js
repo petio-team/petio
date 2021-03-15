@@ -2,7 +2,6 @@ import React from "react";
 import { ReactComponent as LeftArrow } from "../assets/svg/back.svg";
 import { ReactComponent as RightArrow } from "../assets/svg/forward.svg";
 import { throttle } from "lodash";
-import CarouselLoading from "./CarouselLoading";
 // import CarouselLoading from "./CarouselLoading";
 
 class Carousel extends React.Component {
@@ -180,11 +179,7 @@ class Carousel extends React.Component {
           ref={this.carouselRef}
           onScroll={this.scroll}
         >
-          {this.state.inView ? (
-            <div className="carousel--inner">{childrenWithProps}</div>
-          ) : (
-            <CarouselLoading />
-          )}
+          <div className="carousel--inner">{childrenWithProps}</div>
         </div>
       </div>
     );
