@@ -171,7 +171,7 @@ class Requests extends React.Component {
                 Days) or still in cinemas.
               </p>
             </div>
-            <MyRequests requests={this.state.requests} />
+            <MyRequests requests={this.state.requests} msg={this.props.msg} />
           </section>
         </div>
         <section className="request-guide">

@@ -1,4 +1,7 @@
 import React from "react";
+import MovieCard from "../components/MovieCard";
+import TvCard from "../components/TvCard";
+import { ReactComponent as DoneIcon } from "../assets/svg/check.svg";
 
 class MyRequests extends React.Component {
   render() {
@@ -20,15 +23,23 @@ class MyRequests extends React.Component {
             let request = this.props.requests[key];
             return (
               <div key={`mreq__${key}`} className="myrequests--item">
-                <div
-                  className="myrequests--item--thumb"
-                  style={{
-                    backgroundImage:
-                      "url(https://image.tmdb.org/t/p/w200" +
-                      request.thumb +
-                      ")",
-                  }}
-                ></div>
+                <div className="myrequests--item--poster">
+                  {request.type === "tv" ? (
+                    <TvCard
+                      key={request._id}
+                      series={{ id: request.tmdb_id }}
+                      msg={this.props.msg}
+                      view={true}
+                    />
+                  ) : (
+                    <MovieCard
+                      key={request._id}
+                      movie={{ id: request.tmdb_id }}
+                      msg={this.props.msg}
+                      view={true}
+                    />
+                  )}
+                </div>
                 <div className="myrequests--item--details">
                   <p className="detail-title">{request.title}</p>
                   <p className="detail-text">
@@ -42,6 +53,62 @@ class MyRequests extends React.Component {
                       {request.process_stage.message}
                     </span>
                   </p>
+                  <div className="detail-steps">
+                    <p className="detail-steps--item detail-steps--item__completed">
+                      Requested
+                      <div className="icon">
+                        <DoneIcon />
+                      </div>
+                    </p>
+                    <p
+                      className={`detail-steps--item ${
+                        request.process_stage.step > 2
+                          ? "detail-steps--item__completed"
+                          : request.process_stage.step == 2
+                          ? "detail-steps--item__active"
+                          : ""
+                      }`}
+                    >
+                      Approved
+                      <div className="icon">
+                        <DoneIcon />
+                      </div>
+                    </p>
+                    <p
+                      className={`detail-steps--item ${
+                        request.process_stage.step > 3
+                          ? "detail-steps--item__completed"
+                          : request.process_stage.step == 3
+                          ? "detail-steps--item__active"
+                          : ""
+                      }`}
+                    >
+                      Processing
+                      <div className="icon">
+                        <DoneIcon />
+                      </div>
+                    </p>
+                    <p
+                      className={`detail-steps--item ${
+                        request.process_stage.step > 4
+                          ? "detail-steps--item__completed"
+                          : request.process_stage.step == 4
+                          ? "detail-steps--item__active"
+                          : ""
+                      }`}
+                    >
+                      Finalising
+                      <div className="icon">
+                        <DoneIcon />
+                      </div>
+                    </p>
+                    <p className="detail-steps--item">
+                      On Plex
+                      <div className="icon">
+                        <DoneIcon />
+                      </div>
+                    </p>
+                  </div>
                 </div>
               </div>
             );

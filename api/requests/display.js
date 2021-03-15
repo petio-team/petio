@@ -101,6 +101,7 @@ function reqState(req, children) {
     return {
       status: "pending",
       message: "Pending",
+      step: 2,
     };
   }
   if (children) {
@@ -110,6 +111,7 @@ function reqState(req, children) {
           return {
             status: "orange",
             message: "Downloading",
+            step: 3,
           };
         }
 
@@ -117,6 +119,7 @@ function reqState(req, children) {
           return {
             status: "good",
             message: "Downloaded",
+            step: 4,
           };
         }
 
@@ -124,6 +127,7 @@ function reqState(req, children) {
           return {
             status: "bad",
             message: "Removed",
+            step: 2,
           };
         }
 
@@ -136,6 +140,7 @@ function reqState(req, children) {
             return {
               status: "good",
               message: "Downloaded",
+              step: 4,
             };
           }
 
@@ -153,6 +158,7 @@ function reqState(req, children) {
               return {
                 status: "good",
                 message: "Downloaded",
+                step: 4,
               };
             } else {
               let airDate = children[r].info.firstAired;
@@ -160,23 +166,27 @@ function reqState(req, children) {
                 return {
                   status: "blue",
                   message: "Awaiting Info",
+                  step: 3,
                 };
               diff = Math.ceil(new Date(airDate) - new Date());
               if (diff > 0) {
                 return {
                   status: "blue",
                   message: `~${calcDate(diff)}`,
+                  step: 3,
                 };
               } else {
                 if (children[r].info.episodeFileCount > 0) {
                   return {
                     status: "blue",
                     message: "Partially Downloaded",
+                    step: 3,
                   };
                 }
                 return {
                   status: "bad",
                   message: "Unavailable",
+                  step: 3,
                 };
               }
             }
@@ -193,6 +203,7 @@ function reqState(req, children) {
                 return {
                   status: "blue",
                   message: `~${calcDate(diff)}`,
+                  step: 3,
                 };
               }
             }
@@ -202,11 +213,13 @@ function reqState(req, children) {
                 return {
                   status: "cinema",
                   message: "In Cinemas",
+                  step: 3,
                 };
               } else {
                 return {
                   status: "bad",
                   message: "Unavailable",
+                  step: 3,
                 };
               }
             } else {
@@ -218,12 +231,14 @@ function reqState(req, children) {
                   return {
                     status: "cinema",
                     message: "In Cinemas",
+                    step: 3,
                   };
                 }
               }
               return {
                 status: "bad",
                 message: "Unavailable",
+                step: 3,
               };
             }
           }
@@ -235,6 +250,7 @@ function reqState(req, children) {
   return {
     status: "manual",
     message: "No Status",
+    step: 3,
   };
 }
 
