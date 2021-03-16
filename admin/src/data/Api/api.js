@@ -128,6 +128,10 @@ export function testEmail() {
   return get(`/mail/test`);
 }
 
+export function testDiscord() {
+  return get(`/hooks/discord/test`);
+}
+
 export async function getUser(id) {
   return get(`/user/${id}`);
 }

@@ -12,6 +12,7 @@ const getConfig = require("../util/config");
 const processRequest = require("../requests/process");
 const logger = require("../util/logger");
 const bcrypt = require("bcryptjs");
+const Discord = require("../notifications/discord");
 
 class LibraryUpdate {
   constructor() {
@@ -809,6 +810,7 @@ class LibraryUpdate {
       logger.log("error", "LIB CRON: Err: No user data");
       return;
     }
+    this.discordNotify(userData, request);
     if (!userData.email) {
       logger.log("warn", "LIB CRON: Err: User has no email");
       return;
@@ -824,6 +826,16 @@ class LibraryUpdate {
     ]);
 
     logger.log("info", `LIB CRON: Mailer updated`);
+  }
+
+  discordNotify(user, request) {
+    let type = request.type === "tv" ? "TV Show" : "Movie";
+    new Discord().send(
+      `${request.title} added to Plex!`,
+      `The ${type} "${request.title}" has been processed and is now available to watch on Plex"`,
+      user.title,
+      `https://image.tmdb.org/t/p/w500${request.thumb}`
+    );
   }
 
   execMail() {

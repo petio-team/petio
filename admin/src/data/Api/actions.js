@@ -451,6 +451,20 @@ export function testEmail() {
   });
 }
 
+export function testDiscord() {
+  return new Promise((resolve, reject) => {
+    api
+      .testDiscord()
+      .then((data) => {
+        resolve(data);
+      })
+      .catch((err) => {
+        console.log(err);
+        reject();
+      });
+  });
+}
+
 export async function getUser(id) {
   try {
     let userData = await api.getUser(id);

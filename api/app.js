@@ -45,6 +45,7 @@ const configRoute = require("./routes/config");
 const logsRoute = require("./routes/log");
 const filterRoute = require("./routes/filter");
 const discoveryRoute = require("./routes/discovery");
+const notificationsRoute = require("./routes/notifications");
 const { authRequired } = require("./middleware/auth");
 
 class Main {
@@ -121,6 +122,7 @@ class Main {
       this.e.use("/logs", authRequired, logsRoute);
       this.e.use("/filter", authRequired, filterRoute);
       this.e.use("/discovery", authRequired, discoveryRoute);
+      this.e.use("/hooks", authRequired, notificationsRoute);
       this.e.get("*", function (req, res) {
         logger.log(
           "warn",

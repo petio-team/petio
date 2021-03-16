@@ -16,6 +16,7 @@ class General extends React.Component {
       email_enabled: false,
       base_path: "",
       login_type: false,
+      discord_webhook: false,
     };
 
     this.inputChange = this.inputChange.bind(this);
@@ -24,7 +25,9 @@ class General extends React.Component {
     this.loadConfigs = this.loadConfigs.bind(this);
     this.testEmail = this.testEmail.bind(this);
     this.saveBasePath = this.saveBasePath.bind(this);
+    this.saveDiscord = this.saveDiscord.bind(this);
     this.saveLoginType = this.saveLoginType.bind(this);
+    this.testDiscord = this.testDiscord.bind(this);
   }
 
   inputChange(e) {
@@ -80,6 +83,24 @@ class General extends React.Component {
     }
   }
 
+  async saveDiscord() {
+    try {
+      await Api.updateConfig({
+        discord_webhook: this.state.discord_webhook,
+      });
+      this.props.msg({
+        message: "Discord Webhook Saved",
+        type: "good",
+      });
+    } catch (err) {
+      console.log(err);
+      this.props.msg({
+        message: "Failed to Save Discord Webhook",
+        type: "error",
+      });
+    }
+  }
+
   async saveLoginType() {
     try {
       await Api.updateConfig({
@@ -111,6 +132,7 @@ class General extends React.Component {
         email_secure: email.config.emailSecure,
         base_path: config.base_path ? config.base_path : "",
         login_type: config.login_type ? config.login_type : 1,
+        discord_webhook: config.discord_webhook ? config.discord_webhook : "",
         loading: false,
       });
       this.props.msg({
@@ -125,11 +147,33 @@ class General extends React.Component {
     }
   }
 
+  async testDiscord() {
+    try {
+      let test = await Api.testDiscord();
+      if (test.result) {
+        this.props.msg({
+          message: "Discord Test Passed!",
+          type: "good",
+        });
+      } else {
+        this.props.msg({
+          message: "Discord Test Failed",
+          type: "error",
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      this.props.msg({
+        message: "Discord Test Failed",
+        type: "error",
+      });
+    }
+  }
+
   async testEmail() {
     try {
       await this.saveEmail();
       let test = await Api.testEmail();
-      console.log(test);
       if (test.result) {
         this.props.msg({
           message: "Email Test Passed!",
@@ -327,6 +371,28 @@ class General extends React.Component {
           </div>
           <button className="btn btn__square" onClick={this.saveLoginType}>
             Save
+          </button>
+        </section>
+        <section>
+          <p className="main-title mb--2">Discord</p>
+          <p className="description">Please paste here your Discord webhook</p>
+          <input
+            type="text"
+            name="discord_webhook"
+            value={this.state.discord_webhook}
+            onChange={this.inputChange}
+            autoCorrect="off"
+            spellCheck="off"
+          />
+          <button
+            style={{ marginRight: "10px" }}
+            className="btn btn__square"
+            onClick={this.saveDiscord}
+          >
+            Save
+          </button>
+          <button className="btn btn__square" onClick={this.testDiscord}>
+            Test
           </button>
         </section>
       </>

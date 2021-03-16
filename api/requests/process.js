@@ -7,6 +7,7 @@ const Sonarr = require("../services/sonarr");
 const Radarr = require("../services/radarr");
 const logger = require("../util/logger");
 const filter = require("./filter");
+const Discord = require("../notifications/discord");
 
 class processRequest {
   constructor(req = {}, usr = {}) {
@@ -33,6 +34,7 @@ class processRequest {
           out.quota = updatedUser.quotaCount;
         }
         this.mailRequest();
+        this.discordNotify();
       } catch (err) {
         logger.log("error", "REQ: Error");
         logger.log({ level: "error", message: err });
@@ -204,6 +206,18 @@ class processRequest {
         }
       }
     }
+  }
+
+  discordNotify() {
+    let userData = this.user;
+    const requestData = this.request;
+    let type = requestData.type === "tv" ? "TV Show" : "Movie";
+    new Discord().send(
+      "New Request",
+      `A new request has been added for the ${type} "${requestData.title}"`,
+      userData.title,
+      `https://image.tmdb.org/t/p/w500${requestData.thumb}`
+    );
   }
 
   async mailRequest() {
