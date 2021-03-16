@@ -149,6 +149,7 @@ class General extends React.Component {
 
   async testDiscord() {
     try {
+      await this.saveDiscord();
       let test = await Api.testDiscord();
       if (test.result) {
         this.props.msg({
@@ -391,7 +392,12 @@ class General extends React.Component {
           >
             Save
           </button>
-          <button className="btn btn__square" onClick={this.testDiscord}>
+          <button
+            className={`btn btn__square ${
+              this.state.discord_webhook ? "" : "disabled"
+            }`}
+            onClick={this.testDiscord}
+          >
             Test
           </button>
         </section>
