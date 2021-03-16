@@ -96,7 +96,7 @@
       height: 100%;
       object-fit: cover;
       pointer-events: none;
-      opacity: 0;
+      // opacity: 0;
     }
 
     .no-poster {
@@ -219,18 +219,20 @@
     }
   }
 
-  &.img-not-loaded {
-    img {
-      opacity: 0;
-    }
-  }
+  // @include media-breakpoint-up(lg) {
+  //   &.img-not-loaded {
+  //     img {
+  //       opacity: 0;
+  //     }
+  //   }
 
-  &.img-loaded {
-    img {
-      opacity: 1;
-      transition: opacity 0.4s ease;
-    }
-  }
+  //   &.img-loaded {
+  //     img {
+  //       opacity: 1;
+  //       transition: opacity 0.4s ease;
+  //     }
+  //   }
+  // }
 }
 
 .person-card {
