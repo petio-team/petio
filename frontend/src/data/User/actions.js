@@ -71,6 +71,7 @@ export function request(req, user) {
         }
       })
       .catch((data) => {
+        console.log(data);
         if (data) {
           reject(data.message);
         } else {

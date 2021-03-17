@@ -111,7 +111,11 @@ class processRequest {
 
     try {
       await newRequest.save();
-      this.sendToDvr(profile);
+      if (autoApprove) {
+        this.sendToDvr(profile);
+      } else {
+        logger.info("REQ: Request requires approval, waiting");
+      }
     } catch (err) {
       logger.log("error", `REQ: Unable to save request`);
       logger.log({ level: "error", message: err });

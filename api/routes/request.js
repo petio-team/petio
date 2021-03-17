@@ -14,11 +14,7 @@ router.post("/add", async (req, res) => {
   let user = req.body.user;
   let request = req.body.request;
   let process = await new processRequest(request, user).new();
-  if (process.error) {
-    res.status(500).json(process);
-  } else {
-    res.json(process);
-  }
+  res.json(process);
 });
 
 router.get("/min", async (req, res) => {
