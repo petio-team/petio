@@ -131,6 +131,7 @@ class processRequest {
   }
 
   async sendToDvr(profile) {
+    if (!this.request.id) this.request.id = this.request.requestId;
     let filterMatch = await filter(this.request);
     if (filterMatch) {
       logger.log(
@@ -153,7 +154,7 @@ class processRequest {
           console.log(r, profile.radarr[r]);
           let active = profile.radarr[r];
           if (active) {
-            new Radarr(r).processRequest(this.request.requestId);
+            new Radarr(r).processRequest(this.request.id);
           }
         });
       }
@@ -161,7 +162,7 @@ class processRequest {
         Object.keys(profile.sonarr).map((s) => {
           let active = profile.sonarr[s];
           if (active) {
-            new Sonarr(s).processRequest(this.request.requestId);
+            new Sonarr(s).processRequest(this.request.id);
           }
         });
       }
