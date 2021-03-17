@@ -11,7 +11,8 @@ const Mailer = require("../mail/mailer");
 const getConfig = require("../util/config");
 const processRequest = require("../requests/process");
 const logger = require("../util/logger");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
+const Discord = require("../notifications/discord");
 
 class LibraryUpdate {
   constructor() {
@@ -21,9 +22,9 @@ class LibraryUpdate {
     this.full = true;
   }
 
-  run() {
-    this.scan();
-  }
+  // async run() {
+  //   await this.scan();
+  // }
 
   async partial() {
     logger.log("info", `LIB CRON: Running Partial`);
@@ -37,7 +38,7 @@ class LibraryUpdate {
         "warn",
         `LIB CRON: Partial scan failed - unable to get recent`
       );
-      logger.error(err.stack);
+      logger.log({ level: "error", message: err });
       return;
     }
     let matched = {};
@@ -109,6 +110,7 @@ class LibraryUpdate {
     );
     this.execMail();
     logger.log("info", "LIB CRON: Partial Scan Complete");
+    return;
   }
 
   async scan() {
@@ -119,7 +121,7 @@ class LibraryUpdate {
       libraries = await this.getLibraries();
     } catch (err) {
       logger.log("error", `LIB CRON: Error`);
-      logger.error(err.stack);
+      logger.log({ level: "error", message: err });
     }
 
     if (libraries) {
@@ -154,7 +156,7 @@ class LibraryUpdate {
         await adminData.save();
       } catch (err) {
         logger.log("error", `LIB CRON: Error creating admin user`);
-        logger.error(err.stack);
+        logger.log({ level: "error", message: err });
       }
     }
   }
@@ -253,7 +255,7 @@ class LibraryUpdate {
         libraryItem = await newLibrary.save();
       } catch (err) {
         logger.log("error", `LIB CRON: Error`);
-        logger.error(err.stack);
+        logger.log({ level: "error", message: err });
       }
     } else {
       let updatedLibraryItem = false;
@@ -283,11 +285,12 @@ class LibraryUpdate {
               contentChangedAt: lib.contentChangedAt,
               hidden: lib.hidden,
             },
-          }
+          },
+          { useFindAndModify: false }
         );
       } catch (err) {
         logger.log("error", `LIB CRON: Error`);
-        logger.error(err.stack);
+        logger.log({ level: "error", message: err });
       }
       if (updatedLibraryItem) {
         logger.log("info", "LIB CRON: Library Updated " + lib.title);
@@ -319,7 +322,7 @@ class LibraryUpdate {
           );
         } catch (err) {
           logger.log("error", `LIB CRON: Unable to get library content`);
-          logger.error(err.stack);
+          logger.log({ level: "error", message: err });
         }
       })
     );
@@ -419,7 +422,7 @@ class LibraryUpdate {
             `LIB CRON: Error - unable to parse id source from: ${movieObj.guid} - Movie: ${movieObj.title}`
           );
         } else {
-          logger.error(err.stack);
+          logger.log({ level: "error", message: err });
         }
       }
     }
@@ -463,11 +466,11 @@ class LibraryUpdate {
             : false,
         });
         movieDb = await newMovie.save();
-        await this.mailAdded(movieObj, externalId);
+        await this.mailAdded(movieObj, newMovie.tmdb_id);
         logger.log("info", `LIB CRON: Movie Added - ${movieObj.title}`);
       } catch (err) {
         logger.log("warn", `LIB CRON: Error`);
-        logger.error(err.stack);
+        logger.log({ level: "error", message: err });
       }
     } else {
       try {
@@ -517,7 +520,7 @@ class LibraryUpdate {
         );
       } catch (err) {
         movieDb = false;
-        logger.log("warn", err);
+        logger.log({ level: "error", message: err });
       }
     }
   }
@@ -553,7 +556,7 @@ class LibraryUpdate {
         musicDb = await newMusic.save();
       } catch (err) {
         logger.log("error", `LIB CRON: Error`);
-        logger.error(err.stack);
+        logger.log({ level: "error", message: err });
       }
     }
   }
@@ -609,7 +612,7 @@ class LibraryUpdate {
         try {
           externalIds = await this.tmdbExternalIds(externalId);
         } catch (err) {
-          logger.log("warn", err);
+          logger.log({ level: "warn", message: err });
         }
       }
     }
@@ -648,11 +651,11 @@ class LibraryUpdate {
           tmdb_id: idSource === "tmdb" ? externalId : tmdbId,
         });
         showDb = await newShow.save();
-        await this.mailAdded(showObj, externalId);
+        await this.mailAdded(showObj, newShow.tmdb_id);
         logger.log("info", `LIB CRON: Show Added - ${showObj.title}`);
       } catch (err) {
         logger.log("error", `LIB CRON: Error`);
-        logger.error(err.stack);
+        logger.log({ level: "error", message: err });
       }
     } else {
       try {
@@ -707,12 +710,14 @@ class LibraryUpdate {
       friendList = await this.getFriends();
     } catch (err) {
       logger.log("error", `LIB CRON: Error getting friend list`);
-      logger.error(err.stack);
+      logger.log({ level: "error", message: err });
     }
     if (friendList) {
-      Object.keys(friendList).map((item) => {
-        this.saveFriend(friendList[item].attributes);
-      });
+      await Promise.all(
+        Object.keys(friendList).map(async (item) => {
+          await this.saveFriend(friendList[item].attributes);
+        })
+      );
     }
   }
 
@@ -730,7 +735,7 @@ class LibraryUpdate {
             reject("Unable to get friends");
             logger.log("error", "LIB CRON: Unable to get friends");
             logger.log("error", `LIB CRON: Error`);
-            logger.error(err.stack);
+            logger.log({ level: "error", message: err });
           }
           if (!data) {
             reject("no data");
@@ -777,7 +782,7 @@ class LibraryUpdate {
         friendDb = await newFriend.save();
       } catch (err) {
         logger.log("error", `LIB CRON: Error`);
-        logger.error(err.stack);
+        logger.log({ level: "error", message: err });
       }
       if (friendDb) {
         logger.log("info", `LIB CRON: User Created ${obj.title}`);
@@ -788,9 +793,7 @@ class LibraryUpdate {
   }
 
   async mailAdded(plexData, ref_id) {
-    let request = await Request.findOne({
-      $or: [{ imdb_id: ref_id }, { tmdb_id: ref_id }, { tvdb_id: ref_id }],
-    });
+    let request = await Request.findOne({ tmdb_id: ref_id });
     if (request) {
       await Promise.all(
         request.users.map(async (user, i) => {
@@ -807,6 +810,7 @@ class LibraryUpdate {
       logger.log("error", "LIB CRON: Err: No user data");
       return;
     }
+    this.discordNotify(userData, request);
     if (!userData.email) {
       logger.log("warn", "LIB CRON: Err: User has no email");
       return;
@@ -822,6 +826,16 @@ class LibraryUpdate {
     ]);
 
     logger.log("info", `LIB CRON: Mailer updated`);
+  }
+
+  discordNotify(user, request) {
+    let type = request.type === "tv" ? "TV Show" : "Movie";
+    new Discord().send(
+      `${request.title} added to Plex!`,
+      `The ${type} "${request.title}" has been processed and is now available to watch on Plex"`,
+      user.title,
+      `https://image.tmdb.org/t/p/w500${request.thumb}`
+    );
   }
 
   execMail() {

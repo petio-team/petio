@@ -7,7 +7,7 @@ export function login(user, cookie = false) {
   return new Promise((resolve, reject) => {
     let authToken = false;
     if (cookie) {
-      authToken = localStorage.getItem("loggedin");
+      authToken = localStorage.getItem("petio_jwt");
     }
 
     api
@@ -17,7 +17,7 @@ export function login(user, cookie = false) {
           let ls_user = data.token;
           if (data.loggedIn) {
             if (!cookie) {
-              localStorage.setItem("loggedin", ls_user);
+              localStorage.setItem("petio_jwt", ls_user);
             }
             finalise({
               type: types.LOGIN,
@@ -127,6 +127,15 @@ export function addIssue(issue) {
   });
 }
 
+export async function myRequests() {
+  try {
+    let data = await api.myRequests();
+    return data;
+  } catch {
+    return false;
+  }
+}
+
 function finalise(data = false) {
   if (!data) return false;
   return store.dispatch(data);
@@ -134,4 +143,14 @@ function finalise(data = false) {
 
 export function review(item, id, review) {
   api.review(item, id, review);
+}
+
+export async function quota() {
+  try {
+    let data = await api.quota();
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw "Unable to get Quota";
+  }
 }

@@ -1,0 +1,128 @@
+.profile-page {
+  .logout {
+    color: $primary;
+    cursor: pointer;
+  }
+
+  .profile {
+    &-block {
+      background: rgba(white, 0.1);
+      border-radius: 5px;
+      padding: 10px;
+
+      @include media-breakpoint-up(lg) {
+        padding: 20px;
+      }
+
+      &.mb-1 {
+        margin-bottom: 15px;
+      }
+    }
+
+    &-overview {
+      display: flex;
+      flex-direction: row;
+
+      align-items: center;
+    }
+
+    &-quota {
+      margin-top: 15px;
+    }
+
+    &-logout {
+      margin-left: auto;
+    }
+
+    &-thumb {
+      margin-right: 20px;
+      position: relative;
+      height: 50px;
+      pointer-events: none;
+
+      @include media-breakpoint-up(lg) {
+        height: 75px;
+      }
+
+      .thumb {
+        width: 50px;
+        height: 50px;
+        background-size: cover;
+        background-position: center;
+        border-radius: 50%;
+        display: block;
+
+        @include media-breakpoint-up(lg) {
+          width: 75px;
+          height: 75px;
+        }
+      }
+
+      .hover {
+        opacity: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        transition: opacity 0.4s ease;
+        pointer-events: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+
+        p {
+          color: $primary;
+          font-size: 10px;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          font-weight: bold;
+          margin: 0;
+        }
+      }
+
+      &:hover {
+        .hover {
+          @include media-breakpoint-up(lg) {
+            opacity: 1;
+          }
+        }
+      }
+    }
+
+    &-info {
+      margin: 0;
+
+      .role {
+        text-transform: capitalize;
+      }
+
+      p {
+        margin: 0;
+      }
+    }
+
+    &-access {
+      padding-right: 50px;
+      .a {
+        &-wrap {
+          display: flex;
+        }
+
+        &-icon {
+          padding-right: 10px;
+          svg {
+            fill: $primary;
+            height: 50px;
+          }
+
+          &.disabled {
+            opacity: 0.2;
+          }
+        }
+      }
+    }
+  }
+}

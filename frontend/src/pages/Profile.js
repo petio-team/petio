@@ -2,75 +2,68 @@ import React from "react";
 import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import History from "../components/History";
+import User from "../data/User";
 
 class Profile extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      open4kmodal: false,
+      quota: false,
     };
 
-    this.open4k = this.open4k.bind(this);
-    this.close4k = this.close4k.bind(this);
+    this.getQuota = this.getQuota.bind(this);
   }
   componentDidMount() {
     let page = document.querySelectorAll(".page-wrap")[0];
     page.scrollTop = 0;
     window.scrollTo(0, 0);
+    this.getQuota();
   }
 
-  open4k() {
-    this.setState({
-      open4kmodal: true,
-    });
+  async getQuota() {
+    try {
+      let quota = await User.quota();
+      this.setState({
+        quota: quota,
+      });
+      this.props.msg({
+        type: "info",
+        message: "Quotas loaded",
+      });
+    } catch (err) {
+      this.setState({
+        quota: {
+          current: "error",
+          total: "error",
+        },
+      });
+      this.props.msg({
+        type: "error",
+        message: "Failed to load quota",
+      });
+    }
   }
 
-  close4k() {
-    this.setState({
-      open4kmodal: false,
-    });
+  formatQuota() {
+    if (!this.state.quota) {
+      return "Loading...";
+    }
+    if (this.state.quota.current === "error") {
+      return "Error";
+    } else {
+      let current = this.state.quota.current;
+      let total = this.state.quota.total > 0 ? this.state.quota.total : "∞";
+      return `${current} / ${total} - per week`;
+    }
   }
 
   render() {
     return (
       <div className="profile-page">
-        <div
-          className={`modal-4k-request ${this.state.open4kmodal ? "open" : ""}`}
-        >
-          <div className="modal-4k-request--top">
-            <h3>Request 4K / UHD Access</h3>
-          </div>
-          <div className="modal-4k-request--content">
-            <p>
-              Access to 4K / UHD content is limited to users who have both the
-              internet speed and devices to watch 4K without buffering or the
-              server trying to convert down to a lower resolution.
-            </p>
-            <p>
-              Before processing your request make sure your device can play HEVC
-              (aka h.265) and your internet speed is above 50mbps. Check your TV
-              / device manual for information on video codecs and perform a
-              speed test below.
-            </p>
-            <div className="modal-4k-request--speed">
-              <iframe src="https://www.metercustom.net/plugin/" />
-            </div>
-            <p>Passed both criteria? Click below to request access.</p>
-            <div
-              className="btn btn__square bad modal-4k-request--cancel"
-              onClick={this.close4k}
-            >
-              Cancel
-            </div>
-            <button className="modal-4k-request--submit btn btn__square">
-              Request Access
-            </button>
-          </div>
-        </div>
         <h1 className="main-title mb--2">Your Account</h1>
         <section>
-          <div className="profile-overview">
+          <div className="profile-overview profile-block">
             <div className="profile-thumb">
               <a
                 href="https://app.plex.tv/desktop#!/settings/account"
@@ -78,7 +71,14 @@ class Profile extends React.Component {
                 rel="noreferrer"
                 className="thumb"
                 style={{
-                  backgroundImage: "url(" + this.props.user.current.thumb + ")",
+                  backgroundImage:
+                    process.env.NODE_ENV === "development"
+                      ? 'url("http://localhost:7778/user/thumb/' +
+                        this.props.user.current.id +
+                        '")'
+                      : 'url("/api/user/thumb/' +
+                        this.props.user.current.id +
+                        '")',
                   color: "red",
                 }}
               ></a>
@@ -89,9 +89,7 @@ class Profile extends React.Component {
             <div className="profile-info">
               <h3 className="sub-title">{this.props.user.current.username}</h3>
               <p className="email">{this.props.user.current.email}</p>
-              <p className="role">
-                {this.props.user.current.admin ? "Admin" : "Friend"}
-              </p>
+              <p className="role">{this.props.user.current.role}</p>
             </div>
 
             <div className="profile-logout">
@@ -99,6 +97,17 @@ class Profile extends React.Component {
                 Logout
               </p>
             </div>
+          </div>
+          <div className="profile-quota profile-block">
+            <h3 style={{ marginBottom: "0" }} className="sub-title">
+              Your Request Quota
+            </h3>
+            <small style={{ marginBottom: "5px", display: "block" }}>
+              Request quotas reset every Sunday night
+            </small>
+            <p style={{ marginBottom: "0" }}>
+              <strong>{this.formatQuota()}</strong>
+            </p>
           </div>
         </section>
         <History type="movie" />
@@ -111,7 +120,7 @@ class Profile extends React.Component {
 Profile = withRouter(Profile);
 
 function ProfileContainer(props) {
-  return <Profile user={props.user} logout={props.logout} />;
+  return <Profile user={props.user} logout={props.logout} msg={props.msg} />;
 }
 
 const mapStateToProps = function (state) {

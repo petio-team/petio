@@ -101,6 +101,7 @@
     animation-duration: 0.5s;
     animation-iteration-count: infinite;
     animation-direction: alternate;
+    margin-top: 2px;
 
     &-2 {
       animation-delay: 0.1s;
@@ -136,7 +137,11 @@
         left: 0;
         height: 100%;
         width: 100%;
-        background: radial-gradient(farthest-corner at 50% 50%, rgba(50, 50, 50, 0.5) 50%, #323232 100%);
+        background: radial-gradient(
+          farthest-corner at 50% 50%,
+          rgba(50, 50, 50, 0.5) 50%,
+          #323232 100%
+        );
         z-index: 3;
         opacity: 0;
         transition: opacity 0.3s ease;
@@ -188,6 +193,7 @@
         font-size: 9px;
         line-height: 12px;
         white-space: nowrap;
+        margin: 0;
 
         @include media-breakpoint-up(lg) {
           font-size: 13px;

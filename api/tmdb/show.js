@@ -86,10 +86,23 @@ async function showLookup(id, minified = false) {
           });
           seasonData[season.season_number] = season;
         });
+        if (recommendations.results.length === 0) {
+          let params = {};
+          if (show.genres) {
+            let genres = "";
+            for (let i = 0; i < show.genres.length; i++) {
+              genres += `${show.genres[i].id},`;
+            }
+
+            params.with_genres = genres;
+          }
+          recommendations = await discoverSeries(1, params);
+        }
         if (recommendations)
           Object.keys(recommendations.results).map((key) => {
             let recommendation = recommendations.results[key];
-            recommendationsData.push(recommendation.id);
+            if (recommendation.id !== parseInt(id))
+              recommendationsData.push(recommendation.id);
           });
         show.seasonData = seasonData;
         show.recommendations = recommendationsData;
@@ -121,7 +134,7 @@ async function showLookup(id, minified = false) {
       return show;
     } catch (err) {
       logger.log("warn", `Error processing show data - ${id}`);
-      logger.log("warn", err);
+      logger.log({ level: "error", message: err });
       console.log(err);
       return { error: "not found" };
     }
@@ -138,7 +151,7 @@ async function getShowData(id) {
     });
   } catch (err) {
     logger.log("warn", `Error getting show data - ${id}`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 }
@@ -151,20 +164,20 @@ async function externalId(id) {
     });
   } catch (err) {
     logger.log("warn", `Error getting external ID - ${id}`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 }
 
-async function getRecommendations(id) {
+async function getRecommendations(id, page = 1) {
   let data = false;
   try {
-    data = await memoryCache.wrap(`rec_${id}`, function () {
-      return recommendationData(id);
+    data = await memoryCache.wrap(`rec_${id}__${page}`, function () {
+      return recommendationData(id, page);
     });
   } catch (err) {
     logger.log("warn", `Error getting recommendation data - ${id}`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 }
@@ -177,7 +190,7 @@ async function getReviews(id) {
     });
   } catch (err) {
     logger.log("warn", `Error getting review data - ${id}`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 }
@@ -190,7 +203,7 @@ async function getSeasons(seasons, id) {
     });
   } catch (err) {
     logger.log("warn", `Error getting season data - ${id}`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 }
@@ -201,7 +214,7 @@ async function tmdbData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}tv/${id}?api_key=${tmdbApikey}&append_to_response=credits,videos,keywords`;
+  let url = `${tmdb}tv/${id}?api_key=${tmdbApikey}&append_to_response=aggregate_credits,videos,keywords,content_ratings,credits`;
 
   return new Promise((resolve, reject) => {
     request(
@@ -215,17 +228,39 @@ async function tmdbData(id) {
           reject(err);
         }
 
+        if (!data) reject();
+
+        if (data.aggregate_credits) {
+          if (data.aggregate_credits.cast.length > 50)
+            data.aggregate_credits.cast.length = 50;
+          data.credits.cast = [];
+          data.aggregate_credits.cast.map((item, i) => {
+            let character =
+              item.roles.length > 0 ? item.roles[0].character : false;
+            data.credits.cast[i] = {
+              name: item.name,
+              profile_path: item.profile_path,
+              character: character,
+              id: item.id,
+            };
+          });
+          delete data.aggregate_credits;
+        }
+        if (data.content_ratings) {
+          data.age_rating = findEnRating(data.content_ratings.results);
+          delete data.content_ratings;
+        }
         resolve(data);
       }
     );
   });
 }
 
-async function recommendationData(id) {
+async function recommendationData(id, page = 1) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}tv/${id}/recommendations?api_key=${tmdbApikey}&append_to_response=credits,videos,keywords`;
+  let url = `${tmdb}tv/${id}/recommendations?api_key=${tmdbApikey}&page=${page}`;
 
   return new Promise((resolve, reject) => {
     request(
@@ -304,6 +339,7 @@ async function reviewsData(id) {
   });
 }
 
+// Lets i18n this soon
 function findEnLogo(logos) {
   let logoUrl = false;
   logos.forEach((logo) => {
@@ -312,6 +348,17 @@ function findEnLogo(logos) {
     }
   });
   return logoUrl;
+}
+
+// Lets i18n this soon
+function findEnRating(data) {
+  let rating = false;
+  data.forEach((item) => {
+    if (item.iso_3166_1 === "US") {
+      rating = item.rating;
+    }
+  });
+  return rating;
 }
 
 function idLookup(id) {
@@ -390,4 +437,5 @@ module.exports = {
   discoverSeries,
   showLookup,
   network,
+  getRecommendations,
 };

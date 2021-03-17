@@ -89,25 +89,45 @@ async function getUser(token) {
     servers: {},
   };
   let user = await api.getUser(token);
-  let servers = await api.getServers(token);
-  let serverList = servers.getElementsByTagName("MediaContainer")[0].getElementsByTagName("Device");
+  let [servers, serversSsl] = await Promise.all([
+    api.getServers(token),
+    api.getServers(token, true),
+  ]);
+  let serverList = Array.prototype.slice.call(
+    servers
+      .getElementsByTagName("MediaContainer")[0]
+      .getElementsByTagName("Device")
+  );
+  let serverListSsl = Array.prototype.slice.call(
+    serversSsl
+      .getElementsByTagName("MediaContainer")[0]
+      .getElementsByTagName("Device")
+  );
+  Array.prototype.push.apply(serverList, serverListSsl);
   let userData = user.getElementsByTagName("user")[0];
   setup.user.email = userData.getAttribute("email");
   setup.user.id = userData.getAttribute("id");
   setup.user.username = userData.getAttribute("title");
   setup.user.thumb = userData.getAttribute("thumb");
   for (let server of serverList) {
-    if (server.getAttribute("owned") === "1" && server.getAttribute("provides") === "server") {
+    let i = 0;
+    if (
+      server.getAttribute("owned") === "1" &&
+      server.getAttribute("provides") === "server"
+    ) {
       let connections = server.getElementsByTagName("Connection");
-      let i = 0;
+
       for (let connection of connections) {
         console.log(connection);
-        // if (connection.getAttribute('local') === '0')
-        setup.servers[server.getAttribute("clientIdentifier") + i] = {
+        let uri = connection.getAttribute("uri");
+        let details = getUrlDetails(uri);
+        setup.servers[
+          server.getAttribute("clientIdentifier") + details.hostname + i
+        ] = {
           name: server.getAttribute("name"),
-          host: connection.getAttribute("address"),
-          port: connection.getAttribute("port"),
-          protocol: connection.getAttribute("protocol"),
+          host: details.hostname,
+          port: details.port,
+          protocol: details.protocol,
           platform: server.getAttribute("platform"),
           status: "pending",
           clientId: server.getAttribute("clientIdentifier"),
@@ -124,6 +144,7 @@ async function getUser(token) {
     platform: "docker",
     status: "pending",
   };
+  console.log(setup.servers);
   finalise({
     type: types.PLEX_DETAILS,
     servers: setup.servers,
@@ -164,4 +185,14 @@ async function testPlexServer(server, key) {
 function finalise(data = false) {
   if (!data) return false;
   return store.dispatch(data);
+}
+
+function getUrlDetails(url) {
+  var a = document.createElement("a");
+  a.href = url;
+  return {
+    protocol: a.protocol.replace(":", ""),
+    hostname: a.hostname,
+    port: a.port,
+  };
 }

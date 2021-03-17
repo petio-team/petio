@@ -50,7 +50,11 @@
       left: 0;
       height: 100%;
       width: 100%;
-      background: radial-gradient(farthest-corner at 50% 50%, rgba(50, 50, 50, 0.5) 50%, #323232 100%);
+      background: radial-gradient(
+        farthest-corner at 50% 50%,
+        rgba(50, 50, 50, 0.5) 50%,
+        #323232 100%
+      );
       z-index: 3;
       opacity: 0;
       transition: opacity 0.3s ease;
@@ -92,6 +96,7 @@
       height: 100%;
       object-fit: cover;
       pointer-events: none;
+      // opacity: 0;
     }
 
     .no-poster {
@@ -213,13 +218,29 @@
       opacity: 1;
     }
   }
+
+  // @include media-breakpoint-up(lg) {
+  //   &.img-not-loaded {
+  //     img {
+  //       opacity: 0;
+  //     }
+  //   }
+
+  //   &.img-loaded {
+  //     img {
+  //       opacity: 1;
+  //       transition: opacity 0.4s ease;
+  //     }
+  //   }
+  // }
 }
 
 .person-card {
   .image-wrap {
     padding-bottom: 100%;
-    border-radius: 500px;
-    overflow: hidden;
+    border-radius: 500px !important;
+    overflow: hidden !important;
+    transform: translateZ(0);
   }
 
   .text-wrap {
@@ -264,6 +285,7 @@
     align-items: center;
     border-radius: 50px;
     font-weight: bold;
+    display: none;
   }
 }
 

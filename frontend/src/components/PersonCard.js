@@ -4,6 +4,22 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 
 class PersonCard extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      imgLoaded: false,
+    };
+
+    this.imgLoaded = this.imgLoaded.bind(this);
+  }
+
+  imgLoaded() {
+    this.setState({
+      imgLoaded: true,
+    });
+  }
+
   render() {
     let knownFor = null;
     let person = this.props.person;
@@ -19,20 +35,26 @@ class PersonCard extends React.Component {
         );
       });
     }
+
     return (
-      <div key={person.id} className="card person-card">
+      <div
+        key={person.id}
+        className={`card person-card ${
+          this.state.imgLoaded ? "img-loaded" : "img-not-loaded"
+        }`}
+      >
         <div className="card--inner">
           <Link to={`/person/${person.id}`} className="full-link"></Link>
           <div className="image-wrap">
-            {person.profile_path ? (
-              <LazyLoadImage
-                alt={person.name}
-                src={`https://image.tmdb.org/t/p/w200/${person.profile_path}`}
-                // effect="blur"
-              />
-            ) : (
-              <div className="no-poster"></div>
-            )}
+            <LazyLoadImage
+              alt={person.name}
+              src={
+                person.profile_path
+                  ? `https://image.tmdb.org/t/p/w200${person.profile_path}`
+                  : "/images/no-poster-person.jpg"
+              }
+              onLoad={this.imgLoaded}
+            />
           </div>
           <div className="text-wrap">
             <p className="title">{person.name}</p>

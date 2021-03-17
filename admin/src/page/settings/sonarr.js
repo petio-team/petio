@@ -77,18 +77,10 @@ class Sonarr extends React.Component {
     this.getSonarr(true);
 
     if (!silent) {
-      this.setState({
-        isError: false,
-        isMsg: "Sonarr settings saved!",
+      this.props.msg({
+        message: "Sonarr settings saved!",
+        type: "good",
       });
-
-      clearInterval(this.closeMsg);
-      this.closeMsg = setInterval(() => {
-        this.setState({
-          isError: false,
-          isMsg: false,
-        });
-      }, 3000);
     }
   }
 
@@ -109,18 +101,10 @@ class Sonarr extends React.Component {
     if (!silent) {
       this.closeWizard();
 
-      this.setState({
-        isError: false,
-        isMsg: "Sonarr Server Removed",
+      this.props.msg({
+        message: "Sonarr Server Removed",
+        type: "good",
       });
-
-      clearInterval(this.closeMsg);
-      this.closeMsg = setInterval(() => {
-        this.setState({
-          isError: false,
-          isMsg: false,
-        });
-      }, 3000);
     }
   }
 
@@ -132,33 +116,28 @@ class Sonarr extends React.Component {
       let result = await Api.testSonarr(id);
       if (result.connection) {
         this.setState({
-          isError: false,
-          isMsg: "Sonarr Test Connection success!",
           newServer: false,
-          needsTest: true,
+          needsTest: false,
+        });
+        this.props.msg({
+          message: "Sonarr Test Connection success!",
+          type: "good",
         });
         await this.getSonarr(true);
         await this.getSettings(id);
       } else {
-        this.setState({
-          isError: "Sonarr Test Connection failed!",
-          isMsg: false,
+        this.props.msg({
+          message: "Sonarr Test Connection failed!",
+          type: "error",
         });
         this.deleteServer(true);
       }
     } catch (err) {
-      this.setState({
-        isError: "Sonarr Test Connection failed! Error 2",
-        isMsg: false,
+      this.props.msg({
+        message: "Sonarr Test Connection failed! Error 2",
+        type: "error",
       });
     }
-    clearInterval(this.closeMsg);
-    this.closeMsg = setInterval(() => {
-      this.setState({
-        isError: false,
-        isMsg: false,
-      });
-    }, 3000);
   }
 
   inputChange(e) {
@@ -319,16 +298,6 @@ class Sonarr extends React.Component {
     if (this.state.loading) {
       return (
         <>
-          {this.state.isError ? (
-            <div className="setting-msg error">
-              <p>{this.state.isError}</p>
-            </div>
-          ) : null}
-          {this.state.isMsg ? (
-            <div className="setting-msg good">
-              <p>{this.state.isMsg}</p>
-            </div>
-          ) : null}
           <div className="spinner--settings">
             <Spinner />
           </div>
@@ -337,17 +306,6 @@ class Sonarr extends React.Component {
     }
     return (
       <>
-        {this.state.isError ? (
-          <div className="setting-msg error">
-            <p>{this.state.isError}</p>
-          </div>
-        ) : null}
-        {this.state.isMsg ? (
-          <div className="setting-msg good">
-            <p>{this.state.isMsg}</p>
-          </div>
-        ) : null}
-
         <Modal
           title="Add new server"
           open={this.state.addServerOpen}
@@ -510,12 +468,10 @@ class Sonarr extends React.Component {
 
         <section>
           <p className="main-title mb--2">Sonarr</p>
-          <p className="capped-width">
-            Sonarr is a PVR for Usenet and BitTorrent users. It can monitor
+          <p className="description">
+            Sonarr is a PVR. It can monitor
             multiple RSS feeds for new episodes of your favorite shows and will
-            grab, sort and rename them. It can also be configured to
-            automatically upgrade the quality of files already downloaded when a
-            better quality format becomes available.
+            grab, sort and rename them.
           </p>
         </section>
         <section>

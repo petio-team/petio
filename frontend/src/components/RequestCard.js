@@ -10,11 +10,11 @@ class RequestCard extends React.Component {
     }
     let img = request.poster_path ? (
       <img
-        src={`https://image.tmdb.org/t/p/w200/${request.poster_path}`}
+        src={`https://image.tmdb.org/t/p/w200${request.poster_path}`}
         alt={request.title}
       />
     ) : (
-      <div className="no-poster"></div>
+      <img src={`/images/no-poster.jpg`} alt={request.title} />
     );
     let type = this.props.user.requests[request.id].type;
 

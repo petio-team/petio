@@ -8,7 +8,6 @@
     position: fixed;
     top: 0;
     left: 0;
-
     background: none;
   }
 
@@ -22,6 +21,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    top: env(safe-area-inset-top);
 
     @include media-breakpoint-up(lg) {
       display: none;
@@ -37,6 +37,7 @@
     display: flex;
     justify-content: center;
     background: $black;
+    padding-top: env(safe-area-inset-top);
 
     @include media-breakpoint-up(lg) {
       display: block;
@@ -81,7 +82,7 @@
   }
 
   &--scroll {
-    max-height: calc(100vh - 68px);
+    max-height: calc(100vh - 68px + env(safe-area-inset-bottom));
     overflow-y: hidden;
     width: 100%;
     background: $dark-grey;
@@ -93,8 +94,11 @@
     bottom: 0;
     left: 0;
     height: 50px;
+    height: calc(50px + env(safe-area-inset-bottom));
     display: flex;
     justify-content: space-between;
+    padding-bottom: env(safe-area-inset-bottom);
+    // padding-bottom: 20px;
 
     &::-webkit-scrollbar {
       display: none;
@@ -240,6 +244,7 @@
     justify-content: center;
     padding: 0 20px;
     cursor: pointer;
+    top: env(safe-area-inset-top);
 
     .icon {
       padding: 0;

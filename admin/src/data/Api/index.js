@@ -41,6 +41,11 @@ import {
   updateRequest,
   getConsole,
   getReviews,
+  removeIssue,
+  updateFilters,
+  getFilters,
+  uploadThumb,
+  testDiscord,
 } from "./actions";
 
 export default {
@@ -86,4 +91,9 @@ export default {
   updateRequest,
   getConsole,
   getReviews,
+  removeIssue,
+  updateFilters,
+  getFilters,
+  uploadThumb,
+  testDiscord,
 };

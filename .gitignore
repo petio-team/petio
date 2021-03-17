@@ -1,4 +1,4 @@
-
+.idea/
 api/node_modules/
 admin/node_modules/
 frontend/node_modules/
@@ -9,9 +9,12 @@ api/.DS_Store
 frontend/build
 admin/build
 api/config/
+api/config-backup/
 api/logs/
 bin/
 *.zip
 views/
 frontend/.eslintcache
 admin/.eslintcache
+/logs
+api/.DS_Store

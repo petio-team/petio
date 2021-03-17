@@ -5,10 +5,10 @@ const Radarr = require("../services/radarr");
 const fs = require("fs");
 const path = require("path");
 const logger = require("../util/logger");
+const { adminRequired } = require("../middleware/auth");
 
-// Sonnarr
-
-router.get("/sonarr/paths/:id", async (req, res) => {
+// Sonarr
+router.get("/sonarr/paths/:id", adminRequired, async (req, res) => {
   if (!req.params.id) {
     res.status(404).send();
   }
@@ -24,7 +24,7 @@ router.get("/sonarr/paths/:id", async (req, res) => {
   }
 });
 
-router.get("/sonarr/profiles/:id", async (req, res) => {
+router.get("/sonarr/profiles/:id", adminRequired, async (req, res) => {
   if (!req.params.id) {
     res.status(404).send();
   }
@@ -36,19 +36,31 @@ router.get("/sonarr/profiles/:id", async (req, res) => {
   }
 });
 
-router.get("/sonarr/test/:id", async (req, res) => {
+router.get("/sonarr/tags/:id", adminRequired, async (req, res) => {
+  if (!req.params.id) {
+    res.status(404).send();
+  }
+  try {
+    let data = await new Sonarr(req.params.id).getTags();
+    res.json(data);
+  } catch {
+    res.json([]);
+  }
+});
+
+router.get("/sonarr/test/:id", adminRequired, async (req, res) => {
   let data = {
     connection: await new Sonarr(req.params.id).test(),
   };
   res.json(data);
 });
 
-router.get("/sonarr/config", async (req, res) => {
+router.get("/sonarr/config", adminRequired, async (req, res) => {
   let config = new Sonarr().getConfig();
   res.json(config);
 });
 
-router.post("/sonarr/config", async (req, res) => {
+router.post("/sonarr/config", adminRequired, async (req, res) => {
   let data = req.body.data;
   try {
     await saveSonarrConfig(data);
@@ -56,7 +68,7 @@ router.post("/sonarr/config", async (req, res) => {
     return;
   } catch (err) {
     logger.log("error", `ROUTE: Error saving sonarr config`);
-    logger.error(err.stack);
+    logger.log({ level: "error", message: err });
     res.status(500).json({ error: err });
     return;
   }
@@ -75,7 +87,7 @@ function saveSonarrConfig(data) {
     fs.writeFile(configFile, data, (err) => {
       if (err) {
         logger.log("error", `ROUTE: Error writing sonarr config`);
-        logger.error(err.stack);
+        logger.log({ level: "error", message: err });
         reject(err);
       } else {
         logger.log("info", "ROUTE: Sonarr Config updated");
@@ -99,7 +111,7 @@ router.get("/calendar", async (req, res) => {
 
 // Radarr
 
-router.get("/radarr/paths/:id", async (req, res) => {
+router.get("/radarr/paths/:id", adminRequired, async (req, res) => {
   if (!req.params.id) {
     res.status(404).send();
   }
@@ -112,12 +124,12 @@ router.get("/radarr/paths/:id", async (req, res) => {
     res.json(data);
   } catch (err) {
     logger.log("warn", `ROUTE: Enable to get Radarr paths`);
-    logger.error(err.stack);
+    logger.log({ level: "error", message: err });
     res.json([]);
   }
 });
 
-router.get("/radarr/profiles/:id", async (req, res) => {
+router.get("/radarr/profiles/:id", adminRequired, async (req, res) => {
   if (!req.params.id) {
     res.status(404).send();
   }
@@ -129,26 +141,38 @@ router.get("/radarr/profiles/:id", async (req, res) => {
   }
 });
 
-router.get("/radarr/test/:id", async (req, res) => {
+router.get("/radarr/tags/:id", adminRequired, async (req, res) => {
+  if (!req.params.id) {
+    res.status(404).send();
+  }
+  try {
+    let data = await new Radarr(req.params.id).getTags();
+    res.json(data);
+  } catch {
+    res.json([]);
+  }
+});
+
+router.get("/radarr/test/:id", adminRequired, async (req, res) => {
   let data = {
     connection: await new Radarr(req.params.id).test(),
   };
   res.json(data);
 });
 
-router.get("/radarr/config", async (req, res) => {
+router.get("/radarr/config", adminRequired, async (req, res) => {
   let config = new Radarr().getConfig();
   res.json(config);
 });
 
-router.get("/radarr/test", async (req, res) => {
+router.get("/radarr/test", adminRequired, async (req, res) => {
   let data = {
     connection: await new Radarr().test(),
   };
   res.json(data);
 });
 
-router.post("/radarr/config", async (req, res) => {
+router.post("/radarr/config", adminRequired, async (req, res) => {
   let data = req.body.data;
   try {
     await saveRadarrConfig(data);
@@ -156,7 +180,7 @@ router.post("/radarr/config", async (req, res) => {
     return;
   } catch (err) {
     logger.log("error", `ROUTE: Error saving radarr config`);
-    logger.error(err.stack);
+    logger.log({ level: "error", message: err });
     res.status(500).json({ error: err });
     return;
   }
@@ -175,7 +199,7 @@ function saveRadarrConfig(data) {
     fs.writeFile(configFile, data, (err) => {
       if (err) {
         logger.log("error", `ROUTE: Error writing radarr config`);
-        logger.error(err.stack);
+        logger.log({ level: "error", message: err });
         reject(err);
       } else {
         logger.log("info", "ROUTE: Radarr Config updated");

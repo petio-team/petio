@@ -171,6 +171,7 @@ class Issues extends React.Component {
                   ) : (
                     <>
                       <option value="episodes">Missing Episodes</option>
+                      <option value="season">Missing Season</option>
                       <option value="subs">Missing Subtitles</option>
                       <option value="bad-video">
                         Bad Quality / Video Issue

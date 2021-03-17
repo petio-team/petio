@@ -71,24 +71,14 @@ class Radarr extends React.Component {
       uuid: this.state.uuid,
     };
 
-    console.log(servers);
-    // return;
     await Api.saveRadarrConfig(servers);
     await this.getRadarr(true);
 
     if (!silent) {
-      this.setState({
-        isError: false,
-        isMsg: "Radarr settings saved!",
+      this.props.msg({
+        message: "Radarr settings saved!",
+        type: "good",
       });
-
-      clearInterval(this.closeMsg);
-      this.closeMsg = setInterval(() => {
-        this.setState({
-          isError: false,
-          isMsg: false,
-        });
-      }, 3000);
     }
   }
 
@@ -110,18 +100,10 @@ class Radarr extends React.Component {
       this.closeModal("addServer");
       this.closeWizard();
 
-      this.setState({
-        isError: false,
-        isMsg: "Radarr Server Removed",
+      this.props.msg({
+        message: "Radarr Server Removed",
+        type: "good",
       });
-
-      clearInterval(this.closeMsg);
-      this.closeMsg = setInterval(() => {
-        this.setState({
-          isError: false,
-          isMsg: false,
-        });
-      }, 3000);
     }
   }
 
@@ -133,34 +115,29 @@ class Radarr extends React.Component {
       let result = await Api.testRadarr(id);
       if (result.connection) {
         this.setState({
-          isError: false,
-          isMsg: "Radarr Test Connection success!",
           newServer: false,
           needsTest: false,
+        });
+        this.props.msg({
+          message: "Radarr Test Connection success!",
+          type: "good",
         });
         await this.getRadarr(true);
         await this.getSettings(id);
       } else {
-        this.setState({
-          isError: "Radarr Test Connection failed!",
-          isMsg: false,
+        this.props.msg({
+          message: "Radarr Test Connection failed!",
+          type: "error",
         });
+
         this.deleteServer(true);
       }
     } catch (err) {
-      this.setState({
-        isError: "Radarr Test Connection failed! Error 2",
-        isMsg: false,
+      this.props.msg({
+        message: "Radarr Test Connection failed! Error 2",
+        type: "error",
       });
     }
-
-    clearInterval(this.closeMsg);
-    this.closeMsg = setInterval(() => {
-      this.setState({
-        isError: false,
-        isMsg: false,
-      });
-    }, 3000);
   }
 
   inputChange(e) {
@@ -322,16 +299,6 @@ class Radarr extends React.Component {
     if (this.state.loading) {
       return (
         <>
-          {this.state.isError ? (
-            <div className="setting-msg error">
-              <p>{this.state.isError}</p>
-            </div>
-          ) : null}
-          {this.state.isMsg ? (
-            <div className="setting-msg good">
-              <p>{this.state.isMsg}</p>
-            </div>
-          ) : null}
           <div className="spinner--settings">
             <Spinner />
           </div>
@@ -340,17 +307,6 @@ class Radarr extends React.Component {
     }
     return (
       <>
-        {this.state.isError ? (
-          <div className="setting-msg error">
-            <p>{this.state.isError}</p>
-          </div>
-        ) : null}
-        {this.state.isMsg ? (
-          <div className="setting-msg good">
-            <p>{this.state.isMsg}</p>
-          </div>
-        ) : null}
-
         <Modal
           title="Add new server"
           open={this.state.addServerOpen}
@@ -513,13 +469,8 @@ class Radarr extends React.Component {
 
         <section>
           <p className="main-title mb--2">Radarr</p>
-          <p className="capped-width">
-            Radarr is a movie collection manager for Usenet and BitTorrent
-            users. It can monitor multiple RSS feeds for new movies and will
-            interface with clients and indexers to grab, sort, and rename them.
-            It can also be configured to automatically upgrade the quality of
-            existing files in the library when a better quality format becomes
-            available.
+          <p className="description">
+            Radarr is a DVR. It can monitor multiple RSS feeds for new movies and will grab, sort, and rename them.
           </p>
         </section>
         <section>

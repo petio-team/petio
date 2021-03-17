@@ -17,11 +17,13 @@ class MovieCard extends React.Component {
       imdbId: false,
       tmdbId: false,
       inView: false,
+      imgLoaded: false,
     };
     this.getMovie = this.getMovie.bind(this);
     this.card = React.createRef();
     this.inView = this.inView.bind(this);
     this.request = this.request.bind(this);
+    this.imgLoaded = this.imgLoaded.bind(this);
   }
 
   componentDidMount() {
@@ -84,6 +86,12 @@ class MovieCard extends React.Component {
     }
   }
 
+  imgLoaded() {
+    this.setState({
+      imgLoaded: true,
+    });
+  }
+
   render() {
     let id = this.props.movie.id;
     let movie = this.props.api.movie_lookup[id];
@@ -93,7 +101,12 @@ class MovieCard extends React.Component {
     // Loading state
     if (!movie) {
       return (
-        <div ref={this.card} key={id} data-key={id} className={"card type--movie-tv "}>
+        <div
+          ref={this.card}
+          key={id}
+          data-key={id}
+          className={`card type--movie-tv`}
+        >
           <div className="card--inner">
             <Link to={`/movie/${id}`} className="full-link"></Link>
             <div className="image-wrap">
@@ -102,7 +115,7 @@ class MovieCard extends React.Component {
             <div className="text-wrap">
               <p className="title">
                 Loading...
-                <span className="year"></span>
+                <span className="year">&nbsp;</span>
               </p>
             </div>
           </div>
@@ -112,30 +125,54 @@ class MovieCard extends React.Component {
     let img = movie.poster_path ? (
       <LazyLoadImage
         alt={movie.title}
-        src={`https://image.tmdb.org/t/p/w200/${movie.poster_path}`}
+        src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
         // effect="blur"
+        onLoad={this.imgLoaded}
       />
     ) : (
-      <div className="no-poster"></div>
+      <LazyLoadImage
+        src={"/images/no-poster.jpg"}
+        alt={movie.title}
+        onLoad={this.imgLoaded}
+      />
     );
     // Final render
     return (
-      <div ref={this.card} key={movie.id} data-key={movie.id} className={`card type--movie-tv ${movie.on_server ? "on-server" : ""} ${this.props.user.requests[movie.id] ? "requested" : ""}`}>
+      <div
+        ref={this.card}
+        key={movie.id}
+        data-key={movie.id}
+        className={`card type--movie-tv ${movie.on_server ? "on-server" : ""} ${
+          this.props.user.requests[movie.id] ? "requested" : ""
+        } ${this.state.imgLoaded ? "img-loaded" : "img-not-loaded"}`}
+      >
         <div className="card--inner">
           <Link to={`/movie/${movie.id}`} className="full-link"></Link>
           {!this.props.user.requests[movie.id] && !movie.on_server ? (
-            <div className="quick-req" title="Request now" onClick={this.request}>
+            <div
+              className="quick-req"
+              title="Request now"
+              onClick={this.request}
+            >
               <RequestIcon />
             </div>
           ) : null}
           <div className="image-wrap">
-            {this.props.popular_count ? <p className="popular-card--count">{this.props.popular_count}</p> : null}
+            {this.props.popular_count ? (
+              <p className="popular-card--count">{this.props.popular_count}</p>
+            ) : null}
             {img}
           </div>
           <div className="text-wrap">
             <p className="title" title={movie.title}>
               {movie.title}
-              <span className="year">{this.props.character ? this.props.character : movie.release_date ? "(" + new Date(movie.release_date).getFullYear() + ")" : null}</span>
+              <span className="year">
+                {this.props.character
+                  ? this.props.character
+                  : movie.release_date
+                  ? "(" + new Date(movie.release_date).getFullYear() + ")"
+                  : null}
+              </span>
             </p>
           </div>
         </div>

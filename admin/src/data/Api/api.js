@@ -1,364 +1,213 @@
-const apiUrl =
-  process.env.NODE_ENV === "development"
-    ? "http://localhost:7778"
-    : `${window.location.protocol}//${
-        window.location.host
-      }${window.location.pathname.replace("/admin/", "")}/api`;
-
-console.log(process.env);
+import { get, post, upload } from "../http";
 
 export async function popular() {
-  let request = `${apiUrl}/trending`;
-  return call(request).then((res) => res.json());
+  return get("/trending");
 }
 
-export function top(type) {
-  let request = `${apiUrl}/top/shows`;
-  if (type === "movie") {
-    request = `${apiUrl}/top/movies`;
-  }
-  return call(request).then((res) => res.json());
+export async function top(type) {
+  return get(type === "movie" ? "/top/movies" : "/top/shows");
 }
 
-export function history(user_id, type) {
-  let body = {
-    id: user_id,
-    type: type,
-  };
-  let headers = { "Content-Type": "application/json" };
-  let request = `${apiUrl}/history`;
-  return call(request, headers, "post", body).then((res) => res.json());
+export async function history(user_id, type) {
+  return post("/history", { id: user_id, type });
 }
 
-export function getBandwidth() {
-  let headers = { "Content-Type": "application/json" };
-  let request = `${apiUrl}/history/bandwidth`;
-  return call(request, headers, "get").then((res) => res.json());
+export async function getBandwidth() {
+  return get("/history/bandwidth");
 }
 
-export function getServerInfo() {
-  let headers = { "Content-Type": "application/json" };
-  let request = `${apiUrl}/history/server`;
-  return call(request, headers, "get").then((res) => res.json());
+export async function getServerInfo() {
+  return get("/history/server");
 }
 
-export function getCurrentSessions() {
-  let headers = { "Content-Type": "application/json" };
-  let request = `${apiUrl}/sessions`;
-  return call(request, headers, "get").then((res) => res.json());
+export async function getCurrentSessions() {
+  return get("/sessions");
 }
 
-export function get_plex_media(id, type) {
-  let request = `${apiUrl}/plex/lookup/${type}/${id}`;
-  return call(request).then((res) => res.json());
+export async function get_plex_media(id, type) {
+  return get(`/plex/lookup/${type}/${id}`);
 }
 
-export function movie(id = false, minified) {
-  if (!id) {
-    return false;
-  }
-  let request = `${apiUrl}/movie/lookup/${id}`;
-  if (minified) {
-    request = `${apiUrl}/movie/lookup/${id}/minified`;
-  }
-  return call(request).then((res) => res.json());
+export async function movie(id = false, minified) {
+  if (!id) return Promise.resolve(false);
+  return get(`/movie/lookup/${id}${minified ? "/minified" : ""}`);
 }
 
-export function series(id = false, minified) {
-  if (!id) {
-    return false;
-  }
-  let request = `${apiUrl}/show/lookup/${id}`;
-  if (minified) {
-    request = `${apiUrl}/show/lookup/${id}/minified`;
-  }
-  return call(request).then((res) => res.json());
+export async function series(id = false, minified) {
+  if (!id) return Promise.resolve(false);
+  return get(`/show/lookup/${id}${minified ? "/minified" : ""}`);
 }
 
-export function person(id = false) {
-  if (!id) {
-    return false;
-  }
-  let request = `${apiUrl}/person/lookup/${id}`;
-  return call(request).then((res) => res.json());
+export async function person(id = false) {
+  if (!id) return Promise.resolve(false);
+  return get(`/person/lookup/${id}`);
 }
 
 export async function search(title = false) {
-  let request = `${apiUrl}/search/${encodeURI(title)}`;
-  return call(request).then((res) => res.json());
+  return get(`/search/${encodeURIComponent(title)}`);
 }
 
-export function actor(id = false) {
-  if (!id) {
-    return false;
-  }
-  let request = `${apiUrl}/person/lookup/${id}`;
-  return call(request).then((res) => res.json());
+export async function actor(id = false) {
+  if (!id) return Promise.resolve(false);
+  return get(`/person/lookup/${id}`);
 }
 
-export let checkConfig = () => {
-  let request = `${apiUrl}/config`;
-  return call(request).then((res) => res.json());
-};
-
-export let saveConfig = (config) => {
-  let request = `${apiUrl}/setup/set`;
-  let headers = {
-    "Content-Type": "application/json",
-  };
-  let body = config;
-  return call(request, headers, "post", body);
-};
-
-export let updateConfig = (config) => {
-  let request = `${apiUrl}/config/update`;
-  let headers = {
-    "Content-Type": "application/json",
-  };
-  let body = config;
-  return call(request, headers, "post", body);
-};
-
-export function sonarrConfig() {
-  let headers = { "Content-Type": "application/json" };
-  let request = `${apiUrl}/services/sonarr/config`;
-  return call(request, headers, "get").then((res) => res.json());
+export async function checkConfig() {
+  return get("/config");
 }
 
-export let saveSonarrConfig = (config) => {
-  let request = `${apiUrl}/services/sonarr/config`;
-  let headers = {
-    "Content-Type": "application/json",
-  };
-  let body = config;
-  return call(request, headers, "post", body);
-};
-
-export function testSonarr(id) {
-  let headers = { "Content-Type": "application/json" };
-  let request = `${apiUrl}/services/sonarr/test/${id}`;
-  return call(request, headers, "get").then((res) => res.json());
+export async function saveConfig(config) {
+  return post(`/setup/set`, config);
 }
 
-export function sonarrPaths(id) {
-  let headers = { "Content-Type": "application/json" };
-  let request = `${apiUrl}/services/sonarr/paths/${id}`;
-  return call(request, headers, "get").then((res) => res.json());
+export async function updateConfig(config) {
+  return post(`/config/update`, config);
 }
 
-export function sonarrProfiles(id) {
-  let headers = { "Content-Type": "application/json" };
-  let request = `${apiUrl}/services/sonarr/profiles/${id}`;
-  return call(request, headers, "get").then((res) => res.json());
+export async function sonarrConfig() {
+  return get(`/services/sonarr/config`);
 }
 
-export function radarrConfig() {
-  let headers = { "Content-Type": "application/json" };
-  let request = `${apiUrl}/services/radarr/config`;
-  return call(request, headers, "get").then((res) => res.json());
+export async function saveSonarrConfig(config) {
+  return post(`/services/sonarr/config`, config);
 }
 
-export function radarrPaths(id) {
-  let headers = { "Content-Type": "application/json" };
-  let request = `${apiUrl}/services/radarr/paths/${id}`;
-  return call(request, headers, "get").then((res) => res.json());
+export async function testSonarr(id) {
+  return get(`/services/sonarr/test/${id}`);
 }
 
-export function radarrProfiles(id) {
-  let headers = { "Content-Type": "application/json" };
-  let request = `${apiUrl}/services/radarr/profiles/${id}`;
-  return call(request, headers, "get").then((res) => res.json());
+export async function sonarrPaths(id) {
+  return get(`/services/sonarr/paths/${id}`);
 }
 
-export function testRadarr(id) {
-  let headers = { "Content-Type": "application/json" };
-  let request = `${apiUrl}/services/radarr/test/${id}`;
-  return call(request, headers, "get").then((res) => res.json());
+export async function sonarrProfiles(id) {
+  return get(`/services/sonarr/profiles/${id}`);
 }
 
-export let saveRadarrConfig = (config) => {
-  let request = `${apiUrl}/services/radarr/config`;
-  let headers = {
-    "Content-Type": "application/json",
-  };
-  let body = config;
-  return call(request, headers, "post", body);
-};
-
-export let saveEmailConfig = (config) => {
-  let request = `${apiUrl}/mail/create`;
-  let headers = {
-    "Content-Type": "application/json",
-  };
-  let body = { email: config };
-  return call(request, headers, "post", body);
-};
-
-export let getEmailConfig = () => {
-  let request = `${apiUrl}/mail/config`;
-  let headers = {
-    "Content-Type": "application/json",
-  };
-  return call(request, headers, "get").then((res) => res.json());
-};
-
-export let getConfig = () => {
-  let request = `${apiUrl}/config/current`;
-  let headers = {
-    "Content-Type": "application/json",
-  };
-  return call(request, headers, "get").then((res) => res.json());
-};
-
-export let testEmail = () => {
-  let request = `${apiUrl}/mail/test`;
-  let headers = {
-    "Content-Type": "application/json",
-  };
-  return call(request, headers, "get").then((res) => res.json());
-};
-
-export function getUser(id) {
-  let request = `${apiUrl}/user/${id}`;
-  return call(request).then((res) => res.json());
+export async function sonarrTags(id) {
+  return get(`/services/sonarr/tags/${id}`);
 }
 
-export function allUsers() {
-  let request = `${apiUrl}/user/all`;
-  return call(request).then((res) => res.json());
+export async function radarrConfig() {
+  return get(`/services/radarr/config`);
 }
 
-export let testServer = (server) => {
-  let request = `${apiUrl}/setup/test_server`;
-  let headers = {
-    "Content-Type": "application/json",
-  };
-  let body = { server: server };
-  return call(request, headers, "post", body).then((res) => res.json());
-};
+export async function radarrPaths(id) {
+  return get(`/services/radarr/paths/${id}`);
+}
 
-export let testMongo = (mongo) => {
-  let request = `${apiUrl}/setup/test_mongo`;
-  let headers = {
-    "Content-Type": "application/json",
-  };
-  let body = { mongo: mongo };
-  return call(request, headers, "post", body).then((res) => res.json());
-};
+export async function radarrProfiles(id) {
+  return get(`/services/radarr/profiles/${id}`);
+}
 
-export let getIssues = () => {
-  let request = `${apiUrl}/issue/all`;
-  let headers = {
-    "Content-Type": "application/json",
-  };
-  return call(request, headers).then((res) => res.json());
-};
+export async function radarrTags(id) {
+  return get(`/services/radarr/tags/${id}`);
+}
 
-export let createUser = (user) => {
-  let request = `${apiUrl}/user/create_custom`;
-  let headers = {
-    "Content-Type": "application/json",
-  };
-  let body = { user: user };
-  return call(request, headers, "post", body).then((res) => res.json());
-};
+export async function testRadarr(id) {
+  return get(`/services/radarr/test/${id}`);
+}
 
-export let getProfiles = () => {
-  let request = `${apiUrl}/profiles/all`;
-  let headers = {
-    "Content-Type": "application/json",
-  };
-  return call(request, headers).then((res) => res.json());
-};
+export function saveRadarrConfig(config) {
+  return post(`/services/radarr/config`, config);
+}
 
-export let saveProfile = (profile) => {
-  let request = `${apiUrl}/profiles/save_profile`;
-  let headers = {
-    "Content-Type": "application/json",
-  };
-  let body = { profile: profile };
-  return call(request, headers, "post", body).then((res) => res.json());
-};
+export function saveEmailConfig(config) {
+  return post(`/mail/create`, { email: config });
+}
 
-export let deleteProfile = (profile) => {
-  let request = `${apiUrl}/profiles/delete_profile`;
-  let headers = {
-    "Content-Type": "application/json",
-  };
-  let body = { profile: profile };
-  return call(request, headers, "post", body).then((res) => res.json());
-};
+export function getEmailConfig() {
+  return get(`/mail/config`);
+}
 
-export let editUser = (user) => {
-  let request = `${apiUrl}/user/edit`;
-  let headers = {
-    "Content-Type": "application/json",
-  };
-  let body = { user: user };
-  return call(request, headers, "post", body).then((res) => res.json());
-};
+export function getConfig() {
+  return get(`/config/current`);
+}
 
-export let deleteUser = (user) => {
-  let request = `${apiUrl}/user/delete_user`;
-  let headers = {
-    "Content-Type": "application/json",
-  };
-  let body = { user: user };
-  return call(request, headers, "post", body).then((res) => res.json());
-};
+export function testEmail() {
+  return get(`/mail/test`);
+}
 
-export let bulkEditUser = (data) => {
-  let request = `${apiUrl}/user/bulk_edit`;
-  let headers = {
-    "Content-Type": "application/json",
-  };
-  let body = data;
-  return call(request, headers, "post", body).then((res) => res.json());
-};
+export function testDiscord() {
+  return get(`/hooks/discord/test`);
+}
 
-export let removeReq = (req, reason) => {
-  let request = `${apiUrl}/request/remove`;
-  let headers = {
-    "Content-Type": "application/json",
-  };
-  let body = { request: req, reason: reason };
-  return call(request, headers, "post", body);
-};
+export async function getUser(id) {
+  return get(`/user/${id}`);
+}
 
-export let updateReq = (req, servers) => {
-  let request = `${apiUrl}/request/update`;
-  let headers = {
-    "Content-Type": "application/json",
-  };
-  let body = { request: req, servers: servers };
-  return call(request, headers, "post", body);
-};
+export async function allUsers() {
+  return get(`/user/all`);
+}
 
-export let getConsole = () => {
-  let request = `${apiUrl}/logs/stream`;
-  let headers = {
-    "Content-Type": "application/json",
-  };
-  return call(request, headers, "get").then((res) => res.json());
-};
+export function testServer(server) {
+  return post(`/setup/test_server`, { server });
+}
 
-export let getReviews = () => {
-  let request = `${apiUrl}/review/all`;
-  let headers = {
-    "Content-Type": "application/json",
-  };
-  return call(request, headers, "get").then((res) => res.json());
-};
+export function testMongo(mongo) {
+  return post(`/setup/test_mongo`, { mongo });
+}
 
-function call(url, headers, method, body = null) {
-  let args = {
-    method: method,
-    headers: headers,
-  };
+export function getIssues() {
+  return get(`/issue/all`);
+}
 
-  if (method === "post") {
-    args.body = JSON.stringify(body);
-  }
+export function createUser(user) {
+  return post(`/user/create_custom`, { user });
+}
 
-  return fetch(url, args);
+export function getProfiles() {
+  return get(`/profiles/all`);
+}
+
+export function saveProfile(profile) {
+  return post(`/profiles/save_profile`, { profile });
+}
+
+export function deleteProfile(profile) {
+  return post(`/profiles/delete_profile`, { profile });
+}
+
+export function editUser(user) {
+  return post(`/user/edit`, { user });
+}
+
+export function deleteUser(user) {
+  return post(`/user/delete_user`, { user });
+}
+
+export function bulkEditUser(data) {
+  return post(`/user/bulk_edit`, data);
+}
+
+export function removeReq(request, reason) {
+  return post(`/request/remove`, { request, reason });
+}
+
+export function updateReq(request, servers) {
+  return post(`/request/update`, { request, servers });
+}
+
+export function getConsole() {
+  return get(`/logs/stream`);
+}
+
+export function getReviews() {
+  return get(`/review/all`);
+}
+
+export function removeIssue(id, message) {
+  return post(`/issue/remove`, { id, message });
+}
+
+export function updateFilters(movie, tv) {
+  return post(`/filter/update`, { movie, tv });
+}
+
+export function getFilters() {
+  return get(`/filter`);
+}
+
+export function uploadThumb(data, id) {
+  return upload(`/user/thumb/${id}`, data);
 }

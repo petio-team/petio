@@ -8,7 +8,7 @@ export function login(user, pass = false, cookie = false, admin) {
       password = pass;
     let authToken = false;
     if (cookie) {
-      authToken = localStorage.getItem("loggedin");
+      authToken = localStorage.getItem("petio_jwt");
     }
 
     api
@@ -24,7 +24,7 @@ export function login(user, pass = false, cookie = false, admin) {
           }
           if (data.loggedIn) {
             if (!cookie) {
-              localStorage.setItem("loggedin", ls_user);
+              localStorage.setItem("petio_jwt", ls_user);
             }
             finalise({
               type: types.LOGIN,
@@ -33,13 +33,13 @@ export function login(user, pass = false, cookie = false, admin) {
             resolve(data);
           } else {
             resolve({ error: "User not found" });
-            localStorage.removeItem("loggedin");
+            localStorage.removeItem("petio_jwt");
             localStorage.removeItem("adminloggedin");
             return;
           }
         } else {
           resolve({ error: "User not found" });
-          localStorage.removeItem("loggedin");
+          localStorage.removeItem("petio_jwt");
           localStorage.removeItem("adminloggedin");
         }
       })
@@ -51,7 +51,7 @@ export function login(user, pass = false, cookie = false, admin) {
 }
 
 export function logout() {
-  localStorage.removeItem("loggedin");
+  localStorage.removeItem("petio_jwt");
   localStorage.removeItem("adminloggedin");
   finalise({
     type: types.LOGOUT,

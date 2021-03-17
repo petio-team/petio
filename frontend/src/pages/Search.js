@@ -24,7 +24,7 @@ class Search extends React.Component {
   }
 
   handleChange(e) {
-    if (e.currentTarget.value.length > 2) {
+    if (e.currentTarget.value.length > 1) {
       let term = e.currentTarget.value;
       this.setState({
         isLoading: true,
@@ -137,7 +137,13 @@ class Search extends React.Component {
             <Carousel>
               {Object.keys(this.props.api.popular).length > 0
                 ? this.props.api.popular.movies.map((movie) => {
-                    return <MovieCard key={movie.id} movie={movie} />;
+                    return (
+                      <MovieCard
+                        key={movie.id}
+                        movie={movie}
+                        msg={this.props.msg}
+                      />
+                    );
                   })
                 : null}
             </Carousel>

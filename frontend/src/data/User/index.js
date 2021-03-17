@@ -1,21 +1,23 @@
 import {
   login,
-  // loginAdmin,
   logout,
   request,
   getRequests,
   review,
   getReviews,
   addIssue,
+  myRequests,
+  quota,
 } from "./actions";
 
 export default {
   login,
-  // loginAdmin,
   logout,
   request,
   getRequests,
   review,
   getReviews,
   addIssue,
+  myRequests,
+  quota,
 };

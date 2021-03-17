@@ -4,10 +4,12 @@ import { withRouter, Link, Switch, Route } from "react-router-dom";
 
 import { ReactComponent as GeneralIcon } from "../assets/svg/settings-general.svg";
 import { ReactComponent as ConsoleIcon } from "../assets/svg/console.svg";
+import { ReactComponent as FilterIcon } from "../assets/svg/filter.svg";
 import Console from "./settings/console";
 import General from "./settings/general";
 import Radarr from "./settings/radarr";
 import Sonarr from "./settings/sonarr";
+import Filter from "./settings/filter";
 
 class Settings extends React.Component {
   constructor(props) {
@@ -73,6 +75,18 @@ class Settings extends React.Component {
             </div>
           </Link>
           <Link
+            to="/settings/filter"
+            className={
+              "settings--menu--item " +
+              (current === "/settings/filter" ? "active" : "")
+            }
+          >
+            <p>Filter</p>
+            <div className="icon">
+              <FilterIcon />
+            </div>
+          </Link>
+          <Link
             to="/settings/console"
             className={
               "settings--menu--item " +
@@ -88,16 +102,19 @@ class Settings extends React.Component {
         <div className="settings--content">
           <Switch>
             <Route exact path="/settings">
-              <General />
+              <General msg={this.props.msg} />
             </Route>
             <Route path="/settings/radarr">
-              <Radarr />
+              <Radarr msg={this.props.msg} />
             </Route>
             <Route path="/settings/sonarr">
-              <Sonarr />
+              <Sonarr msg={this.props.msg} />
             </Route>
             <Route path="/settings/console">
-              <Console />
+              <Console msg={this.props.msg} />
+            </Route>
+            <Route path="/settings/filter">
+              <Filter msg={this.props.msg} />
             </Route>
             <Route path="*" exact>
               <section>
@@ -121,6 +138,7 @@ function SettingsContainer(props) {
       api={props.api}
       user={props.user}
       checkConfig={props.checkConfig}
+      msg={props.msg}
     />
   );
 }

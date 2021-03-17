@@ -149,3 +149,34 @@
     }
   }
 }
+
+.warning {
+  background: $yellow;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 2px;
+
+  svg {
+    height: 10px;
+    color: $black;
+  }
+}
+
+.warning-text {
+  color: $black;
+  background: $yellow;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+
+  svg {
+    height: 10px;
+    margin-right: 15px;
+  }
+}

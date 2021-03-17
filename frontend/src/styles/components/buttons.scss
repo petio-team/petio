@@ -46,8 +46,10 @@ button {
   }
 
   &:hover {
-    background: $primary;
-    color: black;
+    @include media-breakpoint-up(lg) {
+      background: $primary;
+      color: black;
+    }
   }
 
   &__square {
@@ -62,9 +64,11 @@ button {
       height: 35px;
     }
 
-    &:hover {
-      background: darken($primary, 10);
-      border-color: darken($primary, 10);
+    @include media-breakpoint-up(lg) {
+      &:hover {
+        background: darken($primary, 10);
+        border-color: darken($primary, 10);
+      }
     }
   }
 
@@ -72,9 +76,11 @@ button {
     border-color: $green;
     color: $green;
 
-    &:hover {
-      background: none;
-      color: $green;
+    @include media-breakpoint-up(lg) {
+      &:hover {
+        background: none;
+        color: $green;
+      }
     }
 
     &.btn__square {
@@ -87,9 +93,11 @@ button {
     border-color: $bad;
     color: $bad;
 
-    &:hover {
-      background: none;
-      color: $bad;
+    @include media-breakpoint-up(lg) {
+      &:hover {
+        background: none;
+        color: $bad;
+      }
     }
 
     &.btn__square {
@@ -102,14 +110,31 @@ button {
     border-color: $blue;
     color: $blue;
 
-    &:hover {
-      background: $blue;
-      color: white;
+    @include media-breakpoint-up(lg) {
+      &:hover {
+        background: $blue;
+        color: white;
+      }
     }
 
     &.btn__square {
       background: $blue;
       color: black;
+    }
+  }
+
+  &.pending {
+    svg {
+      filter: brightness(0);
+      margin-right: 5px !important;
+      height: 15px;
+      width: 15px;
+
+      @include media-breakpoint-up(lg) {
+        height: 20px;
+        width: 20px;
+        margin-right: 10px !important;
+      }
     }
   }
 

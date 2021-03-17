@@ -1,11 +1,12 @@
 {
   "name": "petio",
-  "version": "0.3.16",
+  "version": "0.3.31-alpha",
   "description": "Request Platform for Plex",
   "main": "petio.js",
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cluster": "^0.7.7",
     "express": "^4.17.1",
     "express-http-proxy": "1.6.2",
     "http-proxy-middleware": "^1.0.6",
@@ -15,7 +16,6 @@
   "scripts": {
     "start": "node petio.js",
     "version": "npm -s run env echo '$npm_package_version'",
-    "stamp-version": "mv petio.zip petio-${npm_package_version}.zip",
-    "stamp-version-a": "mv petio.zip petio-${npm_package_version}-alpha.zip"
+    "stamp-version": "mv petio.zip petio-${npm_package_version}.zip"
   }
 }

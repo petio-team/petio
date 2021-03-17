@@ -1,115 +1,69 @@
-import { getAuth } from "../auth";
+import { get, post } from "../http";
 
 export async function popular() {
-  let request = `${getAuth().api}/trending`;
-  return process(request).then((res) => res.json());
+  return get("/trending");
 }
 
-export function top(type) {
-  let request = `${getAuth().api}/top/shows`;
-  if (type === "movie") {
-    request = `${getAuth().api}/top/movies`;
-  }
-  return process(request).then((res) => res.json());
+export async function top(type) {
+  return get(`/top/${type === "movie" ? "movies" : "shows"}`);
 }
 
-export function history(user_id, type) {
-  let body = {
-    id: user_id,
-    type: type,
-  };
-  let headers = { "Content-Type": "application/json" };
-  let request = `${getAuth().api}/history`;
-  return process(request, headers, "post", body).then((res) => res.json());
+export async function history(user_id, type) {
+  return post("/history", { id: user_id, type });
 }
 
-export function get_plex_media(id, type) {
-  let request = `${getAuth().api}/plex/lookup/${type}/${id}`;
-  return process(request).then((res) => res.json());
+export async function get_plex_media(id, type) {
+  return get(`/plex/lookup/${type}/${id}`);
 }
 
-export function movie(id = false, minified) {
-  if (!id) {
-    return false;
-  }
-  let request = `${getAuth().api}/movie/lookup/${id}`;
-  if (minified) {
-    request = `${getAuth().api}/movie/lookup/${id}/minified`;
-  }
-  return process(request).then((res) => res.json());
+export async function movie(id = false, minified) {
+  if (!id) return Promise.resolve(false);
+  return get(`/movie/lookup/${id}${minified ? "/minified" : ""}`);
 }
 
-export function series(id = false, minified) {
-  if (!id) {
-    return false;
-  }
-  let request = `${getAuth().api}/show/lookup/${id}`;
-  if (minified) {
-    request = `${getAuth().api}/show/lookup/${id}/minified`;
-  }
-  return process(request).then((res) => res.json());
+export async function series(id = false, minified) {
+  if (!id) return Promise.resolve(false);
+  return get(`/show/lookup/${id}${minified ? "/minified" : ""}`);
 }
 
-export function person(id = false) {
-  if (!id) {
-    return false;
-  }
-  let request = `${getAuth().api}/person/lookup/${id}`;
-  return process(request).then((res) => res.json());
+export async function person(id = false) {
+  if (!id) return Promise.resolve(false);
+  return get(`/person/lookup/${id}`);
 }
 
 export async function search(title = false) {
-  let request = `${getAuth().api}/search/${encodeURI(title)}`;
-  return process(request).then((res) => res.json());
+  return get(`/search/${encodeURIComponent(title)}`);
 }
 
-export function actor(id = false) {
-  if (!id) {
-    return false;
-  }
-  let request = `${getAuth().api}/person/lookup/${id}`;
-  return process(request).then((res) => res.json());
+export async function actor(id = false) {
+  if (!id) return Promise.resolve(false);
+  return get(`/person/lookup/${id}`);
 }
 
 export async function discover(type, page, params = {}) {
-  let headers = { "Content-Type": "application/json" };
-  let request = `${getAuth().api}/${type}/discover`;
-  let body = {
-    page: page,
-    params: params,
-  };
-  return process(request, headers, "post", body).then((res) => res.json());
+  return post(`/${type}/discover`, { page, params });
 }
 
 export async function networkDetails(id) {
-  let request = `${getAuth().api}/show/network/${id}`;
-  return process(request).then((res) => res.json());
+  return get(`/show/network/${id}`);
 }
 
 export async function companyDetails(id) {
-  let request = `${getAuth().api}/movie/company/${id}`;
-  return process(request).then((res) => res.json());
+  return get(`/movie/company/${id}`);
 }
 
 export async function guideCalendar() {
-  let request = `${getAuth().api}/services/calendar`;
-  return process(request).then((res) => res.json());
+  return get("/services/calendar");
 }
 
 export let checkConfig = () => {
-  let request = `${getAuth().api}/config`;
-  return process(request).then((res) => res.json());
+  return get("/config");
 };
 
-function process(url, headers, method, body = null) {
-  let args = {
-    method: method,
-    headers: headers,
-  };
+export async function discoveryMovies() {
+  return get("/discovery/movies");
+}
 
-  if (method === "post") {
-    args.body = JSON.stringify(body);
-  }
-
-  return fetch(url, args);
+export async function discoveryShows() {
+  return get("/discovery/shows");
 }

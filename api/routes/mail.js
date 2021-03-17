@@ -4,7 +4,9 @@ const fs = require("fs");
 const path = require("path");
 const Mailer = require("../mail/mailer");
 const logger = require("../util/logger");
+const { adminRequired } = require("../middleware/auth");
 
+router.use(adminRequired);
 router.post("/create", async (req, res) => {
   let email = req.body.email;
 

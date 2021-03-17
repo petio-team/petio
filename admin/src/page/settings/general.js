@@ -16,6 +16,7 @@ class General extends React.Component {
       email_enabled: false,
       base_path: "",
       login_type: false,
+      discord_webhook: false,
     };
 
     this.inputChange = this.inputChange.bind(this);
@@ -24,7 +25,9 @@ class General extends React.Component {
     this.loadConfigs = this.loadConfigs.bind(this);
     this.testEmail = this.testEmail.bind(this);
     this.saveBasePath = this.saveBasePath.bind(this);
+    this.saveDiscord = this.saveDiscord.bind(this);
     this.saveLoginType = this.saveLoginType.bind(this);
+    this.testDiscord = this.testDiscord.bind(this);
   }
 
   inputChange(e) {
@@ -42,60 +45,78 @@ class General extends React.Component {
   }
 
   async saveEmail() {
-    await Api.saveEmailConfig({
-      user: this.state.email_user,
-      pass: this.state.email_pass,
-      server: this.state.email_server,
-      port: this.state.email_port,
-      secure: this.state.email_secure,
-      enabled: this.state.email_enabled,
-    });
-
-    this.setState({
-      isError: false,
-      isMsg: "Email settings saved!",
-    });
-    clearInterval(this.closeMsg);
-    this.closeMsg = setInterval(() => {
-      this.setState({
-        isError: false,
-        isMsg: false,
+    try {
+      await Api.saveEmailConfig({
+        user: this.state.email_user,
+        pass: this.state.email_pass,
+        server: this.state.email_server,
+        port: this.state.email_port,
+        secure: this.state.email_secure,
+        enabled: this.state.email_enabled,
       });
-    }, 3000);
+
+      this.props.msg({ message: "Email Settings Saved!", type: "good" });
+    } catch (err) {
+      console.log(err);
+      this.props.msg({
+        message: "Failed to Save Email Settings",
+        type: "error",
+      });
+    }
   }
 
   async saveBasePath() {
-    await Api.updateConfig({
-      base_path: this.state.base_path,
-    });
-    this.setState({
-      isError: false,
-      isMsg: "Base Path saved, please restart Petio!",
-    });
-    clearInterval(this.closeMsg);
-    this.closeMsg = setInterval(() => {
-      this.setState({
-        isError: false,
-        isMsg: false,
+    try {
+      await Api.updateConfig({
+        base_path: this.state.base_path,
       });
-    }, 3000);
+      this.props.msg({
+        message: "Base Path Saved, Please restart!",
+        type: "good",
+      });
+    } catch (err) {
+      console.log(err);
+      this.props.msg({
+        message: "Failed to Save Base Path",
+        type: "error",
+      });
+    }
+  }
+
+  async saveDiscord() {
+    try {
+      await Api.updateConfig({
+        discord_webhook: this.state.discord_webhook,
+      });
+      this.props.msg({
+        message: "Discord Webhook Saved",
+        type: "good",
+      });
+    } catch (err) {
+      console.log(err);
+      this.props.msg({
+        message: "Failed to Save Discord Webhook",
+        type: "error",
+      });
+    }
   }
 
   async saveLoginType() {
-    await Api.updateConfig({
-      login_type: this.state.login_type,
-    });
-    this.setState({
-      isError: false,
-      isMsg: "Login Type Updated",
-    });
-    clearInterval(this.closeMsg);
-    this.closeMsg = setInterval(() => {
-      this.setState({
-        isError: false,
-        isMsg: false,
+    try {
+      await Api.updateConfig({
+        login_type: this.state.login_type,
       });
-    }, 3000);
+      this.props.msg({
+        message: "Login Type Updated",
+        type: "good",
+      });
+    } catch (err) {
+      console.log(err);
+      this.props.msg({
+        message: "Failed to Change Login Type",
+        type: "error",
+      });
+    }
   }
 
   async loadConfigs() {
@@ -111,56 +132,67 @@ class General extends React.Component {
         email_secure: email.config.emailSecure,
         base_path: config.base_path ? config.base_path : "",
         login_type: config.login_type ? config.login_type : 1,
+        discord_webhook: config.discord_webhook ? config.discord_webhook : "",
         loading: false,
-        isError: false,
-        isMsg: "Config loaded",
+      });
+      this.props.msg({
+        message: "Config Loaded",
       });
     } catch (err) {
       console.log(err);
-      this.setState({
-        loading: false,
-        isError: "Error getting config",
+      this.props.msg({
+        message: "Failed to Load Config",
+        type: "good",
       });
     }
-    clearInterval(this.closeMsg);
-    this.closeMsg = setInterval(() => {
-      this.setState({
-        isError: false,
-        isMsg: false,
+  }
+
+  async testDiscord() {
+    try {
+      await this.saveDiscord();
+      let test = await Api.testDiscord();
+      if (test.result) {
+        this.props.msg({
+          message: "Discord Test Passed!",
+          type: "good",
+        });
+      } else {
+        this.props.msg({
+          message: "Discord Test Failed",
+          type: "error",
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      this.props.msg({
+        message: "Discord Test Failed",
+        type: "error",
       });
-    }, 3000);
+    }
   }
 
   async testEmail() {
     try {
       await this.saveEmail();
       let test = await Api.testEmail();
-      console.log(test);
       if (test.result) {
-        this.setState({
-          isMsg: "Email test passed",
-          isError: false,
+        this.props.msg({
+          message: "Email Test Passed!",
+          type: "good",
         });
       } else {
-        this.setState({
-          isMsg: false,
-          isError: "Email test Failed",
+        this.props.msg({
+          message: "Email Test Failed",
+          type: "error",
         });
       }
     } catch (err) {
       console.log(err);
-      this.setState({
-        isMsg: false,
-        isError: "Email test Failed",
+      this.props.msg({
+        message: "Email Test Failed",
+        type: "error",
       });
     }
-    clearInterval(this.closeMsg);
-    this.closeMsg = setInterval(() => {
-      this.setState({
-        isError: false,
-        isMsg: false,
-      });
-    }, 3000);
   }
 
   componentDidMount() {
@@ -175,16 +207,6 @@ class General extends React.Component {
     if (this.state.loading) {
       return (
         <>
-          {this.state.isError ? (
-            <div className="setting-msg error">
-              <p>{this.state.isError}</p>
-            </div>
-          ) : null}
-          {this.state.isMsg ? (
-            <div className="setting-msg good">
-              <p>{this.state.isMsg}</p>
-            </div>
-          ) : null}
           <div className="spinner--settings">
             <Spinner />
           </div>
@@ -193,22 +215,14 @@ class General extends React.Component {
     }
     return (
       <>
-        {this.state.isError ? (
-          <div className="setting-msg error">
-            <p>{this.state.isError}</p>
-          </div>
-        ) : null}
-        {this.state.isMsg ? (
-          <div className="setting-msg good">
-            <p>{this.state.isMsg}</p>
-          </div>
-        ) : null}
         <section>
           <p className="main-title">General</p>
         </section>
         <section>
           <p className="main-title mb--2">Plex</p>
-          <p>If connection has been lost to Plex re-authenticate here.</p>
+          <p className="description">
+            If connection has been lost to Plex re-authenticate here.
+          </p>
           <button className="btn btn__square disabled">Login with plex</button>
           <button
             className="btn btn__square disabled"
@@ -279,7 +293,7 @@ class General extends React.Component {
             />
             <p>Enabled</p>
           </div>
-          <p>
+          <p className="description">
             Using Gmail? You can either create a{" "}
             <a
               target="_blank"
@@ -314,7 +328,7 @@ class General extends React.Component {
         </section>
         <section>
           <p className="main-title mb--2">Base path</p>
-          <p>
+          <p className="description">
             A base path can be applied to serve petio from a subdirectory. Any
             specified base must not include a trailing slash and will be applied
             to the end of the access URL. For example <code>/petio</code> would
@@ -338,7 +352,7 @@ class General extends React.Component {
         </section>
         <section>
           <p className="main-title mb--2">User login</p>
-          <p>
+          <p className="description">
             Logging into the admin panel in Petio will always require a
             Username/Email &amp; Password, however the standard user panel can
             be customised for <strong>Fast Login</strong> (where a user only
@@ -358,6 +372,33 @@ class General extends React.Component {
           </div>
           <button className="btn btn__square" onClick={this.saveLoginType}>
             Save
+          </button>
+        </section>
+        <section>
+          <p className="main-title mb--2">Discord</p>
+          <p className="description">Please paste here your Discord webhook</p>
+          <input
+            type="text"
+            name="discord_webhook"
+            value={this.state.discord_webhook}
+            onChange={this.inputChange}
+            autoCorrect="off"
+            spellCheck="off"
+          />
+          <button
+            style={{ marginRight: "10px" }}
+            className="btn btn__square"
+            onClick={this.saveDiscord}
+          >
+            Save
+          </button>
+          <button
+            className={`btn btn__square ${
+              this.state.discord_webhook ? "" : "disabled"
+            }`}
+            onClick={this.testDiscord}
+          >
+            Test
           </button>
         </section>
       </>

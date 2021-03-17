@@ -6,12 +6,13 @@
   max-height: 100vh;
   position: relative;
   overflow-y: auto;
-  padding-bottom: 120px;
+  // padding-bottom: 120px;
   pointer-events: all;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
+  padding-top: calc(80px + env(safe-area-inset-top));
   // transform: translate3d(0, 0, 0);
 
   &::-webkit-scrollbar {
@@ -45,5 +46,11 @@
       width: calc(100% - 250px);
     }
     // margin-top: 88px;
+  }
+}
+
+.generic-wrap {
+  @include media-breakpoint-down(md) {
+    padding-bottom: 120px;
   }
 }

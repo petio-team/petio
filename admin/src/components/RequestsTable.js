@@ -2,6 +2,7 @@ import React from "react";
 import { ReactComponent as MovieIcon } from "../assets/svg/movie.svg";
 import { ReactComponent as TvIcon } from "../assets/svg/tv.svg";
 import { ReactComponent as Arrow } from "../assets/svg/arrow-left.svg";
+import { ReactComponent as WarningIcon } from "../assets/svg/warning.svg";
 
 class RequestsTable extends React.Component {
   constructor(props) {
@@ -199,156 +200,12 @@ class RequestsTable extends React.Component {
   }
 
   reqState(req) {
-    let diff;
-    if (!req.approved) {
-      return (
-        <span className="requests--status requests--status__pending">
-          Pending
-        </span>
-      );
-    }
-    if (req.children) {
-      if (req.children.length > 0) {
-        for (let r = 0; r < req.children.length; r++) {
-          if (req.children[r].status.length > 0) {
-            return (
-              <span className="requests--status requests--status__orange">
-                Downloading
-              </span>
-            );
-          }
-
-          if (
-            req.children[r].info.downloaded ||
-            req.children[r].info.movieFile
-          ) {
-            return (
-              <span className="requests--status requests--status__good">
-                Downloaded
-              </span>
-            );
-          }
-
-          if (req.children[r].info.message === "NotFound") {
-            return (
-              <span className="requests--status requests--status__bad">
-                Removed
-              </span>
-            );
-          }
-
-          if (req.type === "tv" && req.children[r].info) {
-            if (
-              req.children[r].info.episodeCount ===
-                req.children[r].info.episodeFileCount &&
-              req.children[r].info.episodeCount > 0
-            ) {
-              return (
-                <span className="requests--status requests--status__good">
-                  Downloaded
-                </span>
-              );
-            }
-
-            if (req.children[r].info.seasons) {
-              let missing = false;
-              for (let season of req.children[r].info.seasons) {
-                if (season.statistics.percentOfEpisodes !== 100) missing = true;
-              }
-
-              if (!missing) {
-                return (
-                  <span className="requests--status requests--status__good">
-                    Downloaded
-                  </span>
-                );
-              } else {
-                let airDate = req.children[r].info.firstAired;
-                diff = Math.ceil(new Date(airDate) - new Date());
-                if (diff > 0) {
-                  return (
-                    <span className="requests--status requests--status__blue">
-                      ~{this.calcDate(diff)}
-                    </span>
-                  );
-                } else {
-                  if (req.children[r].info.episodeFileCount > 0) {
-                    return (
-                      <span className="requests--status requests--status__blue">
-                        Partially Downloaded
-                      </span>
-                    );
-                  }
-                  return (
-                    <span className="requests--status requests--status__bad">
-                      Unavailable
-                    </span>
-                  );
-                }
-              }
-            }
-          }
-
-          if (req.type === "movie" && req.children[r].info) {
-            if (
-              req.children[r].info.inCinemas ||
-              req.children[r].info.digitalRelease
-            ) {
-              if (req.children[r].info.inCinemas) {
-                diff = Math.ceil(
-                  new Date(req.children[r].info.inCinemas) - new Date()
-                );
-                if (diff > 0) {
-                  return (
-                    <span className="requests--status requests--status__blue">
-                      ~{this.calcDate(diff)}
-                    </span>
-                  );
-                }
-              }
-              if (req.children[r].info.digitalRelease) {
-                let digitalDate = new Date(req.children[r].info.digitalRelease);
-                if (new Date() - digitalDate < 0) {
-                  return (
-                    <span className="requests--status requests--status__cinema">
-                      In Cinemas
-                    </span>
-                  );
-                } else {
-                  return (
-                    <span className="requests--status requests--status__bad">
-                      Unavailable
-                    </span>
-                  );
-                }
-              } else {
-                if (req.children[r].info.inCinemas) {
-                  diff = Math.ceil(
-                    new Date() - new Date(req.children[r].info.inCinemas)
-                  );
-                  if (this.cinemaWindow(diff)) {
-                    return (
-                      <span className="requests--status requests--status__cinema">
-                        In Cinemas
-                      </span>
-                    );
-                  }
-                }
-                return (
-                  <span className="requests--status requests--status__bad">
-                    Unavailable
-                  </span>
-                );
-              }
-            }
-          }
-        }
-      }
-    }
-
+    if (!req.process_stage) return null;
     return (
-      <span className="requests--status requests--status__manual">
-        No status
+      <span
+        className={`requests--status requests--status__${req.process_stage.status}`}
+      >
+        {req.process_stage.message}
       </span>
     );
   }
@@ -396,7 +253,17 @@ class RequestsTable extends React.Component {
               return (
                 <React.Fragment key={key}>
                   <tr>
-                    <td>{req.title}</td>
+                    <td>
+                      {req.title}{" "}
+                      {req.type === "tv" && !req.tvdb_id ? (
+                        <span
+                          className="no-id warning"
+                          title="No TVDb ID for this request"
+                        >
+                          <WarningIcon />
+                        </span>
+                      ) : null}
+                    </td>
                     <td>{this.getYear(req)}</td>
                     <td>{this.typeIcon(req.type)}</td>
                     <td>

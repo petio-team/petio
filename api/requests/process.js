@@ -6,6 +6,8 @@ const Mailer = require("../mail/mailer");
 const Sonarr = require("../services/sonarr");
 const Radarr = require("../services/radarr");
 const logger = require("../util/logger");
+const filter = require("./filter");
+const Discord = require("../notifications/discord");
 
 class processRequest {
   constructor(req = {}, usr = {}) {
@@ -32,9 +34,10 @@ class processRequest {
           out.quota = updatedUser.quotaCount;
         }
         this.mailRequest();
+        this.discordNotify();
       } catch (err) {
         logger.log("error", "REQ: Error");
-        logger.error(err.stack);
+        logger.log({ level: "error", message: err });
         out = {
           message: "failed",
           error: true,
@@ -105,7 +108,7 @@ class processRequest {
       this.sendToDvr(profile);
     } catch (err) {
       logger.log("error", `REQ: Unable to save request`);
-      logger.error(err.stack);
+      logger.log({ level: "error", message: err });
       return {
         message: "failed",
         error: true,
@@ -122,11 +125,26 @@ class processRequest {
   }
 
   async sendToDvr(profile) {
+    let filterMatch = await filter(this.request);
+    if (filterMatch) {
+      logger.log(
+        "info",
+        "REQ: Matched on custom filter, sending to specified server"
+      );
+      logger.log("info", "REQ: Sending to DVR");
+      if (this.request.type === "movie") {
+        new Radarr(filterMatch.server).manualAdd(this.request, filterMatch);
+      } else {
+        new Sonarr(filterMatch.server).manualAdd(this.request, filterMatch);
+      }
+      return;
+    }
     logger.log("info", "REQ: Sending to DVR");
     // If profile is set use arrs from profile
     if (profile) {
       if (profile.radarr && this.request.type === "movie") {
         Object.keys(profile.radarr).map((r) => {
+          console.log(r, profile.radarr[r]);
           let active = profile.radarr[r];
           if (active) {
             new Radarr(r).processRequest(this.request.id);
@@ -188,6 +206,18 @@ class processRequest {
         }
       }
     }
+  }
+
+  discordNotify() {
+    let userData = this.user;
+    const requestData = this.request;
+    let type = requestData.type === "tv" ? "TV Show" : "Movie";
+    new Discord().send(
+      "New Request",
+      `A new request has been added for the ${type} "${requestData.title}"`,
+      userData.title,
+      `https://image.tmdb.org/t/p/w500${requestData.thumb}`
+    );
   }
 
   async mailRequest() {
@@ -253,7 +283,7 @@ class processRequest {
       function (err, data) {
         if (err) {
           logger.log("error", `REQ: Archive Error`);
-          logger.error(err.stack);
+          logger.log({ level: "error", message: err });
         } else {
           logger.log("info", `REQ: Request ${oldReq.title} Archived!`);
         }

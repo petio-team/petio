@@ -3,7 +3,9 @@ const router = express.Router();
 const fs = require("fs");
 const path = require("path");
 const logger = require("../util/logger");
+const { adminRequired } = require("../middleware/auth");
 
+router.use(adminRequired);
 router.post("/update", async (req, res) => {
   let body = req.body;
 
@@ -61,7 +63,7 @@ router.get("/current", async (req, res) => {
     res.json(configParse);
   } catch (err) {
     logger.log("error", "ROUTE: Config error");
-    logger.error(err.stack);
+    logger.log({ level: "error", message: err });
     res.status(500).send("Config Not Found");
   }
 });

@@ -20,6 +20,7 @@ import pjson from "../package.json";
 import Genre from "./pages/Genre";
 import Networks from "./pages/Networks";
 import Company from "./pages/Company";
+import People from "./pages/People";
 
 class App extends React.Component {
   constructor(props) {
@@ -127,12 +128,12 @@ class App extends React.Component {
         loginMsg: error,
         loading: false,
       });
-      localStorage.removeItem("loggedin");
+      localStorage.removeItem("petio_jwt");
     }
   }
 
   logout() {
-    localStorage.removeItem("loggedin");
+    localStorage.removeItem("petio_jwt");
     localStorage.removeItem("adminloggedin");
     User.logout();
     this.setState({
@@ -143,7 +144,7 @@ class App extends React.Component {
   }
 
   loginLocal() {
-    if (localStorage.getItem("loggedin")) {
+    if (localStorage.getItem("petio_jwt")) {
       if (this.props.user.credentials) {
         this.login("", true);
       } else {
@@ -180,8 +181,12 @@ class App extends React.Component {
         config: res.config,
         login_type: parseInt(res.login_type),
       });
+      if (res.config === false) {
+        this.msg({ message: "Petio is not setup redirecting", type: "error" });
+        window.location.href = "/admin/";
+      }
     } catch {
-      this.msg({ message: "API not configured", type: "error" });
+      this.msg({ message: "API not reachable", type: "error" });
       this.setState({
         error: true,
         config: "failed",
@@ -311,7 +316,7 @@ class App extends React.Component {
                 let msg = this.state.pushMsg[i];
                 return (
                   <div
-                    key={msg.timestamp}
+                    key={`msg__${msg.timestamp}__${i}`}
                     className={`push-msg--item ${
                       msg.type !== "info" ? msg.type : ""
                     }`}
@@ -324,12 +329,16 @@ class App extends React.Component {
             <Switch>
               <Route exact path="/">
                 <div className="page-wrap">
-                  <Search msg={this.msg} />
+                  <div className="generic-wrap">
+                    <Search msg={this.msg} />
+                  </div>
                 </div>
               </Route>
               <Route exact path="/user">
                 <div className="page-wrap">
-                  <Profile logout={this.logout} />
+                  <div className="generic-wrap">
+                    <Profile logout={this.logout} msg={this.msg} />
+                  </div>
                 </div>
               </Route>
               <Route exact path="/movie/:id">
@@ -339,7 +348,9 @@ class App extends React.Component {
                   msg={this.msg}
                 />
                 <div className="page-wrap">
-                  <Movie msg={this.msg} openIssues={this.openIssues} />
+                  <div className="generic-wrap">
+                    <Movie msg={this.msg} openIssues={this.openIssues} />
+                  </div>
                 </div>
               </Route>
               <Route exact path="/series/:id">
@@ -349,7 +360,9 @@ class App extends React.Component {
                   msg={this.msg}
                 />
                 <div className="page-wrap">
-                  <Series msg={this.msg} openIssues={this.openIssues} />
+                  <div className="generic-wrap">
+                    <Series msg={this.msg} openIssues={this.openIssues} />
+                  </div>
                 </div>
               </Route>
               <Route exact path="/series/:id/season/:season">
@@ -367,39 +380,60 @@ class App extends React.Component {
               </Route>
               <Route exact path="/requests">
                 <div className="page-wrap">
-                  <Requests />
+                  <div className="generic-wrap">
+                    <Requests />
+                  </div>
                 </div>
               </Route>
               {/* discovery pages */}
               <Route exact path="/movies">
                 <div className="page-wrap">
-                  <Movies />
+                  <div className="generic-wrap">
+                    <Movies msg={this.msg} />
+                  </div>
                 </div>
               </Route>
               <Route exact path="/tv">
                 <div className="page-wrap">
-                  <Shows msg={this.msg} />
+                  <div className="generic-wrap">
+                    <Shows msg={this.msg} />
+                  </div>
                 </div>
               </Route>
               <Route exact path="/genre/:type/:id">
                 <div className="page-wrap">
-                  <Genre msg={this.msg} />
+                  <div className="generic-wrap">
+                    <Genre msg={this.msg} />
+                  </div>
                 </div>
               </Route>
               <Route exact path="/networks/:id">
                 <div className="page-wrap">
-                  <Networks msg={this.msg} />
+                  <div className="generic-wrap">
+                    <Networks msg={this.msg} />
+                  </div>
                 </div>
               </Route>
               <Route exact path="/company/:id">
                 <div className="page-wrap">
-                  <Company msg={this.msg} />
+                  <div className="generic-wrap">
+                    <Company msg={this.msg} />
+                  </div>
+                </div>
+              </Route>
+              <Route exact path="/people">
+                <div className="page-wrap">
+                  <div className="generic-wrap">
+                    <People />
+                  </div>
                 </div>
               </Route>
               <Route path="*" exact>
                 <div className="page-wrap">
-                  <h1 className="main-title mb--1">Not found</h1>
-                  <p>This page doesn&apos;t exist</p>
+                  <div className="generic-wrap">
+                    <h1 className="main-title mb--1">Not found</h1>
+                    <p>This page doesn&apos;t exist</p>
+                  </div>
                 </div>
               </Route>
             </Switch>

@@ -1,16 +1,17 @@
-$black: #282a2d;
-$grey: #f2f3f4;
+$black: #2a2c2e;
+$grey: #f2f2f2;
 $grey-light: #e0e3e6;
 $grey-medium: #868c96;
 $dark-grey: #343536;
-$bad: #f06464;
-$primary: #e19f1f;
+$bad: #e95151;
+$primary: #d79b23;
 $primaryDark: #c78c0d;
-$green: #96c83c;
+$green: #98dd32;
 $good: $green;
-$blue: #19a0d7;
+$blue: #3d85b8;
 $purple: rgb(104, 16, 175);
 $teal: #1f7979;
+$yellow: #ebe723;
 
 // breakpoints /////////////////////////////////////////////
 
@@ -57,6 +58,7 @@ $grid-breakpoints: $breakpoints;
 
 // components
 @import "components/input";
+@import "components/image-upload";
 @import "components/modal";
 @import "components/spinner";
 @import "components/section";
@@ -68,6 +70,7 @@ $grid-breakpoints: $breakpoints;
 @import "components/sessions";
 @import "components/table";
 @import "components/sonarr-radarr";
+@import "components/messages";
 
 // pages
 @import "pages/login";
@@ -75,3 +78,4 @@ $grid-breakpoints: $breakpoints;
 @import "pages/dashboard";
 @import "pages/settings";
 @import "pages/requests";
+@import "pages/profile";

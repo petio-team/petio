@@ -7,20 +7,19 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/user");
 const logger = require("../util/logger");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
+const { authenticate } = require("../middleware/auth");
+const getDiscovery = require("../discovery/display");
+const getHistory = require("../plex/history");
+const getTop = require("../plex/top");
 
 router.post("/", async (req, res) => {
   const prefs = getConfig();
-  const admin = req.body.admin;
-  const authToken = req.body.authToken;
-  const user = req.body.user;
   const request_ip =
     req.headers["x-forwarded-for"] || req.connection.remoteAddress;
-  let userData = false;
-  let token = false;
-  let loggedIn = false;
-  let username = user.username;
-  let password = user.password;
+  const {
+    user: { username, password },
+  } = req.body || { user: {} };
 
   if (!prefs) {
     res.status(500).send("This Petio API is not setup");
@@ -32,85 +31,81 @@ router.post("/", async (req, res) => {
   }
 
   logger.log("info", `LOGIN: New login attempted`);
-  logger.log("info", `LOGIN: Request User: ${username}`);
   logger.log("info", `LOGIN: Request IP: ${request_ip}`);
 
-  if (authToken) {
-    try {
-      let jwtUser = jwt.verify(authToken, prefs.plexToken);
-      if (!jwtUser.username) {
-        throw "No username";
-      }
-
-      logger.log("verbose", `LOGIN: Token fine`);
-      username = jwtUser.username;
-      password = jwtUser.password;
-    } catch (err) {
-      logger.log("warn", `LOGIN: Invalid token, rejected`);
-      logger.warn(err);
-    }
-  }
-
-  if (username) {
-    try {
-      // Find user in db
-      let dbUser = await User.findOne({
-        $or: [{ username: username }, { email: username }, { title: username }],
+  function success(user, isAdmin = false) {
+    user.password = null;
+    const token = jwt.sign({ ...user, admin: isAdmin }, prefs.plexToken);
+    res
+      .cookie("petio_jwt", token, {
+        path: "/",
+        httpOnly: true,
+        maxAge: 2419200000,
+        sameSite: "strict",
+        secure: false,
+      })
+      .json({
+        loggedIn: true,
+        user,
+        token,
+        admin: isAdmin,
       });
-      if (!dbUser.disabled) {
-        // Check if user is disabled
-        let hasAdmin =
-          dbUser.role === "admin" || dbUser.role === "moderator" ? true : false;
-        if (admin && !hasAdmin) {
-          throw "User is not admin";
-        }
-        token = createToken(username, password, admin);
-        if (
-          (dbUser.password && parseInt(prefs.login_type) === 1) ||
-          (admin && dbUser.password)
-        ) {
-          // If standard auth and db user has password or is admin panel
-          let checkPass =
-            dbUser.password && password
-              ? bcrypt.compareSync(password, dbUser.password)
-              : false;
-          if (!checkPass) throw "Password hash failed";
-        } else if (parseInt(prefs.login_type) === 1 || admin) {
-          // Auth against plex, standard login and is plex user
-          await plexAuth(username, password);
-        }
-        saveRequestIp(dbUser, request_ip);
-        userData = dbUser;
-        userData.password = "";
-        loggedIn = true;
-      }
-    } catch (err) {
-      logger.log("warn", `LOGIN: User not found ${username} - ${request_ip}`);
-      logger.warn(err);
-      token = false;
-    }
+    getTop(1);
+    getTop(2);
+    let userId = user.altId ? user.altId : user.id;
+    getHistory(userId, "movie");
+    getHistory(userId, "show");
+    getDiscovery(userId, "movie");
+    getDiscovery(userId, "show");
   }
 
-  res.json({
-    loggedIn: loggedIn,
-    user: userData,
-    token: token,
-    admin: admin ? true : false,
-  });
+  // check for existing jwt
+  try {
+    const user = await authenticate(req);
+    success(user, req.jwtUser.admin);
+    logger.log("info", `LOGIN: Request User: ${user.username}`);
+    return;
+  } catch (e) {
+    // if existing jwt failed, continue onto normal login flow
+  }
+
+  logger.log("info", `LOGIN: Request User: ${username}`);
+
+  try {
+    // Find user in db
+    let dbUser = await User.findOne({
+      $or: [{ username: username }, { email: username }, { title: username }],
+    });
+    if (!dbUser) throw "User not found";
+
+    if (dbUser.disabled) throw "User is disabled";
+
+    let isAdmin = dbUser.role === "admin" || dbUser.role === "moderator";
+
+    if (parseInt(prefs.login_type) === 1 || password) {
+      if (dbUser.password) {
+        if (!bcrypt.compareSync(password, dbUser.password)) {
+          throw "Password is incorrect";
+        }
+      } else {
+        // throws on invalid credentials
+        await plexAuth(username, password);
+      }
+      success(dbUser.toObject(), isAdmin);
+    } else {
+      // passwordless login, no check required. But we downgrade admin perms
+      success(dbUser.toObject(), false);
+    }
+    saveRequestIp(dbUser, request_ip);
+  } catch (err) {
+    logger.log("warn", `LOGIN: User not found ${username} - ${request_ip}`);
+    logger.warn(err);
+    res.json({ loggedIn: false, user: null, admin: false, token: null });
+  }
 });
 
-function createToken(username, password, admin = false) {
-  const prefs = getConfig();
-  if (!prefs.login_type) {
-    prefs.login_type = 1;
-  }
-  if (parseInt(prefs.login_type) === 2 && !admin) {
-    password = "";
-  }
-  return jwt.sign({ username: username, password: password }, prefs.plexToken);
-}
-
 function plexAuth(username, password) {
+  logger.info(`LOGIN: Using Plex Auth for ${username}`);
   return new Promise((resolve, reject) => {
     request(
       "https://plex.tv/users/sign_in.json",
@@ -130,14 +125,17 @@ function plexAuth(username, password) {
       },
       function (err, data) {
         if (err) {
+          logger.warn(`LOGIN: Plex auth failed for ${username}`);
           reject();
         }
         if (!data) {
-          reject("Failed Plex Auth");
+          logger.warn(`LOGIN: Plex auth error ${username}`);
+          reject("LOGIN: Failed Plex Auth");
+        } else if (data.error) {
+          logger.warn(`LOGIN: Plex auth error ${username}`);
+          reject("LOGIN: Failed Plex Auth");
         } else {
-          if (data.error) {
-            reject("Failed Plex Auth");
-          }
+          logger.info(`LOGIN: Plex auth passed ${username}`);
           resolve(data);
         }
       }
@@ -152,12 +150,13 @@ async function saveRequestIp(user, request_ip) {
       {
         $set: {
           lastIp: request_ip,
+          lastLogin: new Date(),
         },
       }
     );
   } catch (err) {
     logger.log("error", "LOGIN: Update IP failed");
-    logger.error(err);
+    logger.log({ level: "error", message: err });
   }
 }
 

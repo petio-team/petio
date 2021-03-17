@@ -107,17 +107,26 @@ class Radarr {
     try {
       let check = await this.get("system/status");
       if (check.error) {
-        logger.log("warn", "SERVICE - RADARR: ERR Connection failed");
+        logger.log(
+          "warn",
+          `SERVICE - RADARR: [${this.config.title}] ERR Connection failed`
+        );
         return false;
       }
       if (check) {
         return check;
       } else {
-        logger.log("warn", "SERVICE - RADARR: ERR Connection failed");
+        logger.log(
+          "warn",
+          `SERVICE - RADARR: [${this.config.title}] ERR Connection failed`
+        );
         return false;
       }
     } catch (err) {
-      logger.log("warn", "SERVICE - RADARR: ERR Connection failed");
+      logger.log(
+        "warn",
+        `SERVICE - RADARR: [${this.config.title}] ERR Connection failed`
+      );
       return false;
     }
   }
@@ -130,9 +139,13 @@ class Radarr {
     return await this.get("qualityProfile");
   }
 
+  async getTags() {
+    return await this.get("tag");
+  }
+
   lookup(id) {
-    return this.get("movie/lookup/tmdb", {
-      tmdbId: id,
+    return this.get("movie/lookup", {
+      term: `tmdb:${id}`,
     });
   }
 
@@ -177,17 +190,16 @@ class Radarr {
     return await this.connect(true);
   }
 
-  async add(movieData) {
-    let system = await this.get("system/status");
-    let sep = system.isWindows ? "\\" : "/";
-    movieData.qualityProfileId = parseInt(this.config.profile);
-    movieData.Path = `${this.config.path_title}${sep}${sanitize(
-      movieData.title
-    )} (${movieData.year})`;
+  async add(movieData, path = false, profile = false, tag = false) {
+    movieData.qualityProfileId = parseInt(
+      profile ? profile : this.config.profile
+    );
+    movieData.rootFolderPath = `${path ? path : this.config.path_title}`;
     movieData.addOptions = {
       searchForMovie: true,
     };
     movieData.monitored = true;
+    if (tag) movieData.tags = [parseInt(tag)];
 
     try {
       let add = await this.post("movie", false, movieData);
@@ -197,8 +209,11 @@ class Radarr {
       }
       return add.id;
     } catch (err) {
-      logger.log("warn", `SERVICE - RADARR: Unable to add movie`);
-      logger.error(err.stack);
+      logger.log(
+        "warn",
+        `SERVICE - RADARR: [${this.config.title}] Unable to add movie`
+      );
+      logger.log({ level: "error", message: err });
       throw err;
     }
   }
@@ -209,60 +224,118 @@ class Radarr {
       if (this.config) {
         try {
           let radarrData = await this.lookup(job.tmdb_id);
-          let radarrId = await this.add(radarrData);
-          let updatedRequest = await Request.findOneAndUpdate(
+          let radarrId = false;
+          if (radarrData[0].id) {
+            logger.log(
+              "warn",
+              `SERVICE - RADARR: [${this.config.title}] Job skipped already found for ${job.title}`
+            );
+            radarrId = radarrData[0].id;
+          } else {
+            radarrId = await this.add(radarrData[0]);
+            logger.log(
+              "info",
+              `SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`
+            );
+          }
+          await Request.findOneAndUpdate(
             {
               requestId: job.requestId,
             },
             { $push: { radarrId: { [this.config.uuid]: radarrId } } },
             { useFindAndModify: false }
           );
-          if (updatedRequest) {
-            logger.log(
-              "info",
-              `SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`
-            );
-          }
         } catch (err) {
           logger.log(
             "warn",
             `SERVICE - RADARR: [${this.config.title}] Unable to add movie ${job.title}`
           );
-          logger.error(err.stack);
+          logger.log({ level: "error", message: err });
         }
       } else {
         // Loop for all servers default
         for (let server of this.fullConfig) {
           if (!server.active) {
-            logger.log("warn", `SERVICE - RADARR: Server not active`);
+            logger.log(
+              "warn",
+              `SERVICE - RADARR: [${this.config.title}] Server not active`
+            );
             return;
           }
 
           this.config = server;
           try {
             let radarrData = await this.lookup(job.tmdb_id);
-            let radarrId = await this.add(radarrData);
-            let updatedRequest = await Request.findOneAndUpdate(
+            let radarrId = false;
+            if (radarrData[0].id) {
+              logger.log(
+                "warn",
+                `SERVICE - RADARR: [${this.config.title}] Job skipped already found for ${job.title}`
+              );
+              radarrId = radarrData[0].id;
+            } else {
+              radarrId = await this.add(radarrData[0]);
+              logger.log(
+                "info",
+                `SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`
+              );
+            }
+
+            await Request.findOneAndUpdate(
               {
                 requestId: job.requestId,
               },
               { $push: { radarrId: { [this.config.uuid]: radarrId } } },
               { useFindAndModify: false }
             );
-            if (updatedRequest) {
-              logger.log(
-                "info",
-                `SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`
-              );
-            }
           } catch (err) {
             logger.log(
               "warn",
               `SERVICE - RADARR: [${this.config.title}] Unable to add movie ${job.title}`
             );
-            logger.error(err.stack);
+            logger.log({ level: "error", message: err });
           }
         }
+      }
+    }
+  }
+
+  async manualAdd(job, manual) {
+    if (this.config) {
+      try {
+        let radarrData = await this.lookup(job.id);
+        let radarrId = false;
+        if (radarrData[0].id) {
+          logger.log(
+            "warn",
+            `SERVICE - RADARR: [${this.config.title}] Job skipped already found for ${job.title}`
+          );
+          radarrId = radarrData[0].id;
+        } else {
+          radarrId = await this.add(
+            radarrData[0],
+            manual.path,
+            manual.profile,
+            manual.tag
+          );
+          logger.log(
+            "info",
+            `SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`
+          );
+        }
+        await Request.findOneAndUpdate(
+          {
+            requestId: job.id,
+          },
+          { $push: { radarrId: { [this.config.uuid]: radarrId } } },
+          { useFindAndModify: false }
+        );
+      } catch (err) {
+        logger.log(
+          "warn",
+          `SERVICE - RADARR: [${this.config.title}] Unable to add movie ${job.title}`
+        );
+        logger.log({ level: "error", message: err });
       }
     }
   }
@@ -320,7 +393,7 @@ class Radarr {
           mainCalendar = [...mainCalendar, ...serverCal];
         } catch (err) {
           logger.log("error", "RADARR: Calendar error");
-          logger.error(err.stack);
+          logger.log({ level: "error", message: err });
         }
       }
     }

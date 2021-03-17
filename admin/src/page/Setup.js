@@ -10,6 +10,8 @@ import { ReactComponent as Server } from "../assets/svg/server.svg";
 import { ReactComponent as Good } from "../assets/svg/check.svg";
 import { ReactComponent as Bad } from "../assets/svg/close.svg";
 import { ReactComponent as TmdbLogo } from "../assets/svg/tmdb.svg";
+import { ReactComponent as LockIcon } from "../assets/svg/lock.svg";
+import { ReactComponent as UnlockIcon } from "../assets/svg/unlock.svg";
 import Api from "../data/Api";
 import pjson from "../../package.json";
 
@@ -379,7 +381,22 @@ class Setup extends React.Component {
                         {this.serverIcon(server.platform)}
                       </div>
                       <div className="server-name">
-                        <p>{server.name}</p>
+                        <p>
+                          {server.name}
+                          <span
+                            className={`server-lock ${
+                              server.protocol === "https"
+                                ? "secure"
+                                : "insecure"
+                            }`}
+                          >
+                            {server.protocol === "https" ? (
+                              <LockIcon />
+                            ) : (
+                              <UnlockIcon />
+                            )}
+                          </span>
+                        </p>
                         <p className="server-loc">{`${server.protocol}://${server.host}:${server.port}`}</p>
                       </div>
                       <div className="server-status">

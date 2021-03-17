@@ -5,6 +5,7 @@ import { ReactComponent as ResIconHd } from "../assets/svg/720p.svg";
 import { ReactComponent as ResIconFHd } from "../assets/svg/1080p.svg";
 import { ReactComponent as ResIconUHd } from "../assets/svg/4k.svg";
 import { ReactComponent as StarIcon } from "../assets/svg/star.svg";
+import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
 
 import { ReactComponent as RequestIcon } from "../assets/svg/request.svg";
 import { ReactComponent as ReportIcon } from "../assets/svg/report.svg";
@@ -155,7 +156,12 @@ class MovieShowOverview extends React.Component {
     let userRating = "Not Reviewed";
     let userRatingVal = 0;
 
-    let requestBtn = this.props.mediaData.on_server ? (
+    let requestBtn = this.props.requestPending ? (
+      <button className="btn btn__square pending">
+        <Spinner />
+        Request
+      </button>
+    ) : this.props.mediaData.on_server ? (
       isIOS ? (
         <a
           href={`plex://preplay/?metadataKey=%2Flibrary%2Fmetadata%2F${this.props.mediaData.on_server.ratingKey}&metadataType=1&server=${this.props.mediaData.on_server.serverKey}`}
@@ -277,20 +283,19 @@ class MovieShowOverview extends React.Component {
       </button>
     );
 
+    let trailerBtn = this.props.video ? (
+      <button onClick={this.props.showTrailer} className="btn btn__square">
+        <TrailerIcon />
+        {this.props.trailer ? "Close Trailer" : "Trailer"}
+      </button>
+    ) : null;
+
     return (
       <section>
         <div className="quick-view">
           <div className="side-content">
             <div className="media-action">
-              {this.props.video ? (
-                <button
-                  onClick={this.props.showTrailer}
-                  className="btn btn__square"
-                >
-                  <TrailerIcon />
-                  Trailer
-                </button>
-              ) : null}
+              {trailerBtn}
               {reviewBtn}
               {this.props.mediaData.available_resolutions ? (
                 <div className="resolutions">
@@ -323,6 +328,10 @@ class MovieShowOverview extends React.Component {
                         this.props.mediaData.first_air_date
                       ).getFullYear()
                     : null}
+                  {!this.props.mediaData.release_date &&
+                  !this.props.mediaData.first_air_date
+                    ? "Unknown"
+                    : null}
                 </p>
                 <div className="detail--bar--sep">·</div>
                 <p className="runtime" title="Running Time">
@@ -340,9 +349,16 @@ class MovieShowOverview extends React.Component {
                 </p>
                 <div className="detail--bar--sep">·</div>
                 <p>
-                  <span className="rating-icon">
+                  <a
+                    href={`https://www.themoviedb.org/${
+                      this.props.mediaData.seasons ? "tv" : "movie"
+                    }/${this.props.mediaData.id}`}
+                    className="rating-icon"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     <TmdbIcon />
-                  </span>
+                  </a>
                   <span
                     className={`rating color-${
                       criticRating > 7.9
@@ -361,9 +377,14 @@ class MovieShowOverview extends React.Component {
                   <>
                     <div className="detail--bar--sep">·</div>
                     <p>
-                      <span className="rating-icon">
+                      <a
+                        href={`https://www.imdb.com/title/${this.props.mediaData.imdb_id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="rating-icon"
+                      >
                         <ImdbIcon />
-                      </span>
+                      </a>
                       <span
                         className={`rating color-${
                           this.props.mediaData.imdb_data.rating.ratingValue >
@@ -385,7 +406,13 @@ class MovieShowOverview extends React.Component {
                 ) : null}
                 <div className="detail--bar--sep">·</div>
                 <p>
-                  <span className="desktop-only">Petio: </span>
+                  <span
+                    className="desktop-only"
+                    style={{ cursor: "help" }}
+                    title="Petio reviews are a combination of Petio users on this server and external user reviews."
+                  >
+                    Petio:{" "}
+                  </span>
                   <span
                     className={`rating d-nm color-${
                       userRatingVal > 79
@@ -407,6 +434,17 @@ class MovieShowOverview extends React.Component {
                       <span className="desktop-only">Language: </span>
                       <span className="item-val">
                         {this.props.mediaData.original_language_format}
+                      </span>
+                    </p>
+                  </>
+                ) : null}
+                {this.props.mediaData.age_rating ? (
+                  <>
+                    <div className="detail--bar--sep">·</div>
+                    <p>
+                      <span className="desktop-only">Rated </span>
+                      <span className="item-val">
+                        {this.props.mediaData.age_rating}
                       </span>
                     </p>
                   </>
@@ -451,6 +489,7 @@ class MovieShowOverview extends React.Component {
                 {requestBtn}
                 {reportBtn}
                 {reviewBtn}
+                {trailerBtn}
               </div>
               <div className="companies--wrap">
                 {this.props.mediaData.production_companies
@@ -461,7 +500,7 @@ class MovieShowOverview extends React.Component {
                           <div className="companies--item" key={`co__${co.id}`}>
                             <Link to={`/company/${co.id}`} title={co.name}>
                               <img
-                                src={`https://image.tmdb.org/t/p/w500${co.logo_path}`}
+                                src={`https://image.tmdb.org/t/p/w185${co.logo_path}`}
                               />
                             </Link>
                           </div>
@@ -485,7 +524,7 @@ class MovieShowOverview extends React.Component {
                               title={network.name}
                             >
                               <img
-                                src={`https://image.tmdb.org/t/p/w500${network.logo_path}`}
+                                src={`https://image.tmdb.org/t/p/w185${network.logo_path}`}
                               />
                             </Link>
                           </div>
@@ -495,6 +534,24 @@ class MovieShowOverview extends React.Component {
                   : null}
               </div>
               <div className="media-crew">
+                {this.props.mediaData.created_by
+                  ? this.props.mediaData.created_by.map((creator) => {
+                      return (
+                        <div
+                          key={`cb__${creator.id}`}
+                          className="media-crew--item"
+                        >
+                          <p className="sub-title">Created By</p>
+                          <Link
+                            to={`/person/${creator.id}`}
+                            className="crew-credit"
+                          >
+                            {creator.name}
+                          </Link>
+                        </div>
+                      );
+                    })
+                  : null}
                 {director ? (
                   <div className="media-crew--item">
                     <p className="sub-title">Director</p>

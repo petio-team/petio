@@ -9,9 +9,12 @@ const path = require("path");
 const pjson = require("./package.json");
 require("./node_modules/cache-manager/lib/stores/memory.js");
 const logger = require("./util/logger");
+const cluster = require("cluster");
+const trending = require("./tmdb/trending");
 
 // Config
 const getConfig = require("./util/config");
+const Worker = require("./worker");
 
 // Plex
 const LibraryUpdate = require("./plex/libraryUpdate");
@@ -40,47 +43,40 @@ const issueRoute = require("./routes/issue");
 const profileRoute = require("./routes/profiles");
 const configRoute = require("./routes/config");
 const logsRoute = require("./routes/log");
+const filterRoute = require("./routes/filter");
+const discoveryRoute = require("./routes/discovery");
+const notificationsRoute = require("./routes/notifications");
+const { authRequired } = require("./middleware/auth");
 
 class Main {
   constructor() {
-    logger.log("info", `API: Petio API Version ${pjson.version} alpha`);
-    logger.log("info", "API: API Starting");
-    // Runs every night at 00:00
-    this.cron = new CronJob("0 0 * * *", function () {
-      const d = new Date();
-      logger.log("info", `CRON: Full Scan Started @ ${d.toDateString()}`);
-      new LibraryUpdate().run();
-    });
+    if (cluster.isMaster) {
+      logger.log("info", `API: Petio API Version ${pjson.version} alpha`);
+      logger.log("info", "API: API Starting");
 
-    // Runs every 30 mins
-    this.partial = new CronJob("0 */30 * * * *", function () {
-      const d = new Date();
-      logger.log("info", `CRON: Partial Scan Started @ ${d.toDateString()}`);
-      new LibraryUpdate().partial();
-    });
-
-    // Every Sunday at 11pm
-    this.resetQuotas = new CronJob("0 11 * * sun", function () {
-      logger.log("info", "CRON: Quotas Cleared");
-      new QuotaSystem().reset();
-    });
-
-    if (process.pkg) {
-      logger.log("verbose", "API: Detected pkg env");
-      this.createConfigDir(
-        path.join(path.dirname(process.execPath), "./config")
+      if (process.pkg) {
+        logger.log("verbose", "API: Detected pkg env");
+        this.createConfigDir(
+          path.join(path.dirname(process.execPath), "./config")
+        );
+      } else {
+        logger.log("verbose", "API: Non pkg env");
+        this.createConfigDir(path.join(__dirname, "./config"));
+      }
+      this.e = app;
+      this.server = null;
+      this.e.use(
+        cors({
+          origin: (origin, callback) => {
+            callback(null, true);
+          },
+          credentials: true,
+        })
       );
-    } else {
-      logger.log("verbose", "API: Non pkg env");
-      this.createConfigDir(path.join(__dirname, "./config"));
+      this.e.use(express.json());
+      this.e.use(express.urlencoded({ extended: true }));
     }
     this.config = getConfig();
-    this.e = app;
-    this.server = null;
-    this.e.use(cors());
-    this.e.options("*", cors());
-    this.e.use(express.json());
-    this.e.use(express.urlencoded({ extended: true }));
   }
 
   setRoutes() {
@@ -105,25 +101,28 @@ class Main {
         next();
       });
       this.e.use("/login", loginRoute);
-      this.e.use("/movie", movieRoute);
-      this.e.use("/show", showRoute);
-      this.e.use("/person", personRoute);
-      this.e.use("/search", searchRoute);
-      this.e.use("/trending", trendingRoute);
-      this.e.use("/request", requestRoute);
-      this.e.use("/top", topRoute);
-      this.e.use("/history", historyRoute);
-      this.e.use("/plex", plexRoute);
-      this.e.use("/review", reviewRoute);
+      this.e.use("/movie", authRequired, movieRoute);
+      this.e.use("/show", authRequired, showRoute);
+      this.e.use("/person", authRequired, personRoute);
+      this.e.use("/search", authRequired, searchRoute);
+      this.e.use("/trending", authRequired, trendingRoute);
+      this.e.use("/request", authRequired, requestRoute);
+      this.e.use("/top", authRequired, topRoute);
+      this.e.use("/history", authRequired, historyRoute);
+      this.e.use("/plex", authRequired, plexRoute);
+      this.e.use("/review", authRequired, reviewRoute);
       this.e.use("/user", userRoute);
-      this.e.use("/genie", genieRoute);
-      this.e.use("/sessions", sessionsRoute);
-      this.e.use("/services", servicesRoute);
-      this.e.use("/mail", mailRoute);
-      this.e.use("/issue", issueRoute);
-      this.e.use("/profiles", profileRoute);
-      this.e.use("/config", configRoute);
-      this.e.use("/logs", logsRoute);
+      this.e.use("/genie", authRequired, genieRoute);
+      this.e.use("/sessions", authRequired, sessionsRoute);
+      this.e.use("/services", authRequired, servicesRoute);
+      this.e.use("/mail", authRequired, mailRoute);
+      this.e.use("/issue", authRequired, issueRoute);
+      this.e.use("/profiles", authRequired, profileRoute);
+      this.e.use("/config", authRequired, configRoute);
+      this.e.use("/logs", authRequired, logsRoute);
+      this.e.use("/filter", authRequired, filterRoute);
+      this.e.use("/discovery", authRequired, discoveryRoute);
+      this.e.use("/hooks", authRequired, notificationsRoute);
       this.e.get("*", function (req, res) {
         logger.log(
           "warn",
@@ -137,9 +136,6 @@ class Main {
   }
 
   async restart() {
-    logger.log("info", "API: Restarting server");
-    this.cron.stop();
-    logger.log("verbose", "API: Stopped crons");
     this.server.close();
     logger.log("verbose", "API: Server stopped");
     this.config = getConfig();
@@ -148,25 +144,33 @@ class Main {
   }
 
   init() {
-    logger.log("info", "API: Starting server");
-    this.setRoutes();
-    try {
-      this.server = this.e.listen(7778);
-      logger.log("verbose", `API: Listening on 7778 internally`);
-      logger.log("info", "API: Server entering listening state");
-      if (!this.config) {
-        logger.log("warn", "API: No config, entering setup mode");
-      } else {
-        logger.log("info", "API: Connecting to Database...");
-        this.connectDb();
+    if (cluster.isMaster) {
+      // Main API worker
+      logger.log("info", "API: Starting server");
+      this.setRoutes();
+      try {
+        this.server = this.e.listen(7778);
+        logger.log("verbose", `API: Listening on 7778 internally`);
+        logger.log("info", "API: Server entering listening state");
+        if (!this.config) {
+          logger.log("warn", "API: No config, entering setup mode");
+        } else {
+          logger.log("info", "API: Connecting to Database...");
+          this.connectDb();
+          trending();
+          cluster.fork();
+        }
+      } catch (err) {
+        logger.log({ level: "error", message: err });
+        logger.log("info", "API: Fatal error Stopping server");
+        this.cron.stop();
+        logger.log("verbose", "API: Stopped crons");
+        this.server.close();
+        logger.log("verbose", "API: Server stopped");
       }
-    } catch (err) {
-      logger.error(err.stack);
-      logger.log("info", "API: Fatal error Stopping server");
-      this.cron.stop();
-      logger.log("verbose", "API: Stopped crons");
-      this.server.close();
-      logger.log("verbose", "API: Server stopped");
+    } else {
+      // Cron Worker on sub thread
+      new Worker().startCrons();
     }
   }
 
@@ -178,26 +182,13 @@ class Main {
         useUnifiedTopology: true,
       });
       logger.log("info", "API: Connected to Database");
-      this.start();
     } catch (err) {
       logger.log("error", "API: Error connecting to database");
-      logger.error(err.stack);
+      logger.log({ level: "error", message: err });
       logger.log("error", "API: Fatal error - database misconfigured!");
       logger.log("warn", "API: Removing config please restart");
       fs.unlinkSync("./config/config.json");
     }
-  }
-
-  async start() {
-    const libUpdate = new LibraryUpdate();
-    logger.log("verbose", `API: Registering Full Scan job`);
-    this.cron.start();
-    logger.log("verbose", `API: Registering Partial Scan job`);
-    this.partial.start();
-    logger.log("verbose", `API: Registering Quota reset job`);
-    this.resetQuotas.start();
-    logger.log("verbose", `API: Running init scan`);
-    libUpdate.run();
   }
 
   setup() {
@@ -327,7 +318,7 @@ class Main {
       } catch (err) {
         res.status(500).send("Error Creating config");
         logger.log("error", "API: Config creation error");
-        logger.error(err.stack);
+        logger.log({ level: "error", message: err });
       }
     });
   }
@@ -350,7 +341,7 @@ class Main {
       fs.writeFile(configFile, data, (err) => {
         if (err) {
           logger.log("error", "API: Writing config to file failed");
-          logger.error(err.stack);
+          logger.log({ level: "error", message: err });
           reject(err);
         } else {
           logger.log("info", "API: Config written to file");
@@ -409,7 +400,7 @@ class Main {
       return;
     } catch (err) {
       logger.log("error", "API: Fatal Error: Cannot create default configs");
-      logger.error(err.stack);
+      logger.log({ level: "error", message: err });
       return;
     }
   }
@@ -429,7 +420,4 @@ class Main {
   }
 }
 
-const API = new Main();
-API.init();
-
-module.exports = API;
+module.exports = new Main().init();

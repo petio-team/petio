@@ -41,32 +41,54 @@ class Profiles extends React.Component {
   }
 
   async saveProfile() {
-    await Api.saveProfile({
-      id: this.state.activeProfile,
-      name: this.state.np_name,
-      quota: this.state.np_quota,
-      radarr: this.state.np_radarr,
-      sonarr: this.state.np_sonarr,
-      autoApprove: this.state.np_auto_approve,
-      isDefault: this.state.np_default,
-    });
-    this.props.closeModal("addProfile");
-    this.props.getProfiles();
+    try {
+      await Api.saveProfile({
+        id: this.state.activeProfile,
+        name: this.state.np_name,
+        quota: this.state.np_quota,
+        radarr: this.state.np_radarr,
+        sonarr: this.state.np_sonarr,
+        autoApprove: this.state.np_auto_approve,
+        isDefault: this.state.np_default,
+      });
+      this.props.msg({
+        message: `Profile Saved: ${this.state.np_name}`,
+        type: "good",
+      });
+      this.props.closeModal("addProfile");
+      this.props.getProfiles();
+    } catch {
+      this.props.msg({
+        message: `Failed to Save Profile: ${this.state.np_name}`,
+        type: "error",
+      });
+    }
   }
 
   async deleteProfile() {
-    await Api.deleteProfile({
-      id: this.state.activeProfile,
-      name: this.state.np_name,
-      quota: this.state.np_quota,
-      radarr: this.state.np_radarr,
-      sonarr: this.state.np_sonarr,
-      autoApprove: this.state.np_auto_approve,
-      isDefault: this.state.np_default,
-    });
-    this.props.closeModal("addProfile");
-    this.props.getProfiles();
-    Api.allUsers();
+    try {
+      await Api.deleteProfile({
+        id: this.state.activeProfile,
+        name: this.state.np_name,
+        quota: this.state.np_quota,
+        radarr: this.state.np_radarr,
+        sonarr: this.state.np_sonarr,
+        autoApprove: this.state.np_auto_approve,
+        isDefault: this.state.np_default,
+      });
+      this.props.msg({
+        message: `Profile Deleted: ${this.state.np_name}`,
+        type: "good",
+      });
+      this.props.closeModal("addProfile");
+      this.props.getProfiles();
+      Api.allUsers();
+    } catch {
+      this.props.msg({
+        message: `Failed to Delete Profile: ${this.state.np_name}`,
+        type: "error",
+      });
+    }
   }
 
   search(key, value, myArray) {
@@ -109,19 +131,43 @@ class Profiles extends React.Component {
           open={this.props.addProfileOpen}
           close={() => {
             this.props.closeModal("addProfile");
-            this.setState({ np_name: "", np_auto_approve: false, np_quota: 0, np_radarr: [], np_sonarr: [], activeProfile: false });
+            this.setState({
+              np_name: "",
+              np_auto_approve: false,
+              np_quota: 0,
+              np_radarr: [],
+              np_sonarr: [],
+              activeProfile: false,
+            });
           }}
           submit={this.saveProfile}
           delete={this.state.activeProfile ? this.deleteProfile : false}
         >
           <p className="sub-title mb--1">New profile</p>
-          <input className="styled-input--input" placeholder="Name" type="text" name="np_name" value={this.state.np_name} onChange={this.inputChange} />
+          <input
+            className="styled-input--input"
+            placeholder="Name"
+            type="text"
+            name="np_name"
+            value={this.state.np_name}
+            onChange={this.inputChange}
+          />
           <p className="sub-title mb--1">Sonarr</p>
           {this.props.s_servers ? (
             this.props.s_servers.map((server) => {
               return (
                 <label key={server.uuid}>
-                  <input data-type="np_sonarr" type="checkbox" checked={this.state.np_sonarr ? this.state.np_sonarr[server.uuid] : false} name={server.uuid} onChange={this.changeCheckbox} />{" "}
+                  <input
+                    data-type="np_sonarr"
+                    type="checkbox"
+                    checked={
+                      this.state.np_sonarr
+                        ? this.state.np_sonarr[server.uuid]
+                        : false
+                    }
+                    name={server.uuid}
+                    onChange={this.changeCheckbox}
+                  />{" "}
                   {server.title}
                 </label>
               );
@@ -134,7 +180,17 @@ class Profiles extends React.Component {
             this.props.r_servers.map((server) => {
               return (
                 <label key={server.uuid}>
-                  <input data-type="np_radarr" type="checkbox" checked={this.state.np_radarr ? this.state.np_radarr[server.uuid] : false} name={server.uuid} onChange={this.changeCheckbox} />{" "}
+                  <input
+                    data-type="np_radarr"
+                    type="checkbox"
+                    checked={
+                      this.state.np_radarr
+                        ? this.state.np_radarr[server.uuid]
+                        : false
+                    }
+                    name={server.uuid}
+                    onChange={this.changeCheckbox}
+                  />{" "}
                   {server.title}
                 </label>
               );
@@ -144,16 +200,34 @@ class Profiles extends React.Component {
           )}
           <p className="sub-title mb--1">Auto Approve</p>
           <label>
-            <input type="checkbox" name="np_auto_approve" checked={this.state.np_auto_approve} onChange={this.inputChange} /> Enabled
+            <input
+              type="checkbox"
+              name="np_auto_approve"
+              checked={this.state.np_auto_approve}
+              onChange={this.inputChange}
+            />{" "}
+            Enabled
           </label>
           <p className="sub-title mb--1">Quota</p>
           <p>
             <small>Quota of requests per week. For no limit leave at 0</small>
           </p>
-          <input className="styled-input--input" type="number" name="np_quota" value={this.state.np_quota} onChange={this.inputChange} />
+          <input
+            className="styled-input--input"
+            type="number"
+            name="np_quota"
+            value={this.state.np_quota}
+            onChange={this.inputChange}
+          />
           <p className="sub-title mb--1">Set as default</p>
           <label>
-            <input type="checkbox" name="np_default" checked={this.state.np_default} onChange={this.inputChange} /> Enabled
+            <input
+              type="checkbox"
+              name="np_default"
+              checked={this.state.np_default}
+              onChange={this.inputChange}
+            />{" "}
+            Enabled
           </label>
         </Modal>
         <section>
@@ -172,8 +246,10 @@ class Profiles extends React.Component {
         </section>
         <section>
           <p className="mb--2">
-            User profiles determine what should happen when a user makes a request. If using Sonarr / Radarr you can pick which servers the request is sent to. You can also choose to allow auto
-            approval for certain users.
+            User profiles determine what should happen when a user makes a
+            request. If using Sonarr / Radarr you can pick which servers the
+            request is sent to. You can also choose to allow auto approval for
+            certain users.
           </p>
           <table className="generic-table generic-table__rounded">
             <thead>
@@ -190,7 +266,13 @@ class Profiles extends React.Component {
             <tbody>
               <tr>
                 <td>Default</td>
-                <td>{this.props.profiles ? (this.search("isDefault", true, this.props.profiles) ? "No" : "Yes") : "Yes"}</td>
+                <td>
+                  {this.props.profiles
+                    ? this.search("isDefault", true, this.props.profiles)
+                      ? "No"
+                      : "Yes"
+                    : "Yes"}
+                </td>
                 <td>All</td>
                 <td>All</td>
                 <td>No</td>
@@ -211,10 +293,18 @@ class Profiles extends React.Component {
                               ? Object.keys(profile.sonarr).map((s) => {
                                   if (!profile.sonarr[s]) return;
                                   sActive = true;
-                                  let server = this.props.findServerByUuid(s, "s_servers");
-                                  let serverName = server ? server.title : "Not Found";
+                                  let server = this.props.findServerByUuid(
+                                    s,
+                                    "s_servers"
+                                  );
+                                  let serverName = server
+                                    ? server.title
+                                    : "Not Found";
                                   return (
-                                    <span key={`${profile._id}_${s}`} className="requests--status requests--status__sonarr">
+                                    <span
+                                      key={`${profile._id}_${s}`}
+                                      className="requests--status requests--status__sonarr"
+                                    >
                                       {serverName}
                                     </span>
                                   );
@@ -229,11 +319,19 @@ class Profiles extends React.Component {
                               ? Object.keys(profile.radarr).map((r) => {
                                   if (!profile.radarr[r]) return null;
                                   rActive = true;
-                                  let server = this.props.findServerByUuid(r, "r_servers");
-                                  let serverName = server ? server.title : "Not Found";
+                                  let server = this.props.findServerByUuid(
+                                    r,
+                                    "r_servers"
+                                  );
+                                  let serverName = server
+                                    ? server.title
+                                    : "Not Found";
 
                                   return (
-                                    <span key={`${profile._id}_${r}`} className="requests--status requests--status__radarr">
+                                    <span
+                                      key={`${profile._id}_${r}`}
+                                      className="requests--status requests--status__radarr"
+                                    >
                                       {serverName}
                                     </span>
                                   );

@@ -34,6 +34,7 @@ class Users extends React.Component {
     this.findProfile = this.findProfile.bind(this);
     this.bulkSave = this.bulkSave.bind(this);
     this.deleteUser = this.deleteUser.bind(this);
+    this.fileUpload = this.fileUpload.bind(this);
   }
   componentDidMount() {
     let page = document.querySelectorAll(".page-wrap")[0];
@@ -93,13 +94,19 @@ class Users extends React.Component {
       eu_enabled: false,
       bu_error: false,
       eu_error: false,
+      custom_user_thumb: false,
     });
   }
 
   inputChange(e) {
     const target = e.target;
     const name = target.name;
-    let value = target.type === "checkbox" ? target.checked : target.value;
+    let value =
+      target.type === "checkbox"
+        ? target.checked
+        : target.type === "file"
+        ? target.files[0]
+        : target.value;
     if (name === "bulk_users_all") {
       let userCheckboxes = document.querySelectorAll(".user-checkbox");
       let bu = {};
@@ -142,7 +149,12 @@ class Users extends React.Component {
         r_servers: radarr,
         s_servers: sonarr,
       });
+      this.props.msg({ message: "Radarr / Sonarr Configs loaded" });
     } catch (err) {
+      this.props.msg({
+        message: "Failed to load Radarr / Sonarr Configs",
+        type: "error",
+      });
       console.log(err);
       this.setState({
         r_servers: false,
@@ -152,6 +164,7 @@ class Users extends React.Component {
   }
 
   async createUser() {
+    let username = this.state.cu_username;
     let newUser = await Api.createUser({
       id: `custom_${this.state.cu_username.replace(" ", "-")}`,
       username: this.state.cu_username,
@@ -164,7 +177,15 @@ class Users extends React.Component {
       this.setState({
         cu_error: newUser.error,
       });
+      this.props.msg({
+        message: `Failed to add user ${username}`,
+        type: "error",
+      });
     } else {
+      this.props.msg({
+        message: `User added ${username}`,
+        type: "good",
+      });
       this.closeModal("addUser");
       Api.allUsers();
     }
@@ -198,6 +219,10 @@ class Users extends React.Component {
       eu_role: user.role ? user.role : "user",
       eu_profile: user.profile ? user.profile : "",
       eu_enabled: user.disabled ? false : true,
+      thumb_path:
+        process.env.NODE_ENV === "development"
+          ? "http://localhost:7778/user/thumb/" + user.id
+          : "/api/user/thumb/" + user.id,
     });
   }
 
@@ -207,8 +232,15 @@ class Users extends React.Component {
       this.setState({
         profiles: profiles,
       });
+      this.props.msg({
+        message: `Profiles Loaded`,
+      });
     } catch (err) {
       console.log(err);
+      this.props.msg({
+        message: `Failed to Load Profiles`,
+        type: "error",
+      });
       this.setState({
         profiles: [],
       });
@@ -228,7 +260,15 @@ class Users extends React.Component {
       this.setState({
         eu_error: edited.error,
       });
+      this.props.msg({
+        message: `Failed to Update User: ${this.state.activeUser.username}`,
+        type: "error",
+      });
     } else {
+      this.props.msg({
+        message: `User Updated: ${this.state.activeUser.username}`,
+        type: "good",
+      });
       this.closeModal("editUser");
       Api.allUsers();
     }
@@ -241,7 +281,15 @@ class Users extends React.Component {
       this.setState({
         eu_error: del.error,
       });
+      this.props.msg({
+        message: `Failed to Delete User: ${this.state.activeUser.username}`,
+        type: "error",
+      });
     } else {
+      this.props.msg({
+        message: `User Deleted: ${this.state.activeUser.username}`,
+        type: "good",
+      });
       this.closeModal("editUser");
       Api.allUsers();
     }
@@ -275,9 +323,64 @@ class Users extends React.Component {
       this.setState({
         bu_error: upd.error,
       });
+      this.props.msg({
+        message: `Failed to Save Users`,
+        type: "error",
+      });
     } else {
+      this.props.msg({
+        message: `Users Bulk Updated ${this.state.activeUser.username}`,
+        type: "error",
+      });
       this.closeModal("bulkUsers");
       Api.allUsers();
+    }
+  }
+
+  async fileUpload(e) {
+    e.preventDefault();
+    var validExtensions = ["jpg", "png", "jpeg"]; //array of valid extensions
+    var fileName = this.state.custom_user_thumb.name;
+    var fileNameExt = fileName.substr(fileName.lastIndexOf(".") + 1);
+    if (!validExtensions.includes(fileNameExt)) {
+      this.props.msg({
+        message:
+          "Only these file types are accepted : " + validExtensions.join(", "),
+        type: "error",
+      });
+      return;
+    }
+    try {
+      const formData = new FormData();
+      formData.append("thumb", this.state.custom_user_thumb);
+      await Api.uploadThumb(formData, this.state.activeUser.id);
+      this.setState({
+        thumb_path:
+          process.env.NODE_ENV === "development"
+            ? "http://localhost:7778/user/thumb/" +
+              this.state.activeUser.id +
+              "?update=" +
+              Date.now()
+            : "/api/user/thumb/" +
+              this.state.activeUser.id +
+              "?update=" +
+              Date.now(),
+        custom_user_thumb: false,
+      });
+      document.getElementById("custom_thumb_upload").value = "";
+      this.props.msg({
+        message: `User Thumb Updated: ${this.state.activeUser.username}`,
+        type: "good",
+      });
+    } catch (err) {
+      this.props.msg({
+        message: err,
+        type: "error",
+      });
+      this.setState({
+        custom_user_thumb: false,
+      });
+      document.getElementById("custom_thumb_upload").value = "";
     }
   }
 
@@ -287,20 +390,53 @@ class Users extends React.Component {
     let usersAz = Object.values(usersUnsorted).sort(this.sortAz);
     return (
       <>
-        <Modal title="Add User" open={this.state.addUserOpen} close={() => this.closeModal("addUser")} submit={this.createUser}>
+        <Modal
+          title="Add User"
+          open={this.state.addUserOpen}
+          close={() => this.closeModal("addUser")}
+          submit={this.createUser}
+        >
           <p className="sub-title mb--1">New user</p>
-          <input className="styled-input--input" placeholder="Username" type="text" name="cu_username" value={this.state.cu_username} onChange={this.inputChange} />
-          <input className="styled-input--input" placeholder="Email" type="email" name="cu_email" value={this.state.cu_email} onChange={this.inputChange} />
+          <input
+            className="styled-input--input"
+            placeholder="Username"
+            type="text"
+            name="cu_username"
+            value={this.state.cu_username}
+            onChange={this.inputChange}
+          />
+          <input
+            className="styled-input--input"
+            placeholder="Email"
+            type="email"
+            name="cu_email"
+            value={this.state.cu_email}
+            onChange={this.inputChange}
+          />
           <p className="sub-title mt--2 mb--1">Password</p>
-          <input className="styled-input--input" placeholder="Password" type="text" name="cu_password" value={this.state.cu_password} onChange={this.inputChange} />
+          <input
+            className="styled-input--input"
+            placeholder="Password"
+            type="text"
+            name="cu_password"
+            value={this.state.cu_password}
+            onChange={this.inputChange}
+          />
           <p className="sub-title mt--2 mb--1">Link history to existing user</p>
           <div className="styled-input--select">
-            <select name="cu_linked" value={this.state.cu_linked} onChange={this.inputChange}>
+            <select
+              name="cu_linked"
+              value={this.state.cu_linked}
+              onChange={this.inputChange}
+            >
               <option value="">None</option>
               {Object.keys(usersAz).map((u) => {
                 let user = usersAz[u];
                 return (
-                  <option key={`user_linked_${user._id}`} value={user.altId ? user.altId : user.id}>
+                  <option
+                    key={`user_linked_${user._id}`}
+                    value={user.altId ? user.altId : user.id}
+                  >
                     {user.title}
                   </option>
                 );
@@ -315,14 +451,34 @@ class Users extends React.Component {
           open={this.state.editUserOpen}
           close={() => this.closeModal("editUser")}
           submit={this.saveUser}
-          delete={this.state.activeUser ? (this.state.activeUser.custom ? this.deleteUser : false) : false}
+          delete={
+            this.state.activeUser
+              ? this.state.activeUser.custom
+                ? this.deleteUser
+                : false
+              : false
+          }
         >
-          <p className="sub-title mb--1">Editing {this.state.activeUser ? this.state.activeUser.title : "user"}</p>
+          <p className="sub-title mb--1">
+            Editing{" "}
+            {this.state.activeUser ? this.state.activeUser.title : "user"}
+          </p>
           <p className="sub-title mt--2 mb--1">Email</p>
-          <input className="styled-input--input" placeholder="Email" type="email" name="eu_email" value={this.state.eu_email} onChange={this.inputChange} />
+          <input
+            className="styled-input--input"
+            placeholder="Email"
+            type="email"
+            name="eu_email"
+            value={this.state.eu_email}
+            onChange={this.inputChange}
+          />
           <p className="sub-title mt--2 mb--1">Role</p>
           <div className="styled-input--select">
-            <select name="eu_role" value={this.state.eu_role} onChange={this.inputChange}>
+            <select
+              name="eu_role"
+              value={this.state.eu_role}
+              onChange={this.inputChange}
+            >
               {this.state.activeUser ? (
                 this.state.activeUser.role !== "admin" ? (
                   <>
@@ -337,13 +493,20 @@ class Users extends React.Component {
           </div>
           <p className="sub-title mt--2 mb--1">Profile</p>
           <div className="styled-input--select">
-            <select name="eu_profile" value={this.state.eu_profile} onChange={this.inputChange}>
+            <select
+              name="eu_profile"
+              value={this.state.eu_profile}
+              onChange={this.inputChange}
+            >
               <option value="">Default</option>
               {this.state.profiles
                 ? Object.keys(this.state.profiles).map((p) => {
                     let profile = this.state.profiles[p];
                     return (
-                      <option key={`user_profile_${profile._id}`} value={profile._id}>
+                      <option
+                        key={`user_profile_${profile._id}`}
+                        value={profile._id}
+                      >
                         {profile.name}
                       </option>
                     );
@@ -356,25 +519,77 @@ class Users extends React.Component {
               <>
                 <p className="sub-title mt--2 mb--1">Enabled / Disabled</p>
                 <label>
-                  <input type="checkbox" checked={this.state.eu_enabled} name="eu_enabled" onChange={this.inputChange} /> Enable this user
+                  <input
+                    type="checkbox"
+                    checked={this.state.eu_enabled}
+                    name="eu_enabled"
+                    onChange={this.inputChange}
+                  />{" "}
+                  Enable this user
                 </label>
               </>
             ) : null
           ) : null}
+          {this.state.activeUser ? (
+            // this.state.activeUser.custom ? (
+            <form
+              onSubmit={this.fileUpload}
+              encType="multipart/form-data"
+              className="image-upload--wrap"
+            >
+              <div className="image-upload--inner">
+                <div
+                  className="image-upload--current"
+                  style={{
+                    backgroundImage: 'url("' + this.state.thumb_path + '")',
+                  }}
+                ></div>
+                <input
+                  type="file"
+                  id="custom_thumb_upload"
+                  name="custom_user_thumb"
+                  onChange={this.inputChange}
+                />
+              </div>
+              <button
+                className={`image-upload--submit btn btn__square ${
+                  this.state.custom_user_thumb ? "" : "disabled"
+                }`}
+              >
+                Upload
+              </button>
+            </form>
+          ) : // ) : null
+          null}
           {this.state.eu_error ? <p>{this.state.eu_error}</p> : null}
         </Modal>
 
-        <Modal title="Bulk Edit" open={this.state.bulkUsersOpen} close={() => this.closeModal("bulkUsers")} submit={this.bulkSave}>
-          <p>You are editing all selected users, any changes will apply to them all</p>
+        <Modal
+          title="Bulk Edit"
+          open={this.state.bulkUsersOpen}
+          close={() => this.closeModal("bulkUsers")}
+          submit={this.bulkSave}
+        >
+          <p>
+            You are editing all selected users, any changes will apply to them
+            all
+          </p>
           <p className="sub-title mt--2 mb--1">Profile</p>
           <div className="styled-input--select">
-            <select name="bu_profile" value={this.state.bu_profile} onChange={this.inputChange}>
+            <select
+              name="bu_profile"
+              value={this.state.bu_profile}
+              onChange={this.inputChange}
+            >
               <option value="">Default</option>
               {this.state.profiles
                 ? Object.keys(this.state.profiles).map((p) => {
                     let profile = this.state.profiles[p];
                     return (
-                      <option key={`bulk_user_profile_${profile._id}`} value={profile._id}>
+                      <option
+                        key={`bulk_user_profile_${profile._id}`}
+                        value={profile._id}
+                      >
                         {profile.name}
                       </option>
                     );
@@ -388,7 +603,13 @@ class Users extends React.Component {
             <small>Note: admin cannot be disabled</small>
           </p>
           <label>
-            <input type="checkbox" checked={this.state.bu_enabled} name="bu_enabled" onChange={this.inputChange} /> Enable this user
+            <input
+              type="checkbox"
+              checked={this.state.bu_enabled}
+              name="bu_enabled"
+              onChange={this.inputChange}
+            />{" "}
+            Enable this user
           </label>
           {this.state.bu_error ? <p>{this.state.bu_error}</p> : null}
         </Modal>
@@ -404,16 +625,22 @@ class Users extends React.Component {
           profiles={this.state.profiles}
           getProfiles={this.getProfiles}
           findProfile={this.findProfile}
+          msg={this.props.msg}
         />
 
         <section>
           <div className="title-btn">
             <p className="main-title">Users</p>
-            <button className="btn btn__square" onClick={() => this.openModal("addUser")}>
+            <button
+              className="btn btn__square"
+              onClick={() => this.openModal("addUser")}
+            >
               Add +
             </button>
             <button
-              className={`btn btn__square ${Object.keys(this.state.bulk_users).length > 0 ? "" : "disabled"}`}
+              className={`btn btn__square ${
+                Object.keys(this.state.bulk_users).length > 0 ? "" : "disabled"
+              }`}
               onClick={() => {
                 this.openModal("bulkUsers");
                 this.setState({
@@ -431,17 +658,38 @@ class Users extends React.Component {
             <thead>
               <tr>
                 <th>
-                  <input className="checkbox-small" type="checkbox" checked={this.state.bulk_users_all} name={"bulk_users_all"} onChange={this.inputChange} />
+                  <input
+                    className="checkbox-small"
+                    type="checkbox"
+                    checked={this.state.bulk_users_all}
+                    name={"bulk_users_all"}
+                    onChange={this.inputChange}
+                  />
                 </th>
-                <th className={`sortable ${this.state.sortBy === "title" ? "active" : ""} ${this.state.dir}`} onClick={() => this.sortCol("title")}>
+                <th
+                  className={`sortable ${
+                    this.state.sortBy === "title" ? "active" : ""
+                  } ${this.state.dir}`}
+                  onClick={() => this.sortCol("title")}
+                >
                   Title
                   <Arrow />
                 </th>
-                <th className={`sortable ${this.state.sortBy === "username" ? "active" : ""} ${this.state.dir}`} onClick={() => this.sortCol("username")}>
+                <th
+                  className={`sortable ${
+                    this.state.sortBy === "username" ? "active" : ""
+                  } ${this.state.dir}`}
+                  onClick={() => this.sortCol("username")}
+                >
                   Username
                   <Arrow />
                 </th>
-                <th className={`sortable ${this.state.sortBy === "email" ? "active" : ""} ${this.state.dir}`} onClick={() => this.sortCol("email")}>
+                <th
+                  className={`sortable ${
+                    this.state.sortBy === "email" ? "active" : ""
+                  } ${this.state.dir}`}
+                  onClick={() => this.sortCol("email")}
+                >
                   Email
                   <Arrow />
                 </th>
@@ -449,6 +697,7 @@ class Users extends React.Component {
                 <th>Profile</th>
                 <th>Active</th>
                 <th>Last IP</th>
+                <th>Last Login</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -462,7 +711,11 @@ class Users extends React.Component {
                         className="checkbox-small user-checkbox"
                         data-type="bulk_users"
                         type="checkbox"
-                        checked={this.state.bulk_users ? this.state.bulk_users[user._id] : false}
+                        checked={
+                          this.state.bulk_users
+                            ? this.state.bulk_users[user._id]
+                            : false
+                        }
                         name={user._id}
                         onChange={this.changeCheckbox}
                       />
@@ -473,11 +726,24 @@ class Users extends React.Component {
                     <td>{user.username}</td>
                     <td>{user.email}</td>
                     <td>{user.role ? user.role : "user"}</td>
-                    <td>{user.profile ? (this.findProfile(user.profile) ? this.findProfile(user.profile).name : "Removed") : "default"}</td>
                     <td>
-                      <div className="table-icon">{user.disabled ? <Close /> : <Check />}</div>
+                      {user.profile
+                        ? this.findProfile(user.profile)
+                          ? this.findProfile(user.profile).name
+                          : "Removed"
+                        : "default"}
+                    </td>
+                    <td>
+                      <div className="table-icon">
+                        {user.disabled ? <Close /> : <Check />}
+                      </div>
                     </td>
                     <td>{user.lastIp ? user.lastIp : "n/a"}</td>
+                    <td>
+                      {user.lastLogin
+                        ? `${new Date(user.lastLogin).toDateString()}`
+                        : "n/a"}
+                    </td>
                     <td>
                       <p
                         className="table-action"

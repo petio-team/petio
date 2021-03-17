@@ -1,4 +1,4 @@
-input:not([type="checkbox"]):not(.styled-input--input) {
+input:not([type="checkbox"]):not(.styled-input--input):not([type="file"]) {
   display: block;
   width: 300px;
   margin-bottom: 20px;
@@ -27,6 +27,7 @@ input[type="checkbox"] {
   appearance: none;
   width: 20px;
   height: 20px;
+  min-width: 20px;
   position: relative;
   background: rgba($grey-medium, 0.3);
   outline: none !important;
@@ -48,6 +49,8 @@ input[type="checkbox"] {
   &.checkbox-small {
     width: 15px;
     height: 15px;
+    min-width: 15px;
+    min-height: 15px;
   }
 }
 
@@ -101,6 +104,14 @@ input[type="checkbox"] {
     background: rgba($grey-medium, 0.3);
     border: none;
     color: white;
+  }
+  select:focus::-ms-value {
+    color: white;
+    background: $primary;
+  }
+
+  option {
+    background: $black;
   }
 }
 

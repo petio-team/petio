@@ -24,6 +24,9 @@ class Company extends React.Component {
   componentDidMount() {
     this.getResults();
     this.getDetails();
+    setTimeout(() => {
+      this.getResults(2);
+    }, 200);
   }
 
   componentDidUpdate() {

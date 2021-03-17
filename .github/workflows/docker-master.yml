@@ -1,4 +1,4 @@
-name: Docker Build Dev
+name: Docker Master Build
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - master
 jobs:
   docker-aio:
-    name: Build Full Docker
+    name: Docker Master Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

@@ -23,6 +23,7 @@ class Movie extends React.Component {
       related: false,
       trailer: false,
       reviewOpen: false,
+      requestPending: false,
     };
 
     this.getMovie = this.getMovie.bind(this);
@@ -93,6 +94,9 @@ class Movie extends React.Component {
         return;
       }
     }
+    this.setState({
+      requestPending: true,
+    });
     let request = {
       id: movie.id,
       imdb_id: movie.imdb_id,
@@ -116,6 +120,9 @@ class Movie extends React.Component {
         type: "error",
       });
     }
+    this.setState({
+      requestPending: false,
+    });
   }
 
   openReview() {
@@ -141,12 +148,14 @@ class Movie extends React.Component {
 
   getMovie() {
     let id = this.props.match.params.id;
-
+    console.log("checking movie");
     // this.getRelated();
     if (!this.props.api.movie_lookup[id]) {
       // check for cached
+      console.log("no movie in redux");
       Api.movie(id);
     } else if (this.props.api.movie_lookup[id].isMinified) {
+      console.log("redux is min");
       Api.movie(id);
     }
   }
@@ -163,13 +172,20 @@ class Movie extends React.Component {
     if (this.props.api.movie_lookup[id])
       movieData = this.props.api.movie_lookup[id];
 
-    if (
-      !movieData ||
-      movieData.isMinified ||
-      !this.props.user ||
-      movieData.error
-    ) {
+    if (!movieData || movieData.isMinified || !this.props.user) {
       return <MovieShowLoading />;
+    }
+
+    if (movieData.error) {
+      return (
+        <div className="media-wrap">
+          <p className="main-title">Movie Not Found</p>
+          <p>
+            This movie may have been removed from TMDb or the link you&apos;ve
+            followed is invalid
+          </p>
+        </div>
+      );
     }
 
     let related = null;
@@ -195,7 +211,7 @@ class Movie extends React.Component {
     }
 
     let video = false;
-    if (movieData.videos.results) {
+    if (movieData.videos && movieData.videos.results) {
       for (let i = 0; i < movieData.videos.results.length; i++) {
         let vid = movieData.videos.results[i];
         if (vid.site === "YouTube" && !video) {
@@ -226,6 +242,8 @@ class Movie extends React.Component {
           trailer={this.state.trailer}
           requested={this.state.requested}
           request={this.request}
+          showTrailer={this.showTrailer}
+          requestPending={this.state.requestPending}
         />
         <div className="media-content">
           <MovieShowOverview
@@ -239,6 +257,8 @@ class Movie extends React.Component {
             openIssues={this.props.openIssues}
             requested={this.state.requested}
             request={this.request}
+            trailer={this.state.trailer}
+            requestPending={this.state.requestPending}
           />
           <section>
             <h3 className="sub-title mb--1">Cast</h3>

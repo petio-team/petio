@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const fs = require("fs");
 const path = require("path");
+const { adminRequired } = require("../middleware/auth");
 
 let liveLogfile = process.pkg
   ? path.join(path.dirname(process.execPath), "./logs/live1.log")
@@ -10,7 +11,8 @@ let liveLogfile2 = process.pkg
   ? path.join(path.dirname(process.execPath), "./logs/live.log")
   : "./logs/live.log";
 
-router.get("/stream", async (req, res) => {
+router.use(adminRequired);
+router.get("/stream", adminRequired, async (req, res) => {
   // res.status(200).send();
   let dataNew, dataOld;
   try {

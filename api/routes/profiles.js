@@ -3,7 +3,9 @@ const router = express.Router();
 const Profile = require("../models/profile");
 const User = require("../models/user");
 const logger = require("../util/logger");
+const { adminRequired } = require("../middleware/auth");
 
+router.use(adminRequired);
 router.get("/all", async (req, res) => {
   try {
     data = await Profile.find();
@@ -84,7 +86,7 @@ router.post("/save_profile", async (req, res) => {
       res.status(200).json(newProfile);
     } catch (err) {
       logger.log("error", "ROUTE: Profile failed to save");
-      logger.error(err.stack);
+      logger.log({ level: "error", message: err });
       res.status(500).json({
         error: "Error creating user",
       });
@@ -113,7 +115,7 @@ router.post("/delete_profile", async (req, res) => {
     );
   } catch (err) {
     logger.log("error", "ROUTE: Profile failed to delete");
-    logger.error(err.stack);
+    logger.log({ level: "error", message: err });
   }
 
   try {

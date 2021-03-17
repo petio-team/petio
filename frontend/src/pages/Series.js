@@ -200,6 +200,18 @@ class Series extends React.Component {
       return <MovieShowLoading />;
     }
 
+    if (seriesData.error) {
+      return (
+        <div className="media-wrap">
+          <p className="main-title">Series Not Found</p>
+          <p>
+            This show may have been removed from TMDb or the link you&apos;ve
+            followed is invalid
+          </p>
+        </div>
+      );
+    }
+
     let related = null;
     let relatedItems = null;
     if (seriesData.recommendations) {
@@ -273,6 +285,7 @@ class Series extends React.Component {
           requested={this.state.requested}
           request={this.request}
           openIssues={this.props.openIssues}
+          showTrailer={this.showTrailer}
         />
 
         <div className="media-content">
@@ -287,6 +300,7 @@ class Series extends React.Component {
             request={this.request}
             externalReviews={seriesData.reviews}
             openIssues={this.props.openIssues}
+            trailer={this.state.trailer}
           />
 
           <section>
@@ -295,7 +309,7 @@ class Series extends React.Component {
               {seasons.map((season) => {
                 return (
                   <div
-                    className="card type--movie-tv"
+                    className="card type--movie-tv img-loaded"
                     key={`season--${season.season_number}${id}`}
                   >
                     <div className="card--inner">
@@ -306,12 +320,12 @@ class Series extends React.Component {
                       <div className="image-wrap">
                         {season.poster_path ? (
                           <img
-                            src={`https://image.tmdb.org/t/p/w200/${season.poster_path}`}
+                            src={`https://image.tmdb.org/t/p/w200${season.poster_path}`}
                             alt={season.name}
                           />
                         ) : seriesData.poster_path ? (
                           <img
-                            src={`https://image.tmdb.org/t/p/w500/${seriesData.poster_path}`}
+                            src={`https://image.tmdb.org/t/p/w500${seriesData.poster_path}`}
                             alt={season.name}
                           />
                         ) : null}

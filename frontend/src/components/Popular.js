@@ -50,10 +50,6 @@ class Popular extends React.Component {
         <>
           <section>
             <h3 className="sub-title mb--1">Popular on Plex</h3>
-            <p>
-              What&apos;s popular on Plex right now. The numbers indicate number
-              of plays in the past month.
-            </p>
             {this.state.topData ? (
               <Carousel>
                 {Object.keys(this.state.topData).map((t) => {
@@ -65,7 +61,7 @@ class Popular extends React.Component {
                   }
                   return (
                     <MovieCard
-                      key={`${this.state.topData[t].item.tmdb_id}__top`}
+                      key={`${this.state.topData[t].item.tmdb_id}__top_movie`}
                       movie={{
                         id: this.state.topData[t].item.tmdb_id,
                       }}
@@ -86,10 +82,6 @@ class Popular extends React.Component {
         <>
           <section>
             <h3 className="sub-title mb--1">Popular on Plex</h3>
-            <p>
-              What&apos;s popular on Plex right now. The numbers indicate number
-              of plays in the past month.
-            </p>
             {this.state.topData ? (
               <Carousel>
                 {Object.keys(this.state.topData).map((t) => {
@@ -101,7 +93,7 @@ class Popular extends React.Component {
                   }
                   return (
                     <TvCard
-                      key={this.state.topData[t].id}
+                      key={`${this.state.topData[t].item.tmdb_id}__top_tv`}
                       series={{
                         id: this.state.topData[t].item.tmdb_id,
                       }}

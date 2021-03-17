@@ -69,10 +69,25 @@ async function movieLookup(id, minified = false) {
       movie.available_resolutions = onPlex.resolutions;
       movie.imdb_data = imdb_data;
       movie.reviews = reviews.results;
+      if (!minified) {
+        if (recommendations.results.length === 0) {
+          let params = {};
+          if (movie.genres) {
+            let genres = "";
+            for (let i = 0; i < movie.genres.length; i++) {
+              genres += `${movie.genres[i].id},`;
+            }
+
+            params.with_genres = genres;
+          }
+          recommendations = await discoverMovie(1, params);
+        }
+      }
       if (recommendations.results) {
         Object.keys(recommendations.results).map((key) => {
           let recommendation = recommendations.results[key];
-          recommendationsData.push(recommendation.id);
+          if (recommendation.id !== parseInt(id))
+            recommendationsData.push(recommendation.id);
         });
       }
       if (!minified && movie.belongs_to_collection) {
@@ -117,7 +132,7 @@ async function movieLookup(id, minified = false) {
       return movie;
     } catch (err) {
       logger.log("warn", `Error processing movie data - ${id}`);
-      logger.log("warn", err);
+      logger.log({ level: "error", message: err });
       return { error: "not found" };
     }
   }
@@ -133,20 +148,20 @@ async function getMovieData(id) {
     });
   } catch (err) {
     logger.log("warn", `Error getting movie data - ${id}`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 }
 
-async function getRecommendations(id) {
+async function getRecommendations(id, page = 1) {
   let data = false;
   try {
-    data = await memoryCache.wrap(`rec_${id}`, function () {
-      return recommendationData(id);
+    data = await memoryCache.wrap(`rec_${id}_${page}`, function () {
+      return recommendationData(id, page);
     });
   } catch (err) {
     logger.log("warn", `Error getting movie recommendations - ${id}`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 }
@@ -159,7 +174,7 @@ async function getReviews(id) {
     });
   } catch (err) {
     logger.log("warn", `Error getting movie reviews - ${id}`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 }
@@ -172,7 +187,7 @@ async function getCollection(id) {
     });
   } catch (err) {
     logger.log("warn", `Error getting movie collections - ${id}`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 }
@@ -183,7 +198,7 @@ function tmdbData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}movie/${id}?api_key=${tmdbApikey}&append_to_response=credits,videos,keywords`;
+  let url = `${tmdb}movie/${id}?api_key=${tmdbApikey}&append_to_response=credits,videos,keywords,release_dates`;
   return new Promise((resolve, reject) => {
     request(
       url,
@@ -195,18 +210,23 @@ function tmdbData(id) {
         if (err) {
           reject();
         }
+        if (!data) reject();
         data.timestamp = new Date();
+        if (data.release_dates) {
+          data.age_rating = findEnRating(data.release_dates.results);
+          delete data.release_dates;
+        }
         resolve(data);
       }
     );
   });
 }
 
-async function recommendationData(id) {
+async function recommendationData(id, page = 1) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}movie/${id}/recommendations?api_key=${tmdbApikey}&append_to_response=credits,videos,keywords`;
+  let url = `${tmdb}movie/${id}/recommendations?api_key=${tmdbApikey}&page=${page}`;
 
   return new Promise((resolve, reject) => {
     request(
@@ -274,6 +294,7 @@ async function reviewsData(id) {
   });
 }
 
+// Lets i18n this soon
 function findEnLogo(logos) {
   let logoUrl = false;
   logos.forEach((logo) => {
@@ -282,6 +303,17 @@ function findEnLogo(logos) {
     }
   });
   return logoUrl;
+}
+
+// Lets i18n this soon
+function findEnRating(data) {
+  let rating = false;
+  data.forEach((item) => {
+    if (item.iso_3166_1 === "US") {
+      rating = item.release_dates[0].certification;
+    }
+  });
+  return rating;
 }
 
 function discoverMovie(page = 1, params = {}) {
@@ -338,4 +370,5 @@ module.exports = {
   discoverMovie,
   movieLookup,
   company,
+  getRecommendations,
 };

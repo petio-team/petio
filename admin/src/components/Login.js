@@ -45,15 +45,20 @@ class Login extends React.Component {
           loading: false,
         });
         if (res.error && cookie) {
-          this.props.displayMessage(
-            "error",
-            "Your session has expired please log in again"
-          );
+          this.props.msg({
+            message: "Your session has expired please log in again",
+            type: "error",
+          });
+
           return;
         }
 
         if (res.error) {
-          this.props.displayMessage("error", "User not found");
+          this.props.msg({
+            message: "User Not Found",
+            type: "error",
+          });
+
           return;
         }
 
@@ -64,20 +69,22 @@ class Login extends React.Component {
       .catch((error) => {
         console.log(error);
         // Move this to error message
-        this.props.displayMessage(
-          "error",
-          "There has been an error, Petio may be temporarily unavailable"
-        );
-        localStorage.removeItem("loggedin");
+        this.props.msg({
+          message:
+            "There has been an error, Petio may be temporarily unavailable",
+          type: "error",
+        });
+
+        localStorage.removeItem("petio_jwt");
       });
   }
 
   loginLocal() {
-    if (localStorage.getItem("loggedin")) {
+    if (localStorage.getItem("petio_jwt")) {
       if (localStorage.getItem("adminloggedin") === "true") {
         this.login("", false, true, true);
       } else {
-        localStorage.removeItem("loggedin");
+        localStorage.removeItem("petio_jwt");
       }
     }
   }

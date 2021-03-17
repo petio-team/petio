@@ -4,6 +4,7 @@ import User from "../data/User";
 import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
 import RequestsTable from "../components/RequestsTable";
 import Modal from "../components/Modal";
+import { ReactComponent as WarningIcon } from "../assets/svg/warning.svg";
 
 class Requests extends React.Component {
   constructor(props) {
@@ -198,15 +199,6 @@ class Requests extends React.Component {
         requests: this.props.user.requests,
       });
     }
-    if (Object.keys(this.state.requests).length > 0)
-      Object.keys(this.state.requests).map((key) => {
-        let req = this.state.requests[key];
-        for (let i = 0; i < req.users.length; i++) {
-          if (!this.props.api.users[req.users[i]]) {
-            Api.getUser(req.users[i]);
-          }
-        }
-      });
   }
 
   componentWillUnmount() {
@@ -340,7 +332,10 @@ class Requests extends React.Component {
         )}
         {editable ? null : (
           <p style={{ margin: 0 }}>
-            <small>{`These settings cannot be edited once sent to ${type}`}</small>
+            <small>
+              {`These settings cannot be edited once sent to`}
+              <span style={{ textTransform: "capitalize" }}>{type}</span>
+            </small>
           </p>
         )}
       </div>
@@ -353,8 +348,11 @@ class Requests extends React.Component {
   }
 
   updateReq() {
+    this.props.msg({
+      message: `Request Updated: ${this.state.activeRequest.title}`,
+      type: "good",
+    });
     this.closeModal("editRequest");
-    alert("req updated");
   }
 
   async approveReq() {
@@ -379,15 +377,34 @@ class Requests extends React.Component {
       });
     }
 
+    if (
+      this.state.activeRequest.type === "tv" &&
+      servers &&
+      !this.state.activeRequest.tvdb_id
+    ) {
+      err = "No TVDb ID Cannot add to Sonarr";
+    }
+
+    if (
+      this.state.activeRequest.type === "movie" &&
+      servers &&
+      !this.state.activeRequest.tmdb_id
+    ) {
+      err = "No TMDb ID Cannot add to Radarr";
+    }
+
     if (err) {
-      alert(err);
+      this.props.msg({ message: err, type: "error" });
       return;
     }
 
-    console.log(this.state.activeRequest, servers);
     await Api.updateRequest(this.state.activeRequest, servers);
     this.closeModal("editRequest");
     this.getRequests(true);
+    this.props.msg({
+      message: `Request Approved: ${this.state.activeRequest.title}`,
+      type: "good",
+    });
   }
 
   async removeReq() {
@@ -399,8 +416,12 @@ class Requests extends React.Component {
     if (remove) {
       this.closeModal("deleteRequest");
       this.getRequests(true);
+      this.props.msg({
+        message: `Request removed - ${this.state.activeRequest.title}`,
+        type: "good",
+      });
     } else {
-      alert("Failed to remove request");
+      this.props.msg({ message: "Failed to remove request", type: "error" });
     }
   }
 
@@ -461,6 +482,12 @@ class Requests extends React.Component {
         >
           {this.state.activeRequest ? (
             <>
+              {this.state.activeRequest.type === "tv" &&
+              !this.state.activeRequest.tvdb_id ? (
+                <p className="warning-text">
+                  <WarningIcon /> No TVDb ID
+                </p>
+              ) : null}
               <p className="sub-title mb--1">
                 {this.state.activeRequest.title}
               </p>

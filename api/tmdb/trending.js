@@ -2,6 +2,8 @@
 const getConfig = require("../util/config");
 const request = require("xhr-request");
 const onServer = require("../plex/onServer");
+const { movieLookup } = require("../tmdb/movie");
+const { showLookup } = require("../tmdb/show");
 
 const cacheManager = require("cache-manager");
 const memoryCache = cacheManager.caching({
@@ -19,13 +21,11 @@ async function trending() {
   let tv = await getShows();
 
   for (let i = 0; i < movies.results.length; i++) {
-    let res = await onServer("movie", false, false, movies.results[i].id);
-    movies.results[i].on_server = res.exists;
+    movies.results[i] = await movieLookup(movies.results[i].id, true);
   }
 
   for (let i = 0; i < tv.results.length; i++) {
-    let res = await onServer("show", false, false, tv.results[i].id);
-    tv.results[i].on_server = res.exists;
+    tv.results[i] = await showLookup(tv.results[i].id, true);
   }
 
   let data = {
@@ -47,7 +47,7 @@ async function getPerson() {
     });
   } catch (err) {
     logger.log("warn", `Error getting trending people`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 }
@@ -60,7 +60,7 @@ async function getMovies() {
     });
   } catch (err) {
     logger.log("warn", `Error getting trending movies`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 }
@@ -73,7 +73,7 @@ async function getShows() {
     });
   } catch (err) {
     logger.log("warn", `Error getting trending shows`);
-    logger.log("warn", err);
+    logger.log({ level: "error", message: err });
   }
   return data;
 }

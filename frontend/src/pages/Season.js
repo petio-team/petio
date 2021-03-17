@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import Api from "../data/Api";
 
 import MovieShowTop from "../components/MovieShowTop";
+import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
 import User from "../data/User";
 import Review from "../components/Review";
 import { ReactComponent as BackIcon } from "../assets/svg/back.svg";
@@ -150,7 +151,9 @@ class Season extends React.Component {
     if (!seriesData || !seasonData) {
       return (
         <div className="page-wrap">
-          <p>Loading...</p>
+          <div className="spinner">
+            <Spinner />
+          </div>
         </div>
       );
     } else {
@@ -195,12 +198,20 @@ class Season extends React.Component {
                       </Link>
                     </div>
                     <div className="detail--bar">
-                      <p>{new Date(seasonData.air_date).getFullYear()}</p>
+                      <p>
+                        {seasonData.air_date
+                          ? new Date(seasonData.air_date).getFullYear()
+                          : "Unknown"}
+                      </p>
                       <div className="detail--bar--sep">·</div>
                       <p>{seasonData.name}</p>
                     </div>
                     <p className="sub-title mb--1">Overview</p>
-                    <p className="overview">{seasonData.overview}</p>
+                    <p className="overview">
+                      {seasonData.overview
+                        ? seasonData.overview
+                        : seriesData.overview}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -222,7 +233,7 @@ class Season extends React.Component {
                     >
                       <div className="season-episode--img">
                         <img
-                          src={`https://image.tmdb.org/t/p/w500/${
+                          src={`https://image.tmdb.org/t/p/w500${
                             episode.still_path
                               ? episode.still_path
                               : seriesData.poster_path
@@ -245,61 +256,6 @@ class Season extends React.Component {
           </div>
         </div>
       );
-      // if (seriesData.isMinified) {
-      //   return <p>Loading...</p>;
-      // }
-      // return (
-      //   <div
-      //     className="page-wrap season-wrap"
-      //     style={{
-      //       backgroundImage: "url(https://image.tmdb.org/t/p/original/" + seriesData.backdrop_path + ")",
-      //     }}
-      //   >
-      //     <div className="season-inner">
-      //       <div className="season-details">
-      //         <div className="stick">
-      //           <div>
-      //             <Link to={`/series/${id}`} className="btn btn__square">
-      //               {seriesData.name}
-      //             </Link>
-      //           </div>
-      //           {seriesData.logo ? (
-      //             <div>
-      //               <img className="media-logo__small" src={seriesData.logo} />
-      //             </div>
-      //           ) : null}
-      //           <h1 className="main-title">{seasonData.name}</h1>
-      //           <p className="overview">{seasonData.overview}</p>
-      //         </div>
-      //       </div>
-      //       <div className="season-episodes">
-      //         <div className="season-episodes-inner">
-      //           {seasonData.episodes.map((episode) => {
-      //             let airDate = episode.air_date ? Date.parse(episode.air_date) : false;
-      //             return (
-      //               <div className={"season-episode " + (airDate < now ? "aired" : "not-aired")}>
-      //                 <div className="season-episode--img">
-      //                   <img src={`https://image.tmdb.org/t/p/w500/${episode.still_path}`} />
-      //                 </div>
-      //                 <div className="season-episode--info">
-      //                   <p className="upper small ep-num">
-      //                     Season {episode.season_number}: Episode {episode.episode_number} - {this.daysTillAir(airDate)}
-      //                   </p>
-      //                   <h4 className="sub-title">{episode.name}</h4>
-      //                   <p className="small detail">{episode.overview}</p>
-      //                 </div>
-      //                 <div className="season-episode--actions">
-      //                   <button className="btn btn__square">Request</button>
-      //                   <button className="btn btn__square">Report an issue</button>
-      //                 </div>
-      //               </div>
-      //             );
-      //           })}
-      //         </div>
-      //       </div>
-      //     </div>
-      //   </div>
-      // );
     }
   }
 }
