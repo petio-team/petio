@@ -932,7 +932,16 @@ class LibraryUpdate {
             logger.info(
               `LIB CRON: Meta updated for request: ${request.title}, processing request with updated meta`
             );
-            new processRequest(request).sendToDvr(false);
+            new processRequest({
+              id: request.requestId,
+              type: request.type,
+              title: request.title,
+              thumb: request.thumb,
+              imdb_id: request.imdb_id,
+              tmdb_id: request.tmdb_id,
+              tvdb_id: request.tvdb_id,
+              approved: request.approved,
+            }).sendToDvr(false);
           } catch (err) {
             console.log(err);
             logger.info(

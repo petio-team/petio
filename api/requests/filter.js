@@ -50,7 +50,7 @@ async function filter(item) {
         }
       }
     });
-    console.log(hasMatched, compulsoryPass, optionalMatch, f.rows.length);
+    // console.log(hasMatched, compulsoryPass, optionalMatch, f.rows.length);
     if (
       hasMatched &&
       compulsoryPass &&
