@@ -102,12 +102,14 @@ router.post("/update", async (req, res) => {
   let request = req.body.request;
   let servers = req.body.servers;
   let approved = req.body.request.approved;
+  let manualStatus = req.body.request.manualStatus;
   try {
     await Request.findOneAndUpdate(
       { requestId: request.requestId },
       {
         $set: {
           approved: true,
+          manualStatus: manualStatus,
         },
       },
       { new: true, useFindAndModify: false }

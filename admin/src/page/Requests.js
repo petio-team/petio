@@ -30,8 +30,9 @@ class Requests extends React.Component {
     this.deleteReq = this.deleteReq.bind(this);
     this.updateReq = this.updateReq.bind(this);
     this.removeReq = this.removeReq.bind(this);
-    this.approveReq = this.approveReq.bind(this);
+    // this.approveReq = this.approveReq.bind(this);
     this.inputChange = this.inputChange.bind(this);
+    this.statusChange = this.statusChange.bind(this);
   }
 
   componentDidMount() {
@@ -55,6 +56,7 @@ class Requests extends React.Component {
     this.setState({
       [`${id}Open`]: false,
       req_delete_reason: "",
+      activeRequest: false,
     });
   }
 
@@ -65,6 +67,17 @@ class Requests extends React.Component {
 
     this.setState({
       [name]: value,
+    });
+  }
+
+  statusChange(e) {
+    const target = e.target;
+    let value = target.value;
+    let activeRequest = this.state.activeRequest;
+    activeRequest.manualStatus = value;
+
+    this.setState({
+      activeRequest: activeRequest,
     });
   }
 
@@ -347,15 +360,15 @@ class Requests extends React.Component {
     this.openModal("deleteRequest");
   }
 
-  updateReq() {
-    this.props.msg({
-      message: `Request Updated: ${this.state.activeRequest.title}`,
-      type: "good",
-    });
-    this.closeModal("editRequest");
-  }
+  // updateReq() {
+  //   this.props.msg({
+  //     message: `Request Updated: ${this.state.activeRequest.title}`,
+  //     type: "good",
+  //   });
+  //   this.closeModal("editRequest");
+  // }
 
-  async approveReq() {
+  async updateReq() {
     let servers = {};
     let err = false;
     let type_server = {};
@@ -402,7 +415,9 @@ class Requests extends React.Component {
     this.closeModal("editRequest");
     this.getRequests(true);
     this.props.msg({
-      message: `Request Approved: ${this.state.activeRequest.title}`,
+      message: this.state.activeRequest.approved
+        ? `Request Updated: ${this.state.activeRequest.title}`
+        : `Request Approved: ${this.state.activeRequest.title}`,
       type: "good",
     });
   }
@@ -476,7 +491,7 @@ class Requests extends React.Component {
               ? this.state.activeRequest.sonarrId.length > 0 ||
                 this.state.activeRequest.radarrId.length > 0
                 ? false
-                : this.approveReq
+                : this.updateReq
               : false
           }
         >
@@ -503,14 +518,14 @@ class Requests extends React.Component {
                       : "Radarr"}
                   </p>
                   {this.state.activeRequest.type === "tv" ? (
-                    this.state.s_servers ? (
+                    this.state.s_servers.length > 0 ? (
                       this.state.s_servers.map((server) => {
                         return this.renderReqEdit(server, "sonarr");
                       })
                     ) : (
-                      <p>No Radarr Servers</p>
+                      <p>No Sonarr Servers</p>
                     )
-                  ) : this.state.r_servers ? (
+                  ) : this.state.r_servers.length > 0 ? (
                     this.state.r_servers.map((server) => {
                       return this.renderReqEdit(server, "radarr");
                     })
@@ -524,6 +539,21 @@ class Requests extends React.Component {
                   )}
                 </>
               )}
+              <p className="sub-title mt--2">Manually Set Status</p>
+              <p className="mb--1">
+                <small>This will only be used for untracked requests</small>
+              </p>
+              <div className="styled-input--select">
+                <select
+                  name="manualStatus"
+                  value={this.state.activeRequest.manualStatus}
+                  onChange={this.statusChange}
+                >
+                  <option value="">None</option>
+                  <option value="3">Processing</option>
+                  <option value="4">Finalising</option>
+                </select>
+              </div>
             </>
           ) : null}
         </Modal>
