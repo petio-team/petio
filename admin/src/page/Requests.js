@@ -491,29 +491,38 @@ class Requests extends React.Component {
               <p className="sub-title mb--1">
                 {this.state.activeRequest.title}
               </p>
-              <p className="sub-title mt--2 mb--1">
-                Edit{" "}
-                {this.state.activeRequest.type === "tv" ? "Sonarr" : "Radarr"}
-              </p>
-              {this.state.activeRequest.type === "tv" ? (
-                this.state.s_servers ? (
-                  this.state.s_servers.map((server) => {
-                    return this.renderReqEdit(server, "sonarr");
-                  })
-                ) : (
-                  <p>No Radarr Servers</p>
-                )
-              ) : this.state.r_servers ? (
-                this.state.r_servers.map((server) => {
-                  return this.renderReqEdit(server, "radarr");
-                })
+              {this.state.activeRequest.type === "tv" &&
+              !this.state.activeRequest.tvdb_id ? (
+                <p>Can&apos;t send to DVR without TVDB ID</p>
               ) : (
-                <p>No Radarr Servers</p>
-              )}
-              {this.state.activeRequest.approved ? null : (
-                <p style={{ margin: 0 }}>
-                  Submitting will also immediately approve this request
-                </p>
+                <>
+                  <p className="sub-title mt--2 mb--1">
+                    Edit{" "}
+                    {this.state.activeRequest.type === "tv"
+                      ? "Sonarr"
+                      : "Radarr"}
+                  </p>
+                  {this.state.activeRequest.type === "tv" ? (
+                    this.state.s_servers ? (
+                      this.state.s_servers.map((server) => {
+                        return this.renderReqEdit(server, "sonarr");
+                      })
+                    ) : (
+                      <p>No Radarr Servers</p>
+                    )
+                  ) : this.state.r_servers ? (
+                    this.state.r_servers.map((server) => {
+                      return this.renderReqEdit(server, "radarr");
+                    })
+                  ) : (
+                    <p>No Radarr Servers</p>
+                  )}
+                  {this.state.activeRequest.approved ? null : (
+                    <p style={{ margin: 0 }}>
+                      Submitting will also immediately approve this request
+                    </p>
+                  )}
+                </>
               )}
             </>
           ) : null}
