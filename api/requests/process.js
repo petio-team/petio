@@ -153,7 +153,7 @@ class processRequest {
           console.log(r, profile.radarr[r]);
           let active = profile.radarr[r];
           if (active) {
-            new Radarr(r).processRequest(this.request.id);
+            new Radarr(r).processRequest(this.request.requestId);
           }
         });
       }
@@ -161,7 +161,7 @@ class processRequest {
         Object.keys(profile.sonarr).map((s) => {
           let active = profile.sonarr[s];
           if (active) {
-            new Sonarr(s).processRequest(this.request.id);
+            new Sonarr(s).processRequest(this.request.requestId);
           }
         });
       }
