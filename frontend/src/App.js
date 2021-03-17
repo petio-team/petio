@@ -93,6 +93,22 @@ class App extends React.Component {
       password: password,
       type: type,
     };
+    if (/^\s/.test(username)) {
+      this.msg({
+        type: "error",
+        message:
+          "The username you entered contains a space before! Please remove it",
+      });
+      return;
+    }
+    if (/^\s/.test(password)) {
+      this.msg({
+        type: "error",
+        message:
+          "The password you entered contains a space before! Please remove it",
+      });
+      return;
+    }
     if (!this.props.user.credentials || this.state.config === "failed") {
       return;
     }

@@ -36,6 +36,22 @@ class Login extends React.Component {
   }
 
   login(username, password, cookie = false) {
+    if (/^\s/.test(username)) {
+      this.props.msg({
+        type: "error",
+        message:
+          "The username you entered contains a space before! Please remove it",
+      });
+      return;
+    }
+    if (/^\s/.test(password)) {
+      this.props.msg({
+        type: "error",
+        message:
+          "The password you entered contains a space before! Please remove it",
+      });
+      return;
+    }
     this.setState({
       loading: true,
     });
