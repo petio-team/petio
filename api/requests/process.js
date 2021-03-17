@@ -8,6 +8,7 @@ const Radarr = require("../services/radarr");
 const logger = require("../util/logger");
 const filter = require("./filter");
 const Discord = require("../notifications/discord");
+const { showLookup } = require("../tmdb/show");
 
 class processRequest {
   constructor(req = {}, usr = {}) {
@@ -89,6 +90,11 @@ class processRequest {
 
     if (userDetails.role === "admin") {
       autoApprove = true;
+    }
+
+    if (this.request.type === "tv" && !this.request.tvdb_id) {
+      let lookup = await showLookup(this.request.id, true);
+      this.request.tvdb_id = lookup.tvdb_id;
     }
 
     const newRequest = new Request({

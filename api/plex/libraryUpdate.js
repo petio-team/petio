@@ -13,6 +13,7 @@ const processRequest = require("../requests/process");
 const logger = require("../util/logger");
 const bcrypt = require("bcryptjs");
 const Discord = require("../notifications/discord");
+const { showLookup } = require("../tmdb/show");
 
 class LibraryUpdate {
   constructor() {
@@ -919,6 +920,26 @@ class LibraryUpdate {
       let request = requests[i];
       if (request.type === "tv") {
         onServer = await Show.findOne({ tmdb_id: request.tmdb_id });
+        if (!request.tvdb_id) {
+          logger.info(
+            `LIB CRON: No TVDB ID for request: ${request.title}, attempting to pull meta`
+          );
+          let lookup = await showLookup(request.tmdb_id, true);
+          request.thumb = lookup.poster_path;
+          request.tvdb_id = lookup.tvdb_id;
+          try {
+            await request.save();
+            logger.info(
+              `LIB CRON: Meta updated for request: ${request.title}, processing request with updated meta`
+            );
+            new processRequest(request).sendToDvr(false);
+          } catch (err) {
+            console.log(err);
+            logger.info(
+              `LIB CRON: Failed to update meta for request: ${request.title}`
+            );
+          }
+        }
       }
       if (request.type === "movie") {
         onServer = await Movie.findOne({ tmdb_id: request.tmdb_id });
