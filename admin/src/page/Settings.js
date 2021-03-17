@@ -54,7 +54,7 @@ class Settings extends React.Component {
             <p>Radarr</p>
             <div className="icon">
               <img
-                className="png-safe"
+                className=""
                 src="https://avatars1.githubusercontent.com/u/25025331"
               />
             </div>
