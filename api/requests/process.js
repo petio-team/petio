@@ -131,7 +131,6 @@ class processRequest {
   }
 
   async sendToDvr(profile) {
-    console.log(this.request);
     let filterMatch = await filter(this.request);
     if (filterMatch) {
       logger.log(
