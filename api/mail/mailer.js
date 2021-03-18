@@ -31,6 +31,7 @@ class Mailer {
   async _check() {
     try {
       let verify = await this.transport.verify();
+      if (!this.config.emailFrom) throw "No From Email set";
       return verify;
     } catch (err) {
       return err;
@@ -71,6 +72,13 @@ class Mailer {
   async test() {
     try {
       let verify = await this.verify();
+      this.mail(
+        "Petio Test Email",
+        "This is a test",
+        "If you're seeing this email then your Petio email settings are correct!",
+        false,
+        [this.adminEmail]
+      );
       logger.log("verbose", "MAILER: Verified");
       if (verify === true) {
         return {
@@ -108,27 +116,32 @@ class Mailer {
       // Send mail
       to.forEach((send, i) => {
         let timeout = i * 2000; //timeout between emails to avoid quota
-        let username = name[i];
+        let username = name[i] || "";
         i++;
-        setTimeout(() => {
+        setTimeout(async () => {
           logger.log(
             "info",
-            `MAILER: Sending email from: ${this.config.emailUser} to ${send} with the subject ${subject}`
+            `MAILER: Sending email from: ${this.config.emailFrom} to ${send} with the subject ${subject}`
           );
-          this.transport.sendMail({
-            from: `"Petio" <${this.config.emailUser}>`,
-            to: `${username} <${send}>`,
-            bcc: this.adminEmail,
-            subject: subject,
-            html: this.mailHtml(title, text, img, username),
-            text: text,
-            onError: (e) => {
-              logger.log("warn", `MAILER: Message failed to send`);
-              logger.log("error", e);
-            },
-            onSuccess: (s) =>
-              logger.log("info", "MAILER: Message sent: %s", s.messageId),
-          });
+          try {
+            await this.transport.sendMail({
+              from: `"Petio" <${this.config.emailFrom}>`,
+              to: `${username} <${send}>`,
+              bcc: this.adminEmail,
+              subject: subject,
+              html: this.mailHtml(title, text, img, username),
+              text: text,
+              onError: (e) => {
+                logger.log("warn", `MAILER: Message failed to send`);
+                logger.log("error", e);
+              },
+              onSuccess: (s) =>
+                logger.log("info", "MAILER: Message sent: %s", s.messageId),
+            });
+          } catch (err) {
+            logger.error(err.response);
+            logger.log("warn", `MAILER: Message failed to send`);
+          }
         }, timeout);
       });
     } catch (err) {

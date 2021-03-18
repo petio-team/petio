@@ -53,6 +53,7 @@ class General extends React.Component {
         port: this.state.email_port,
         secure: this.state.email_secure,
         enabled: this.state.email_enabled,
+        from: this.state.email_from,
       });
 
       this.props.msg({ message: "Email Settings Saved!", type: "good" });
@@ -130,6 +131,7 @@ class General extends React.Component {
         email_server: email.config.emailServer,
         email_port: email.config.emailPort,
         email_secure: email.config.emailSecure,
+        email_from: email.config.emailFrom,
         base_path: config.base_path ? config.base_path : "",
         login_type: config.login_type ? config.login_type : 1,
         discord_webhook: config.discord_webhook ? config.discord_webhook : "",
@@ -233,6 +235,16 @@ class General extends React.Component {
         </section>
         <section>
           <p className="main-title mb--2">Email</p>
+          <label>From Address</label>
+          <input
+            type="text"
+            name="email_from"
+            value={this.state.email_from}
+            onChange={this.inputChange}
+            autoComplete="new-password"
+            autoCorrect="off"
+            spellCheck="off"
+          />
           <label>Username</label>
           <input
             type="text"

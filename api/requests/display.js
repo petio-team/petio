@@ -83,6 +83,7 @@ async function getRequests(user = false, all = false) {
             radarrId: request.radarrId,
             media: media,
             approved: request.approved,
+            manualStatus: request.manualStatus,
             process_stage: reqState(request, children),
           };
         }
@@ -244,6 +245,23 @@ function reqState(req, children) {
           }
         }
       }
+    }
+  }
+
+  if (req.manualStatus) {
+    switch (req.manualStatus) {
+      case 3:
+        return {
+          status: "orange",
+          message: "Processing",
+          step: 3,
+        };
+      case 4:
+        return {
+          status: "good",
+          message: "Finalising",
+          step: 4,
+        };
     }
   }
 

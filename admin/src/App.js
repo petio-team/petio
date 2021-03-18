@@ -246,6 +246,7 @@ class App extends React.Component {
             <Sidebar
               mobOpen={this.state.mobMenuOpen}
               changeLogin={this.changeLogin}
+              toggleMobMenu={this.toggleMobMenu}
             />
             <div className="view">
               <Switch>

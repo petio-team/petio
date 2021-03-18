@@ -305,7 +305,7 @@ class Radarr {
       try {
         let radarrData = await this.lookup(job.id);
         let radarrId = false;
-        if (radarrData[0].id) {
+        if (radarrData[0] && radarrData[0].id) {
           logger.log(
             "warn",
             `SERVICE - RADARR: [${this.config.title}] Job skipped already found for ${job.title}`

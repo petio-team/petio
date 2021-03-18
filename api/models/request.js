@@ -12,6 +12,7 @@ const RequestSchema = mongoose.Schema({
   sonarrId: Array,
   radarrId: Array,
   approved: Boolean,
+  manualStatus: Number,
 });
 
 module.exports = mongoose.model("Request", RequestSchema);

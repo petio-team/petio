@@ -6,6 +6,7 @@ const ProfileSchema = mongoose.Schema(
     sonarr: Object,
     radarr: Object,
     autoApprove: Boolean,
+    autoApproveTv: Boolean,
     quota: Number,
     isDefault: Boolean,
   },

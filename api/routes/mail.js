@@ -23,6 +23,7 @@ router.post("/create", async (req, res) => {
     emailServer: email.server,
     emailPort: email.port,
     emailSecure: email.secure,
+    emailFrom: email.from,
   };
   configData = JSON.stringify(configData);
   let config = await createConfig(configData);
@@ -45,6 +46,7 @@ router.get("/config", async (req, res) => {
       emailServer: "",
       emailPort: "",
       emailSecure: false,
+      emailFrom: "",
     };
   } else {
     data = {
@@ -54,6 +56,7 @@ router.get("/config", async (req, res) => {
       emailServer: config.emailServer,
       emailPort: config.emailPort,
       emailSecure: config.emailSecure,
+      emailFrom: config.emailFrom,
     };
   }
   res.json({

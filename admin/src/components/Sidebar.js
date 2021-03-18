@@ -32,6 +32,7 @@ class Sidebar extends React.Component {
                 ? "active"
                 : "")
             }
+            onClick={this.props.toggleMobMenu}
           >
             <p>{user.title}</p>
             <div className="icon">
@@ -52,6 +53,7 @@ class Sidebar extends React.Component {
           <Link
             to="/"
             className={"menu--item " + (current === "/" ? "active" : "")}
+            onClick={this.props.toggleMobMenu}
           >
             <p>Dashboard</p>
             <div className="icon">
@@ -66,6 +68,7 @@ class Sidebar extends React.Component {
                 ? "active"
                 : "")
             }
+            onClick={this.props.toggleMobMenu}
           >
             <p>Requests</p>
             <div className="icon">
@@ -80,6 +83,7 @@ class Sidebar extends React.Component {
                 ? "active"
                 : "")
             }
+            onClick={this.props.toggleMobMenu}
           >
             <p>Issues</p>
             <div className="icon">
@@ -94,6 +98,7 @@ class Sidebar extends React.Component {
                 ? "active"
                 : "")
             }
+            onClick={this.props.toggleMobMenu}
           >
             <p>Reviews</p>
             <div className="icon">
@@ -108,6 +113,7 @@ class Sidebar extends React.Component {
                 ? "active"
                 : "")
             }
+            onClick={this.props.toggleMobMenu}
           >
             <p>Users</p>
             <div className="icon">
@@ -122,6 +128,7 @@ class Sidebar extends React.Component {
                 ? "active"
                 : "")
             }
+            onClick={this.props.toggleMobMenu}
           >
             <p>Settings</p>
             <div className="icon">
@@ -154,6 +161,7 @@ function SidebarContainer(props) {
       user={props.user}
       changeLogin={props.changeLogin}
       mobOpen={props.mobOpen}
+      toggleMobMenu={props.toggleMobMenu}
     />
   );
 }

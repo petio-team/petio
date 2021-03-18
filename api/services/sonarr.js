@@ -301,7 +301,7 @@ class Sonarr {
       try {
         let sonarrData = await this.lookup(job.tvdb_id);
         let sonarrId = false;
-        if (sonarrData[0].id) {
+        if (sonarrData[0] && sonarrData[0].id) {
           logger.log(
             "warn",
             `SERVICE - SONARR: [${this.config.title}] Job skipped already found for ${job.title}`

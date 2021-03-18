@@ -8,6 +8,7 @@ const Radarr = require("../services/radarr");
 const logger = require("../util/logger");
 const filter = require("./filter");
 const Discord = require("../notifications/discord");
+const { showLookup } = require("../tmdb/show");
 
 class processRequest {
   constructor(req = {}, usr = {}) {
@@ -62,11 +63,19 @@ class processRequest {
       ? await Profile.findById(this.user.profile)
       : false;
     let autoApprove = profile ? profile.autoApprove : false;
+    let autoApproveTv = profile ? profile.autoApproveTv : false;
+    if (userDetails.role === "admin") {
+      autoApprove = true;
+      autoApproveTv = true;
+    }
     await Request.updateOne(
       { requestId: this.request.id },
       { $push: { users: this.user.id } }
     );
-    if (autoApprove) {
+    if (
+      (this.request.type === "movie" && autoApprove) ||
+      (this.request.type === "tv" && autoApproveTv)
+    ) {
       await Request.updateOne(
         { requestId: this.request.id },
         { $set: { approved: true } }
@@ -85,10 +94,19 @@ class processRequest {
     let profile = userDetails.profile
       ? await Profile.findById(this.user.profile)
       : false;
-    let autoApprove = profile ? profile.autoApprove : false;
+    let autoApprove = profile
+      ? this.request.type === "movie"
+        ? profile.autoApprove
+        : profile.autoApproveTv
+      : false;
 
     if (userDetails.role === "admin") {
       autoApprove = true;
+    }
+
+    if (this.request.type === "tv" && !this.request.tvdb_id) {
+      let lookup = await showLookup(this.request.id, true);
+      this.request.tvdb_id = lookup.tvdb_id;
     }
 
     const newRequest = new Request({
@@ -105,7 +123,11 @@ class processRequest {
 
     try {
       await newRequest.save();
-      this.sendToDvr(profile);
+      if (autoApprove) {
+        this.sendToDvr(profile);
+      } else {
+        logger.info("REQ: Request requires approval, waiting");
+      }
     } catch (err) {
       logger.log("error", `REQ: Unable to save request`);
       logger.log({ level: "error", message: err });
