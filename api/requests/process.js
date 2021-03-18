@@ -63,11 +63,19 @@ class processRequest {
       ? await Profile.findById(this.user.profile)
       : false;
     let autoApprove = profile ? profile.autoApprove : false;
+    let autoApproveTv = profile ? profile.autoApproveTv : false;
+    if (userDetails.role === "admin") {
+      autoApprove = true;
+      autoApproveTv = true;
+    }
     await Request.updateOne(
       { requestId: this.request.id },
       { $push: { users: this.user.id } }
     );
-    if (autoApprove) {
+    if (
+      (this.request.type === "movie" && autoApprove) ||
+      (this.request.type === "tv" && autoApproveTv)
+    ) {
       await Request.updateOne(
         { requestId: this.request.id },
         { $set: { approved: true } }
@@ -86,7 +94,11 @@ class processRequest {
     let profile = userDetails.profile
       ? await Profile.findById(this.user.profile)
       : false;
-    let autoApprove = profile ? profile.autoApprove : false;
+    let autoApprove = profile
+      ? this.request.type === "movie"
+        ? profile.autoApprove
+        : profile.autoApproveTv
+      : false;
 
     if (userDetails.role === "admin") {
       autoApprove = true;

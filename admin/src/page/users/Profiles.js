@@ -11,6 +11,7 @@ class Profiles extends React.Component {
       np_name: "",
       np_quota: 0,
       np_auto_approve: false,
+      np_auto_approve_tv: false,
       np_sonarr: {},
       np_radarr: {},
     };
@@ -34,6 +35,7 @@ class Profiles extends React.Component {
       np_name: profile.name,
       np_quota: profile.quota,
       np_auto_approve: profile.autoApprove,
+      np_auto_approve_tv: profile.autoApproveTv,
       np_sonarr: profile.sonarr,
       np_radarr: profile.radarr,
       np_default: profile.isDefault,
@@ -49,6 +51,7 @@ class Profiles extends React.Component {
         radarr: this.state.np_radarr,
         sonarr: this.state.np_sonarr,
         autoApprove: this.state.np_auto_approve,
+        autoApproveTv: this.state.np_auto_approve_tv,
         isDefault: this.state.np_default,
       });
       this.props.msg({
@@ -74,6 +77,7 @@ class Profiles extends React.Component {
         radarr: this.state.np_radarr,
         sonarr: this.state.np_sonarr,
         autoApprove: this.state.np_auto_approve,
+        autoApproveTv: this.state.np_auto_approve_tv,
         isDefault: this.state.np_default,
       });
       this.props.msg({
@@ -138,6 +142,7 @@ class Profiles extends React.Component {
               np_radarr: [],
               np_sonarr: [],
               activeProfile: false,
+              activeProfileTv: false,
             });
           }}
           submit={this.saveProfile}
@@ -198,12 +203,22 @@ class Profiles extends React.Component {
           ) : (
             <p>No Radarr Servers</p>
           )}
-          <p className="sub-title mb--1">Auto Approve</p>
+          <p className="sub-title mb--1">Auto Approve Movies</p>
           <label>
             <input
               type="checkbox"
               name="np_auto_approve"
               checked={this.state.np_auto_approve}
+              onChange={this.inputChange}
+            />{" "}
+            Enabled
+          </label>
+          <p className="sub-title mb--1">Auto Approve TV</p>
+          <label>
+            <input
+              type="checkbox"
+              name="np_auto_approve_tv"
+              checked={this.state.np_auto_approve_tv}
               onChange={this.inputChange}
             />{" "}
             Enabled
@@ -258,7 +273,8 @@ class Profiles extends React.Component {
                 <th>Default</th>
                 <th>Sonarr</th>
                 <th>Radarr</th>
-                <th>Auto approve</th>
+                <th>Auto Approve Movie</th>
+                <th>Auto Approve TV</th>
                 <th>Quota (per week)</th>
                 <th>Actions</th>
               </tr>
@@ -275,6 +291,7 @@ class Profiles extends React.Component {
                 </td>
                 <td>All</td>
                 <td>All</td>
+                <td>No</td>
                 <td>No</td>
                 <td>∞</td>
                 <td>None</td>
@@ -341,6 +358,7 @@ class Profiles extends React.Component {
                           {!rActive ? "None" : null}
                         </td>
                         <td>{profile.autoApprove ? "Yes" : "No"}</td>
+                        <td>{profile.autoApproveTv ? "Yes" : "No"}</td>
                         <td>{profile.quota === 0 ? "∞" : profile.quota}</td>
                         <td>
                           <p

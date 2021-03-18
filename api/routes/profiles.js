@@ -58,6 +58,7 @@ router.post("/save_profile", async (req, res) => {
             sonarr: profile.sonarr,
             radarr: profile.radarr,
             autoApprove: profile.autoApprove,
+            autoApproveTv: profile.autoApproveTv,
             quota: profile.quota,
             isDefault: profile.isDefault,
           },
@@ -79,6 +80,7 @@ router.post("/save_profile", async (req, res) => {
         sonarr: profile.sonarr,
         radarr: profile.radarr,
         autoApprove: profile.autoApprove,
+        autoApproveTv: profile.autoApproveTv,
         quota: profile.quota,
         isDefault: profile.isDefault,
       });

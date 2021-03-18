@@ -52,12 +52,20 @@ class Requests extends React.Component {
     });
   }
 
-  closeModal(id) {
-    this.setState({
-      [`${id}Open`]: false,
-      req_delete_reason: "",
-      activeRequest: false,
-    });
+  closeModal(id, clear = false) {
+    console.log(clear);
+    if (clear) {
+      this.setState({
+        [`${id}Open`]: false,
+        req_delete_reason: "",
+        activeRequest: false,
+      });
+    } else {
+      this.setState({
+        [`${id}Open`]: false,
+        req_delete_reason: "",
+      });
+    }
   }
 
   inputChange(e) {
@@ -412,7 +420,7 @@ class Requests extends React.Component {
     }
 
     await Api.updateRequest(this.state.activeRequest, servers);
-    this.closeModal("editRequest");
+    this.closeModal("editRequest", true);
     this.getRequests(true);
     this.props.msg({
       message: this.state.activeRequest.approved
@@ -423,16 +431,17 @@ class Requests extends React.Component {
   }
 
   async removeReq() {
+    let request = this.state.activeRequest;
     let reason =
       this.state.req_delete_reason.length > 0
         ? this.state.req_delete_reason
         : false;
-    let remove = await Api.removeRequest(this.state.activeRequest, reason);
+    let remove = await Api.removeRequest(request, reason);
     if (remove) {
-      this.closeModal("deleteRequest");
+      this.closeModal("deleteRequest", true);
       this.getRequests(true);
       this.props.msg({
-        message: `Request removed - ${this.state.activeRequest.title}`,
+        message: `Request removed - ${request.title}`,
         type: "good",
       });
     } else {
@@ -446,7 +455,7 @@ class Requests extends React.Component {
         <Modal
           title="Remove Request"
           open={this.state.deleteRequestOpen}
-          close={() => this.closeModal("deleteRequest")}
+          close={() => this.closeModal("deleteRequest", true)}
           submit={this.removeReq}
         >
           <p className="sub-title mb--1">
@@ -470,7 +479,7 @@ class Requests extends React.Component {
         <Modal
           title="Edit Request"
           open={this.state.editRequestOpen}
-          close={() => this.closeModal("editRequest")}
+          close={() => this.closeModal("editRequest", true)}
           submitText={
             this.state.activeRequest
               ? this.state.activeRequest.approved
