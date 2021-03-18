@@ -62,3 +62,4 @@ This application is no way endorsed by Plex, TheMovieDb, IMDb or any other third
 
 <h2>Sponsors</h2>
 <p><a target="_blank" href="https://versobit.com/"><img src="https://versobit.com/img/logos/logo_black_50h.svg" height="30px" /></a></p>
+<p>Want to sponsor this project? <a target="_blank" href="https://discord.gg/bseGmrUd3N">Get in touch on Discord</a></p>
