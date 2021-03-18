@@ -52,10 +52,13 @@ Configuring Petio is fairly straight forward but our docs cover the process, fro
 <p><a target="_blank" href="https://github.com/orgs/petio-team/people/angrycuban13">angrycuban13</a></p>
 
 <h4>Thanks to:</h4>
-
+<p><a target="_blank" href="https://github.com/orgs/petio-team/people/RyleaStark">RyleaStark</a>
 
 <h2>License</h2>
 
 This application is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 This application is no way endorsed by Plex, TheMovieDb, IMDb or any other third party resources utilized within this application.
+
+<h2>Sponsors</h2>
+<p><a target="_blank" href="https://versobit.com/"><img src="https://versobit.com/img/logos/logo_black_50h.svg" height="30px" /></a></p>
