@@ -1,0 +1,11 @@
+apiVersion: v2
+name: petio
+description: A Helm chart for petio
+type: application
+version: 0.1.0
+appVersion: "0.4.1-alpha-rc2"
+dependencies:
+  - name: mongodb
+    version: 10.10.3
+    repository: https://charts.bitnami.com/bitnami
+    condition: install.mongodb
