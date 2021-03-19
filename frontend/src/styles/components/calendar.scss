@@ -20,6 +20,10 @@
   overflow: visible !important;
 }
 
+.rbc-event {
+  pointer-events: none;
+}
+
 .rbc-event-content {
   overflow: visible !important;
   width: 100%;
@@ -65,6 +69,11 @@
   overflow: hidden;
   display: flex;
   align-items: center;
+  pointer-events: none;
+
+  &-content {
+    pointer-events: none;
+  }
 
   &--icon {
     margin-right: 2px;
@@ -82,20 +91,21 @@
     font-weight: 500;
   }
 
-  &.recorded {
-    background: rgba($good, 0.8);
-  }
+  // &.recorded {
+  //   background: rgba($good, 0.8);
+  // }
 
-  &.hasAired:not(.recorded):not(.airsToday) {
-    background: rgba($bad, 0.5);
-  }
+  // &.hasAired:not(.recorded):not(.airsToday) {
+  //   background: rgba($bad, 0.5);
+  // }
 
-  &.airsToday {
-    background: rgba($blue, 0.5);
-  }
+  // &.airsToday {
+  //   background: rgba($blue, 0.5);
+  // }
 
   &--wrap {
     position: relative;
+    pointer-events: none;
   }
 }
 
