@@ -25,3 +25,10 @@ ingress:
       - petio.domain.tld
       secretName: petio-acme
 ```
+
+## Building the chart
+
+```
+helm dependency update
+helm package .
+```
