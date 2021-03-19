@@ -17,6 +17,10 @@ fullnameOverride: ""
 install:
   mongodb: true
 
+# MongoDB Credentials
+auth:
+  rootPassword: ChangeMe
+
 podAnnotations: {}
 
 podSecurityContext:
