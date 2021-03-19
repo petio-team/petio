@@ -1,27 +1,27 @@
 {
   "name": "petio",
-  "version": "0.4.1-alpha-rc2",
+  "version": "0.4.2-alpha",
   "private": true,
   "homepage": ".",
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^9.3.2",
-    "@testing-library/user-event": "^12.7.2",
+    "@testing-library/user-event": "^13.0.2",
     "axios": "^0.21.1",
-    "dateformat": "^3.0.3",
+    "dateformat": "^4.5.1",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
     "node-sass": "^5.0.0",
     "react": "^16.13.1",
     "react-big-calendar": "^0.32.0",
-    "react-device-detect": "^1.15.0",
+    "react-device-detect": "^1.17.0",
     "react-dom": "^16.13.1",
     "react-lazy-load-image-component": "^1.5.1",
     "react-player": "^2.9.0",
     "react-redux": "^7.2.2",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "4.0.2",
+    "react-scripts": "4.0.3",
     "redux": "^4.0.5",
     "redux-devtools-extension": "^2.13.8",
     "redux-thunk": "^2.3.0"
@@ -44,8 +44,8 @@
     ]
   },
   "devDependencies": {
-    "eslint": "^7.19.0",
-    "eslint-config-prettier": "^7.2.0",
+    "eslint": "^7.22.0",
+    "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-react": "^7.22.0",
     "prettier": "^2.2.1"
