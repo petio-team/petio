@@ -52,9 +52,10 @@ Configuring Petio is fairly straight forward but our docs cover the process, fro
 <p><a target="_blank" href="https://github.com/orgs/petio-team/people/angrycuban13">angrycuban13</a></p>
 
 <h4>Thanks to:</h4>
-<p><a target="_blank" href="https://github.com/orgs/petio-team/people/RyleaStark">RyleaStark</a>
-<p><a target="_blank" href="https://github.com/orgs/petio-team/people/danshilm">danshilm</a>
-<p><a target="_blank" href="https://github.com/orgs/petio-team/people/MasterFrexe">Frexe</a>
+<p><a target="_blank" href="https://github.com/orgs/petio-team/people/RyleaStark">RyleaStark</a></p>
+<p><a target="_blank" href="https://github.com/orgs/petio-team/people/danshilm">danshilm</a></p>
+<p><a target="_blank" href="https://github.com/orgs/petio-team/people/MasterFrexe">Frexe</a></p>
+<p><a target="_blank" href="https://github.com/orgs/petio-team/people/PotentialIngenuity">PotentialIngenuity</a></p>
 
 <h2>License</h2>
 
