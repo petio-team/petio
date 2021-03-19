@@ -23,6 +23,7 @@ mongodb:
     username: petio
     password: ChangeMe
     database: petio
+    rootPassword: ChangeMeToo
 
 podAnnotations: {}
 
