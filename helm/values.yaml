@@ -17,9 +17,10 @@ fullnameOverride: ""
 install:
   mongodb: true
 
-# MongoDB Credentials
-auth:
-  rootPassword: ChangeMe
+# MongoDB Credentials, only used when install.mongodb is enabled
+mongodb:
+  auth:
+    rootPassword: ChangeMe
 
 podAnnotations: {}
 
