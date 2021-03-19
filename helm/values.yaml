@@ -20,7 +20,9 @@ install:
 # MongoDB Credentials, only used when install.mongodb is enabled
 mongodb:
   auth:
-    rootPassword: ChangeMe
+    username: petio
+    password: ChangeMe
+    database: petio
 
 podAnnotations: {}
 
