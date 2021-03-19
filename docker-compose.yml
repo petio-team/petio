@@ -13,6 +13,8 @@ services:
       - "7777:7777"
     networks:
       - petio-network
+    depends_on:
+      - mongo
     user: "1000:1000"
     environment:
       - TZ=Etc/UTC
