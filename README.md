@@ -47,15 +47,15 @@ Configuring Petio is fairly straight forward but our docs cover the process, fro
 <p><a target="_blank" href="https://https://fontawesome.com//">Fontawesome (SVG Icon Assets)</a></p>
 
 <h4>Special Thanks to:</h4>
-<p><a target="_blank" href="https://github.com/orgs/petio-team/people/vertig0ne">vertig0ne</a></p>
-<p><a target="_blank" href="https://github.com/orgs/petio-team/people/leram84">leram84</a></p>
-<p><a target="_blank" href="https://github.com/orgs/petio-team/people/angrycuban13">angrycuban13</a></p>
+<p><a target="_blank" href="https://github.com/vertig0ne">vertig0ne</a></p>
+<p><a target="_blank" href="https://github.com/leram84">leram84</a></p>
+<p><a target="_blank" href="https://github.com/angrycuban13">angrycuban13</a></p>
 
 <h4>Thanks to:</h4>
-<p><a target="_blank" href="https://github.com/orgs/petio-team/people/RyleaStark">RyleaStark</a></p>
-<p><a target="_blank" href="https://github.com/orgs/petio-team/people/danshilm">danshilm</a></p>
-<p><a target="_blank" href="https://github.com/orgs/petio-team/people/MasterFrexe">Frexe</a></p>
-<p><a target="_blank" href="https://github.com/orgs/petio-team/people/PotentialIngenuity">PotentialIngenuity</a></p>
+<p><a target="_blank" href="https://github.com/RyleaStark">RyleaStark</a></p>
+<p><a target="_blank" href="https://github.com/danshilm">danshilm</a></p>
+<p><a target="_blank" href="https://github.com/MasterFrexe">Frexe</a></p>
+<p><a target="_blank" href="https://github.com/PotentialIngenuity">PotentialIngenuity</a></p>
 
 <h2>License</h2>
 
