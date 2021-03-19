@@ -5,9 +5,7 @@ metadata:
   labels:
     {{- include "petio.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
       {{- include "petio.selectorLabels" . | nindent 6 }}
@@ -38,14 +36,19 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /
+              path: /api/config
               port: http
           readinessProbe:
             httpGet:
-              path: /
+              path: /api/config
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: petio-config
+              mountPath: /app/api/config
+            - name: petio-logs
+              mountPath: /app/logs
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -58,3 +61,10 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      volumes:
+        - name: petio-config
+          persistentVolumeClaim:
+            claimName: {{ include "petio.fullname" . }}-config
+        - name: petio-logs
+          persistentVolumeClaim:
+            claimName: {{ include "petio.fullname" . }}-logs
