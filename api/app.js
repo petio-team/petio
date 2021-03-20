@@ -78,7 +78,7 @@ class Main {
     }
     this.config = getConfig();
 
-    if (typeof this.config.plex_popular == 'undefined') {
+    if (typeof this.config.plex_popular == 'undefined' && this.config) {
       this.updatePopularConfig()
     }
   }
