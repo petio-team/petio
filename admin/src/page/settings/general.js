@@ -17,6 +17,7 @@ class General extends React.Component {
       base_path: "",
       login_type: false,
       discord_webhook: false,
+      plex_popular: true,
     };
 
     this.inputChange = this.inputChange.bind(this);
@@ -27,6 +28,7 @@ class General extends React.Component {
     this.saveBasePath = this.saveBasePath.bind(this);
     this.saveDiscord = this.saveDiscord.bind(this);
     this.saveLoginType = this.saveLoginType.bind(this);
+    this.savePlexPopular = this.savePlexPopular.bind(this);
     this.testDiscord = this.testDiscord.bind(this);
   }
 
@@ -120,6 +122,24 @@ class General extends React.Component {
     }
   }
 
+  async savePlexPopular() {
+    try {
+      await Api.updateConfig({
+        plex_popular: this.state.plex_popular,
+      });
+      this.props.msg({
+        message: "Plex Popular Saved",
+        type: "good",
+      });
+    } catch (err) {
+      console.log(err);
+      this.props.msg({
+        message: "Failed to Save Plex Popular",
+        type: "error",
+      });
+    }
+  }
+
   async loadConfigs() {
     try {
       let email = await Api.getEmailConfig();
@@ -135,6 +155,7 @@ class General extends React.Component {
         base_path: config.base_path ? config.base_path : "",
         login_type: config.login_type ? config.login_type : 1,
         discord_webhook: config.discord_webhook ? config.discord_webhook : "",
+        plex_popular: config.plex_popular,
         loading: false,
       });
       this.props.msg({
@@ -411,6 +432,23 @@ class General extends React.Component {
             onClick={this.testDiscord}
           >
             Test
+          </button>
+        </section>
+        <section>
+          <p className="main-title mb--2">Popular content on Plex</p>
+          <p className="description">
+            Adds a section to Movies and TV Shows showing the current most popular content on Plex.
+          </p>
+          <div className="checkbox-wrap mb--2">
+            <input
+              type="checkbox"
+              name="plex_popular"
+              checked={this.state.plex_popular}
+              onChange={this.inputChange}
+            />
+          </div>
+          <button className="btn btn__square" onClick={this.savePlexPopular}>
+            Save
           </button>
         </section>
       </>
