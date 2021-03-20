@@ -2,6 +2,7 @@ const request = require("xhr-request");
 const plexLookup = require("../plex/plexLookup");
 const Movie = require("../tmdb/movie");
 const Show = require("../tmdb/show");
+const logger = require("../util/logger");
 
 // Config
 const getConfig = require("../util/config");
