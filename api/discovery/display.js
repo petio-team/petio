@@ -18,10 +18,13 @@ const memoryCache = cacheManager.caching({
 module.exports = async function getDiscoveryData(id, type = "movie") {
   if (!id) throw "No user";
   const discoveryPrefs = await Discovery.findOne({ id: id });
-  const popularData = await getTop(type === "movie" ? 1 : 2);
+  const config = getConfig();
   let popular = [];
-  for (p in popularData) {
-    popular.push(popularData[p]);
+  if (config.plex_popular) {
+    const popularData = await getTop(type === "movie" ? 1 : 2);
+    for (p in popularData) {
+      popular.push(popularData[p]);
+    }
   }
   if (!discoveryPrefs) throw "No user profile created";
   const watchHistory =
@@ -241,7 +244,7 @@ module.exports = async function getDiscoveryData(id, type = "movie") {
         });
   let data = [...peopleData, ...directorData, ...recentData, ...genresData];
   data = shuffle(data);
-  return [
+  return config.plex_popular ? [
     {
       title:
         type === "movie" ? "Popular Movies on Plex" : "Popular Shows on Plex",
@@ -252,7 +255,13 @@ module.exports = async function getDiscoveryData(id, type = "movie") {
       results: upcoming.results,
     },
     ...data,
-  ];
+  ] : [
+      {
+        title: type === "movie" ? "Movies coming soon" : "Shows coming soon",
+        results: upcoming.results,
+      },
+      ...data,
+    ];
 };
 
 // Caching layer
