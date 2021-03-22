@@ -20,7 +20,11 @@ module.exports = async function getDiscoveryData(id, type = "movie") {
   const discoveryPrefs = await Discovery.findOne({ id: id });
   const config = getConfig();
   let popular = [];
-  if (config.plex_popular) {
+  if (
+    config.plexPopular ||
+    config.plexPopular === null ||
+    config.plexPopular === undefined
+  ) {
     const popularData = await getTop(type === "movie" ? 1 : 2);
     for (p in popularData) {
       popular.push(popularData[p]);
@@ -244,7 +248,7 @@ module.exports = async function getDiscoveryData(id, type = "movie") {
         });
   let data = [...peopleData, ...directorData, ...recentData, ...genresData];
   data = shuffle(data);
-  return config.plex_popular ? [
+  return [
     {
       title:
         type === "movie" ? "Popular Movies on Plex" : "Popular Shows on Plex",
@@ -255,13 +259,7 @@ module.exports = async function getDiscoveryData(id, type = "movie") {
       results: upcoming.results,
     },
     ...data,
-  ] : [
-      {
-        title: type === "movie" ? "Movies coming soon" : "Shows coming soon",
-        results: upcoming.results,
-      },
-      ...data,
-    ];
+  ];
 };
 
 // Caching layer

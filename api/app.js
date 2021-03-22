@@ -77,37 +77,6 @@ class Main {
       this.e.use(express.urlencoded({ extended: true }));
     }
     this.config = getConfig();
-
-    // if (typeof this.config.plex_popular == 'undefined') {
-    //   this.updatePopularConfig()
-    // }
-  }
-
-  async updatePopularConfig() {
-    let project_folder, configFile;
-    if (process.pkg) {
-      project_folder = path.dirname(process.execPath);
-      configFile = path.join(project_folder, "./config/config.json");
-    } else {
-      project_folder = __dirname;
-      configFile = path.join(project_folder, "./config/config.json");
-    }
-    try {
-      let updatedConfig = JSON.stringify({
-        ...this.config,
-        plex_popular: true,
-      });
-      fs.writeFile(configFile, updatedConfig, (err) => {
-        if (err) {
-          logger.log("warn", err);
-        } else {
-          logger.log("info", "Config updated with plex_popular variable");
-        }
-      });
-    } catch (err) {
-      logger.log("verbose", err);
-      logger.log("warn", "Config not found");
-    }
   }
 
   setRoutes() {
@@ -338,7 +307,7 @@ class Main {
         adminDisplayName: user.username,
         fanartApi: "ee409f6fb0c5cd2352e7a454d3f580d4",
         base_path: "",
-        plex_popular: true,
+        plexPopular: true,
       };
       try {
         await this.createConfig(JSON.stringify(configData, null, 2));

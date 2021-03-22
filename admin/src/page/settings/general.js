@@ -17,7 +17,7 @@ class General extends React.Component {
       base_path: "",
       login_type: false,
       discord_webhook: false,
-      plex_popular: true,
+      plexPopular: false,
     };
 
     this.inputChange = this.inputChange.bind(this);
@@ -125,7 +125,7 @@ class General extends React.Component {
   async savePlexPopular() {
     try {
       await Api.updateConfig({
-        plex_popular: this.state.plex_popular,
+        plexPopular: this.state.plexPopular,
       });
       this.props.msg({
         message: "Plex Popular Saved",
@@ -155,7 +155,10 @@ class General extends React.Component {
         base_path: config.base_path ? config.base_path : "",
         login_type: config.login_type ? config.login_type : 1,
         discord_webhook: config.discord_webhook ? config.discord_webhook : "",
-        plex_popular: config.plex_popular,
+        plexPopular:
+          config.plexPopular === null || config.plexPopular === undefined
+            ? true
+            : config.plexPopular,
         loading: false,
       });
       this.props.msg({
@@ -437,15 +440,16 @@ class General extends React.Component {
         <section>
           <p className="main-title mb--2">Popular content on Plex</p>
           <p className="description">
-            Adds a section to Movies and TV Shows showing the current most popular content on Plex.
+            Display most popular titles from Plex in the discovery view.
           </p>
           <div className="checkbox-wrap mb--2">
             <input
               type="checkbox"
-              name="plex_popular"
-              checked={this.state.plex_popular}
+              name="plexPopular"
+              checked={this.state.plexPopular}
               onChange={this.inputChange}
             />
+            <p>Enabled</p>
           </div>
           <button className="btn btn__square" onClick={this.savePlexPopular}>
             Save
