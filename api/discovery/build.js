@@ -23,15 +23,13 @@ module.exports = async function buildDiscovery() {
       userIds.push(users[i].id);
     }
   });
-  await Promise.all(
-    Promise.map(
+  await Promise.map(
       userIds,
       async (i) => {
         await userBuild(i);
       },
       { concurrency: 10 }
-    )
-  );
+    );
   logger.info("DISC: Finished building discovery profiles");
 };
 

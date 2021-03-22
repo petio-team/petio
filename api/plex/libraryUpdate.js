@@ -40,8 +40,8 @@ class LibraryUpdate {
     }
     let matched = {};
 
-    await Promise.all(
-      Object.keys(recent.Metadata).map(async (i) => {
+    await Promise.map(
+      Object.keys(recent.Metadata, async (i) => {
         let obj = recent.Metadata[i];
 
         if (obj.type === "movie") {
@@ -103,7 +103,7 @@ class LibraryUpdate {
             `LIB CRON: Partial scan type not found - ${obj.type}`
           );
         }
-      })
+      }, {concurrency: 10})
     );
     this.execMail();
     logger.log("info", "LIB CRON: Partial Scan Complete");
@@ -322,8 +322,7 @@ class LibraryUpdate {
       libraries.Directory.map(async (lib) => {
         try {
           let libContent = await this.getLibrary(lib.key);
-          await Promise.all(
-            Promise.map(
+          await Promise.map(
               Object.keys(libContent.Metadata),
               async (item) => {
                 let obj = libContent.Metadata[item];
@@ -340,9 +339,8 @@ class LibraryUpdate {
                   );
                 }
               },
-              { concurrency: 20 }
-            )
-          );
+              { concurrency: 10 }
+            );
         } catch (err) {
           logger.log("error", `LIB CRON: Unable to get library content`);
           logger.log({ level: "error", message: err });
