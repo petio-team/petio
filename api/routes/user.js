@@ -133,7 +133,7 @@ router.post("/create_custom", adminRequired, async (req, res) => {
     ],
   });
   if (dbUser) {
-    res.status(409).json({
+    res.status(200).json({
       error: "User exists, please change the username or email",
     });
     return;

@@ -30,7 +30,7 @@ function parseResponse(response) {
   } else if (response.status === 401) {
     console.log();
   }
-  throw new HttpError(response.status);
+  console.log(new HttpError(response.status));
 }
 
 export function get(path, options = {}) {

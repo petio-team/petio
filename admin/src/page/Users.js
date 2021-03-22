@@ -165,29 +165,34 @@ class Users extends React.Component {
 
   async createUser() {
     let username = this.state.cu_username;
-    let newUser = await Api.createUser({
-      id: `custom_${this.state.cu_username.replace(" ", "-")}`,
-      username: this.state.cu_username,
-      email: this.state.cu_email,
-      password: this.state.cu_password,
-      linked: this.state.cu_linked,
-    });
-
-    if (newUser.error) {
-      this.setState({
-        cu_error: newUser.error,
+    try {
+      let newUser = await Api.createUser({
+        id: `custom_${this.state.cu_username.replace(" ", "-")}`,
+        username: this.state.cu_username,
+        email: this.state.cu_email,
+        password: this.state.cu_password,
+        linked: this.state.cu_linked,
       });
+
+      if (newUser.error) {
+        this.props.msg({
+          message: `${newUser.error}`,
+          type: "error",
+        });
+      } else {
+        this.props.msg({
+          message: `User added ${username}`,
+          type: "good",
+        });
+        this.closeModal("addUser");
+        Api.allUsers();
+      }
+    } catch (err) {
+      console.log(err);
       this.props.msg({
-        message: `Failed to add user ${username}`,
+        message: `Failed to add user: ${username}`,
         type: "error",
       });
-    } else {
-      this.props.msg({
-        message: `User added ${username}`,
-        type: "good",
-      });
-      this.closeModal("addUser");
-      Api.allUsers();
     }
   }
 
