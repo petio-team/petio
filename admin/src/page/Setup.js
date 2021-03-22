@@ -196,7 +196,7 @@ class Setup extends React.Component {
       .then(() => {
         setTimeout(() => {
           this.props.checkConfig();
-        }, 10000);
+        }, 80000);
       })
       .catch(() => {
         alert(
@@ -319,10 +319,7 @@ class Setup extends React.Component {
                 Welcome to Petio, firstly lets log in to Plex to get all of your
                 user and server info
               </p>
-              <button
-                className="btn btn__square btn__full"
-                onClick={this.loginOauth}
-              >
+              <button className="btn btn__square" onClick={this.loginOauth}>
                 Login with plex
               </button>
             </div>
