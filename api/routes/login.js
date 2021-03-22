@@ -106,10 +106,14 @@ function success(user, isAdmin = false, res) {
   getTop(1);
   getTop(2);
   let userId = user.altId ? user.altId : user.id;
-  getHistory(userId, "movie");
-  getHistory(userId, "show");
-  getDiscovery(userId, "movie");
-  getDiscovery(userId, "show");
+  try {
+    getHistory(userId, "movie");
+    getHistory(userId, "show");
+    getDiscovery(userId, "movie");
+    getDiscovery(userId, "show");
+  } catch (err) {
+    // No need to log
+  }
 }
 
 function plexAuth(username, password) {
