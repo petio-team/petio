@@ -370,13 +370,16 @@ class App extends React.Component {
                       API Not configured, please complete setup
                     </div>
                   ) : null}
-                  <button className="btn btn__square">Login</button>
+                  <button className="btn btn__square btn__full">Login</button>
                 </form>
                 <div className="login--inner--divide">
                   <p>or</p>
                 </div>
                 <div>
-                  <button className="btn btn__square" onClick={this.loginOauth}>
+                  <button
+                    className="btn btn__square btn__full"
+                    onClick={this.loginOauth}
+                  >
                     Login with Plex
                   </button>
                 </div>
@@ -395,7 +398,7 @@ class App extends React.Component {
                   <TmdbLogo />
                 </a>
               </div>
-              <p className="powered-by">Petio build (alpha) {pjson.version}</p>
+              <p className="powered-by">Petio build {pjson.version}</p>
             </>
           ) : (
             <div className="spinner">

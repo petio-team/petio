@@ -207,43 +207,43 @@ class Setup extends React.Component {
   }
 
   async waitText() {
-    await this.timeout(1000);
+    await this.timeout(10000);
     this.setState({
       finalText: "Creating configs...",
     });
-    await this.timeout(1000);
+    await this.timeout(10000);
     this.setState({
       finalText: "Connecting to the database...",
     });
-    await this.timeout(1000);
+    await this.timeout(10000);
     this.setState({
       finalText: "Loading your libraries...",
     });
-    await this.timeout(1000);
+    await this.timeout(10000);
     this.setState({
       finalText: "Finding your embarassing movies...",
     });
-    await this.timeout(1000);
+    await this.timeout(10000);
     this.setState({
       finalText: "Finding your embarassing movies... oh wow...",
     });
-    await this.timeout(1000);
+    await this.timeout(10000);
     this.setState({
       finalText: "Matching content against online sources...",
     });
-    await this.timeout(1000);
+    await this.timeout(10000);
     this.setState({
       finalText: "Getting your friends...",
     });
-    await this.timeout(1000);
+    await this.timeout(10000);
     this.setState({
       finalText: "Finishing up...",
     });
-    await this.timeout(5000);
+    await this.timeout(50000);
     this.setState({
       finalText: "This is taking a while...",
     });
-    await this.timeout(10000);
+    await this.timeout(100000);
     this.setState({
       finalText: "Should really be done by now...",
     });
@@ -319,7 +319,10 @@ class Setup extends React.Component {
                 Welcome to Petio, firstly lets log in to Plex to get all of your
                 user and server info
               </p>
-              <button className="btn btn__square" onClick={this.loginOauth}>
+              <button
+                className="btn btn__square btn__full"
+                onClick={this.loginOauth}
+              >
                 Login with plex
               </button>
             </div>

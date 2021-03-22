@@ -118,10 +118,9 @@ class Login extends React.Component {
               <h1 className="logo">
                 Pet<span>io</span>
               </h1>
-              <p className="main-title">Login</p>
-              <p>Log in with your Plex username / password</p>
+              <p className="main-title">Login Admin</p>
               <form onSubmit={this.loginForm} autoComplete="on">
-                <p>Username</p>
+                <p style={{ marginBottom: "5px" }}>Username / Email</p>
                 <input
                   type="text"
                   name="username"
@@ -130,7 +129,7 @@ class Login extends React.Component {
                   autoComplete="username"
                 />
 
-                <p>Password</p>
+                <p style={{ marginBottom: "5px" }}>Password</p>
                 <input
                   type="password"
                   name="password"
@@ -139,7 +138,7 @@ class Login extends React.Component {
                   autoComplete="current-password"
                 />
 
-                <button className="btn btn__square">Login</button>
+                <button className="btn btn__square btn__full">Login</button>
               </form>
             </div>
             <div className="credits">
@@ -156,9 +155,7 @@ class Login extends React.Component {
                 <TmdbLogo />
               </a>
             </div>
-            <p className="powered-by">
-              Petio Admin build (alpha) {pjson.version}
-            </p>
+            <p className="powered-by">Petio Admin build {pjson.version}</p>
           </>
         ) : (
           <div className="spinner">

@@ -68,6 +68,19 @@ button {
     }
   }
 
+  &__medium {
+    width: 150px;
+    text-align: center;
+    display: inline-block;
+    max-width: 100%;
+  }
+
+  &__full {
+    width: 100%;
+    text-align: center;
+    display: inline-block;
+  }
+
   &.good {
     border-color: $green;
     color: $green;
