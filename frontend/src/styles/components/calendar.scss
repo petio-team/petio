@@ -37,6 +37,10 @@
   }
 }
 
+.rbc-show-more {
+  pointer-events: none;
+}
+
 .rbc-day-bg {
   background: rgba($grey-light, 0.1);
   border: none !important;
