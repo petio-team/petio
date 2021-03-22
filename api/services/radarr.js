@@ -372,7 +372,7 @@ class Radarr {
     let mainCalendar = [];
     let now = new Date();
     for (let server of this.fullConfig) {
-      if (!server.active) {
+      if (server.active) {
         this.config = server;
 
         try {
