@@ -310,7 +310,7 @@ class LibraryUpdate {
               async (item) => {
                 let obj = libContent.Metadata[item];
                 if (obj.type === "movie") {
-                  //await this.saveMovie(obj);
+                  await this.saveMovie(obj);
                 } else if (obj.type === "artist") {
                   await this.saveMusic(obj);
                 } else if (obj.type === "show") {
@@ -431,7 +431,6 @@ class LibraryUpdate {
             `LIB CRON: Error - unable to parse id source from: ${movieObj.guid} - Movie: ${movieObj.title}`
           );
         } else {
-          console.log("Movie: " + movieObj.title);
           logger.log({ level: "error", message: err });
         }
       }
