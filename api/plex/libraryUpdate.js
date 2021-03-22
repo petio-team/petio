@@ -45,8 +45,8 @@ class LibraryUpdate {
     }
     let matched = {};
 
-    await Promise.all(
-      Object.keys(recent.Metadata).map(async (i) => {
+    await Promise.map(
+      Object.keys(recent.Metadata, async (i) => {
         let obj = recent.Metadata[i];
 
         if (obj.type === "movie") {
@@ -108,7 +108,7 @@ class LibraryUpdate {
             `LIB CRON: Partial scan type not found - ${obj.type}`
           );
         }
-      })
+      }, {concurrency: 10})
     );
     this.execMail();
     logger.log("info", "LIB CRON: Partial Scan Complete");
@@ -305,13 +305,12 @@ class LibraryUpdate {
       libraries.Directory.map(async (lib) => {
         try {
           let libContent = await this.getLibrary(lib.key);
-          await Promise.all(
-            Promise.map(
+          await Promise.map(
               Object.keys(libContent.Metadata),
               async (item) => {
                 let obj = libContent.Metadata[item];
                 if (obj.type === "movie") {
-                  await this.saveMovie(obj);
+                  //await this.saveMovie(obj);
                 } else if (obj.type === "artist") {
                   await this.saveMusic(obj);
                 } else if (obj.type === "show") {
@@ -323,9 +322,8 @@ class LibraryUpdate {
                   );
                 }
               },
-              { concurrency: 20 }
-            )
-          );
+              { concurrency: 10 }
+            );
         } catch (err) {
           logger.log("error", `LIB CRON: Unable to get library content`);
           logger.log({ level: "error", message: err });
@@ -433,6 +431,7 @@ class LibraryUpdate {
             `LIB CRON: Error - unable to parse id source from: ${movieObj.guid} - Movie: ${movieObj.title}`
           );
         } else {
+          console.log("Movie: " + movieObj.title);
           logger.log({ level: "error", message: err });
         }
       }
