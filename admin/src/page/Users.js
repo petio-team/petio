@@ -329,8 +329,8 @@ class Users extends React.Component {
       });
     } else {
       this.props.msg({
-        message: `Users Bulk Updated ${this.state.activeUser.username}`,
-        type: "error",
+        message: `Users Bulk Updated`,
+        type: "info",
       });
       this.closeModal("bulkUsers");
       Api.allUsers();
