@@ -20,7 +20,13 @@ class RequestCard extends React.Component {
         alt={request.title}
       />
     ) : (
-      <div className="no-poster"></div>
+      <img
+        src={`${window.location.pathname.replace(
+          /\/$/,
+          ""
+        )}/images/no-poster.jpg`}
+        alt={request.title}
+      />
     );
     let type = this.props.user.requests[request.id].type;
 
@@ -49,7 +55,9 @@ class RequestCard extends React.Component {
                         src={
                           process.env.NODE_ENV === "development"
                             ? `http://localhost:7778/user/thumb/${user_id}`
-                            : `/api/user/thumb/${user_id}`
+                            : `${window.location.pathname
+                                .replace("/admin/", "")
+                                .replace(/\/$/, "")}/api/user/thumb/${user_id}`
                         }
                       />
                     </div>

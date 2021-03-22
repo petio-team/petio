@@ -171,7 +171,6 @@ async function plexOauth(token) {
   try {
     let data = JSON.parse(xmlParser.xml2json(plex.data, { compact: false }));
     let user = data.elements[0].attributes;
-    console.log(user);
     return user.id;
   } catch (err) {
     console.log(err);

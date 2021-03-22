@@ -44,8 +44,13 @@ class Sidebar extends React.Component {
                       ? 'url("http://localhost:7778/user/thumb/' +
                         user.id +
                         '")'
-                      : 'url("/api/user/thumb/' + user.id + '")',
-                  color: "red",
+                      : 'url("' +
+                        window.location.pathname
+                          .replace("/admin/", "")
+                          .replace(/\/$/, "") +
+                        "/api/user/thumb/" +
+                        user.id +
+                        '")',
                 }}
               ></div>
             </div>

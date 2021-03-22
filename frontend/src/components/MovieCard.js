@@ -131,7 +131,10 @@ class MovieCard extends React.Component {
       />
     ) : (
       <LazyLoadImage
-        src={"/images/no-poster.jpg"}
+        src={`${window.location.pathname.replace(
+          /\/$/,
+          ""
+        )}/images/no-poster.jpg`}
         alt={movie.title}
         onLoad={this.imgLoaded}
       />

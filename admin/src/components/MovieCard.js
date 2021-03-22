@@ -74,7 +74,13 @@ class MovieCard extends React.Component {
         // effect="blur"
       />
     ) : (
-      <div className="no-poster"></div>
+      <LazyLoadImage
+        src={`${window.location.pathname.replace(
+          /\/$/,
+          ""
+        )}/images/no-poster.jpg`}
+        alt={movie.title}
+      />
     );
     let playbackState = null;
     switch (this.props.playbackState) {

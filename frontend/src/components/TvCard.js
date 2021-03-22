@@ -131,7 +131,10 @@ class TvCard extends React.Component {
       />
     ) : (
       <LazyLoadImage
-        src={"/images/no-poster.jpg"}
+        src={`${window.location.pathname.replace(
+          /\/$/,
+          ""
+        )}/images/no-poster.jpg`}
         alt={series.title}
         onLoad={this.imgLoaded}
       />

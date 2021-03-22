@@ -51,7 +51,10 @@ class PersonCard extends React.Component {
               src={
                 person.profile_path
                   ? `https://image.tmdb.org/t/p/w200${person.profile_path}`
-                  : "/images/no-poster-person.jpg"
+                  : `${window.location.pathname.replace(
+                      /\/$/,
+                      ""
+                    )}/images/no-poster-person.jpg`
               }
               onLoad={this.imgLoaded}
             />
