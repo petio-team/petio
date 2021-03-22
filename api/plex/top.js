@@ -23,6 +23,7 @@ async function getTop(type) {
   } catch (err) {
     logger.log("warn", `Error getting popular data - ${id}`);
     logger.log({ level: "error", message: err });
+    return [];
   }
   return data;
 }

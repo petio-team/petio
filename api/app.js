@@ -51,7 +51,7 @@ const { authRequired } = require("./middleware/auth");
 class Main {
   constructor() {
     if (cluster.isMaster) {
-      logger.log("info", `API: Petio API Version ${pjson.version} alpha`);
+      logger.log("info", `API: Petio API Version ${pjson.version}`);
       logger.log("info", "API: API Starting");
 
       if (process.pkg) {

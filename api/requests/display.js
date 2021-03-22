@@ -4,6 +4,7 @@ const Request = require("../models/request");
 const Sonarr = require("../services/sonarr");
 const Radarr = require("../services/radarr");
 const logger = require("../util/logger");
+const Promise = require("bluebird");
 
 async function getRequests(user = false, all = false) {
   const requests = await Request.find();
@@ -17,77 +18,80 @@ async function getRequests(user = false, all = false) {
     data = {};
 
     await Promise.all(
-      requests.map(async (request, i) => {
-        let children = [];
-        let media = [];
-        if (request.users.includes(user) || all) {
-          if (request.type === "movie" && request.radarrId.length > 0) {
-            for (let i = 0; i < Object.keys(request.radarrId).length; i++) {
-              let radarrIds = request.radarrId[i];
-              let rId = radarrIds[Object.keys(radarrIds)[0]];
-              let serverUuid = Object.keys(radarrIds)[0];
-              let server = new Radarr(serverUuid);
-              children[i] = {};
-              children[i].id = rId;
-              children[i].info = await server.movie(rId);
-              children[i].info.serverName = server.config.title;
-              children[i].status = [];
-              if (radarrQ[i]) {
-                for (let o = 0; o < radarrQ[i].records.length; o++) {
-                  if (radarrQ[i].records[o].movieId === rId) {
-                    children[i].status[o] = radarrQ[i].records[o];
+      requests.map(
+        async (request, i) => {
+          let children = [];
+          let media = [];
+          if (request.users.includes(user) || all) {
+            if (request.type === "movie" && request.radarrId.length > 0) {
+              for (let i = 0; i < Object.keys(request.radarrId).length; i++) {
+                let radarrIds = request.radarrId[i];
+                let rId = radarrIds[Object.keys(radarrIds)[0]];
+                let serverUuid = Object.keys(radarrIds)[0];
+                let server = new Radarr(serverUuid);
+                children[i] = {};
+                children[i].id = rId;
+                children[i].info = await server.movie(rId);
+                children[i].info.serverName = server.config.title;
+                children[i].status = [];
+                if (radarrQ[i]) {
+                  for (let o = 0; o < radarrQ[i].records.length; o++) {
+                    if (radarrQ[i].records[o].movieId === rId) {
+                      children[i].status[o] = radarrQ[i].records[o];
+                    }
                   }
                 }
               }
             }
-          }
 
-          if (request.type === "tv" && request.sonarrId.length > 0) {
-            for (let i = 0; i < Object.keys(request.sonarrId).length; i++) {
-              let sonarrIds = request.sonarrId[i];
-              let sId = sonarrIds[Object.keys(sonarrIds)[0]];
-              let serverUuid = Object.keys(sonarrIds)[0];
-              let server = new Sonarr(serverUuid);
-              children[i] = {};
-              children[i].id = sId;
-              children[i].info = await server.series(sId);
-              children[i].info.serverName = server.config.title;
-              children[i].status = [];
-              if (sonarrQ[i]) {
-                for (let o = 0; o < sonarrQ[i].length; o++) {
-                  if (sonarrQ[i][o].series.id === sId) {
-                    children[i].status.push(sonarrQ[i][o]);
+            if (request.type === "tv" && request.sonarrId.length > 0) {
+              for (let i = 0; i < Object.keys(request.sonarrId).length; i++) {
+                let sonarrIds = request.sonarrId[i];
+                let sId = sonarrIds[Object.keys(sonarrIds)[0]];
+                let serverUuid = Object.keys(sonarrIds)[0];
+                let server = new Sonarr(serverUuid);
+                children[i] = {};
+                children[i].id = sId;
+                children[i].info = await server.series(sId);
+                children[i].info.serverName = server.config.title;
+                children[i].status = [];
+                if (sonarrQ[i]) {
+                  for (let o = 0; o < sonarrQ[i].length; o++) {
+                    if (sonarrQ[i][o].series.id === sId) {
+                      children[i].status.push(sonarrQ[i][o]);
+                    }
                   }
                 }
               }
             }
-          }
 
-          if (request.type === "movie") {
-            media = await movieLookup(request.requestId, true);
-          } else if (request.type === "tv") {
-            media = await showLookup(request.requestId, true);
-          }
+            if (request.type === "movie") {
+              media = await movieLookup(request.requestId, true);
+            } else if (request.type === "tv") {
+              media = await showLookup(request.requestId, true);
+            }
 
-          data[request.requestId] = {
-            title: request.title,
-            children: children,
-            requestId: request.requestId,
-            type: request.type,
-            thumb: request.thumb,
-            imdb_id: request.imdb_id,
-            tmdb_id: request.tmdb_id,
-            tvdb_id: request.tvdb_id,
-            users: request.users,
-            sonarrId: request.sonarrId,
-            radarrId: request.radarrId,
-            media: media,
-            approved: request.approved,
-            manualStatus: request.manualStatus,
-            process_stage: reqState(request, children),
-          };
-        }
-      })
+            data[request.requestId] = {
+              title: request.title,
+              children: children,
+              requestId: request.requestId,
+              type: request.type,
+              thumb: request.thumb,
+              imdb_id: request.imdb_id,
+              tmdb_id: request.tmdb_id,
+              tvdb_id: request.tvdb_id,
+              users: request.users,
+              sonarrId: request.sonarrId,
+              radarrId: request.radarrId,
+              media: media,
+              approved: request.approved,
+              manualStatus: request.manualStatus,
+              process_stage: reqState(request, children),
+            };
+          }
+        },
+        { concurrency: 20 }
+      )
     );
   } catch (err) {
     logger.log("error", `ROUTE: Error getting requests display`);
