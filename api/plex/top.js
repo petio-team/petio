@@ -60,7 +60,6 @@ async function parseTop(data, type) {
     let item = top[i];
     let ratingKey = item.ratingKey;
     let globalViewCount = item.globalViewCount;
-    let userCount = item.userCount;
     let plexData = false;
     if (type === 2) {
       plexData = await plexLookup(ratingKey, "show");

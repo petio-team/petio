@@ -123,6 +123,12 @@ async function movieLookup(id, minified = false) {
         delete movie.videos;
         delete movie.vote_average;
         delete movie.vote_count;
+        delete movie.adult;
+        delete movie.backdrop_path;
+        delete movie.genre_ids;
+        delete movie.original_language;
+        delete movie.overview;
+        delete movie.video;
       } else {
         movie.original_language_format = ISO6391.getName(
           movie.original_language

@@ -6,6 +6,8 @@ const Movie = require("../tmdb/movie");
 const Show = require("../tmdb/show");
 const getHistory = require("../plex/history");
 const onServer = require("../plex/onServer");
+const trending = require("../tmdb/trending");
+const Promise = require("bluebird");
 
 const cacheManager = require("cache-manager");
 const getTop = require("../plex/top");
@@ -20,6 +22,7 @@ module.exports = async function getDiscoveryData(id, type = "movie") {
   const discoveryPrefs = await Discovery.findOne({ id: id });
   const config = getConfig();
   let popular = [];
+  let trendingData = await trending();
   if (
     config.plexPopular ||
     config.plexPopular === null ||
@@ -75,6 +78,7 @@ module.exports = async function getDiscoveryData(id, type = "movie") {
           if (!watchHistory[result.id]) {
             let onPlex = await onServer(type, false, false, result.id);
             if (!onPlex) onPlex = { exists: false };
+            result = formatResult(result, type);
             result.on_server = onPlex.exists;
             return result;
           } else {
@@ -113,6 +117,7 @@ module.exports = async function getDiscoveryData(id, type = "movie") {
           discData.map(async (result, i) => {
             if (!watchHistory[result.id]) {
               let onPlex = await onServer(type, false, false, result.id);
+              result = formatResult(result, type);
               result.on_server = onPlex.exists;
               return result;
             } else {
@@ -149,6 +154,7 @@ module.exports = async function getDiscoveryData(id, type = "movie") {
           discData.map(async (result, i) => {
             if (!watchHistory[result.id]) {
               let onPlex = await onServer(type, false, false, result.id);
+              result = formatResult(result, type);
               result.on_server = onPlex.exists;
               return result;
             } else {
@@ -168,72 +174,77 @@ module.exports = async function getDiscoveryData(id, type = "movie") {
   let recentData = await Promise.all(
     Object.keys(recentlyViewed)
       .slice(0, 5)
-      .map(async (r) => {
-        let recent = recentlyViewed[r];
-        if (recent.id) {
-          let related =
-            type === "movie"
-              ? await Promise.all([
-                  Movie.getRecommendations(recent.id, 1),
-                  Movie.getRecommendations(recent.id, 2),
-                ])
-              : await Promise.all([
-                  Show.getRecommendations(recent.id, 1),
-                  Show.getRecommendations(recent.id, 2),
-                ]);
-          if (!related[0].results) related[0].results = [];
-          if (!related[1].results) related[1].results = [];
-          related = {
-            results: [...related[0].results, ...related[1].results],
-          };
-          if (related.results.length === 0) {
-            let lookup =
+      .map(
+        async (r) => {
+          let recent = recentlyViewed[r];
+          if (recent.id) {
+            let related =
               type === "movie"
-                ? await Movie.movieLookup(recent.id, true)
-                : await Show.showLookup(recent.id, true);
-            if (!lookup) return null;
-            let params = {};
-            if (lookup.genres) {
-              let genres = "";
-              for (let i = 0; i < lookup.genres.length; i++) {
-                genres += `${lookup.genres[i].id},`;
-              }
+                ? await Promise.all([
+                    Movie.getRecommendations(recent.id, 1),
+                    Movie.getRecommendations(recent.id, 2),
+                  ])
+                : await Promise.all([
+                    Show.getRecommendations(recent.id, 1),
+                    Show.getRecommendations(recent.id, 2),
+                  ]);
+            if (!related[0].results) related[0].results = [];
+            if (!related[1].results) related[1].results = [];
+            related = {
+              results: [...related[0].results, ...related[1].results],
+            };
+            if (related.results.length === 0) {
+              let lookup =
+                type === "movie"
+                  ? await Movie.movieLookup(recent.id, true)
+                  : await Show.showLookup(recent.id, true);
+              if (!lookup) return null;
+              let params = {};
+              if (lookup.genres) {
+                let genres = "";
+                for (let i = 0; i < lookup.genres.length; i++) {
+                  genres += `${lookup.genres[i].id},`;
+                }
 
-              params.with_genres = genres;
+                params.with_genres = genres;
+              }
+              recommendations =
+                type === "movie"
+                  ? await discoverMovie(1, params)
+                  : await discoverShow(1, params);
+              if (recommendations.results.length === 0) return null;
+              let newRelated = [];
+              recommendations.results.map(async (result, i) => {
+                if (!(result.id.toString() in watchHistory)) {
+                  let onPlex = await onServer(type, false, false, result.id);
+                  result = formatResult(result, type);
+                  result.on_server = onPlex.exists;
+                  newRelated.push(result);
+                }
+              });
+              return {
+                title: `Because you watched "${recent.title || recent.name}"`,
+                results: recommendations.results,
+              };
+            } else {
+              let newRelated = [];
+              related.results.map(async (result, i) => {
+                if (!(result.id.toString() in watchHistory)) {
+                  let onPlex = await onServer(type, false, false, result.id);
+                  result = formatResult(result, type);
+                  result.on_server = onPlex.exists;
+                  newRelated.push(result);
+                }
+              });
+              return {
+                title: `Because you watched "${recent.title || recent.name}"`,
+                results: newRelated,
+              };
             }
-            recommendations =
-              type === "movie"
-                ? await discoverMovie(1, params)
-                : await discoverShow(1, params);
-            if (recommendations.results.length === 0) return null;
-            let newRelated = [];
-            recommendations.results.map(async (result, i) => {
-              if (!(result.id.toString() in watchHistory)) {
-                let onPlex = await onServer(type, false, false, result.id);
-                recommendations.results[i].on_server = onPlex.exists;
-                newRelated.push(recommendations.results[i]);
-              }
-            });
-            return {
-              title: `Because you watched "${recent.title || recent.name}"`,
-              results: recommendations.results,
-            };
-          } else {
-            let newRelated = [];
-            related.results.map(async (result, i) => {
-              if (!(result.id.toString() in watchHistory)) {
-                let onPlex = await onServer(type, false, false, result.id);
-                related.results[i].on_server = onPlex.exists;
-                newRelated.push(related.results[i]);
-              }
-            });
-            return {
-              title: `Because you watched "${recent.title || recent.name}"`,
-              results: newRelated,
-            };
           }
-        }
-      })
+        },
+        { concurrency: 20 }
+      )
   );
   let now = new Date().toISOString().split("T")[0];
   let upcoming =
@@ -253,6 +264,11 @@ module.exports = async function getDiscoveryData(id, type = "movie") {
       title:
         type === "movie" ? "Popular Movies on Plex" : "Popular Shows on Plex",
       results: popular,
+    },
+    {
+      title:
+        type === "movie" ? "Trending Movies Online" : "Trending Shows Online",
+      results: type === "movie" ? trendingData.movies : trendingData.tv,
     },
     {
       title: type === "movie" ? "Movies coming soon" : "Shows coming soon",
@@ -563,4 +579,61 @@ function shuffle(array) {
   }
 
   return array;
+}
+
+function formatResult(result, type) {
+  if (type === "movie") {
+    delete result.credits;
+    delete result.backdrop_path;
+    delete result.belongs_to_collection;
+    delete result.genres;
+    delete result.homepage;
+    delete result.popularity;
+    delete result.recommendations;
+    delete result.revenue;
+    delete result.runtime;
+    delete result.spoken_languages;
+    delete result.status;
+    delete result.tagline;
+    delete result.videos;
+    delete result.vote_average;
+    delete result.vote_count;
+    delete result.adult;
+    delete result.backdrop_path;
+    delete result.genre_ids;
+    delete result.original_language;
+    delete result.overview;
+    delete result.video;
+  } else {
+    delete result.created_by;
+    delete result.credits;
+    delete result.genres;
+    delete result.in_production;
+    delete result.last_air_date;
+    delete result.next_episode_to_air;
+    delete result.number_of_episodes;
+    delete result.number_of_seasons;
+    delete result.origin_country;
+    delete result.original_name;
+    delete result.overview;
+    delete result.popularity;
+    delete result.status;
+    delete result.videos;
+    delete result.vote_average;
+    delete result.vote_count;
+    delete result.seasons;
+    delete result.age_rating;
+    delete result.backdrop_path;
+    delete result.episode_run_time;
+    delete result.imdb_id;
+    delete result.keywords;
+    delete result.last_episode_to_air;
+    delete result.networks;
+    delete result.original_language;
+    delete result.spoken_languages;
+    delete result.tagline;
+    delete result.type;
+  }
+
+  return result;
 }

@@ -6,6 +6,7 @@ const getConfig = require("../util/config");
 const logger = require("../util/logger");
 const Movie = require("../models/movie");
 const Show = require("../models/show");
+const Promise = require("bluebird");
 
 module.exports = async function buildDiscovery() {
   logger.info("DISC: Started building discovery profiles");
@@ -23,9 +24,12 @@ module.exports = async function buildDiscovery() {
     }
   });
   await Promise.all(
-    userIds.map(async (i) => {
-      await userBuild(i);
-    })
+    userIds.map(
+      async (i) => {
+        await userBuild(i);
+      },
+      { concurrency: 10 }
+    )
   );
   logger.info("DISC: Finished building discovery profiles");
 };

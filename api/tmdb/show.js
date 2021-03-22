@@ -127,6 +127,17 @@ async function showLookup(id, minified = false) {
         delete show.vote_average;
         delete show.vote_count;
         delete show.seasons;
+        delete show.age_rating;
+        delete show.backdrop_path;
+        delete show.episode_run_time;
+        delete show.imdb_id;
+        delete show.keywords;
+        delete show.last_episode_to_air;
+        delete show.networks;
+        delete show.original_language;
+        delete show.spoken_languages;
+        delete show.tagline;
+        delete show.type;
       } else {
         show.original_language_format = ISO6391.getName(show.original_language);
       }

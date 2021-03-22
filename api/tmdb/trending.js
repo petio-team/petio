@@ -1,7 +1,6 @@
 // Config
 const getConfig = require("../util/config");
 const request = require("xhr-request");
-const onServer = require("../plex/onServer");
 const { movieLookup } = require("../tmdb/movie");
 const { showLookup } = require("../tmdb/show");
 
@@ -16,16 +15,45 @@ const logger = require("../util/logger");
 
 async function trending() {
   logger.log("verbose", `TMDB Trending lookup`);
-  let person = await getPerson();
-  let movies = await getMovies();
-  let tv = await getShows();
+  // let person = await getPerson();
+  // let movies = await getMovies();
+  // let tv = await getShows();
+
+  let [person, movies, tv] = await Promise.all([
+    getPerson(),
+    getMovies(),
+    getShows(),
+  ]);
 
   for (let i = 0; i < movies.results.length; i++) {
-    movies.results[i] = await movieLookup(movies.results[i].id, true);
+    let movieData = await movieLookup(movies.results[i].id, true);
+    movies.results[i] = {
+      on_server: movieData.on_server,
+      title: movieData.title,
+      poster_path: movieData.poster_path,
+      release_date: movieData.release_date,
+      id: movieData.id,
+    };
   }
 
   for (let i = 0; i < tv.results.length; i++) {
-    tv.results[i] = await showLookup(tv.results[i].id, true);
+    let showData = await showLookup(tv.results[i].id, true);
+    tv.results[i] = {
+      on_server: showData.on_server,
+      name: showData.name,
+      poster_path: showData.poster_path,
+      first_air_date: showData.first_air_date,
+      id: showData.id,
+    };
+  }
+
+  for (let i = 0; i < person.results.length; i++) {
+    let personData = person.results[i];
+    person.results[i] = {
+      id: personData.id,
+      name: personData.name,
+      profile_path: personData.profile_path,
+    };
   }
 
   let data = {

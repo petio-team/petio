@@ -61,27 +61,6 @@ class Movies extends React.Component {
     return (
       <>
         <h1 className="main-title mb--1">Movies</h1>
-        {/* <Popular type="movie" />
-        <History type="movie" /> */}
-        <section>
-          <h3 className="sub-title mb--1">Trending Movies</h3>
-          <p>Movies trending online right now</p>
-          <Carousel>
-            {Object.keys(this.props.api.popular).length > 0 ? (
-              this.props.api.popular.movies.map((movie) => {
-                return (
-                  <MovieCard
-                    key={movie.id}
-                    msg={this.props.msg}
-                    movie={movie}
-                  />
-                );
-              })
-            ) : (
-              <CarouselLoading />
-            )}
-          </Carousel>
-        </section>
         {this.state.personalised && this.state.personalised.length > 0
           ? this.state.personalised.map((row, r) => {
               if (!row || row.results.length < 4) return null;

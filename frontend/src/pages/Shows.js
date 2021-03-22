@@ -62,21 +62,6 @@ class Shows extends React.Component {
     return (
       <>
         <h1 className="main-title mb--1">TV Shows</h1>
-        {/* <Popular type="show" />
-        <History type="show" /> */}
-        <section>
-          <h3 className="sub-title mb--1">Trending Shows</h3>
-          <p>Shows trending online right now</p>
-          <Carousel>
-            {Object.keys(this.props.api.popular).length > 0
-              ? this.props.api.popular.tv.map((tv) => {
-                  return (
-                    <ShowCard key={tv.id} msg={this.props.msg} series={tv} />
-                  );
-                })
-              : null}
-          </Carousel>
-        </section>
         {this.state.personalised && this.state.personalised.length > 0
           ? this.state.personalised.map((row, r) => {
               if (!row || row.results.length < 4) return null;
