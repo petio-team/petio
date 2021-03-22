@@ -395,7 +395,12 @@ class LibraryUpdate {
       .split("://")[0];
     let externalId = false;
     let externalIds = {};
-    if (idSource === "local") return;
+    if (idSource === "local" || idSource === "none") {
+      logger.verbose(
+        `LIB CRON: Item skipped :: Not matched / local only - ${movieObj.title}`
+      );
+      return;
+    }
     if (idSource === "plex") {
       let title = movieObj.title;
       try {
