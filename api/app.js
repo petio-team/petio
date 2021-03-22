@@ -3,7 +3,6 @@ const app = express();
 const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv/config");
-const CronJob = require("cron").CronJob;
 const fs = require("fs");
 const path = require("path");
 const pjson = require("./package.json");
@@ -11,16 +10,14 @@ require("./node_modules/cache-manager/lib/stores/memory.js");
 const logger = require("./util/logger");
 const cluster = require("cluster");
 const trending = require("./tmdb/trending");
+const bcrypt = require("bcryptjs");
 
 // Config
 const getConfig = require("./util/config");
 const Worker = require("./worker");
 
 // Plex
-const LibraryUpdate = require("./plex/libraryUpdate");
 const testConnection = require("./plex/testConnection");
-
-const QuotaSystem = require("./requests/quotas");
 
 // Routes
 const movieRoute = require("./routes/movie");
@@ -301,7 +298,7 @@ class Main {
         plexClientID: server.clientId,
         adminUsername: user.username,
         adminEmail: user.email,
-        adminPass: user.password,
+        adminPass: bcrypt.hashSync(user.password, 10),
         adminId: user.id,
         adminThumb: user.thumb,
         adminDisplayName: user.username,

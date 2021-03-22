@@ -12,7 +12,6 @@ const Mailer = require("../mail/mailer");
 const getConfig = require("../util/config");
 const processRequest = require("../requests/process");
 const logger = require("../util/logger");
-const bcrypt = require("bcryptjs");
 const Discord = require("../notifications/discord");
 const { showLookup } = require("../tmdb/show");
 
@@ -23,10 +22,6 @@ class LibraryUpdate {
     this.tmdb = "https://api.themoviedb.org/3/";
     this.full = true;
   }
-
-  // async run() {
-  //   await this.scan();
-  // }
 
   async partial() {
     logger.log("info", `LIB CRON: Running Partial`);
@@ -150,14 +145,36 @@ class LibraryUpdate {
           email: this.config.adminEmail,
           thumb: this.config.adminThumb,
           title: this.config.adminDisplayName,
+          nameLower: this.config.adminDisplayName.toLowerCase(),
           username: this.config.adminUsername,
-          password: bcrypt.hashSync(this.config.adminPass, 10),
+          password: this.config.adminPass,
           altId: 1,
           role: "admin",
         });
         await adminData.save();
       } catch (err) {
         logger.log("error", `LIB CRON: Error creating admin user`);
+        logger.log({ level: "error", message: err });
+      }
+    } else {
+      try {
+        logger.log(
+          "info",
+          `LIB CRON: Admin Updating ${this.config.adminDisplayName}`
+        );
+        adminFound.email = this.config.adminEmail;
+        adminFound.thumb = this.config.adminThumb;
+        adminFound.title = this.config.adminDisplayName;
+        adminFound.nameLower = this.config.adminDisplayName.toLowerCase();
+        adminFound.username = this.config.adminUsername;
+        adminFound.password = this.config.adminPass;
+        await adminFound.save();
+        logger.log(
+          "info",
+          `LIB CRON: Admin Updated ${this.config.adminDisplayName}`
+        );
+      } catch (err) {
+        logger.log("error", `LIB CRON: Admin Update Failed ${obj.title}`);
         logger.log({ level: "error", message: err });
       }
     }
@@ -716,6 +733,7 @@ class LibraryUpdate {
   }
 
   async updateFriends() {
+    logger.info("LIB CRON: Updating Friends");
     let friendList = false;
     try {
       friendList = await this.getFriends();
@@ -774,6 +792,7 @@ class LibraryUpdate {
     } catch {
       friendDb = false;
     }
+
     if (!friendDb) {
       try {
         let defaultProfile = await Profile.findOne({ isDefault: true });
@@ -781,7 +800,10 @@ class LibraryUpdate {
           id: obj.id,
           title: obj.title,
           username: obj.username ? obj.username : obj.title,
-          email: obj.email,
+          nameLower: obj.username
+            ? obj.username.toLowerCase()
+            : obj.title.toLowerCase(),
+          email: obj.email.toLowerCase(),
           recommendationsPlaylistId: obj.recommendationsPlaylistId,
           thumb: obj.thumb,
           Server: obj.Server,
@@ -799,6 +821,22 @@ class LibraryUpdate {
         logger.log("info", `LIB CRON: User Created ${obj.title}`);
       } else {
         logger.log("warn", `LIB CRON: User Failed to Create ${obj.title}`);
+      }
+    } else {
+      try {
+        logger.log("info", `LIB CRON: User Updating ${obj.title}`);
+        friendDb.title = obj.title;
+        friendDb.username = obj.username;
+        friendDb.nameLower = obj.username
+          ? obj.username.toLowerCase()
+          : obj.title.toLowerCase();
+        friendDb.email = obj.email;
+        friendDb.thumb = obj.thumb;
+        await friendDb.save();
+        logger.log("info", `LIB CRON: User Updated ${obj.title}`);
+      } catch (err) {
+        logger.log("error", `LIB CRON: User Update Failed ${obj.title}`);
+        logger.log({ level: "error", message: err });
       }
     }
   }

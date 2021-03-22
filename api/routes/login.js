@@ -50,7 +50,12 @@ router.post("/", async (req, res) => {
   try {
     // Find user in db
     let dbUser = await User.findOne({
-      $or: [{ username: username }, { email: username }, { title: username }],
+      $or: [
+        { username: username },
+        { email: username },
+        { title: username },
+        { nameLower: username.toLowerCase() },
+      ],
     });
     if (!dbUser) throw "User not found";
 

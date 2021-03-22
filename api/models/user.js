@@ -5,6 +5,7 @@ const FriendSchema = mongoose.Schema(
     id: String,
     title: String,
     username: String,
+    nameLower: String,
     email: String,
     password: String,
     recommendationsPlaylistId: String,
@@ -24,5 +25,3 @@ const FriendSchema = mongoose.Schema(
 );
 
 module.exports = mongoose.model("Friend", FriendSchema);
-
-// ratingKey
