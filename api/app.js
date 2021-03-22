@@ -78,9 +78,9 @@ class Main {
     }
     this.config = getConfig();
 
-    if (typeof this.config.plex_popular == 'undefined') {
-      this.updatePopularConfig()
-    }
+    // if (typeof this.config.plex_popular == 'undefined') {
+    //   this.updatePopularConfig()
+    // }
   }
 
   async updatePopularConfig() {
@@ -93,17 +93,20 @@ class Main {
       configFile = path.join(project_folder, "./config/config.json");
     }
     try {
-      let updatedConfig = JSON.stringify({ ...this.config, plex_popular: true });
+      let updatedConfig = JSON.stringify({
+        ...this.config,
+        plex_popular: true,
+      });
       fs.writeFile(configFile, updatedConfig, (err) => {
         if (err) {
           logger.log("warn", err);
         } else {
-          logger.log("info", 'Config updated with plex_popular variable');
+          logger.log("info", "Config updated with plex_popular variable");
         }
       });
     } catch (err) {
       logger.log("verbose", err);
-      logger.log("warn", 'Config not found');
+      logger.log("warn", "Config not found");
     }
   }
 

@@ -1,4 +1,5 @@
 const request = require("xhr-request");
+const Promise = require("bluebird");
 const xmlParser = require("xml-js");
 const Library = require("../models/library");
 const Movie = require("../models/movie");
@@ -305,21 +306,24 @@ class LibraryUpdate {
         try {
           let libContent = await this.getLibrary(lib.key);
           await Promise.all(
-            Object.keys(libContent.Metadata).map(async (item) => {
-              let obj = libContent.Metadata[item];
-              if (obj.type === "movie") {
-                await this.saveMovie(obj);
-              } else if (obj.type === "artist") {
-                await this.saveMusic(obj);
-              } else if (obj.type === "show") {
-                await this.saveShow(obj);
-              } else {
-                logger.log(
-                  "info",
-                  `LIB CRON: Unknown media type - ${obj.type}`
-                );
-              }
-            })
+            Object.keys(libContent.Metadata).map(
+              async (item) => {
+                let obj = libContent.Metadata[item];
+                if (obj.type === "movie") {
+                  await this.saveMovie(obj);
+                } else if (obj.type === "artist") {
+                  await this.saveMusic(obj);
+                } else if (obj.type === "show") {
+                  await this.saveShow(obj);
+                } else {
+                  logger.log(
+                    "info",
+                    `LIB CRON: Unknown media type - ${obj.type}`
+                  );
+                }
+              },
+              { concurrency: 20 }
+            )
           );
         } catch (err) {
           logger.log("error", `LIB CRON: Unable to get library content`);
