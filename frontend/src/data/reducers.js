@@ -1,12 +1,10 @@
-import { combineReducers } from 'redux';
-import api from './Api/reducer';
-import plex from './Plex/reducer';
-import user from './User/reducer';
+import { combineReducers } from "redux";
+import api from "./Api/reducer";
+import user from "./User/reducer";
 
 const rootReducer = combineReducers({
-	plex,
-	api,
-	user,
+  api,
+  user,
 });
 
 export default rootReducer;

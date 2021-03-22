@@ -4,6 +4,10 @@ export async function login(user, token = false) {
   return post("/login", { user, authToken: token });
 }
 
+export async function plexLogin(token = false) {
+  return post("/login/plex_login", { token: token });
+}
+
 export async function request(req, user) {
   return post("/request/add", { request: req, user });
 }

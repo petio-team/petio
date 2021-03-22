@@ -3,6 +3,7 @@ import { HashRouter, Switch, Route } from "react-router-dom";
 import { connect } from "react-redux";
 import User from "./data/User";
 import Api from "./data/Api";
+// import Plex from "./data/Plex";
 import Sidebar from "./components/Sidebar";
 import Search from "./pages/Search";
 import Series from "./pages/Series";
@@ -21,6 +22,43 @@ import Genre from "./pages/Genre";
 import Networks from "./pages/Networks";
 import Company from "./pages/Company";
 import People from "./pages/People";
+
+const popupCenter = (url, title, w, h) => {
+  // Fixes dual-screen position | credit Tautulli
+  var dualScreenLeft =
+    window.screenLeft != undefined ? window.screenLeft : window.screenX;
+  var dualScreenTop =
+    window.screenTop != undefined ? window.screenTop : window.screenY;
+
+  var width = window.innerWidth
+    ? window.innerWidth
+    : document.documentElement.clientWidth
+    ? document.documentElement.clientWidth
+    : screen.width;
+  var height = window.innerHeight
+    ? window.innerHeight
+    : document.documentElement.clientHeight
+    ? document.documentElement.clientHeight
+    : screen.height;
+
+  var left = width / 2 - w / 2 + dualScreenLeft;
+  var top = height / 2 - h / 2 + dualScreenTop;
+  var newWindow = window.open(
+    url,
+    title,
+    "scrollbars=yes, width=" +
+      w +
+      ", height=" +
+      h +
+      ", top=" +
+      top +
+      ", left=" +
+      left
+  );
+
+  if (window.focus) newWindow.focus();
+  return newWindow;
+};
 
 class App extends React.Component {
   constructor(props) {
@@ -44,6 +82,7 @@ class App extends React.Component {
     this.inputChange = this.inputChange.bind(this);
     this.logout = this.logout.bind(this);
     this.msg = this.msg.bind(this);
+    this.loginOauth = this.loginOauth.bind(this);
   }
 
   inputChange(e) {
@@ -225,6 +264,43 @@ class App extends React.Component {
     }
   }
 
+  async loginOauth() {
+    try {
+      let plexWindow = popupCenter("", "Login with Plex", 500, 500);
+      this.setState({
+        loading: true,
+      });
+      let res = await User.plexAuth(plexWindow);
+      this.setState({
+        loading: false,
+        loginMsg: false,
+      });
+      if (res.error) {
+        this.msg({
+          message: res.error,
+          type: "error",
+        });
+        return;
+      }
+      if (res.loggedIn) {
+        this.setState({
+          isLoggedIn: true,
+        });
+      }
+      if (res.admin) {
+        this.setState({
+          isAdmin: true,
+        });
+      }
+      User.getRequests();
+    } catch (err) {
+      this.msg({ message: err, type: "error" });
+      this.setState({
+        loading: false,
+      });
+    }
+  }
+
   render() {
     if (this.state.loading) {
       return (
@@ -244,7 +320,7 @@ class App extends React.Component {
               let msg = this.state.pushMsg[i];
               return (
                 <div
-                  key={msg.timestamp}
+                  key={`${msg.timestamp}__${i}`}
                   className={`push-msg--item ${
                     msg.type !== "info" ? msg.type : ""
                   }`}
@@ -264,7 +340,7 @@ class App extends React.Component {
                   {!this.state.adminLogin ? "Login" : "Admin Login"}
                 </p>
                 <form onSubmit={this.loginForm} autoComplete="on">
-                  <p>Username / Email</p>
+                  <p style={{ marginBottom: "5px" }}>Username / Email</p>
                   <input
                     type="text"
                     name="username"
@@ -274,7 +350,7 @@ class App extends React.Component {
                   />
                   {this.state.login_type === 1 ? (
                     <>
-                      <p>Password</p>
+                      <p style={{ marginBottom: "5px" }}>Password</p>
                       <input
                         type="password"
                         name="password"
@@ -296,6 +372,14 @@ class App extends React.Component {
                   ) : null}
                   <button className="btn btn__square">Login</button>
                 </form>
+                <div className="login--inner--divide">
+                  <p>or</p>
+                </div>
+                <div>
+                  <button className="btn btn__square" onClick={this.loginOauth}>
+                    Login with Plex
+                  </button>
+                </div>
               </div>
               <div className="credits">
                 <a href="https://fanart.tv/" target="_blank" rel="noreferrer">

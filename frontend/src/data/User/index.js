@@ -8,6 +8,7 @@ import {
   addIssue,
   myRequests,
   quota,
+  plexAuth,
 } from "./actions";
 
 export default {
@@ -20,4 +21,5 @@ export default {
   addIssue,
   myRequests,
   quota,
+  plexAuth,
 };

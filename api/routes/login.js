@@ -12,6 +12,8 @@ const { authenticate } = require("../middleware/auth");
 const getDiscovery = require("../discovery/display");
 const getHistory = require("../plex/history");
 const getTop = require("../plex/top");
+const axios = require("axios");
+const xmlParser = require("xml-js");
 
 router.post("/", async (req, res) => {
   const prefs = getConfig();
@@ -33,36 +35,10 @@ router.post("/", async (req, res) => {
   logger.log("info", `LOGIN: New login attempted`);
   logger.log("info", `LOGIN: Request IP: ${request_ip}`);
 
-  function success(user, isAdmin = false) {
-    user.password = null;
-    const token = jwt.sign({ ...user, admin: isAdmin }, prefs.plexToken);
-    res
-      .cookie("petio_jwt", token, {
-        path: "/",
-        httpOnly: true,
-        maxAge: 2419200000,
-        sameSite: "strict",
-        secure: false,
-      })
-      .json({
-        loggedIn: true,
-        user,
-        token,
-        admin: isAdmin,
-      });
-    getTop(1);
-    getTop(2);
-    let userId = user.altId ? user.altId : user.id;
-    getHistory(userId, "movie");
-    getHistory(userId, "show");
-    getDiscovery(userId, "movie");
-    getDiscovery(userId, "show");
-  }
-
   // check for existing jwt
   try {
     const user = await authenticate(req);
-    success(user, req.jwtUser.admin);
+    success(user, req.jwtUser.admin, res);
     logger.log("info", `LOGIN: Request User: ${user.username}`);
     return;
   } catch (e) {
@@ -91,10 +67,10 @@ router.post("/", async (req, res) => {
         // throws on invalid credentials
         await plexAuth(username, password);
       }
-      success(dbUser.toObject(), isAdmin);
+      success(dbUser.toObject(), isAdmin, res);
     } else {
       // passwordless login, no check required. But we downgrade admin perms
-      success(dbUser.toObject(), false);
+      success(dbUser.toObject(), false, res);
     }
     saveRequestIp(dbUser, request_ip);
   } catch (err) {
@@ -103,6 +79,33 @@ router.post("/", async (req, res) => {
     res.json({ loggedIn: false, user: null, admin: false, token: null });
   }
 });
+
+function success(user, isAdmin = false, res) {
+  const prefs = getConfig();
+  user.password = null;
+  const token = jwt.sign({ ...user, admin: isAdmin }, prefs.plexToken);
+  res
+    .cookie("petio_jwt", token, {
+      path: "/",
+      httpOnly: true,
+      maxAge: 2419200000,
+      sameSite: "strict",
+      secure: false,
+    })
+    .json({
+      loggedIn: true,
+      user,
+      token,
+      admin: isAdmin,
+    });
+  getTop(1);
+  getTop(2);
+  let userId = user.altId ? user.altId : user.id;
+  getHistory(userId, "movie");
+  getHistory(userId, "show");
+  getDiscovery(userId, "movie");
+  getDiscovery(userId, "show");
+}
 
 function plexAuth(username, password) {
   logger.info(`LOGIN: Using Plex Auth for ${username}`);
@@ -141,6 +144,39 @@ function plexAuth(username, password) {
       }
     );
   });
+}
+
+router.post("/plex_login", async (req, res) => {
+  const request_ip =
+    req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+  const token = req.body.token;
+  try {
+    let userId = await plexOauth(token);
+    let dbUser = await User.findOne({ id: userId });
+    if (!dbUser) throw "User not found";
+    if (dbUser.disabled) throw "User is disabled";
+    let isAdmin = dbUser.role === "admin" || dbUser.role === "moderator";
+    success(dbUser.toObject(), isAdmin, res);
+    saveRequestIp(dbUser, request_ip);
+  } catch (err) {
+    console.log(err);
+    res.json({ error: err });
+  }
+});
+
+async function plexOauth(token) {
+  let plex = await axios.get(
+    `https://plex.tv/users/account?X-Plex-Token=${token}`
+  );
+  try {
+    let data = JSON.parse(xmlParser.xml2json(plex.data, { compact: false }));
+    let user = data.elements[0].attributes;
+    console.log(user);
+    return user.id;
+  } catch (err) {
+    console.log(err);
+    throw "Plex authentication failed";
+  }
 }
 
 async function saveRequestIp(user, request_ip) {

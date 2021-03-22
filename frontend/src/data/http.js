@@ -26,7 +26,7 @@ function parseResponse(response) {
       .json()
       .catch(() => response.text());
   }
-  throw new HttpError(response.status);
+  console.log(new HttpError(response.status));
 }
 
 export function get(path, options = {}) {
