@@ -60,6 +60,7 @@
 
     &--poster {
       width: 140px;
+      min-width: 140px;
 
       .text-wrap {
         display: none;
@@ -68,6 +69,7 @@
 
     &--details {
       margin-left: 10px;
+      width: 100%;
 
       .detail-title {
         font-size: 15px;
