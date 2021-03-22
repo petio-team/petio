@@ -41,7 +41,8 @@ class LibraryUpdate {
     let matched = {};
 
     await Promise.map(
-      Object.keys(recent.Metadata, async (i) => {
+      Object.keys(recent.Metadata),
+      async (i) => {
         let obj = recent.Metadata[i];
 
         if (obj.type === "movie") {
@@ -103,7 +104,8 @@ class LibraryUpdate {
             `LIB CRON: Partial scan type not found - ${obj.type}`
           );
         }
-      }, {concurrency: 10})
+      },
+      { concurrency: 10 }
     );
     this.execMail();
     logger.log("info", "LIB CRON: Partial Scan Complete");
@@ -323,24 +325,24 @@ class LibraryUpdate {
         try {
           let libContent = await this.getLibrary(lib.key);
           await Promise.map(
-              Object.keys(libContent.Metadata),
-              async (item) => {
-                let obj = libContent.Metadata[item];
-                if (obj.type === "movie") {
-                  await this.saveMovie(obj);
-                } else if (obj.type === "artist") {
-                  await this.saveMusic(obj);
-                } else if (obj.type === "show") {
-                  await this.saveShow(obj);
-                } else {
-                  logger.log(
-                    "info",
-                    `LIB CRON: Unknown media type - ${obj.type}`
-                  );
-                }
-              },
-              { concurrency: 10 }
-            );
+            Object.keys(libContent.Metadata),
+            async (item) => {
+              let obj = libContent.Metadata[item];
+              if (obj.type === "movie") {
+                await this.saveMovie(obj);
+              } else if (obj.type === "artist") {
+                await this.saveMusic(obj);
+              } else if (obj.type === "show") {
+                await this.saveShow(obj);
+              } else {
+                logger.log(
+                  "info",
+                  `LIB CRON: Unknown media type - ${obj.type}`
+                );
+              }
+            },
+            { concurrency: 10 }
+          );
         } catch (err) {
           logger.log("error", `LIB CRON: Unable to get library content`);
           logger.log({ level: "error", message: err });
