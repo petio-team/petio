@@ -1,6 +1,6 @@
 {
   "name": "petio-rest",
-  "version": "0.4.2-alpha",
+  "version": "0.4.3-alpha",
   "description": "Rest Api for Petio",
   "main": "index.js",
   "scripts": {
