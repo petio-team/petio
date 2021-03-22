@@ -17,9 +17,10 @@
   &--item {
     width: 200px;
     padding: 10px 20px;
-    background: $blue;
+    background: $dark-grey;
     border-radius: 5px;
     margin-top: 5px;
+    border-left: solid 5px $blue;
 
     @include media-breakpoint-up(lg) {
       width: 300px;
@@ -28,11 +29,11 @@
     }
 
     &.good {
-      background: $good;
+      border-color: $good;
     }
 
     &.error {
-      background: $bad;
+      border-color: $bad;
     }
   }
 }
