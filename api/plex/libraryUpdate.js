@@ -306,7 +306,8 @@ class LibraryUpdate {
         try {
           let libContent = await this.getLibrary(lib.key);
           await Promise.all(
-            Object.keys(libContent.Metadata).map(
+            Promise.map(
+              Object.keys(libContent.Metadata),
               async (item) => {
                 let obj = libContent.Metadata[item];
                 if (obj.type === "movie") {

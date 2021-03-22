@@ -24,7 +24,8 @@ module.exports = async function buildDiscovery() {
     }
   });
   await Promise.all(
-    userIds.map(
+    Promise.map(
+      userIds,
       async (i) => {
         await userBuild(i);
       },
