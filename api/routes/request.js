@@ -37,6 +37,7 @@ router.get("/min", async (req, res) => {
           sonarrId: request.sonarrId,
           radarrId: request.radarrId,
           approved: request.approved,
+          defaults: request.pendingDefault,
         };
       })
     );
