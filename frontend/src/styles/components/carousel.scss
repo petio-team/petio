@@ -76,12 +76,12 @@
   }
 
   .card {
-    width: 80px;
-    min-width: 80px;
+    width: 100px;
+    min-width: 100px;
 
     @include media-breakpoint-up(md) {
-      width: 100px;
-      min-width: 100px;
+      width: 120px;
+      min-width: 120px;
     }
 
     @include media-breakpoint-up(lg) {
@@ -94,8 +94,8 @@
 .carousel-loading {
   display: flex;
   &-item {
-    width: 80px;
-    min-width: 80px;
+    width: 100px;
+    min-width: 100px;
     margin-right: 5px;
     animation-name: loading;
     animation-duration: 0.5s;
@@ -169,8 +169,8 @@
     }
 
     @include media-breakpoint-up(md) {
-      width: 100px;
-      min-width: 100px;
+      width: 120px;
+      min-width: 120px;
     }
 
     @include media-breakpoint-up(lg) {
@@ -190,8 +190,8 @@
 
       .title {
         font-weight: 700;
-        font-size: 9px;
-        line-height: 12px;
+        font-size: 11px;
+        line-height: 16px;
         white-space: nowrap;
         margin: 0;
 

@@ -1,5 +1,8 @@
 section {
-	padding-bottom: 25px;
-	border-bottom: solid 1px rgba(white, 0.1);
-	margin-bottom: 25px;
+  margin-bottom: 25px;
+
+  @include media-breakpoint-up(md) {
+    padding-bottom: 25px;
+    border-bottom: solid 1px rgba(white, 0.1);
+  }
 }
