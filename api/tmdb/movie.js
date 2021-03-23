@@ -5,8 +5,7 @@ const fanartLookup = require("../fanart");
 const request = require("xhr-request");
 const onServer = require("../plex/onServer");
 const imdb = require("../meta/imdb");
-
-const ISO6391 = require("iso-639-1");
+const getLanguage = require("./languages");
 
 const logger = require("../util/logger");
 
@@ -130,9 +129,7 @@ async function movieLookup(id, minified = false) {
         delete movie.overview;
         delete movie.video;
       } else {
-        movie.original_language_format = ISO6391.getName(
-          movie.original_language
-        );
+          movie.original_language_format = getLanguage(movie.original_language);
       }
 
       return movie;
