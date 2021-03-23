@@ -78,7 +78,7 @@ class Profile extends React.Component {
                         '")'
                       : 'url("' +
                         this.props.user.credentials.api +
-                        "user/thumb/" +
+                        "/user/thumb/" +
                         this.props.user.current.id +
                         '")',
                   color: "red",
