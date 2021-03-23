@@ -169,9 +169,14 @@ class Requests extends React.Component {
     }
   }
 
-  editReq(req) {
+  editReq(reqD) {
     let edit_radarr = {};
     let edit_sonarr = {};
+    let req = this.props.user.requests[reqD.requestId];
+    if (!req) {
+      this.props.msg({ message: "Error editing request", type: "error" });
+      return;
+    }
     if (req.type === "movie") {
       if (req.radarrId.length > 0) {
         req.radarrId.map((r, i) => {
