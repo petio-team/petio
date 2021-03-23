@@ -279,7 +279,7 @@ class Setup extends React.Component {
         preset = "mongo:27017";
         break;
       case "unraid":
-        preset = "MongoDB:27017";
+        preset = "X.X.X.X:27017";
         break;
       default:
         preset = "localhost:27017";
