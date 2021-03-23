@@ -87,6 +87,7 @@ async function getRequests(user = false, all = false) {
               approved: request.approved,
               manualStatus: request.manualStatus,
               process_stage: reqState(request, children),
+              defaults: request.pendingDefault,
             };
           }
         },

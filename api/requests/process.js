@@ -9,6 +9,8 @@ const logger = require("../util/logger");
 const filter = require("./filter");
 const Discord = require("../notifications/discord");
 const { showLookup } = require("../tmdb/show");
+const fs = require("fs");
+const path = require("path");
 
 class processRequest {
   constructor(req = {}, usr = {}) {
@@ -127,6 +129,7 @@ class processRequest {
         this.sendToDvr(profile);
       } else {
         logger.info("REQ: Request requires approval, waiting");
+        this.pendingDefaults(profile);
       }
     } catch (err) {
       logger.log("error", `REQ: Unable to save request`);
@@ -144,6 +147,77 @@ class processRequest {
       user: this.user.title,
       request: this.request,
     };
+  }
+
+  async pendingDefaults(profile) {
+    let pending = {};
+    let filterMatch = await filter(this.request);
+    if (filterMatch) {
+      logger.log(
+        "info",
+        "REQ: Pending Request Matched on custom filter, setting default"
+      );
+      pending[filterMatch.server] = {
+        path: filterMatch.path,
+        profile: filterMatch.profile,
+        tag: filterMatch.tag,
+      };
+    } else {
+      let project_folder, configFile, configData, configParse;
+      if (this.request.type === "movie") {
+        if (process.pkg) {
+          project_folder = path.dirname(process.execPath);
+          configFile = path.join(project_folder, "./config/radarr.json");
+        } else {
+          project_folder = __dirname;
+          configFile = path.join(project_folder, "../config/radarr.json");
+        }
+        configData = fs.readFileSync(configFile);
+        configParse = JSON.parse(configData);
+
+        for (let s in configParse) {
+          let server = configParse[s];
+          if (profile.radarr && profile.radarr[server.uuid]) {
+            pending[server.uuid] = {
+              path: server.path_title,
+              profile: server.profile,
+              tag: false,
+            };
+          }
+        }
+      } else {
+        if (process.pkg) {
+          project_folder = path.dirname(process.execPath);
+          configFile = path.join(project_folder, "./config/sonarr.json");
+        } else {
+          project_folder = __dirname;
+          configFile = path.join(project_folder, "../config/sonarr.json");
+        }
+        configData = fs.readFileSync(configFile);
+        configParse = JSON.parse(configData);
+
+        for (let s in configParse) {
+          let server = configParse[s];
+          if (profile.sonarr && profile.sonarr[server.uuid]) {
+            pending[server.uuid] = {
+              path: server.path_title,
+              profile: server.profile,
+              tag: false,
+            };
+          }
+        }
+      }
+    }
+    if (Object.keys(pending).length > 0) {
+      await Request.updateOne(
+        { requestId: this.request.id },
+        { $set: { pendingDefault: pending } }
+      );
+
+      logger.log("info", "REQ: Pending Defaults set for later");
+    } else {
+      logger.log("info", "REQ: No Pending Defaults to Set");
+    }
   }
 
   async sendToDvr(profile) {

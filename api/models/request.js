@@ -13,8 +13,7 @@ const RequestSchema = mongoose.Schema({
   radarrId: Array,
   approved: Boolean,
   manualStatus: Number,
+  pendingDefault: Object,
 });
 
 module.exports = mongoose.model("Request", RequestSchema);
-
-// requestId

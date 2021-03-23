@@ -187,6 +187,18 @@ class Requests extends React.Component {
               : false,
           };
         });
+      } else {
+        if (req.defaults) {
+          Object.keys(req.defaults).map((s) => {
+            let uuid = s;
+            let server = req.defaults[s];
+            edit_radarr[uuid] = {
+              active: true,
+              profile: server.profile,
+              path: server.path,
+            };
+          });
+        }
       }
     }
     if (req.type === "tv") {
@@ -204,6 +216,18 @@ class Requests extends React.Component {
               : false,
           };
         });
+      } else {
+        if (req.defaults) {
+          Object.keys(req.defaults).map((s) => {
+            let uuid = s;
+            let server = req.defaults[s];
+            edit_sonarr[uuid] = {
+              active: true,
+              profile: server.profile,
+              path: server.path,
+            };
+          });
+        }
       }
     }
     this.setState({
@@ -419,13 +443,16 @@ class Requests extends React.Component {
       return;
     }
 
+    let title = this.state.activeRequest.title;
+    let approved = this.state.activeRequest.approved;
+
     await Api.updateRequest(this.state.activeRequest, servers);
     this.closeModal("editRequest", true);
     this.getRequests(true);
     this.props.msg({
-      message: this.state.activeRequest.approved
-        ? `Request Updated: ${this.state.activeRequest.title}`
-        : `Request Approved: ${this.state.activeRequest.title}`,
+      message: approved
+        ? `Request Updated: ${title}`
+        : `Request Approved: ${title}`,
       type: "good",
     });
   }

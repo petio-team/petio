@@ -55,7 +55,7 @@ async function filter(item) {
       compulsoryPass &&
       (optionalMatch > 0 || f.rows.length === 1)
     ) {
-      logger.log(`FILT: Match on filter ${i + 1}`);
+      logger.info(`FILT: Match on filter ${i + 1}`);
       action = f.action;
     }
   });
