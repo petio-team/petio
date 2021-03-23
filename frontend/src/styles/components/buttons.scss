@@ -193,6 +193,11 @@ button {
     border-color: rgba($grey-medium, 0);
     width: 120px;
   }
+
+  &.disabled {
+    opacity: 0.2;
+    pointer-events: none;
+  }
 }
 
 @keyframes spinner1 {

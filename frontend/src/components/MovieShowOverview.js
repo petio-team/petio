@@ -195,12 +195,12 @@ class MovieShowOverview extends React.Component {
       </button>
     );
 
-    let reportBtn = (
+    let reportBtn = this.props.mediaData.on_server ? (
       <button className="btn btn__square" onClick={this.props.openIssues}>
         <ReportIcon />
         Report an issue
       </button>
-    );
+    ) : null;
 
     let hasReviewed = false;
     if (this.props.user.reviews) {
