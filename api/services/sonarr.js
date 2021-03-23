@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 var sanitize = require("sanitize-filename");
 const logger = require("../util/logger");
+const axios = require("axios");
 
 class Sonarr {
   constructor(id = false, forced = false, profileOvr = false, pathOvr = false) {

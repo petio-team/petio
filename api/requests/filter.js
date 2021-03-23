@@ -50,14 +50,12 @@ async function filter(item) {
         }
       }
     });
-    // console.log(hasMatched, compulsoryPass, optionalMatch, f.rows.length);
     if (
       hasMatched &&
       compulsoryPass &&
       (optionalMatch > 0 || f.rows.length === 1)
     ) {
-      console.log(filterMatch, compulsoryPass, optionalMatch, f.rows.length);
-      console.log(`Match on filter ${i + 1}`);
+      logger.log(`FILT: Match on filter ${i + 1}`);
       action = f.action;
     }
   });
@@ -106,7 +104,7 @@ function getValue(condition, media) {
       if (media.release_date)
         values.push(new Date(media.release_date).getFullYear());
       if (media.first_air_date)
-        values.push(new Date(media.release_date).getFullYear());
+        values.push(new Date(media.first_air_date).getFullYear());
       break;
     case "age_rating":
       values = [media.age_rating];
