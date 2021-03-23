@@ -605,7 +605,7 @@ class Requests extends React.Component {
               </section>
               <section>
                 <RequestsTable
-                  requests={this.state.requests}
+                  requests={this.props.user.requests}
                   api={this.props.api}
                   editReq={this.editReq}
                 />
