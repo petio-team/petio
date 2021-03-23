@@ -441,6 +441,8 @@ class General extends React.Component {
           <p className="main-title mb--2">Popular content on Plex</p>
           <p className="description">
             Display most popular titles from Plex in the discovery view.
+            <br />
+            Required Plex Pass
           </p>
           <div className="checkbox-wrap mb--2">
             <input
