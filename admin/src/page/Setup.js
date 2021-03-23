@@ -12,6 +12,7 @@ import { ReactComponent as Bad } from "../assets/svg/close.svg";
 import { ReactComponent as TmdbLogo } from "../assets/svg/tmdb.svg";
 import { ReactComponent as LockIcon } from "../assets/svg/lock.svg";
 import { ReactComponent as UnlockIcon } from "../assets/svg/unlock.svg";
+import { ReactComponent as UnraidIcon } from "../assets/svg/unraid.svg";
 import Api from "../data/Api";
 import pjson from "../../package.json";
 
@@ -66,6 +67,7 @@ class Setup extends React.Component {
       selectedServer: false,
       mongoStatus: "",
       mongoType: "mongodb://",
+      mongoInstall: "docker",
       finalText: "Getting things set up...",
     };
 
@@ -78,6 +80,7 @@ class Setup extends React.Component {
     this.testMongo = this.testMongo.bind(this);
     this.waitText = this.waitText.bind(this);
     this.changeMongoType = this.changeMongoType.bind(this);
+    this.mongoPreset = this.mongoPreset.bind(this);
   }
 
   serverIcon(platform) {
@@ -269,6 +272,24 @@ class Setup extends React.Component {
     window.scrollTo(0, 0);
   }
 
+  mongoPreset(type) {
+    let preset;
+    switch (type) {
+      case "docker":
+        preset = "mongo:27017";
+        break;
+      case "unraid":
+        preset = "MongoDB:27017";
+        break;
+      default:
+        preset = "localhost:27017";
+    }
+    this.setState({
+      mongoInstall: type,
+      db: preset,
+    });
+  }
+
   render() {
     return (
       <div className="setup--wrap">
@@ -452,6 +473,34 @@ class Setup extends React.Component {
                 To switch between local / cloud db clusters click on the prefix
                 to switch between the two.
               </p>
+              <div className="mongo-options">
+                <div
+                  className={`mongo-option ${
+                    this.state.mongoInstall === "docker" ? "active" : ""
+                  }`}
+                  onClick={() => this.mongoPreset("docker")}
+                >
+                  <Docker />
+                  <p>Docker</p>
+                </div>
+                <div
+                  className={`mongo-option unraid ${
+                    this.state.mongoInstall === "unraid" ? "active" : ""
+                  }`}
+                  onClick={() => this.mongoPreset("unraid")}
+                >
+                  <UnraidIcon />
+                </div>
+                <div
+                  className={`mongo-option ${
+                    this.state.mongoInstall === "other" ? "active" : ""
+                  }`}
+                  onClick={() => this.mongoPreset("other")}
+                >
+                  <Server />
+                  <p>Other</p>
+                </div>
+              </div>
               <div className="mongo-wrap">
                 <div className="mongo-icon">
                   <Server />
