@@ -56,6 +56,8 @@ function getTopData(type) {
 async function parseTop(data, type) {
   let top = data.MediaContainer.Metadata;
   let output = {};
+  if (!top)
+    throw "No Plex Top Data, you're probably not a Plex Pass user. This is not an error";
   for (let i = 0; i < top.length; i++) {
     let item = top[i];
     let ratingKey = item.ratingKey;
