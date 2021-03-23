@@ -254,15 +254,25 @@ class RequestsTable extends React.Component {
                 <React.Fragment key={key}>
                   <tr>
                     <td>
-                      {req.title}{" "}
-                      {req.type === "tv" && !req.tvdb_id ? (
-                        <span
-                          className="no-id warning"
-                          title="No TVDb ID for this request"
-                        >
-                          <WarningIcon />
-                        </span>
-                      ) : null}
+                      <a
+                        style={{ color: "inherit" }}
+                        href={`${window.location.pathname.replace(
+                          "/admin/",
+                          ""
+                        )}/#/${req.type === "movie" ? "movie" : "tv"}/${
+                          req.requestId
+                        }`}
+                      >
+                        {req.title}{" "}
+                        {req.type === "tv" && !req.tvdb_id ? (
+                          <span
+                            className="no-id warning"
+                            title="No TVDb ID for this request"
+                          >
+                            <WarningIcon />
+                          </span>
+                        ) : null}
+                      </a>
                     </td>
                     <td>{this.getYear(req)}</td>
                     <td>{this.typeIcon(req.type)}</td>

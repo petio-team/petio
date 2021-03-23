@@ -37,6 +37,14 @@ class RequestCard extends React.Component {
         className={"card type--movie-tv"}
       >
         <div className="card--inner">
+          <a
+            className="full-link"
+            href={`${window.location.pathname.replace("/admin/", "")}/#/${
+              this.props.user.requests[request.id].type === "movie"
+                ? "movie"
+                : "tv"
+            }/${request.id}`}
+          ></a>
           <div className="request-count">
             {Object.keys(this.props.user.requests[request.id].users).length}
           </div>
