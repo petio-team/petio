@@ -1,26 +1,32 @@
 version: 2
 updates:
-    - package-ecosystem: 'npm'
-      directory: '/'
-      schedule:
-          interval: 'daily'
-    - package-ecosystem: 'npm'
-      directory: '/admin'
-      schedule:
-          interval: 'daily'
-    - package-ecosystem: 'npm'
-      directory: '/api'
-      schedule:
-          interval: 'daily'
-    - package-ecosystem: 'npm'
-      directory: '/frontend'
-      schedule:
-          interval: 'daily'
-    - package-ecosystem: 'docker'
-      directory: '/'
-      schedule:
-          interval: 'daily'
-    - package-ecosystem: 'docker'
-      directory: '/api'
-      schedule:
-          interval: 'daily'
+  - package-ecosystem: "npm"
+    directory: "/"
+    target_branch: "develop"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "npm"
+    directory: "/admin"
+    target_branch: "develop"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "npm"
+    directory: "/api"
+    target_branch: "develop"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    target_branch: "develop"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "docker"
+    directory: "/"
+    target_branch: "develop"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "docker"
+    directory: "/api"
+    target_branch: "develop"
+    schedule:
+      interval: "daily"
