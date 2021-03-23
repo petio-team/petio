@@ -14,6 +14,7 @@ const processRequest = require("../requests/process");
 const logger = require("../util/logger");
 const Discord = require("../notifications/discord");
 const { showLookup } = require("../tmdb/show");
+const bcrypt = require("bcryptjs");
 
 class LibraryUpdate {
   constructor() {
@@ -149,7 +150,10 @@ class LibraryUpdate {
           title: this.config.adminDisplayName,
           nameLower: this.config.adminDisplayName.toLowerCase(),
           username: this.config.adminUsername,
-          password: this.config.adminPass,
+          password:
+            this.config.adminPass.substring(0, 3) === "$2a"
+              ? this.config.adminPass
+              : bcrypt.hashSync(this.config.adminPass, 10),
           altId: 1,
           role: "admin",
         });
@@ -169,7 +173,10 @@ class LibraryUpdate {
         adminFound.title = this.config.adminDisplayName;
         adminFound.nameLower = this.config.adminDisplayName.toLowerCase();
         adminFound.username = this.config.adminUsername;
-        adminFound.password = this.config.adminPass;
+        adminFound.password =
+          this.config.adminPass.substring(0, 3) === "$2a"
+            ? this.config.adminPass
+            : bcrypt.hashSync(this.config.adminPass, 10);
         await adminFound.save();
         logger.log(
           "info",
