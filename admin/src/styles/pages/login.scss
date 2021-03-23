@@ -28,6 +28,13 @@
     }
   }
 
+  @include media-breakpoint-down(sm) {
+    .btn {
+      height: 40px;
+      font-size: 14px;
+    }
+  }
+
   p {
     max-width: 300px;
     line-height: 1;
@@ -81,6 +88,10 @@
     margin: 0;
     font-size: 12px;
     line-height: 1;
+
+    @include media-breakpoint-down(md) {
+      text-align: right;
+    }
 
     a {
       display: flex;
