@@ -142,9 +142,10 @@ class Season extends React.Component {
       ? this.props.api.series_lookup[id].seasonData[season]
       : false;
     if (seriesData)
-      seriesData.poster_path = seasonData
-        ? seasonData.poster_path
-        : seriesData.poster_path;
+      seriesData.poster_path =
+        seasonData && seasonData.poster_path
+          ? seasonData.poster_path
+          : seriesData.poster_path;
     console.log(seasonData);
     let now = new Date();
     now.setHours(0, 0, 0, 0);
