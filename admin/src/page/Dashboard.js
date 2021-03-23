@@ -207,36 +207,40 @@ class Dashboard extends React.Component {
     let requests = this.props.user.requests;
     return (
       <div className="widget--board">
-        <div className="widget--item widget--item__30">
-          <div className="widget--item--inner">
-            <div className="widget--title">Bandwidth</div>
-            <hr />
-            {this.state.bandwidth ? (
+        {this.state.bandwidth ? (
+          <div className="widget--item widget--item__30">
+            <div className="widget--item--inner">
+              <div className="widget--title">Bandwidth</div>
+              <hr />
               <Bandwidth bandwidth={this.state.bandwidth} />
-            ) : null}
+            </div>
           </div>
-        </div>
-        <div className="widget--item widget--item__30">
-          <div className="widget--item--inner">
-            <div className="widget--title">CPU</div>
-            <hr />
-            {this.state.serverInfo ? <Cpu cpu={this.state.serverInfo} /> : null}
+        ) : null}
+        {this.state.serverInfo ? (
+          <div className="widget--item widget--item__30">
+            <div className="widget--item--inner">
+              <div className="widget--title">CPU</div>
+              <hr />
+              <Cpu cpu={this.state.serverInfo} />
+            </div>
           </div>
-        </div>
-        <div className="widget--item widget--item__30">
-          <div className="widget--item--inner">
-            <div className="widget--title">RAM</div>
-            <hr />
-            {this.state.serverInfo ? <Ram ram={this.state.serverInfo} /> : null}
+        ) : null}
+        {this.state.serverInfo ? (
+          <div className="widget--item widget--item__30">
+            <div className="widget--item--inner">
+              <div className="widget--title">RAM</div>
+              <hr />
+              <Ram ram={this.state.serverInfo} />
+            </div>
           </div>
-        </div>
+        ) : null}
         <div className="widget--item">
           <div className="widget--item--inner">
             <div className="widget--title">Requests</div>
             <hr />
             {!requests ? (
               <CarouselLoading />
-            ) : (
+            ) : Object.keys(requests).length > 0 ? (
               <Carousel>
                 {Object.keys(requests).map((key) => {
                   let request = this.props.api.movie_lookup[key];
@@ -255,6 +259,8 @@ class Dashboard extends React.Component {
                   );
                 })}
               </Carousel>
+            ) : (
+              <p>No requests</p>
             )}
           </div>
         </div>

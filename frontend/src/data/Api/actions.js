@@ -358,24 +358,28 @@ export function checkConfig() {
 export async function discoveryMovies() {
   try {
     let data = await api.discoveryMovies();
-    data.map((section) => {
-      if (section && section.results && section.results.length > 0)
-        section.results.map((result) => {
-          let movie = {
-            isMinified: true,
-            id: result.id,
-            title: result.title,
-            release_date: result.release_date,
-            on_server: result.on_server ? true : false,
-            poster_path: result.poster_path,
-          };
-          finalise({
-            type: types.MOVIE_LOOKUP,
-            movie: movie,
-            id: movie.id,
+    if (data) {
+      data.map((section) => {
+        if (section && section.results && section.results.length > 0)
+          section.results.map((result) => {
+            let movie = {
+              isMinified: true,
+              id: result.id,
+              title: result.title,
+              release_date: result.release_date,
+              on_server: result.on_server ? true : false,
+              poster_path: result.poster_path,
+            };
+            finalise({
+              type: types.MOVIE_LOOKUP,
+              movie: movie,
+              id: movie.id,
+            });
           });
-        });
-    });
+      });
+    } else {
+      data = [];
+    }
     return data;
   } catch (err) {
     console.log(err);
@@ -386,24 +390,28 @@ export async function discoveryMovies() {
 export async function discoveryShows() {
   try {
     let data = await api.discoveryShows();
-    data.map((section) => {
-      if (section && section.results && section.results.length > 0)
-        section.results.map((result) => {
-          let series = {
-            isMinified: true,
-            id: result.id,
-            name: result.name,
-            first_air_date: result.first_air_date,
-            on_server: result.on_server ? true : false,
-            poster_path: result.poster_path,
-          };
-          finalise({
-            type: types.SERIES_LOOKUP,
-            series: series,
-            id: series.id,
+    if (data) {
+      data.map((section) => {
+        if (section && section.results && section.results.length > 0)
+          section.results.map((result) => {
+            let series = {
+              isMinified: true,
+              id: result.id,
+              name: result.name,
+              first_air_date: result.first_air_date,
+              on_server: result.on_server ? true : false,
+              poster_path: result.poster_path,
+            };
+            finalise({
+              type: types.SERIES_LOOKUP,
+              series: series,
+              id: series.id,
+            });
           });
-        });
-    });
+      });
+    } else {
+      data = [];
+    }
     return data;
   } catch (err) {
     console.log(err);

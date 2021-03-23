@@ -23,6 +23,7 @@ async function getHistory(id, type) {
   } catch (err) {
     logger.log("warn", `Error getting history data - ${id}`);
     logger.log({ level: "error", message: err });
+    return [];
   }
   return data;
 }

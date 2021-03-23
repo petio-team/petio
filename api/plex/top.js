@@ -21,7 +21,7 @@ async function getTop(type) {
       return getTopData(type);
     });
   } catch (err) {
-    logger.log("warn", `Error getting popular data - ${id}`);
+    logger.log("warn", `Error getting top data - ${type}`);
     logger.log({ level: "error", message: err });
     return [];
   }
