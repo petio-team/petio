@@ -500,59 +500,73 @@ class LibraryUpdate {
             ? externalIds.tmdb_id
             : false,
         });
-        movieDb = await newMovie.save();
-        await this.mailAdded(movieObj, newMovie.tmdb_id);
-        logger.log("info", `LIB CRON: Movie Added - ${movieObj.title}`);
+        if (!externalIds.tmdb_id) {
+          logger.log(
+            "warn",
+            `LIB CRON: Movie couldn't be matched - ${movieObj.title} - try rematching in Plex`
+          );
+        } else {
+          movieDb = await newMovie.save();
+          await this.mailAdded(movieObj, newMovie.tmdb_id);
+          logger.log("info", `LIB CRON: Movie Added - ${movieObj.title}`);
+        }
       } catch (err) {
         logger.log("warn", `LIB CRON: Error`);
         logger.log({ level: "error", message: err });
       }
     } else {
       try {
-        await Movie.findOneAndUpdate(
-          {
-            ratingKey: movieObj.ratingKey,
-          },
-          {
-            $set: {
-              title: movieObj.title,
+        if (externalIds.tmdb_id) {
+          await Movie.findOneAndUpdate(
+            {
               ratingKey: movieObj.ratingKey,
-              key: movieObj.key,
-              guid: movieObj.guid,
-              studio: movieObj.studio,
-              type: movieObj.type,
-              titleSort: movieObj.titleSort,
-              contentRating: movieObj.contentRating,
-              summary: movieObj.summary,
-              rating: movieObj.rating,
-              year: movieObj.year,
-              tagline: movieObj.tagline,
-              thumb: movieObj.thumb,
-              art: movieObj.art,
-              duration: movieObj.duration,
-              originallyAvailableAt: movieObj.originallyAvailableAt,
-              addedAt: movieObj.addedAt,
-              updatedAt: movieObj.updatedAt,
-              primaryExtraKey: movieObj.primaryExtraKey,
-              ratingImage: movieObj.ratingImage,
-              Media: movieObj.Media,
-              Genre: movieObj.Genre,
-              Director: movieObj.Director,
-              Writer: movieObj.Writer,
-              Country: movieObj.Country,
-              Role: movieObj.Role,
-              idSource: idSource,
-              externalId: externalId,
-              imdb_id: externalIds.hasOwnProperty("imdb_id")
-                ? externalIds.imdb_id
-                : false,
-              tmdb_id: externalIds.hasOwnProperty("tmdb_id")
-                ? externalIds.tmdb_id
-                : false,
             },
-          },
-          { useFindAndModify: false }
-        );
+            {
+              $set: {
+                title: movieObj.title,
+                ratingKey: movieObj.ratingKey,
+                key: movieObj.key,
+                guid: movieObj.guid,
+                studio: movieObj.studio,
+                type: movieObj.type,
+                titleSort: movieObj.titleSort,
+                contentRating: movieObj.contentRating,
+                summary: movieObj.summary,
+                rating: movieObj.rating,
+                year: movieObj.year,
+                tagline: movieObj.tagline,
+                thumb: movieObj.thumb,
+                art: movieObj.art,
+                duration: movieObj.duration,
+                originallyAvailableAt: movieObj.originallyAvailableAt,
+                addedAt: movieObj.addedAt,
+                updatedAt: movieObj.updatedAt,
+                primaryExtraKey: movieObj.primaryExtraKey,
+                ratingImage: movieObj.ratingImage,
+                Media: movieObj.Media,
+                Genre: movieObj.Genre,
+                Director: movieObj.Director,
+                Writer: movieObj.Writer,
+                Country: movieObj.Country,
+                Role: movieObj.Role,
+                idSource: idSource,
+                externalId: externalId,
+                imdb_id: externalIds.hasOwnProperty("imdb_id")
+                  ? externalIds.imdb_id
+                  : false,
+                tmdb_id: externalIds.hasOwnProperty("tmdb_id")
+                  ? externalIds.tmdb_id
+                  : false,
+              },
+            },
+            { useFindAndModify: false }
+          );
+        } else {
+          logger.log(
+            "warn",
+            `LIB CRON: Movie couldn't be matched - ${movieObj.title} - try rematching in Plex`
+          );
+        }
       } catch (err) {
         movieDb = false;
         logger.log({ level: "error", message: err });
@@ -685,54 +699,68 @@ class LibraryUpdate {
           tvdb_id: idSource === "tvdb" ? externalId : externalIds.tvdb_id,
           tmdb_id: idSource === "tmdb" ? externalId : tmdbId,
         });
-        showDb = await newShow.save();
-        await this.mailAdded(showObj, newShow.tmdb_id);
-        logger.log("info", `LIB CRON: Show Added - ${showObj.title}`);
+        if (idSource !== "tmdb" && !tmdbId) {
+          logger.log(
+            "warn",
+            `LIB CRON: Show couldn't be matched - ${showObj.title} - try rematching in Plex`
+          );
+        } else {
+          showDb = await newShow.save();
+          await this.mailAdded(showObj, newShow.tmdb_id);
+          logger.log("info", `LIB CRON: Show Added - ${showObj.title}`);
+        }
       } catch (err) {
         logger.log("error", `LIB CRON: Error`);
         logger.log({ level: "error", message: err });
       }
     } else {
       try {
-        await Show.findOneAndUpdate(
-          {
-            ratingKey: showObj.ratingKey,
-          },
-          {
-            $set: {
+        if (idSource === "tmdb" || tmdbId) {
+          await Show.findOneAndUpdate(
+            {
               ratingKey: showObj.ratingKey,
-              key: showObj.key,
-              guid: showObj.guid,
-              studio: showObj.studio,
-              type: showObj.type,
-              title: showObj.title,
-              titleSort: showObj.titleSort,
-              contentRating: showObj.contentRating,
-              summary: showObj.summary,
-              index: showObj.index,
-              rating: showObj.rating,
-              year: showObj.year,
-              thumb: showObj.thumb,
-              art: showObj.art,
-              banner: showObj.banner,
-              theme: showObj.theme,
-              duration: showObj.duration,
-              originallyAvailableAt: showObj.originallyAvailableAt,
-              leafCount: showObj.leafCount,
-              viewedLeafCount: showObj.viewedLeafCount,
-              childCount: showObj.childCount,
-              addedAt: showObj.addedAt,
-              updatedAt: showObj.updatedAt,
-              Genre: showObj.Genre,
-              idSource: idSource,
-              externalId: externalId,
-              imdb_id: idSource === "imdb" ? externalId : externalIds.imdb_id,
-              tvdb_id: idSource === "tvdb" ? externalId : externalIds.tvdb_id,
-              tmdb_id: idSource === "tmdb" ? externalId : tmdbId,
             },
-          },
-          { useFindAndModify: false }
-        );
+            {
+              $set: {
+                ratingKey: showObj.ratingKey,
+                key: showObj.key,
+                guid: showObj.guid,
+                studio: showObj.studio,
+                type: showObj.type,
+                title: showObj.title,
+                titleSort: showObj.titleSort,
+                contentRating: showObj.contentRating,
+                summary: showObj.summary,
+                index: showObj.index,
+                rating: showObj.rating,
+                year: showObj.year,
+                thumb: showObj.thumb,
+                art: showObj.art,
+                banner: showObj.banner,
+                theme: showObj.theme,
+                duration: showObj.duration,
+                originallyAvailableAt: showObj.originallyAvailableAt,
+                leafCount: showObj.leafCount,
+                viewedLeafCount: showObj.viewedLeafCount,
+                childCount: showObj.childCount,
+                addedAt: showObj.addedAt,
+                updatedAt: showObj.updatedAt,
+                Genre: showObj.Genre,
+                idSource: idSource,
+                externalId: externalId,
+                imdb_id: idSource === "imdb" ? externalId : externalIds.imdb_id,
+                tvdb_id: idSource === "tvdb" ? externalId : externalIds.tvdb_id,
+                tmdb_id: idSource === "tmdb" ? externalId : tmdbId,
+              },
+            },
+            { useFindAndModify: false }
+          );
+        } else {
+          logger.log(
+            "warn",
+            `LIB CRON: Show couldn't be matched - ${showObj.title} - try rematching in Plex`
+          );
+        }
       } catch {
         showDb = false;
       }
