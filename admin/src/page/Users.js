@@ -257,13 +257,36 @@ class Users extends React.Component {
   }
 
   async saveUser() {
-    let edited = await Api.editUser({
+    let userObj;
+    let password =
+      !this.state.eu_password || this.state.eu_password === ""
+        ? false
+        : this.state.eu_password;
+    if (this.state.activeUser.custom && !password) {
+      this.props.msg({
+        message: "Custom users must have a password set",
+        type: "error",
+      });
+      return;
+    }
+
+    userObj = {
       id: this.state.activeUser._id,
       email: this.state.eu_email,
       role: this.state.eu_role,
       profile: this.state.eu_profile,
       disabled: this.state.eu_enabled ? false : true,
-    });
+    };
+
+    if (password !== "*********" && password) {
+      userObj.password = password;
+    }
+
+    if (!this.state.activeUser.custom && !password) {
+      userObj.clearPassword = true;
+    }
+
+    let edited = await Api.editUser(userObj);
 
     if (edited.error) {
       this.setState({

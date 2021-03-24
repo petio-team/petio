@@ -164,21 +164,32 @@ router.post("/create_custom", adminRequired, async (req, res) => {
 
 router.post("/edit", adminRequired, async (req, res) => {
   let user = req.body.user;
+  let userObj = {
+    email: user.email,
+    role: user.role,
+    profile: user.profile,
+    disabled: user.disabled,
+  };
+
+  if (user.password) {
+    userObj.password = bcrypt.hashSync(user.password, 10);
+  }
+
+  if (user.clearPassword) {
+    userObj.password = null;
+  }
+
   if (!user) {
     res.status(500).json({
       error: "No user details",
     });
   }
+
   try {
     await User.findOneAndUpdate(
       { _id: user.id },
       {
-        $set: {
-          email: user.email,
-          role: user.role,
-          profile: user.profile,
-          disabled: user.disabled,
-        },
+        $set: userObj,
       },
       { new: true, useFindAndModify: false }
     );
