@@ -51,21 +51,27 @@ class FilterAction extends React.Component {
                 onChange={this.props.inputChange}
                 value={this.props.data.path}
               >
-                {this.props.data.server &&
-                this.props.settings[this.props.data.server] ? (
+                {this.props.data.server ? (
                   <>
                     <option value="">Please Select</option>
-                    {this.props.settings[this.props.data.server].paths.map(
-                      (path, i) => {
-                        return (
-                          <option
-                            key={`${fs}__${this.props.item}__p_${i}`}
-                            value={path.path}
-                          >
-                            {path.path}
-                          </option>
-                        );
-                      }
+                    {this.props.settings[this.props.data.server] &&
+                    this.props.settings[this.props.data.server].paths &&
+                    this.props.settings[this.props.data.server].paths.length >
+                      0 ? (
+                      this.props.settings[this.props.data.server].paths.map(
+                        (path, i) => {
+                          return (
+                            <option
+                              key={`${fs}__${this.props.item}__p_${i}`}
+                              value={path.path}
+                            >
+                              {path.path}
+                            </option>
+                          );
+                        }
+                      )
+                    ) : (
+                      <option value="">Loading...</option>
                     )}
                   </>
                 ) : (
