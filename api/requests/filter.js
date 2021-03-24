@@ -115,6 +115,11 @@ function getValue(condition, media) {
         media.keywords.results.map((kw) => {
           values.push(kw.name);
         });
+    case "language":
+      values = [];
+      if (media.original_language)
+        values.push(media.original_language);
+      break;
   }
   return values;
 }
