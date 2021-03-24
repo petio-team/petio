@@ -1,13 +1,23 @@
 .styled-input {
   &--select {
     background: rgba($grey-medium, 0.3);
-    height: 30px;
+    height: 40px;
     display: flex;
     align-items: center;
-    padding: 0 20px;
+    padding: 0 10px;
     margin-bottom: 20px;
-    border-radius: 30px;
+    border-radius: 3px;
+    border: solid 1px rgba($grey-medium, 0.5) !important;
     color: white;
+
+    &.disabled {
+      opacity: 0.5;
+      cursor: no-drop;
+
+      select {
+        pointer-events: none;
+      }
+    }
 
     select {
       appearance: none;
@@ -26,12 +36,12 @@
 
   &--textarea {
     background: rgba($grey-medium, 0.3);
-    height: 90px;
-    min-height: 90px;
-    padding: 20px;
+    height: 120px;
+    min-height: 120px;
+    padding: 10px;
     color: white;
-    border: none;
-    border-radius: 10px;
+    border: solid 1px rgba($grey-medium, 0.5) !important;
+    border-radius: 3px;
     outline: none !important;
     font-size: 16px;
     min-width: 100%;
@@ -40,12 +50,14 @@
 
   &--input {
     background: rgba($grey-medium, 0.3);
-    height: 30px;
-    padding: 0 20px;
+    height: 40px;
+    padding: 0 10px;
     margin-bottom: 20px;
-    border-radius: 30px;
+    border-radius: 3px;
     color: white;
-    line-height: 30px;
+    line-height: 40px;
     font-size: 16px;
+    border: solid 1px rgba($grey-medium, 0.5) !important;
+    outline: none !important;
   }
 }

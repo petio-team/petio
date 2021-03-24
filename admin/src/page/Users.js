@@ -91,6 +91,7 @@ class Users extends React.Component {
       eu_email: "",
       eu_role: "",
       eu_profile: "",
+      eu_password: "",
       eu_enabled: false,
       bu_error: false,
       eu_error: false,
@@ -107,6 +108,8 @@ class Users extends React.Component {
         : target.type === "file"
         ? target.files[0]
         : target.value;
+    if (name === "eu_password")
+      value = value.replace("*********", "").replace("********", "");
     if (name === "bulk_users_all") {
       let userCheckboxes = document.querySelectorAll(".user-checkbox");
       let bu = {};
@@ -223,6 +226,7 @@ class Users extends React.Component {
       eu_email: user.email,
       eu_role: user.role ? user.role : "user",
       eu_profile: user.profile ? user.profile : "",
+      eu_password: user.password === "removed" ? "*********" : "",
       eu_enabled: user.disabled ? false : true,
       thumb_path:
         process.env.NODE_ENV === "development"
@@ -418,7 +422,7 @@ class Users extends React.Component {
             value={this.state.cu_email}
             onChange={this.inputChange}
           />
-          <p className="sub-title mt--2 mb--1">Password</p>
+          <p className="sub-title mb--1">Password</p>
           <input
             className="styled-input--input"
             placeholder="Password"
@@ -427,7 +431,7 @@ class Users extends React.Component {
             value={this.state.cu_password}
             onChange={this.inputChange}
           />
-          <p className="sub-title mt--2 mb--1">Link history to existing user</p>
+          <p className="sub-title mb--1">Link history to existing user</p>
           <div className="styled-input--select">
             <select
               name="cu_linked"
@@ -477,7 +481,7 @@ class Users extends React.Component {
             value={this.state.eu_email}
             onChange={this.inputChange}
           />
-          <p className="sub-title mt--2 mb--1">Role</p>
+          <p className="sub-title mb--1">Role</p>
           <div className="styled-input--select">
             <select
               name="eu_role"
@@ -496,7 +500,7 @@ class Users extends React.Component {
               ) : null}
             </select>
           </div>
-          <p className="sub-title mt--2 mb--1">Profile</p>
+          <p className="sub-title mb--1">Profile</p>
           <div className="styled-input--select">
             <select
               name="eu_profile"
@@ -522,7 +526,7 @@ class Users extends React.Component {
           {this.state.activeUser ? (
             this.state.activeUser.role !== "admin" ? (
               <>
-                <p className="sub-title mt--2 mb--1">Enabled / Disabled</p>
+                <p className="sub-title mb--1">Enabled / Disabled</p>
                 <label>
                   <input
                     type="checkbox"
@@ -535,6 +539,22 @@ class Users extends React.Component {
               </>
             ) : null
           ) : null}
+          <p className="sub-title mb--1">Password</p>
+          {this.state.activeUser && !this.state.activeUser.custom ? (
+            <p>
+              <small>
+                Warning: Custom passwords will disable a users Plex password. To
+                disable custom password and revert to Plex password leave blank
+              </small>
+            </p>
+          ) : null}
+          <input
+            className="styled-input--input"
+            type="password"
+            name="eu_password"
+            value={this.state.eu_password}
+            onChange={this.inputChange}
+          />
           {this.state.activeUser ? (
             // this.state.activeUser.custom ? (
             <form
