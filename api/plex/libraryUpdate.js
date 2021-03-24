@@ -173,10 +173,8 @@ class LibraryUpdate {
         adminFound.title = this.config.adminDisplayName;
         adminFound.nameLower = this.config.adminDisplayName.toLowerCase();
         adminFound.username = this.config.adminUsername;
-        adminFound.password =
-          this.config.adminPass.substring(0, 3) === "$2a"
-            ? this.config.adminPass
-            : bcrypt.hashSync(this.config.adminPass, 10);
+        if (this.config.adminPass.substring(0, 3) !== "$2a")
+          adminFound.password = bcrypt.hashSync(this.config.adminPass, 10);
         await adminFound.save();
         logger.log(
           "info",

@@ -686,3 +686,13 @@ export async function uploadThumb(post, id) {
     }
   }
 }
+
+export async function testPlex() {
+  try {
+    let data = await api.testPlex();
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw "Unable to test, please try again later";
+  }
+}

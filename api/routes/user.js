@@ -7,6 +7,7 @@ const logger = require("../util/logger");
 const bcrypt = require("bcryptjs");
 const { adminRequired, authRequired } = require("../middleware/auth");
 var multer = require("multer");
+const getConfig = require("../util/config");
 const fs = require("fs");
 const path = require("path");
 const uploadPath = process.pkg
@@ -164,20 +165,6 @@ router.post("/create_custom", adminRequired, async (req, res) => {
 
 router.post("/edit", adminRequired, async (req, res) => {
   let user = req.body.user;
-  let userObj = {
-    email: user.email,
-    role: user.role,
-    profile: user.profile,
-    disabled: user.disabled,
-  };
-
-  if (user.password) {
-    userObj.password = bcrypt.hashSync(user.password, 10);
-  }
-
-  if (user.clearPassword) {
-    userObj.password = null;
-  }
 
   if (!user) {
     res.status(500).json({
@@ -186,6 +173,29 @@ router.post("/edit", adminRequired, async (req, res) => {
   }
 
   try {
+    let userObj = {
+      email: user.email,
+      role: user.role,
+      profile: user.profile,
+      disabled: user.disabled,
+    };
+
+    if (user.password) {
+      userObj.password = bcrypt.hashSync(user.password, 10);
+    }
+
+    if (user.clearPassword) {
+      userObj.password = null;
+    }
+
+    if (user.role === "admin" && !user.password) {
+      let prefs = getConfig();
+      userObj.password =
+        prefs.adminPass.substring(0, 3) === "$2a"
+          ? prefs.adminPass
+          : bcrypt.hashSync(prefs.adminPass, 10);
+    }
+
     await User.findOneAndUpdate(
       { _id: user.id },
       {
@@ -197,7 +207,8 @@ router.post("/edit", adminRequired, async (req, res) => {
     res.json({
       message: "User edited",
     });
-  } catch {
+  } catch (err) {
+    logger.log({ level: "error", message: err });
     res.status(500).json({
       error: "Error editing user",
     });

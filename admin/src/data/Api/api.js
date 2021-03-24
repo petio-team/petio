@@ -211,3 +211,7 @@ export function getFilters() {
 export function uploadThumb(data, id) {
   return upload(`/user/thumb/${id}`, data);
 }
+
+export function testPlex() {
+  return get(`/plex/test_plex`);
+}

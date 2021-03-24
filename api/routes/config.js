@@ -25,7 +25,7 @@ router.post("/update", async (req, res) => {
     let updatedConfig = JSON.stringify({ ...configParse, ...body });
     fs.writeFile(configFile, updatedConfig, (err) => {
       if (err) {
-        logger.log("info", err);
+        logger.log({ level: "error", message: err });
         res.status(500).send("Error updating config");
       } else {
         res.status(200).send("Config updated");
@@ -33,7 +33,7 @@ router.post("/update", async (req, res) => {
     });
     // return JSON.parse(userConfig);
   } catch (err) {
-    logger.log("info", err);
+    logger.log({ level: "error", message: err });
     res.status(500).send("Config Not Found");
   }
 });

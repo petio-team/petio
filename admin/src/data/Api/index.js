@@ -46,6 +46,7 @@ import {
   getFilters,
   uploadThumb,
   testDiscord,
+  testPlex,
 } from "./actions";
 
 export default {
@@ -96,4 +97,5 @@ export default {
   getFilters,
   uploadThumb,
   testDiscord,
+  testPlex,
 };

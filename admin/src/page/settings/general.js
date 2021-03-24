@@ -30,6 +30,7 @@ class General extends React.Component {
     this.saveLoginType = this.saveLoginType.bind(this);
     this.savePlexPopular = this.savePlexPopular.bind(this);
     this.testDiscord = this.testDiscord.bind(this);
+    this.testPlex = this.testPlex.bind(this);
   }
 
   inputChange(e) {
@@ -221,6 +222,28 @@ class General extends React.Component {
     }
   }
 
+  async testPlex() {
+    try {
+      let plexConnect = await Api.testPlex();
+      if (plexConnect.error) {
+        this.props.msg({
+          message: `Plex Test Failed: ${plexConnect.error}`,
+          type: "error",
+        });
+      } else {
+        this.props.msg({
+          message: "Plex Test Passed!",
+          type: "good",
+        });
+      }
+    } catch (err) {
+      this.props.msg({
+        message: `Plex Test Failed: ${err}`,
+        type: "error",
+      });
+    }
+  }
+
   componentDidMount() {
     this.loadConfigs();
   }
@@ -251,8 +274,9 @@ class General extends React.Component {
           </p>
           <button className="btn btn__square disabled">Login with plex</button>
           <button
-            className="btn btn__square disabled"
+            className="btn btn__square"
             style={{ marginLeft: "10px" }}
+            onClick={this.testPlex}
           >
             Test
           </button>
