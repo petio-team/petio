@@ -181,7 +181,8 @@ class Requests extends React.Component {
       if (req.radarrId.length > 0) {
         req.radarrId.map((r, i) => {
           let uuid = Object.keys(r)[0];
-          let child = req.children[i] ? req.children[i].info : {};
+          let child =
+            req.children && req.children[i] ? req.children[i].info : {};
           edit_radarr[uuid] = {
             active: true,
             profile: child.qualityProfileId ? child.qualityProfileId : false,
