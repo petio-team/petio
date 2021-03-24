@@ -215,3 +215,7 @@ export function uploadThumb(data, id) {
 export function testPlex() {
   return get(`/plex/test_plex`);
 }
+
+export function updatePlexToken() {
+  return get(`/plex/update_token`);
+}

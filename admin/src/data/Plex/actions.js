@@ -54,6 +54,21 @@ export function plexAuth(plexWindow) {
     .then((res) => {
       plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=067e602b-1e86-4739-900d-1abdf8f6da71&code=${res.code}`;
 
+      waitForPin(plexWindow, res.id, true);
+    })
+    .catch(() => {
+      alert("Unable to open popout window, please make sure to allow pop-ups!");
+    });
+}
+
+export function plexToken(plexWindow) {
+  plexWindow.document.body.innerHTML = plex_oauth_loader;
+  api
+    .getPins()
+    .then((response) => response.json())
+    .then((res) => {
+      plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=067e602b-1e86-4739-900d-1abdf8f6da71&code=${res.code}`;
+
       waitForPin(plexWindow, res.id);
     })
     .catch(() => {
@@ -68,12 +83,20 @@ function saveToken(token) {
   });
 }
 
-async function waitForPin(plexWindow, id) {
+async function waitForPin(plexWindow, id, setup = false) {
   let response = await api.validatePin(id);
   if (response.authToken) {
     plexWindow.close();
     saveToken(response.authToken);
-    getUser(response.authToken);
+    if (setup) {
+      getUser(response.authToken);
+    } else {
+      finalise({
+        type: types.PLEX_TOKEN,
+        token: false,
+      });
+      console.log(`token sends here: ${response.authToken}`);
+    }
   } else if (plexWindow.closed) {
     alert("Unable to login please try again");
   } else {

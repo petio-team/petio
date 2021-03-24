@@ -102,7 +102,7 @@ class Settings extends React.Component {
         <div className="settings--content">
           <Switch>
             <Route exact path="/settings">
-              <General msg={this.props.msg} />
+              <General msg={this.props.msg} plex={this.props.plex} />
             </Route>
             <Route path="/settings/radarr">
               <Radarr msg={this.props.msg} />

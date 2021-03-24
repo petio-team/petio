@@ -1,7 +1,47 @@
 import React from "react";
 import Api from "../../data/Api";
+import Plex from "../../data/Plex";
 
 import { ReactComponent as Spinner } from "../../assets/svg/spinner.svg";
+
+/* eslint-disable */
+const popupCenter = (url, title, w, h) => {
+  // Fixes dual-screen position | credit Tautulli
+  var dualScreenLeft =
+    window.screenLeft != undefined ? window.screenLeft : window.screenX;
+  var dualScreenTop =
+    window.screenTop != undefined ? window.screenTop : window.screenY;
+
+  var width = window.innerWidth
+    ? window.innerWidth
+    : document.documentElement.clientWidth
+    ? document.documentElement.clientWidth
+    : screen.width;
+  var height = window.innerHeight
+    ? window.innerHeight
+    : document.documentElement.clientHeight
+    ? document.documentElement.clientHeight
+    : screen.height;
+
+  var left = width / 2 - w / 2 + dualScreenLeft;
+  var top = height / 2 - h / 2 + dualScreenTop;
+  var newWindow = window.open(
+    url,
+    title,
+    "scrollbars=yes, width=" +
+      w +
+      ", height=" +
+      h +
+      ", top=" +
+      top +
+      ", left=" +
+      left
+  );
+
+  if (window.focus) newWindow.focus();
+  return newWindow;
+};
+/* eslint-enable */
 
 class General extends React.Component {
   constructor(props) {
@@ -18,6 +58,7 @@ class General extends React.Component {
       login_type: false,
       discord_webhook: false,
       plexPopular: false,
+      token: false,
     };
 
     this.inputChange = this.inputChange.bind(this);
@@ -31,6 +72,11 @@ class General extends React.Component {
     this.savePlexPopular = this.savePlexPopular.bind(this);
     this.testDiscord = this.testDiscord.bind(this);
     this.testPlex = this.testPlex.bind(this);
+  }
+
+  newToken() {
+    let plexWindow = popupCenter("", "Login with Plex", 500, 500);
+    Plex.plexToken(plexWindow);
   }
 
   inputChange(e) {
@@ -248,6 +294,21 @@ class General extends React.Component {
     this.loadConfigs();
   }
 
+  componentDidUpdate() {
+    console.log(this.props.plex.token);
+    if (this.state.token !== this.props.plex.token) {
+      this.setState({
+        token: this.props.plex.token,
+      });
+      console.log("change");
+      if (this.props.plex.token)
+        this.props.msg({
+          type: "good",
+          message: "Token Updated!",
+        });
+    }
+  }
+
   componentWillUnmount() {
     clearInterval(this.closeMsg);
   }
@@ -272,7 +333,9 @@ class General extends React.Component {
           <p className="description">
             If connection has been lost to Plex re-authenticate here.
           </p>
-          <button className="btn btn__square disabled">Login with plex</button>
+          <button className="btn btn__square" onClick={this.newToken}>
+            Login with plex
+          </button>
           <button
             className="btn btn__square"
             style={{ marginLeft: "10px" }}

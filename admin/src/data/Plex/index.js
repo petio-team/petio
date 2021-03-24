@@ -1,5 +1,6 @@
-import { plexAuth } from './actions';
+import { plexAuth, plexToken } from "./actions";
 
 export default {
-	plexAuth,
+  plexAuth,
+  plexToken,
 };
