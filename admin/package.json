@@ -8,7 +8,7 @@
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^12.7.2",
     "node-sass": "^5.0.0",
-    "react": "^17.0.1",
+    "react": "^17.0.2",
     "react-charts": "^2.0.0-beta.7",
     "react-dom": "^16.13.1",
     "react-lazy-load-image-component": "^1.5.1",
