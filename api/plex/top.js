@@ -61,7 +61,6 @@ async function parseTop(data, type) {
   for (let i = 0; i < top.length; i++) {
     let item = top[i];
     let ratingKey = item.ratingKey;
-    let globalViewCount = item.globalViewCount;
     let plexData = false;
     if (type === 2) {
       plexData = await plexLookup(ratingKey, "show");
@@ -73,7 +72,6 @@ async function parseTop(data, type) {
         type === 2
           ? await Show.showLookup(plexData.tmdb_id, true)
           : await Movie.movieLookup(plexData.tmdb_id, true);
-    output[plexData.tmdb_id].globalViewCount = globalViewCount;
   }
   return output;
 }
