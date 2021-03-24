@@ -36,7 +36,7 @@ Configuring Petio is fairly straight forward but our docs cover the process, fro
 <p><a target="_blank" href="https://github.com/petio-team/petio-docs/wiki/Configuration">How to configure Petio</a></p>
 
 <h2>Frequently Asked Questions</h2>
-<p>Coming Soon</p>
+<p>Our FAQs can be found <a href="https://github.com/petio-team/petio-docs/wiki/FAQ">here</a></p>
 
 <h2>Credits</h2>
 <h4>Attribution Credits</h4>
