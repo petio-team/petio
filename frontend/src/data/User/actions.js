@@ -4,43 +4,70 @@ import * as api from "./api";
 import { initAuth } from "../auth";
 import { validatePin, getPins } from "../Plex/api";
 
+function getCookie(cname) {
+  var name = cname + "=";
+  var decodedCookie = decodeURIComponent(document.cookie);
+  var ca = decodedCookie.split(";");
+  for (var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == " ") {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
+function deleteCookie(name) {
+  if (getCookie(name)) {
+    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:01 GMT`;
+  }
+}
+
 export function login(user, cookie = false) {
   return new Promise((resolve, reject) => {
     let authToken = false;
     if (cookie) {
-      authToken = localStorage.getItem("petio_jwt");
+      // authToken = localStorage.getItem("petio_jwt");
+      authToken = getCookie("petio_jwt");
     }
 
     api
       .login(user, authToken)
       .then((data) => {
         if (data.user) {
-          let ls_user = data.token;
+          // let ls_user = data.token;
           if (data.loggedIn) {
-            if (!cookie) {
-              localStorage.setItem("petio_jwt", ls_user);
-            }
+            // if (!cookie) {
+            //   localStorage.setItem("petio_jwt", ls_user);
+            // }
             finalise({
               type: types.LOGIN,
               data: data,
             });
             resolve(data);
           } else {
+            deleteCookie("petio_jwt");
             reject("User not found");
             return;
           }
         } else {
+          deleteCookie("petio_jwt");
           reject("User not found");
         }
       })
       .catch((err) => {
         console.log(err);
+        deleteCookie("petio_jwt");
         reject("An error has occured");
       });
   });
 }
 
 export function logout() {
+  deleteCookie("petio_jwt");
   finalise({
     type: types.LOGOUT,
   });

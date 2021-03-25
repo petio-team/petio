@@ -43,6 +43,7 @@ router.post("/", async (req, res) => {
     return;
   } catch (e) {
     // if existing jwt failed, continue onto normal login flow
+    logger.log("info", `LOGIN: No JWT: ${req.body.user.username}`);
   }
 
   logger.log("info", `LOGIN: Request User: ${username}`);
@@ -91,7 +92,6 @@ function success(user, isAdmin = false, res) {
   const token = jwt.sign({ ...user, admin: isAdmin }, prefs.plexToken);
   res
     .cookie("petio_jwt", token, {
-      path: "/",
       maxAge: 2419200000,
     })
     .json({

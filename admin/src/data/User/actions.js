@@ -45,12 +45,7 @@ export function login(user, pass = false, cookie = false, admin) {
           } else {
             // localStorage.setItem("adminloggedin", false);
           }
-          if (data.loggedIn) {
-            if (!data.admin) {
-              resolve({ error: "You don't have permission to login" });
-              deleteCookie("petio_jwt");
-              return;
-            }
+          if (data.loggedIn && data.admin) {
             // if (!cookie) {
             //   localStorage.setItem("petio_jwt", ls_user);
             // }
@@ -81,8 +76,9 @@ export function login(user, pass = false, cookie = false, admin) {
 }
 
 export function logout() {
-  localStorage.removeItem("petio_jwt");
-  localStorage.removeItem("adminloggedin");
+  // localStorage.removeItem("petio_jwt");
+  // localStorage.removeItem("adminloggedin");
+  deleteCookie("petio_jwt");
   finalise({
     type: types.LOGOUT,
   });
