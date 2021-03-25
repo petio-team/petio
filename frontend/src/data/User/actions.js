@@ -22,7 +22,10 @@ function getCookie(cname) {
 
 function deleteCookie(name) {
   if (getCookie(name)) {
+    console.log("Cookie found");
     document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/`;
+  } else {
+    console.log("Cookie not found");
   }
 }
 
