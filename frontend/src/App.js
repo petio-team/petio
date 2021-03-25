@@ -188,8 +188,6 @@ class App extends React.Component {
   }
 
   logout() {
-    localStorage.removeItem("petio_jwt");
-    localStorage.removeItem("adminloggedin");
     User.logout();
     this.setState({
       isLoggedIn: false,

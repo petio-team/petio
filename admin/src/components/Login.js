@@ -115,13 +115,6 @@ class Login extends React.Component {
     if (this.getCookie("petio_jwt")) {
       this.login("", false, true, true);
     }
-    // if (localStorage.getItem("petio_jwt")) {
-    //   if (localStorage.getItem("adminloggedin") === "true") {
-    //     this.login("", false, true, true);
-    //   } else {
-    //     localStorage.removeItem("petio_jwt");
-    //   }
-    // }
   }
 
   componentDidMount() {

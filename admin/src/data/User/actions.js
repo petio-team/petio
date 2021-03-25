@@ -20,7 +20,7 @@ function getCookie(cname) {
 
 function deleteCookie(name) {
   if (getCookie(name)) {
-    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:01 GMT`;
+    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/`;
   }
 }
 
@@ -30,7 +30,6 @@ export function login(user, pass = false, cookie = false, admin) {
       password = pass;
     let authToken = false;
     if (cookie) {
-      // authToken = localStorage.getItem("petio_jwt");
       authToken = getCookie("petio_jwt");
     }
 
@@ -38,17 +37,10 @@ export function login(user, pass = false, cookie = false, admin) {
       .login(username, password, admin, authToken)
       .then((data) => {
         if (data.user) {
-          // let ls_user = data.token;
           if (data.admin) {
             data.user.admin = true;
-            // localStorage.setItem("adminloggedin", true);
-          } else {
-            // localStorage.setItem("adminloggedin", false);
           }
           if (data.loggedIn && data.admin) {
-            // if (!cookie) {
-            //   localStorage.setItem("petio_jwt", ls_user);
-            // }
             finalise({
               type: types.LOGIN,
               data: data,
@@ -57,15 +49,11 @@ export function login(user, pass = false, cookie = false, admin) {
           } else {
             resolve({ error: "User not found" });
             deleteCookie("petio_jwt");
-            // localStorage.removeItem("petio_jwt");
-            // localStorage.removeItem("adminloggedin");
             return;
           }
         } else {
           resolve({ error: "User not found" });
           deleteCookie("petio_jwt");
-          // localStorage.removeItem("petio_jwt");
-          // localStorage.removeItem("adminloggedin");
         }
       })
       .catch((err) => {
@@ -76,8 +64,6 @@ export function login(user, pass = false, cookie = false, admin) {
 }
 
 export function logout() {
-  // localStorage.removeItem("petio_jwt");
-  // localStorage.removeItem("adminloggedin");
   deleteCookie("petio_jwt");
   finalise({
     type: types.LOGOUT,

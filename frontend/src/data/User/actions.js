@@ -30,7 +30,6 @@ export function login(user, cookie = false) {
   return new Promise((resolve, reject) => {
     let authToken = false;
     if (cookie) {
-      // authToken = localStorage.getItem("petio_jwt");
       authToken = getCookie("petio_jwt");
     }
 
@@ -38,11 +37,7 @@ export function login(user, cookie = false) {
       .login(user, authToken)
       .then((data) => {
         if (data.user) {
-          // let ls_user = data.token;
           if (data.loggedIn) {
-            // if (!cookie) {
-            //   localStorage.setItem("petio_jwt", ls_user);
-            // }
             finalise({
               type: types.LOGIN,
               data: data,
