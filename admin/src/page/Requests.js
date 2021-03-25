@@ -384,7 +384,7 @@ class Requests extends React.Component {
         {editable ? null : (
           <p style={{ margin: 0 }}>
             <small>
-              {`These settings cannot be edited once sent to`}
+              {`These settings cannot be edited once sent to `}
               <span style={{ textTransform: "capitalize" }}>{type}</span>
             </small>
           </p>
