@@ -6,6 +6,7 @@ function getCookie(cname) {
   var name = cname + "=";
   var decodedCookie = decodeURIComponent(document.cookie);
   var ca = decodedCookie.split(";");
+  console.log(ca);
   for (var i = 0; i < ca.length; i++) {
     var c = ca[i];
     while (c.charAt(0) == " ") {
@@ -20,7 +21,10 @@ function getCookie(cname) {
 
 function deleteCookie(name) {
   if (getCookie(name)) {
+    console.log("Cookie found");
     document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/`;
+  } else {
+    console.log("Cookie not found");
   }
 }
 
