@@ -22,10 +22,13 @@ router.get("/lookup/:type/:id", async (req, res) => {
 router.get("/test_plex", async (req, res) => {
   const prefs = getConfig();
   let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}?X-Plex-Token=${prefs.plexToken}`;
+  console.log(url);
   try {
+    let validate = await axios.get(
+      `https://plex.tv/pms/resources?X-Plex-Token=${prefs.plexToken}`
+    );
     let connection = await axios.get(url);
     let data = connection.data.MediaContainer;
-    console.log(connection.data);
     if (
       data.myPlexUsername === prefs.adminUsername ||
       data.myPlexUsername === prefs.adminEmail

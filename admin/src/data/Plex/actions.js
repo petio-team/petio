@@ -1,7 +1,7 @@
 import { store } from "../store";
 import * as types from "../actionTypes";
 import * as api from "./api";
-import { testServer } from "../Api/api";
+import { testServer, updateConfig } from "../Api/api";
 
 // Credit Tautulli
 const plex_oauth_loader =
@@ -95,7 +95,10 @@ async function waitForPin(plexWindow, id, setup = false) {
         type: types.PLEX_TOKEN,
         token: false,
       });
-      console.log(`token sends here: ${response.authToken}`);
+      updateConfig({
+        plexToken: response.authToken,
+      });
+      location.reload();
     }
   } else if (plexWindow.closed) {
     alert("Unable to login please try again");
