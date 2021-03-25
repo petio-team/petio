@@ -101,7 +101,7 @@ async function waitForPin(plexWindow, id, setup = false) {
     alert("Unable to login please try again");
   } else {
     setTimeout(() => {
-      waitForPin(plexWindow, id);
+      waitForPin(plexWindow, id, setup);
     }, 1000);
   }
 }
