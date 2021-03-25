@@ -95,14 +95,33 @@ class Login extends React.Component {
       });
   }
 
-  loginLocal() {
-    if (localStorage.getItem("petio_jwt")) {
-      if (localStorage.getItem("adminloggedin") === "true") {
-        this.login("", false, true, true);
-      } else {
-        localStorage.removeItem("petio_jwt");
+  getCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(";");
+    for (var i = 0; i < ca.length; i++) {
+      var c = ca[i];
+      while (c.charAt(0) == " ") {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
       }
     }
+    return "";
+  }
+
+  loginLocal() {
+    if (this.getCookie("petio_jwt")) {
+      this.login("", false, true, true);
+    }
+    // if (localStorage.getItem("petio_jwt")) {
+    //   if (localStorage.getItem("adminloggedin") === "true") {
+    //     this.login("", false, true, true);
+    //   } else {
+    //     localStorage.removeItem("petio_jwt");
+    //   }
+    // }
   }
 
   componentDidMount() {

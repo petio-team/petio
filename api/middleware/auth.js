@@ -9,14 +9,19 @@ async function authenticate(req) {
   const prefs = getConfig();
   const { authorization: header } = req.headers;
   let petioJwt;
-  if (req.cookies && req.cookies.petio_jwt) {
-    petioJwt = req.cookies.petio_jwt;
-  } else if (header && /^Bearer (.*)$/.test(header)) {
-    const match = /^Bearer (.*)$/.exec(header);
-    petioJwt = match[1];
+  if (req.body.authToken) {
+    petioJwt = req.body.authToken;
   } else {
     throw `AUTH: No auth token provided - route ${req.path}`;
   }
+  // if (req.cookies && req.cookies.petio_jwt) {
+  //   petioJwt = req.cookies.petio_jwt;
+  // } else if (header && /^Bearer (.*)$/.test(header)) {
+  //   const match = /^Bearer (.*)$/.exec(header);
+  //   petioJwt = match[1];
+  // } else {
+  //   throw `AUTH: No auth token provided - route ${req.path}`;
+  // }
   req.jwtUser = jwt.verify(petioJwt, prefs.plexToken);
 
   try {

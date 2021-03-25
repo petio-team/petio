@@ -2,30 +2,58 @@ import { store } from "../store";
 import * as types from "../actionTypes";
 import * as api from "./api";
 
+function getCookie(cname) {
+  var name = cname + "=";
+  var decodedCookie = decodeURIComponent(document.cookie);
+  var ca = decodedCookie.split(";");
+  for (var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == " ") {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
+function deleteCookie(name) {
+  if (getCookie(name)) {
+    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:01 GMT`;
+  }
+}
+
 export function login(user, pass = false, cookie = false, admin) {
   return new Promise((resolve, reject) => {
     let username = user,
       password = pass;
     let authToken = false;
     if (cookie) {
-      authToken = localStorage.getItem("petio_jwt");
+      // authToken = localStorage.getItem("petio_jwt");
+      authToken = getCookie("petio_jwt");
     }
 
     api
       .login(username, password, admin, authToken)
       .then((data) => {
         if (data.user) {
-          let ls_user = data.token;
+          // let ls_user = data.token;
           if (data.admin) {
             data.user.admin = true;
-            localStorage.setItem("adminloggedin", true);
+            // localStorage.setItem("adminloggedin", true);
           } else {
-            localStorage.setItem("adminloggedin", false);
+            // localStorage.setItem("adminloggedin", false);
           }
           if (data.loggedIn) {
-            if (!cookie) {
-              localStorage.setItem("petio_jwt", ls_user);
+            if (!data.admin) {
+              resolve({ error: "You don't have permission to login" });
+              deleteCookie("petio_jwt");
+              return;
             }
+            // if (!cookie) {
+            //   localStorage.setItem("petio_jwt", ls_user);
+            // }
             finalise({
               type: types.LOGIN,
               data: data,
@@ -33,14 +61,16 @@ export function login(user, pass = false, cookie = false, admin) {
             resolve(data);
           } else {
             resolve({ error: "User not found" });
-            localStorage.removeItem("petio_jwt");
-            localStorage.removeItem("adminloggedin");
+            deleteCookie("petio_jwt");
+            // localStorage.removeItem("petio_jwt");
+            // localStorage.removeItem("adminloggedin");
             return;
           }
         } else {
           resolve({ error: "User not found" });
-          localStorage.removeItem("petio_jwt");
-          localStorage.removeItem("adminloggedin");
+          deleteCookie("petio_jwt");
+          // localStorage.removeItem("petio_jwt");
+          // localStorage.removeItem("adminloggedin");
         }
       })
       .catch((err) => {

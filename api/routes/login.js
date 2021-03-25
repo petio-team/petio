@@ -92,10 +92,7 @@ function success(user, isAdmin = false, res) {
   res
     .cookie("petio_jwt", token, {
       path: "/",
-      httpOnly: true,
       maxAge: 2419200000,
-      sameSite: "strict",
-      secure: false,
     })
     .json({
       loggedIn: true,
