@@ -117,6 +117,7 @@ class LibraryUpdate {
   async scan() {
     logger.log("info", `LIB CRON: Running Full`);
     await this.createAdmin();
+    await this.updateFriends();
     let libraries = false;
     try {
       libraries = await this.getLibraries();
@@ -128,7 +129,6 @@ class LibraryUpdate {
     if (libraries) {
       await this.saveLibraries(libraries);
       await this.updateLibraryContent(libraries);
-      await this.updateFriends();
       this.execMail();
       logger.log("info", "LIB CRON: Full Scan Complete");
       this.checkOldRequests();
