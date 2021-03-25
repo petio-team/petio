@@ -18,27 +18,58 @@ const memoryCache = cacheManager.caching({
 });
 
 module.exports = async function getDiscoveryData(id, type = "movie") {
-  if (!id) throw "No user";
+  if (!id) return { error: "No ID" };
   const discoveryPrefs = await Discovery.findOne({ id: id });
   const config = getConfig();
   let popular = [];
-  let trendingData = await trending();
+  let now = new Date().toISOString().split("T")[0];
+  let [trendingData, upcoming, popularData] = await Promise.all([
+    trending(),
+    type === "movie"
+      ? discoverMovie(1, {
+          sort_by: "popularity.desc",
+          "primary_release_date.gte": now,
+        })
+      : discoverShow(1, {
+          sort_by: "popularity.desc",
+          "first_air_date.gte": now,
+        }),
+    getTop(type === "movie" ? 1 : 2),
+  ]);
   if (
     config.plexPopular ||
     config.plexPopular === null ||
     config.plexPopular === undefined
   ) {
-    const popularData = await getTop(type === "movie" ? 1 : 2);
     for (p in popularData) {
       popular.push(popularData[p]);
     }
   }
-  if (!discoveryPrefs) throw "No user profile created";
+  if (!discoveryPrefs) {
+    logger.warn(
+      `DISC: No user data yet for ${id} - this is likely still being built, generic discovery returned`
+    );
+    return [
+      {
+        title:
+          type === "movie" ? "Popular Movies on Plex" : "Popular Shows on Plex",
+        results: popular,
+      },
+      {
+        title:
+          type === "movie" ? "Trending Movies Online" : "Trending Shows Online",
+        results: type === "movie" ? trendingData.movies : trendingData.tv,
+      },
+      {
+        title: type === "movie" ? "Movies coming soon" : "Shows coming soon",
+        results: upcoming.results,
+      },
+    ];
+  }
   const watchHistory =
     type === "movie"
       ? discoveryPrefs.movie.history
       : discoveryPrefs.series.history;
-  if (!discoveryPrefs) throw "User not found in discovery";
   let mediaGenres =
     type === "movie"
       ? discoveryPrefs.movie.genres
@@ -243,17 +274,6 @@ module.exports = async function getDiscoveryData(id, type = "movie") {
     },
     { concurrency: 10 }
   );
-  let now = new Date().toISOString().split("T")[0];
-  let upcoming =
-    type === "movie"
-      ? await discoverMovie(1, {
-          sort_by: "popularity.desc",
-          "primary_release_date.gte": now,
-        })
-      : await discoverShow(1, {
-          sort_by: "popularity.desc",
-          "first_air_date.gte": now,
-        });
   let data = [...peopleData, ...directorData, ...recentData, ...genresData];
   data = shuffle(data);
   return [

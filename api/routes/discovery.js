@@ -14,6 +14,7 @@ router.get("/movies", async (req, res) => {
       message: `ROUTE: Movie Discovery Profile returned for ${userId}`,
     });
     let data = await getDiscovery(userId, "movie");
+    if (data.error) throw data.error;
     res.json(data);
   } catch (err) {
     logger.log({ level: "error", message: err });
@@ -32,6 +33,7 @@ router.get("/shows", async (req, res) => {
       message: `ROUTE: TV Discovery Profile returned for ${userId}`,
     });
     let data = await getDiscovery(userId, "show");
+    if (data.error) throw data.error;
     res.json(data);
   } catch (err) {
     logger.log({ level: "error", message: err });

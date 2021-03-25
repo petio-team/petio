@@ -15,6 +15,7 @@ const logger = require("../util/logger");
 const Discord = require("../notifications/discord");
 const { showLookup } = require("../tmdb/show");
 const bcrypt = require("bcryptjs");
+const axios = require("axios");
 
 class LibraryUpdate {
   constructor() {
@@ -325,81 +326,51 @@ class LibraryUpdate {
   }
 
   async updateLibraryContent(libraries) {
-    await Promise.all(
-      libraries.Directory.map(async (lib) => {
-        try {
-          let libContent = await this.getLibrary(lib.key);
-          await Promise.map(
-            Object.keys(libContent.Metadata),
-            async (item) => {
-              let obj = libContent.Metadata[item];
-              if (obj.type === "movie") {
-                await this.saveMovie(obj);
-              } else if (obj.type === "artist") {
-                await this.saveMusic(obj);
-              } else if (obj.type === "show") {
-                await this.saveShow(obj);
-              } else {
-                logger.log(
-                  "info",
-                  `LIB CRON: Unknown media type - ${obj.type}`
-                );
-              }
-            },
-            { concurrency: 10 }
-          );
-        } catch (err) {
-          logger.log("error", `LIB CRON: Unable to get library content`);
-          logger.log({ level: "error", message: err });
-        }
-      })
-    );
+    for (let l in libraries.Directory) {
+      let lib = libraries.Directory[l];
+      try {
+        let libContent = await this.getLibrary(lib.key);
+        await Promise.map(
+          Object.keys(libContent.Metadata),
+          async (item) => {
+            let obj = libContent.Metadata[item];
+            if (obj.type === "movie") {
+              await this.saveMovie(obj);
+            } else if (obj.type === "artist") {
+              await this.saveMusic(obj);
+            } else if (obj.type === "show") {
+              await this.saveShow(obj);
+            } else {
+              logger.log("info", `LIB CRON: Unknown media type - ${obj.type}`);
+            }
+          },
+          { concurrency: 10 }
+        );
+      } catch (err) {
+        logger.log("error", `LIB CRON: Unable to get library content`);
+        logger.log({ level: "error", message: err });
+      }
+    }
   }
 
-  getLibrary(id) {
+  async getLibrary(id) {
     let url = `${this.config.plexProtocol}://${this.config.plexIp}:${this.config.plexPort}/library/sections/${id}/all?X-Plex-Token=${this.config.plexToken}`;
-    return new Promise((resolve, reject) => {
-      request(
-        url,
-        {
-          method: "GET",
-          json: true,
-        },
-        function (err, data) {
-          if (err || !data) {
-            reject("Unable to get library content");
-          }
-          if (data) {
-            resolve(data.MediaContainer);
-          } else {
-            reject("Unable to get library content");
-          }
-        }
-      );
-    });
+    try {
+      let res = await axios.get(url);
+      return res.data.MediaContainer;
+    } catch (e) {
+      throw "Unable to get library content";
+    }
   }
 
-  getMeta(id) {
+  async getMeta(id) {
     let url = `${this.config.plexProtocol}://${this.config.plexIp}:${this.config.plexPort}/library/metadata/${id}?X-Plex-Token=${this.config.plexToken}`;
-    return new Promise((resolve, reject) => {
-      request(
-        url,
-        {
-          method: "GET",
-          json: true,
-        },
-        function (err, data) {
-          if (err || !data) {
-            reject("Unable to get meta");
-          }
-          if (data) {
-            resolve(data.MediaContainer.Metadata[0]);
-          } else {
-            reject("Unable to get meta");
-          }
-        }
-      );
-    });
+    try {
+      let res = await axios.get(url);
+      return res.data.MediaContainer.Metadata[0];
+    } catch (e) {
+      throw "Unable to get meta";
+    }
   }
 
   async saveMovie(movieObj) {
@@ -1025,7 +996,6 @@ class LibraryUpdate {
                 approved: request.approved,
               }).sendToDvr(false);
           } catch (err) {
-            console.log(err);
             logger.info(
               `LIB CRON: Failed to update meta for request: ${request.title}`
             );

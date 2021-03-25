@@ -24,12 +24,12 @@ module.exports = async function buildDiscovery() {
     }
   });
   await Promise.map(
-      userIds,
-      async (i) => {
-        await userBuild(i);
-      },
-      { concurrency: 10 }
-    );
+    userIds,
+    async (i) => {
+      await userBuild(i);
+    },
+    { concurrency: 10 }
+  );
   logger.info("DISC: Finished building discovery profiles");
 };
 
@@ -292,7 +292,7 @@ function cert(cert, type) {
       return false;
 
     default:
-      console.log(cert);
+      logger.info(`DISC: Unmapped Cert Rating - ${cert}`);
       return false;
   }
 }
