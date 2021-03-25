@@ -344,7 +344,7 @@ class LibraryUpdate {
               logger.log("info", `LIB CRON: Unknown media type - ${obj.type}`);
             }
           },
-          { concurrency: 10 }
+          { concurrency: 30 }
         );
       } catch (err) {
         logger.log("error", `LIB CRON: Unable to get library content`);
