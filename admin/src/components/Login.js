@@ -1,8 +1,46 @@
 import React from "react";
 import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
 import User from "../data/User";
+import Plex from "../data/Plex";
 import pjson from "../../package.json";
 import { ReactComponent as TmdbLogo } from "../assets/svg/tmdb.svg";
+
+const popupCenter = (url, title, w, h) => {
+  // Fixes dual-screen position | credit Tautulli
+  var dualScreenLeft =
+    window.screenLeft != undefined ? window.screenLeft : window.screenX;
+  var dualScreenTop =
+    window.screenTop != undefined ? window.screenTop : window.screenY;
+
+  var width = window.innerWidth
+    ? window.innerWidth
+    : document.documentElement.clientWidth
+    ? document.documentElement.clientWidth
+    : screen.width;
+  var height = window.innerHeight
+    ? window.innerHeight
+    : document.documentElement.clientHeight
+    ? document.documentElement.clientHeight
+    : screen.height;
+
+  var left = width / 2 - w / 2 + dualScreenLeft;
+  var top = height / 2 - h / 2 + dualScreenTop;
+  var newWindow = window.open(
+    url,
+    title,
+    "scrollbars=yes, width=" +
+      w +
+      ", height=" +
+      h +
+      ", top=" +
+      top +
+      ", left=" +
+      left
+  );
+
+  if (window.focus) newWindow.focus();
+  return newWindow;
+};
 
 class Login extends React.Component {
   constructor(props) {
@@ -16,6 +54,7 @@ class Login extends React.Component {
 
     this.loginForm = this.loginForm.bind(this);
     this.inputChange = this.inputChange.bind(this);
+    this.loginOauth = this.loginOauth.bind(this);
   }
 
   inputChange(e) {
@@ -121,6 +160,39 @@ class Login extends React.Component {
     this.loginLocal();
   }
 
+  async loginOauth() {
+    try {
+      let plexWindow = popupCenter("", "Login with Plex", 500, 500);
+      this.setState({
+        loading: true,
+      });
+      let res = await Plex.plexLogin(plexWindow);
+      this.setState({
+        loading: false,
+        loginMsg: false,
+      });
+      if (res.error) {
+        this.props.msg({
+          message: res.error,
+          type: "error",
+        });
+        return;
+      }
+
+      if (res.loggedIn && res.admin) {
+        this.props.changeLogin(true);
+      }
+
+      User.getRequests();
+    } catch (err) {
+      console.log(err);
+      // this.props.msg({ message: err, type: "error" });
+      this.setState({
+        loading: false,
+      });
+    }
+  }
+
   render() {
     return (
       <div className="login-wrap">
@@ -151,6 +223,17 @@ class Login extends React.Component {
                 />
 
                 <button className="btn btn__square btn__full">Login</button>
+                <div className="login--inner--divide">
+                  <p>or</p>
+                </div>
+                <div>
+                  <button
+                    className="btn btn__square btn__full"
+                    onClick={this.loginOauth}
+                  >
+                    Login with Plex
+                  </button>
+                </div>
               </form>
             </div>
             <div className="credits">

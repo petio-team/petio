@@ -46,34 +46,28 @@ const plex_oauth_loader =
   "</div>" +
   "</div>";
 
-export function plexAuth(plexWindow) {
+export async function plexAuth(plexWindow) {
   plexWindow.document.body.innerHTML = plex_oauth_loader;
-  api
-    .getPins()
-    .then((response) => response.json())
-    .then((res) => {
-      plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=067e602b-1e86-4739-900d-1abdf8f6da71&code=${res.code}`;
-
-      waitForPin(plexWindow, res.id, true);
-    })
-    .catch(() => {
-      alert("Unable to open popout window, please make sure to allow pop-ups!");
-    });
+  let pins = await api.getPins();
+  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=fc684eb1-cdff-46cc-a807-a3720696ae9f&code=${pins.code}`;
+  let data = await waitForPin(plexWindow, pins.id, true, false);
+  return data;
 }
 
-export function plexToken(plexWindow) {
+export async function plexLogin(plexWindow) {
   plexWindow.document.body.innerHTML = plex_oauth_loader;
-  api
-    .getPins()
-    .then((response) => response.json())
-    .then((res) => {
-      plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=067e602b-1e86-4739-900d-1abdf8f6da71&code=${res.code}`;
+  let pins = await api.getPins();
+  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=fc684eb1-cdff-46cc-a807-a3720696ae9f&code=${pins.code}`;
+  let data = await waitForPin(plexWindow, pins.id, false, true);
+  return data;
+}
 
-      waitForPin(plexWindow, res.id);
-    })
-    .catch(() => {
-      alert("Unable to open popout window, please make sure to allow pop-ups!");
-    });
+export async function plexToken(plexWindow) {
+  plexWindow.document.body.innerHTML = plex_oauth_loader;
+  let pins = await api.getPins();
+  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=fc684eb1-cdff-46cc-a807-a3720696ae9f&code=${pins.code}`;
+  let data = await waitForPin(plexWindow, pins.id);
+  return data;
 }
 
 function saveToken(token) {
@@ -83,14 +77,35 @@ function saveToken(token) {
   });
 }
 
-async function waitForPin(plexWindow, id, setup = false) {
+async function waitForPin(plexWindow, id, setup = false, login = false) {
+  await timeout(1000);
   let response = await api.validatePin(id);
   if (response.authToken) {
     plexWindow.close();
-    saveToken(response.authToken);
     if (setup) {
+      saveToken(response.authToken);
       getUser(response.authToken);
+    } else if (login) {
+      let data = await api.plexLogin(response.authToken);
+      if (data.user) {
+        if (data.loggedIn) {
+          finalise({
+            type: types.LOGIN,
+            data: data,
+          });
+          return data;
+        } else {
+          return {
+            error: "User not found",
+          };
+        }
+      } else {
+        return {
+          error: "User not found",
+        };
+      }
     } else {
+      saveToken(response.authToken);
       finalise({
         type: types.PLEX_TOKEN,
         token: false,
@@ -101,12 +116,16 @@ async function waitForPin(plexWindow, id, setup = false) {
       location.reload();
     }
   } else if (plexWindow.closed) {
-    alert("Unable to login please try again");
+    return {
+      error: "Plex window closed",
+    };
   } else {
-    setTimeout(() => {
-      waitForPin(plexWindow, id, setup);
-    }, 1000);
+    return await waitForPin(plexWindow, id, setup, login);
   }
+}
+
+function timeout(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function getUser(token) {

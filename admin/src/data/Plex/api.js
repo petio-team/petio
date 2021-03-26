@@ -1,20 +1,21 @@
-import pjson from "../../../package.json";
+import { post } from "../http";
+
 const plexHeaders = {
   "Content-Type": "application/json",
   Accept: "application/json",
   "X-Plex-Device": "API",
   "X-Plex-Device-Name": "Petio",
   "X-Plex-Product": "Petio",
-  "X-Plex-Version": "1.0.0",
-  "X-Plex-Platform-Version": pjson.version,
-  "X-Plex-Client-Identifier": "067e602b-1e86-4739-900d-1abdf8f6da71",
+  "X-Plex-Version": "v1.0",
+  "X-Plex-Platform-Version": "v1.0",
+  "X-Plex-Client-Identifier": "fc684eb1-cdff-46cc-a807-a3720696ae9f",
 };
 
 export function getPins() {
   let url = "https://plex.tv/api/v2/pins?strong=true";
   let method = "post";
   let headers = plexHeaders;
-  return process(url, headers, method);
+  return process(url, headers, method).then((response) => response.json());
 }
 
 export function validatePin(id) {
@@ -42,6 +43,10 @@ export function getServers(token, ssl = false) {
   return process(url, headers, method)
     .then((response) => response.text())
     .then((str) => new window.DOMParser().parseFromString(str, "text/xml"));
+}
+
+export async function plexLogin(token = false) {
+  return post("/login/plex_login", { token: token });
 }
 
 function process(url, headers, method, body = null) {

@@ -139,3 +139,42 @@
     }
   }
 }
+
+.login {
+  &--inner {
+    &--divide {
+      text-align: center;
+      margin: 10px 0;
+      overflow: hidden;
+
+      p {
+        margin: 0;
+        display: inline-block;
+        position: relative;
+        padding: 0 10px;
+
+        &:before,
+        &:after {
+          content: "";
+          position: absolute;
+          top: calc(50% - 0.5px);
+          height: 1px;
+          background: rgba(white, 0.3);
+          width: 500px;
+        }
+
+        &:before {
+          right: 100%;
+        }
+
+        &:after {
+          left: 100%;
+        }
+      }
+    }
+
+    .main-title {
+      margin-bottom: 10px;
+    }
+  }
+}

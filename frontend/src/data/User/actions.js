@@ -133,9 +133,7 @@ async function waitForPin(plexWindow, id) {
     plexWindow.close();
     let data = await api.plexLogin(response.authToken);
     if (data.user) {
-      let ls_user = data.token;
       if (data.loggedIn) {
-        localStorage.setItem("petio_jwt", ls_user);
         finalise({
           type: types.LOGIN,
           data: data,

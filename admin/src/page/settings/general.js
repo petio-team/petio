@@ -295,12 +295,10 @@ class General extends React.Component {
   }
 
   componentDidUpdate() {
-    console.log(this.props.plex.token);
     if (this.state.token !== this.props.plex.token) {
       this.setState({
         token: this.props.plex.token,
       });
-      console.log("change");
       if (this.props.plex.token)
         this.props.msg({
           type: "good",
