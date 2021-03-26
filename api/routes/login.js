@@ -82,7 +82,9 @@ router.post("/", async (req, res) => {
   } catch (err) {
     logger.log("warn", `LOGIN: User not found ${username} - ${request_ip}`);
     logger.warn(err);
-    res.json({ loggedIn: false, user: null, admin: false, token: null });
+    res
+      .status(401)
+      .json({ loggedIn: false, user: null, admin: false, token: null });
   }
 });
 
@@ -166,7 +168,9 @@ router.post("/plex_login", async (req, res) => {
     saveRequestIp(dbUser, request_ip);
   } catch (err) {
     console.log(err);
-    res.json({ error: err });
+    res
+      .status(401)
+      .json({ loggedIn: false, user: null, admin: false, token: null });
   }
 });
 

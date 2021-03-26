@@ -43,10 +43,12 @@ function parseResponse(response) {
       .clone()
       .json()
       .catch(() => response.text());
-  } else if (response.status === 401) {
-    console.log();
   }
   console.log(new HttpError(response.status));
+  return response
+    .clone()
+    .json()
+    .catch(() => response.text());
 }
 
 export function get(path, options = {}) {

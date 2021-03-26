@@ -57,7 +57,7 @@ export function login(user, cookie = false) {
         }
       })
       .catch((err) => {
-        console.log(err);
+        console.log(err.status);
         deleteCookie("petio_jwt");
         reject("An error has occured");
       });
