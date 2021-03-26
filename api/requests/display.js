@@ -248,6 +248,14 @@ function reqState(req, children) {
               };
             }
           }
+
+          if (children[r].info.status === "announced") {
+            return {
+              status: "blue",
+              message: "Awaiting Info",
+              step: 3,
+            };
+          }
         }
       }
     }
