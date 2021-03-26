@@ -20,6 +20,9 @@ router.use(
   "/api",
   createProxyMiddleware({
     target: "http://localhost:7778",
+    headers: {
+      Connection: "keep-alive",
+    },
     logProvider: function (provider) {
       return logger;
     },
