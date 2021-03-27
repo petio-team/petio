@@ -84,7 +84,7 @@ async function create(id) {
     }
   } catch (err) {
     //
-    console.log(err);
+    // console.log(err);
   }
   return;
 }

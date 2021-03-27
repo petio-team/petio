@@ -195,60 +195,93 @@ class Setup extends React.Component {
       db: this.state.mongoType + this.state.db,
     };
     this.waitText();
-    Api.saveConfig(config)
-      .then(() => {
-        setTimeout(() => {
-          this.props.checkConfig();
-        }, 80000);
-      })
-      .catch(() => {
-        alert(
-          "Setup failed, check API is running and no errors, if this persists please contact the dev team."
-        );
-        window.location.reload(false);
+    try {
+      await Api.saveConfig(config);
+      this.props.checkConfig(true);
+    } catch {
+      this.props.msg({
+        type: "error",
+        message:
+          "Setup failed, check API is running and no errors, if this persists please contact the dev team.",
       });
+      this.setTimeout(() => {
+        location.reload();
+      }, 3000);
+    }
   }
 
-  async waitText() {
-    await this.timeout(10000);
+  async waitText(it = 1) {
+    if (this.state.exiting) return;
+    let text,
+      to = 0;
+    switch (it) {
+      case 1:
+        text = "Starting things up...";
+        to = 1000;
+        break;
+      case 2:
+        text = "Creating configs...";
+        to = 1000;
+        break;
+      case 3:
+        text = "Connecting to the database...";
+        to = 1000;
+        break;
+      case 4:
+        text = "Getting your friends...";
+        to = 1000;
+        break;
+      case 5:
+        text = "Loading your libraries...";
+        to = 3000;
+        break;
+      case 6:
+        text = "Finding your embarassing movies...";
+        to = 3000;
+        break;
+      case 7:
+        text = "Finding your embarassing movies... oh wow...";
+        to = 1000;
+        break;
+      case 8:
+        text = "Building your Petio library...";
+        to = 3000;
+        break;
+      case 9:
+        text =
+          "Building your Petio library... Grab a cup of tea this could take a few minutes...";
+        to = 1000;
+        break;
+      case 10:
+        text =
+          "If you're library is extremely big or your server connection is remote this might take a little while...";
+        to = 120000;
+        break;
+      case 11:
+        text =
+          "We're not done, but you can start using Petio now while the rest of your library scans. Just a second we'll let you in....";
+        to = 120000;
+        break;
+      case 12:
+        text =
+          "We're not done, but you can start using Petio now while the rest of your library scans. Just a second we'll let you in....";
+        to = 3000;
+        break;
+      case 13:
+        location.reload();
+        break;
+    }
+    it++;
+    await this.timeout(to);
     this.setState({
-      finalText: "Creating configs...",
+      finalText: text,
     });
-    await this.timeout(10000);
+    this.waitText(it);
+  }
+
+  componentWillUnmount() {
     this.setState({
-      finalText: "Connecting to the database...",
-    });
-    await this.timeout(10000);
-    this.setState({
-      finalText: "Loading your libraries...",
-    });
-    await this.timeout(10000);
-    this.setState({
-      finalText: "Finding your embarassing movies...",
-    });
-    await this.timeout(10000);
-    this.setState({
-      finalText: "Finding your embarassing movies... oh wow...",
-    });
-    await this.timeout(10000);
-    this.setState({
-      finalText: "Matching content against online sources...",
-    });
-    await this.timeout(10000);
-    this.setState({
-      finalText: "Getting your friends...",
-    });
-    await this.timeout(10000);
-    this.setState({
-      finalText: "Finishing up...",
-    });
-    await this.timeout(50000);
-    this.setState({
-      finalText: "This is taking a while...",
-    });
-    await this.timeout(100000);
-    this.setState({
-      finalText: "Should really be done by now...",
+      exiting: true,
     });
   }
 
@@ -373,7 +406,12 @@ class Setup extends React.Component {
                 value={this.state.password}
                 onChange={this.inputChange}
               />
-              <button className="btn btn__square" onClick={this.saveUser}>
+              <button
+                className={`btn btn__square ${
+                  this.state.password ? "" : "disabled"
+                }`}
+                onClick={this.saveUser}
+              >
                 Next
               </button>
             </div>
@@ -607,6 +645,7 @@ function SetupContainer(props) {
       api={props.api}
       user={props.user}
       checkConfig={props.checkConfig}
+      msg={props.msg}
     />
   );
 }

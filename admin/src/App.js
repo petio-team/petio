@@ -42,10 +42,36 @@ class App extends React.Component {
     });
   }
 
-  checkConfig() {
+  async checkConfig(setup = false) {
     this.setState({
       configChecked: true,
     });
+    try {
+      let res = await Api.checkConfig();
+      if (res.error) {
+        this.props.msg({
+          type: "error",
+          message: res.error,
+        });
+        throw "Config error";
+      }
+      if (setup && !res.ready) {
+        setTimeout(() => {
+          this.checkConfig(true);
+        }, 10000);
+        return;
+      }
+      this.setState({
+        config: res.config,
+        loading: false,
+      });
+    } catch {
+      this.setState({
+        error: true,
+        loading: false,
+      });
+    }
+
     Api.checkConfig()
       .then((res) => {
         console.log(res);
@@ -177,7 +203,7 @@ class App extends React.Component {
             })}
           </div>
           <div className="page-wrap">
-            <Setup checkConfig={this.checkConfig} />
+            <Setup msg={this.msg} checkConfig={this.checkConfig} />
           </div>
         </div>
       );

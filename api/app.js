@@ -14,6 +14,7 @@ const bcrypt = require("bcryptjs");
 
 // Config
 const getConfig = require("./util/config");
+const setupReady = require("./util/setupReady");
 const Worker = require("./worker");
 
 // Plex
@@ -80,13 +81,34 @@ class Main {
     logger.log("info", "API: Setting up routes");
     this.e.get("/config", async (req, res) => {
       let config = getConfig();
+      let ready = false;
+      if (config) {
+        try {
+          let setupCheck = await setupReady();
+          if (setupCheck.ready) {
+            ready = true;
+          }
+          if (setupCheck.error) {
+            res.status(500).json({
+              error: "An error has occured",
+            });
+            return;
+          }
+        } catch {
+          res.status(500).json({
+            error: "An error has occured",
+          });
+          return;
+        }
+      }
       res.json(
         config
           ? {
               config: true,
               login_type: config.login_type ? config.login_type : 1,
+              ready: ready,
             }
-          : { config: false, login_type: 1 }
+          : { config: false, login_type: 1, ready: ready }
       );
     });
     this.setup();
