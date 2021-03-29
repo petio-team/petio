@@ -826,23 +826,24 @@ class LibraryUpdate {
       } else {
         logger.log("warn", `LIB CRON: User Failed to Create ${obj.title}`);
       }
-    } else {
-      try {
-        logger.log("info", `LIB CRON: User Updating ${obj.title}`);
-        friendDb.title = obj.title;
-        friendDb.username = obj.username;
-        friendDb.nameLower = obj.username
-          ? obj.username.toLowerCase()
-          : obj.title.toLowerCase();
-        friendDb.email = obj.email;
-        friendDb.thumb = obj.thumb;
-        await friendDb.save();
-        logger.log("info", `LIB CRON: User Updated ${obj.title}`);
-      } catch (err) {
-        logger.log("error", `LIB CRON: User Update Failed ${obj.title}`);
-        logger.log({ level: "error", message: err });
-      }
     }
+    // else {
+    //   try {
+    //     logger.log("info", `LIB CRON: User Updating ${obj.title}`);
+    //     friendDb.title = obj.title;
+    //     friendDb.username = obj.username;
+    //     friendDb.nameLower = obj.username
+    //       ? obj.username.toLowerCase()
+    //       : obj.title.toLowerCase();
+    //     friendDb.email = obj.email;
+    //     friendDb.thumb = obj.thumb;
+    //     await friendDb.save();
+    //     logger.log("info", `LIB CRON: User Updated ${obj.title}`);
+    //   } catch (err) {
+    //     logger.log("error", `LIB CRON: User Update Failed ${obj.title}`);
+    //     logger.log({ level: "error", message: err });
+    //   }
+    // }
   }
 
   async mailAdded(plexData, ref_id) {
