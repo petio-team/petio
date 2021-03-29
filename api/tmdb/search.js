@@ -14,10 +14,11 @@ const { showLookup } = require("../tmdb/show");
 async function search(term) {
   logger.log("verbose", `TMDB Search ${term}`);
 
-  let [movies, shows, people] = await Promise.all([
+  let [movies, shows, people, companies] = await Promise.all([
     searchMovies(sanitize(term)),
     searchShows(sanitize(term)),
     searchPeople(sanitize(term)),
+    searchCompanies(sanitize(term)),
   ]);
 
   await Promise.map(
@@ -44,6 +45,7 @@ async function search(term) {
     movies: movies.results,
     shows: shows.results,
     people: people.results,
+    companies: companies.results,
   };
 }
 
@@ -57,6 +59,9 @@ async function searchMovies(term) {
     return res.data;
   } catch (err) {
     logger.error("Error searching for movies");
+    return {
+      results: [],
+    };
   }
 }
 
@@ -70,6 +75,9 @@ async function searchShows(term) {
     return res.data;
   } catch (err) {
     logger.error("Error searching for shows");
+    return {
+      results: [],
+    };
   }
 }
 
@@ -83,6 +91,25 @@ async function searchPeople(term) {
     return res.data;
   } catch (err) {
     logger.error("Error searching for people");
+    return {
+      results: [],
+    };
+  }
+}
+
+async function searchCompanies(term) {
+  const config = getConfig();
+  const tmdbApikey = config.tmdbApi;
+  const tmdb = "https://api.themoviedb.org/3/";
+  let url = `${tmdb}search/company?query=${term}&api_key=${tmdbApikey}`;
+  try {
+    let res = await axios.get(url, { httpAgent: agent });
+    return res.data;
+  } catch (err) {
+    logger.error("Error searching for companies");
+    return {
+      results: [],
+    };
   }
 }
 

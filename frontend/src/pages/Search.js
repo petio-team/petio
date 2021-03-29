@@ -9,6 +9,7 @@ import Carousel from "../components/Carousel";
 import PersonCard from "../components/PersonCard";
 import CarouselLoading from "../components/CarouselLoading";
 import CarouselLoadingPerson from "../components/CarouselLoadingPerson";
+import CompanyCard from "../components/CompanyCard";
 
 class Search extends React.Component {
   constructor(props) {
@@ -119,6 +120,27 @@ class Search extends React.Component {
             <Carousel>
               {this.props.api.search_results.people.map((person) => {
                 return <PersonCard key={person.id} person={person} />;
+              })}
+            </Carousel>
+          ) : this.state.isLoading ? (
+            <CarouselLoadingPerson />
+          ) : (
+            <p>No results</p>
+          )}
+        </section>
+        <section>
+          <h3 className="sub-title mb--1">Companies</h3>
+          {this.props.api.search_results.companies &&
+          this.props.api.search_results.companies.length > 0 ? (
+            <Carousel>
+              {this.props.api.search_results.companies.map((company) => {
+                // if (!company.logo_path) return null;
+                return (
+                  <CompanyCard
+                    key={`co__card__${company.id}`}
+                    company={company}
+                  />
+                );
               })}
             </Carousel>
           ) : this.state.isLoading ? (

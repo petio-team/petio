@@ -167,6 +167,7 @@ export async function search(term) {
       movies: searchResults.movies,
       series: searchResults.shows,
       people: searchResults.people,
+      companies: searchResults.companies,
     });
 
     resolve();

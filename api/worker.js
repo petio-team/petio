@@ -23,7 +23,7 @@ class Worker {
   }
 
   async startCrons() {
-    // return; // for debug local
+    return; // for debug local
     try {
       await this.connnectDb();
       const libUpdate = new LibraryUpdate();

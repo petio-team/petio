@@ -304,3 +304,60 @@
   font-size: 12px;
   border-radius: 20px;
 }
+
+.company-card {
+  margin-right: 5px;
+
+  @include media-breakpoint-up(lg) {
+    margin-right: 10px;
+  }
+
+  &--inner {
+    position: relative;
+    margin-top: 2px;
+    box-shadow: 0 0 0 0 $primary;
+    transition: box-shadow 0.3s ease;
+    width: 300px;
+    height: 200px;
+    background: rgba($black, 0.6);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  &--image {
+    height: 100%;
+    width: 100%;
+    position: relative;
+
+    img {
+      opacity: 1;
+      filter: grayscale(1) invert(1);
+      height: 100%;
+      width: 100%;
+      object-fit: contain;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  }
+
+  .full-link {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    position: absolute;
+    z-index: 5;
+  }
+
+  &:hover {
+    .company-card {
+      &--inner {
+        background: $black;
+      }
+    }
+  }
+}

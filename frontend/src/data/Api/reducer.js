@@ -25,6 +25,7 @@ export default function (
       movies: [],
       series: [],
       people: [],
+      companies: [],
     },
     actor_movie: {},
     actor_series: {},
@@ -85,6 +86,7 @@ export default function (
           movies: action.movies,
           series: action.series,
           people: action.people,
+          companies: action.companies,
         },
       };
 
