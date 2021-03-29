@@ -196,6 +196,12 @@ router.post("/edit", adminRequired, async (req, res) => {
           : bcrypt.hashSync(prefs.adminPass, 10);
     }
 
+    if (user.role === "admin" && user.email) {
+      updateConfig({
+        adminEmail: user.email,
+      });
+    }
+
     await User.findOneAndUpdate(
       { _id: user.id },
       {
@@ -346,5 +352,33 @@ router.post("/thumb/:id", adminRequired, async (req, res) => {
     res.sendStatus(500);
   }
 });
+
+async function updateConfig(obj) {
+  let project_folder, configFile;
+  if (process.pkg) {
+    project_folder = path.dirname(process.execPath);
+    configFile = path.join(project_folder, "./config/config.json");
+  } else {
+    project_folder = __dirname;
+    configFile = path.join(project_folder, "../config/config.json");
+  }
+
+  let userConfig = false;
+  try {
+    userConfig = fs.readFileSync(configFile);
+    let configParse = JSON.parse(userConfig);
+    let updatedConfig = JSON.stringify({ ...configParse, ...obj });
+    fs.writeFile(configFile, updatedConfig, (err) => {
+      if (err) {
+        logger.error("ROUTE: Usr unable to update config");
+        logger.log({ level: "error", message: err });
+      }
+    });
+    // return JSON.parse(userConfig);
+  } catch (err) {
+    logger.error("ROUTE: Usr unable to update config");
+    logger.log({ level: "error", message: err });
+  }
+}
 
 module.exports = router;
