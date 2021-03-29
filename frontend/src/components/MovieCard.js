@@ -145,9 +145,11 @@ class MovieCard extends React.Component {
         ref={this.card}
         key={movie.id}
         data-key={movie.id}
-        className={`card type--movie-tv ${movie.on_server ? "on-server" : ""} ${
-          this.props.user.requests[movie.id] ? "requested" : ""
-        } ${this.state.imgLoaded ? "img-loaded" : "img-not-loaded"}`}
+        className={`card type--movie-tv ${
+          this.props.movie.on_server || movie.on_server ? "on-server" : ""
+        } ${this.props.user.requests[movie.id] ? "requested" : ""} ${
+          this.state.imgLoaded ? "img-loaded" : "img-not-loaded"
+        }`}
       >
         <div className="card--inner">
           <Link to={`/movie/${movie.id}`} className="full-link"></Link>

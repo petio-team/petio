@@ -5,7 +5,6 @@ const Promise = require("bluebird");
 
 // Config
 const getConfig = require("../util/config");
-const request = require("xhr-request");
 const { movieLookup } = require("../tmdb/movie");
 const { showLookup } = require("../tmdb/show");
 

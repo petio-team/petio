@@ -22,18 +22,9 @@ module.exports = async function getDiscoveryData(id, type = "movie") {
   const discoveryPrefs = await Discovery.findOne({ id: id });
   const config = getConfig();
   let popular = [];
-  let now = new Date().toISOString().split("T")[0];
   let [trendingData, upcoming, popularData] = await Promise.all([
     trending(),
-    type === "movie"
-      ? discoverMovie(1, {
-          sort_by: "popularity.desc",
-          "primary_release_date.gte": now,
-        })
-      : discoverShow(1, {
-          sort_by: "popularity.desc",
-          "first_air_date.gte": now,
-        }),
+    comingSoon(type),
     getTop(type === "movie" ? 1 : 2),
   ]);
   if (
@@ -653,4 +644,50 @@ function formatResult(result, type) {
   }
 
   return result;
+}
+
+async function comingSoon(type) {
+  let now = new Date().toISOString().split("T")[0];
+  try {
+    let data =
+      type === "movie"
+        ? await discoverMovie(1, {
+            sort_by: "popularity.desc",
+            "primary_release_date.gte": now,
+          })
+        : await discoverShow(1, {
+            sort_by: "popularity.desc",
+            "first_air_date.gte": now,
+          });
+    await Promise.map(
+      data.results,
+      async (result, i) => {
+        let onPlex =
+          type === "movie"
+            ? await onServer("movie", false, false, result.id)
+            : await onServer("show", false, false, result.id);
+        data.results[i] =
+          type === "movie"
+            ? {
+                on_server: onPlex.exists,
+                title: result.title,
+                poster_path: result.poster_path,
+                release_date: result.release_date,
+                id: result.id,
+              }
+            : {
+                on_server: onPlex.exists,
+                name: result.name,
+                poster_path: result.poster_path,
+                first_air_date: result.first_air_date,
+                id: result.id,
+              };
+      },
+      { concurrency: 10 }
+    );
+    return data;
+  } catch (e) {
+    console.log(e);
+    return [];
+  }
 }
