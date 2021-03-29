@@ -1,4 +1,3 @@
-const request = require("xhr-request");
 const Promise = require("bluebird");
 const xmlParser = require("xml-js");
 const Library = require("../models/library");
@@ -188,56 +187,28 @@ class LibraryUpdate {
     }
   }
 
-  getLibraries() {
-    return new Promise((resolve, reject) => {
-      let url = `${this.config.plexProtocol}://${this.config.plexIp}:${this.config.plexPort}/library/sections/?X-Plex-Token=${this.config.plexToken}`;
-      request(
-        url,
-        {
-          method: "GET",
-          json: true,
-        },
-        function (err, data) {
-          if (err || !data) {
-            logger.log("warn", "LIB CRON: Library update failed!");
-            reject("Unable to get library info");
-          }
-          if (data) {
-            logger.log("info", "LIB CRON: Found Libraries");
-            resolve(data.MediaContainer);
-          } else {
-            logger.log("warn", "LIB CRON: Library update failed!");
-            reject("Unable to get library info");
-          }
-        }
-      );
-    });
+  async getLibraries() {
+    let url = `${this.config.plexProtocol}://${this.config.plexIp}:${this.config.plexPort}/library/sections/?X-Plex-Token=${this.config.plexToken}`;
+    try {
+      let res = await axios.get(url);
+      logger.log("info", "LIB CRON: Found Libraries");
+      return res.data.MediaContainer;
+    } catch (e) {
+      logger.log("warn", "LIB CRON: Library update failed!");
+      throw e;
+    }
   }
 
-  getRecent() {
-    return new Promise((resolve, reject) => {
-      let url = `${this.config.plexProtocol}://${this.config.plexIp}:${this.config.plexPort}/library/recentlyAdded/?X-Plex-Token=${this.config.plexToken}`;
-      request(
-        url,
-        {
-          method: "GET",
-          json: true,
-        },
-        function (err, data) {
-          if (err || !data) {
-            logger.log("warn", "LIB CRON: Recently added failed!");
-            reject();
-          }
-          if (data) {
-            logger.log("info", "LIB CRON: Recently Added received");
-            resolve(data.MediaContainer);
-          } else {
-            logger.log("warn", "LIB CRON: Recently added failed!");
-            reject();
-          }
-        }
-      );
-    });
+  async getRecent() {
+    let url = `${this.config.plexProtocol}://${this.config.plexIp}:${this.config.plexPort}/library/recentlyAdded/?X-Plex-Token=${this.config.plexToken}`;
+    try {
+      let res = await axios.get(url);
+      logger.log("info", "LIB CRON: Recently Added received");
+      return res.data.MediaContainer;
+    } catch {
+      logger.log("warn", "LIB CRON: Recently added failed!");
+      throw "Recently added failed";
+    }
   }
 
   async saveLibraries(libraries) {
@@ -754,38 +725,20 @@ class LibraryUpdate {
     }
   }
 
-  getFriends() {
+  async getFriends() {
     let url = `https://plex.tv/pms/friends/all?X-Plex-Token=${this.config.plexToken}`;
-    return new Promise((resolve, reject) => {
-      request(
-        url,
-        {
-          method: "GET",
-          // json: true,
-        },
-        function (err, data) {
-          if (err) {
-            reject("Unable to get friends");
-            logger.log("error", "LIB CRON: Unable to get friends");
-            logger.log("error", `LIB CRON: Error`);
-            logger.log({ level: "error", message: err });
-          }
-          if (!data) {
-            reject("no data");
-          } else {
-            let dataParse = JSON.parse(
-              xmlParser.xml2json(data, { compact: false })
-            );
-
-            if (dataParse.elements[0]) {
-              resolve(dataParse.elements[0].elements);
-            } else {
-              reject("No User object returned");
-            }
-          }
-        }
+    try {
+      let res = await axios.get(url);
+      let dataParse = JSON.parse(
+        xmlParser.xml2json(res.data, { compact: false })
       );
-    });
+      return dataParse.elements[0].elements;
+    } catch (e) {
+      logger.log("error", "LIB CRON: Unable to get friends");
+      logger.log("error", `LIB CRON: Error`);
+      logger.log({ level: "error", message: e });
+      throw "Unable to get friends";
+    }
   }
 
   async saveFriend(obj) {
@@ -827,23 +780,6 @@ class LibraryUpdate {
         logger.log("warn", `LIB CRON: User Failed to Create ${obj.title}`);
       }
     }
-    // else {
-    //   try {
-    //     logger.log("info", `LIB CRON: User Updating ${obj.title}`);
-    //     friendDb.title = obj.title;
-    //     friendDb.username = obj.username;
-    //     friendDb.nameLower = obj.username
-    //       ? obj.username.toLowerCase()
-    //       : obj.title.toLowerCase();
-    //     friendDb.email = obj.email;
-    //     friendDb.thumb = obj.thumb;
-    //     await friendDb.save();
-    //     logger.log("info", `LIB CRON: User Updated ${obj.title}`);
-    //   } catch (err) {
-    //     logger.log("error", `LIB CRON: User Update Failed ${obj.title}`);
-    //     logger.log({ level: "error", message: err });
-    //   }
-    // }
   }
 
   async mailAdded(plexData, ref_id) {
@@ -902,67 +838,34 @@ class LibraryUpdate {
     this.mailer = [];
   }
 
-  externalIdTv(id, type) {
+  async externalIdTv(id, type) {
     let url = `${this.tmdb}find/${id}?api_key=${this.config.tmdbApi}&language=en-US&external_source=${type}_id`;
-    return new Promise((resolve, reject) => {
-      request(
-        url,
-        {
-          method: "GET",
-          json: true,
-        },
-        function (err, data) {
-          if (err) {
-            reject(err);
-          }
-          if (!data || !data.tv_results) {
-            reject("Error no data returned from tmdb TV external");
-          } else if (data.tv_results.length === 0) {
-            reject();
-          } else {
-            resolve(data.tv_results[0].id);
-          }
-        }
-      );
-    });
+    try {
+      let res = await axios.get(url);
+      return res.data.tv_results[0].id;
+    } catch (e) {
+      throw e;
+    }
   }
 
-  tmdbExternalIds(id) {
+  async tmdbExternalIds(id) {
     let url = `${this.tmdb}tv/${id}/external_ids?api_key=${this.config.tmdbApi}`;
-    return new Promise((resolve, reject) => {
-      request(
-        url,
-        {
-          method: "GET",
-          json: true,
-        },
-        function (err, data) {
-          if (err) {
-            reject(err);
-          }
-          resolve(data);
-        }
-      );
-    });
+    try {
+      let res = await axios.get(url);
+      return res.data;
+    } catch (e) {
+      throw e;
+    }
   }
 
-  externalIdMovie(id) {
+  async externalIdMovie(id) {
     let url = `${this.tmdb}movie/${id}/external_ids?api_key=${this.config.tmdbApi}`;
-    return new Promise((resolve, reject) => {
-      request(
-        url,
-        {
-          method: "GET",
-          json: true,
-        },
-        function (err, data) {
-          if (err) {
-            reject(err);
-          }
-          resolve(data);
-        }
-      );
-    });
+    try {
+      let res = await axios.get(url);
+      return res.data;
+    } catch (e) {
+      throw e;
+    }
   }
 
   async checkOldRequests() {

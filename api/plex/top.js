@@ -1,4 +1,4 @@
-const request = require("xhr-request");
+const axios = require("axios");
 const plexLookup = require("../plex/plexLookup");
 const Movie = require("../tmdb/movie");
 const Show = require("../tmdb/show");
@@ -28,29 +28,20 @@ async function getTop(type) {
   return data;
 }
 
-function getTopData(type) {
+async function getTopData(type) {
   const prefs = getConfig();
-  return new Promise((resolve, reject) => {
-    let d = new Date();
-    d.setMonth(d.getMonth() - 1);
-    d.setHours(0, 0, 0);
-    d.setMilliseconds(0);
-    let timestamp = (d / 1000) | 0;
-    let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/library/all/top?type=${type}&viewedAt>=${timestamp}&limit=20&X-Plex-Token=${prefs.plexToken}`;
-    request(
-      url,
-      {
-        method: "GET",
-        json: true,
-      },
-      function (err, data) {
-        if (err) {
-          reject(err);
-        }
-        resolve(parseTop(data, type));
-      }
-    );
-  });
+  let d = new Date();
+  d.setMonth(d.getMonth() - 1);
+  d.setHours(0, 0, 0);
+  d.setMilliseconds(0);
+  let timestamp = (d / 1000) | 0;
+  let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/library/all/top?type=${type}&viewedAt>=${timestamp}&limit=20&X-Plex-Token=${prefs.plexToken}`;
+  try {
+    let res = await axios.get(url);
+    return parseTop(res.data, type);
+  } catch (e) {
+    // Do nothing
+  }
 }
 
 async function parseTop(data, type) {
