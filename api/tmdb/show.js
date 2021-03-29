@@ -19,6 +19,9 @@ const memoryCache = cacheManager.caching({
 });
 
 async function showLookup(id, minified = false) {
+  if (!id || id == "false") {
+    return "No ID";
+  }
   logger.log("verbose", `TMDB Show Lookup ${id}`);
   let external = await externalId(id);
   let show = false;

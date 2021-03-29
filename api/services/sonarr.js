@@ -179,6 +179,15 @@ class Sonarr {
       }
       // await this.refresh();
       queue[i] = await this.get(`queue`);
+      let totalRecords = queue[i].totalRecords;
+      let pageSize = queue[i].pageSize;
+      let pages = Math.ceil(totalRecords / pageSize);
+      for (let p = 2; p <= pages; p++) {
+        let queuePage = await this.get("queue", {
+          page: p,
+        });
+        queue[i].records = [...queue[i].records, ...queuePage.records];
+      }
       queue[i]["serverName"] = this.config.title;
     }
     return queue;
