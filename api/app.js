@@ -11,6 +11,7 @@ const logger = require("./util/logger");
 const cluster = require("cluster");
 const trending = require("./tmdb/trending");
 const bcrypt = require("bcryptjs");
+const cookieParser = require("cookie-parser");
 
 // Config
 const getConfig = require("./util/config");
@@ -73,6 +74,7 @@ class Main {
       );
       this.e.use(express.json());
       this.e.use(express.urlencoded({ extended: true }));
+      this.e.use(cookieParser());
     }
     this.config = getConfig();
   }
