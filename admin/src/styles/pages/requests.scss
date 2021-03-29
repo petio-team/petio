@@ -62,7 +62,7 @@
   }
 
   &--quality {
-    padding: 5px 10px;
+    // padding: 5px 10px;
     border-radius: 10px;
     font-size: 8px;
     display: inline-flex;
@@ -72,7 +72,7 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-right: 10px;
-    background: $grey-medium;
+    // background: $grey-medium;
   }
 
   &--icon {
@@ -93,11 +93,12 @@
   }
 
   &--prog {
-    width: 40%;
+    width: 80%;
     height: 4px;
     background: $black;
     position: relative;
     margin-right: 20px;
+    max-width: 300px;
 
     &--active {
       position: absolute;

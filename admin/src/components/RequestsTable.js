@@ -20,6 +20,10 @@ class RequestsTable extends React.Component {
     let sortVal = this.state.sortBy;
     let av = a[sortVal];
     let bv = b[sortVal];
+    if (sortVal === "status") {
+      av = a.process_stage.message;
+      bv = b.process_stage.message;
+    }
     if (!av) av = "";
     if (!bv) bv = "";
     if (typeof av === "string") av = av.toLowerCase();
@@ -159,7 +163,7 @@ class RequestsTable extends React.Component {
                       {child.quality.quality.name}
                     </span>
                   </td>
-                  <td>
+                  <td colSpan="4">
                     {" "}
                     <div className="requests--prog--wrap">
                       <div className="requests--prog">
@@ -184,9 +188,6 @@ class RequestsTable extends React.Component {
                       )}
                     </div>
                   </td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
                 </tr>
               </>
             );
@@ -229,7 +230,15 @@ class RequestsTable extends React.Component {
             </th>
             <th>Year</th>
             <th>Type</th>
-            <th>Status</th>
+            <th
+              className={`sortable ${
+                this.state.sortBy === "status" ? "active" : ""
+              } ${this.state.dir}`}
+              onClick={() => this.sortCol("status")}
+            >
+              Status
+              <Arrow />
+            </th>
             <th>Users</th>
             <th>Approved</th>
             <th>Actions</th>
