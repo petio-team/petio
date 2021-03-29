@@ -129,18 +129,21 @@ class Requests extends React.Component {
     let radarr = this.state.r_servers;
     let sonarr = this.state.s_servers;
 
-    await Promise.all(
-      radarr.map(async (server) => {
-        let options = await this.getArrOptions(server.uuid, "radarr");
-        server.options = options;
-      })
-    );
-    await Promise.all(
-      sonarr.map(async (server) => {
-        let options = await this.getArrOptions(server.uuid, "sonarr");
-        server.options = options;
-      })
-    );
+    if (radarr)
+      await Promise.all(
+        radarr.map(async (server) => {
+          let options = await this.getArrOptions(server.uuid, "radarr");
+          server.options = options;
+        })
+      );
+
+    if (sonarr)
+      await Promise.all(
+        sonarr.map(async (server) => {
+          let options = await this.getArrOptions(server.uuid, "sonarr");
+          server.options = options;
+        })
+      );
 
     this.setState({
       s_servers: sonarr,
@@ -560,14 +563,15 @@ class Requests extends React.Component {
                       : "Radarr"}
                   </p>
                   {this.state.activeRequest.type === "tv" ? (
-                    this.state.s_servers.length > 0 ? (
+                    this.state.s_servers && this.state.s_servers.length > 0 ? (
                       this.state.s_servers.map((server) => {
                         return this.renderReqEdit(server, "sonarr");
                       })
                     ) : (
                       <p>No Sonarr Servers</p>
                     )
-                  ) : this.state.r_servers.length > 0 ? (
+                  ) : this.state.r_servers &&
+                    this.state.r_servers.length > 0 ? (
                     this.state.r_servers.map((server) => {
                       return this.renderReqEdit(server, "radarr");
                     })

@@ -259,7 +259,7 @@ class RequestsTable extends React.Component {
                         href={`${window.location.pathname.replace(
                           "/admin/",
                           ""
-                        )}/#/${req.type === "movie" ? "movie" : "tv"}/${
+                        )}/#/${req.type === "movie" ? "movie" : "series"}/${
                           req.requestId
                         }`}
                       >

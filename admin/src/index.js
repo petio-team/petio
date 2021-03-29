@@ -1,25 +1,24 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
-import { initStore, store } from './data/store';
-import { Provider } from 'react-redux';
-import './styles/main.scss';
+import React from "react";
+import ReactDOM from "react-dom";
+import App from "./App";
+import * as serviceWorker from "./serviceWorker";
+import { initStore, store } from "./data/store";
+import { Provider } from "react-redux";
+import "./styles/main.scss";
 
 const startApp = () => {
-	initStore();
-	console.log(process.env);
-	ReactDOM.render(
-		<Provider store={store}>
-			<App />
-		</Provider>,
-		document.getElementById('root')
-	);
+  initStore();
+  ReactDOM.render(
+    <Provider store={store}>
+      <App />
+    </Provider>,
+    document.getElementById("root")
+  );
 };
 
 if (!window.cordova) {
-	startApp();
+  startApp();
 } else {
-	document.addEventListener('deviceready', startApp, false);
+  document.addEventListener("deviceready", startApp, false);
 }
 serviceWorker.unregister();
