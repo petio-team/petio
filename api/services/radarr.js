@@ -1,8 +1,7 @@
-const request = require("xhr-request");
+const axios = require("axios");
 const Request = require("../models/request");
 const fs = require("fs");
 const path = require("path");
-var sanitize = require("sanitize-filename");
 const logger = require("../util/logger");
 
 class Radarr {
@@ -39,45 +38,34 @@ class Radarr {
     }
   }
 
-  process(method, endpoint, params, body = false) {
-    return new Promise((resolve, reject) => {
-      if (!this.config.hostname) {
-        reject("");
-        return;
-      }
-      if (!params) {
-        params = {};
-      }
-      params.apikey = this.config.apiKey;
-      let paramsString = "";
-      Object.keys(params).map((val, i) => {
-        let key = val;
-        paramsString += `${i === 0 ? "?" : "&"}${key}=${params[val]}`;
-      });
-      let url = `${this.config.protocol}://${this.config.hostname}${
-        this.config.port ? ":" + this.config.port : ""
-      }${this.config.urlBase}/api/v3/${endpoint}${paramsString}`;
-      let args = {
-        method: method,
-        json: true,
-        timeout: 30000,
-      };
-      if (method === "post" && body) {
-        args = {
-          method: method,
-          json: true,
-          body: body,
-          timeout: 30000,
-        };
-      }
-      request(url, args, function (err, data) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(data);
-        }
-      });
+  async process(method, endpoint, params, body = false) {
+    if (!this.config.hostname) {
+      reject("");
+      return;
+    }
+    if (!params) {
+      params = {};
+    }
+    params.apikey = this.config.apiKey;
+    let paramsString = "";
+    Object.keys(params).map((val, i) => {
+      let key = val;
+      paramsString += `${i === 0 ? "?" : "&"}${key}=${params[val]}`;
     });
+    let url = `${this.config.protocol}://${this.config.hostname}${
+      this.config.port ? ":" + this.config.port : ""
+    }${this.config.urlBase}/api/v3/${endpoint}${paramsString}`;
+    try {
+      if (method === "post" && body) {
+        let res = await axios.post(url, body);
+        return res.data;
+      } else {
+        let res = await axios.get(url);
+        return res.data;
+      }
+    } catch (err) {
+      throw err;
+    }
   }
 
   getConfig() {
