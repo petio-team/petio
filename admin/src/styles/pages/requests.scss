@@ -106,7 +106,8 @@
       left: 0;
       background: $primary;
       height: 100%;
-      transition: width 10s linear;
+      // transition: width 10s linear;
+      width: 0;
     }
 
     &--wrap {

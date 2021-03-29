@@ -26,7 +26,7 @@ async function getRequests(user = false, all = false) {
             if (request.type === "movie" && request.radarrId.length > 0) {
               for (let i = 0; i < Object.keys(request.radarrId).length; i++) {
                 let radarrIds = request.radarrId[i];
-                let rId = radarrIds[Object.keys(radarrIds)[0]];
+                let rId = parseInt(radarrIds[Object.keys(radarrIds)[0]]);
                 let serverUuid = Object.keys(radarrIds)[0];
                 let server = new Radarr(serverUuid);
                 children[i] = {};
@@ -34,10 +34,10 @@ async function getRequests(user = false, all = false) {
                 children[i].info = await server.movie(rId);
                 children[i].info.serverName = server.config.title;
                 children[i].status = [];
-                if (radarrQ[i]) {
-                  for (let o = 0; o < radarrQ[i].records.length; o++) {
-                    if (radarrQ[i].records[o].movieId === rId) {
-                      children[i].status.push(radarrQ[i].records[o]);
+                if (radarrQ[serverUuid]) {
+                  for (let o = 0; o < radarrQ[serverUuid].records.length; o++) {
+                    if (radarrQ[serverUuid].records[o].movieId === rId) {
+                      children[i].status.push(radarrQ[serverUuid].records[o]);
                     }
                   }
                 }
@@ -47,7 +47,7 @@ async function getRequests(user = false, all = false) {
             if (request.type === "tv" && request.sonarrId.length > 0) {
               for (let i = 0; i < Object.keys(request.sonarrId).length; i++) {
                 let sonarrIds = request.sonarrId[i];
-                let sId = sonarrIds[Object.keys(sonarrIds)[0]];
+                let sId = parseInt(sonarrIds[Object.keys(sonarrIds)[0]]);
                 let serverUuid = Object.keys(sonarrIds)[0];
                 let server = new Sonarr(serverUuid);
                 children[i] = {};
@@ -55,10 +55,10 @@ async function getRequests(user = false, all = false) {
                 children[i].info = await server.series(sId);
                 children[i].info.serverName = server.config.title;
                 children[i].status = [];
-                if (sonarrQ[i]) {
-                  for (let o = 0; o < sonarrQ[i].length; o++) {
-                    if (sonarrQ[i][o].series.id === sId) {
-                      children[i].status.push(sonarrQ[i][o]);
+                if (sonarrQ[serverUuid]) {
+                  for (let o = 0; o < sonarrQ[serverUuid].length; o++) {
+                    if (sonarrQ[serverUuid][o].series.id === sId) {
+                      children[i].status.push(sonarrQ[serverUuid][o]);
                     }
                   }
                 }

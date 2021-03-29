@@ -170,7 +170,7 @@ class Sonarr {
   }
 
   async queue() {
-    let queue = [];
+    let queue = {};
     for (let i = 0; i < this.fullConfig.length; i++) {
       this.config = this.fullConfig[i];
       const active = await this.connect();
@@ -178,17 +178,20 @@ class Sonarr {
         return false;
       }
       // await this.refresh();
-      queue[i] = await this.get(`queue`);
-      let totalRecords = queue[i].totalRecords;
-      let pageSize = queue[i].pageSize;
+      queue[this.config.uuid] = await this.get(`queue`);
+      let totalRecords = queue[this.config.uuid].totalRecords;
+      let pageSize = queue[this.config.uuid].pageSize;
       let pages = Math.ceil(totalRecords / pageSize);
       for (let p = 2; p <= pages; p++) {
         let queuePage = await this.get("queue", {
           page: p,
         });
-        queue[i].records = [...queue[i].records, ...queuePage.records];
+        queue[this.config.uuid].records = [
+          ...queue[i].records,
+          ...queuePage.records,
+        ];
       }
-      queue[i]["serverName"] = this.config.title;
+      queue[this.config.uuid]["serverName"] = this.config.title;
     }
     return queue;
   }

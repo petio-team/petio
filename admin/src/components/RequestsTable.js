@@ -21,8 +21,8 @@ class RequestsTable extends React.Component {
     let av = a[sortVal];
     let bv = b[sortVal];
     if (sortVal === "status") {
-      av = a.process_stage.message;
-      bv = b.process_stage.message;
+      av = a.process_stage ? a.process_stage.message : 0;
+      bv = b.process_stage ? b.process_stage.message : 0;
     }
     if (!av) av = "";
     if (!bv) bv = "";
