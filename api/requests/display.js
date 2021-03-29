@@ -37,7 +37,7 @@ async function getRequests(user = false, all = false) {
                 if (radarrQ[i]) {
                   for (let o = 0; o < radarrQ[i].records.length; o++) {
                     if (radarrQ[i].records[o].movieId === rId) {
-                      children[i].status[o] = radarrQ[i].records[o];
+                      children[i].status.push(radarrQ[i].records[o]);
                     }
                   }
                 }
