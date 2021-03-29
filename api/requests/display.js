@@ -189,11 +189,6 @@ function reqState(req, children) {
                     step: 3,
                   };
                 }
-                return {
-                  status: "bad",
-                  message: "Unavailable",
-                  step: 3,
-                };
               }
             }
           }
@@ -221,12 +216,6 @@ function reqState(req, children) {
                   message: "In Cinemas",
                   step: 3,
                 };
-              } else {
-                return {
-                  status: "bad",
-                  message: "Unavailable",
-                  step: 3,
-                };
               }
             } else {
               if (children[r].info.inCinemas) {
@@ -241,11 +230,6 @@ function reqState(req, children) {
                   };
                 }
               }
-              return {
-                status: "bad",
-                message: "Unavailable",
-                step: 3,
-              };
             }
           }
 
@@ -258,6 +242,11 @@ function reqState(req, children) {
           }
         }
       }
+      return {
+        status: "bad",
+        message: "Unavailable",
+        step: 3,
+      };
     }
   }
 
