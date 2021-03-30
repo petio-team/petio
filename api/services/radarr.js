@@ -160,7 +160,11 @@ class Radarr {
     if (!active) {
       return false;
     }
-    return this.delete(`movie/${id}`);
+    try {
+      return this.delete(`movie/${id}`);
+    } catch {
+      logger.warn("RADARR: Unable to remove job, likely already removed");
+    }
   }
 
   async queue() {

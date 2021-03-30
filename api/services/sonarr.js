@@ -158,7 +158,11 @@ class Sonarr {
     if (!active) {
       return false;
     }
-    return this.delete(`series/${id}`);
+    try {
+      return this.delete(`series/${id}`);
+    } catch {
+      logger.warn("SONARR: Unable to remove job, likely already removed");
+    }
   }
 
   async queue() {
