@@ -2,6 +2,7 @@ import React from "react";
 import { withRouter } from "react-router-dom";
 import TvCard from "../components/TvCard";
 import Api from "../data/Api";
+import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
 
 class Networks extends React.Component {
   constructor(props) {
@@ -119,7 +120,11 @@ class Networks extends React.Component {
             ) : this.state.results === "none" ? (
               <p>No results</p>
             ) : (
-              <p>Loading...</p>
+              <div className="spinner">
+                <div>
+                  <Spinner />
+                </div>
+              </div>
             )}
           </div>
         </section>

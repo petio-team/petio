@@ -89,6 +89,21 @@
       min-width: 150px;
     }
   }
+
+  .company-card {
+    width: 200px;
+    min-width: 200px;
+
+    @include media-breakpoint-up(md) {
+      width: 240px;
+      min-width: 240px;
+    }
+
+    @include media-breakpoint-up(lg) {
+      width: 300px;
+      min-width: 300px;
+    }
+  }
 }
 
 .carousel-loading {
@@ -205,6 +220,33 @@
         display: block;
         color: $grey-light;
         font-weight: normal;
+      }
+    }
+
+    &.company {
+      width: 200px;
+
+      .text-wrap {
+        display: none;
+      }
+
+      @include media-breakpoint-up(md) {
+        width: 240px;
+      }
+
+      @include media-breakpoint-up(lg) {
+        width: 300px;
+      }
+
+      .carousel-loading-item {
+        &--inner {
+          padding-bottom: 0;
+          height: 150px;
+
+          @include media-breakpoint-up(lg) {
+            height: 200px;
+          }
+        }
       }
     }
   }

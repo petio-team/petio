@@ -9,6 +9,7 @@ import Carousel from "../components/Carousel";
 import PersonCard from "../components/PersonCard";
 import CarouselLoading from "../components/CarouselLoading";
 import CarouselLoadingPerson from "../components/CarouselLoadingPerson";
+import CarouselLoadingCompany from "../components/CarouselLoadingCompany";
 import CompanyCard from "../components/CompanyCard";
 
 class Search extends React.Component {
@@ -129,12 +130,12 @@ class Search extends React.Component {
           )}
         </section>
         <section>
-          <h3 className="sub-title mb--1">Companies</h3>
+          <h3 className="sub-title mb--1">Studios</h3>
           {this.props.api.search_results.companies &&
           this.props.api.search_results.companies.length > 0 ? (
             <Carousel>
               {this.props.api.search_results.companies.map((company) => {
-                // if (!company.logo_path) return null;
+                if (!company.logo_path) return null;
                 return (
                   <CompanyCard
                     key={`co__card__${company.id}`}
@@ -144,7 +145,7 @@ class Search extends React.Component {
               })}
             </Carousel>
           ) : this.state.isLoading ? (
-            <CarouselLoadingPerson />
+            <CarouselLoadingCompany />
           ) : (
             <p>No results</p>
           )}
@@ -195,12 +196,32 @@ class Search extends React.Component {
         </section>
         <section>
           <h3 className="sub-title mb--1">Trending People</h3>
+
+          {Object.keys(this.props.api.popular).length > 0 ? (
+            <Carousel>
+              {this.props.api.popular.people.map((person) => {
+                return <PersonCard key={person.id} person={person} />;
+              })}
+            </Carousel>
+          ) : (
+            <CarouselLoadingPerson />
+          )}
+        </section>
+        <section>
+          <h3 className="sub-title mb--1">Studios</h3>
           <Carousel>
-            {Object.keys(this.props.api.popular).length > 0
-              ? this.props.api.popular.people.map((person) => {
-                  return <PersonCard key={person.id} person={person} />;
-                })
-              : null}
+            {Object.keys(this.props.api.popular).length > 0 ? (
+              this.props.api.popular.companies.map((company) => {
+                return (
+                  <CompanyCard
+                    key={`co__card__${company.id}`}
+                    company={company}
+                  />
+                );
+              })
+            ) : (
+              <CarouselLoadingCompany />
+            )}
           </Carousel>
         </section>
       </>

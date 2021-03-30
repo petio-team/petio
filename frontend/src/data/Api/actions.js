@@ -49,6 +49,7 @@ export async function getPopular() {
         movies: popular.movies,
         tv: popular.tv,
         people: popular.people,
+        companies: popular.companies,
       },
     });
   }

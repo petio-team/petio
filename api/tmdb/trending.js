@@ -79,6 +79,23 @@ async function trending() {
     people: person.results,
     movies: movies.results,
     tv: tv.results,
+    companies: [
+      {
+        id: 2,
+        logo_path: "/wdrCwmRnLFJhEoH8GSfymY85KHT.png",
+        name: "Walt Disney Pictures",
+      },
+      {
+        id: 33,
+        logo_path: "/8lvHyhjr8oUKOOy2dKXoALWKdp0.png",
+        name: "Universal Pictures",
+      },
+      {
+        id: 7,
+        logo_path: "/vru2SssLX3FPhnKZGtYw00pVIS9.png",
+        name: "DreamWorks Pictures",
+      },
+    ],
   };
 
   return data;

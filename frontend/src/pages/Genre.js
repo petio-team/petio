@@ -24,6 +24,7 @@ import { ReactComponent as GenreThriller } from "../assets/svg/genres/thriller.s
 import { ReactComponent as GenreWar } from "../assets/svg/genres/war.svg";
 import { ReactComponent as GenreWestern } from "../assets/svg/genres/western.svg";
 import { ReactComponent as GenreAnime } from "../assets/svg/genres/anime.svg";
+import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
 
 class Genre extends React.Component {
   constructor(props) {
@@ -290,7 +291,11 @@ class Genre extends React.Component {
             ) : this.state.results === "none" ? (
               <p>No results</p>
             ) : (
-              <p>Loading...</p>
+              <div className="spinner">
+                <div>
+                  <Spinner />
+                </div>
+              </div>
             )}
           </div>
         </section>

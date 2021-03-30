@@ -2,6 +2,7 @@ import React from "react";
 import { withRouter } from "react-router-dom";
 import MovieCard from "../components/MovieCard";
 import Api from "../data/Api";
+import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
 
 class Company extends React.Component {
   constructor(props) {
@@ -123,7 +124,11 @@ class Company extends React.Component {
             ) : this.state.results === "none" ? (
               <p>No results</p>
             ) : (
-              <p>Loading...</p>
+              <div className="spinner">
+                <div>
+                  <Spinner />
+                </div>
+              </div>
             )}
           </div>
         </section>
