@@ -35,7 +35,7 @@ async function getRequests(user = false, all = false) {
                   children[i].info = await server.movie(rId);
                   children[i].info.serverName = server.config.title;
                 } catch {
-                  children[i].info = false;
+                  children[i].info = { message: "NotFound" };
                 }
                 children[i].status = [];
                 if (radarrQ[serverUuid]) {
@@ -60,7 +60,7 @@ async function getRequests(user = false, all = false) {
                   children[i].info = await server.series(sId);
                   children[i].info.serverName = server.config.title;
                 } catch {
-                  children[i].info = false;
+                  children[i].info = { message: "NotFound" };
                 }
                 children[i].status = [];
                 if (sonarrQ[serverUuid]) {

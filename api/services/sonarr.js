@@ -65,7 +65,6 @@ class Sonarr {
         return res.data;
       }
     } catch (err) {
-      logger.error(`SONARR: Error with call - ${url}`);
       throw err;
     }
   }
