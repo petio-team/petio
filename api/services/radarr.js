@@ -148,7 +148,11 @@ class Radarr {
     if (!active) {
       return false;
     }
-    return this.get(`movie/${id}`);
+    try {
+      return this.get(`movie/${id}`);
+    } catch {
+      return false;
+    }
   }
 
   async remove(id) {

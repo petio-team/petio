@@ -31,8 +31,12 @@ async function getRequests(user = false, all = false) {
                 let server = new Radarr(serverUuid);
                 children[i] = {};
                 children[i].id = rId;
-                children[i].info = await server.movie(rId);
-                children[i].info.serverName = server.config.title;
+                try {
+                  children[i].info = await server.movie(rId);
+                  children[i].info.serverName = server.config.title;
+                } catch {
+                  children[i].info = false;
+                }
                 children[i].status = [];
                 if (radarrQ[serverUuid]) {
                   for (let o = 0; o < radarrQ[serverUuid].records.length; o++) {
@@ -52,8 +56,12 @@ async function getRequests(user = false, all = false) {
                 let server = new Sonarr(serverUuid);
                 children[i] = {};
                 children[i].id = sId;
-                children[i].info = await server.series(sId);
-                children[i].info.serverName = server.config.title;
+                try {
+                  children[i].info = await server.series(sId);
+                  children[i].info.serverName = server.config.title;
+                } catch {
+                  children[i].info = false;
+                }
                 children[i].status = [];
                 if (sonarrQ[serverUuid]) {
                   for (let o = 0; o < sonarrQ[serverUuid].length; o++) {
@@ -97,6 +105,7 @@ async function getRequests(user = false, all = false) {
   } catch (err) {
     logger.log("error", `ROUTE: Error getting requests display`);
     logger.log({ level: "error", message: err });
+    data = requests;
   }
   return data;
 }

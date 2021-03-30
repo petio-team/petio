@@ -65,6 +65,7 @@ class Sonarr {
         return res.data;
       }
     } catch (err) {
+      logger.error(`SONARR: Error with call - ${url}`);
       throw err;
     }
   }
@@ -146,7 +147,11 @@ class Sonarr {
     if (!active) {
       return false;
     }
-    return this.get(`series/${id}`);
+    try {
+      return this.get(`series/${id}`);
+    } catch {
+      return false;
+    }
   }
 
   async remove(id) {
