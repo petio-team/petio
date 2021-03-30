@@ -95,6 +95,46 @@ async function trending() {
         logo_path: "/vru2SssLX3FPhnKZGtYw00pVIS9.png",
         name: "DreamWorks Pictures",
       },
+      {
+        id: 9993,
+        logo_path: "/2Tc1P3Ac8M479naPp1kYT3izLS5.png",
+        name: "DC Entertainment",
+      },
+      {
+        id: 420,
+        logo_path: "/hUzeosd33nzE5MCNsZxCGEKTXaQ.png",
+        name: "Marvel Studios",
+      },
+      {
+        id: 174,
+        logo_path: "/ky0xOc5OrhzkZ1N6KyUxacfQsCk.png",
+        name: "Warner Bros. Pictures",
+      },
+      {
+        id: 4,
+        logo_path: "/fycMZt242LVjagMByZOLUGbCvv3.png",
+        name: "Paramount",
+      },
+      {
+        id: 34,
+        logo_path: "/GagSvqWlyPdkFHMfQ3pNq6ix9P.png",
+        name: "Sony Pictures",
+      },
+      {
+        id: 25,
+        logo_path: "/qZCc1lty5FzX30aOCVRBLzaVmcp.png",
+        name: "20th Century Fox",
+      },
+      {
+        id: 1632,
+        logo_path: "/cisLn1YAUuptXVBa0xjq7ST9cH0.png",
+        name: "Lionsgate",
+      },
+      {
+        id: 21,
+        logo_path: "/aOWKh4gkNrfFZ3Ep7n0ckPhoGb5.png",
+        name: "Metro-Goldwyn-Mayer",
+      },
     ],
   };
 

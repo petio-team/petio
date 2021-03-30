@@ -99,6 +99,7 @@ class Carousel extends React.Component {
 
   scroll() {
     let carousel = this.carouselRef.current;
+    if (!carousel) return;
     let position = carousel.scrollLeft; //+ carousel.offsetWidth;
     let max = carousel.scrollWidth - carousel.offsetWidth;
     this.setState({

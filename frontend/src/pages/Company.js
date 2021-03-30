@@ -94,16 +94,31 @@ class Company extends React.Component {
   render() {
     return (
       <>
-        <section>
+        <div className="company--header">
           <h1 className="main-title mb--1 company--title">
             {this.state.details ? (
               <img
                 title={this.state.details.name}
                 src={`https://image.tmdb.org/t/p/w500${this.state.details.logo_path}`}
+                className={`co__${this.state.details.id}`}
               />
             ) : null}
+            {/* {this.state.details.name} */}
           </h1>
-        </section>
+          {this.state.results.length > 0 ? (
+            <div className="company--header--bg">
+              <div
+                className="company--header--bg--item"
+                style={{
+                  backgroundImage:
+                    "url(https://image.tmdb.org/t/p/w300" +
+                    this.state.results[0].backdrop_path +
+                    ")",
+                }}
+              ></div>
+            </div>
+          ) : null}
+        </div>
         <section>
           <div className="company--grid">
             {this.state.results ? (
@@ -121,7 +136,8 @@ class Company extends React.Component {
                   </div>
                 );
               })
-            ) : this.state.results === "none" ? (
+            ) : this.state.results === "none" ||
+              this.state.results.length === 0 ? (
               <p>No results</p>
             ) : (
               <div className="spinner">

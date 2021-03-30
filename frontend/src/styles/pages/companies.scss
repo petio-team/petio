@@ -1,17 +1,72 @@
 .company {
+  &--header {
+    height: 150px;
+    position: relative;
+    margin: -25px -20px 20px;
+
+    @include media-breakpoint-up(lg) {
+      height: 200px;
+      margin: -50px -50px 50px;
+    }
+
+    &--bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+      opacity: 0.6;
+
+      &--item {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        filter: blur(10px);
+        transform: scale(1.1);
+      }
+    }
+  }
   &--title {
     display: flex;
     align-items: center;
+    position: relative;
+    z-index: 3;
+    padding: 20px;
+    height: 100%;
 
     img {
       max-height: 50px;
-      filter: grayscale(1) invert(1);
+      filter: contrast(10) brightness(99) grayscale(1) invert(1);
       max-width: 150px;
+      margin-right: 20px;
 
       @include media-breakpoint-up(lg) {
         max-height: 100px;
         max-width: 300px;
+        margin-right: 50px;
       }
+
+      &.co__213,
+      &.co__420,
+      &.co__20580,
+      &.co__6705,
+      &.co__4081 {
+        filter: none;
+      }
+    }
+
+    font-size: 25px;
+
+    @include media-breakpoint-up(lg) {
+      font-size: 40px;
+      padding: 50px;
     }
   }
 
