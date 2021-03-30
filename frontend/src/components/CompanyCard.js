@@ -59,7 +59,7 @@ class CompanyCard extends React.Component {
             <div className="company-card--image">
               <LazyLoadImage
                 alt={company.name}
-                src={`https://image.tmdb.org/t/p/w200${company.logo_path}`}
+                src={`https://image.tmdb.org/t/p/w500${company.logo_path}`}
                 onLoad={this.imgLoaded}
               />
             </div>
