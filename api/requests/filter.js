@@ -20,8 +20,8 @@ async function filter(item) {
     let compulsoryPass = true;
     let optionalMatch = 0;
     let hasMatched = false;
-    f.rows.map((row) => {
-      if (row.comparison === "and") {
+    f.rows.map((row, i) => {
+      if (row.comparison === "and" && i > 0) {
         // must match
         filterMatch = filterCompare(
           row.condition,
@@ -117,8 +117,7 @@ function getValue(condition, media) {
         });
     case "language":
       values = [];
-      if (media.original_language)
-        values.push(media.original_language);
+      if (media.original_language) values.push(media.original_language);
       break;
   }
   return values;
