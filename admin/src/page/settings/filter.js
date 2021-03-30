@@ -21,12 +21,14 @@ class Filter extends React.Component {
     this.getSettings = this.getSettings.bind(this);
     this.inputChange = this.inputChange.bind(this);
     this.addRow = this.addRow.bind(this);
+    this.addAction = this.addAction.bind(this);
     this.collapse = this.collapse.bind(this);
     this.saveFilters = this.saveFilters.bind(this);
     this.getFilters = this.getFilters.bind(this);
     this.removeRow = this.removeRow.bind(this);
     this.removeFilter = this.removeFilter.bind(this);
     this.getFilters = this.getFilters.bind(this);
+    this.removeAction = this.removeAction.bind(this);
   }
 
   addFilter(type) {
@@ -86,6 +88,25 @@ class Filter extends React.Component {
     });
   }
 
+  addAction(type, i) {
+    let filters = this.state[type];
+    if (!Array.isArray(filters[i].action))
+      filters[i].action = [filters[i].action];
+    filters[i].action.push({
+      path: false,
+      profile: false,
+      server: false,
+      tag: false,
+      type: false,
+    });
+    this.setState({
+      [type]: filters,
+    });
+    this.props.msg({
+      message: "Action Added",
+    });
+  }
+
   removeRow(type, i, r) {
     let filters = this.state[type];
     filters[i].rows = this.removeFromArray(filters[i].rows, r);
@@ -96,6 +117,19 @@ class Filter extends React.Component {
 
     this.props.msg({
       message: "Condition Removed",
+    });
+  }
+
+  removeAction(type, i, r) {
+    let filters = this.state[type];
+    filters[i].action = this.removeFromArray(filters[i].action, r);
+
+    this.setState({
+      [type]: filters,
+    });
+
+    this.props.msg({
+      message: "Action Removed",
     });
   }
 
@@ -169,7 +203,11 @@ class Filter extends React.Component {
     if (target.dataset.type) {
       let current = this.state[target.dataset.type];
       if (target.dataset.row === "action") {
-        current[target.dataset.item][target.dataset.row][name] = value;
+        let actionRow = target.dataset.actionRow;
+        console.log(target.dataset);
+        current[target.dataset.item][target.dataset.row][actionRow][
+          name
+        ] = value;
       } else {
         current[target.dataset.item].rows[target.dataset.row][name] = value;
       }
@@ -217,7 +255,6 @@ class Filter extends React.Component {
   }
 
   componentDidMount() {
-    console.log(this.props);
     this.getArrs();
     this.getFilters();
   }
@@ -259,7 +296,9 @@ class Filter extends React.Component {
             servers={this.state.radarr_servers}
             settings={this.state.radarr_settings}
             addRow={this.addRow}
+            addAction={this.addAction}
             removeRow={this.removeRow}
+            removeAction={this.removeAction}
             removeFilter={this.removeFilter}
             addFilter={this.addFilter}
             type={"movie_filters"}
@@ -275,7 +314,9 @@ class Filter extends React.Component {
             servers={this.state.sonarr_servers}
             settings={this.state.sonarr_settings}
             addRow={this.addRow}
+            addAction={this.addAction}
             removeRow={this.removeRow}
+            removeAction={this.removeAction}
             removeFilter={this.removeFilter}
             addFilter={this.addFilter}
             type={"tv_filters"}

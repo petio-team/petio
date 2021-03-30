@@ -223,15 +223,26 @@ class processRequest {
   async sendToDvr(profile) {
     let filterMatch = await filter(this.request);
     if (filterMatch) {
+      if (!Array.isArray(filterMatch)) filterMatch = [filterMatch];
       logger.log(
         "info",
         "REQ: Matched on custom filter, sending to specified server"
       );
       logger.log("info", "REQ: Sending to DVR");
       if (this.request.type === "movie") {
-        new Radarr(filterMatch.server).manualAdd(this.request, filterMatch);
+        for (let i = 0; i < filterMatch.length; i++) {
+          new Radarr(filterMatch[i].server).manualAdd(
+            this.request,
+            filterMatch[i]
+          );
+        }
       } else {
-        new Sonarr(filterMatch.server).manualAdd(this.request, filterMatch);
+        for (let i = 0; i < filterMatch.length; i++) {
+          new Sonarr(filterMatch[i].server).manualAdd(
+            this.request,
+            filterMatch[i]
+          );
+        }
       }
       return;
     }

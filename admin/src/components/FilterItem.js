@@ -59,6 +59,8 @@ class FilterItem extends React.Component {
                     type={this.props.type}
                     inputChange={this.props.inputChange}
                     data={this.props.data[i].action}
+                    addAction={this.props.addAction}
+                    removeAction={this.props.removeAction}
                   />
                 </>
               ) : null}

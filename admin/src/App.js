@@ -145,7 +145,8 @@ class App extends React.Component {
               let msg = this.state.pushMsg[i];
               return (
                 <div
-                  key={msg.timestamp}
+                  data-key={`pm__${msg.timestamp}__${i}__error`}
+                  key={`pm__${msg.timestamp}__${i}__error`}
                   className={`push-msg--item ${
                     msg.type !== "info" ? msg.type : ""
                   }`}
@@ -191,7 +192,7 @@ class App extends React.Component {
               let msg = this.state.pushMsg[i];
               return (
                 <div
-                  key={msg.timestamp}
+                  key={`pm__${msg.timestamp}__${i}__setup`}
                   className={`push-msg--item ${
                     msg.type !== "info" ? msg.type : ""
                   }`}
@@ -215,7 +216,7 @@ class App extends React.Component {
               let msg = this.state.pushMsg[i];
               return (
                 <div
-                  key={msg.timestamp}
+                  key={`pm__${msg.timestamp}__${i}__login`}
                   className={`push-msg--item ${
                     msg.type !== "info" ? msg.type : ""
                   }`}
@@ -240,7 +241,7 @@ class App extends React.Component {
               let msg = this.state.pushMsg[i];
               return (
                 <div
-                  key={msg.timestamp}
+                  key={`pm__${msg.timestamp}__${i}__logged_in`}
                   className={`push-msg--item ${
                     msg.type !== "info" ? msg.type : ""
                   }`}

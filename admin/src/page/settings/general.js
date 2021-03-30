@@ -192,12 +192,12 @@ class General extends React.Component {
       let email = await Api.getEmailConfig();
       let config = await Api.getConfig();
       this.setState({
-        email_enabled: email.config.emailEnabled,
+        email_enabled: email.config.emailEnabled || false,
         email_user: email.config.emailUser,
         email_pass: email.config.emailPass,
         email_server: email.config.emailServer,
         email_port: email.config.emailPort,
-        email_secure: email.config.emailSecure,
+        email_secure: email.config.emailSecure || false,
         email_from: email.config.emailFrom,
         base_path: config.base_path ? config.base_path : "",
         login_type: config.login_type ? config.login_type : 1,
