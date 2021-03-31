@@ -4,6 +4,8 @@ const MusicSchema = mongoose.Schema(
   {
     title: String,
     ratingKey: Number,
+    metaId: String,
+    metaTitle: String,
     key: String,
     guid: String,
     type: String,

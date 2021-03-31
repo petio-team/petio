@@ -31,6 +31,7 @@ const MovieSchema = mongoose.Schema({
   externalId: String,
   imdb_id: String,
   tmdb_id: String,
+  petioTimestamp: Date,
 });
 
 module.exports = mongoose.model("Movie", MovieSchema);
