@@ -11,6 +11,7 @@ const memoryCache = cacheManager.caching({
 });
 
 async function lookup(imdb_id) {
+  return false;
   if (!imdb_id) {
     return false;
   }
