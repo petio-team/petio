@@ -27,6 +27,7 @@
     "iso-639-1": "^2.1.8",
     "joi": "^17.3.0",
     "jsonwebtoken": "^8.5.1",
+    "line-reader": "^0.4.0",
     "mongoose": "^5.12.1",
     "multer": "^1.4.2",
     "nodejs-nodemailer-outlook": "^1.2.3",
@@ -35,7 +36,8 @@
     "saslprep": "^1.0.3",
     "winston": "^3.3.3",
     "xhr-request": "^1.1.0",
-    "xml-js": "^1.6.11"
+    "xml-js": "^1.6.11",
+    "zlib": "^1.0.5"
   },
   "devDependencies": {
     "dotenv": "^8.2.0"

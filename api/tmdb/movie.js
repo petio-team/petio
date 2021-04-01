@@ -7,7 +7,7 @@ const getConfig = require("../util/config");
 
 const fanartLookup = require("../fanart");
 const onServer = require("../plex/onServer");
-const imdb = require("../meta/imdb");
+const { lookup: imdb } = require("../meta/imdb");
 const getLanguage = require("./languages");
 
 const logger = require("../util/logger");
@@ -43,10 +43,6 @@ async function movieLookup(id, minified = false) {
       if (fanart.moviethumb) {
         movie.tile = findEnLogo(fanart.moviethumb);
       }
-    }
-    if (minified) {
-      // Pre-fetch IMDB on minfied lookup but don't wait or return
-      imdb(movie.imdb_id);
     }
     try {
       let collectionData = false;

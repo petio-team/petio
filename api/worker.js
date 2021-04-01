@@ -5,6 +5,7 @@ const QuotaSystem = require("./requests/quotas");
 const getConfig = require("./util/config");
 const mongoose = require("mongoose");
 const buildDiscovery = require("./discovery/build");
+const { storeCache: imdbCache } = require("./meta/imdb");
 
 class Worker {
   async connnectDb() {
@@ -26,6 +27,7 @@ class Worker {
     // return; // for debug local
     try {
       await this.connnectDb();
+      await imdbCache();
       const libUpdate = new LibraryUpdate();
       await libUpdate.scan();
       buildDiscovery();
@@ -57,6 +59,7 @@ class Worker {
       logger.log("verbose", `API: Registering Quota reset job`);
       this.resetQuotas.start();
     } catch (err) {
+      console.log(err);
       logger.error("CRONW: Failed to start crons!");
     }
   }
@@ -72,6 +75,7 @@ class Worker {
         break;
       case 3:
         new QuotaSystem().reset();
+        imdbCache();
       default:
         logger.log("warn", "CRONW: Invalid cron");
     }

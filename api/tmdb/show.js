@@ -6,7 +6,7 @@ const axios = require("axios");
 const getConfig = require("../util/config");
 const fanartLookup = require("../fanart");
 const onServer = require("../plex/onServer");
-const imdb = require("../meta/imdb");
+const { lookup: imdb } = require("../meta/imdb");
 const getLanguage = require("./languages");
 
 const logger = require("../util/logger");
@@ -37,11 +37,6 @@ async function showLookup(id, minified = false) {
   if (show) {
     if (!show.id) {
       return { error: "no id returned" };
-    }
-
-    if (minified) {
-      // Pre-fetch IMDB on minfied lookup but don't wait or return
-      imdb(external.imdb_id);
     }
 
     try {

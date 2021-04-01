@@ -1,63 +1,109 @@
 // https://www.imdb.com/title/tt6475714/
 const axios = require("axios");
-const cheerio = require("cheerio");
 const logger = require("../util/logger");
-
-const cacheManager = require("cache-manager");
-const memoryCache = cacheManager.caching({
-  store: "memory",
-  max: 1000,
-  ttl: 604800 /*seconds*/,
-});
+const zlib = require("zlib");
+const fs = require("fs");
+const path = require("path");
+const lineReader = require("line-reader");
+const Imdb = require("../models/imdb");
 
 async function lookup(imdb_id) {
-  return false;
   if (!imdb_id) {
     return false;
   }
 
-  try {
-    let data = await getRaw(imdb_id);
-    return data;
-  } catch (err) {
-    return {
-      rating: false,
-      description: false,
-    };
-  }
+  let data = await Imdb.findOne({ id: imdb_id });
+  if (!data) return false;
+  return {
+    rating: { ratingValue: data.rating },
+    description: false,
+  };
 }
 
-async function getRaw(id) {
-  let data = false;
+async function storeCache() {
+  const unzip = zlib.createGunzip();
+  let project_folder, tempFile;
+  if (process.pkg) {
+    project_folder = path.dirname(process.execPath);
+    tempFile = path.join(project_folder, "./imdb_dump.txt");
+  } else {
+    project_folder = __dirname;
+    tempFile = path.join(project_folder, "../imdb_dump.txt");
+  }
+  logger.info("IMDB: Rebuilding Cache");
   try {
-    data = await memoryCache.wrap(`imdb_${id}`, function () {
-      return crawl(id);
+    logger.info("IMDB: Cache Downloading latest cache");
+    const res = await axios({
+      url: "https://datasets.imdbws.com/title.ratings.tsv.gz",
+      method: "GET",
+      responseType: "stream",
     });
-  } catch (err) {
-    logger.log("warn", `Error crawling imdb - ${id}`);
-    logger.log({ level: "error", message: err });
+    logger.info("IMDB: Cache Storing to temp");
+    const fileStream = fs.createWriteStream(tempFile);
+    res.data.pipe(unzip).pipe(fileStream);
+    fileStream.on("close", async () => {
+      logger.info("IMDB: Cache Download complete");
+      try {
+        await parseData(tempFile);
+        logger.info("IMDB: Cache Finished");
+      } catch (e) {
+        console.log(e);
+        logger.error("IMDB: Cache failed - db write issue");
+      }
+    });
+  } catch (e) {
+    logger.log({ level: "error", message: e });
   }
-  return data;
 }
 
-async function crawl(id) {
+async function parseData(file) {
+  logger.info("IMDB: Cache Emptying old cache");
+  await Imdb.deleteMany({});
+  logger.info("IMDB: Cache cleared");
+  logger.info("IMDB: Cache parsing download, updating local cache");
+  return new Promise((resolve, reject) => {
+    let buffer = [];
+    lineReader.eachLine(file, async (line, last, cb) => {
+      let data = line.split("\t");
+      if (data[0] === "tconst" || (parseInt(data[2]) < 1000 && !last)) {
+        cb();
+        return;
+      }
+      if (buffer.length < 50000) {
+        buffer.push({
+          insertOne: {
+            document: {
+              id: data[0],
+              rating: data[1],
+            },
+          },
+        });
+        if (!last) {
+          cb();
+          return;
+        }
+      }
+      try {
+        await processBuffer(buffer);
+        buffer = [];
+        if (last) {
+          resolve();
+        }
+        cb();
+      } catch {
+        cb(false);
+        reject();
+      }
+    });
+  });
+}
+
+async function processBuffer(data) {
   try {
-    let res = await axios.get(`https://www.imdb.com/title/${id}`);
-    let raw = cheerio.load(res.data);
-    let meta = JSON.parse(raw(`script[type='application/ld+json']`).html());
-    let rating = meta.aggregateRating;
-    delete rating["@type"];
-    let description = meta.description;
-    return {
-      rating: rating,
-      description: description,
-    };
-  } catch (err) {
-    return {
-      rating: false,
-      description: false,
-    };
+    await Imdb.bulkWrite(data);
+  } catch {
+    throw "IMDB: Error cannot write to Db";
   }
 }
 
-module.exports = lookup;
+module.exports = { lookup, storeCache };

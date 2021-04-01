@@ -18,3 +18,4 @@ frontend/.eslintcache
 admin/.eslintcache
 /logs
 api/.DS_Store
+api/imdb_dump.txt
