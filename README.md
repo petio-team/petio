@@ -40,9 +40,10 @@ Configuring Petio is fairly straight forward but our docs cover the process, fro
 
 <h2>Credits</h2>
 <h4>Attribution Credits</h4>
-<p><a target="_blank" href="https://www.themoviedb.org/"><img height="10px" src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_1-5bdc75aaebeb75dc7ae79426ddd9be3b2be1e342510f8202baf6bffa71d7f5c4.svg"/>The Movie Database (Data Source)</a></p>
+<p><a target="_blank" href="https://www.themoviedb.org/"><img height="15px" src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_1-5bdc75aaebeb75dc7ae79426ddd9be3b2be1e342510f8202baf6bffa71d7f5c4.svg"/> The Movie Database (Data Source)</a></p>
 <p><a target="_blank" href="https://fanart.tv/">Fanart.tv (Extra visual assets)</a></p>
 <p><a target="_blank" href="https://https://fontawesome.com//">Fontawesome (SVG Icon Assets)</a></p>
+<p><a target="_blank" href="https://www.imdb.com"><img height="15px" src="https://m.media-amazon.com/images/G/01/IMDb/BG_rectangle._CB1509060989_SY230_SX307_AL_.png"/> Information courtesy of IMDb. Used with permission.</a></p>
 
 <h4>Special Thanks to:</h4>
 <p><a target="_blank" href="https://github.com/vertig0ne">vertig0ne</a></p>
