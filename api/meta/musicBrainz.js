@@ -1,6 +1,7 @@
 const MusicBrainzApi = require("musicbrainz-api").MusicBrainzApi;
 const pjson = require("../package.json");
 const sanitize = require("sanitize-filename");
+const logger = require("../util/logger");
 
 class MusicMeta {
   constructor() {
@@ -18,28 +19,33 @@ class MusicMeta {
   }
 
   async match(name, genres) {
+    logger.info(`MB: Attempting to match ${name}`);
     if (!genres) return false;
     // return true;
-    name = name.replace(/[^a-zA-Z0-9 ]/g, "");
     let term = sanitize(name);
     try {
       let res = await this.api.searchArtist(term);
       let artists = res.artists;
+      if (artists.length === 0) {
+        logger.warn(`MB: No match for ${term}`);
+        return false;
+      }
       let match = false;
       artists.map((artist) => {
         let genreMatch = 0;
-        let artistName = artist.name.replace(/[^a-zA-Z0-9 ]/g, "");
+        let artistName = artist.name;
         if (match) return;
         let tags = artist.tags;
         for (let t in tags) {
           let tag = tags[t];
 
           genres.map((genre) => {
-            if (name === "The Who")
-              console.log(this.formatGenre(genre.tag), tag.name);
-            if (this.formatGenre(genre.tag) === tag.name) {
-              genreMatch++;
-            }
+            let genresF = this.formatGenre(genre.tag);
+            genresF.map((genreF) => {
+              if (genreF === tag.name) {
+                genreMatch++;
+              }
+            });
           });
         }
         if (genreMatch > 0 && artistName === name) {
@@ -48,10 +54,7 @@ class MusicMeta {
       });
 
       if (!match) {
-        if (
-          artists[0].score === 100 &&
-          artists[0].name.replace(/[^a-zA-Z0-9 ]/g, "") === name
-        ) {
+        if (artists[0].score === 100 && artists[0].name === name) {
           match = artists[0];
         }
       }
@@ -64,7 +67,7 @@ class MusicMeta {
   }
 
   formatGenre(name) {
-    return name.toLowerCase().replace("/", " ").replace("-", " ");
+    return name.toLowerCase().replace("-", " ").split("/");
   }
 }
 
