@@ -42,13 +42,15 @@ class Filter extends React.Component {
           comparison: false,
         },
       ],
-      action: {
-        server: false,
-        path: false,
-        profile: false,
-        tag: false,
-        type: false,
-      },
+      action: [
+        {
+          server: false,
+          path: false,
+          profile: false,
+          tag: false,
+          type: false,
+        },
+      ],
       collapse: false,
     });
     this.setState({
@@ -202,6 +204,7 @@ class Filter extends React.Component {
 
     if (target.dataset.type) {
       let current = this.state[target.dataset.type];
+      console.log(current, target.dataset.type);
       if (target.dataset.row === "action") {
         let actionRow = target.dataset.actionRow;
         console.log(target.dataset);
