@@ -24,7 +24,7 @@
     "fs": "0.0.1-security",
     "http": "0.0.1-security",
     "https": "^1.0.0",
-    "iso-639-1": "^2.1.8",
+    "iso-639-1": "^2.1.9",
     "joi": "^17.3.0",
     "jsonwebtoken": "^8.5.1",
     "line-reader": "^0.4.0",
