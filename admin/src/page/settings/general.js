@@ -583,14 +583,14 @@ class General extends React.Component {
         <section>
           <p className="main-title mb--2">Telegram</p>
           <p className="description">
-            Please enter here your telegram chat config. You can find
-            documentation about telegram bot on{" "}
+            Please enter here your Telegram chat config. You can find
+            documentation about Telegram&apos;s bot on{" "}
             <a
               href="https://core.telegram.org/bots"
               target="_blank"
               rel="noreferrer"
             >
-              telegram documentation
+              Telegram documentation
             </a>
             .
           </p>
