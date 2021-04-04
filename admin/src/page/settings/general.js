@@ -59,6 +59,7 @@ class General extends React.Component {
       discord_webhook: false,
       telegram_bot_token: "",
       telegram_chat_id: "",
+      telegram_send_silently: false,
       plexPopular: false,
       token: false,
     };
@@ -160,6 +161,7 @@ class General extends React.Component {
       await Api.updateConfig({
         telegram_bot_token: this.state.telegram_bot_token,
         telegram_chat_id: this.state.telegram_chat_id,
+        telegram_send_silently: this.state.telegram_send_silently,
       });
       this.props.msg({
         message: "Telegram Chat Config Saved",
@@ -231,6 +233,9 @@ class General extends React.Component {
         telegram_chat_id: config.telegram_chat_id
           ? config.telegram_chat_id
           : "",
+        telegram_send_silently: config.telegram_send_silently
+          ? config.telegram_send_silently
+          : false,
         plexPopular:
           config.plexPopular === null || config.plexPopular === undefined
             ? true
@@ -578,7 +583,16 @@ class General extends React.Component {
         <section>
           <p className="main-title mb--2">Telegram</p>
           <p className="description">
-            Please enter here your Telegram Chat Config
+            Please enter here your telegram chat config. You can find
+            documentation about telegram bot on{" "}
+            <a
+              href="https://core.telegram.org/bots"
+              target="_blank"
+              rel="noreferrer"
+            >
+              telegram documentation
+            </a>
+            .
           </p>
           <label>Bot token</label>
           <input
@@ -598,6 +612,27 @@ class General extends React.Component {
             autoCorrect="off"
             spellCheck="off"
           />
+          <p className="description">
+            You must start a conversation with the bot or add it to your group
+            to receive messages.
+            <br />
+            <a
+              target="_blank"
+              href="http://stackoverflow.com/a/37396871/882971"
+              rel="noreferrer"
+            >
+              More Info
+            </a>
+          </p>
+          <div className="checkbox-wrap mb--2">
+            <input
+              type="checkbox"
+              name="telegram_send_silently"
+              checked={this.state.telegram_send_silently}
+              onChange={this.inputChange}
+            />
+            <p>Send silently (notification with no sound)</p>
+          </div>
           <button
             style={{ marginRight: "10px" }}
             className="btn btn__square"

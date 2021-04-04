@@ -18,6 +18,7 @@ class Telegram {
     this.config = configParse;
     this.botToken = configParse.telegram_bot_token || null;
     this.chatId = configParse.telegram_chat_id || null;
+    this.sendSilently = configParse.telegram_send_silently || false;
   }
 
   check() {
@@ -84,6 +85,11 @@ class Telegram {
       params.append("chat_id", this.chatId);
       params.append("text", text);
       params.append("parse_mode", "HTML");
+      if (this.sendSilently) {
+        params.append("disable_notification", "true");
+      }
+
+      console.log(params);
 
       await axios.get(
         `https://api.telegram.org/bot${this.botToken}/sendMessage`,
