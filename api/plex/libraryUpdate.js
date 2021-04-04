@@ -12,6 +12,7 @@ const getConfig = require("../util/config");
 const processRequest = require("../requests/process");
 const logger = require("../util/logger");
 const Discord = require("../notifications/discord");
+const Telegram = require("../notifications/telegram");
 const { showLookup } = require("../tmdb/show");
 const bcrypt = require("bcryptjs");
 const axios = require("axios");
@@ -820,11 +821,13 @@ class LibraryUpdate {
 
   discordNotify(user, request) {
     let type = request.type === "tv" ? "TV Show" : "Movie";
-    new Discord().send(
-      `${request.title} added to Plex!`,
-      `The ${type} "${request.title}" has been processed and is now available to watch on Plex"`,
-      user.title,
-      `https://image.tmdb.org/t/p/w500${request.thumb}`
+    [new Discord(), new Telegram()].forEach((notification) =>
+      notification.send(
+        `${request.title} added to Plex!`,
+        `The ${type} "${request.title}" has been processed and is now available to watch on Plex"`,
+        user.title,
+        `https://image.tmdb.org/t/p/w500${request.thumb}`
+      )
     );
   }
 

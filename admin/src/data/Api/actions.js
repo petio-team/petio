@@ -465,6 +465,20 @@ export function testDiscord() {
   });
 }
 
+export function testTelegram() {
+  return new Promise((resolve, reject) => {
+    api
+      .testTelegram()
+      .then((data) => {
+        resolve(data);
+      })
+      .catch((err) => {
+        console.log(err);
+        reject();
+      });
+  });
+}
+
 export async function getUser(id) {
   try {
     let userData = await api.getUser(id);
