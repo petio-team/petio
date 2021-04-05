@@ -314,11 +314,11 @@ class LibraryUpdate {
           async (item) => {
             let obj = libContent.Metadata[item];
             if (obj.type === "movie") {
-              // await this.saveMovie(obj);
+              await this.saveMovie(obj);
             } else if (obj.type === "artist") {
               music.push(obj);
             } else if (obj.type === "show") {
-              // await this.saveShow(obj);
+              await this.saveShow(obj);
             } else {
               logger.log("info", `LIB CRON: Unknown media type - ${obj.type}`);
             }
@@ -374,7 +374,7 @@ class LibraryUpdate {
     let tmdbId = false;
     let externalId = false;
     let added = false;
-    logger.info(`LIB CRON: Movie Job: ${title}`);
+    logger.verbose(`LIB CRON: Movie Job: ${title}`);
     try {
       movieDb = await Movie.findOne({
         ratingKey: parseInt(movieObj.ratingKey),
@@ -497,7 +497,7 @@ class LibraryUpdate {
     let title = musicObj.title;
     let added = false;
     let match = false;
-    logger.info(`LIB CRON: Music Job: ${title}`);
+    logger.verbose(`LIB CRON: Music Job: ${title}`);
     try {
       musicDb = await Music.findOne({
         ratingKey: parseInt(musicObj.ratingKey),
@@ -505,11 +505,18 @@ class LibraryUpdate {
     } catch {
       musicDb = false;
     }
-    if (musicDb) {
-      match = musicDb.metaId;
+    if (musicDb && musicDb.metaId) {
+      match = { id: musicDb.metaId, name: musicDb.metaTitle };
     }
-    if (!match)
+    if (match && musicDb.metaId === "no genres" && musicObj.Genre) {
+      logger.info(
+        `LIB CRON: Music - "${title}" Now has genres, attempting to match`
+      );
+      match = false;
+    }
+    if (!match) {
       match = await new MusicMeta().match(musicObj.title, musicObj.Genre);
+    }
     if (!musicDb) {
       added = true;
       musicDb = new Music({
@@ -522,7 +529,7 @@ class LibraryUpdate {
     try {
       await musicDb.save();
       if (added) {
-        await this.mailAdded(musicObj, musicDb.tmdb_id);
+        await this.mailAdded(musicObj, musicDb.metaId);
         logger.log("info", `LIB CRON: Music Added - ${musicObj.title}`);
       }
     } catch (err) {
@@ -539,7 +546,7 @@ class LibraryUpdate {
     let externalId = false;
     let added = false;
     let seasons = [];
-    logger.info(`LIB CRON: TV Job: ${title}`);
+    logger.verbose(`LIB CRON: TV Job: ${title}`);
     try {
       showDb = await Show.findOne({ ratingKey: parseInt(showObj.ratingKey) });
     } catch {

@@ -20,7 +20,7 @@ class MusicMeta {
 
   async match(name, genres) {
     logger.info(`MB: Attempting to match ${name}`);
-    if (!genres) return false;
+    if (!genres) return { id: "no genres", title: false };
     // return true;
     let term = sanitize(name);
     try {
@@ -59,10 +59,13 @@ class MusicMeta {
         }
       }
 
+      if (!match) {
+        return { id: "no match", title: false };
+      }
       return match;
     } catch (e) {
       console.log(e);
-      return false;
+      return { id: "error", title: false };
     }
   }
 
