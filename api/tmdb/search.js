@@ -6,7 +6,7 @@ const Promise = require("bluebird");
 // Config
 const getConfig = require("../util/config");
 const onServer = require("../plex/onServer");
-var sanitize = require("sanitize-filename");
+const sanitize = require("sanitize-filename");
 const logger = require("../util/logger");
 const { movieLookup } = require("../tmdb/movie");
 const { showLookup } = require("../tmdb/show");

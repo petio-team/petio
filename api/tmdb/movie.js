@@ -162,8 +162,8 @@ async function getRecommendations(id, page = 1) {
       return await recommendationData(id, page);
     });
   } catch (err) {
-    logger.log("warn", `Error getting movie recommendations - ${id}`);
-    logger.log({ level: "error", message: err });
+    logger.log("debug", `Error getting movie recommendations - ${id}`);
+    logger.log({ level: "debug", message: err });
   }
   return data;
 }
