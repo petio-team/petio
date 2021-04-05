@@ -468,10 +468,10 @@ on-finished@~2.3.0:
   dependencies:
     ee-first "1.1.1"
 
-open@^8.0.3:
-  version "8.0.3"
-  resolved "https://registry.yarnpkg.com/open/-/open-8.0.3.tgz#04f4406c950666c35041aad8a621700022116afd"
-  integrity sha512-7nsHNw3rOIPTwhF5iYkgE+LVM/oUHWC3cgrWNxPqa+W+Wl5Ekvo32qayB5PYX8zNjXzUkrTaJsWpaGmuw8Aspg==
+open@^8.0.5:
+  version "8.0.5"
+  resolved "https://registry.yarnpkg.com/open/-/open-8.0.5.tgz#92ee3faafef4ddbe78006f7881572f3e81430b8f"
+  integrity sha512-hkPXCz7gijWp2GoWqsQ4O/5p7F6d5pIQ/+9NyeWG1nABJ4zvLi9kJRv1a44kVf5p13wK0WMoiRA+Xey68yOytA==
   dependencies:
     define-lazy-prop "^2.0.0"
     is-docker "^2.1.1"
