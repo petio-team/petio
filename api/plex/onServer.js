@@ -62,6 +62,7 @@ async function onServer(type, imdb, tvdb, tmdb) {
     let foundItemImdb = false;
     let foundItemTvdb = false;
     let foundItemTmdb = false;
+    let seasons = false;
 
     if (imdb) {
       foundItemImdb = await Show.findOne({
@@ -83,9 +84,11 @@ async function onServer(type, imdb, tvdb, tmdb) {
 
     if (foundItemImdb || foundItemTvdb || foundItemTmdb) {
       let found = foundItemImdb || foundItemTvdb || foundItemTmdb;
+      seasons = found.seasonData;
       return {
         exists: { ratingKey: found.ratingKey, serverKey: clientId },
         resolutions: [],
+        seasons: seasons,
       };
       // return { exists: true, resolutions: [] };
     } else {
