@@ -43,7 +43,6 @@
 
     img {
       max-height: 50px;
-      filter: contrast(10) brightness(99) grayscale(1) invert(1);
       max-width: 150px;
       margin-right: 20px;
 
@@ -51,14 +50,6 @@
         max-height: 100px;
         max-width: 300px;
         margin-right: 50px;
-      }
-
-      &.co__213,
-      &.co__420,
-      &.co__20580,
-      &.co__6705,
-      &.co__4081 {
-        filter: none;
       }
     }
 

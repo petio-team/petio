@@ -91,6 +91,15 @@ class Networks extends React.Component {
     }
   }
 
+  filter(id) {
+    switch (id) {
+      case 214:
+        return "";
+      default:
+        return "_filter(duotone,ffffff,868c96)";
+    }
+  }
+
   render() {
     return (
       <>
@@ -99,7 +108,9 @@ class Networks extends React.Component {
             {this.state.details ? (
               <img
                 title={this.state.details.name}
-                src={`https://image.tmdb.org/t/p/w500${this.state.details.logo_path}`}
+                src={`https://image.tmdb.org/t/p/w500${this.filter(
+                  this.state.details.id
+                )}${this.state.details.logo_path}`}
                 className={`co__${this.state.details.id}`}
               />
             ) : null}

@@ -27,7 +27,7 @@ class Worker {
     // return; // for debug local
     try {
       await this.connnectDb();
-      await imdbCache();
+      await imdbCache(true);
       const libUpdate = new LibraryUpdate();
       await libUpdate.scan();
       buildDiscovery();
