@@ -187,7 +187,6 @@ class Sonarr {
   }
 
   async addShow(server, request, filter = false) {
-    console.log(server);
     let sonarrId = false;
     if (!this.fullConfig || this.fullConfig.length === 0) {
       logger.log("info", `SERVICE - SONARR: No active servers`);

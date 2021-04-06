@@ -214,7 +214,7 @@ class Season extends React.Component {
                   <div className="media-action">
                     <Link to={`/series/${id}`} className="btn btn__square">
                       <BackIcon />
-                      Back to {seriesData.name}
+                      Back to show
                     </Link>
                   </div>
                 </div>
@@ -223,7 +223,7 @@ class Season extends React.Component {
                     <div className="media--actions__mob">
                       <Link to={`/series/${id}`} className="btn btn__square">
                         <BackIcon />
-                        Back to {seriesData.name}
+                        Back to show
                       </Link>
                     </div>
                     <div className="detail--bar">

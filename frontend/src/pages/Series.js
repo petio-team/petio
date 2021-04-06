@@ -222,8 +222,10 @@ class Series extends React.Component {
       seasonNumber: seasonNumber,
       availableEps: onServer ? Object.keys(onServer.episodes).length : 0,
       totalEps:
-        seriesData && seriesData.seasons && seriesData.seasons[seasonNumber]
-          ? seriesData.seasons[seasonNumber].episode_count
+        seriesData &&
+        seriesData.seasonData &&
+        seriesData.seasonData[seasonNumber]
+          ? Object.keys(seriesData.seasonData[seasonNumber].episodes).length
           : 0,
     };
   }
