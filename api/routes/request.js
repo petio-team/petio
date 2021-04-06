@@ -39,6 +39,9 @@ router.get("/min", async (req, res) => {
           approved: request.approved,
           defaults: request.pendingDefault,
         };
+        if (request.type === "tv") {
+          data[request.requestId].seasons = request.seasons;
+        }
       })
     );
   } catch (err) {

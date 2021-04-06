@@ -97,6 +97,10 @@ async function getRequests(user = false, all = false) {
               process_stage: reqState(request, children),
               defaults: request.pendingDefault,
             };
+
+            if (request.type === "tv") {
+              data[request.requestId].seasons = request.seasons;
+            }
           }
         },
         { concurrency: 20 }

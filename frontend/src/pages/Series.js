@@ -77,10 +77,21 @@ class Series extends React.Component {
       return;
     }
     let requestUsers = Object.keys(requests[id].users).length;
-    if (this.props.user.requests[id] && requestUsers !== this.state.requested) {
-      this.setState({
-        requested: requestUsers,
-      });
+    if (
+      this.props.api.series_lookup[id] &&
+      this.props.user.requests[id] &&
+      requestUsers !== this.state.requested &&
+      this.props.user.requests[id].seasons &&
+      this.props.api.series_lookup[id].seasons
+    ) {
+      if (
+        !this.props.user.requests[id].seasons ||
+        Object.keys(this.props.user.requests[id].seasons).length ===
+          Object.keys(this.props.api.series_lookup[id].seasons).length
+      )
+        this.setState({
+          requested: requestUsers,
+        });
     } else if (!requests[id] && this.state.requested) {
       this.setState({
         requested: false,
@@ -93,7 +104,12 @@ class Series extends React.Component {
     let series = this.props.api.series_lookup[id];
     let requests = this.props.user.requests[id];
     if (requests) {
-      if (requests.users.includes(this.props.user.current.id)) {
+      if (
+        (requests.users.includes(this.props.user.current.id) &&
+          !this.props.user.requests[id].seasons) ||
+        Object.keys(this.props.user.requests[id].seasons).length ===
+          Object.keys(this.props.api.series_lookup[id].seasons).length
+      ) {
         this.props.msg({
           message: "Already Requested",
           type: "error",
@@ -101,6 +117,11 @@ class Series extends React.Component {
         return;
       }
     }
+    let seasons = {};
+    if (series.seasons.length > 0)
+      series.seasons.map((season) => {
+        seasons[season.season_number] = true;
+      });
     let request = {
       id: series.id,
       tmdb_id: series.id,
@@ -109,6 +130,7 @@ class Series extends React.Component {
       title: series.name,
       type: "tv",
       thumb: series.poster_path,
+      seasons: seasons,
     };
 
     try {
@@ -186,6 +208,24 @@ class Series extends React.Component {
     this.setState({
       trailer: this.state.trailer ? false : true,
     });
+  }
+
+  seasonEpisodes(seriesData, seasonNumber) {
+    let onServer =
+      seriesData &&
+      seriesData.server_seasons &&
+      seriesData.server_seasons[seasonNumber]
+        ? seriesData.server_seasons[seasonNumber]
+        : false;
+    return {
+      onServer: onServer ? true : false,
+      seasonNumber: seasonNumber,
+      availableEps: onServer ? Object.keys(onServer.episodes).length : 0,
+      totalEps:
+        seriesData && seriesData.seasons && seriesData.seasons[seasonNumber]
+          ? seriesData.seasons[seasonNumber].episode_count
+          : 0,
+    };
   }
 
   render() {
@@ -307,9 +347,24 @@ class Series extends React.Component {
             <h3 className="sub-title mb--1">Seasons</h3>
             <Carousel>
               {seasons.map((season) => {
+                let seasonInfo = this.seasonEpisodes(
+                  seriesData,
+                  season.season_number
+                );
+                let requestedSeason =
+                  this.props.user.requests[id] &&
+                  this.props.user.requests[id].seasons &&
+                  this.props.user.requests[id].seasons[season.season_number]
+                    ? true
+                    : false;
                 return (
                   <div
-                    className="card type--movie-tv img-loaded"
+                    className={`card type--movie-tv img-loaded ${
+                      seasonInfo.onServer ? "on-server" : ""
+                    } ${requestedSeason ? "requested" : ""}`}
+                    data-season_no={season.season_number}
+                    data-total_eps={seasonInfo.totalEps}
+                    data-avail_eps={seasonInfo.availableEps}
                     key={`season--${season.season_number}${id}`}
                   >
                     <div className="card--inner">
@@ -329,6 +384,9 @@ class Series extends React.Component {
                             alt={season.name}
                           />
                         ) : null}
+                        <div className="ep-count">
+                          {seasonInfo.availableEps} / {seasonInfo.totalEps}
+                        </div>
                       </div>
                       <div className="text-wrap">
                         <p className="title">

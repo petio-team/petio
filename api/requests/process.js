@@ -23,7 +23,9 @@ class processRequest {
     let quotaPass = await this.checkQuota();
     if (quotaPass) {
       try {
-        let existing = await Request.findOne({ requestId: this.request.id });
+        let existing = await Request.findOne({
+          requestId: this.request.id,
+        });
         if (existing) {
           out = await this.existing();
         } else {
@@ -71,18 +73,28 @@ class processRequest {
       autoApprove = true;
       autoApproveTv = true;
     }
-    await Request.updateOne(
-      { requestId: this.request.id },
-      { $push: { users: this.user.id } }
-    );
+    let requestDb = await Request.findOne({ requestId: this.request.id });
+    if (!requestDb.users.includes(this.user.id)) {
+      requestDb.users.push(this.user.id);
+      requestDb.markModified("users");
+    }
+    if (this.request.type === "tv") {
+      let existingSeasons = requestDb.seasons || {};
+      Object.keys(this.request.seasons).map((key) => {
+        existingSeasons[key] = true;
+      });
+      requestDb.seasons = existingSeasons;
+      this.request.seasons = existingSeasons;
+      console.log(existingSeasons);
+      requestDb.markModified("seasons");
+    }
+    await requestDb.save();
     if (
       (this.request.type === "movie" && autoApprove) ||
       (this.request.type === "tv" && autoApproveTv)
     ) {
-      await Request.updateOne(
-        { requestId: this.request.id },
-        { $set: { approved: true } }
-      );
+      requestDb.approved = true;
+      await requestDb.save();
       this.sendToDvr(profile);
     }
     return {
@@ -123,6 +135,10 @@ class processRequest {
       tvdb_id: this.request.tvdb_id,
       approved: autoApprove,
     });
+
+    if (this.request.type === "tv") {
+      newRequest.seasons = this.request.seasons;
+    }
 
     try {
       await newRequest.save();
@@ -239,7 +255,8 @@ class processRequest {
         }
       } else {
         for (let i = 0; i < filterMatch.length; i++) {
-          new Sonarr(filterMatch[i].server).manualAdd(
+          new Sonarr().addShow(
+            filterMatch[i].server,
             this.request,
             filterMatch[i]
           );
@@ -263,15 +280,14 @@ class processRequest {
         Object.keys(profile.sonarr).map((s) => {
           let active = profile.sonarr[s];
           if (active) {
-            new Sonarr(s).processRequest(this.request.id);
+            new Sonarr().addShow(s, this.request);
           }
         });
       }
     } else {
       // No profile set send to all arrs
       logger.log("info", "REQ: No profile for DVR");
-      if (this.request.type === "tv")
-        new Sonarr().processRequest(this.request.id);
+      if (this.request.type === "tv") new Sonarr().addShow(false, this.request);
       if (this.request.type === "movie")
         new Radarr().processRequest(this.request.id);
     }
@@ -301,9 +317,8 @@ class processRequest {
           let sonarrIds = this.request.sonarrId[i];
           let sId = sonarrIds[Object.keys(sonarrIds)[0]];
           let serverUuid = Object.keys(sonarrIds)[0];
-          let server = new Sonarr(serverUuid);
           try {
-            server.remove(sId);
+            new Sonarr().remove(serverUuid, sId);
             logger.log(
               "info",
               `REQ: ${this.request.title} removed from Sonarr server - ${serverUuid}`

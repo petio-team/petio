@@ -42,10 +42,15 @@ class MovieShowTop extends React.Component {
   }
 
   render() {
+    let typeRequest = this.props.mediaData.episode_run_time
+      ? this.props.season
+        ? `season ${this.props.season}`
+        : "show"
+      : "";
     let requestBtn = this.props.requestPending ? (
       <button className="btn btn__square pending">
         <Spinner />
-        Request
+        Request {typeRequest}
       </button>
     ) : this.props.mediaData.on_server ? (
       <a
@@ -65,7 +70,7 @@ class MovieShowTop extends React.Component {
     ) : (
       <button className="btn btn__square" onClick={this.props.request}>
         <RequestIcon />
-        Request
+        Request {typeRequest}
       </button>
     );
 
