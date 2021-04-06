@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import PersonCard from "../components/PersonCard";
 import TvCard from "../components/TvCard";
 import Api from "../data/Api";
+import Nav from "../data/Nav";
 import Carousel from "../components/Carousel";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import User from "../data/User";
@@ -34,6 +35,12 @@ class Series extends React.Component {
     this.openReview = this.openReview.bind(this);
     this.closeReview = this.closeReview.bind(this);
     this.getReviews = this.getReviews.bind(this);
+  }
+
+  componentWillUnmount() {
+    let page = document.querySelectorAll(".page-wrap")[0];
+    Nav.storeNav(this.props.location.pathname, this.state, page.scrollTop);
+    console.log(this.props.location.pathname, this.state, page.scrollTop);
   }
 
   componentDidUpdate() {
