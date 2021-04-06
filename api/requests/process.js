@@ -256,7 +256,7 @@ class processRequest {
       } else {
         for (let i = 0; i < filterMatch.length; i++) {
           new Sonarr().addShow(
-            filterMatch[i].server,
+            { id: filterMatch[i].server },
             this.request,
             filterMatch[i]
           );

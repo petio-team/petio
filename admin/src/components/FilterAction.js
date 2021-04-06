@@ -106,7 +106,9 @@ class FilterAction extends React.Component {
                     onChange={this.props.inputChange}
                     value={item.profile}
                   >
-                    {item.server && this.props.settings[item.server] ? (
+                    {item.server &&
+                    this.props.settings[item.server] &&
+                    this.props.settings[item.server].profiles ? (
                       <>
                         <option value="">Please Select</option>
                         {this.props.settings[item.server].profiles.map(
@@ -141,7 +143,7 @@ class FilterAction extends React.Component {
                     value={item.tag}
                   >
                     {item.server && this.props.settings[item.server] ? (
-                      this.props.settings[item.server].tags.length > 0 ? (
+                      this.props.settings[item.server].tags ? (
                         <>
                           <option value="">Don&apos;t set tag</option>
                           {this.props.settings[item.server].tags.map((tag) => {

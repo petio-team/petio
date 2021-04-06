@@ -122,15 +122,18 @@ class Sonarr {
     }
   }
 
-  async getPaths() {
+  async getPaths(serverId) {
+    this.config = this.findUuid(serverId, this.fullConfig);
     return await this.get("rootfolder");
   }
 
-  async getProfiles() {
-    return await this.get("profile");
+  async getProfiles(serverId) {
+    this.config = this.findUuid(serverId, this.fullConfig);
+    return await this.get("qualityprofile");
   }
 
-  async getTags() {
+  async getTags(serverId) {
+    this.config = this.findUuid(serverId, this.fullConfig);
     return await this.get("tag");
   }
 
@@ -178,11 +181,13 @@ class Sonarr {
     return queue;
   }
 
-  async test() {
+  async test(serverId) {
+    this.config = this.findUuid(serverId, this.fullConfig);
     return await this.connect(true);
   }
 
   async addShow(server, request, filter = false) {
+    console.log(server);
     let sonarrId = false;
     if (!this.fullConfig || this.fullConfig.length === 0) {
       logger.log("info", `SERVICE - SONARR: No active servers`);

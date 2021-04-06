@@ -83,7 +83,7 @@ class Season extends React.Component {
     try {
       await User.request(request, this.props.user.current);
       this.props.msg({
-        message: `New Request added: ${series.name}`,
+        message: `New Request added: ${series.name} Season ${this.state.season}`,
         type: "good",
       });
       await User.getRequests();

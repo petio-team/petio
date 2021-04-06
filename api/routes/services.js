@@ -13,7 +13,7 @@ router.get("/sonarr/paths/:id", adminRequired, async (req, res) => {
     res.status(404).send();
   }
   try {
-    let data = await new Sonarr(req.params.id).getPaths();
+    let data = await new Sonarr().getPaths(req.params.id);
 
     data.forEach((el) => {
       delete el.unmappedFolders;
@@ -29,7 +29,7 @@ router.get("/sonarr/profiles/:id", adminRequired, async (req, res) => {
     res.status(404).send();
   }
   try {
-    let data = await new Sonarr(req.params.id).getProfiles();
+    let data = await new Sonarr().getProfiles(req.params.id);
     res.json(data);
   } catch {
     res.json([]);
@@ -41,7 +41,7 @@ router.get("/sonarr/tags/:id", adminRequired, async (req, res) => {
     res.status(404).send();
   }
   try {
-    let data = await new Sonarr(req.params.id).getTags();
+    let data = await new Sonarr().getTags(req.params.id);
     res.json(data);
   } catch {
     res.json([]);
@@ -50,7 +50,7 @@ router.get("/sonarr/tags/:id", adminRequired, async (req, res) => {
 
 router.get("/sonarr/test/:id", adminRequired, async (req, res) => {
   let data = {
-    connection: await new Sonarr(req.params.id).test(),
+    connection: await new Sonarr().test(req.params.id),
   };
   res.json(data);
 });
