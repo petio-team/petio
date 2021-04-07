@@ -68,7 +68,7 @@ async function getRequests(user = false, all = false) {
                 children[i].status = [];
                 if (sonarrQ[serverUuid] && sonarrQ[serverUuid].records) {
                   for (let o = 0; o < sonarrQ[serverUuid].records.length; o++) {
-                    if (sonarrQ[serverUuid].records[o].series.id === sId) {
+                    if (sonarrQ[serverUuid].records[o].seriesId === sId) {
                       children[i].status.push(sonarrQ[serverUuid].records[o]);
                     }
                   }
