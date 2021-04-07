@@ -38,7 +38,7 @@ async function getRequests(user = false, all = false) {
                   children[i].info = { message: "NotFound" };
                 }
                 children[i].status = [];
-                if (radarrQ[serverUuid]) {
+                if (radarrQ[serverUuid] && radarrQ[serverUuid].records) {
                   for (let o = 0; o < radarrQ[serverUuid].records.length; o++) {
                     if (radarrQ[serverUuid].records[o].movieId === rId) {
                       children[i].status.push(radarrQ[serverUuid].records[o]);
@@ -66,10 +66,10 @@ async function getRequests(user = false, all = false) {
                   children[i].info = { message: "NotFound" };
                 }
                 children[i].status = [];
-                if (sonarrQ[serverUuid]) {
-                  for (let o = 0; o < sonarrQ[serverUuid].length; o++) {
+                if (sonarrQ[serverUuid] && sonarrQ[serverUuid].records) {
+                  for (let o = 0; o < sonarrQ[serverUuid].records.length; o++) {
                     if (sonarrQ[serverUuid][o].series.id === sId) {
-                      children[i].status.push(sonarrQ[serverUuid][o]);
+                      children[i].status.push(sonarrQ[serverUuid].records[o]);
                     }
                   }
                 }
@@ -110,6 +110,7 @@ async function getRequests(user = false, all = false) {
       )
     );
   } catch (err) {
+    console.log(err.stack);
     logger.log("error", `ROUTE: Error getting requests display`);
     logger.log({ level: "error", message: err });
     data = requests;
