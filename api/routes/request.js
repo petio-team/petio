@@ -133,13 +133,12 @@ router.post("/update", async (req, res) => {
       await Promise.all(
         Object.keys(servers).map(async (s) => {
           let active = servers[s].active;
+          request.id = request.requestId;
           if (active) {
-            await new Sonarr(
-              s,
-              false,
-              servers[s].profile,
-              servers[s].path
-            ).processRequest(request.requestId);
+            await new Sonarr().addShow({ id: s }, request, {
+              profile: servers[s].profile,
+              path: servers[s].path,
+            });
           }
         })
       );

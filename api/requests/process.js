@@ -85,7 +85,6 @@ class processRequest {
       });
       requestDb.seasons = existingSeasons;
       this.request.seasons = existingSeasons;
-      console.log(existingSeasons);
       requestDb.markModified("seasons");
     }
     await requestDb.save();
@@ -174,11 +173,14 @@ class processRequest {
         "info",
         "REQ: Pending Request Matched on custom filter, setting default"
       );
-      pending[filterMatch.server] = {
-        path: filterMatch.path,
-        profile: filterMatch.profile,
-        tag: filterMatch.tag,
-      };
+      for (let f = 0; f < filterMatch.length; f++) {
+        let filter = filterMatch[f];
+        pending[filter.server] = {
+          path: filter.path,
+          profile: filter.profile,
+          tag: filter.tag,
+        };
+      }
     } else {
       let project_folder, configFile, configData, configParse;
       if (this.request.type === "movie") {
@@ -269,7 +271,6 @@ class processRequest {
     if (profile) {
       if (profile.radarr && this.request.type === "movie") {
         Object.keys(profile.radarr).map((r) => {
-          console.log(r, profile.radarr[r]);
           let active = profile.radarr[r];
           if (active) {
             new Radarr(r).processRequest(this.request.id);
