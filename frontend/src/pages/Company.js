@@ -2,6 +2,7 @@ import React from "react";
 import { withRouter } from "react-router-dom";
 import MovieCard from "../components/MovieCard";
 import Api from "../data/Api";
+import Nav from "../data/Nav";
 import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
 
 class Company extends React.Component {
@@ -23,11 +24,20 @@ class Company extends React.Component {
   }
 
   componentDidMount() {
-    this.getResults();
-    this.getDetails();
-    setTimeout(() => {
-      this.getResults(2);
-    }, 200);
+    let page = document.querySelectorAll(".page-wrap")[0];
+    let scrollY = 0;
+    let pHist = Nav.getNav(this.props.location.pathname);
+    page.scrollTop = scrollY;
+    window.scrollTo(0, scrollY);
+    if (pHist) {
+      this.setState(pHist.state);
+    } else {
+      this.getResults();
+      this.getDetails();
+      setTimeout(() => {
+        this.getResults(2);
+      }, 200);
+    }
   }
 
   componentDidUpdate() {
@@ -39,12 +49,48 @@ class Company extends React.Component {
         .getElementsByClassName("page-wrap")[0]
         .addEventListener("scroll", this.trackScrolling);
     }
+
+    if (this.state.getPos) {
+      this.setState({
+        getPos: false,
+      });
+      this.getPos();
+    }
   }
 
   componentWillUnmount() {
     document
       .getElementsByClassName("page-wrap")[0]
       .removeEventListener("scroll", this.trackScrolling);
+    let page = document.querySelectorAll(".page-wrap")[0];
+    let carouselsData = document.querySelectorAll(".carousel");
+    let carousels = [];
+    carouselsData.forEach((carousel) => {
+      carousels.push(carousel.scrollLeft);
+    });
+    let state = this.state;
+    state.scrollWatch = false;
+    Nav.storeNav(
+      this.props.location.pathname,
+      state,
+      page.scrollTop,
+      carousels
+    );
+  }
+
+  getPos() {
+    let page = document.querySelectorAll(".page-wrap")[0];
+    let scrollY = 0;
+    let pHist = Nav.getNav(this.props.location.pathname);
+    if (pHist) {
+      scrollY = pHist.scroll;
+      document.querySelectorAll(".carousel").forEach((carousel, i) => {
+        carousel.scrollLeft = pHist.carousels[i];
+      });
+    }
+
+    page.scrollTop = scrollY;
+    window.scrollTo(0, scrollY);
   }
 
   isBottom(el) {

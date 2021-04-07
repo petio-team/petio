@@ -3,6 +3,7 @@ import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import Api from "../data/Api";
 import { ReactComponent as SearchIcon } from "../assets/svg/search.svg";
+import { ReactComponent as ClearIcon } from "../assets/svg/close.svg";
 import MovieCard from "../components/MovieCard";
 import TvCard from "../components/TvCard";
 import Carousel from "../components/Carousel";
@@ -11,6 +12,7 @@ import CarouselLoading from "../components/CarouselLoading";
 import CarouselLoadingPerson from "../components/CarouselLoadingPerson";
 import CarouselLoadingCompany from "../components/CarouselLoadingCompany";
 import CompanyCard from "../components/CompanyCard";
+import Nav from "../data/Nav";
 
 class Search extends React.Component {
   constructor(props) {
@@ -23,6 +25,18 @@ class Search extends React.Component {
     };
 
     this.handleChange = this.handleChange.bind(this);
+    this.clearSearch = this.clearSearch.bind(this);
+  }
+
+  clearSearch() {
+    this.setState({
+      searchTerm: "",
+      searchActive: false,
+      isLoading: false,
+    });
+    document.querySelectorAll(".carousel").forEach((carousel) => {
+      carousel.scrollLeft = 0;
+    });
   }
 
   handleChange(e) {
@@ -68,8 +82,33 @@ class Search extends React.Component {
     Api.getPopular();
 
     let page = document.querySelectorAll(".page-wrap")[0];
-    page.scrollTop = 0;
-    window.scrollTo(0, 0);
+    let scrollY = 0;
+    let pHist = Nav.getNav(this.props.location.pathname);
+    if (pHist) {
+      scrollY = pHist.scroll;
+      this.setState(pHist.state);
+      document.querySelectorAll(".carousel").forEach((carousel, i) => {
+        carousel.scrollLeft = pHist.carousels[i];
+      });
+    }
+
+    page.scrollTop = scrollY;
+    window.scrollTo(0, scrollY);
+  }
+
+  componentWillUnmount() {
+    let page = document.querySelectorAll(".page-wrap")[0];
+    let carouselsData = document.querySelectorAll(".carousel");
+    let carousels = [];
+    carouselsData.forEach((carousel) => {
+      carousels.push(carousel.scrollLeft);
+    });
+    Nav.storeNav(
+      this.props.location.pathname,
+      this.state,
+      page.scrollTop,
+      carousels
+    );
   }
 
   render() {
@@ -237,6 +276,14 @@ class Search extends React.Component {
               value={this.state.searchTerm}
               onChange={this.handleChange}
             />
+            <button
+              className={`search-form--clear ${
+                this.state.searchTerm ? "active" : ""
+              }`}
+              onClick={this.clearSearch}
+            >
+              <ClearIcon />
+            </button>
             <button className="search-btn">
               <SearchIcon />
             </button>

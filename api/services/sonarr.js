@@ -303,6 +303,40 @@ class Sonarr {
       logger.warn("SONARR: Unable to remove job, likely already removed");
     }
   }
+
+  async calendar() {
+    let mainCalendar = [];
+    let now = new Date();
+    for (let server of this.fullConfig) {
+      if (server.active) {
+        this.config = server;
+
+        try {
+          let serverCal = await this.get("/calendar", {
+            unmonitored: true,
+            start: new Date(
+              now.getFullYear(),
+              now.getMonth() - 1,
+              1
+            ).toISOString(),
+            end: new Date(
+              now.getFullYear(),
+              now.getMonth() + 2,
+              1
+            ).toISOString(),
+          });
+          mainCalendar = [...mainCalendar, ...serverCal];
+        } catch (err) {
+          logger.log("error", "SONARR: Calendar error");
+          logger.log({ level: "error", message: err });
+        }
+      }
+    }
+
+    logger.log("verbose", "SONARR: Calendar returned");
+
+    return mainCalendar;
+  }
 }
 
 module.exports = Sonarr;

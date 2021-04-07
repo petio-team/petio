@@ -2,13 +2,11 @@ import React from "react";
 import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import Api from "../data/Api";
-// import Popular from "../components/Popular";
-// import History from "../components/History";
+import Nav from "../data/Nav";
 import MovieCard from "../components/MovieCard";
 import Carousel from "../components/Carousel";
 import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
 import CarouselLoading from "../components/CarouselLoading";
-// import User from "../data/User";
 
 class Movies extends React.Component {
   constructor(props) {
@@ -20,16 +18,57 @@ class Movies extends React.Component {
     };
 
     this.getPersonalised = this.getPersonalised.bind(this);
+    this.getPos = this.getPos.bind(this);
   }
+
+  componentWillUnmount() {
+    let page = document.querySelectorAll(".page-wrap")[0];
+    let carouselsData = document.querySelectorAll(".carousel");
+    let carousels = [];
+    carouselsData.forEach((carousel) => {
+      carousels.push(carousel.scrollLeft);
+    });
+    Nav.storeNav("/movies", this.state, page.scrollTop, carousels);
+  }
+
   componentDidMount() {
     let page = document.querySelectorAll(".page-wrap")[0];
-    page.scrollTop = 0;
-    window.scrollTo(0, 0);
-
-    if (!Object.keys(this.props.api.popular).length > 0) {
-      Api.getPopular();
+    let scrollY = 0;
+    let pHist = Nav.getNav("/movies");
+    page.scrollTop = scrollY;
+    window.scrollTo(0, scrollY);
+    if (pHist) {
+      this.setState(pHist.state);
+    } else {
+      if (!Object.keys(this.props.api.popular).length > 0) {
+        Api.getPopular();
+      }
+      this.getPersonalised();
     }
-    this.getPersonalised();
+  }
+
+  componentDidUpdate() {
+    if (this.state.getPos) {
+      this.setState({
+        getPos: false,
+      });
+      this.getPos();
+    }
+  }
+
+  getPos() {
+    let page = document.querySelectorAll(".page-wrap")[0];
+    let scrollY = 0;
+    let pHist = Nav.getNav("/movies");
+    if (pHist) {
+      scrollY = pHist.scroll;
+      document.querySelectorAll(".carousel").forEach((carousel, i) => {
+        carousel.scrollLeft = pHist.carousels[i];
+      });
+    }
+
+    page.scrollTop = scrollY;
+    window.scrollTo(0, scrollY);
   }
 
   async getPersonalised() {

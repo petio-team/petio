@@ -15,8 +15,15 @@ export default function (
           [action.path]: {
             state: action.state,
             scroll: action.scroll,
+            carousels: action.carousels,
           },
         },
+      };
+
+    case types.CLEAR_NAV:
+      return {
+        ...state,
+        pages: {},
       };
 
     default:

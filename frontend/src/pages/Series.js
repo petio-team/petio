@@ -24,47 +24,66 @@ class Series extends React.Component {
       related: false,
       trailer: false,
       reviewOpen: false,
+      pathname: this.props.location.pathname,
     };
 
     this.getSeries = this.getSeries.bind(this);
     this.request = this.request.bind(this);
     this.getRequests = this.getRequests.bind(this);
-    // this.getRelated = this.getRelated.bind(this);
     this.init = this.init.bind(this);
     this.showTrailer = this.showTrailer.bind(this);
     this.openReview = this.openReview.bind(this);
     this.closeReview = this.closeReview.bind(this);
     this.getReviews = this.getReviews.bind(this);
+    this.storePos = this.storePos.bind(this);
   }
 
   componentWillUnmount() {
-    let page = document.querySelectorAll(".page-wrap")[0];
-    Nav.storeNav(this.props.location.pathname, this.state, page.scrollTop);
-    console.log(this.props.location.pathname, this.state, page.scrollTop);
+    this.storePos();
   }
 
   componentDidUpdate() {
     this.getRequests();
     if (this.props.match.params.id !== this.state.id) {
+      this.storePos();
       this.setState({
         onServer: false,
         id: this.props.match.params.id,
         requested: false,
         related: false,
+        pathname: this.props.location.pathname,
       });
       this.init();
     }
   }
 
-  init() {
+  storePos() {
     let page = document.querySelectorAll(".page-wrap")[0];
-    page.scrollTop = 0;
-    window.scrollTo(0, 0);
-    let id = this.props.match.params.id;
+    let carouselsData = document.querySelectorAll(".carousel");
+    let carousels = [];
+    carouselsData.forEach((carousel) => {
+      carousels.push(carousel.scrollLeft);
+    });
+    Nav.storeNav(this.state.pathname, false, page.scrollTop, carousels);
+  }
 
+  init() {
+    let id = this.props.match.params.id;
     this.getSeries(id);
     this.getRequests();
     this.getReviews();
+    let page = document.querySelectorAll(".page-wrap")[0];
+    let scrollY = 0;
+    let pHist = Nav.getNav(this.props.location.pathname);
+    if (pHist) {
+      scrollY = pHist.scroll;
+      document.querySelectorAll(".carousel").forEach((carousel, i) => {
+        carousel.scrollLeft = pHist.carousels[i];
+      });
+    }
+
+    page.scrollTop = scrollY;
+    window.scrollTo(0, scrollY);
   }
 
   componentDidMount() {
@@ -265,7 +284,6 @@ class Series extends React.Component {
     let relatedItems = null;
     if (seriesData.recommendations) {
       relatedItems = seriesData.recommendations.map((key) => {
-        // if (this.props.api.series_lookup[id]) {
         return (
           <TvCard
             key={`related-${key}`}
@@ -273,7 +291,6 @@ class Series extends React.Component {
             series={{ id: key }}
           />
         );
-        // }
       });
       related = (
         <section>
