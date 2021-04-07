@@ -33,9 +33,9 @@ class Dashboard extends React.Component {
   }
 
   componentDidMount() {
-    // if (!this.state.pending && !this.state.requests) {
-    this.getRequests();
-    // }
+    if (!this.state.pending && !this.state.requests) {
+      this.getRequests();
+    }
     this.pollServer();
     this.pollServerDelay();
     this.getIssues();
@@ -48,9 +48,9 @@ class Dashboard extends React.Component {
   }
 
   componentDidUpdate() {
-    // if (!this.state.pending && !this.state.requests) {
-    //   this.getRequests();
-    // }
+    if (!this.state.pending && !this.state.requests) {
+      this.getRequests();
+    }
   }
 
   async getIssues() {
