@@ -143,7 +143,8 @@ class Sonarr {
     });
   }
 
-  async series(id) {
+  async series(server, id) {
+    this.config = this.findUuid(server.id, this.fullConfig);
     const active = await this.connect();
     if (!active) {
       return false;
@@ -153,6 +154,11 @@ class Sonarr {
     } catch {
       return false;
     }
+  }
+
+  serverDetails(server) {
+    this.config = this.findUuid(server.id, this.fullConfig);
+    return this.config;
   }
 
   async queue() {

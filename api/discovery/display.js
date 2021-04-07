@@ -654,10 +654,12 @@ async function comingSoon(type) {
         ? await discoverMovie(1, {
             sort_by: "popularity.desc",
             "primary_release_date.gte": now,
+            with_original_language: "en",
           })
         : await discoverShow(1, {
             sort_by: "popularity.desc",
             "first_air_date.gte": now,
+            with_original_language: "en",
           });
     await Promise.map(
       data.results,

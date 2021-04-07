@@ -53,11 +53,14 @@ async function getRequests(user = false, all = false) {
                 let sonarrIds = request.sonarrId[i];
                 let sId = parseInt(sonarrIds[Object.keys(sonarrIds)[0]]);
                 let serverUuid = Object.keys(sonarrIds)[0];
-                let server = new Sonarr(serverUuid);
+                let server = new Sonarr().serverDetails({ id: serverUuid });
                 children[i] = {};
                 children[i].id = sId;
                 try {
-                  children[i].info = await server.series(sId);
+                  children[i].info = await new Sonarr().series(
+                    { id: serverUuid },
+                    sId
+                  );
                   children[i].info.serverName = server.config.title;
                 } catch {
                   children[i].info = { message: "NotFound" };
