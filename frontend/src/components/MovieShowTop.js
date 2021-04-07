@@ -124,25 +124,27 @@ class MovieShowTop extends React.Component {
           )}
         </div>
         <div className="media-poster">
-          <div className="media-poster--inner">
-            {this.props.mediaData.poster_path ? (
-              <LazyLoadImage
-                src={
-                  "https://image.tmdb.org/t/p/w500" +
-                  this.props.mediaData.poster_path
-                }
-                alt={this.props.mediaData.title}
-                effect="blur"
-                key={`${this.props.mediaData.title}__poster`}
-              />
-            ) : (
-              <LazyLoadImage
-                src={"/images/no-poster.jpg"}
-                alt={this.props.mediaData.title}
-                effect="blur"
-                key={`${this.props.mediaData.title}__nposter`}
-              />
-            )}
+          <div className="media-poster__cap">
+            <div className="media-poster--inner">
+              {this.props.mediaData.poster_path ? (
+                <LazyLoadImage
+                  src={
+                    "https://image.tmdb.org/t/p/w500" +
+                    this.props.mediaData.poster_path
+                  }
+                  alt={this.props.mediaData.title}
+                  effect="blur"
+                  key={`${this.props.mediaData.title}__poster`}
+                />
+              ) : (
+                <LazyLoadImage
+                  src={"/images/no-poster.jpg"}
+                  alt={this.props.mediaData.title}
+                  effect="blur"
+                  key={`${this.props.mediaData.title}__nposter`}
+                />
+              )}
+            </div>
           </div>
         </div>
         <div className="media-details">
