@@ -178,7 +178,7 @@ class Sonarr {
           page: p,
         });
         queue[this.config.uuid].records = [
-          ...queue[i].records,
+          ...queue[this.config.uuid].records,
           ...queuePage.records,
         ];
       }

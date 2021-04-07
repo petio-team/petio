@@ -34,7 +34,7 @@ class Dashboard extends React.Component {
 
   componentDidMount() {
     // if (!this.state.pending && !this.state.requests) {
-    //   this.getRequests();
+    this.getRequests();
     // }
     this.pollServer();
     this.pollServerDelay();

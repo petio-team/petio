@@ -26,13 +26,13 @@ class SessionMedia extends React.Component {
   }
 
   componentDidUpdate() {
-    if (!this.props.live && !this.state.id && this.props.type !== "clip") {
-      if (this.props.type === "movie") {
-        this.getMovie();
-      } else {
-        this.getSeries();
-      }
-    }
+    // if (!this.props.live && !this.state.id && this.props.type !== "clip") {
+    //   if (this.props.type === "movie") {
+    //     this.getMovie();
+    //   } else {
+    //     this.getSeries();
+    //   }
+    // }
   }
 
   getMovie() {
