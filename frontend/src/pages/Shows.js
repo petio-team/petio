@@ -34,7 +34,7 @@ class Shows extends React.Component {
     let scrollY = 0;
     let pHist = Nav.getNav("/tv");
     page.scrollTop = scrollY;
-    window.scrollTo(0, scrollY);
+
     if (pHist) {
       this.setState(pHist.state);
     } else {
@@ -66,7 +66,6 @@ class Shows extends React.Component {
     }
 
     page.scrollTop = scrollY;
-    window.scrollTo(0, scrollY);
   }
 
   async getPersonalised() {

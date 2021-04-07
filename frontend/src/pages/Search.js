@@ -93,7 +93,6 @@ class Search extends React.Component {
     }
 
     page.scrollTop = scrollY;
-    window.scrollTo(0, scrollY);
   }
 
   componentWillUnmount() {

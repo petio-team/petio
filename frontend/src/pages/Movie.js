@@ -93,7 +93,6 @@ class Movie extends React.Component {
     let page = document.querySelectorAll(".page-wrap")[0];
     let scrollY = 0;
     let pHist = Nav.getNav(this.props.location.pathname);
-    console.log(pHist);
     if (pHist) {
       scrollY = pHist.scroll;
       document.querySelectorAll(".carousel").forEach((carousel, i) => {
@@ -102,7 +101,6 @@ class Movie extends React.Component {
     }
 
     page.scrollTop = scrollY;
-    window.scrollTo(0, scrollY);
   }
 
   getRequests() {

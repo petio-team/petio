@@ -83,7 +83,6 @@ class Series extends React.Component {
     }
 
     page.scrollTop = scrollY;
-    window.scrollTo(0, scrollY);
   }
 
   componentDidMount() {

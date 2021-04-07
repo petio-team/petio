@@ -28,7 +28,7 @@ class Company extends React.Component {
     let scrollY = 0;
     let pHist = Nav.getNav(this.props.location.pathname);
     page.scrollTop = scrollY;
-    window.scrollTo(0, scrollY);
+
     if (pHist) {
       this.setState(pHist.state);
     } else {
@@ -90,7 +90,6 @@ class Company extends React.Component {
     }
 
     page.scrollTop = scrollY;
-    window.scrollTo(0, scrollY);
   }
 
   isBottom(el) {

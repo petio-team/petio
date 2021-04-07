@@ -36,7 +36,7 @@ class Movies extends React.Component {
     let scrollY = 0;
     let pHist = Nav.getNav("/movies");
     page.scrollTop = scrollY;
-    window.scrollTo(0, scrollY);
+
     if (pHist) {
       this.setState(pHist.state);
     } else {
@@ -68,7 +68,6 @@ class Movies extends React.Component {
     }
 
     page.scrollTop = scrollY;
-    window.scrollTo(0, scrollY);
   }
 
   async getPersonalised() {
