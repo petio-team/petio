@@ -7,3 +7,5 @@ petio-rest-macos
 *.exe
 .DS_Store
 config-ash.json
+package-lock.json
+yarn.lock
