@@ -19,3 +19,4 @@ admin/.eslintcache
 /logs
 api/.DS_Store
 api/imdb_dump.txt
+package-lock.json
