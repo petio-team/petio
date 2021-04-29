@@ -214,9 +214,11 @@ class Sonarr {
       let lookup = await this.lookup(request.tvdb_id);
       let showData = lookup[0];
       let rSeasons = request.seasons;
-      for (let s = 0; s < showData.seasons.length; s++) {
-        let season = showData.seasons[s];
-        season.monitored = rSeasons[season.seasonNumber] ? true : false;
+      if (rSeasons) {
+        for (let s = 0; s < showData.seasons.length; s++) {
+          let season = showData.seasons[s];
+          season.monitored = rSeasons[season.seasonNumber] ? true : false;
+        }
       }
       showData.qualityProfileId =
         filter && filter.profile ? filter.profile : this.config.profile;

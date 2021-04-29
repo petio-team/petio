@@ -24,7 +24,7 @@ class Worker {
   }
 
   async startCrons() {
-    // return; // for debug local
+    return; // for debug local
     try {
       await this.connnectDb();
       await imdbCache(true);

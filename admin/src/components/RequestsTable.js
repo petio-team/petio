@@ -41,6 +41,16 @@ class RequestsTable extends React.Component {
           bv = `__${b.children[0].info.inCinemas}`;
         }
       }
+      if (a.type === "tv" && a.children && a.process_stage.status === "blue") {
+        if (a.children[0].info.firstAired) {
+          av = `__${a.children[0].info.firstAired}`;
+        }
+      }
+      if (b.type === "tv" && b.children && b.process_stage.status === "blue") {
+        if (b.children[0].info.firstAired) {
+          bv = `__${b.children[0].info.firstAired}`;
+        }
+      }
     }
     if (!av) av = "";
     if (!bv) bv = "";

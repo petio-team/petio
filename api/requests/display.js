@@ -61,9 +61,9 @@ async function getRequests(user = false, all = false) {
                     { id: serverUuid },
                     sId
                   );
-                  children[i].info.serverName = server.config.title;
-                } catch {
-                  children[i].info = { message: "NotFound" };
+                  children[i].info.serverName = server.title;
+                } catch (e) {
+                  children[i].info = { message: "NotFound", error: e };
                 }
                 children[i].status = [];
                 if (sonarrQ[serverUuid] && sonarrQ[serverUuid].records) {

@@ -414,7 +414,17 @@ class LibraryUpdate {
           externalIds[source[0] + "_id"] = source[1];
           if (source[0] === "tmdb") tmdbId = source[1];
         }
-      } catch {
+        if (!externalIds["tmdb_id"]) {
+          try {
+            tmdbId = await this.externalIdMovie(
+              externalIds[Object.keys(externalIds)[0]]
+            );
+          } catch {
+            tmdbId = false;
+          }
+        }
+      } catch (e) {
+        logger.log({ level: "error", message: e });
         logger.log(
           "warn",
           `LIB CRON: Movie couldn't be matched - ${title} - try rematching in Plex`
@@ -432,15 +442,9 @@ class LibraryUpdate {
 
       if (idSource !== "tmdb") {
         try {
-          tmdbId = await this.externalIdMovie(externalId, idSource);
+          tmdbId = await this.externalIdMovie(externalId);
         } catch {
           tmdbId = false;
-        }
-      } else {
-        try {
-          externalIds = await this.tmdbExternalIds(externalId);
-        } catch (err) {
-          logger.log({ level: "warn", message: err });
         }
       }
     }
@@ -585,7 +589,8 @@ class LibraryUpdate {
         },
         { concurrency: 2 }
       );
-    } catch {
+    } catch (e) {
+      logger.log({ level: "error", message: e });
       logger.log("warn", `LIB CRON: Unable to fetch meta for ${title}`);
       if (showDb) {
         showDb.petioTimestamp = this.timestamp;
@@ -605,7 +610,8 @@ class LibraryUpdate {
           externalIds[source[0] + "_id"] = source[1];
           if (source[0] === "tmdb") tmdbId = source[1];
         }
-      } catch {
+      } catch (e) {
+        logger.log({ level: "error", message: e });
         logger.log(
           "warn",
           `LIB CRON: Show couldn't be matched - ${title} - try rematching in Plex`
@@ -846,11 +852,11 @@ class LibraryUpdate {
     }
   }
 
-  async externalIdMovie(id) {
-    let url = `${this.tmdb}movie/${id}/external_ids?api_key=${this.config.tmdbApi}`;
+  async externalIdMovie(id, type) {
+    let url = `${this.tmdb}find/${id}?api_key=${this.config.tmdbApi}&language=en-US&external_source=${type}_id`;
     try {
       let res = await axios.get(url);
-      return res.data;
+      return res.data.movie_results[0].id;
     } catch (e) {
       throw e;
     }
