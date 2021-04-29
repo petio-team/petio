@@ -149,7 +149,7 @@ class RequestsTable extends React.Component {
                 ) : null}
                 <tr className="child">
                   <td>
-                    {type === "tv" ? (
+                    {type === "tv" && child.episode ? (
                       <p>
                         Series: {child.episode.seasonNumber} Episode:{" "}
                         {child.episode.episodeNumber}

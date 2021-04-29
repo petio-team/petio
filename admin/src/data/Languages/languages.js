@@ -115,6 +115,7 @@ const languages = [
   { code: "om", name: "Oromo" },
   { code: "os", name: "Ossetian; Ossetic" },
   { code: "pi", name: "Pali" },
+  { code: "pl", name: "Polish"},
   { code: "pt", name: "Portuguese" },
   { code: "qu", name: "Quechua" },
   { code: "rm", name: "Raeto-Romance" },
