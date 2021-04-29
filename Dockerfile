@@ -12,9 +12,9 @@ RUN mkdir /build && \
     cp -R /source/admin /build/ && \
     cp -R /source/api /build/ && \
     cd /build/frontend && \
-    npm ci && npm run build && \
+    npm install && npm run build && \
     cd /build/admin && \
-    npm ci && npm run build && \
+    npm install && npm run build && \
     cd /build/api && \
     npm install && \
     cd /build && \
