@@ -364,6 +364,7 @@ class LibraryUpdate {
       let res = await axios.get(url);
       return res.data.MediaContainer.Metadata;
     } catch (e) {
+      logger.log({ level: "error", message: e });
       throw "Unable to get meta";
     }
   }
