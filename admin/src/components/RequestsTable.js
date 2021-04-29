@@ -23,6 +23,34 @@ class RequestsTable extends React.Component {
     if (sortVal === "status") {
       av = a.process_stage ? a.process_stage.message : 0;
       bv = b.process_stage ? b.process_stage.message : 0;
+      if (
+        a.type === "movie" &&
+        a.children &&
+        a.process_stage.status === "blue"
+      ) {
+        if (a.children[0].info.inCinemas) {
+          av = `__${a.children[0].info.inCinemas}`;
+        }
+      }
+      if (
+        b.type === "movie" &&
+        b.children &&
+        b.process_stage.status === "blue"
+      ) {
+        if (b.children[0].info.inCinemas) {
+          bv = `__${b.children[0].info.inCinemas}`;
+        }
+      }
+      if (a.type === "tv" && a.children && a.process_stage.status === "blue") {
+        if (a.children[0].info.firstAired) {
+          av = `__${a.children[0].info.firstAired}`;
+        }
+      }
+      if (b.type === "tv" && b.children && b.process_stage.status === "blue") {
+        if (b.children[0].info.firstAired) {
+          bv = `__${b.children[0].info.firstAired}`;
+        }
+      }
     }
     if (!av) av = "";
     if (!bv) bv = "";

@@ -6,6 +6,12 @@ const logger = require("./api/util/logger");
 const numCPUs = require("os").cpus().length;
 const cluster = require("cluster");
 
+function delay(t) {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(), t);
+  });
+}
+
 class Wrapper {
   // Start Main Wrapper
   async getBase() {
@@ -34,6 +40,8 @@ class Wrapper {
   }
 
   async init() {
+    logger.log("info", `WRAPPER: Delaying start`);
+    await delay(5000);
     if (cluster.isMaster) {
       logger.log("info", `WRAPPER: Starting Petio wrapper`);
       logger.log("info", `WRAPPER: OS has ${numCPUs} CPU(s)`);
