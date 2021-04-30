@@ -145,6 +145,10 @@ class Season extends React.Component {
       return <span className="aired">Has aired on tv</span>;
     }
 
+    if (days === 0) {
+      return <span className="not-aired">airs today</span>;
+    }
+
     return days < 100 ? (
       <span className="not-aired">
         airs in {days} {days > 1 ? "days" : "day"}
