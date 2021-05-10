@@ -281,7 +281,7 @@ class processRequest {
         Object.keys(profile.sonarr).map((s) => {
           let active = profile.sonarr[s];
           if (active) {
-            new Sonarr().addShow(s, this.request);
+            new Sonarr().addShow({ id: s }, this.request);
           }
         });
       }
