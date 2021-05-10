@@ -22,7 +22,7 @@ body {
 html,
 body {
   @include media-breakpoint-down(md) {
-    position: fixed;
+    // position: fixed;
     overflow: hidden;
     pointer-events: none;
     height: 100vh;
@@ -30,11 +30,11 @@ body {
   }
 }
 
-body {
-  @include media-breakpoint-down(md) {
-    position: relative;
-  }
-}
+// body {
+//   @include media-breakpoint-down(md) {
+//     position: relative;
+//   }
+// }
 
 #root {
   position: absolute;
