@@ -63,6 +63,7 @@ class Wrapper {
         process.exit(1);
       });
       try {
+        app.get('/health', (_, res) => res.status(200).send('OK'))
         let basePath = await this.getBase();
         logger.log("info", `ROUTER: Base path found - ${basePath}`);
         app.use((req, res, next) => {
