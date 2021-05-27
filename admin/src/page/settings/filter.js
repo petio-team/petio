@@ -208,6 +208,11 @@ class Filter extends React.Component {
       if (target.dataset.row === "action") {
         let actionRow = target.dataset.actionRow;
         console.log(target.dataset);
+        if (!Array.isArray(current[target.dataset.item].action)) {
+          current[target.dataset.item].action = [
+            current[target.dataset.item].action,
+          ];
+        }
         current[target.dataset.item][target.dataset.row][actionRow][
           name
         ] = value;
