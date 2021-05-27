@@ -46,7 +46,7 @@ class Discord {
             text: "Powered by Petio",
             icon_url: "https://petio.tv/favicon.png",
           },
-          image: {
+          thumbnail: {
             url: data.image,
           },
         },
