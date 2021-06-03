@@ -189,7 +189,7 @@ async function personData() {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}trending/person/day?api_key=${tmdbApikey}&append_to_response=images`;
+  let url = `${tmdb}trending/person/week?api_key=${tmdbApikey}&append_to_response=images`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -203,7 +203,7 @@ async function moviesData() {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}trending/movie/day?api_key=${tmdbApikey}&append_to_response=images`;
+  let url = `${tmdb}trending/movie/week?api_key=${tmdbApikey}&append_to_response=images`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -217,7 +217,7 @@ async function showsData() {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}trending/tv/day?api_key=${tmdbApikey}&append_to_response=images`;
+  let url = `${tmdb}trending/tv/week?api_key=${tmdbApikey}&append_to_response=images`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;

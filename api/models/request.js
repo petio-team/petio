@@ -14,6 +14,7 @@ const RequestSchema = mongoose.Schema({
   approved: Boolean,
   manualStatus: Number,
   pendingDefault: Object,
+  seasons: Object,
 });
 
 module.exports = mongoose.model("Request", RequestSchema);

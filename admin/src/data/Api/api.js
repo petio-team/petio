@@ -132,6 +132,10 @@ export function testDiscord() {
   return get(`/hooks/discord/test`);
 }
 
+export function testTelegram() {
+  return get(`/hooks/telegram/test`);
+}
+
 export async function getUser(id) {
   return get(`/user/${id}`);
 }

@@ -12,9 +12,9 @@ RUN mkdir /build && \
     cp -R /source/admin /build/ && \
     cp -R /source/api /build/ && \
     cd /build/frontend && \
-    npm ci && npm run build && \
+    npm install && npm run build && \
     cd /build/admin && \
-    npm ci && npm run build && \
+    npm install && npm run build && \
     cd /build/api && \
     npm install && \
     cd /build && \
@@ -40,4 +40,4 @@ LABEL org.opencontainers.image.vendor="petio-team"
 LABEL org.opencontainers.image.url="https://github.com/petio-team/petio"
 LABEL org.opencontainers.image.documentation="https://github.com/petio-team/petio-docs/wiki"
 LABEL org.opencontainers.image.licenses="MIT"
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD [ "wget", "--spider", "http://localhost:7777" ]
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD [ "wget", "--spider", "http://localhost:7777/health" ]

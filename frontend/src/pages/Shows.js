@@ -2,12 +2,10 @@ import React from "react";
 import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import Api from "../data/Api";
-// import Popular from "../components/Popular";
-// import History from "../components/History";
+import Nav from "../data/Nav";
 import ShowCard from "../components/TvCard";
 import Carousel from "../components/Carousel";
 import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
-// import User from "../data/User";
 
 class Shows extends React.Component {
   constructor(props) {
@@ -21,16 +19,53 @@ class Shows extends React.Component {
     this.getPersonalised = this.getPersonalised.bind(this);
   }
 
+  componentWillUnmount() {
+    let page = document.querySelectorAll(".page-wrap")[0];
+    let carouselsData = document.querySelectorAll(".carousel");
+    let carousels = [];
+    carouselsData.forEach((carousel) => {
+      carousels.push(carousel.scrollLeft);
+    });
+    Nav.storeNav("/tv", this.state, page.scrollTop, carousels);
+  }
+
   componentDidMount() {
     let page = document.querySelectorAll(".page-wrap")[0];
-    page.scrollTop = 0;
-    window.scrollTo(0, 0);
+    let scrollY = 0;
+    let pHist = Nav.getNav("/tv");
+    page.scrollTop = scrollY;
 
-    if (!Object.keys(this.props.api.popular).length > 0) {
-      Api.getPopular();
+    if (pHist) {
+      this.setState(pHist.state);
+    } else {
+      if (!Object.keys(this.props.api.popular).length > 0) {
+        Api.getPopular();
+      }
+      this.getPersonalised();
+    }
+  }
+
+  componentDidUpdate() {
+    if (this.state.getPos) {
+      this.setState({
+        getPos: false,
+      });
+      this.getPos();
+    }
+  }
+
+  getPos() {
+    let page = document.querySelectorAll(".page-wrap")[0];
+    let scrollY = 0;
+    let pHist = Nav.getNav("/tv");
+    if (pHist) {
+      scrollY = pHist.scroll;
+      document.querySelectorAll(".carousel").forEach((carousel, i) => {
+        carousel.scrollLeft = pHist.carousels[i];
+      });
     }
 
-    this.getPersonalised();
+    page.scrollTop = scrollY;
   }
 
   async getPersonalised() {

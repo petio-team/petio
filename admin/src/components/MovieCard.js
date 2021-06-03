@@ -25,9 +25,9 @@ class MovieCard extends React.Component {
     this.getMovie();
   }
 
-  componentDidUpdate() {
-    this.getMovie();
-  }
+  // componentDidUpdate() {
+  //   this.getMovie();
+  // }
 
   getMovie() {
     let movie = this.props.movie;

@@ -12,9 +12,11 @@ const getConfig = require("../util/config");
 const processRequest = require("../requests/process");
 const logger = require("../util/logger");
 const Discord = require("../notifications/discord");
+const Telegram = require("../notifications/telegram");
 const { showLookup } = require("../tmdb/show");
 const bcrypt = require("bcryptjs");
 const axios = require("axios");
+const MusicMeta = require("../meta/musicBrainz");
 
 class LibraryUpdate {
   constructor() {
@@ -22,6 +24,11 @@ class LibraryUpdate {
     this.mailer = [];
     this.tmdb = "https://api.themoviedb.org/3/";
     this.full = true;
+    this.timestamp = new Date().toString();
+  }
+
+  timeout(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   async partial() {
@@ -110,6 +117,7 @@ class LibraryUpdate {
     );
     this.execMail();
     logger.log("info", "LIB CRON: Partial Scan Complete");
+    this.checkOldRequests();
     return;
   }
 
@@ -299,6 +307,7 @@ class LibraryUpdate {
   async updateLibraryContent(libraries) {
     for (let l in libraries.Directory) {
       let lib = libraries.Directory[l];
+      let music = [];
       try {
         let libContent = await this.getLibrary(lib.key);
         await Promise.map(
@@ -308,15 +317,20 @@ class LibraryUpdate {
             if (obj.type === "movie") {
               await this.saveMovie(obj);
             } else if (obj.type === "artist") {
-              await this.saveMusic(obj);
+              music.push(obj);
             } else if (obj.type === "show") {
               await this.saveShow(obj);
             } else {
               logger.log("info", `LIB CRON: Unknown media type - ${obj.type}`);
             }
           },
-          { concurrency: 30 }
+          { concurrency: 10 }
         );
+        for (let i in music) {
+          let artist = music[i];
+          await this.saveMusic(artist);
+          await this.timeout(20);
+        }
       } catch (err) {
         logger.log("error", `LIB CRON: Unable to get library content`);
         logger.log({ level: "error", message: err });
@@ -335,7 +349,7 @@ class LibraryUpdate {
   }
 
   async getMeta(id) {
-    let url = `${this.config.plexProtocol}://${this.config.plexIp}:${this.config.plexPort}/library/metadata/${id}?X-Plex-Token=${this.config.plexToken}`;
+    let url = `${this.config.plexProtocol}://${this.config.plexIp}:${this.config.plexPort}/library/metadata/${id}?includeChildren=1&X-Plex-Token=${this.config.plexToken}`;
     try {
       let res = await axios.get(url);
       return res.data.MediaContainer.Metadata[0];
@@ -344,8 +358,25 @@ class LibraryUpdate {
     }
   }
 
+  async getSeason(id) {
+    let url = `${this.config.plexProtocol}://${this.config.plexIp}:${this.config.plexPort}/library/metadata/${id}/children?X-Plex-Token=${this.config.plexToken}`;
+    try {
+      let res = await axios.get(url);
+      return res.data.MediaContainer.Metadata;
+    } catch (e) {
+      logger.log({ level: "error", message: e });
+      throw "Unable to get meta";
+    }
+  }
+
   async saveMovie(movieObj) {
     let movieDb = false;
+    let title = movieObj.title;
+    let externalIds = {};
+    let tmdbId = false;
+    let externalId = false;
+    let added = false;
+    logger.verbose(`LIB CRON: Movie Job: ${title}`);
     try {
       movieDb = await Movie.findOne({
         ratingKey: parseInt(movieObj.ratingKey),
@@ -353,230 +384,239 @@ class LibraryUpdate {
     } catch {
       movieDb = false;
     }
-
     let idSource = movieObj.guid
       .replace("com.plexapp.agents.", "")
       .split("://")[0];
-    let externalId = false;
-    let externalIds = {};
     if (idSource === "local" || idSource === "none") {
       logger.verbose(
-        `LIB CRON: Item skipped :: Not matched / local only - ${movieObj.title}`
+        `LIB CRON: Item skipped :: Not matched / local only - ${title}`
       );
       return;
     }
+    try {
+      movieObj = await this.getMeta(movieObj.ratingKey);
+    } catch {
+      logger.log("warn", `LIB CRON: Unable to fetch meta for ${title}`);
+      if (movieDb) {
+        movieDb.petioTimestamp = this.timestamp;
+        try {
+          await movieDb.save();
+        } catch (err) {
+          logger.error(`LIB CRON: Failed to save timestamp ${title} to Db`);
+          logger.log({ level: "error", message: err });
+        }
+      }
+      return;
+    }
     if (idSource === "plex") {
-      let title = movieObj.title;
       try {
-        movieObj = await this.getMeta(movieObj.ratingKey);
         for (let guid of movieObj.Guid) {
           let source = guid.id.split("://");
           externalIds[source[0] + "_id"] = source[1];
+          if (source[0] === "tmdb") tmdbId = source[1];
         }
-      } catch (err) {
-        logger.log("warn", `LIB CRON: Unable to fetch meta for ${title}`);
+        if (!externalIds["tmdb_id"]) {
+          try {
+            tmdbId = await this.externalIdMovie(
+              externalIds[Object.keys(externalIds)[0]]
+            );
+          } catch {
+            tmdbId = false;
+          }
+        }
+      } catch (e) {
+        logger.log({ level: "error", message: e });
+        logger.log(
+          "warn",
+          `LIB CRON: Movie couldn't be matched - ${title} - try rematching in Plex`
+        );
         return;
       }
     } else {
       if (idSource === "themoviedb") {
         idSource = "tmdb";
       }
+      externalId = movieObj.guid
+        .replace("com.plexapp.agents.", "")
+        .split("://")[1]
+        .split("?")[0];
 
-      try {
-        externalId = movieObj.guid
-          .replace("com.plexapp.agents.", "")
-          .split("://")[1]
-          .split("?")[0];
-
-        externalIds = await this.externalIdMovie(externalId);
-        externalIds.tmdb_id = externalIds.id ? externalIds.id : false;
-      } catch (err) {
-        if (!externalId) {
-          logger.log(
-            "warn",
-            `LIB CRON: Error - unable to parse id source from: ${movieObj.guid} - Movie: ${movieObj.title}`
-          );
-        } else {
-          logger.log({ level: "error", message: err });
+      if (idSource !== "tmdb") {
+        try {
+          tmdbId = await this.externalIdMovie(externalId);
+        } catch {
+          tmdbId = false;
         }
       }
     }
-
+    if (idSource !== "tmdb" && !tmdbId) {
+      logger.log(
+        "warn",
+        `LIB CRON: Movie couldn't be matched - ${title} - try rematching in Plex`
+      );
+      return;
+    }
     if (!movieDb) {
-      try {
-        let newMovie = new Movie({
-          title: movieObj.title,
-          ratingKey: movieObj.ratingKey,
-          key: movieObj.key,
-          guid: movieObj.guid,
-          studio: movieObj.studio,
-          type: movieObj.type,
-          titleSort: movieObj.titleSort,
-          contentRating: movieObj.contentRating,
-          summary: movieObj.summary,
-          rating: movieObj.rating,
-          year: movieObj.year,
-          tagline: movieObj.tagline,
-          thumb: movieObj.thumb,
-          art: movieObj.art,
-          duration: movieObj.duration,
-          originallyAvailableAt: movieObj.originallyAvailableAt,
-          addedAt: movieObj.addedAt,
-          updatedAt: movieObj.updatedAt,
-          primaryExtraKey: movieObj.primaryExtraKey,
-          ratingImage: movieObj.ratingImage,
-          Media: movieObj.Media,
-          Genre: movieObj.Genre,
-          Director: movieObj.Director,
-          Writer: movieObj.Writer,
-          Country: movieObj.Country,
-          Role: movieObj.Role,
-          idSource: idSource,
-          externalId: externalId,
-          imdb_id: externalIds.hasOwnProperty("imdb_id")
-            ? externalIds.imdb_id
-            : false,
-          tmdb_id: externalIds.hasOwnProperty("tmdb_id")
-            ? externalIds.tmdb_id
-            : false,
-        });
-        if (!externalIds.tmdb_id) {
-          logger.log(
-            "warn",
-            `LIB CRON: Movie couldn't be matched - ${movieObj.title} - try rematching in Plex`
-          );
-        } else {
-          movieDb = await newMovie.save();
-          await this.mailAdded(movieObj, newMovie.tmdb_id);
-          logger.log("info", `LIB CRON: Movie Added - ${movieObj.title}`);
-        }
-      } catch (err) {
-        logger.log("warn", `LIB CRON: Error`);
-        logger.log({ level: "error", message: err });
+      added = true;
+      movieDb = new Movie({
+        ratingKey: movieObj.ratingKey,
+      });
+    }
+    movieDb.title = movieObj.title;
+    movieDb.ratingKey = movieObj.ratingKey;
+    movieDb.studio = movieObj.studio;
+    movieDb.type = movieObj.type;
+    movieDb.contentRating = movieObj.contentRating;
+    movieDb.rating = movieObj.rating;
+    movieDb.year = movieObj.year;
+    movieDb.addedAt = movieObj.addedAt;
+    movieDb.updatedAt = movieObj.updatedAt;
+    movieDb.Media = movieObj.Media;
+    movieDb.Genre = movieObj.Genre;
+    movieDb.Director = movieObj.Director;
+    movieDb.Writer = movieObj.Writer;
+    movieDb.Country = movieObj.Country;
+    movieDb.Role = movieObj.Role;
+    movieDb.idSource = idSource;
+    movieDb.externalId = externalId;
+    movieDb.imdb_id = externalIds.hasOwnProperty("imdb_id")
+      ? externalIds.imdb_id
+      : false;
+    movieDb.tmdb_id = externalIds.hasOwnProperty("tmdb_id")
+      ? externalIds.tmdb_id
+      : false;
+
+    try {
+      await movieDb.save();
+      if (added) {
+        await this.mailAdded(movieObj, movieDb.tmdb_id);
+        logger.log("info", `LIB CRON: Movie Added - ${movieObj.title}`);
       }
-    } else {
-      try {
-        if (externalIds.tmdb_id) {
-          await Movie.findOneAndUpdate(
-            {
-              ratingKey: movieObj.ratingKey,
-            },
-            {
-              $set: {
-                title: movieObj.title,
-                ratingKey: movieObj.ratingKey,
-                key: movieObj.key,
-                guid: movieObj.guid,
-                studio: movieObj.studio,
-                type: movieObj.type,
-                titleSort: movieObj.titleSort,
-                contentRating: movieObj.contentRating,
-                summary: movieObj.summary,
-                rating: movieObj.rating,
-                year: movieObj.year,
-                tagline: movieObj.tagline,
-                thumb: movieObj.thumb,
-                art: movieObj.art,
-                duration: movieObj.duration,
-                originallyAvailableAt: movieObj.originallyAvailableAt,
-                addedAt: movieObj.addedAt,
-                updatedAt: movieObj.updatedAt,
-                primaryExtraKey: movieObj.primaryExtraKey,
-                ratingImage: movieObj.ratingImage,
-                Media: movieObj.Media,
-                Genre: movieObj.Genre,
-                Director: movieObj.Director,
-                Writer: movieObj.Writer,
-                Country: movieObj.Country,
-                Role: movieObj.Role,
-                idSource: idSource,
-                externalId: externalId,
-                imdb_id: externalIds.hasOwnProperty("imdb_id")
-                  ? externalIds.imdb_id
-                  : false,
-                tmdb_id: externalIds.hasOwnProperty("tmdb_id")
-                  ? externalIds.tmdb_id
-                  : false,
-              },
-            },
-            { useFindAndModify: false }
-          );
-        } else {
-          logger.log(
-            "warn",
-            `LIB CRON: Movie couldn't be matched - ${movieObj.title} - try rematching in Plex`
-          );
-        }
-      } catch (err) {
-        movieDb = false;
-        logger.log({ level: "error", message: err });
-      }
+    } catch (err) {
+      logger.error(`LIB CRON: Failed to save ${title} to Db`);
+      logger.log({ level: "error", message: err });
     }
   }
 
   async saveMusic(musicObj) {
     let musicDb = false;
+    let title = musicObj.title;
+    let added = false;
+    let match = false;
+    logger.verbose(`LIB CRON: Music Job: ${title}`);
     try {
       musicDb = await Music.findOne({
         ratingKey: parseInt(musicObj.ratingKey),
       });
-      if (!this.full && musicDb) {
-        return;
-      }
     } catch {
       musicDb = false;
     }
+    if (musicDb && musicDb.metaId) {
+      match = { id: musicDb.metaId, name: musicDb.metaTitle };
+    }
+    if (match && musicDb.metaId === "no genres" && musicObj.Genre) {
+      logger.info(
+        `LIB CRON: Music - "${title}" Now has genres, attempting to match`
+      );
+      match = false;
+    }
+    if (!match) {
+      match = await new MusicMeta().match(musicObj.title, musicObj.Genre);
+    }
     if (!musicDb) {
-      try {
-        let newMusic = new Music({
-          title: musicObj.title,
-          ratingKey: musicObj.ratingKey,
-          key: musicObj.key,
-          guid: musicObj.guid,
-          type: musicObj.type,
-          summary: musicObj.summary,
-          index: musicObj.index,
-          thumb: musicObj.thumb,
-          addedAt: musicObj.addedAt,
-          updatedAt: musicObj.updatedAt,
-          Genre: musicObj.Genre,
-          Country: musicObj.Country,
-        });
-        musicDb = await newMusic.save();
-      } catch (err) {
-        logger.log("error", `LIB CRON: Error`);
-        logger.log({ level: "error", message: err });
+      added = true;
+      musicDb = new Music({
+        ratingKey: musicObj.ratingKey,
+      });
+    }
+    musicDb.title = musicObj.title;
+    musicDb.metaId = match ? match.id : false;
+    musicDb.metaTitle = match ? match.name : false;
+    try {
+      await musicDb.save();
+      if (added) {
+        await this.mailAdded(musicObj, musicDb.metaId);
+        logger.log("info", `LIB CRON: Music Added - ${musicObj.title}`);
       }
+    } catch (err) {
+      logger.error(`LIB CRON: Failed to save ${title} to Db`);
+      logger.log({ level: "error", message: err });
     }
   }
 
   async saveShow(showObj) {
     let showDb = false;
-
+    let title = showObj.title;
+    let externalIds = {};
+    let tmdbId = false;
+    let externalId = false;
+    let added = false;
+    let seasons = [];
+    logger.verbose(`LIB CRON: TV Job: ${title}`);
     try {
       showDb = await Show.findOne({ ratingKey: parseInt(showObj.ratingKey) });
     } catch {
       showDb = false;
     }
-
     let idSource = showObj.guid
       .replace("com.plexapp.agents.", "")
       .split("://")[0];
-    let externalIds = {};
-    let tmdbId = false;
-    let externalId = false;
-    if (idSource === "local") return;
+    if (idSource === "local" || idSource === "none") {
+      logger.verbose(
+        `LIB CRON: Item skipped :: Not matched / local only - ${title}`
+      );
+      return;
+    }
+    try {
+      showObj = await this.getMeta(showObj.ratingKey);
+      seasons = await Promise.map(
+        showObj.Children.Metadata,
+        async (season) => {
+          let seasonData = await this.getSeason(season.ratingKey);
+          let thisSeason = {
+            seasonNumber: season.index,
+            title: season.title,
+            episodes: {},
+          };
+          for (let e in seasonData) {
+            let ep = seasonData[e];
+            thisSeason.episodes[ep.index] = {
+              title: ep.title,
+              episodeNumber: ep.index,
+              seasonNumber: ep.parentIndex,
+            };
+          }
+          return thisSeason;
+        },
+        { concurrency: 2 }
+      );
+    } catch (e) {
+      logger.log({ level: "error", message: e });
+      logger.log("warn", `LIB CRON: Unable to fetch meta for ${title}`);
+      if (showDb) {
+        showDb.petioTimestamp = this.timestamp;
+        try {
+          await showDb.save();
+        } catch (err) {
+          logger.error(`LIB CRON: Failed to save timestamp ${title} to Db`);
+          logger.log({ level: "error", message: err });
+        }
+      }
+      return;
+    }
     if (idSource === "plex") {
-      let title = showObj.title;
       try {
-        showObj = await this.getMeta(showObj.ratingKey);
         for (let guid of showObj.Guid) {
           let source = guid.id.split("://");
           externalIds[source[0] + "_id"] = source[1];
           if (source[0] === "tmdb") tmdbId = source[1];
         }
-      } catch (err) {
-        logger.log("warn", `LIB CRON: Unable to fetch meta for ${title}`);
+      } catch (e) {
+        logger.log({ level: "error", message: e });
+        logger.log(
+          "warn",
+          `LIB CRON: Show couldn't be matched - ${title} - try rematching in Plex`
+        );
         return;
       }
     } else {
@@ -605,105 +645,58 @@ class LibraryUpdate {
         }
       }
     }
-
+    if (idSource !== "tmdb" && !tmdbId) {
+      logger.log(
+        "warn",
+        `LIB CRON: Show couldn't be matched - ${title} - try rematching in Plex`
+      );
+      return;
+    }
     if (!showDb) {
-      try {
-        let newShow = new Show({
-          ratingKey: showObj.ratingKey,
-          key: showObj.key,
-          guid: showObj.guid,
-          studio: showObj.studio,
-          type: showObj.type,
-          title: showObj.title,
-          titleSort: showObj.titleSort,
-          contentRating: showObj.contentRating,
-          summary: showObj.summary,
-          index: showObj.index,
-          rating: showObj.rating,
-          year: showObj.year,
-          thumb: showObj.thumb,
-          art: showObj.art,
-          banner: showObj.banner,
-          theme: showObj.theme,
-          duration: showObj.duration,
-          originallyAvailableAt: showObj.originallyAvailableAt,
-          leafCount: showObj.leafCount,
-          viewedLeafCount: showObj.viewedLeafCount,
-          childCount: showObj.childCount,
-          addedAt: showObj.addedAt,
-          updatedAt: showObj.updatedAt,
-          Genre: showObj.Genre,
-          idSource: idSource,
-          externalId: externalId,
-          imdb_id: idSource === "imdb" ? externalId : externalIds.imdb_id,
-          tvdb_id: idSource === "tvdb" ? externalId : externalIds.tvdb_id,
-          tmdb_id: idSource === "tmdb" ? externalId : tmdbId,
-        });
-        if (idSource !== "tmdb" && !tmdbId) {
-          logger.log(
-            "warn",
-            `LIB CRON: Show couldn't be matched - ${showObj.title} - try rematching in Plex`
-          );
-        } else {
-          showDb = await newShow.save();
-          await this.mailAdded(showObj, newShow.tmdb_id);
-          logger.log("info", `LIB CRON: Show Added - ${showObj.title}`);
-        }
-      } catch (err) {
-        logger.log("error", `LIB CRON: Error`);
-        logger.log({ level: "error", message: err });
+      added = true;
+      showDb = new Show({
+        ratingKey: showObj.ratingKey,
+      });
+    }
+    showDb.ratingKey = showObj.ratingKey;
+    showDb.key = showObj.key;
+    showDb.guid = showObj.guid;
+    showDb.studio = showObj.studio;
+    showDb.type = showObj.type;
+    showDb.title = showObj.title;
+    showDb.titleSort = showObj.titleSort;
+    showDb.contentRating = showObj.contentRating;
+    showDb.rating = showObj.rating;
+    showDb.year = showObj.year;
+    showDb.leafCount = showObj.leafCount;
+    showDb.childCount = showObj.childCount;
+    showDb.addedAt = showObj.addedAt;
+    showDb.updatedAt = showObj.updatedAt;
+    showDb.Genre = showObj.Genre;
+    showDb.idSource = idSource;
+    showDb.externalId = externalId;
+    showDb.imdb_id = idSource === "imdb" ? externalId : externalIds.imdb_id;
+    showDb.tvdb_id = idSource === "tvdb" ? externalId : externalIds.tvdb_id;
+    showDb.tmdb_id = idSource === "tmdb" ? externalId : tmdbId;
+    showDb.petioTimestamp = this.timestamp;
+    showDb.seasonData = {};
+    for (let s in seasons) {
+      let season = seasons[s];
+      showDb.seasonData[season.seasonNumber] = {
+        seasonNumber: season.seasonNumber,
+        title: season.title,
+        episodes: season.episodes,
+      };
+    }
+    try {
+      await showDb.save();
+      if (added) {
+        await this.mailAdded(showObj, showDb.tmdb_id);
+        logger.log("info", `LIB CRON: Show Added - ${showObj.title}`);
       }
-    } else {
-      try {
-        if (idSource === "tmdb" || tmdbId) {
-          await Show.findOneAndUpdate(
-            {
-              ratingKey: showObj.ratingKey,
-            },
-            {
-              $set: {
-                ratingKey: showObj.ratingKey,
-                key: showObj.key,
-                guid: showObj.guid,
-                studio: showObj.studio,
-                type: showObj.type,
-                title: showObj.title,
-                titleSort: showObj.titleSort,
-                contentRating: showObj.contentRating,
-                summary: showObj.summary,
-                index: showObj.index,
-                rating: showObj.rating,
-                year: showObj.year,
-                thumb: showObj.thumb,
-                art: showObj.art,
-                banner: showObj.banner,
-                theme: showObj.theme,
-                duration: showObj.duration,
-                originallyAvailableAt: showObj.originallyAvailableAt,
-                leafCount: showObj.leafCount,
-                viewedLeafCount: showObj.viewedLeafCount,
-                childCount: showObj.childCount,
-                addedAt: showObj.addedAt,
-                updatedAt: showObj.updatedAt,
-                Genre: showObj.Genre,
-                idSource: idSource,
-                externalId: externalId,
-                imdb_id: idSource === "imdb" ? externalId : externalIds.imdb_id,
-                tvdb_id: idSource === "tvdb" ? externalId : externalIds.tvdb_id,
-                tmdb_id: idSource === "tmdb" ? externalId : tmdbId,
-              },
-            },
-            { useFindAndModify: false }
-          );
-        } else {
-          logger.log(
-            "warn",
-            `LIB CRON: Show couldn't be matched - ${showObj.title} - try rematching in Plex`
-          );
-        }
-      } catch {
-        showDb = false;
-      }
+    } catch (err) {
+      logger.error(`LIB CRON: Failed to save ${title} to Db`);
+      logger.log({ level: "error", message: err });
     }
   }
 
@@ -820,11 +813,13 @@ class LibraryUpdate {
 
   discordNotify(user, request) {
     let type = request.type === "tv" ? "TV Show" : "Movie";
-    new Discord().send(
-      `${request.title} added to Plex!`,
-      `The ${type} "${request.title}" has been processed and is now available to watch on Plex"`,
-      user.title,
-      `https://image.tmdb.org/t/p/w500${request.thumb}`
+    [new Discord(), new Telegram()].forEach((notification) =>
+      notification.send(
+        `${request.title} added to Plex!`,
+        `The ${type} "${request.title}" has been processed and is now available to watch on Plex"`,
+        user.title,
+        `https://image.tmdb.org/t/p/w500${request.thumb}`
+      )
     );
   }
 
@@ -858,11 +853,11 @@ class LibraryUpdate {
     }
   }
 
-  async externalIdMovie(id) {
-    let url = `${this.tmdb}movie/${id}/external_ids?api_key=${this.config.tmdbApi}`;
+  async externalIdMovie(id, type) {
+    let url = `${this.tmdb}find/${id}?api_key=${this.config.tmdbApi}&language=en-US&external_source=${type}_id`;
     try {
       let res = await axios.get(url);
-      return res.data;
+      return res.data.movie_results[0].id;
     } catch (e) {
       throw e;
     }

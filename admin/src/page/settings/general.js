@@ -57,6 +57,9 @@ class General extends React.Component {
       base_path: "",
       login_type: false,
       discord_webhook: false,
+      telegram_bot_token: "",
+      telegram_chat_id: "",
+      telegram_send_silently: false,
       plexPopular: false,
       token: false,
     };
@@ -68,9 +71,11 @@ class General extends React.Component {
     this.testEmail = this.testEmail.bind(this);
     this.saveBasePath = this.saveBasePath.bind(this);
     this.saveDiscord = this.saveDiscord.bind(this);
+    this.saveTelegram = this.saveTelegram.bind(this);
     this.saveLoginType = this.saveLoginType.bind(this);
     this.savePlexPopular = this.savePlexPopular.bind(this);
     this.testDiscord = this.testDiscord.bind(this);
+    this.testTelegram = this.testTelegram.bind(this);
     this.testPlex = this.testPlex.bind(this);
   }
 
@@ -151,6 +156,26 @@ class General extends React.Component {
     }
   }
 
+  async saveTelegram() {
+    try {
+      await Api.updateConfig({
+        telegram_bot_token: this.state.telegram_bot_token,
+        telegram_chat_id: this.state.telegram_chat_id,
+        telegram_send_silently: this.state.telegram_send_silently,
+      });
+      this.props.msg({
+        message: "Telegram Chat Config Saved",
+        type: "good",
+      });
+    } catch (err) {
+      console.log(err);
+      this.props.msg({
+        message: "Failed to Save Telegram Chat Config",
+        type: "error",
+      });
+    }
+  }
+
   async saveLoginType() {
     try {
       await Api.updateConfig({
@@ -202,6 +227,15 @@ class General extends React.Component {
         base_path: config.base_path ? config.base_path : "",
         login_type: config.login_type ? config.login_type : 1,
         discord_webhook: config.discord_webhook ? config.discord_webhook : "",
+        telegram_bot_token: config.telegram_bot_token
+          ? config.telegram_bot_token
+          : "",
+        telegram_chat_id: config.telegram_chat_id
+          ? config.telegram_chat_id
+          : "",
+        telegram_send_silently: config.telegram_send_silently
+          ? config.telegram_send_silently
+          : false,
         plexPopular:
           config.plexPopular === null || config.plexPopular === undefined
             ? true
@@ -239,6 +273,30 @@ class General extends React.Component {
       console.log(err);
       this.props.msg({
         message: "Discord Test Failed",
+        type: "error",
+      });
+    }
+  }
+
+  async testTelegram() {
+    try {
+      await this.saveTelegram();
+      let test = await Api.testTelegram();
+      if (test.result) {
+        this.props.msg({
+          message: "Telegram Test Passed!",
+          type: "good",
+        });
+      } else {
+        this.props.msg({
+          message: "Telegram Test Failed",
+          type: "error",
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      this.props.msg({
+        message: "Telegram Test Failed",
         type: "error",
       });
     }
@@ -518,6 +576,77 @@ class General extends React.Component {
               this.state.discord_webhook ? "" : "disabled"
             }`}
             onClick={this.testDiscord}
+          >
+            Test
+          </button>
+        </section>
+        <section>
+          <p className="main-title mb--2">Telegram</p>
+          <p className="description">
+            Please enter here your Telegram chat config. You can find
+            documentation about Telegram&apos;s bot on{" "}
+            <a
+              href="https://core.telegram.org/bots"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Telegram documentation
+            </a>
+            .
+          </p>
+          <label>Bot token</label>
+          <input
+            type="text"
+            name="telegram_bot_token"
+            value={this.state.telegram_bot_token}
+            onChange={this.inputChange}
+            autoCorrect="off"
+            spellCheck="off"
+          />
+          <label>Chat ID</label>
+          <input
+            type="text"
+            name="telegram_chat_id"
+            value={this.state.telegram_chat_id}
+            onChange={this.inputChange}
+            autoCorrect="off"
+            spellCheck="off"
+          />
+          <p className="description">
+            You must start a conversation with the bot or add it to your group
+            to receive messages.
+            <br />
+            <a
+              target="_blank"
+              href="http://stackoverflow.com/a/37396871/882971"
+              rel="noreferrer"
+            >
+              More Info
+            </a>
+          </p>
+          <div className="checkbox-wrap mb--2">
+            <input
+              type="checkbox"
+              name="telegram_send_silently"
+              checked={this.state.telegram_send_silently}
+              onChange={this.inputChange}
+            />
+            <p>Send silently (notification with no sound)</p>
+          </div>
+          <button
+            style={{ marginRight: "10px" }}
+            className="btn btn__square"
+            onClick={this.saveTelegram}
+          >
+            Save
+          </button>
+          <button
+            className={`btn btn__square ${
+              this.state.telegram_bot_token && this.state.telegram_chat_id
+                ? ""
+                : "disabled"
+            }`}
+            onClick={this.testTelegram}
           >
             Test
           </button>

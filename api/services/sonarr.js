@@ -1,12 +1,11 @@
 const Request = require("../models/request");
 const fs = require("fs");
 const path = require("path");
-var sanitize = require("sanitize-filename");
 const logger = require("../util/logger");
 const axios = require("axios");
 
 class Sonarr {
-  constructor(id = false, forced = false, profileOvr = false, pathOvr = false) {
+  constructor() {
     let project_folder, configFile;
     if (process.pkg) {
       project_folder = path.dirname(process.execPath);
@@ -18,17 +17,7 @@ class Sonarr {
     const configData = fs.readFileSync(configFile);
     const configParse = JSON.parse(configData);
     this.fullConfig = configParse;
-    this.forced = forced;
-    if (id !== false) {
-      this.config = this.findUuid(id, configParse);
-      if (profileOvr) this.config.profile = profileOvr;
-      if (pathOvr) this.config.path_title = pathOvr;
-
-      if (!this.config) {
-        this.config = {};
-        this.config.title = "Server Removed";
-      }
-    }
+    this.config = false;
   }
 
   findUuid(uuid, config) {
@@ -55,10 +44,16 @@ class Sonarr {
     });
     let url = `${this.config.protocol}://${this.config.hostname}${
       this.config.port ? ":" + this.config.port : ""
-    }${this.config.urlBase}/api/${endpoint}${paramsString}`;
+    }${this.config.urlBase}/api/v3/${endpoint}${paramsString}`;
     try {
       if (method === "post" && body) {
         let res = await axios.post(url, body);
+        return res.data;
+      } else if (method === "delete") {
+        let res = await axios.delete(url);
+        return res.data;
+      } else if (method === "put" && body) {
+        let res = await axios.put(url, body);
         return res.data;
       } else {
         let res = await axios.get(url);
@@ -85,13 +80,17 @@ class Sonarr {
     return this.process("post", endpoint, params, body);
   }
 
+  async put(endpoint, params = false, body = {}) {
+    return this.process("put", endpoint, params, body);
+  }
+
   async connect(test = false) {
     if (!this.config || this.config.title == "Server Removed") {
       return false;
     }
     if (!this.config.active && !test) {
       logger.log(
-        "warn",
+        "verbose",
         `SERVICE - SONARR: [${this.config.title}] Sonarr not enabled`
       );
       return false;
@@ -123,15 +122,18 @@ class Sonarr {
     }
   }
 
-  async getPaths() {
+  async getPaths(serverId) {
+    this.config = this.findUuid(serverId, this.fullConfig);
     return await this.get("rootfolder");
   }
 
-  async getProfiles() {
-    return await this.get("profile");
+  async getProfiles(serverId) {
+    this.config = this.findUuid(serverId, this.fullConfig);
+    return await this.get("qualityprofile");
   }
 
-  async getTags() {
+  async getTags(serverId) {
+    this.config = this.findUuid(serverId, this.fullConfig);
     return await this.get("tag");
   }
 
@@ -141,7 +143,8 @@ class Sonarr {
     });
   }
 
-  async series(id) {
+  async series(server, id) {
+    this.config = this.findUuid(server.id, this.fullConfig);
     const active = await this.connect();
     if (!active) {
       return false;
@@ -153,16 +156,9 @@ class Sonarr {
     }
   }
 
-  async remove(id) {
-    const active = await this.connect();
-    if (!active) {
-      return false;
-    }
-    try {
-      return this.delete(`series/${id}`);
-    } catch {
-      logger.warn("SONARR: Unable to remove job, likely already removed");
-    }
+  serverDetails(server) {
+    this.config = this.findUuid(server.id, this.fullConfig);
+    return this.config;
   }
 
   async queue() {
@@ -173,7 +169,6 @@ class Sonarr {
       if (!active) {
         return false;
       }
-      // await this.refresh();
       queue[this.config.uuid] = await this.get(`queue`);
       let totalRecords = queue[this.config.uuid].totalRecords;
       let pageSize = queue[this.config.uuid].pageSize;
@@ -183,7 +178,7 @@ class Sonarr {
           page: p,
         });
         queue[this.config.uuid].records = [
-          ...queue[i].records,
+          ...queue[this.config.uuid].records,
           ...queuePage.records,
         ];
       }
@@ -192,187 +187,128 @@ class Sonarr {
     return queue;
   }
 
-  async test() {
+  async test(serverId) {
+    this.config = this.findUuid(serverId, this.fullConfig);
     return await this.connect(true);
   }
 
-  async add(
-    seriesData,
-    path = false,
-    profile = false,
-    type = "standard",
-    tag = false
-  ) {
-    seriesData.qualityProfileId = profile ? profile : this.config.profile;
-    seriesData.seasonFolder = true;
-    seriesData.rootFolderPath = `${path ? path : this.config.path_title}`;
-    seriesData.addOptions = {
-      searchForMissingEpisodes: true,
-    };
-    if (type) seriesData.seriesType = type;
-    if (tag) seriesData.tags = [parseInt(tag)];
-
-    try {
-      let add = await this.post("series", false, seriesData);
-      if (!add.id) throw add.message;
-      return add.id;
-    } catch (err) {
-      console.log(err);
-      logger.log({ level: "error", message: err });
-      logger.log(
-        "error",
-        `SERVICE - SONARR: [${this.config.title}] Unable to add series`
-      );
-      logger.log({ level: "error", message: err });
-      return false;
-    }
-  }
-
-  async processJobs(jobQ) {
-    for (let job of jobQ) {
-      if (this.config) {
-        try {
-          let sonarrData = await this.lookup(job.tvdb_id);
-          let sonarrId = false;
-          if (sonarrData[0].id) {
-            logger.log(
-              "warn",
-              `SERVICE - SONARR: [${this.config.title}] Job skipped already found for ${job.title}`
-            );
-            sonarrId = sonarrData[0].id;
-          } else {
-            sonarrId = await this.add(sonarrData[0]);
-            logger.log(
-              "info",
-              `SERVICE - SONARR: [${this.config.title}] Sonnar job added for ${job.title}`
-            );
-          }
-
-          await Request.findOneAndUpdate(
-            {
-              requestId: job.requestId,
-            },
-            { $push: { sonarrId: { [this.config.uuid]: sonarrId } } },
-            { useFindAndModify: false }
-          );
-        } catch (err) {
-          logger.log("info", err);
-          logger.log(
-            "warn",
-            `SERVICE - SONARR: [${this.config.title}] Unable to add series ${job.title}`
-          );
-        }
-      } else {
-        for (let server of this.fullConfig) {
-          if (!server.active) {
-            return;
-          }
-
-          this.config = server;
-          try {
-            let sonarrData = await this.lookup(job.tvdb_id);
-            let sonarrId = false;
-            if (sonarrData[0].id) {
-              logger.log(
-                "warn",
-                `SERVICE - SONARR: [${this.config.title}] Job skipped already found for ${job.title}`
-              );
-              sonarrId = sonarrData[0].id;
-            } else {
-              sonarrId = await this.add(sonarrData[0]);
-              logger.log(
-                "info",
-                `SERVICE - SONARR: [${this.config.title}] Sonnar job added for ${job.title}`
-              );
-            }
-
-            await Request.findOneAndUpdate(
-              {
-                requestId: job.requestId,
-              },
-              { $push: { sonarrId: { [this.config.uuid]: sonarrId } } },
-              { useFindAndModify: false }
-            );
-          } catch (err) {
-            logger.log("info", err);
-            logger.log(
-              "warn",
-              `SERVICE - SONARR: [${this.config.title}] Unable to add series ${job.title}`
-            );
-          }
-        }
-      }
-    }
-  }
-
-  async manualAdd(job, manual) {
-    if (this.config) {
-      try {
-        let sonarrData = await this.lookup(job.tvdb_id);
-        let sonarrId = false;
-        if (sonarrData[0] && sonarrData[0].id) {
-          logger.log(
-            "warn",
-            `SERVICE - SONARR: [${this.config.title}] Job skipped already found for ${job.title}`
-          );
-          sonarrId = sonarrData[0].id;
-        } else {
-          console.log(manual.type);
-          sonarrId = await this.add(
-            sonarrData[0],
-            manual.path,
-            manual.profile,
-            manual.type,
-            manual.tag
-          );
-          logger.log(
-            "info",
-            `SERVICE - SONARR: [${this.config.title}] Sonnar job added for ${job.title}`
-          );
-        }
-        await Request.findOneAndUpdate(
-          {
-            requestId: job.id,
-          },
-          { $push: { sonarrId: { [this.config.uuid]: sonarrId } } },
-          { useFindAndModify: false }
-        );
-      } catch (err) {
-        console.log(err);
-        logger.log({ level: "error", message: err });
-        logger.log(
-          "warn",
-          `SERVICE - SONARR: [${this.config.title}] Unable to add series ${job.title}`
-        );
-      }
-    }
-  }
-
-  async processRequest(id) {
-    logger.log("info", `SERVICE - SONARR: Processing request`);
+  async addShow(server, request, filter = false) {
+    let sonarrId = false;
     if (!this.fullConfig || this.fullConfig.length === 0) {
       logger.log("info", `SERVICE - SONARR: No active servers`);
       return;
     }
-
-    const req = await Request.findOne({ requestId: id });
-    if (req.type === "tv") {
-      if (!req.tvdb_id) {
-        logger.log(
-          "warn",
-          `SERVICE - SONARR: TVDB ID not found for ${req.title}`
-        );
-      } else if (req.sonarrId.length === 0 || this.forced) {
-        if (!req.approved) {
-          logger.log(
-            "warn",
-            `SERVICE - SONARR: Request requires approval - ${req.title}`
-          );
-        } else {
-          logger.log("info", "SERVICE - SONARR: Request passed to queue");
-          this.processJobs([req]);
+    if (!request.tvdb_id) {
+      logger.log(
+        "warn",
+        `SERVICE - SONARR: TVDB ID not found for ${request.title}`
+      );
+      return;
+    }
+    let servers = this.fullConfig;
+    if (server) {
+      servers = [this.findUuid(server.id, this.fullConfig)];
+    }
+    for (let i = 0; i < servers.length; i++) {
+      this.config = servers[i];
+      let lookup = await this.lookup(request.tvdb_id);
+      let showData = lookup[0];
+      let rSeasons = request.seasons;
+      if (rSeasons) {
+        for (let s = 0; s < showData.seasons.length; s++) {
+          let season = showData.seasons[s];
+          season.monitored = rSeasons[season.seasonNumber] ? true : false;
         }
       }
+      showData.qualityProfileId =
+        filter && filter.profile ? filter.profile : this.config.profile;
+      showData.seasonFolder = true;
+      showData.rootFolderPath = `${
+        filter && filter.path ? filter.path : this.config.path_title
+      }`;
+      showData.addOptions = {
+        searchForMissingEpisodes: true,
+      };
+      showData.languageProfileId = 1;
+      if (filter && filter.type) showData.seriesType = filter.type;
+      if (filter && filter.tag) showData.tags = [parseInt(filter.tag)];
+
+      if (showData.id) {
+        sonarrId = showData.id;
+        logger.log(
+          "info",
+          `SERVICE - SONARR: Request exists - Updating ${request.title}`
+        );
+        try {
+          await this.put(`series/${showData.id}`, false, showData);
+          logger.log(
+            "info",
+            `SERVICE - SONARR: [${this.config.title}] Sonnar job updated for ${request.title}`
+          );
+        } catch (err) {
+          console.log(err);
+          logger.log(
+            "error",
+            `SERVICE - SONARR: [${this.config.title}] Unable to update series`
+          );
+          logger.log({ level: "error", message: err });
+          return false;
+        }
+      } else {
+        try {
+          let add = await this.post("series", false, showData);
+          if (!add.id) throw add.message;
+          logger.log(
+            "info",
+            `SERVICE - SONARR: [${this.config.title}] Sonnar job added for ${request.title}`
+          );
+          sonarrId = add.id;
+        } catch (err) {
+          logger.log(
+            "error",
+            `SERVICE - SONARR: [${this.config.title}] Unable to add series`
+          );
+          logger.log({ level: "error", message: err });
+          return false;
+        }
+      }
+      try {
+        let dbRequest = await Request.findOne({
+          requestId: request.id,
+        });
+        let exists = false;
+        for (let o; o < dbRequest.sonarrId.lenght; o++) {
+          if (dbRequest.sonarrId[o][this.config.uuid]) {
+            exists = true;
+            dbRequest.sonarrId[o][this.config.uuid] = sonarrId;
+          }
+        }
+        if (!exists)
+          dbRequest.sonarrId.push({
+            [this.config.uuid]: sonarrId,
+          });
+        await dbRequest.save();
+      } catch (err) {
+        console.log(err.stack);
+        logger.log("error", `SERVICE - SONARR: Can't update request in Db`);
+        logger.log({ level: "error", message: err });
+      }
+    }
+  }
+
+  async remove(serverId, id) {
+    this.config = this.findUuid(serverId, this.fullConfig);
+    const active = await this.connect();
+    if (!active) {
+      return false;
+    }
+    try {
+      return this.delete(`series/${id}`, {
+        deleteFiles: false,
+        addImportListExclusion: false,
+      });
+    } catch {
+      logger.warn("SONARR: Unable to remove job, likely already removed");
     }
   }
 

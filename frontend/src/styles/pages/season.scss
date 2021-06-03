@@ -137,6 +137,34 @@
         object-position: center;
         object-fit: cover;
       }
+
+      &:after {
+        content: "";
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        height: 20px;
+        width: 20px;
+        background: $good;
+        transform: rotate(45deg) translateY(-20px);
+        pointer-events: none;
+        transition: all 0.3s ease;
+
+        @include media-breakpoint-up(lg) {
+          top: -15px;
+          right: -15px;
+          height: 30px;
+          width: 30px;
+        }
+      }
+    }
+    &.on-server {
+      .season-episode--img {
+        &:after {
+          background: $good;
+          transform: rotate(45deg) translateY(0);
+        }
+      }
     }
   }
 }

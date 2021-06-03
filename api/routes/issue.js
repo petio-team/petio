@@ -114,7 +114,7 @@ async function mailIssueResolve(user_id, media_id, type, title, message) {
   new Mailer().mail(
     `Issue closed for the ${typeF} ${title}`,
     `Issue closed for ${typeF}: ${title}`,
-    `The issue you reported has now been closed. ${message}`,
+    `The issue you reported has now been closed. <p style='text-align:center;color:#fff;'> Admin Message: ${message}</p>`,
     `https://image.tmdb.org/t/p/w500${media.poster_path}`,
     [userData.email],
     [userData.title]

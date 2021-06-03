@@ -37,3 +37,7 @@ export const LOGOUT = "LOGOUT";
 export const CREDENTIALS = "CREDENTIALS";
 export const CREDENTIALS_EMAIL = "CREDENTIALS_EMAIL";
 export const UPDATE_QUOTA = "UPDATE_QUOTA";
+
+// Nav
+export const STORE_NAV = "STORE_NAV";
+export const CLEAR_NAV = "CLEAR_NAV";

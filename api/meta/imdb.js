@@ -20,7 +20,14 @@ async function lookup(imdb_id) {
   };
 }
 
-async function storeCache() {
+async function storeCache(firstTime = false) {
+  if (firstTime) {
+    let exists = await Imdb.findOne({});
+    if (exists) {
+      logger.info("IMDB: Cache exists skipping setup");
+      return;
+    }
+  }
   const unzip = zlib.createGunzip();
   let project_folder, tempFile;
   if (process.pkg) {

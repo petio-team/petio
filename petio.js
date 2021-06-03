@@ -6,6 +6,12 @@ const logger = require("./api/util/logger");
 const numCPUs = require("os").cpus().length;
 const cluster = require("cluster");
 
+function delay(t) {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(), t);
+  });
+}
+
 class Wrapper {
   // Start Main Wrapper
   async getBase() {
@@ -34,6 +40,8 @@ class Wrapper {
   }
 
   async init() {
+    logger.log("info", `WRAPPER: Delaying start`);
+    await delay(5000);
     if (cluster.isMaster) {
       logger.log("info", `WRAPPER: Starting Petio wrapper`);
       logger.log("info", `WRAPPER: OS has ${numCPUs} CPU(s)`);
@@ -55,6 +63,7 @@ class Wrapper {
         process.exit(1);
       });
       try {
+        app.get('/health', (_, res) => res.status(200).send('OK'))
         let basePath = await this.getBase();
         logger.log("info", `ROUTER: Base path found - ${basePath}`);
         app.use((req, res, next) => {

@@ -3,6 +3,7 @@ import { withRouter } from "react-router-dom";
 import MovieCard from "../components/MovieCard";
 import TvCard from "../components/TvCard";
 import Api from "../data/Api";
+import Nav from "../data/Nav";
 
 import { ReactComponent as GenreAction } from "../assets/svg/genres/action.svg";
 import { ReactComponent as GenreAdventure } from "../assets/svg/genres/adventure.svg";
@@ -178,10 +179,19 @@ class Genre extends React.Component {
   }
 
   componentDidMount() {
-    this.getResults();
-    setTimeout(() => {
-      this.getResults(2);
-    }, 200);
+    let page = document.querySelectorAll(".page-wrap")[0];
+    let scrollY = 0;
+    let pHist = Nav.getNav(this.props.location.pathname);
+    page.scrollTop = scrollY;
+
+    if (pHist) {
+      this.setState(pHist.state);
+    } else {
+      this.getResults();
+      setTimeout(() => {
+        this.getResults(2);
+      }, 200);
+    }
   }
 
   componentDidUpdate() {
@@ -193,12 +203,47 @@ class Genre extends React.Component {
         .getElementsByClassName("page-wrap")[0]
         .addEventListener("scroll", this.trackScrolling);
     }
+
+    if (this.state.getPos) {
+      this.setState({
+        getPos: false,
+      });
+      this.getPos();
+    }
   }
 
   componentWillUnmount() {
     document
       .getElementsByClassName("page-wrap")[0]
       .removeEventListener("scroll", this.trackScrolling);
+    let page = document.querySelectorAll(".page-wrap")[0];
+    let carouselsData = document.querySelectorAll(".carousel");
+    let carousels = [];
+    carouselsData.forEach((carousel) => {
+      carousels.push(carousel.scrollLeft);
+    });
+    let state = this.state;
+    state.scrollWatch = false;
+    Nav.storeNav(
+      this.props.location.pathname,
+      state,
+      page.scrollTop,
+      carousels
+    );
+  }
+
+  getPos() {
+    let page = document.querySelectorAll(".page-wrap")[0];
+    let scrollY = 0;
+    let pHist = Nav.getNav(this.props.location.pathname);
+    if (pHist) {
+      scrollY = pHist.scroll;
+      document.querySelectorAll(".carousel").forEach((carousel, i) => {
+        carousel.scrollLeft = pHist.carousels[i];
+      });
+    }
+
+    page.scrollTop = scrollY;
   }
 
   isBottom(el) {

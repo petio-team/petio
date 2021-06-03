@@ -500,7 +500,7 @@ class MovieShowOverview extends React.Component {
                           <div className="companies--item" key={`co__${co.id}`}>
                             <Link to={`/company/${co.id}`} title={co.name}>
                               <img
-                                src={`https://image.tmdb.org/t/p/w185${co.logo_path}`}
+                                src={`https://image.tmdb.org/t/p/w185_filter(duotone,ffffff,868c96)${co.logo_path}`}
                               />
                             </Link>
                           </div>
@@ -524,7 +524,7 @@ class MovieShowOverview extends React.Component {
                               title={network.name}
                             >
                               <img
-                                src={`https://image.tmdb.org/t/p/w185${network.logo_path}`}
+                                src={`https://image.tmdb.org/t/p/w185_filter(duotone,ffffff,868c96)${network.logo_path}`}
                               />
                             </Link>
                           </div>

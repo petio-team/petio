@@ -107,6 +107,19 @@
       height: 100%;
       background: $dark-grey;
     }
+
+    .ep-count {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      z-index: 3;
+      background: rgba($dark-grey, 0.8);
+      font-size: 12px;
+      letter-spacing: 1px;
+      font-weight: bold;
+      padding: 4px;
+      border-top-left-radius: 5px;
+    }
   }
 
   .quick-req {
@@ -357,7 +370,7 @@
 
     img {
       opacity: 1;
-      filter: grayscale(1) invert(1);
+      // filter: grayscale(1) invert(1);
       height: 100%;
       width: 100%;
       object-fit: contain;

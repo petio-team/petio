@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import PersonCard from "../components/PersonCard";
 import MovieCard from "../components/MovieCard";
 import Api from "../data/Api";
+import Nav from "../data/Nav";
 import Carousel from "../components/Carousel";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import User from "../data/User";
@@ -24,6 +25,7 @@ class Movie extends React.Component {
       trailer: false,
       reviewOpen: false,
       requestPending: false,
+      pathname: this.props.location.pathname,
     };
 
     this.getMovie = this.getMovie.bind(this);
@@ -34,11 +36,18 @@ class Movie extends React.Component {
     this.openReview = this.openReview.bind(this);
     this.closeReview = this.closeReview.bind(this);
     this.getReviews = this.getReviews.bind(this);
+    this.storePos = this.storePos.bind(this);
+    this.getPos = this.getPos.bind(this);
+  }
+
+  componentWillUnmount() {
+    this.storePos();
   }
 
   componentDidUpdate() {
     this.getRequests();
     if (this.props.match.params.id !== this.state.id) {
+      this.storePos();
       this.setState({
         onServer: false,
         id: this.props.match.params.id,
@@ -48,17 +57,50 @@ class Movie extends React.Component {
       });
       this.init();
     }
+    if (this.state.getPos) {
+      this.setState({
+        getPos: false,
+      });
+      this.getPos();
+    }
+  }
+
+  storePos() {
+    let page = document.querySelectorAll(".page-wrap")[0];
+    let carouselsData = document.querySelectorAll(".carousel");
+    let carousels = [];
+    carouselsData.forEach((carousel) => {
+      carousels.push(carousel.scrollLeft);
+    });
+    Nav.storeNav(`/movie/${this.state.id}`, false, page.scrollTop, carousels);
   }
 
   init() {
-    let page = document.querySelectorAll(".page-wrap")[0];
-    page.scrollTop = 0;
-    window.scrollTo(0, 0);
     let id = this.props.match.params.id;
-
     this.getMovie(id);
     this.getRequests();
     this.getReviews();
+    let pHist = Nav.getNav(this.props.location.pathname);
+    if (pHist) {
+      this.setState({
+        getPos: true,
+      });
+    }
+    this.getPos();
+  }
+
+  getPos() {
+    let page = document.querySelectorAll(".page-wrap")[0];
+    let scrollY = 0;
+    let pHist = Nav.getNav(this.props.location.pathname);
+    if (pHist) {
+      scrollY = pHist.scroll;
+      document.querySelectorAll(".carousel").forEach((carousel, i) => {
+        carousel.scrollLeft = pHist.carousels[i];
+      });
+    }
+
+    page.scrollTop = scrollY;
   }
 
   getRequests() {

@@ -3,6 +3,7 @@ import * as types from "../actionTypes";
 import * as api from "./api";
 import { initAuth } from "../auth";
 import { validatePin, getPins } from "../Plex/api";
+import Nav from "../Nav";
 
 function getCookie(cname) {
   var name = cname + "=";
@@ -69,6 +70,7 @@ export function logout() {
   finalise({
     type: types.LOGOUT,
   });
+  Nav.clearNav();
   initAuth();
 }
 

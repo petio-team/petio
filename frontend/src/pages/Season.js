@@ -42,12 +42,19 @@ class Season extends React.Component {
     }
   }
 
+  componentDidUpdate() {
+    this.getRequests();
+  }
+
   async request() {
     let id = this.props.match.params.id;
     let series = this.props.api.series_lookup[id];
     let requests = this.props.user.requests[id];
     if (requests) {
-      if (requests.users.includes(this.props.user.current.id)) {
+      if (
+        requests.users.includes(this.props.user.current.id) &&
+        requests.seasons[this.state.season]
+      ) {
         this.props.msg({
           message: "Already Requested",
           type: "error",
@@ -62,13 +69,21 @@ class Season extends React.Component {
       imdb_id: series.imdb_id,
       title: series.name,
       type: "tv",
-      thumb: series.poster_path,
+      seasons: {
+        [this.state.season]: true,
+      },
+      thumb:
+        series.seasonData &&
+        series.seasonData[this.state.season] &&
+        series.seasonData[this.state.season].poster_path
+          ? series.seasonData[this.state.season].poster_path
+          : series.poster_path,
     };
 
     try {
       await User.request(request, this.props.user.current);
       this.props.msg({
-        message: `New Request added: ${series.name}`,
+        message: `New Request added: ${series.name} Season ${this.state.season}`,
         type: "good",
       });
       await User.getRequests();
@@ -99,7 +114,12 @@ class Season extends React.Component {
       return;
     }
     let requestUsers = Object.keys(requests[id].users).length;
-    if (this.props.user.requests[id] && requestUsers !== this.state.requested) {
+    if (
+      this.props.user.requests[id] &&
+      this.props.user.requests[id].seasons &&
+      this.props.user.requests[id].seasons[this.state.season] &&
+      requestUsers !== this.state.requested
+    ) {
       this.setState({
         requested: requestUsers,
       });
@@ -125,6 +145,10 @@ class Season extends React.Component {
       return <span className="aired">Has aired on tv</span>;
     }
 
+    if (days === 0) {
+      return <span className="not-aired">airs today</span>;
+    }
+
     return days < 100 ? (
       <span className="not-aired">
         airs in {days} {days > 1 ? "days" : "day"}
@@ -141,12 +165,19 @@ class Season extends React.Component {
     let seasonData = this.props.api.series_lookup[id]
       ? this.props.api.series_lookup[id].seasonData[season]
       : false;
-    if (seriesData)
+    let onServer = false;
+    let seasonNumber = false;
+    if (seriesData) {
+      seasonNumber = seasonData.season_number;
       seriesData.poster_path =
         seasonData && seasonData.poster_path
           ? seasonData.poster_path
           : seriesData.poster_path;
-    console.log(seasonData);
+      onServer =
+        seriesData.server_seasons && seriesData.server_seasons[seasonNumber]
+          ? seriesData.server_seasons[seasonNumber]
+          : false;
+    }
     let now = new Date();
     now.setHours(0, 0, 0, 0);
     if (!seriesData || !seasonData) {
@@ -174,6 +205,7 @@ class Season extends React.Component {
           />
           <MovieShowTop
             mediaData={seriesData}
+            season={seasonNumber}
             trailer={this.state.trailer}
             requested={this.state.requested}
             request={this.request}
@@ -186,7 +218,7 @@ class Season extends React.Component {
                   <div className="media-action">
                     <Link to={`/series/${id}`} className="btn btn__square">
                       <BackIcon />
-                      Back to {seriesData.name}
+                      Back to show
                     </Link>
                   </div>
                 </div>
@@ -195,7 +227,7 @@ class Season extends React.Component {
                     <div className="media--actions__mob">
                       <Link to={`/series/${id}`} className="btn btn__square">
                         <BackIcon />
-                        Back to {seriesData.name}
+                        Back to show
                       </Link>
                     </div>
                     <div className="detail--bar">
@@ -224,13 +256,18 @@ class Season extends React.Component {
                   let airDate = episode.air_date
                     ? Date.parse(episode.air_date)
                     : false;
+                  let epOnServer =
+                    onServer &&
+                    onServer.episodes &&
+                    onServer.episodes[episode.episode_number]
+                      ? onServer.episodes[episode.episode_number]
+                      : false;
                   return (
                     <div
                       key={`ep__s${episode.season_number}e${episode.episode_number}`}
-                      className={
-                        "season-episode " +
-                        (airDate < now ? "aired" : "not-aired")
-                      }
+                      className={`season-episode ${
+                        airDate < now ? "aired" : "not-aired"
+                      } ${epOnServer ? "on-server" : ""}`}
                     >
                       <div className="season-episode--img">
                         <img

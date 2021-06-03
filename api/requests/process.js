@@ -8,6 +8,7 @@ const Radarr = require("../services/radarr");
 const logger = require("../util/logger");
 const filter = require("./filter");
 const Discord = require("../notifications/discord");
+const Telegram = require("../notifications/telegram");
 const { showLookup } = require("../tmdb/show");
 const fs = require("fs");
 const path = require("path");
@@ -22,7 +23,9 @@ class processRequest {
     let quotaPass = await this.checkQuota();
     if (quotaPass) {
       try {
-        let existing = await Request.findOne({ requestId: this.request.id });
+        let existing = await Request.findOne({
+          requestId: this.request.id,
+        });
         if (existing) {
           out = await this.existing();
         } else {
@@ -70,18 +73,27 @@ class processRequest {
       autoApprove = true;
       autoApproveTv = true;
     }
-    await Request.updateOne(
-      { requestId: this.request.id },
-      { $push: { users: this.user.id } }
-    );
+    let requestDb = await Request.findOne({ requestId: this.request.id });
+    if (!requestDb.users.includes(this.user.id)) {
+      requestDb.users.push(this.user.id);
+      requestDb.markModified("users");
+    }
+    if (this.request.type === "tv") {
+      let existingSeasons = requestDb.seasons || {};
+      Object.keys(this.request.seasons).map((key) => {
+        existingSeasons[key] = true;
+      });
+      requestDb.seasons = existingSeasons;
+      this.request.seasons = existingSeasons;
+      requestDb.markModified("seasons");
+    }
+    await requestDb.save();
     if (
       (this.request.type === "movie" && autoApprove) ||
       (this.request.type === "tv" && autoApproveTv)
     ) {
-      await Request.updateOne(
-        { requestId: this.request.id },
-        { $set: { approved: true } }
-      );
+      requestDb.approved = true;
+      await requestDb.save();
       this.sendToDvr(profile);
     }
     return {
@@ -123,6 +135,10 @@ class processRequest {
       approved: autoApprove,
     });
 
+    if (this.request.type === "tv") {
+      newRequest.seasons = this.request.seasons;
+    }
+
     try {
       await newRequest.save();
       if (autoApprove) {
@@ -157,11 +173,14 @@ class processRequest {
         "info",
         "REQ: Pending Request Matched on custom filter, setting default"
       );
-      pending[filterMatch.server] = {
-        path: filterMatch.path,
-        profile: filterMatch.profile,
-        tag: filterMatch.tag,
-      };
+      for (let f = 0; f < filterMatch.length; f++) {
+        let filter = filterMatch[f];
+        pending[filter.server] = {
+          path: filter.path,
+          profile: filter.profile,
+          tag: filter.tag,
+        };
+      }
     } else {
       let project_folder, configFile, configData, configParse;
       if (this.request.type === "movie") {
@@ -238,7 +257,8 @@ class processRequest {
         }
       } else {
         for (let i = 0; i < filterMatch.length; i++) {
-          new Sonarr(filterMatch[i].server).manualAdd(
+          new Sonarr().addShow(
+            { id: filterMatch[i].server },
             this.request,
             filterMatch[i]
           );
@@ -251,7 +271,6 @@ class processRequest {
     if (profile) {
       if (profile.radarr && this.request.type === "movie") {
         Object.keys(profile.radarr).map((r) => {
-          console.log(r, profile.radarr[r]);
           let active = profile.radarr[r];
           if (active) {
             new Radarr(r).processRequest(this.request.id);
@@ -262,15 +281,14 @@ class processRequest {
         Object.keys(profile.sonarr).map((s) => {
           let active = profile.sonarr[s];
           if (active) {
-            new Sonarr(s).processRequest(this.request.id);
+            new Sonarr().addShow({ id: s }, this.request);
           }
         });
       }
     } else {
       // No profile set send to all arrs
       logger.log("info", "REQ: No profile for DVR");
-      if (this.request.type === "tv")
-        new Sonarr().processRequest(this.request.id);
+      if (this.request.type === "tv") new Sonarr().addShow(false, this.request);
       if (this.request.type === "movie")
         new Radarr().processRequest(this.request.id);
     }
@@ -300,9 +318,8 @@ class processRequest {
           let sonarrIds = this.request.sonarrId[i];
           let sId = sonarrIds[Object.keys(sonarrIds)[0]];
           let serverUuid = Object.keys(sonarrIds)[0];
-          let server = new Sonarr(serverUuid);
           try {
-            server.remove(sId);
+            new Sonarr().remove(serverUuid, sId);
             logger.log(
               "info",
               `REQ: ${this.request.title} removed from Sonarr server - ${serverUuid}`
@@ -319,11 +336,13 @@ class processRequest {
     let userData = this.user;
     const requestData = this.request;
     let type = requestData.type === "tv" ? "TV Show" : "Movie";
-    new Discord().send(
-      "New Request",
-      `A new request has been added for the ${type} "${requestData.title}"`,
-      userData.title,
-      `https://image.tmdb.org/t/p/w500${requestData.thumb}`
+    [new Discord(), new Telegram()].forEach((notification) =>
+      notification.send(
+        "New Request",
+        `A new request has been added for the ${type} "${requestData.title}"`,
+        userData.title,
+        `https://image.tmdb.org/t/p/w500${requestData.thumb}`
+      )
     );
   }
 
@@ -336,7 +355,7 @@ class processRequest {
     const requestData = this.request;
     let type = requestData.type === "tv" ? "TV Show" : "Movie";
     new Mailer().mail(
-      `You've just requested the ${type} ${requestData.title}`,
+      `You've just requested a ${type}: ${requestData.title}`,
       `${type}: ${requestData.title}`,
       `Your request has been received and you'll receive an email once it has been added to Plex!`,
       `https://image.tmdb.org/t/p/w500${requestData.thumb}`,

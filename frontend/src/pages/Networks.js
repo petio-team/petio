@@ -2,6 +2,7 @@ import React from "react";
 import { withRouter } from "react-router-dom";
 import TvCard from "../components/TvCard";
 import Api from "../data/Api";
+import Nav from "../data/Nav";
 import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
 
 class Networks extends React.Component {
@@ -23,11 +24,20 @@ class Networks extends React.Component {
   }
 
   componentDidMount() {
-    this.getResults();
-    this.getDetails();
-    setTimeout(() => {
-      this.getResults(2);
-    }, 200);
+    let page = document.querySelectorAll(".page-wrap")[0];
+    let scrollY = 0;
+    let pHist = Nav.getNav(this.props.location.pathname);
+    page.scrollTop = scrollY;
+
+    if (pHist) {
+      this.setState(pHist.state);
+    } else {
+      this.getResults();
+      this.getDetails();
+      setTimeout(() => {
+        this.getResults(2);
+      }, 200);
+    }
   }
 
   componentDidUpdate() {
@@ -39,12 +49,46 @@ class Networks extends React.Component {
         .getElementsByClassName("page-wrap")[0]
         .addEventListener("scroll", this.trackScrolling);
     }
+    if (this.state.getPos) {
+      this.setState({
+        getPos: false,
+      });
+      this.getPos();
+    }
   }
 
   componentWillUnmount() {
     document
       .getElementsByClassName("page-wrap")[0]
       .removeEventListener("scroll", this.trackScrolling);
+    let page = document.querySelectorAll(".page-wrap")[0];
+    let carouselsData = document.querySelectorAll(".carousel");
+    let carousels = [];
+    carouselsData.forEach((carousel) => {
+      carousels.push(carousel.scrollLeft);
+    });
+    let state = this.state;
+    state.scrollWatch = false;
+    Nav.storeNav(
+      this.props.location.pathname,
+      state,
+      page.scrollTop,
+      carousels
+    );
+  }
+
+  getPos() {
+    let page = document.querySelectorAll(".page-wrap")[0];
+    let scrollY = 0;
+    let pHist = Nav.getNav(this.props.location.pathname);
+    if (pHist) {
+      scrollY = pHist.scroll;
+      document.querySelectorAll(".carousel").forEach((carousel, i) => {
+        carousel.scrollLeft = pHist.carousels[i];
+      });
+    }
+
+    page.scrollTop = scrollY;
   }
 
   isBottom(el) {
@@ -91,6 +135,15 @@ class Networks extends React.Component {
     }
   }
 
+  filter(id) {
+    switch (id) {
+      case 214:
+        return "";
+      default:
+        return "_filter(duotone,ffffff,868c96)";
+    }
+  }
+
   render() {
     return (
       <>
@@ -99,7 +152,9 @@ class Networks extends React.Component {
             {this.state.details ? (
               <img
                 title={this.state.details.name}
-                src={`https://image.tmdb.org/t/p/w500${this.state.details.logo_path}`}
+                src={`https://image.tmdb.org/t/p/w500${this.filter(
+                  this.state.details.id
+                )}${this.state.details.logo_path}`}
                 className={`co__${this.state.details.id}`}
               />
             ) : null}

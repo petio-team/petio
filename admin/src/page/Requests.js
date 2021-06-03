@@ -53,7 +53,6 @@ class Requests extends React.Component {
   }
 
   closeModal(id, clear = false) {
-    console.log(clear);
     if (clear) {
       this.setState({
         [`${id}Open`]: false,

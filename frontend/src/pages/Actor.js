@@ -2,6 +2,7 @@ import React from "react";
 import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import Api from "../data/Api";
+import Nav from "../data/Nav";
 import MovieCard from "../components/MovieCard";
 import TvCard from "../components/TvCard";
 import Carousel from "../components/Carousel";
@@ -19,13 +20,59 @@ class Actor extends React.Component {
     this.handleScroll = this.handleScroll.bind(this);
     this.toggleBio = this.toggleBio.bind(this);
   }
+
   componentDidMount() {
     let page = document.querySelectorAll(".page-wrap")[0];
-    page.scrollTop = 0;
-    window.scrollTo(0, 0);
-    let id = this.props.match.params.id;
+    let scrollY = 0;
+    let pHist = Nav.getNav(this.props.location.pathname);
+    page.scrollTop = scrollY;
 
-    this.getActor(id);
+    if (pHist) {
+      this.setState(pHist.state);
+    } else {
+      let id = this.props.match.params.id;
+      this.getActor(id);
+    }
+  }
+
+  componentDidUpdate() {
+    if (this.state.getPos) {
+      this.setState({
+        getPos: false,
+      });
+      this.getPos();
+    }
+  }
+
+  componentWillUnmount() {
+    let page = document.querySelectorAll(".page-wrap")[0];
+    let carouselsData = document.querySelectorAll(".carousel");
+    let carousels = [];
+    carouselsData.forEach((carousel) => {
+      carousels.push(carousel.scrollLeft);
+    });
+    let state = this.state;
+    state.scrollWatch = false;
+    Nav.storeNav(
+      this.props.location.pathname,
+      state,
+      page.scrollTop,
+      carousels
+    );
+  }
+
+  getPos() {
+    let page = document.querySelectorAll(".page-wrap")[0];
+    let scrollY = 0;
+    let pHist = Nav.getNav(this.props.location.pathname);
+    if (pHist) {
+      scrollY = pHist.scroll;
+      document.querySelectorAll(".carousel").forEach((carousel, i) => {
+        carousel.scrollLeft = pHist.carousels[i];
+      });
+    }
+
+    page.scrollTop = scrollY;
   }
 
   getActor(id) {

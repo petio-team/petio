@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const search = require("../tmdb/search");
-
+const MusicMeta = require("../meta/musicBrainz");
 const ExpressCache = require("express-cache-middleware");
 const cacheManager = require("cache-manager");
 
@@ -28,6 +28,10 @@ router.get("/:term", async (req, res) => {
       shows: [],
     });
   }
+});
+
+router.get("/music/:term", async (req, res) => {
+  new MusicMeta().search(req.params.term);
 });
 
 module.exports = router;

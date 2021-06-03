@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import PersonCard from "../components/PersonCard";
 import TvCard from "../components/TvCard";
 import Api from "../data/Api";
+import Nav from "../data/Nav";
 import Carousel from "../components/Carousel";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import User from "../data/User";
@@ -23,41 +24,65 @@ class Series extends React.Component {
       related: false,
       trailer: false,
       reviewOpen: false,
+      pathname: this.props.location.pathname,
     };
 
     this.getSeries = this.getSeries.bind(this);
     this.request = this.request.bind(this);
     this.getRequests = this.getRequests.bind(this);
-    // this.getRelated = this.getRelated.bind(this);
     this.init = this.init.bind(this);
     this.showTrailer = this.showTrailer.bind(this);
     this.openReview = this.openReview.bind(this);
     this.closeReview = this.closeReview.bind(this);
     this.getReviews = this.getReviews.bind(this);
+    this.storePos = this.storePos.bind(this);
+  }
+
+  componentWillUnmount() {
+    this.storePos();
   }
 
   componentDidUpdate() {
     this.getRequests();
     if (this.props.match.params.id !== this.state.id) {
+      this.storePos();
       this.setState({
         onServer: false,
         id: this.props.match.params.id,
         requested: false,
         related: false,
+        pathname: this.props.location.pathname,
       });
       this.init();
     }
   }
 
-  init() {
+  storePos() {
     let page = document.querySelectorAll(".page-wrap")[0];
-    page.scrollTop = 0;
-    window.scrollTo(0, 0);
-    let id = this.props.match.params.id;
+    let carouselsData = document.querySelectorAll(".carousel");
+    let carousels = [];
+    carouselsData.forEach((carousel) => {
+      carousels.push(carousel.scrollLeft);
+    });
+    Nav.storeNav(this.state.pathname, false, page.scrollTop, carousels);
+  }
 
+  init() {
+    let id = this.props.match.params.id;
     this.getSeries(id);
     this.getRequests();
     this.getReviews();
+    let page = document.querySelectorAll(".page-wrap")[0];
+    let scrollY = 0;
+    let pHist = Nav.getNav(this.props.location.pathname);
+    if (pHist) {
+      scrollY = pHist.scroll;
+      document.querySelectorAll(".carousel").forEach((carousel, i) => {
+        carousel.scrollLeft = pHist.carousels[i];
+      });
+    }
+
+    page.scrollTop = scrollY;
   }
 
   componentDidMount() {
@@ -77,10 +102,21 @@ class Series extends React.Component {
       return;
     }
     let requestUsers = Object.keys(requests[id].users).length;
-    if (this.props.user.requests[id] && requestUsers !== this.state.requested) {
-      this.setState({
-        requested: requestUsers,
-      });
+    if (
+      this.props.api.series_lookup[id] &&
+      this.props.user.requests[id] &&
+      requestUsers !== this.state.requested &&
+      this.props.user.requests[id].seasons &&
+      this.props.api.series_lookup[id].seasons
+    ) {
+      if (
+        !this.props.user.requests[id].seasons ||
+        Object.keys(this.props.user.requests[id].seasons).length ===
+          Object.keys(this.props.api.series_lookup[id].seasons).length
+      )
+        this.setState({
+          requested: requestUsers,
+        });
     } else if (!requests[id] && this.state.requested) {
       this.setState({
         requested: false,
@@ -93,7 +129,12 @@ class Series extends React.Component {
     let series = this.props.api.series_lookup[id];
     let requests = this.props.user.requests[id];
     if (requests) {
-      if (requests.users.includes(this.props.user.current.id)) {
+      if (
+        (requests.users.includes(this.props.user.current.id) &&
+          !this.props.user.requests[id].seasons) ||
+        Object.keys(this.props.user.requests[id].seasons).length ===
+          Object.keys(this.props.api.series_lookup[id].seasons).length
+      ) {
         this.props.msg({
           message: "Already Requested",
           type: "error",
@@ -101,6 +142,11 @@ class Series extends React.Component {
         return;
       }
     }
+    let seasons = {};
+    if (series.seasons.length > 0)
+      series.seasons.map((season) => {
+        seasons[season.season_number] = true;
+      });
     let request = {
       id: series.id,
       tmdb_id: series.id,
@@ -109,6 +155,7 @@ class Series extends React.Component {
       title: series.name,
       type: "tv",
       thumb: series.poster_path,
+      seasons: seasons,
     };
 
     try {
@@ -188,6 +235,26 @@ class Series extends React.Component {
     });
   }
 
+  seasonEpisodes(seriesData, seasonNumber) {
+    let onServer =
+      seriesData &&
+      seriesData.server_seasons &&
+      seriesData.server_seasons[seasonNumber]
+        ? seriesData.server_seasons[seasonNumber]
+        : false;
+    return {
+      onServer: onServer ? true : false,
+      seasonNumber: seasonNumber,
+      availableEps: onServer ? Object.keys(onServer.episodes).length : 0,
+      totalEps:
+        seriesData &&
+        seriesData.seasonData &&
+        seriesData.seasonData[seasonNumber]
+          ? Object.keys(seriesData.seasonData[seasonNumber].episodes).length
+          : 0,
+    };
+  }
+
   render() {
     let id = this.state.id;
     let seriesData = this.props.api.series_lookup[id];
@@ -216,7 +283,6 @@ class Series extends React.Component {
     let relatedItems = null;
     if (seriesData.recommendations) {
       relatedItems = seriesData.recommendations.map((key) => {
-        // if (this.props.api.series_lookup[id]) {
         return (
           <TvCard
             key={`related-${key}`}
@@ -224,7 +290,6 @@ class Series extends React.Component {
             series={{ id: key }}
           />
         );
-        // }
       });
       related = (
         <section>
@@ -307,9 +372,24 @@ class Series extends React.Component {
             <h3 className="sub-title mb--1">Seasons</h3>
             <Carousel>
               {seasons.map((season) => {
+                let seasonInfo = this.seasonEpisodes(
+                  seriesData,
+                  season.season_number
+                );
+                let requestedSeason =
+                  this.props.user.requests[id] &&
+                  this.props.user.requests[id].seasons &&
+                  this.props.user.requests[id].seasons[season.season_number]
+                    ? true
+                    : false;
                 return (
                   <div
-                    className="card type--movie-tv img-loaded"
+                    className={`card type--movie-tv img-loaded ${
+                      seasonInfo.onServer ? "on-server" : ""
+                    } ${requestedSeason ? "requested" : ""}`}
+                    data-season_no={season.season_number}
+                    data-total_eps={seasonInfo.totalEps}
+                    data-avail_eps={seasonInfo.availableEps}
                     key={`season--${season.season_number}${id}`}
                   >
                     <div className="card--inner">
@@ -329,6 +409,9 @@ class Series extends React.Component {
                             alt={season.name}
                           />
                         ) : null}
+                        <div className="ep-count">
+                          {seasonInfo.availableEps} / {seasonInfo.totalEps}
+                        </div>
                       </div>
                       <div className="text-wrap">
                         <p className="title">

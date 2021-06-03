@@ -73,6 +73,7 @@ async function showLookup(id, minified = false) {
       delete show.homepage;
       delete show.languages;
       if (!minified) {
+        show.server_seasons = onPlex.seasons;
         let seasons = Object.assign({}, seasonsLookup);
         let seasonData = {};
         let recommendationsData = [];
