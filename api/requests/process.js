@@ -355,7 +355,7 @@ class processRequest {
     const requestData = this.request;
     let type = requestData.type === "tv" ? "TV Show" : "Movie";
     new Mailer().mail(
-      `You've just requested the ${type} ${requestData.title}`,
+      `You've just requested a ${type}: ${requestData.title}`,
       `${type}: ${requestData.title}`,
       `Your request has been received and you'll receive an email once it has been added to Plex!`,
       `https://image.tmdb.org/t/p/w500${requestData.thumb}`,
