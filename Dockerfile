@@ -1,6 +1,6 @@
-FROM --platform=linux/amd64 node:16.3.0-alpine3.13 as builder
+FROM --platform=linux/amd64 node:14.15.1-alpine3.12 as builder
 
-RUN apk add --no-cache git python3
+RUN apk add --no-cache git
 COPY ./ /source/
 RUN mkdir /build && \
     cp /source/petio.js /build/ && \
