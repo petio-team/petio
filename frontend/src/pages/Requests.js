@@ -16,12 +16,14 @@ class Requests extends React.Component {
 
     this.state = {
       requests: false,
+      archive: false,
       loaded: false,
       calendar: false,
     };
 
     this.getRequests = this.getRequests.bind(this);
     this.getCalendar = this.getCalendar.bind(this);
+    this.getArchive = this.getArchive.bind(this);
   }
 
   componentDidMount() {
@@ -30,6 +32,7 @@ class Requests extends React.Component {
     window.scrollTo(0, 0);
     this.getRequests();
     this.getCalendar();
+    this.getArchive();
   }
 
   async getCalendar() {
@@ -54,6 +57,20 @@ class Requests extends React.Component {
     this.setState({
       requests: requests,
       loaded: true,
+    });
+  }
+
+  async getArchive() {
+    let archive;
+    const id = this.props.user.current.id;
+    try {
+      archive = await User.getArchive(id);
+    } catch {
+      archive = {};
+    }
+
+    this.setState({
+      archive: archive,
     });
   }
 
@@ -190,6 +207,10 @@ class Requests extends React.Component {
               views={["month", "agenda"]}
             />
           ) : null}
+        </section>
+        <section className="request-archive">
+          <h3 className="sub-title mb--1">Previous Requests</h3>
+          <p>See your completed / failed requests</p>
         </section>
       </div>
     );

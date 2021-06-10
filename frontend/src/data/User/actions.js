@@ -216,6 +216,15 @@ export function getRequests() {
   });
 }
 
+export async function getArchive(id) {
+  try {
+    const data = await api.getArchive(id);
+    return data;
+  } catch {
+    return false;
+  }
+}
+
 export function getReviews(id) {
   return new Promise((resolve, reject) => {
     api.getReviews(id).then((data) => {
