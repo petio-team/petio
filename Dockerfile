@@ -7,16 +7,16 @@ RUN mkdir /build && \
     cp /source/router.js /build/ && \
     cp /source/package.json /build/ && \
     cd /build && \
-    npm install && \
+    npm install --force && \
     cp -R /source/frontend /build/ && \
     cp -R /source/admin /build/ && \
     cp -R /source/api /build/ && \
     cd /build/frontend && \
     npm install && npm run build && \
     cd /build/admin && \
-    npm install && npm run build && \
+    npm install --force && npm run build && \
     cd /build/api && \
-    npm install && \
+    npm install --force && \
     cd /build && \
     mkdir /build/views && \
     mv /build/frontend/build /build/views/frontend && rm -rf /build/frontend && \
