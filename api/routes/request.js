@@ -8,6 +8,7 @@ const Radarr = require("../services/radarr");
 
 const processRequest = require("../requests/process");
 const { getRequests } = require("../requests/display");
+const { getArchive } = require("../requests/archive");
 const logger = require("../util/logger");
 
 router.post("/add", async (req, res) => {
@@ -171,6 +172,12 @@ router.post("/update", async (req, res) => {
     logger.log({ level: "error", message: err });
     res.status(500).send();
   }
+});
+
+router.get("/archive/:id", async (req, res) => {
+  const id = req.params.id;
+  const archive = await getArchive(id);
+  res.json(archive);
 });
 
 module.exports = router;

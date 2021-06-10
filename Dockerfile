@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 node:14.15.1-alpine3.12 as builder
+FROM --platform=linux/amd64 node:16.3.0-alpine3.12 as builder
 
 RUN apk add --no-cache git
 COPY ./ /source/
@@ -38,6 +38,6 @@ COPY --from=builder /build/ /app/
 
 LABEL org.opencontainers.image.vendor="petio-team"
 LABEL org.opencontainers.image.url="https://github.com/petio-team/petio"
-LABEL org.opencontainers.image.documentation="https://github.com/petio-team/petio-docs/wiki"
+LABEL org.opencontainers.image.documentation="https://github.com/petio-team/petio-docs"
 LABEL org.opencontainers.image.licenses="MIT"
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD [ "wget", "--spider", "http://localhost:7777/health" ]
