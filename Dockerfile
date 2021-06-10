@@ -7,16 +7,16 @@ RUN mkdir /build && \
     cp /source/router.js /build/ && \
     cp /source/package.json /build/ && \
     cd /build && \
-    npm install --force && \
+    npm install --force --legacy-peer-deps && \
     cp -R /source/frontend /build/ && \
     cp -R /source/admin /build/ && \
     cp -R /source/api /build/ && \
     cd /build/frontend && \
-    npm install && npm run build && \
+    npm install --force --legacy-peer-deps && npm run build && \
     cd /build/admin && \
     npm install --force && npm run build && \
     cd /build/api && \
-    npm install --force && \
+    npm install --force --legacy-peer-deps && \
     cd /build && \
     mkdir /build/views && \
     mv /build/frontend/build /build/views/frontend && rm -rf /build/frontend && \
