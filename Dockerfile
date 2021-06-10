@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 node:14.15.1-alpine3.12 as builder
+FROM --platform=linux/amd64 node:16.3.0-alpine3.13 as builder
 
 RUN apk add --no-cache git
 COPY ./ /source/
@@ -7,16 +7,16 @@ RUN mkdir /build && \
     cp /source/router.js /build/ && \
     cp /source/package.json /build/ && \
     cd /build && \
-    npm install --force --legacy-peer-deps && \
+    npm install --legacy-peer-deps && \
     cp -R /source/frontend /build/ && \
     cp -R /source/admin /build/ && \
     cp -R /source/api /build/ && \
     cd /build/frontend && \
-    npm install --force --legacy-peer-deps && npm run build && \
+    npm install --legacy-peer-deps && npm run build && \
     cd /build/admin && \
-    npm install --force && npm run build && \
+    npm install && npm run build && \
     cd /build/api && \
-    npm install --force --legacy-peer-deps && \
+    npm install --legacy-peer-deps && \
     cd /build && \
     mkdir /build/views && \
     mv /build/frontend/build /build/views/frontend && rm -rf /build/frontend && \
