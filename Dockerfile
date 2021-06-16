@@ -25,7 +25,7 @@ RUN mkdir /build && \
     chmod -R u=rwX,go=rX /build
 
 
-FROM alpine:3.13
+FROM alpine:3.14.0
 
 EXPOSE 7777
 VOLUME ["/app/api/config", "/app/logs"]
