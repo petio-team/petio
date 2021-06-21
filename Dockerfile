@@ -17,7 +17,7 @@ RUN npm install && \
     npm run build
 
 WORKDIR /build/admin
-RUN npm install && \
+RUN npm install --legacy-peer-deps && \
     npm run build
 
 WORKDIR /build/api
