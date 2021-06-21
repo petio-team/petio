@@ -21,7 +21,7 @@ RUN npm install --legacy-peer-deps && \
     npm run build
 
 WORKDIR /build/api
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 WORKDIR /build/views
 RUN mv /build/frontend/build /build/views/frontend && \
