@@ -12,6 +12,7 @@ const cluster = require("cluster");
 const trending = require("./tmdb/trending");
 const bcrypt = require("bcryptjs");
 const cookieParser = require("cookie-parser");
+const { getClientIp } = require("./util/request");
 
 // Config
 const getConfig = require("./util/config");
@@ -147,9 +148,7 @@ class Main {
       this.e.get("*", function (req, res) {
         logger.log(
           "warn",
-          `API: Route not found ${req.url} | IP: ${
-            req.headers["x-forwarded-for"] || req.connection.remoteAddress
-          }`
+          `API: Route not found ${req.url} | IP: ${getClientIp(req)}`
         );
         res.status(404).send(`Petio API: route not found - ${req.url}`);
       });

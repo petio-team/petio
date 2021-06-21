@@ -5,6 +5,7 @@ const fs = require("fs");
 const logger = require("./api/util/logger");
 const numCPUs = require("os").cpus().length;
 const cluster = require("cluster");
+const { getClientIp } = require("./api/util/request");
 
 function delay(t) {
   return new Promise((resolve) => {
@@ -63,7 +64,7 @@ class Wrapper {
         process.exit(1);
       });
       try {
-        app.get('/health', (_, res) => res.status(200).send('OK'))
+        app.get("/health", (_, res) => res.status(200).send("OK"));
         let basePath = await this.getBase();
         logger.log("info", `ROUTER: Base path found - ${basePath}`);
         app.use((req, res, next) => {
@@ -74,9 +75,7 @@ class Wrapper {
         app.get("*", function (req, res) {
           logger.log(
             "warn",
-            `ROUTER: Not found - ${req.path} | IP: ${
-              req.headers["x-forwarded-for"] || req.connection.remoteAddress
-            }`
+            `ROUTER: Not found - ${req.path} | IP: ${getClientIp(req)}`
           );
           res.status(404).send(`Petio Router: not found - ${req.path}`);
         });
