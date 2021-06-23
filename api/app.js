@@ -78,15 +78,7 @@ class Main {
 
       if (process.env.TRUSTED_PROXIES) {
         let proxies = process.env.TRUSTED_PROXIES.split(",");
-        this.e.set("trust proxy", (ip) => {
-          proxies.forEach((proxy) => {
-            if (proxy == ip) {
-              return true;
-            }
-
-            return false;
-          });
-        });
+        this.e.set("trust proxy", proxies);
       }
     }
     this.config = getConfig();
