@@ -12,7 +12,6 @@ const cluster = require("cluster");
 const trending = require("./tmdb/trending");
 const bcrypt = require("bcryptjs");
 const cookieParser = require("cookie-parser");
-const { getClientIp } = require("./util/request");
 
 // Config
 const getConfig = require("./util/config");
@@ -76,6 +75,19 @@ class Main {
       this.e.use(express.json());
       this.e.use(express.urlencoded({ extended: true }));
       this.e.use(cookieParser());
+
+      if (process.env.TRUSTED_PROXIES) {
+        let proxies = process.env.TRUSTED_PROXIES.split(",");
+        this.e.set("trust proxy", (ip) => {
+          proxies.forEach((proxy) => {
+            if (proxy == ip) {
+              return true;
+            }
+
+            return false;
+          });
+        });
+      }
     }
     this.config = getConfig();
   }
@@ -146,10 +158,7 @@ class Main {
       this.e.use("/discovery", authRequired, discoveryRoute);
       this.e.use("/hooks", authRequired, notificationsRoute);
       this.e.get("*", function (req, res) {
-        logger.log(
-          "warn",
-          `API: Route not found ${req.url} | IP: ${getClientIp(req)}`
-        );
+        logger.log("warn", `API: Route not found ${req.url} | IP: ${req.ip}`);
         res.status(404).send(`Petio API: route not found - ${req.url}`);
       });
     }
