@@ -44,7 +44,7 @@ COPY --from=builder /build/ /app/
 
 LABEL org.opencontainers.image.vendor="petio-team"
 LABEL org.opencontainers.image.url="https://github.com/petio-team/petio"
-LABEL org.opencontainers.image.documentation="https://github.com/petio-team/petio-docs"
+LABEL org.opencontainers.image.documentation="https://docs.petio.tv/"
 LABEL org.opencontainers.image.licenses="MIT"
 
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD [ "wget", "--spider", "http://localhost:7777/health" ]

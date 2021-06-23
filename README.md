@@ -20,23 +20,23 @@ Allow your users to interact with media both on and off your server with this ap
 <h4>1. Installation</h4>
 This application can be installed to run in docker or as a standalone binary that can be configured to run as a service. See our docs below for guides on different setup methods.
 <ul><li>
-<p><a target="_blank" href="https://github.com/petio-team/petio-docs/blob/master/install-guides/docker.md">Docker installation</a></p>
+<p><a target="_blank" href="https://docs.petio.tv/install-guides/docker">Docker installation</a></p>
   </li></ul>
 
 Binary (executable file) guides
 **note:** this method requires a local mongodb instance to be installed
 <ul>
-<li><a target="_blank" href="https://github.com/petio-team/petio-docs/blob/master/install-guides/windows.md">Windows</a> </li>
-<li><a target="_blank" href="https://github.com/petio-team/petio-docs/tree/master/install-guides/linux">Linux</a> </li>
-  <li><a target="_blank" href="https://github.com/petio-team/petio-docs/blob/master/install-guides/macos.md">MacOS</a></li>
+<li><a target="_blank" href="hhttps://docs.petio.tv/install-guides/windows">Windows</a> </li>
+<li><a target="_blank" href="https://docs.petio.tv/install-guides/linux">Linux</a> </li>
+  <li><a target="_blank" href="https://docs.petio.tv/install-guides/macos">MacOS</a></li>
 </ul>
 
 <h4>2. Configuring Petio</h4>
 Configuring Petio is fairly straight forward but our docs cover the process, from initial server conenction to email / Sonarr / Radarr.
-<p><a target="_blank" href="https://github.com/petio-team/petio-docs/tree/master/configuration">How to configure Petio</a></p>
+<p><a target="_blank" href="https://docs.petio.tv/configuration/first-time-setup">How to configure Petio</a></p>
 
 <h2>Frequently Asked Questions</h2>
-<p>Our FAQs can be found <a href="https://github.com/petio-team/petio-docs/blob/master/faq.md">here</a></p>
+<p>Our FAQs can be found <a href="https://docs.petio.tv/troubleshooting/troubleshooting-faq">here</a></p>
 
 <h2>Credits</h2>
 <h4>Attribution Credits</h4>
