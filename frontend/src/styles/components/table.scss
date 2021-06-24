@@ -16,6 +16,10 @@
     }
   }
 
+  a {
+    color: inherit;
+  }
+
   tr:not(.child):not(.sub) {
     th,
     td {
@@ -131,6 +135,24 @@
   &__rounded {
     overflow: hidden;
     border-radius: 5px;
+  }
+
+  &--row {
+    &--good {
+      color: $green;
+
+      .table-icon svg {
+        fill: $green;
+      }
+    }
+
+    &--bad {
+      color: $bad;
+
+      .table-icon svg {
+        fill: $bad;
+      }
+    }
   }
 }
 

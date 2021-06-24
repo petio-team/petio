@@ -1,4 +1,4 @@
-const Archive = require("../models/request");
+const Archive = require("../models/archive");
 
 async function getArchive(userId) {
   const requests = await Archive.find({ users: userId });
