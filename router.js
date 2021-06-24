@@ -23,6 +23,7 @@ router.use(
     headers: {
       Connection: "keep-alive",
     },
+    xfwd: true,
     logProvider: function (provider) {
       return logger;
     },
