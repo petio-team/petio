@@ -20,6 +20,7 @@ const FriendSchema = mongoose.Schema(
     quotaCount: Number,
     custom_thumb: String,
     lastLogin: Date,
+    petioTimestamp: Date,
   },
   { collection: "friends" }
 );

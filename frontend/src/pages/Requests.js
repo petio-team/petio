@@ -66,6 +66,7 @@ class Requests extends React.Component {
     const id = this.props.user.current.id;
     try {
       archive = await User.getArchive(id);
+      archive.requests = archive.requests.reverse();
     } catch {
       archive = {};
     }
@@ -239,7 +240,7 @@ class Requests extends React.Component {
             </thead>
             <tbody>
               {this.state.archive ? (
-                this.state.archive.requests.reverse().map((req) => {
+                this.state.archive.requests.map((req) => {
                   return (
                     <tr
                       key={req._id}
