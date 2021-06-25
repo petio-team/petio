@@ -123,6 +123,13 @@ function getValue(condition, media) {
       values = [];
       if (media.popularity) values.push(media.popularity);
       break;
+    case "networks":
+      values = [];
+      if (media.networks && Array.isArray(media.networks.results))
+        media.networks.results.map((nw) => {
+          values.push(nw.name);
+        });
+      break;
   }
   return values;
 }
