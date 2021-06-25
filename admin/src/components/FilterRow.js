@@ -30,8 +30,13 @@ class FilterRow extends React.Component {
       language: {
         type: "string",
         value: "language",
-        label: "Language"
-      }
+        label: "Language",
+      },
+      popularity: {
+        type: "number",
+        value: "popularity",
+        label: "Popularity",
+      },
     };
     const operators = {
       equals: {

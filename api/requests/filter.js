@@ -119,6 +119,10 @@ function getValue(condition, media) {
       values = [];
       if (media.original_language) values.push(media.original_language);
       break;
+    case "popularity":
+      values = [];
+      if (media.popularity) values.push(media.popularity);
+      break;
   }
   return values;
 }
