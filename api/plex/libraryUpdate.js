@@ -403,6 +403,13 @@ class LibraryUpdate {
     }
     if (idSource === "plex") {
       try {
+        if (!Array.isArray(movieObj.Guid)) {
+          logger.log(
+            "warn",
+            `LIB CRON: Movie couldn't be matched - ${title} - try rematching in Plex`
+          );
+          return;
+        }
         for (let guid of movieObj.Guid) {
           let source = guid.id.split("://");
           externalIds[source[0] + "_id"] = source[1];
