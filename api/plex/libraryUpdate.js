@@ -673,7 +673,6 @@ class LibraryUpdate {
     showDb.imdb_id = idSource === "imdb" ? externalId : externalIds.imdb_id;
     showDb.tvdb_id = idSource === "tvdb" ? externalId : externalIds.tvdb_id;
     showDb.tmdb_id = idSource === "tmdb" ? externalId : tmdbId;
-    showDb.petioTimestamp = this.timestamp;
     showDb.seasonData = {};
     for (let s in seasons) {
       let season = seasons[s];
