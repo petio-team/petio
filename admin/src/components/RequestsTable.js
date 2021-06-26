@@ -256,7 +256,15 @@ class RequestsTable extends React.Component {
               <Arrow />
             </th>
             <th>Year</th>
-            <th>Type</th>
+            <th
+              className={`sortable ${
+                this.state.sortBy === "type" ? "active" : ""
+              } ${this.state.dir}`}
+              onClick={() => this.sortCol("type")}
+            >
+              Type
+              <Arrow />
+            </th>
             <th
               className={`sortable ${
                 this.state.sortBy === "status" ? "active" : ""
