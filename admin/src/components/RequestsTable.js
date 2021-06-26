@@ -275,7 +275,15 @@ class RequestsTable extends React.Component {
               <Arrow />
             </th>
             <th>Users</th>
-            <th>Approved</th>
+            <th
+              className={`fixed sortable ${
+                this.state.sortBy === "approved" ? "active" : ""
+              } ${this.state.dir}`}
+              onClick={() => this.sortCol("approved")}
+            >
+              Approved
+              <Arrow />
+            </th>
             <th>Actions</th>
           </tr>
         </thead>
