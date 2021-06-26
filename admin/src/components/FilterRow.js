@@ -37,15 +37,15 @@ class FilterRow extends React.Component {
         value: "popularity",
         label: "Popularity",
       },
-      networks: {
+      network: {
         type: "string",
-        value: "networks",
-        label: "Networks",
+        value: "network",
+        label: "Network",
       },
-      companies: {
+      studio: {
         type: "string",
-        value: "companies",
-        label: "Companies",
+        value: "studio",
+        label: "Studio",
       },
       adult: {
         type: "string",
