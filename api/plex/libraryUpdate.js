@@ -942,7 +942,7 @@ class LibraryUpdate {
         { useFindAndModify: false }
       );
     }
-    const deleteShow = await Show.find({
+    const deleteShows = await Show.find({
       petioTimestamp: { $ne: this.timestamp },
     });
     for (let i in deleteShows) {
