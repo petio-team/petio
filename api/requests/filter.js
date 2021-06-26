@@ -140,6 +140,10 @@ function getValue(condition, media) {
           values.push(cp.name);
         });
       break;
+    case "adult":
+      values = [];
+      if (media.adult !== undefined) values.push(media.adult);
+      break;
   }
   return values;
 }
