@@ -42,6 +42,11 @@ class FilterRow extends React.Component {
         value: "networks",
         label: "Networks",
       },
+      companies: {
+        type: "string",
+        value: "companies",
+        label: "Companies",
+      },
     };
     const operators = {
       equals: {

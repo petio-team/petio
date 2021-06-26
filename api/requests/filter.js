@@ -130,6 +130,16 @@ function getValue(condition, media) {
           values.push(nw.name);
         });
       break;
+    case "companies":
+      values = [];
+      if (
+        media.production_companies &&
+        Array.isArray(media.production_companies.results)
+      )
+        media.production_companies.results.map((cp) => {
+          values.push(cp.name);
+        });
+      break;
   }
   return values;
 }
