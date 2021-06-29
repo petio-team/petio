@@ -109,6 +109,15 @@ class Sonarr extends React.Component {
   }
 
   async test(id, add = false) {
+    if (!this.state.base.startsWith("/") && this.state.base.length > 0) {
+      this.setState({
+        base: "/" + this.state.base,
+      });
+      setTimeout(() => {
+        this.test(id, add);
+      }, 1000);
+      return;
+    }
     if (add) {
       await this.saveServer(true);
     }
