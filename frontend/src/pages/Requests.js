@@ -249,7 +249,11 @@ class Requests extends React.Component {
                       }`}
                     >
                       <td>
-                        <Link to={`/${req.type}/${req.tmdb_id}`}>
+                        <Link
+                          to={`/${req.type === "movie" ? "movie" : "series"}/${
+                            req.tmdb_id
+                          }`}
+                        >
                           {req.title}
                         </Link>
                       </td>
