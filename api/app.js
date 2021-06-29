@@ -45,6 +45,7 @@ const logsRoute = require("./routes/log");
 const filterRoute = require("./routes/filter");
 const discoveryRoute = require("./routes/discovery");
 const notificationsRoute = require("./routes/notifications");
+const batchRoute = require("./routes/batch");
 const { authRequired } = require("./middleware/auth");
 
 class Main {
@@ -149,6 +150,7 @@ class Main {
       this.e.use("/filter", authRequired, filterRoute);
       this.e.use("/discovery", authRequired, discoveryRoute);
       this.e.use("/hooks", authRequired, notificationsRoute);
+      this.e.use("/batch", authRequired, batchRoute);
       this.e.get("*", function (req, res) {
         logger.log("warn", `API: Route not found ${req.url} | IP: ${req.ip}`);
         res.status(404).send(`Petio API: route not found - ${req.url}`);

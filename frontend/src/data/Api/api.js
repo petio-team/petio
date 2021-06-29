@@ -67,3 +67,7 @@ export async function discoveryMovies() {
 export async function discoveryShows() {
   return get("/discovery/shows");
 }
+
+export async function batchLookup(ids, type) {
+  return post(`/batch/${type}`, { ids: ids });
+}

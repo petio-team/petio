@@ -104,6 +104,11 @@ router.post("/update", async (req, res) => {
   let servers = req.body.servers;
   let approved = req.body.request.approved;
   let manualStatus = req.body.request.manualStatus;
+  if (manualStatus === "5") {
+    new processRequest(request, false).archive(true, false, false);
+    res.status(200).send();
+    return;
+  }
   try {
     await Request.findOneAndUpdate(
       { requestId: request.requestId },

@@ -15,6 +15,7 @@ import {
   guideCalendar,
   discoveryMovies,
   discoveryShows,
+  batchLookup,
 } from "./actions";
 
 export default {
@@ -34,4 +35,5 @@ export default {
   guideCalendar,
   discoveryMovies,
   discoveryShows,
+  batchLookup,
 };

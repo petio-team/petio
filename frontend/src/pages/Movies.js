@@ -39,6 +39,16 @@ class Movies extends React.Component {
 
     if (pHist) {
       this.setState(pHist.state);
+      // if (pHist.state.personalised) {
+      //   let ids = [];
+      //   pHist.state.personalised.forEach((section) => {
+      //     section.results.forEach((movie) => {
+      //       ids.push(movie.id);
+      //     });
+      //   });
+      //   Api.batchLookup(ids, "movie");
+      //   this.setState(pHist.state);
+      // }
     } else {
       if (!Object.keys(this.props.api.popular).length > 0) {
         Api.getPopular();
