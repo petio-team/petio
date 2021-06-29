@@ -416,12 +416,22 @@ class LibraryUpdate {
           if (source[0] === "tmdb") tmdbId = source[1];
         }
         if (!externalIds["tmdb_id"]) {
+          const type = Object.keys(externalIds)[0].replace("_id", "");
           try {
             tmdbId = await this.externalIdMovie(
-              externalIds[Object.keys(externalIds)[0]]
+              externalIds[Object.keys(externalIds)[0]].replace("/", ""),
+              type
+            );
+            logger.log(
+              "info",
+              `LIB CRON: Got external ID - ${title} - using agent ${type} : ${tmdbId}`
             );
           } catch {
             tmdbId = false;
+            logger.log(
+              "warn",
+              `LIB CRON: Couldn't get external ID - ${title} - using agent ${type}`
+            );
           }
         }
       } catch (e) {
@@ -443,8 +453,16 @@ class LibraryUpdate {
 
       if (idSource !== "tmdb") {
         try {
-          tmdbId = await this.externalIdMovie(externalId);
+          tmdbId = await this.externalIdMovie(externalId, idSource);
+          logger.log(
+            "info",
+            `LIB CRON: Got external ID - ${title} - using agent ${type} : ${tmdbId}`
+          );
         } catch {
+          logger.log(
+            "warn",
+            `LIB CRON: Couldn't get external ID - ${title} - using agent ${type}`
+          );
           tmdbId = false;
         }
       }
