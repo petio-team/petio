@@ -415,8 +415,8 @@ class LibraryUpdate {
           externalIds[source[0] + "_id"] = source[1];
           if (source[0] === "tmdb") tmdbId = source[1];
         }
+        const type = Object.keys(externalIds)[0].replace("_id", "");
         if (!externalIds["tmdb_id"]) {
-          const type = Object.keys(externalIds)[0].replace("_id", "");
           try {
             tmdbId = await this.externalIdMovie(
               externalIds[Object.keys(externalIds)[0]].replace("/", ""),
