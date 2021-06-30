@@ -501,9 +501,7 @@ class LibraryUpdate {
     movieDb.imdb_id = externalIds.hasOwnProperty("imdb_id")
       ? externalIds.imdb_id
       : false;
-    movieDb.tmdb_id = externalIds.hasOwnProperty("tmdb_id")
-      ? externalIds.tmdb_id
-      : false;
+    movieDb.tmdb_id = idSource === "tmdb" ? externalId : tmdbId;
 
     if (this.timestamp) {
       movieDb.petioTimestamp = this.timestamp;
