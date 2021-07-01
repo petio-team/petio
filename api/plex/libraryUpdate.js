@@ -312,6 +312,13 @@ class LibraryUpdate {
       let music = [];
       try {
         let libContent = await this.getLibrary(lib.key);
+        if (!libContent || !libContent.Metadata) {
+          logger.log(
+            "warn",
+            `LIB CRON: No content in library skipping - ${lib.title}`
+          );
+          return;
+        }
         await Promise.map(
           Object.keys(libContent.Metadata),
           async (item) => {
