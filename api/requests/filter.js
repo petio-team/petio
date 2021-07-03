@@ -144,6 +144,10 @@ function getValue(condition, media) {
       values = [];
       if (media.adult !== undefined) values.push(media.adult);
       break;
+    case "status":
+      values = [];
+      if (media.status !== undefined) values.push(media.status);
+      break;
   }
   return values;
 }

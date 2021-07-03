@@ -52,6 +52,11 @@ class FilterRow extends React.Component {
         value: "adult",
         label: "Adult",
       },
+      status: {
+        type: "string",
+        value: "status",
+        label: "Status",
+      },
     };
     const operators = {
       equals: {
