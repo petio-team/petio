@@ -320,6 +320,7 @@ class Sonarr {
         this.config = server;
 
         try {
+          const seriesInfo = await this.get("/series");
           let serverCal = await this.get("/calendar", {
             unmonitored: true,
             start: new Date(
@@ -332,6 +333,13 @@ class Sonarr {
               now.getMonth() + 2,
               1
             ).toISOString(),
+          });
+          serverCal.map((item) => {
+            const seriesId = item.seriesId;
+            const series = seriesInfo[seriesId];
+            if (series) {
+              item.series = { title: series.title };
+            }
           });
           mainCalendar = [...mainCalendar, ...serverCal];
         } catch (err) {

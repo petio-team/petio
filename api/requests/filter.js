@@ -119,6 +119,35 @@ function getValue(condition, media) {
       values = [];
       if (media.original_language) values.push(media.original_language);
       break;
+    case "popularity":
+      values = [];
+      if (media.popularity) values.push(media.popularity);
+      break;
+    case "network":
+      values = [];
+      if (media.networks && Array.isArray(media.networks.results))
+        media.networks.results.map((nw) => {
+          values.push(nw.name);
+        });
+      break;
+    case "studio":
+      values = [];
+      if (
+        media.production_companies &&
+        Array.isArray(media.production_companies.results)
+      )
+        media.production_companies.results.map((cp) => {
+          values.push(cp.name);
+        });
+      break;
+    case "adult":
+      values = [];
+      if (media.adult !== undefined) values.push(media.adult);
+      break;
+    case "status":
+      values = [];
+      if (media.status !== undefined) values.push(media.status);
+      break;
   }
   return values;
 }

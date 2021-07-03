@@ -420,3 +420,32 @@ export async function discoveryShows() {
     throw "Unable to get Discovery Shows";
   }
 }
+
+export async function batchLookup(ids, type) {
+  try {
+    let data = await api.batchLookup(ids, type);
+    if (data) {
+      data.map((item) => {
+        if (type === "movie") {
+          finalise({
+            type: types.MOVIE_LOOKUP,
+            movie: item,
+            id: item.id,
+          });
+        } else {
+          finalise({
+            type: types.SERIES_LOOKUP,
+            series: item,
+            id: item.id,
+          });
+        }
+        return;
+      });
+    } else {
+      throw "No data returned from batch lookup";
+    }
+  } catch (err) {
+    console.log(err);
+    throw "Unable to lookup";
+  }
+}

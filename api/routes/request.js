@@ -8,6 +8,7 @@ const Radarr = require("../services/radarr");
 
 const processRequest = require("../requests/process");
 const { getRequests } = require("../requests/display");
+const { getArchive } = require("../requests/archive");
 const logger = require("../util/logger");
 
 router.post("/add", async (req, res) => {
@@ -103,6 +104,11 @@ router.post("/update", async (req, res) => {
   let servers = req.body.servers;
   let approved = req.body.request.approved;
   let manualStatus = req.body.request.manualStatus;
+  if (manualStatus === "5") {
+    new processRequest(request, false).archive(true, false, false);
+    res.status(200).send();
+    return;
+  }
   try {
     await Request.findOneAndUpdate(
       { requestId: request.requestId },
@@ -171,6 +177,12 @@ router.post("/update", async (req, res) => {
     logger.log({ level: "error", message: err });
     res.status(500).send();
   }
+});
+
+router.get("/archive/:id", async (req, res) => {
+  const id = req.params.id;
+  const archive = await getArchive(id);
+  res.json(archive);
 });
 
 module.exports = router;

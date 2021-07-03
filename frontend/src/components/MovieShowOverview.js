@@ -156,6 +156,12 @@ class MovieShowOverview extends React.Component {
     let userRating = "Not Reviewed";
     let userRatingVal = 0;
 
+    let typeRequest = this.props.mediaData.episode_run_time
+      ? this.props.season
+        ? `season ${this.props.season}`
+        : "show"
+      : "";
+
     let requestBtn = this.props.requestPending ? (
       <button className="btn btn__square pending">
         <Spinner />
@@ -191,7 +197,7 @@ class MovieShowOverview extends React.Component {
     ) : (
       <button className="btn btn__square" onClick={this.props.request}>
         <RequestIcon />
-        Request
+        Request {typeRequest}
       </button>
     );
 
@@ -221,9 +227,8 @@ class MovieShowOverview extends React.Component {
               this.props.user.reviews[this.props.match.params.id][i].user ==
               this.props.user.current.id
             ) {
-              hasReviewed = this.props.user.reviews[this.props.match.params.id][
-                i
-              ];
+              hasReviewed =
+                this.props.user.reviews[this.props.match.params.id][i];
             }
           }
           if (

@@ -133,6 +133,7 @@ class processRequest {
       tmdb_id: this.request.tmdb_id,
       tvdb_id: this.request.tvdb_id,
       approved: autoApprove,
+      timeStamp: new Date(),
     });
 
     if (this.request.type === "tv") {
@@ -399,6 +400,7 @@ class processRequest {
       removed: removed ? true : false,
       removed_reason: reason,
       complete: complete ? true : false,
+      timeStamp: this.request.timeStamp ? this.request.timeStamp : new Date(),
     });
     await archiveRequest.save();
     Request.findOneAndRemove(

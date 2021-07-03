@@ -266,7 +266,7 @@ class Radarr {
           if (!server.active) {
             logger.log(
               "warn",
-              `SERVICE - RADARR: [${this.config.title}] Server not active`
+              `SERVICE - RADARR: [${server.title}] Server not active`
             );
             return;
           }

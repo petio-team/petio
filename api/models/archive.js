@@ -15,6 +15,7 @@ const ArchiveSchema = mongoose.Schema({
   removed: Boolean,
   removed_reason: String,
   complete: Boolean,
+  timeStamp: Date,
 });
 
 module.exports = mongoose.model("Archive", ArchiveSchema);

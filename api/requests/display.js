@@ -281,6 +281,12 @@ function reqState(req, children) {
           message: "Finalising",
           step: 4,
         };
+      case 5:
+        return {
+          status: "good",
+          message: "Complete",
+          step: 5,
+        };
     }
   }
 

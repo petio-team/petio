@@ -63,7 +63,7 @@ class Sonarr extends React.Component {
       hostname: this.state.host,
       apiKey: this.state.apikey,
       port: this.state.port,
-      urlBase: this.state.base,
+      urlBase: this.state.base === "/" ? "" : this.state.base,
       path: this.state.path,
       path_title: this.state.path_title,
       profile: this.state.profile,
@@ -109,6 +109,15 @@ class Sonarr extends React.Component {
   }
 
   async test(id, add = false) {
+    if (!this.state.base.startsWith("/") && this.state.base.length > 0) {
+      this.setState({
+        base: "/" + this.state.base,
+      });
+      setTimeout(() => {
+        this.test(id, add);
+      }, 1000);
+      return;
+    }
     if (add) {
       await this.saveServer(true);
     }
@@ -469,9 +478,8 @@ class Sonarr extends React.Component {
         <section>
           <p className="main-title mb--2">Sonarr</p>
           <p className="description">
-            Sonarr is a PVR. It can monitor
-            multiple RSS feeds for new episodes of your favorite shows and will
-            grab, sort and rename them.
+            Sonarr is a PVR. It can monitor multiple RSS feeds for new episodes
+            of your favorite shows and will grab, sort and rename them.
           </p>
         </section>
         <section>
