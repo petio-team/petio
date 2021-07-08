@@ -530,14 +530,7 @@ class Requests extends React.Component {
               : false
           }
           delete={this.deleteReq}
-          submit={
-            this.state.activeRequest
-              ? this.state.activeRequest.sonarrId.length > 0 ||
-                this.state.activeRequest.radarrId.length > 0
-                ? this.updateReq
-                : false
-              : false
-          }
+          submit={this.updateReq}
         >
           {this.state.activeRequest ? (
             <>
