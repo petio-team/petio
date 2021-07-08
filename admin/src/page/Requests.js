@@ -534,8 +534,8 @@ class Requests extends React.Component {
             this.state.activeRequest
               ? this.state.activeRequest.sonarrId.length > 0 ||
                 this.state.activeRequest.radarrId.length > 0
-                ? false
-                : this.updateReq
+                ? this.updateReq
+                : false
               : false
           }
         >
