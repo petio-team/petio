@@ -597,6 +597,7 @@ class Requests extends React.Component {
                   <option value="">None</option>
                   <option value="3">Processing</option>
                   <option value="4">Finalising</option>
+                  <option value="5">Complete</option>
                 </select>
               </div>
             </>

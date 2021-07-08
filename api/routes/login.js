@@ -17,8 +17,7 @@ const xmlParser = require("xml-js");
 
 router.post("/", async (req, res) => {
   const prefs = getConfig();
-  const request_ip =
-    req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+  const request_ip = req.ip;
   const {
     user: { username, password },
   } = req.body || { user: {} };
@@ -155,8 +154,7 @@ function plexAuth(username, password) {
 }
 
 router.post("/plex_login", async (req, res) => {
-  const request_ip =
-    req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+  const request_ip = req.ip;
   const token = req.body.token;
   try {
     let userId = await plexOauth(token);

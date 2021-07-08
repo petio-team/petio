@@ -24,7 +24,7 @@ class LibraryUpdate {
     this.mailer = [];
     this.tmdb = "https://api.themoviedb.org/3/";
     this.full = true;
-    this.timestamp = new Date().toString();
+    this.timestamp = false;
   }
 
   timeout(ms) {
@@ -122,6 +122,7 @@ class LibraryUpdate {
   }
 
   async scan() {
+    this.timestamp = new Date().toString();
     logger.log("info", `LIB CRON: Running Full`);
     await this.createAdmin();
     await this.updateFriends();
@@ -139,6 +140,7 @@ class LibraryUpdate {
       this.execMail();
       logger.log("info", "LIB CRON: Full Scan Complete");
       this.checkOldRequests();
+      await this.deleteOld();
     } else {
       logger.log("warn", "Couldn't update libraries");
     }
@@ -310,6 +312,13 @@ class LibraryUpdate {
       let music = [];
       try {
         let libContent = await this.getLibrary(lib.key);
+        if (!libContent || !libContent.Metadata) {
+          logger.log(
+            "warn",
+            `LIB CRON: No content in library skipping - ${lib.title}`
+          );
+          return;
+        }
         await Promise.map(
           Object.keys(libContent.Metadata),
           async (item) => {
@@ -397,31 +406,40 @@ class LibraryUpdate {
       movieObj = await this.getMeta(movieObj.ratingKey);
     } catch {
       logger.log("warn", `LIB CRON: Unable to fetch meta for ${title}`);
-      if (movieDb) {
-        movieDb.petioTimestamp = this.timestamp;
-        try {
-          await movieDb.save();
-        } catch (err) {
-          logger.error(`LIB CRON: Failed to save timestamp ${title} to Db`);
-          logger.log({ level: "error", message: err });
-        }
-      }
       return;
     }
     if (idSource === "plex") {
       try {
+        if (!Array.isArray(movieObj.Guid)) {
+          logger.log(
+            "warn",
+            `LIB CRON: Movie couldn't be matched - ${title} - try rematching in Plex`
+          );
+          return;
+        }
         for (let guid of movieObj.Guid) {
           let source = guid.id.split("://");
           externalIds[source[0] + "_id"] = source[1];
           if (source[0] === "tmdb") tmdbId = source[1];
         }
+
         if (!externalIds["tmdb_id"]) {
+          const type = Object.keys(externalIds)[0].replace("_id", "");
           try {
             tmdbId = await this.externalIdMovie(
-              externalIds[Object.keys(externalIds)[0]]
+              externalIds[Object.keys(externalIds)[0]].replace("/", ""),
+              type
+            );
+            logger.log(
+              "info",
+              `LIB CRON: Got external ID - ${title} - using agent ${type} : ${tmdbId}`
             );
           } catch {
             tmdbId = false;
+            logger.log(
+              "warn",
+              `LIB CRON: Couldn't get external ID - ${title} - using agent ${type}`
+            );
           }
         }
       } catch (e) {
@@ -443,8 +461,16 @@ class LibraryUpdate {
 
       if (idSource !== "tmdb") {
         try {
-          tmdbId = await this.externalIdMovie(externalId);
+          tmdbId = await this.externalIdMovie(externalId, idSource);
+          logger.log(
+            "info",
+            `LIB CRON: Got external ID - ${title} - using agent ${idSource} : ${tmdbId}`
+          );
         } catch {
+          logger.log(
+            "warn",
+            `LIB CRON: Couldn't get external ID - ${title} - using agent ${idSource}`
+          );
           tmdbId = false;
         }
       }
@@ -482,9 +508,11 @@ class LibraryUpdate {
     movieDb.imdb_id = externalIds.hasOwnProperty("imdb_id")
       ? externalIds.imdb_id
       : false;
-    movieDb.tmdb_id = externalIds.hasOwnProperty("tmdb_id")
-      ? externalIds.tmdb_id
-      : false;
+    movieDb.tmdb_id = idSource === "tmdb" ? externalId : tmdbId;
+
+    if (this.timestamp) {
+      movieDb.petioTimestamp = this.timestamp;
+    }
 
     try {
       await movieDb.save();
@@ -593,19 +621,17 @@ class LibraryUpdate {
     } catch (e) {
       logger.log({ level: "error", message: e });
       logger.log("warn", `LIB CRON: Unable to fetch meta for ${title}`);
-      if (showDb) {
-        showDb.petioTimestamp = this.timestamp;
-        try {
-          await showDb.save();
-        } catch (err) {
-          logger.error(`LIB CRON: Failed to save timestamp ${title} to Db`);
-          logger.log({ level: "error", message: err });
-        }
-      }
       return;
     }
     if (idSource === "plex") {
       try {
+        if (!Array.isArray(showObj.Guid)) {
+          logger.log(
+            "warn",
+            `LIB CRON: Show couldn't be matched - ${title} - try rematching in Plex`
+          );
+          return;
+        }
         for (let guid of showObj.Guid) {
           let source = guid.id.split("://");
           externalIds[source[0] + "_id"] = source[1];
@@ -678,7 +704,6 @@ class LibraryUpdate {
     showDb.imdb_id = idSource === "imdb" ? externalId : externalIds.imdb_id;
     showDb.tvdb_id = idSource === "tvdb" ? externalId : externalIds.tvdb_id;
     showDb.tmdb_id = idSource === "tmdb" ? externalId : tmdbId;
-    showDb.petioTimestamp = this.timestamp;
     showDb.seasonData = {};
     for (let s in seasons) {
       let season = seasons[s];
@@ -687,6 +712,9 @@ class LibraryUpdate {
         title: season.title,
         episodes: season.episodes,
       };
+    }
+    if (this.timestamp) {
+      showDb.petioTimestamp = this.timestamp;
     }
     try {
       await showDb.save();
@@ -927,6 +955,35 @@ class LibraryUpdate {
           titles
         );
       }
+    }
+  }
+
+  async deleteOld() {
+    const deleteMovies = await Movie.find({
+      petioTimestamp: { $ne: this.timestamp },
+    });
+    for (let i in deleteMovies) {
+      let deleteMovie = deleteMovies[i];
+      logger.warn(
+        `LIB CRON: Deleting Movie - ${deleteMovie.title} - no longer found in Plex`
+      );
+      await Movie.findOneAndRemove(
+        { _id: deleteMovie._id },
+        { useFindAndModify: false }
+      );
+    }
+    const deleteShows = await Show.find({
+      petioTimestamp: { $ne: this.timestamp },
+    });
+    for (let i in deleteShows) {
+      let deleteShow = deleteShows[i];
+      logger.warn(
+        `LIB CRON: Deleting TV Show - ${deleteShow.title} - no longer found in Plex`
+      );
+      await Show.findOneAndRemove(
+        { _id: deleteShow._id },
+        { useFindAndModify: false }
+      );
     }
   }
 }

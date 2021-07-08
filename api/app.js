@@ -45,6 +45,7 @@ const logsRoute = require("./routes/log");
 const filterRoute = require("./routes/filter");
 const discoveryRoute = require("./routes/discovery");
 const notificationsRoute = require("./routes/notifications");
+const batchRoute = require("./routes/batch");
 const { authRequired } = require("./middleware/auth");
 
 class Main {
@@ -75,6 +76,11 @@ class Main {
       this.e.use(express.json());
       this.e.use(express.urlencoded({ extended: true }));
       this.e.use(cookieParser());
+
+      if (process.env.TRUSTED_PROXIES) {
+        let proxies = process.env.TRUSTED_PROXIES.split(",");
+        this.e.set("trust proxy", proxies);
+      }
     }
     this.config = getConfig();
   }
@@ -144,13 +150,9 @@ class Main {
       this.e.use("/filter", authRequired, filterRoute);
       this.e.use("/discovery", authRequired, discoveryRoute);
       this.e.use("/hooks", authRequired, notificationsRoute);
+      this.e.use("/batch", authRequired, batchRoute);
       this.e.get("*", function (req, res) {
-        logger.log(
-          "warn",
-          `API: Route not found ${req.url} | IP: ${
-            req.headers["x-forwarded-for"] || req.connection.remoteAddress
-          }`
-        );
+        logger.log("warn", `API: Route not found ${req.url} | IP: ${req.ip}`);
         res.status(404).send(`Petio API: route not found - ${req.url}`);
       });
     }

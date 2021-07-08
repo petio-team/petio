@@ -1,5 +1,5 @@
 import React from "react";
-import { withRouter } from "react-router-dom";
+import { withRouter, Link } from "react-router-dom";
 import { connect } from "react-redux";
 import Api from "../data/Api";
 import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
@@ -16,12 +16,15 @@ class Requests extends React.Component {
 
     this.state = {
       requests: false,
+      archive: false,
       loaded: false,
       calendar: false,
     };
 
     this.getRequests = this.getRequests.bind(this);
     this.getCalendar = this.getCalendar.bind(this);
+    this.getArchive = this.getArchive.bind(this);
+    this.typeIcon = this.typeIcon.bind(this);
   }
 
   componentDidMount() {
@@ -30,6 +33,7 @@ class Requests extends React.Component {
     window.scrollTo(0, 0);
     this.getRequests();
     this.getCalendar();
+    this.getArchive();
   }
 
   async getCalendar() {
@@ -57,10 +61,41 @@ class Requests extends React.Component {
     });
   }
 
+  async getArchive() {
+    let archive;
+    const id = this.props.user.current.id;
+    try {
+      archive = await User.getArchive(id);
+      archive.requests = archive.requests.reverse();
+    } catch {
+      archive = {};
+    }
+
+    this.setState({
+      archive: archive,
+    });
+  }
+
   isToday(someDate) {
     someDate = someDate.setHours(0, 0, 0, 0);
     const today = new Date().setHours(0, 0, 0, 0);
     return someDate === today;
+  }
+
+  typeIcon(type) {
+    let icon = null;
+    switch (type) {
+      case "movie":
+        icon = <MovieIcon />;
+        break;
+      case "tv":
+        icon = <TvIcon />;
+        break;
+      default:
+        icon = null;
+    }
+
+    return <span className="table-icon">{icon}</span>;
   }
 
   render() {
@@ -190,6 +225,57 @@ class Requests extends React.Component {
               views={["month", "agenda"]}
             />
           ) : null}
+        </section>
+        <section className="request-archive">
+          <h3 className="sub-title mb--1">Previous Requests</h3>
+          <p>See your completed / failed requests</p>
+          <table className="generic-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Approved</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {this.state.archive ? (
+                this.state.archive.requests.map((req) => {
+                  return (
+                    <tr
+                      key={req._id}
+                      className={`generic-table--row--${
+                        req.removed ? "bad" : req.complete ? "good" : "normal"
+                      }`}
+                    >
+                      <td>
+                        <Link
+                          to={`/${req.type === "movie" ? "movie" : "series"}/${
+                            req.tmdb_id
+                          }`}
+                        >
+                          {req.title}
+                        </Link>
+                      </td>
+                      <td>{this.typeIcon(req.type)}</td>
+                      <td>{req.approved ? "Yes" : "No"}</td>
+                      <td>
+                        {req.removed
+                          ? "Removed"
+                          : req.complete
+                          ? "Completed"
+                          : "other"}
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan="4">Empty</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </section>
       </div>
     );

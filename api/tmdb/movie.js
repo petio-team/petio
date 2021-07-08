@@ -20,7 +20,10 @@ const memoryCache = cacheManager.caching({
 });
 
 async function movieLookup(id, minified = false) {
-  logger.log("verbose", `TMDB Person Lookup ${id}`);
+  logger.log("verbose", `TMDB Movie Lookup ${id}`);
+  if (!id || id == "false") {
+    return "No ID";
+  }
   let fanart = minified ? false : await fanartLookup(id, "movies");
   let movie = false;
   try {
@@ -46,21 +49,16 @@ async function movieLookup(id, minified = false) {
     }
     try {
       let collectionData = false;
-      let [
-        onPlex,
-        recommendations,
-        imdb_data,
-        collection,
-        reviews,
-      ] = await Promise.all([
-        onServer("movie", movie.imdb_id, false, id),
-        getRecommendations(id),
-        !minified && movie.imdb_id ? imdb(movie.imdb_id) : false,
-        !minified && movie.belongs_to_collection
-          ? getCollection(movie.belongs_to_collection.id)
-          : false,
-        !minified ? getReviews(id) : false,
-      ]);
+      let [onPlex, recommendations, imdb_data, collection, reviews] =
+        await Promise.all([
+          onServer("movie", movie.imdb_id, false, id),
+          getRecommendations(id),
+          !minified && movie.imdb_id ? imdb(movie.imdb_id) : false,
+          !minified && movie.belongs_to_collection
+            ? getCollection(movie.belongs_to_collection.id)
+            : false,
+          !minified ? getReviews(id) : false,
+        ]);
 
       let recommendationsData = [];
       movie.on_server = onPlex.exists;

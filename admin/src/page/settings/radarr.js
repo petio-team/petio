@@ -63,7 +63,7 @@ class Radarr extends React.Component {
       hostname: this.state.host,
       apiKey: this.state.apikey,
       port: this.state.port,
-      urlBase: this.state.base,
+      urlBase: this.state.base === "/" ? "" : this.state.base,
       path: this.state.path,
       path_title: this.state.path_title,
       profile: this.state.profile,
@@ -108,6 +108,15 @@ class Radarr extends React.Component {
   }
 
   async test(id, add = false) {
+    if (!this.state.base.startsWith("/") && this.state.base.length > 0) {
+      this.setState({
+        base: "/" + this.state.base,
+      });
+      setTimeout(() => {
+        this.test(id, add);
+      }, 1000);
+      return;
+    }
     if (add) {
       await this.saveServer(true);
     }
@@ -470,7 +479,8 @@ class Radarr extends React.Component {
         <section>
           <p className="main-title mb--2">Radarr</p>
           <p className="description">
-            Radarr is a DVR. It can monitor multiple RSS feeds for new movies and will grab, sort, and rename them.
+            Radarr is a DVR. It can monitor multiple RSS feeds for new movies
+            and will grab, sort, and rename them.
           </p>
         </section>
         <section>

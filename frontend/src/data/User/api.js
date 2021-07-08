@@ -30,6 +30,10 @@ export async function getRequests() {
   return get("/request/min");
 }
 
+export async function getArchive(id) {
+  return get(`/request/archive/${id}`);
+}
+
 export async function getReviews(id) {
   if (!id) return Promise.resolve();
   return get(`/review/all/${id}`);

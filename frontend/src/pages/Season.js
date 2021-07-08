@@ -8,6 +8,9 @@ import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
 import User from "../data/User";
 import Review from "../components/Review";
 import { ReactComponent as BackIcon } from "../assets/svg/back.svg";
+import { ReactComponent as CheckIcon } from "../assets/svg/check.svg";
+import { ReactComponent as RequestIcon } from "../assets/svg/request.svg";
+import { isIOS } from "react-device-detect";
 
 class Season extends React.Component {
   constructor(props) {
@@ -189,6 +192,44 @@ class Season extends React.Component {
         </div>
       );
     } else {
+      let requestBtn = this.props.requestPending ? (
+        <button className="btn btn__square pending">
+          <Spinner />
+          Request
+        </button>
+      ) : onServer ? (
+        isIOS ? (
+          <a
+            href={`plex://preplay/?metadataKey=%2Flibrary%2Fmetadata%2F${seriesData.on_server.ratingKey}&metadataType=1&server=${seriesData.on_server.serverKey}`}
+            target="_blank"
+            rel="noreferrer"
+            className="btn btn__square good"
+          >
+            <CheckIcon />
+            Watch now
+          </a>
+        ) : (
+          <a
+            href={`https://app.plex.tv/desktop#!/server/${seriesData.on_server.serverKey}/details?key=%2Flibrary%2Fmetadata%2F${seriesData.on_server.ratingKey}`}
+            target="_blank"
+            rel="noreferrer"
+            className="btn btn__square good"
+          >
+            <CheckIcon />
+            Watch now
+          </a>
+        )
+      ) : this.state.requested ? (
+        <button className="btn btn__square blue" onClick={this.props.request}>
+          {`Requested by ${this.state.requested}
+				${this.state.requested > 1 ? "users" : "user"}`}
+        </button>
+      ) : (
+        <button className="btn btn__square" onClick={this.request}>
+          <RequestIcon />
+          Request season {seasonNumber}
+        </button>
+      );
       return (
         <div
           className="media-wrap"
@@ -229,6 +270,7 @@ class Season extends React.Component {
                         <BackIcon />
                         Back to show
                       </Link>
+                      {requestBtn}
                     </div>
                     <div className="detail--bar">
                       <p>

@@ -5,7 +5,7 @@ import { ReactComponent as CheckIcon } from "../assets/svg/check.svg";
 import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
 import { ReactComponent as CloseIcon } from "../assets/svg/close.svg";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import ReactPlayer from "react-player";
+import ReactPlayer from "react-player/youtube";
 
 class MovieShowTop extends React.Component {
   constructor(props) {
