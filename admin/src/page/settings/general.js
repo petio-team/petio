@@ -48,18 +48,8 @@ class General extends React.Component {
     super(props);
 
     this.state = {
-      email_user: "",
-      email_pass: "",
-      email_server: "",
-      email_port: "",
-      email_secure: false,
-      email_enabled: false,
       base_path: "",
       login_type: false,
-      discord_webhook: false,
-      telegram_bot_token: "",
-      telegram_chat_id: "",
-      telegram_send_silently: false,
       plexPopular: false,
       token: false,
     };
