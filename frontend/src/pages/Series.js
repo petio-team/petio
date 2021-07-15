@@ -145,7 +145,11 @@ class Series extends React.Component {
     let seasons = {};
     if (series.seasons.length > 0)
       series.seasons.map((season) => {
-        seasons[season.season_number] = true;
+        if (season.season_number == 0) {
+          seasons[season.season_number] = false;
+        } else {
+          seasons[season.season_number] = true;
+        }
       });
     let request = {
       id: series.id,
