@@ -470,6 +470,8 @@ function genreID(genreName, type) {
       case "Thriller":
       case "Suspense":
         return 9648;
+      case "Romance":
+        return 10749;
       case "News":
         return 10763;
       case "Reality":
