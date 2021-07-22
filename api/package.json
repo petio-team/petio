@@ -36,12 +36,20 @@
     "sanitize-filename": "^1.6.3",
     "saslprep": "^1.0.3",
     "winston": "^3.3.3",
+    "xdg-app-paths": "^7.3.0",
     "xhr-request": "^1.1.0",
     "xml-js": "^1.6.11",
-    "zlib": "^1.0.5"
+    "yaml": "^1.10.2",
+    "yarn": "^1.22.10",
+    "zlib": "^1.0.5",
+    "zod": "^3.5.1"
   },
   "devDependencies": {
-    "dotenv": "^8.2.0"
+    "@types/jest": "^26.0.24",
+    "dotenv": "^8.2.0",
+    "jest": "^27.0.6",
+    "ts-jest": "^27.0.3",
+    "typescript": "^4.3.5"
   },
   "bin": "app.js",
   "targets": [
