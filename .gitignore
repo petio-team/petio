@@ -8,7 +8,7 @@ api/config.json
 api/.DS_Store
 frontend/build
 admin/build
-api/config/
+api/config/*.json
 api/config-backup/
 api/logs/
 bin/
