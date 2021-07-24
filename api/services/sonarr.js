@@ -47,6 +47,9 @@ class Sonarr {
     try {
       if (method === "post" && body) {
         let res = await axios.post(url, body);
+        if (typeof res.data !== 'object') {
+          reject("not a valid object");
+        }
         return res.data;
       } else if (method === "delete") {
         let res = await axios.delete(url);
@@ -56,6 +59,9 @@ class Sonarr {
         return res.data;
       } else {
         let res = await axios.get(url);
+        if (typeof res.data !== 'object') {
+          reject("not a valid object");
+        }
         return res.data;
       }
     } catch (err) {
