@@ -24,7 +24,7 @@ class Radarr extends React.Component {
       protocol: "http",
       host: "localhost",
       port: "",
-      profile: "",
+      profile: false,
       profile_title: "",
       path: "",
       path_title: "",
@@ -92,7 +92,6 @@ class Radarr extends React.Component {
 
     servers.splice(this.state.activeServer, 1);
 
-    console.log(servers);
     // return;
     await Api.saveRadarrConfig(servers);
     this.getRadarr(true);
@@ -314,6 +313,7 @@ class Radarr extends React.Component {
         </>
       );
     }
+
     return (
       <>
         <Modal
@@ -324,18 +324,18 @@ class Radarr extends React.Component {
             this.state.needsTest
               ? false
               : () => {
-                  this.saveServer();
-                  this.closeModal("addServer");
-                }
+                this.saveServer();
+                this.closeModal("addServer");
+              }
           }
           close={() => this.closeModal("addServer")}
           delete={
             this.state.newServer
               ? false
               : () => {
-                  this.deleteServer();
-                  this.closeModal("addServer");
-                }
+                this.deleteServer();
+                this.closeModal("addServer");
+              }
           }
         >
           <label>Title</label>
@@ -398,9 +398,8 @@ class Radarr extends React.Component {
           </button>
           <label>Profile</label>
           <div
-            className={`styled-input--select ${
-              this.state.profiles ? "" : "disabled"
-            }`}
+            className={`styled-input--select ${this.state.profiles ? "" : "disabled"
+              }`}
           >
             <select
               name="profile"
@@ -408,8 +407,8 @@ class Radarr extends React.Component {
               onChange={this.inputChange}
             >
               {this.state.profiles &&
-              !this.state.newServer &&
-              !this.state.needsTest ? (
+                !this.state.newServer &&
+                !this.state.needsTest ? (
                 <>
                   <option value="">Choose an option</option>
                   {this.state.profiles.map((item) => {
@@ -431,9 +430,8 @@ class Radarr extends React.Component {
           </div>
           <label>Path</label>
           <div
-            className={`styled-input--select ${
-              this.state.profiles ? "" : "disabled"
-            }`}
+            className={`styled-input--select ${this.state.profiles ? "" : "disabled"
+              }`}
           >
             <select
               name="path"
@@ -461,9 +459,9 @@ class Radarr extends React.Component {
             </select>
           </div>
           {!this.state.newServer &&
-          this.state.path &&
-          this.state.profile &&
-          !this.state.needsTest ? (
+            this.state.path &&
+            this.state.profile &&
+            !this.state.needsTest ? (
             <div className="checkbox-wrap mb--2">
               <input
                 type="checkbox"
