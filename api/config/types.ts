@@ -46,7 +46,7 @@ export const ConfigSchema = z.object({
       discord: z
         .object({
           webhook: z.string().optional(),
-          enabled: z.boolean().optional(),
+          enabled: z.boolean().optional().default(true),
         })
         .optional(),
       telegram: z
@@ -54,7 +54,7 @@ export const ConfigSchema = z.object({
           token: z.string().optional(),
           chatId: z.string().optional(),
           silent: z.boolean().optional(),
-          enabled: z.boolean().optional(),
+          enabled: z.boolean().optional().default(true),
         })
         .optional(),
       email: z
@@ -62,7 +62,6 @@ export const ConfigSchema = z.object({
           address: z.string().optional(),
           username: z.string().optional(),
           password: z.string().optional(),
-          smtp: z.string().optional(),
           port: z.number().optional(),
           secure: z.boolean().optional(),
           enabled: z.boolean().optional(),

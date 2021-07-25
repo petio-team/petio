@@ -102,6 +102,7 @@ export const UpgradeLegacyConfigs = (configs: T.LegacyConfigs): T.Config => {
       return {};
     }
     const lc: T.LegacyConfig = configs.config;
+    mainConfig.general = { basePath: lc.base_path };
     mainConfig.discovery = { popular: lc.plexPopular };
     mainConfig.thirdpartyapis = { tmdb: lc.tmdbApi, fanart: lc.fanartApi };
     mainConfig.plex = {
@@ -112,11 +113,15 @@ export const UpgradeLegacyConfigs = (configs: T.LegacyConfigs): T.Config => {
       protocol: lc.plexProtocol,
     };
     mainConfig.admin = {
+      id: lc.adminId?.length ? parseInt(lc.adminId) : 0,
       username: lc.adminUsername,
       password: lc.adminPass,
       email: lc.adminEmail,
       displayName: lc.adminDisplayName,
       thumbnail: lc.adminThumb,
+    };
+    mainConfig.db = {
+      url: lc.DB_URL,
     };
     mainConfig.notifications = {
       discord: {
@@ -136,19 +141,18 @@ export const UpgradeLegacyConfigs = (configs: T.LegacyConfigs): T.Config => {
 
   const lEmail = (): T.Config => {
     const emailConfig: T.Config = {};
-    if (configs.config === undefined) {
+    if (configs.email === undefined) {
       return {};
     }
-    const lec: T.LegacyEmailConfig = T.LegacyEmailConfigSchema.parse(
-      configs.email
-    );
+    const lec: T.LegacyEmailConfig = configs.email;
     emailConfig.notifications = {
       email: {
+        address: lec.emailServer,
         username: lec.emailUser,
         password: lec.emailPass,
-        smtp: lec.emailServer,
         port: lec.emailPort?.length ? parseInt(lec.emailPort) : 25,
         secure: lec.emailSecure,
+        enabled: lec.emailEnabled,
       },
     };
 
@@ -157,27 +161,25 @@ export const UpgradeLegacyConfigs = (configs: T.LegacyConfigs): T.Config => {
 
   const lSonarr = (): T.Config => {
     const sonarrConfig: T.Config = {};
-    if (configs.config === undefined) {
+    if (configs.sonarr === undefined) {
       return {};
     }
-    const lsc: T.LegacyArrConfig = T.LegacyArrConfigSchema.parse(
-      configs.sonarr
-    );
+    const lsc: T.LegacyArrConfig[] = configs.sonarr;
     sonarrConfig.instances = [
       {
         type: "sonarr",
-        protocol: lsc.protocol === "https" ? "https" : "http",
-        title: lsc.title,
-        hostname: lsc.hostname,
-        port: lsc.port?.length ? parseInt(lsc.port) : 8787,
-        apiKey: lsc.apiKey,
-        baseUrl: lsc.urlBase,
-        pathId: lsc.path?.length ? parseInt(lsc.path) : 0,
-        path: lsc.path_title,
-        profileId: lsc.profile?.length ? parseInt(lsc.profile) : 0,
-        profile: lsc.profile_title,
-        uuid: lsc.uuid,
-        active: lsc.active,
+        protocol: lsc[0].protocol === "https" ? "https" : "http",
+        title: lsc[0].title,
+        hostname: lsc[0].hostname,
+        port: lsc[0].port?.length ? parseInt(lsc[0].port) : 8787,
+        apiKey: lsc[0].apiKey,
+        baseUrl: lsc[0].urlBase,
+        pathId: lsc[0].path?.length ? parseInt(lsc[0].path) : 0,
+        path: lsc[0].path_title,
+        profileId: lsc[0].profile?.length ? parseInt(lsc[0].profile) : 0,
+        profile: lsc[0].profile_title,
+        uuid: lsc[0].uuid,
+        active: lsc[0].active,
       },
     ];
 
@@ -186,32 +188,34 @@ export const UpgradeLegacyConfigs = (configs: T.LegacyConfigs): T.Config => {
 
   const lRadarr = (): T.Config => {
     const radarrConfig: T.Config = {};
-    if (configs.config === undefined) {
+    if (configs.radarr === undefined) {
       return {};
     }
-    const lsc: T.LegacyArrConfig = T.LegacyArrConfigSchema.parse(
-      configs.radarr
-    );
+    const lsc: T.LegacyArrConfig[] = configs.radarr;
     radarrConfig.instances = [
       {
         type: "radarr",
-        protocol: lsc.protocol === "https" ? "https" : "http",
-        title: lsc.title,
-        hostname: lsc.hostname,
-        port: lsc.port?.length ? parseInt(lsc.port) : 8787,
-        apiKey: lsc.apiKey,
-        baseUrl: lsc.urlBase,
-        pathId: lsc.path?.length ? parseInt(lsc.path) : 0,
-        path: lsc.path_title,
-        profileId: lsc.profile?.length ? parseInt(lsc.profile) : 0,
-        profile: lsc.profile_title,
-        uuid: lsc.uuid,
-        active: lsc.active,
+        protocol: lsc[0].protocol === "https" ? "https" : "http",
+        title: lsc[0].title,
+        hostname: lsc[0].hostname,
+        port: lsc[0].port?.length ? parseInt(lsc[0].port) : 8787,
+        apiKey: lsc[0].apiKey,
+        baseUrl: lsc[0].urlBase,
+        pathId: lsc[0].path?.length ? parseInt(lsc[0].path) : 0,
+        path: lsc[0].path_title,
+        profileId: lsc[0].profile?.length ? parseInt(lsc[0].profile) : 0,
+        profile: lsc[0].profile_title,
+        uuid: lsc[0].uuid,
+        active: lsc[0].active,
       },
     ];
 
     return radarrConfig;
   };
 
-  return { ...lConfig(), ...lEmail(), ...lSonarr(), ...lRadarr() };
+  return {
+    ...lConfig(),
+    notifications: { ...lConfig().notifications, ...lEmail().notifications },
+    instances: [...(lSonarr().instances ?? []), ...(lRadarr().instances ?? [])],
+  };
 };
