@@ -1,0 +1,16 @@
+[
+    {
+        "active": true,
+        "title": "4K",
+        "protocol": "https",
+        "hostname": "radarr.domain.co.uk",
+        "apiKey": "9dcd45a7406141b78978406d8ccc9ca6",
+        "port": "443",
+        "urlBase": "/base_path",
+        "path": "3",
+        "path_title": "/mnt/unionfs/movies-4k",
+        "profile": "7",
+        "profile_title": "4K",
+        "uuid": "08108733-3b30-46cd-af4c-111af03d7f4e"
+    }
+]

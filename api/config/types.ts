@@ -143,11 +143,9 @@ export const LegacyArrConfigSchema = z.object({
 export type LegacyArrConfig = z.infer<typeof LegacyArrConfigSchema>;
 
 export const LegacyConfigsSchema = z.object({
-  sonarr: LegacyArrConfigSchema.optional(),
-  radarr: LegacyArrConfigSchema.optional(),
+  sonarr: z.array(LegacyArrConfigSchema).optional(),
+  radarr: z.array(LegacyArrConfigSchema).optional(),
   email: LegacyEmailConfigSchema.optional(),
   config: LegacyConfigSchema.optional(),
 });
 export type LegacyConfigs = z.infer<typeof LegacyConfigsSchema>;
-
-export type LegacyTypes = "Sonarr" | "Radarr" | "Email" | "Config";

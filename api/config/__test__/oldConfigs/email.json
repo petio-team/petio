@@ -1,0 +1,8 @@
+{
+    "emailEnabled": true,
+    "emailUser": "user@user.com",
+    "emailPass": "xxLq7z6Y@pbB49qhbqLaB6Q7DDfA",
+    "emailServer": "emailserver@emailserver.com",
+    "emailPort": "25",
+    "emailSecure": true
+}

@@ -41,40 +41,48 @@ export const LoadConfig = async (
  *
  * @returns an object of legacy config files
  */
-export const LoadLegacyConfigs = async (): Promise<T.LegacyConfigs> => {
-  const source = process.cwd() + "/api/config";
+export const LoadLegacyConfigs = async (
+  legacyConfigPath: string
+): Promise<T.LegacyConfigs> => {
   let legacyConfig: T.LegacyConfigs = {};
+  let source: string = "";
 
-  let stat = await fs.stat(source + "/config.json");
+  source = path.join(legacyConfigPath, "config.json");
+  let stat = await fs.stat(source);
   if (stat.isFile()) {
-    const file = await fs.readFile(source + "/config.json", {
+    const file = await fs.readFile(source, {
       encoding: "utf-8",
     });
     legacyConfig.config = T.LegacyConfigSchema.parse(JSON.parse(file));
   }
 
-  stat = await fs.stat(source + "/email.json");
+  source = path.join(legacyConfigPath, "email.json");
+  stat = await fs.stat(source);
   if (stat.isFile()) {
-    const file = await fs.readFile(source + "/email.json", {
+    const file = await fs.readFile(source, {
       encoding: "utf-8",
     });
     legacyConfig.email = T.LegacyEmailConfigSchema.parse(JSON.parse(file));
   }
 
-  stat = await fs.stat(source + "/radarr.json");
+  source = path.join(legacyConfigPath, "radarr.json");
+  stat = await fs.stat(source);
   if (stat.isFile()) {
-    const file = await fs.readFile(source + "/radarr.json", {
+    const file = await fs.readFile(source, {
       encoding: "utf-8",
     });
-    legacyConfig.radarr = T.LegacyArrConfigSchema.parse(JSON.parse(file));
+    const instances = T.LegacyArrConfigSchema.array().parse(JSON.parse(file));
+    legacyConfig.radarr = [...(legacyConfig.radarr ?? []), ...instances];
   }
 
-  stat = await fs.stat(source + "/sonarr.json");
+  source = path.join(legacyConfigPath, "sonarr.json");
+  stat = await fs.stat(source);
   if (stat.isFile()) {
-    const file = await fs.readFile(source + "/sonarr.json", {
+    const file = await fs.readFile(source, {
       encoding: "utf-8",
     });
-    legacyConfig.sonarr = T.LegacyArrConfigSchema.parse(JSON.parse(file));
+    const instances = T.LegacyArrConfigSchema.array().parse(JSON.parse(file));
+    legacyConfig.sonarr = [...(legacyConfig.sonarr ?? []), ...instances];
   }
 
   return legacyConfig;
