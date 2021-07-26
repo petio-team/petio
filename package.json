@@ -15,11 +15,16 @@
   },
   "scripts": {
     "start": "node petio.js",
+    "lint": "yarn eslint . --ext .ts,.tsx",
     "version": "npm -s run env echo '$npm_package_version'",
     "stamp-version": "mv petio.zip petio-${npm_package_version}.zip",
     "prepare": "husky install"
   },
   "devDependencies": {
-    "husky": "^7.0.0"
+    "@typescript-eslint/eslint-plugin": "^4.28.5",
+    "@typescript-eslint/parser": "^4.28.5",
+    "eslint": "^7.31.0",
+    "husky": "^7.0.0",
+    "typescript": "^4.3.5"
   }
 }
