@@ -210,3 +210,93 @@ test("parse legacy config files into a new schema", async () => {
 
   expect(Config.UpgradeLegacyConfigs(configs)).toStrictEqual(data);
 });
+
+test("write config data to file", async () => {
+  const source = path.join(process.cwd(), "config", "__test__", "petio.yaml");
+  const data: T.Config = {
+    general: {
+      basePath: "/base_path",
+    },
+    discovery: {
+      popular: true,
+    },
+    thirdpartyapis: {
+      tmdb: "Eizb6EBc&B$G$S!5fBCd4b!xazGJ",
+      fanart: "Eizb6EBc&B$G$S!5fBCd4b!xazGJ",
+    },
+    plex: {
+      ip: "12-34-87-177.fyAE5mgr8RzGGhzjBycCFgHGgbzX.petio.direct",
+      port: 32400,
+      token: "fyAE5mgr8RzGGhzjBycCFgHGgbzX",
+      clientId: "BeTX8bRYjPTS47qhn3xphgp6eEHJnDhL9eBmTfgY",
+      protocol: "https",
+    },
+    db: {
+      url: "mongodb://192.168.1.10:27017/petio",
+    },
+    admin: {
+      id: 34385839843,
+      username: "admin",
+      email: "admin@admin.com",
+      password: "$2a$10$anGB9e7mJLDDC3HOa.dEtui1XhWtepHGqPJk1gpks80wXUD07QcNq",
+      thumbnail: "https://plex.tv/users/sadsdasdasad/avatar?c=asddsadsdsaasd",
+      displayName: "admin",
+    },
+    notifications: {
+      discord: {
+        webhook:
+          "https://discord.com/api/webhooks/446698948436349783/o8-xhNXdisoyKApR3Lq-tjYeFS4KTGHDXodT8cEQng7D7XTqNEMhMntHRzso07-zHJN5",
+        enabled: true,
+      },
+      telegram: {
+        token: "my_telegram_token",
+        chatId: "my_telegram_chat_id",
+        silent: true,
+        enabled: true,
+      },
+      email: {
+        address: "emailserver@emailserver.com",
+        username: "user@user.com",
+        password: "xxLq7z6Y@pbB49qhbqLaB6Q7DDfA",
+        port: 25,
+        secure: true,
+        enabled: true,
+      },
+    },
+    instances: [
+      {
+        type: "sonarr",
+        title: "TV",
+        protocol: "https",
+        port: 443,
+        hostname: "sonarr.domain.co.uk",
+        apiKey: "79666654333889484489567897795339",
+        baseUrl: "/base_path",
+        pathId: 2,
+        path: "/mnt/unionfs/tv-4k",
+        profileId: 7,
+        profile: "4K",
+        uuid: "77d7aadd-decd-40e8-9a76-7079a8d16e5f",
+        active: true,
+      },
+      {
+        type: "radarr",
+        title: "4K",
+        protocol: "https",
+        port: 443,
+        hostname: "radarr.domain.co.uk",
+        apiKey: "9dcd45a7406141b78978406d8ccc9ca6",
+        baseUrl: "/base_path",
+        pathId: 3,
+        path: "/mnt/unionfs/movies-4k",
+        profileId: 7,
+        profile: "4K",
+        uuid: "08108733-3b30-46cd-af4c-111af03d7f4e",
+        active: true,
+      },
+    ],
+  };
+
+  await Config.WriteConfig(source, data);
+  expect(await Config.LoadConfig(source)).toStrictEqual(data);
+});

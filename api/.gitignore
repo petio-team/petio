@@ -7,3 +7,4 @@ petio-rest-macos
 config-ash.json
 package-lock.json
 yarn.lock
+config/__test__/petio.yaml
