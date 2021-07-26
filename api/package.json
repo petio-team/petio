@@ -4,7 +4,8 @@
   "description": "Rest Api for Petio",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
