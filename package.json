@@ -16,6 +16,10 @@
   "scripts": {
     "start": "node petio.js",
     "version": "npm -s run env echo '$npm_package_version'",
-    "stamp-version": "mv petio.zip petio-${npm_package_version}.zip"
+    "stamp-version": "mv petio.zip petio-${npm_package_version}.zip",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "husky": "^7.0.0"
   }
 }
