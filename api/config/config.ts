@@ -219,3 +219,13 @@ export const UpgradeLegacyConfigs = (configs: T.LegacyConfigs): T.Config => {
     instances: [...(lSonarr().instances ?? []), ...(lRadarr().instances ?? [])],
   };
 };
+
+/**
+ * WriteConfig attempts to write the config to the filesystem
+ */
+export const WriteConfig = async (
+  configPath: string,
+  data: T.Config
+): Promise<void> => {
+  await fs.writeFile(configPath, yaml.stringify(data));
+};
