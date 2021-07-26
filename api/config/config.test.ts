@@ -52,7 +52,7 @@ test("load config file", async () => {
 
 test("load legacy config files", async () => {
   const dir = path.join(process.cwd(), "config", "__test__", "oldConfigs");
-  let data: T.LegacyConfigs = {
+  const data: T.LegacyConfigs = {
     sonarr: [
       {
         title: "TV",

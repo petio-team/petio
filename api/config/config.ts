@@ -44,8 +44,8 @@ export const LoadConfig = async (
 export const LoadLegacyConfigs = async (
   legacyConfigPath: string
 ): Promise<T.LegacyConfigs> => {
-  let legacyConfig: T.LegacyConfigs = {};
-  let source: string = "";
+  const legacyConfig: T.LegacyConfigs = {};
+  let source = "";
 
   source = path.join(legacyConfigPath, "config.json");
   let stat = await fs.stat(source);
