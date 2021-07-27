@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const DiscoverySchema = mongoose.Schema({
   id: String,
@@ -20,4 +20,4 @@ const DiscoverySchema = mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Discover", DiscoverySchema);
+export default mongoose.model("Discover", DiscoverySchema);

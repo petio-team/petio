@@ -1,23 +1,22 @@
-const Discovery = require("../models/discovery");
-const logger = require("../util/logger");
-const getConfig = require("../util/config");
-const request = require("xhr-request");
-const Movie = require("../tmdb/movie");
-const Show = require("../tmdb/show");
-const getHistory = require("../plex/history");
-const onServer = require("../plex/onServer");
-const trending = require("../tmdb/trending");
-const Promise = require("bluebird");
-
-const cacheManager = require("cache-manager");
-const getTop = require("../plex/top");
+import Discovery from "../models/discovery";
+import logger from "../util/logger";
+import getConfig from "../util/config";
+import request from "xhr-request";
+import Movie from "../tmdb/movie";
+import Show from "../tmdb/show";
+import getHistory from "../plex/history";
+import onServer from "../plex/onServer";
+import trending from "../tmdb/trending";
+import Promise from "bluebird";
+import cacheManager from "cache-manager";
+import getTop from "../plex/top";
 const memoryCache = cacheManager.caching({
   store: "memory",
   // max: 500,
   ttl: 3600 /*seconds*/,
 });
 
-module.exports = async function getDiscoveryData(id, type = "movie") {
+export default async function getDiscoveryData(id, type = "movie") {
   if (!id) return { error: "No ID" };
   const discoveryPrefs = await Discovery.findOne({ id: id });
   const config = getConfig();

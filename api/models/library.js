@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const LibrarySchema = mongoose.Schema(
   {
@@ -26,6 +26,6 @@ const LibrarySchema = mongoose.Schema(
   { collection: "libraries" }
 );
 
-module.exports = mongoose.model("Library", LibrarySchema);
+export default mongoose.model("Library", LibrarySchema);
 
 // uuid

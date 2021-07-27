@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const IssueSchema = mongoose.Schema({
   mediaId: String,
@@ -11,4 +11,4 @@ const IssueSchema = mongoose.Schema({
   comment: String,
 });
 
-module.exports = mongoose.model("Issue", IssueSchema);
+export default mongoose.model("Issue", IssueSchema);

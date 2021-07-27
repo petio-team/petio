@@ -1,9 +1,7 @@
-const jwt = require("jsonwebtoken");
-
-const logger = require("../util/logger");
-
-const getConfig = require("../util/config");
-const User = require("../models/user");
+import jwt from "jsonwebtoken";
+import logger from "../util/logger";
+import getConfig from "../util/config";
+import User from "../models/user";
 
 async function authenticate(req) {
   const prefs = getConfig();
@@ -29,9 +27,9 @@ async function authenticate(req) {
   }
 }
 
-exports.authenticate = authenticate;
+export {authenticate};
 
-exports.authRequired = async (req, res, next) => {
+export async function authRequired(req, res, next) {
   try {
     await authenticate(req);
   } catch (e) {
@@ -41,13 +39,13 @@ exports.authRequired = async (req, res, next) => {
     return;
   }
   next();
-};
+}
 
-exports.adminRequired = (req, res, next) => {
+export function adminRequired(req, res, next) {
   if (req.jwtUser && req.jwtUser.admin) {
     next();
   } else {
     res.sendStatus(403);
     logger.log("warn", `AUTH: User not admin`);
   }
-};
+}

@@ -1,9 +1,8 @@
 // Config
-const getConfig = require("../util/config");
+import getConfig from "../util/config";
 
-const request = require("xhr-request");
-
-const cacheManager = require("cache-manager");
+import request from "xhr-request";
+import cacheManager from "cache-manager";
 const memoryCache = cacheManager.caching({ store: "memory", max: 500, ttl: 86400 /*seconds*/ });
 
 async function fanart(id, type) {
@@ -40,4 +39,4 @@ async function fanartData(id, type) {
   });
 }
 
-module.exports = fanart;
+export default fanart;

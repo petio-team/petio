@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const FriendSchema = mongoose.Schema(
   {
@@ -25,4 +25,4 @@ const FriendSchema = mongoose.Schema(
   { collection: "friends" }
 );
 
-module.exports = mongoose.model("Friend", FriendSchema);
+export default mongoose.model("Friend", FriendSchema);

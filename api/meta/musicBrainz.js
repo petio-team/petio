@@ -1,7 +1,7 @@
-const MusicBrainzApi = require("musicbrainz-api").MusicBrainzApi;
-const pjson = require("../package.json");
-const sanitize = require("sanitize-filename");
-const logger = require("../util/logger");
+import {MusicBrainzApi} from "musicbrainz-api";
+import pjson from "../package.json";
+import sanitize from "sanitize-filename";
+import logger from "../util/logger";
 
 class MusicMeta {
   constructor() {
@@ -74,4 +74,4 @@ class MusicMeta {
   }
 }
 
-module.exports = MusicMeta;
+export default MusicMeta;

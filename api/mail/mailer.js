@@ -1,7 +1,7 @@
-const nodemailer = require("nodemailer");
-const fs = require("fs");
-const path = require("path");
-const logger = require("../util/logger");
+import nodemailer from "nodemailer";
+import fs from "fs";
+import path from "path";
+import logger from "../util/logger";
 
 class Mailer {
   constructor() {
@@ -151,4 +151,4 @@ class Mailer {
   }
 }
 
-module.exports = Mailer;
+export default Mailer;

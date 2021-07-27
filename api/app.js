@@ -1,52 +1,54 @@
-const express = require("express");
+import express from "express";
 const app = express();
-const mongoose = require("mongoose");
-const cors = require("cors");
-require("dotenv/config");
-const fs = require("fs");
-const path = require("path");
-const pjson = require("./package.json");
-require("./node_modules/cache-manager/lib/stores/memory.js");
-const logger = require("./util/logger");
-const cluster = require("cluster");
-const trending = require("./tmdb/trending");
-const bcrypt = require("bcryptjs");
-const cookieParser = require("cookie-parser");
+import mongoose from "mongoose";
+import cors from "cors";
+import "dotenv/config";
+import fs from "fs";
+import path from "path";
+import pjson from "./package.json";
+import "cache-manager";
+import logger from "./util/logger";
+import cluster from "cluster";
+import trending from "./tmdb/trending";
+import bcrypt from "bcryptjs";
+import cookieParser from "cookie-parser";
 
 // Config
-const getConfig = require("./util/config");
-const setupReady = require("./util/setupReady");
-const Worker = require("./worker");
+import getConfig from "./util/config";
+
+import setupReady from "./util/setupReady";
+import Worker from "./worker";
 
 // Plex
-const testConnection = require("./plex/testConnection");
+import testConnection from "./plex/testConnection";
 
 // Routes
-const movieRoute = require("./routes/movie");
-const showRoute = require("./routes/show");
-const searchRoute = require("./routes/search");
-const personRoute = require("./routes/person");
-const loginRoute = require("./routes/login");
-const trendingRoute = require("./routes/trending");
-const requestRoute = require("./routes/request");
-const topRoute = require("./routes/top");
-const historyRoute = require("./routes/history");
-const plexRoute = require("./routes/plex");
-const reviewRoute = require("./routes/review");
-const userRoute = require("./routes/user");
-const genieRoute = require("./routes/genie");
-const sessionsRoute = require("./routes/sessions");
-const servicesRoute = require("./routes/services");
-const mailRoute = require("./routes/mail");
-const issueRoute = require("./routes/issue");
-const profileRoute = require("./routes/profiles");
-const configRoute = require("./routes/config");
-const logsRoute = require("./routes/log");
-const filterRoute = require("./routes/filter");
-const discoveryRoute = require("./routes/discovery");
-const notificationsRoute = require("./routes/notifications");
-const batchRoute = require("./routes/batch");
-const { authRequired } = require("./middleware/auth");
+import movieRoute from "./routes/movie";
+
+import showRoute from "./routes/show";
+import searchRoute from "./routes/search";
+import personRoute from "./routes/person";
+import loginRoute from "./routes/login";
+import trendingRoute from "./routes/trending";
+import requestRoute from "./routes/request";
+import topRoute from "./routes/top";
+import historyRoute from "./routes/history";
+import plexRoute from "./routes/plex";
+import reviewRoute from "./routes/review";
+import userRoute from "./routes/user";
+import genieRoute from "./routes/genie";
+import sessionsRoute from "./routes/sessions";
+import servicesRoute from "./routes/services";
+import mailRoute from "./routes/mail";
+import issueRoute from "./routes/issue";
+import profileRoute from "./routes/profiles";
+import configRoute from "./routes/config";
+import logsRoute from "./routes/log";
+import filterRoute from "./routes/filter";
+import discoveryRoute from "./routes/discovery";
+import notificationsRoute from "./routes/notifications";
+import batchRoute from "./routes/batch";
+import { authRequired } from "./middleware/auth";
 
 class Main {
   constructor() {
@@ -444,4 +446,4 @@ class Main {
   }
 }
 
-module.exports = new Main().init();
+export default new Main().init();

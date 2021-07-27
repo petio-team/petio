@@ -1,8 +1,8 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const FilterSchema = mongoose.Schema({
   id: String,
   data: Array,
 });
 
-module.exports = mongoose.model("Filter", FilterSchema);
+export default mongoose.model("Filter", FilterSchema);

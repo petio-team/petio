@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const MusicSchema = mongoose.Schema(
   {
@@ -20,6 +20,6 @@ const MusicSchema = mongoose.Schema(
   { collection: "music" }
 );
 
-module.exports = mongoose.model("Music", MusicSchema);
+export default mongoose.model("Music", MusicSchema);
 
 // ratingKey

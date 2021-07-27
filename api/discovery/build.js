@@ -1,14 +1,16 @@
-const User = require("../models/user");
-const Discovery = require("../models/discovery");
-const request = require("xhr-request");
-// const { movieLookup, discoverMovie } = require("../tmdb/movie");
-const getConfig = require("../util/config");
-const logger = require("../util/logger");
-const Movie = require("../models/movie");
-const Show = require("../models/show");
-const Promise = require("bluebird");
+import User from "../models/user";
+import Discovery from "../models/discovery";
+import request from "xhr-request";
 
-module.exports = async function buildDiscovery() {
+// const { movieLookup, discoverMovie } = require("../tmdb/movie");
+import getConfig from "../util/config";
+
+import logger from "../util/logger";
+import Movie from "../models/movie";
+import Show from "../models/show";
+import Promise from "bluebird";
+
+export default async function buildDiscovery() {
   logger.info("DISC: Started building discovery profiles");
   let users = await User.find();
   if (!users || users.length === 0) {

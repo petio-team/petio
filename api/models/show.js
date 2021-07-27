@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const TvSchema = mongoose.Schema(
   {
@@ -37,6 +37,6 @@ const TvSchema = mongoose.Schema(
   { collection: "shows" }
 );
 
-module.exports = mongoose.model("Show", TvSchema);
+export default mongoose.model("Show", TvSchema);
 
 // ratingKey

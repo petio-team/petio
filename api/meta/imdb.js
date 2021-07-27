@@ -1,11 +1,12 @@
 // https://www.imdb.com/title/tt6475714/
-const axios = require("axios");
-const logger = require("../util/logger");
-const zlib = require("zlib");
-const fs = require("fs");
-const path = require("path");
-const lineReader = require("line-reader");
-const Imdb = require("../models/imdb");
+import axios from "axios";
+
+import logger from "../util/logger";
+import zlib from "zlib";
+import fs from "fs";
+import path from "path";
+import lineReader from "line-reader";
+import Imdb from "../models/imdb";
 
 async function lookup(imdb_id) {
   if (!imdb_id) {
@@ -113,4 +114,4 @@ async function processBuffer(data) {
   }
 }
 
-module.exports = { lookup, storeCache };
+export default { lookup, storeCache };

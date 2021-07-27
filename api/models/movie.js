@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const MovieSchema = mongoose.Schema({
   title: String,
@@ -34,6 +34,6 @@ const MovieSchema = mongoose.Schema({
   petioTimestamp: Date,
 });
 
-module.exports = mongoose.model("Movie", MovieSchema);
+export default mongoose.model("Movie", MovieSchema);
 
 // ratingKey
