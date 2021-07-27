@@ -150,7 +150,7 @@ class Sonarr {
     }
     try {
       return this.get(`series/${id}`);
-    } catch {
+    } catch (_) {
       return false;
     }
   }
@@ -305,7 +305,7 @@ class Sonarr {
         deleteFiles: false,
         addImportListExclusion: false,
       });
-    } catch {
+    } catch (_) {
       logger.warn("SONARR: Unable to remove job, likely already removed");
     }
   }

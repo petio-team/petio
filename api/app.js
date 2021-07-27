@@ -102,7 +102,7 @@ class Main {
             });
             return;
           }
-        } catch {
+        } catch (_) {
           res.status(500).json({
             error: "An error has occured",
           });
@@ -112,10 +112,10 @@ class Main {
       res.json(
         config
           ? {
-              config: true,
-              login_type: config.login_type ? config.login_type : 1,
-              ready: ready,
-            }
+            config: true,
+            login_type: config.login_type ? config.login_type : 1,
+            ready: ready,
+          }
           : { config: false, login_type: 1, ready: ready }
       );
     });

@@ -28,7 +28,7 @@ async function showLookup(id, minified = false) {
   try {
     data = await getShowData(id);
     show = Object.assign({}, data);
-  } catch {
+  } catch (_) {
     return { error: "not found" };
   }
   if (show.success === false) {

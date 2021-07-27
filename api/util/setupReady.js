@@ -21,7 +21,7 @@ async function setupReady() {
         error: false,
       };
     }
-  } catch {
+  } catch (_) {
     logger.error("CHK: Fatal Error unable to write Db to file!");
     return {
       ready: false,

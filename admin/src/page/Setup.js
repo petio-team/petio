@@ -27,13 +27,13 @@ const popupCenter = (url, title, w, h) => {
   var width = window.innerWidth
     ? window.innerWidth
     : document.documentElement.clientWidth
-    ? document.documentElement.clientWidth
-    : screen.width;
+      ? document.documentElement.clientWidth
+      : screen.width;
   var height = window.innerHeight
     ? window.innerHeight
     : document.documentElement.clientHeight
-    ? document.documentElement.clientHeight
-    : screen.height;
+      ? document.documentElement.clientHeight
+      : screen.height;
 
   var left = width / 2 - w / 2 + dualScreenLeft;
   var top = height / 2 - h / 2 + dualScreenTop;
@@ -41,13 +41,13 @@ const popupCenter = (url, title, w, h) => {
     url,
     title,
     "scrollbars=yes, width=" +
-      w +
-      ", height=" +
-      h +
-      ", top=" +
-      top +
-      ", left=" +
-      left
+    w +
+    ", height=" +
+    h +
+    ", top=" +
+    top +
+    ", left=" +
+    left
   );
 
   if (window.focus) newWindow.focus();
@@ -198,7 +198,7 @@ class Setup extends React.Component {
     try {
       await Api.saveConfig(config);
       this.props.checkConfig(true);
-    } catch {
+    } catch (_) {
       this.props.msg({
         type: "error",
         message:
@@ -328,33 +328,29 @@ class Setup extends React.Component {
       <div className="setup--wrap">
         <div className="setup--steps">
           <div
-            className={`setup--step ${this.state.step > 1 ? "complete" : ""} ${
-              this.state.step === 1 ? "active" : ""
-            }`}
+            className={`setup--step ${this.state.step > 1 ? "complete" : ""} ${this.state.step === 1 ? "active" : ""
+              }`}
           >
             1
           </div>
           <span></span>
           <div
-            className={`setup--step ${this.state.step > 2 ? "complete" : ""} ${
-              this.state.step === 2 ? "active" : ""
-            }`}
+            className={`setup--step ${this.state.step > 2 ? "complete" : ""} ${this.state.step === 2 ? "active" : ""
+              }`}
           >
             2
           </div>
           <span></span>
           <div
-            className={`setup--step ${this.state.step > 3 ? "complete" : ""} ${
-              this.state.step === 3 ? "active" : ""
-            }`}
+            className={`setup--step ${this.state.step > 3 ? "complete" : ""} ${this.state.step === 3 ? "active" : ""
+              }`}
           >
             3
           </div>
           <span></span>
           <div
-            className={`setup--step ${this.state.step > 4 ? "complete" : ""} ${
-              this.state.step === 4 ? "active" : ""
-            }`}
+            className={`setup--step ${this.state.step > 4 ? "complete" : ""} ${this.state.step === 4 ? "active" : ""
+              }`}
           >
             4
           </div>
@@ -407,9 +403,8 @@ class Setup extends React.Component {
                 onChange={this.inputChange}
               />
               <button
-                className={`btn btn__square ${
-                  this.state.password ? "" : "disabled"
-                }`}
+                className={`btn btn__square ${this.state.password ? "" : "disabled"
+                  }`}
                 onClick={this.saveUser}
               >
                 Next
@@ -430,9 +425,8 @@ class Setup extends React.Component {
                   return (
                     <div
                       key={key}
-                      className={`server-select-option ${
-                        this.state.selectedServer === key ? "selected" : ""
-                      } ${server.status !== "connected" ? "disabled" : ""}`}
+                      className={`server-select-option ${this.state.selectedServer === key ? "selected" : ""
+                        } ${server.status !== "connected" ? "disabled" : ""}`}
                       data-id={key}
                       onClick={this.selectServer}
                     >
@@ -443,11 +437,10 @@ class Setup extends React.Component {
                         <p>
                           {server.name}
                           <span
-                            className={`server-lock ${
-                              server.protocol === "https"
+                            className={`server-lock ${server.protocol === "https"
                                 ? "secure"
                                 : "insecure"
-                            }`}
+                              }`}
                           >
                             {server.protocol === "https" ? (
                               <LockIcon />
@@ -460,25 +453,22 @@ class Setup extends React.Component {
                       </div>
                       <div className="server-status">
                         <div
-                          className={`server-status-item server-status-pending ${
-                            server.status === "pending" ? "active" : ""
-                          }`}
+                          className={`server-status-item server-status-pending ${server.status === "pending" ? "active" : ""
+                            }`}
                         >
                           <Spinner />
                         </div>
                         <div
-                          className={`server-status-item server-status-good ${
-                            server.status === "connected" ? "active" : ""
-                          }`}
+                          className={`server-status-item server-status-good ${server.status === "connected" ? "active" : ""
+                            }`}
                         >
                           <span>
                             <Good />
                           </span>
                         </div>
                         <div
-                          className={`server-status-item server-status-bad ${
-                            server.status === "failed" ? "active" : ""
-                          }`}
+                          className={`server-status-item server-status-bad ${server.status === "failed" ? "active" : ""
+                            }`}
                         >
                           <span>
                             <Bad />
@@ -513,26 +503,23 @@ class Setup extends React.Component {
               </p>
               <div className="mongo-options">
                 <div
-                  className={`mongo-option ${
-                    this.state.mongoInstall === "docker" ? "active" : ""
-                  }`}
+                  className={`mongo-option ${this.state.mongoInstall === "docker" ? "active" : ""
+                    }`}
                   onClick={() => this.mongoPreset("docker")}
                 >
                   <Docker />
                   <p>Docker</p>
                 </div>
                 <div
-                  className={`mongo-option unraid ${
-                    this.state.mongoInstall === "unraid" ? "active" : ""
-                  }`}
+                  className={`mongo-option unraid ${this.state.mongoInstall === "unraid" ? "active" : ""
+                    }`}
                   onClick={() => this.mongoPreset("unraid")}
                 >
                   <UnraidIcon />
                 </div>
                 <div
-                  className={`mongo-option ${
-                    this.state.mongoInstall === "other" ? "active" : ""
-                  }`}
+                  className={`mongo-option ${this.state.mongoInstall === "other" ? "active" : ""
+                    }`}
                   onClick={() => this.mongoPreset("other")}
                 >
                   <Server />
@@ -561,25 +548,22 @@ class Setup extends React.Component {
                 </div>
                 <div className="mongo-status">
                   <div
-                    className={`mongo-status-item mongo-status-pending ${
-                      this.state.mongoStatus === "pending" ? "active" : ""
-                    }`}
+                    className={`mongo-status-item mongo-status-pending ${this.state.mongoStatus === "pending" ? "active" : ""
+                      }`}
                   >
                     <Spinner />
                   </div>
                   <div
-                    className={`mongo-status-item mongo-status-good ${
-                      this.state.mongoStatus === "connected" ? "active" : ""
-                    }`}
+                    className={`mongo-status-item mongo-status-good ${this.state.mongoStatus === "connected" ? "active" : ""
+                      }`}
                   >
                     <span>
                       <Good />
                     </span>
                   </div>
                   <div
-                    className={`mongo-status-item mongo-status-bad ${
-                      this.state.mongoStatus === "failed" ? "active" : ""
-                    }`}
+                    className={`mongo-status-item mongo-status-bad ${this.state.mongoStatus === "failed" ? "active" : ""
+                      }`}
                   >
                     <span>
                       <Bad />
@@ -588,18 +572,16 @@ class Setup extends React.Component {
                 </div>
               </div>
               <button
-                className={`btn btn__square ${
-                  this.state.mongoStatus === "pending" ? "disabled" : ""
-                }`}
+                className={`btn btn__square ${this.state.mongoStatus === "pending" ? "disabled" : ""
+                  }`}
                 style={{ marginTop: "10px", marginRight: "10px" }}
                 onClick={this.testMongo}
               >
                 Test
               </button>
               <button
-                className={`btn btn__square ${
-                  this.state.mongoStatus !== "connected" ? "disabled" : ""
-                }`}
+                className={`btn btn__square ${this.state.mongoStatus !== "connected" ? "disabled" : ""
+                  }`}
                 style={{ marginTop: "10px" }}
                 onClick={this.finalise}
               >

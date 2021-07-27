@@ -297,7 +297,7 @@ class Sonarr extends React.Component {
           profiles: settings.profiles.length > 0 ? settings.profiles : false,
           paths: settings.paths.length > 0 ? settings.paths : false,
         });
-    } catch {
+    } catch (_) {
       return;
     }
   }
@@ -323,18 +323,18 @@ class Sonarr extends React.Component {
             this.state.needsTest
               ? false
               : () => {
-                  this.saveServer();
-                  this.closeModal("addServer");
-                }
+                this.saveServer();
+                this.closeModal("addServer");
+              }
           }
           close={() => this.closeModal("addServer")}
           delete={
             this.state.newServer
               ? false
               : () => {
-                  this.deleteServer();
-                  this.closeModal("addServer");
-                }
+                this.deleteServer();
+                this.closeModal("addServer");
+              }
           }
         >
           <label>Title</label>
@@ -397,9 +397,8 @@ class Sonarr extends React.Component {
           </button>
           <label>Profile</label>
           <div
-            className={`styled-input--select ${
-              this.state.profiles || this.state.needsTest ? "" : "disabled"
-            }`}
+            className={`styled-input--select ${this.state.profiles || this.state.needsTest ? "" : "disabled"
+              }`}
           >
             <select
               name="profile"
@@ -407,8 +406,8 @@ class Sonarr extends React.Component {
               onChange={this.inputChange}
             >
               {this.state.profiles &&
-              !this.state.newServer &&
-              !this.state.needsTest ? (
+                !this.state.newServer &&
+                !this.state.needsTest ? (
                 <>
                   <option value="">Choose an option</option>
                   {this.state.profiles.map((item) => {
@@ -430,9 +429,8 @@ class Sonarr extends React.Component {
           </div>
           <label>Path</label>
           <div
-            className={`styled-input--select ${
-              this.state.profiles || this.state.needsTest ? "" : "disabled"
-            }`}
+            className={`styled-input--select ${this.state.profiles || this.state.needsTest ? "" : "disabled"
+              }`}
           >
             <select
               name="path"
@@ -460,9 +458,9 @@ class Sonarr extends React.Component {
             </select>
           </div>
           {!this.state.newServer &&
-          this.state.path &&
-          this.state.profile &&
-          !this.state.needsTest ? (
+            this.state.path &&
+            this.state.profile &&
+            !this.state.needsTest ? (
             <div className="checkbox-wrap mb--2">
               <input
                 type="checkbox"

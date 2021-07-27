@@ -220,7 +220,7 @@ export async function getArchive(id) {
   try {
     const data = await api.getArchive(id);
     return data;
-  } catch {
+  } catch (_) {
     return false;
   }
 }
@@ -259,7 +259,7 @@ export async function myRequests() {
   try {
     let data = await api.myRequests();
     return data;
-  } catch {
+  } catch (_) {
     return false;
   }
 }

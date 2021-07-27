@@ -40,7 +40,7 @@ router.post("/save_profile", async (req, res) => {
         },
         { new: true, useFindAndModify: false }
       );
-    } catch {
+    } catch (_) {
       res.status(500).json({
         error: "Failed to update, error removing defaults",
       });
@@ -68,7 +68,7 @@ router.post("/save_profile", async (req, res) => {
       res.status(200).json({
         message: "Profile updated",
       });
-    } catch {
+    } catch (_) {
       res.status(500).json({
         error: "Failed to update",
       });
@@ -125,7 +125,7 @@ router.post("/delete_profile", async (req, res) => {
     res.status(200).json({
       message: "Profile deleted",
     });
-  } catch {
+  } catch (_) {
     res.status(500).json({
       error: "Failed to delete",
     });

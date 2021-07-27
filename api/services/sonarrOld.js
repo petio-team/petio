@@ -52,9 +52,8 @@ class Sonarr {
       let key = val;
       paramsString += `${i === 0 ? "?" : "&"}${key}=${params[val]}`;
     });
-    let url = `${this.config.protocol}://${this.config.hostname}${
-      this.config.port ? ":" + this.config.port : ""
-    }${this.config.urlBase}/api/${endpoint}${paramsString}`;
+    let url = `${this.config.protocol}://${this.config.hostname}${this.config.port ? ":" + this.config.port : ""
+      }${this.config.urlBase}/api/${endpoint}${paramsString}`;
     try {
       if (method === "post" && body) {
         let res = await axios.post(url, body);
@@ -147,7 +146,7 @@ class Sonarr {
     }
     try {
       return this.get(`series/${id}`);
-    } catch {
+    } catch (_) {
       return false;
     }
   }
@@ -159,7 +158,7 @@ class Sonarr {
     }
     try {
       return this.delete(`series/${id}`);
-    } catch {
+    } catch (_) {
       logger.warn("SONARR: Unable to remove job, likely already removed");
     }
   }

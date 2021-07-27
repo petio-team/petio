@@ -63,7 +63,7 @@ router.get("/", async (req, res) => {
   try {
     let data = await Filter.find();
     res.json(data);
-  } catch {
+  } catch (_) {
     logger.warn("FILTER: Unable to load filters");
     res.json({});
   }

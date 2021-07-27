@@ -29,7 +29,7 @@ async function movieLookup(id, minified = false) {
   try {
     data = await getMovieData(id);
     movie = Object.assign({}, data);
-  } catch {
+  } catch (_) {
     return { error: "not found" };
   }
   if (movie.success === false) {

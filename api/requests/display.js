@@ -34,7 +34,7 @@ async function getRequests(user = false, all = false) {
                 try {
                   children[i].info = await server.movie(rId);
                   children[i].info.serverName = server.config.title;
-                } catch {
+                } catch (_) {
                   children[i].info = { message: "NotFound" };
                 }
                 children[i].status = [];
@@ -157,7 +157,7 @@ function reqState(req, children) {
         if (req.type === "tv" && children[r].info) {
           if (
             children[r].info.episodeCount ===
-              children[r].info.episodeFileCount &&
+            children[r].info.episodeFileCount &&
             children[r].info.episodeCount > 0
           ) {
             return {

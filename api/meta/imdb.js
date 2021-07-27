@@ -97,7 +97,7 @@ async function parseData(file) {
           resolve();
         }
         cb();
-      } catch {
+      } catch (_) {
         cb(false);
         reject();
       }
@@ -108,7 +108,7 @@ async function parseData(file) {
 async function processBuffer(data) {
   try {
     await Imdb.bulkWrite(data);
-  } catch {
+  } catch (_) {
     throw "IMDB: Error cannot write to Db";
   }
 }

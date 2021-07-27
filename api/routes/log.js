@@ -18,14 +18,14 @@ router.get("/stream", adminRequired, async (req, res) => {
   try {
     let logsNew = fs.readFileSync(liveLogfile, "utf8");
     dataNew = JSON.parse(`[${logsNew.replace(/,\s*$/, "")}]`);
-  } catch {
+  } catch (_) {
     dataNew = [];
   }
 
   try {
     let logsOld = fs.readFileSync(liveLogfile2, "utf8");
     dataOld = JSON.parse(`[${logsOld.replace(/,\s*$/, "")}]`);
-  } catch {
+  } catch (_) {
     dataOld = [];
   }
 

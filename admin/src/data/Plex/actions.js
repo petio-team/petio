@@ -217,7 +217,7 @@ async function testPlexServer(server, key) {
       key: key,
       server: server,
     });
-  } catch {
+  } catch (_) {
     server.status = "failed";
     finalise({
       type: types.PLEX_SERVER,

@@ -91,7 +91,7 @@ class Requests extends React.Component {
     let requests;
     try {
       requests = await User.myRequests();
-    } catch {
+    } catch (_) {
       requests = {};
     }
 
@@ -107,7 +107,7 @@ class Requests extends React.Component {
     try {
       archive = await User.getArchive(id);
       archive.requests = archive.requests.reverse();
-    } catch {
+    } catch (_) {
       archive = {};
     }
 

@@ -87,7 +87,7 @@ class Movies extends React.Component {
         personalised: personalised,
         loading: false,
       });
-    } catch {
+    } catch (_) {
       console.log("Couldn't load user personalised");
       this.setState({
         loading: false,
@@ -111,29 +111,29 @@ class Movies extends React.Component {
         <h1 className="main-title mb--1">Movies</h1>
         {this.state.personalised && this.state.personalised.length > 0
           ? this.state.personalised.map((row, r) => {
-              if (!row || row.results.length < 4) return null;
-              return (
-                <section key={`psn__${r}`}>
-                  <h3 className="sub-title mb--1">{row.title}</h3>
-                  <Carousel>
-                    {row.results.length > 0 ? (
-                      row.results.map((movie) => {
-                        if (!movie.id) return null;
-                        return (
-                          <MovieCard
-                            key={`psn__${r}__${movie.id}`}
-                            msg={this.props.msg}
-                            movie={movie}
-                          />
-                        );
-                      })
-                    ) : (
-                      <CarouselLoading />
-                    )}
-                  </Carousel>
-                </section>
-              );
-            })
+            if (!row || row.results.length < 4) return null;
+            return (
+              <section key={`psn__${r}`}>
+                <h3 className="sub-title mb--1">{row.title}</h3>
+                <Carousel>
+                  {row.results.length > 0 ? (
+                    row.results.map((movie) => {
+                      if (!movie.id) return null;
+                      return (
+                        <MovieCard
+                          key={`psn__${r}__${movie.id}`}
+                          msg={this.props.msg}
+                          movie={movie}
+                        />
+                      );
+                    })
+                  ) : (
+                    <CarouselLoading />
+                  )}
+                </Carousel>
+              </section>
+            );
+          })
           : null}
       </>
     );

@@ -215,7 +215,7 @@ class LibraryUpdate {
       let res = await axios.get(url);
       logger.log("info", "LIB CRON: Recently Added received");
       return res.data.MediaContainer;
-    } catch {
+    } catch (_) {
       logger.log("warn", "LIB CRON: Recently added failed!");
       throw "Recently added failed";
     }
@@ -233,7 +233,7 @@ class LibraryUpdate {
     let libraryItem = false;
     try {
       libraryItem = await Library.findOne({ uuid: lib.uuid });
-    } catch {
+    } catch (_) {
       logger.log("info", "LIB CRON: Library Not found, attempting to create");
     }
     if (!libraryItem) {
@@ -391,7 +391,7 @@ class LibraryUpdate {
       movieDb = await Movie.findOne({
         ratingKey: parseInt(movieObj.ratingKey),
       });
-    } catch {
+    } catch (_) {
       movieDb = false;
     }
     let idSource = movieObj.guid
@@ -405,7 +405,7 @@ class LibraryUpdate {
     }
     try {
       movieObj = await this.getMeta(movieObj.ratingKey);
-    } catch {
+    } catch (_) {
       logger.log("warn", `LIB CRON: Unable to fetch meta for ${title}`);
       return;
     }
@@ -442,7 +442,7 @@ class LibraryUpdate {
               "info",
               `LIB CRON: Got external ID - ${title} - using agent ${type} : ${tmdbId}`
             );
-          } catch {
+          } catch (_) {
             tmdbId = false;
             logger.log(
               "warn",
@@ -483,7 +483,7 @@ class LibraryUpdate {
             "info",
             `LIB CRON: Got external ID - ${title} - using agent ${idSource} : ${tmdbId}`
           );
-        } catch {
+        } catch (_) {
           logger.log(
             "warn",
             `LIB CRON: Couldn't get external ID - ${title} - using agent ${idSource}`
@@ -553,7 +553,7 @@ class LibraryUpdate {
       musicDb = await Music.findOne({
         ratingKey: parseInt(musicObj.ratingKey),
       });
-    } catch {
+    } catch (_) {
       musicDb = false;
     }
     if (musicDb && musicDb.metaId) {
@@ -600,7 +600,7 @@ class LibraryUpdate {
     logger.verbose(`LIB CRON: TV Job: ${title}`);
     try {
       showDb = await Show.findOne({ ratingKey: parseInt(showObj.ratingKey) });
-    } catch {
+    } catch (_) {
       showDb = false;
     }
     let idSource = showObj.guid
@@ -684,7 +684,7 @@ class LibraryUpdate {
       if (idSource !== "tmdb") {
         try {
           tmdbId = await this.externalIdTv(externalId, idSource);
-        } catch {
+        } catch (_) {
           tmdbId = false;
         }
       } else {
@@ -791,7 +791,7 @@ class LibraryUpdate {
     let friendDb = false;
     try {
       friendDb = await User.findOne({ id: obj.id });
-    } catch {
+    } catch (_) {
       friendDb = false;
     }
 

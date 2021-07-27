@@ -252,7 +252,7 @@ router.post("/bulk_edit", adminRequired, async (req, res) => {
     res.json({
       message: "Users saved",
     });
-  } catch {
+  } catch (_) {
     res.status(500).json({
       error: "Error editing user",
     });
@@ -280,7 +280,7 @@ router.post("/delete_user", adminRequired, async (req, res) => {
     res.json({
       message: "User deleted",
     });
-  } catch {
+  } catch (_) {
     res.status(500).json({
       error: "Error deleting user",
     });

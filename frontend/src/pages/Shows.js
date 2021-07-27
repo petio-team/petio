@@ -75,7 +75,7 @@ class Shows extends React.Component {
         personalised: personalised,
         loading: false,
       });
-    } catch {
+    } catch (_) {
       console.log("Couldn't load user personalised");
       this.setState({
         loading: false,
@@ -99,27 +99,27 @@ class Shows extends React.Component {
         <h1 className="main-title mb--1">TV Shows</h1>
         {this.state.personalised && this.state.personalised.length > 0
           ? this.state.personalised.map((row, r) => {
-              if (!row || row.results.length < 4) return null;
-              return (
-                <section key={`psn__${r}`}>
-                  <h3 className="sub-title mb--1">{row.title}</h3>
-                  <Carousel>
-                    {row.results.length > 0
-                      ? row.results.map((series) => {
-                          if (!series.id) return null;
-                          return (
-                            <ShowCard
-                              key={`psn__${r}__${series.id}`}
-                              msg={this.props.msg}
-                              series={series}
-                            />
-                          );
-                        })
-                      : null}
-                  </Carousel>
-                </section>
-              );
-            })
+            if (!row || row.results.length < 4) return null;
+            return (
+              <section key={`psn__${r}`}>
+                <h3 className="sub-title mb--1">{row.title}</h3>
+                <Carousel>
+                  {row.results.length > 0
+                    ? row.results.map((series) => {
+                      if (!series.id) return null;
+                      return (
+                        <ShowCard
+                          key={`psn__${r}__${series.id}`}
+                          msg={this.props.msg}
+                          series={series}
+                        />
+                      );
+                    })
+                    : null}
+                </Carousel>
+              </section>
+            );
+          })
           : null}
       </>
     );

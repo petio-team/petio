@@ -192,7 +192,7 @@ class Filter extends React.Component {
           sonarr_settings: current,
         });
       }
-    } catch {
+    } catch (_) {
       return;
     }
   }

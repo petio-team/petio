@@ -52,9 +52,8 @@ class Radarr {
       let key = val;
       paramsString += `${i === 0 ? "?" : "&"}${key}=${params[val]}`;
     });
-    let url = `${this.config.protocol}://${this.config.hostname}${
-      this.config.port ? ":" + this.config.port : ""
-    }${this.config.urlBase}/api/v3/${endpoint}${paramsString}`;
+    let url = `${this.config.protocol}://${this.config.hostname}${this.config.port ? ":" + this.config.port : ""
+      }${this.config.urlBase}/api/v3/${endpoint}${paramsString}`;
     try {
       if (method === "post" && body) {
         let res = await axios.post(url, body);
@@ -150,7 +149,7 @@ class Radarr {
     }
     try {
       return this.get(`movie/${id}`);
-    } catch {
+    } catch (_) {
       return false;
     }
   }
@@ -162,7 +161,7 @@ class Radarr {
     }
     try {
       return this.delete(`movie/${id}`);
-    } catch {
+    } catch (_) {
       logger.warn("RADARR: Unable to remove job, likely already removed");
     }
   }

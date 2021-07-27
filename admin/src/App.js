@@ -65,7 +65,7 @@ class App extends React.Component {
         config: res.config,
         loading: false,
       });
-    } catch {
+    } catch (_) {
       this.setState({
         error: true,
         loading: false,
@@ -147,9 +147,8 @@ class App extends React.Component {
                 <div
                   data-key={`pm__${msg.timestamp}__${i}__error`}
                   key={`pm__${msg.timestamp}__${i}__error`}
-                  className={`push-msg--item ${
-                    msg.type !== "info" ? msg.type : ""
-                  }`}
+                  className={`push-msg--item ${msg.type !== "info" ? msg.type : ""
+                    }`}
                 >
                   {msg.message}
                 </div>
@@ -193,9 +192,8 @@ class App extends React.Component {
               return (
                 <div
                   key={`pm__${msg.timestamp}__${i}__setup`}
-                  className={`push-msg--item ${
-                    msg.type !== "info" ? msg.type : ""
-                  }`}
+                  className={`push-msg--item ${msg.type !== "info" ? msg.type : ""
+                    }`}
                 >
                   {msg.message}
                 </div>
@@ -217,9 +215,8 @@ class App extends React.Component {
               return (
                 <div
                   key={`pm__${msg.timestamp}__${i}__login`}
-                  className={`push-msg--item ${
-                    msg.type !== "info" ? msg.type : ""
-                  }`}
+                  className={`push-msg--item ${msg.type !== "info" ? msg.type : ""
+                    }`}
                 >
                   {msg.message}
                 </div>
@@ -242,9 +239,8 @@ class App extends React.Component {
               return (
                 <div
                   key={`pm__${msg.timestamp}__${i}__logged_in`}
-                  className={`push-msg--item ${
-                    msg.type !== "info" ? msg.type : ""
-                  }`}
+                  className={`push-msg--item ${msg.type !== "info" ? msg.type : ""
+                    }`}
                 >
                   {msg.message}
                 </div>
@@ -259,9 +255,8 @@ class App extends React.Component {
                 </div>
               </div>
               <button
-                className={`nav-toggle ${
-                  this.state.mobMenuOpen ? "active" : ""
-                }`}
+                className={`nav-toggle ${this.state.mobMenuOpen ? "active" : ""
+                  }`}
                 onClick={this.toggleMobMenu}
               >
                 <span></span>

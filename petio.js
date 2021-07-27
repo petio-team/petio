@@ -33,7 +33,7 @@ class Wrapper {
         logger.log("verbose", `Config found base path not set`);
         return "/";
       }
-    } catch {
+    } catch (_) {
       logger.log("verbose", `Config not found base path not set`);
       return "/";
     }

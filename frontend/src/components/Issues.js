@@ -72,7 +72,7 @@ class Issues extends React.Component {
         message: `New Issue added`,
         type: "good",
       });
-    } catch {
+    } catch (_) {
       this.props.msg({
         message: "Error adding issue, please try again later!",
         type: "error",

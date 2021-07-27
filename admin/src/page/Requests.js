@@ -163,7 +163,7 @@ class Requests extends React.Component {
         profiles: settings.profiles,
         paths: settings.paths,
       };
-    } catch {
+    } catch (_) {
       return {
         profiles: false,
         paths: false,
@@ -543,7 +543,7 @@ class Requests extends React.Component {
           {this.state.activeRequest ? (
             <>
               {this.state.activeRequest.type === "tv" &&
-              !this.state.activeRequest.tvdb_id ? (
+                !this.state.activeRequest.tvdb_id ? (
                 <p className="warning-text">
                   <WarningIcon /> No TVDb ID
                 </p>
@@ -552,7 +552,7 @@ class Requests extends React.Component {
                 {this.state.activeRequest.title}
               </p>
               {this.state.activeRequest.type === "tv" &&
-              !this.state.activeRequest.tvdb_id ? (
+                !this.state.activeRequest.tvdb_id ? (
                 <p>Can&apos;t send to DVR without TVDB ID</p>
               ) : (
                 <>
