@@ -114,4 +114,4 @@ async function processBuffer(data) {
   }
 }
 
-export default { lookup, storeCache };
+export { lookup, storeCache };
