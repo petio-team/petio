@@ -1,11 +1,11 @@
-const CronJob = require("cron").CronJob;
-const logger = require("./util/logger");
-const LibraryUpdate = require("./plex/libraryUpdate");
-const QuotaSystem = require("./requests/quotas");
-const getConfig = require("./util/config");
-const mongoose = require("mongoose");
-const buildDiscovery = require("./discovery/build");
-const { storeCache: imdbCache } = require("./meta/imdb");
+import { CronJob } from "cron";
+import logger from "./util/logger";
+import LibraryUpdate from "./plex/libraryUpdate";
+import QuotaSystem from "./requests/quotas";
+import getConfig from "./util/config";
+import mongoose from "mongoose";
+import buildDiscovery from "./discovery/build";
+import { storeCache as imdbCache } from "./meta/imdb";
 
 class Worker {
   async connnectDb() {
@@ -82,4 +82,4 @@ class Worker {
   }
 }
 
-module.exports = Worker;
+export default Worker;
