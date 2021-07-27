@@ -1,9 +1,8 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const personLookup = require("../tmdb/person");
-
-const ExpressCache = require("express-cache-middleware");
-const cacheManager = require("cache-manager");
+import personLookup from "../tmdb/person";
+import ExpressCache from "express-cache-middleware";
+import cacheManager from "cache-manager";
 
 // Cache for 1 day
 const cacheMiddleware = new ExpressCache(
@@ -21,4 +20,4 @@ router.get("/lookup/:id", async (req, res) => {
   res.json(data);
 });
 
-module.exports = router;
+export default router;

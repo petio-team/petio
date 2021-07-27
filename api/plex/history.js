@@ -1,13 +1,13 @@
-const request = require("xhr-request");
-const plexLookup = require("../plex/plexLookup");
-const Movie = require("../tmdb/movie");
-const Show = require("../tmdb/show");
+import request from "xhr-request";
+import plexLookup from "../plex/plexLookup";
+import Movie from "../tmdb/movie";
+import Show from "../tmdb/show";
 
 // Config
-const getConfig = require("../util/config");
+import getConfig from "../util/config";
 
-const cacheManager = require("cache-manager");
-const logger = require("../util/logger");
+import cacheManager from "cache-manager";
+import logger from "../util/logger";
 const memoryCache = cacheManager.caching({
   store: "memory",
   max: 500,
@@ -107,4 +107,4 @@ async function parseHistory(data, type) {
   return output;
 }
 
-module.exports = getHistory;
+export default getHistory;

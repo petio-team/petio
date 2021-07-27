@@ -1,13 +1,13 @@
-const axios = require("axios");
-const plexLookup = require("../plex/plexLookup");
-const Movie = require("../tmdb/movie");
-const Show = require("../tmdb/show");
-const logger = require("../util/logger");
+import axios from "axios";
+import plexLookup from "../plex/plexLookup";
+import Movie from "../tmdb/movie";
+import Show from "../tmdb/show";
+import logger from "../util/logger";
 
 // Config
-const getConfig = require("../util/config");
+import getConfig from "../util/config";
 
-const cacheManager = require("cache-manager");
+import cacheManager from "cache-manager";
 const memoryCache = cacheManager.caching({
   store: "memory",
   max: 500,
@@ -67,4 +67,4 @@ async function parseTop(data, type) {
   return output;
 }
 
-module.exports = getTop;
+export default getTop;

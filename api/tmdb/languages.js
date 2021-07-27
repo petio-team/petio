@@ -207,4 +207,4 @@ function getLanguageNameByISOCode(code) {
   return "Unknown";
 }
 
-module.exports = getLanguageNameByISOCode;
+export default getLanguageNameByISOCode;

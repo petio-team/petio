@@ -1,10 +1,11 @@
-const http = require("http");
+import http from "http";
 const agent = new http.Agent({ family: 4 });
-const axios = require("axios");
+import axios from "axios";
 
 // Config
-const getConfig = require("../util/config");
-const logger = require("../util/logger");
+import getConfig from "../util/config";
+
+import logger from "../util/logger";
 
 async function personLookup(id) {
   logger.log("verbose", `TMDB Person Lookup ${id}`);
@@ -60,4 +61,4 @@ async function getPersonShows(id) {
   }
 }
 
-module.exports = personLookup;
+export default personLookup;

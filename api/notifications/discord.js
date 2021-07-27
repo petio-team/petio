@@ -1,7 +1,7 @@
-const fs = require("fs");
-const path = require("path");
-const axios = require("axios");
-const logger = require("../util/logger");
+import fs from "fs";
+import path from "path";
+import axios from "axios";
+import logger from "../util/logger";
 
 class Discord {
   constructor() {
@@ -112,4 +112,4 @@ class Discord {
   }
 }
 
-module.exports = Discord;
+export default Discord;

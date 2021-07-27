@@ -1,8 +1,8 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const getSessions = require("../plex/sessions");
-const logger = require("../util/logger");
-const { adminRequired } = require("../middleware/auth");
+import getSessions from "../plex/sessions";
+import logger from "../util/logger";
+import {adminRequired} from "../middleware/auth";
 
 router.use(adminRequired);
 router.get("/", async (req, res) => {
@@ -16,4 +16,4 @@ router.get("/", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

@@ -1,9 +1,8 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const getTop = require("../plex/top");
-
-const ExpressCache = require("express-cache-middleware");
-const cacheManager = require("cache-manager");
+import getTop from "../plex/top";
+import ExpressCache from "express-cache-middleware";
+import cacheManager from "cache-manager";
 
 // Cache for 1 day
 const cacheMiddleware = new ExpressCache(
@@ -26,4 +25,4 @@ router.get("/shows", async (req, res) => {
   res.json(data);
 });
 
-module.exports = router;
+export default router;

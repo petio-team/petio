@@ -1,8 +1,8 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const logger = require("../util/logger");
-const Discord = require("../notifications/discord");
-const Telegram = require("../notifications/telegram");
+import logger from "../util/logger";
+import Discord from "../notifications/discord";
+import Telegram from "../notifications/telegram";
 
 router.get("/discord/test", async (req, res) => {
   let test = await new Discord().test();
@@ -14,4 +14,4 @@ router.get("/telegram/test", async (req, res) => {
   res.json({ result: test.result, error: test.error });
 });
 
-module.exports = router;
+export default router;

@@ -1,17 +1,16 @@
-const http = require("http");
+import http from "http";
 const agent = new http.Agent({ family: 4 });
-const axios = require("axios");
+import axios from "axios";
 
 // Config
-const getConfig = require("../util/config");
-const fanartLookup = require("../fanart");
-const onServer = require("../plex/onServer");
-const { lookup: imdb } = require("../meta/imdb");
-const getLanguage = require("./languages");
+import getConfig from "../util/config";
 
-const logger = require("../util/logger");
-
-const cacheManager = require("cache-manager");
+import fanartLookup from "../fanart";
+import onServer from "../plex/onServer";
+import { lookup as imdb } from "../meta/imdb";
+import getLanguage from "./languages";
+import logger from "../util/logger";
+import cacheManager from "cache-manager";
 const memoryCache = cacheManager.caching({
   store: "memory",
   max: 500,
@@ -374,7 +373,7 @@ async function network(id) {
   }
 }
 
-module.exports = {
+export {
   discoverSeries,
   showLookup,
   network,

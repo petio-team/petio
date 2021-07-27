@@ -1,8 +1,8 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const logger = require("../util/logger");
-const { movieLookup } = require("../tmdb/movie");
-const showLookup = require("../tmdb/show");
+import logger from "../util/logger";
+import {movieLookup} from "../tmdb/movie";
+import showLookup from "../tmdb/show";
 
 router.post("/movie", async (req, res) => {
   const ids = req.body.ids;
@@ -16,4 +16,4 @@ router.post("/movie", async (req, res) => {
   res.json(output);
 });
 
-module.exports = router;
+export default router;

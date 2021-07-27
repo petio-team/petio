@@ -1,22 +1,22 @@
-const Promise = require("bluebird");
-const xmlParser = require("xml-js");
-const Library = require("../models/library");
-const Movie = require("../models/movie");
-const Music = require("../models/artist");
-const Show = require("../models/show");
-const User = require("../models/user");
-const Request = require("../models/request");
-const Profile = require("../models/profile");
-const Mailer = require("../mail/mailer");
-const getConfig = require("../util/config");
-const processRequest = require("../requests/process");
-const logger = require("../util/logger");
-const Discord = require("../notifications/discord");
-const Telegram = require("../notifications/telegram");
-const { showLookup } = require("../tmdb/show");
-const bcrypt = require("bcryptjs");
-const axios = require("axios");
-const MusicMeta = require("../meta/musicBrainz");
+import Promise from "bluebird";
+import xmlParser from "xml-js";
+import Library from "../models/library";
+import Movie from "../models/movie";
+import Music from "../models/artist";
+import Show from "../models/show";
+import User from "../models/user";
+import Request from "../models/request";
+import Profile from "../models/profile";
+import Mailer from "../mail/mailer";
+import getConfig from "../util/config";
+import processRequest from "../requests/process";
+import logger from "../util/logger";
+import Discord from "../notifications/discord";
+import Telegram from "../notifications/telegram";
+import {showLookup} from "../tmdb/show";
+import bcrypt from "bcryptjs";
+import axios from "axios";
+import MusicMeta from "../meta/musicBrainz";
 
 class LibraryUpdate {
   constructor() {
@@ -1012,4 +1012,4 @@ class LibraryUpdate {
   }
 }
 
-module.exports = LibraryUpdate;
+export default LibraryUpdate;

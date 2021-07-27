@@ -1,9 +1,9 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const search = require("../tmdb/search");
-const MusicMeta = require("../meta/musicBrainz");
-const ExpressCache = require("express-cache-middleware");
-const cacheManager = require("cache-manager");
+import search from "../tmdb/search";
+import MusicMeta from "../meta/musicBrainz";
+import ExpressCache from "express-cache-middleware";
+import cacheManager from "cache-manager";
 
 // Cache for 1 day
 const cacheMiddleware = new ExpressCache(
@@ -34,4 +34,4 @@ router.get("/music/:term", async (req, res) => {
   new MusicMeta().search(req.params.term);
 });
 
-module.exports = router;
+export default router;

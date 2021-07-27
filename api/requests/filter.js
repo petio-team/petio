@@ -1,7 +1,7 @@
-const logger = require("../util/logger");
-const Filter = require("../models/filter");
-const { movieLookup } = require("../tmdb/movie");
-const { showLookup } = require("../tmdb/show");
+import logger from "../util/logger";
+import Filter from "../models/filter";
+import {movieLookup} from "../tmdb/movie";
+import {showLookup} from "../tmdb/show";
 
 async function filter(item) {
   if (!item.tmdb_id) return false;
@@ -152,4 +152,4 @@ function getValue(condition, media) {
   return values;
 }
 
-module.exports = filter;
+export default filter;

@@ -1,7 +1,7 @@
-const Movie = require("../models/movie");
-const Show = require("../models/show");
-const User = require("../models/user");
-const logger = require("./logger");
+import Movie from "../models/movie";
+import Show from "../models/show";
+import User from "../models/user";
+import logger from "./logger";
 
 async function setupReady() {
   try {
@@ -30,4 +30,4 @@ async function setupReady() {
   }
 }
 
-module.exports = setupReady;
+export default setupReady;

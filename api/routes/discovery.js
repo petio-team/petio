@@ -1,7 +1,7 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const logger = require("../util/logger");
-const getDiscovery = require("../discovery/display");
+import logger from "../util/logger";
+import getDiscovery from "../discovery/display";
 
 router.get("/movies", async (req, res) => {
   let userId = req.jwtUser.altId ? req.jwtUser.altId : req.jwtUser.id;
@@ -41,4 +41,4 @@ router.get("/shows", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

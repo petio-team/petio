@@ -1,15 +1,14 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const Request = require("../models/request");
-const User = require("../models/user");
-const Mailer = require("../mail/mailer");
-const Sonarr = require("../services/sonarr");
-const Radarr = require("../services/radarr");
-
-const processRequest = require("../requests/process");
-const { getRequests } = require("../requests/display");
-const { getArchive } = require("../requests/archive");
-const logger = require("../util/logger");
+import Request from "../models/request";
+import User from "../models/user";
+import Mailer from "../mail/mailer";
+import Sonarr from "../services/sonarr";
+import Radarr from "../services/radarr";
+import processRequest from "../requests/process";
+import {getRequests} from "../requests/display";
+import {getArchive} from "../requests/archive";
+import logger from "../util/logger";
 
 router.post("/add", async (req, res) => {
   let user = req.body.user;
@@ -185,4 +184,4 @@ router.get("/archive/:id", async (req, res) => {
   res.json(archive);
 });
 
-module.exports = router;
+export default router;

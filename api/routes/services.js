@@ -1,11 +1,11 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const Sonarr = require("../services/sonarr");
-const Radarr = require("../services/radarr");
-const fs = require("fs");
-const path = require("path");
-const logger = require("../util/logger");
-const { adminRequired } = require("../middleware/auth");
+import Sonarr from "../services/sonarr";
+import Radarr from "../services/radarr";
+import fs from "fs";
+import path from "path";
+import logger from "../util/logger";
+import {adminRequired} from "../middleware/auth";
 
 // Sonarr
 router.get("/sonarr/paths/:id", adminRequired, async (req, res) => {
@@ -209,4 +209,4 @@ function saveRadarrConfig(data) {
   });
 }
 
-module.exports = router;
+export default router;

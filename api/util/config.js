@@ -1,6 +1,6 @@
-const fs = require("fs");
-const path = require("path");
-const logger = require("./logger");
+import fs from "fs";
+import path from "path";
+import logger from "./logger";
 
 function getConfig() {
   let project_folder, configFile;
@@ -22,4 +22,4 @@ function getConfig() {
   }
 }
 
-module.exports = getConfig;
+export default getConfig;

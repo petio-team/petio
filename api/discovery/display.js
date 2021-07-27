@@ -75,7 +75,7 @@ export default async function getDiscoveryData(id, type = "movie") {
   let genresSorted = [];
   let actorsSorted = [];
   let directorsSorted = [];
-  for (var genre in mediaGenres) {
+  for (const genre in mediaGenres) {
     genresSorted.push(mediaGenres[genre]);
   }
   genresSorted.sort(function (a, b) {
@@ -118,7 +118,7 @@ export default async function getDiscoveryData(id, type = "movie") {
       };
     })
   );
-  for (var actor in mediaActors) {
+  for (const actor in mediaActors) {
     actorsSorted.push({ name: actor, count: mediaActors[actor] });
   }
   actorsSorted.sort(function (a, b) {
@@ -155,7 +155,7 @@ export default async function getDiscoveryData(id, type = "movie") {
     })
   );
 
-  for (var director in mediaDirectors) {
+  for (const director in mediaDirectors) {
     directorsSorted.push({ name: director, count: mediaDirectors[director] });
   }
   directorsSorted.sort(function (a, b) {
@@ -573,9 +573,7 @@ function searchPeople(term) {
 }
 
 function shuffle(array) {
-  var currentIndex = array.length,
-    temporaryValue,
-    randomIndex;
+  let currentIndex = array.length, temporaryValue, randomIndex;
 
   while (0 !== currentIndex) {
     randomIndex = Math.floor(Math.random() * currentIndex);

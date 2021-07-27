@@ -1,7 +1,9 @@
-const Movie = require("../models/movie");
+import Movie from "../models/movie";
+
 // const Music = require('../models/artist'); // to be added when music added
-const Show = require("../models/show");
-const getConfig = require("../util/config");
+import Show from "../models/show";
+
+import getConfig from "../util/config";
 
 async function onServer(type, imdb, tvdb, tmdb) {
   let config = getConfig();
@@ -97,4 +99,4 @@ async function onServer(type, imdb, tvdb, tmdb) {
   }
 }
 
-module.exports = onServer;
+export default onServer;

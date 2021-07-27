@@ -1,8 +1,8 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const fs = require("fs");
-const path = require("path");
-const { adminRequired } = require("../middleware/auth");
+import fs from "fs";
+import path from "path";
+import {adminRequired} from "../middleware/auth";
 
 let liveLogfile = process.pkg
   ? path.join(path.dirname(process.execPath), "./logs/live1.log")
@@ -33,4 +33,4 @@ router.get("/stream", adminRequired, async (req, res) => {
   res.json(data);
 });
 
-module.exports = router;
+export default router;

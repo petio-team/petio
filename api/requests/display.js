@@ -1,10 +1,10 @@
-const { movieLookup } = require("../tmdb/movie");
-const { showLookup } = require("../tmdb/show");
-const Request = require("../models/request");
-const Sonarr = require("../services/sonarr");
-const Radarr = require("../services/radarr");
-const logger = require("../util/logger");
-const Promise = require("bluebird");
+import {movieLookup} from "../tmdb/movie";
+import {showLookup} from "../tmdb/show";
+import Request from "../models/request";
+import Sonarr from "../services/sonarr";
+import Radarr from "../services/radarr";
+import logger from "../util/logger";
+import Promise from "bluebird";
 
 async function getRequests(user = false, all = false) {
   const requests = await Request.find();
@@ -325,4 +325,4 @@ function cinemaWindow(diff) {
   return true;
 }
 
-module.exports = { getRequests };
+export default { getRequests };

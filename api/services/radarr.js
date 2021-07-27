@@ -1,8 +1,8 @@
-const axios = require("axios");
-const Request = require("../models/request");
-const fs = require("fs");
-const path = require("path");
-const logger = require("../util/logger");
+import axios from "axios";
+import Request from "../models/request";
+import fs from "fs";
+import path from "path";
+import logger from "../util/logger";
 
 class Radarr {
   constructor(id = false, forced = false, profileOvr = false, pathOvr = false) {
@@ -411,4 +411,4 @@ class Radarr {
   }
 }
 
-module.exports = Radarr;
+export default Radarr;

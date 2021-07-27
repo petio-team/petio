@@ -1,10 +1,10 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const trending = require("../tmdb/trending");
+import trending from "../tmdb/trending";
 
 router.get("/", async (req, res) => {
   let data = await trending();
   res.json(data);
 });
 
-module.exports = router;
+export default router;

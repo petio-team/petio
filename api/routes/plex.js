@@ -1,12 +1,12 @@
 require("dotenv/config");
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const plexLookup = require("../plex/plexLookup");
-const getConfig = require("../util/config");
-const logger = require("../util/logger");
-const axios = require("axios");
-const fs = require("fs");
-const path = require("path");
+import plexLookup from "../plex/plexLookup";
+import getConfig from "../util/config";
+import logger from "../util/logger";
+import axios from "axios";
+import fs from "fs";
+import path from "path";
 
 router.get("/lookup/:type/:id", async (req, res) => {
   let type = req.params.type;
@@ -84,4 +84,4 @@ function updateCredentials(obj) {
   }
 }
 
-module.exports = router;
+export default router;

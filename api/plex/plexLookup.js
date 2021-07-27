@@ -1,5 +1,5 @@
-const Movie = require('../models/movie');
-const Show = require('../models/show');
+import Movie from '../models/movie';
+import Show from '../models/show';
 
 async function plexLookup(id, type) {
 	let plexMatch = false;
@@ -19,4 +19,4 @@ async function plexLookup(id, type) {
 	}
 }
 
-module.exports = plexLookup;
+export default plexLookup;

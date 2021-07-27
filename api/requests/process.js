@@ -1,17 +1,17 @@
-const Request = require("../models/request");
-const Archive = require("../models/archive");
-const User = require("../models/user");
-const Profile = require("../models/profile");
-const Mailer = require("../mail/mailer");
-const Sonarr = require("../services/sonarr");
-const Radarr = require("../services/radarr");
-const logger = require("../util/logger");
-const filter = require("./filter");
-const Discord = require("../notifications/discord");
-const Telegram = require("../notifications/telegram");
-const { showLookup } = require("../tmdb/show");
-const fs = require("fs");
-const path = require("path");
+import Request from "../models/request";
+import Archive from "../models/archive";
+import User from "../models/user";
+import Profile from "../models/profile";
+import Mailer from "../mail/mailer";
+import Sonarr from "../services/sonarr";
+import Radarr from "../services/radarr";
+import logger from "../util/logger";
+import filter from "./filter";
+import Discord from "../notifications/discord";
+import Telegram from "../notifications/telegram";
+import {showLookup} from "../tmdb/show";
+import fs from "fs";
+import path from "path";
 
 class processRequest {
   constructor(req = {}, usr = {}) {
@@ -420,4 +420,4 @@ class processRequest {
   }
 }
 
-module.exports = processRequest;
+export default processRequest;

@@ -1,15 +1,16 @@
-const http = require("http");
+import http from "http";
 const agent = new http.Agent({ family: 4 });
-const axios = require("axios");
-const Promise = require("bluebird");
+import axios from "axios";
+import Promise from "bluebird";
 
 // Config
-const getConfig = require("../util/config");
-const onServer = require("../plex/onServer");
-const sanitize = require("sanitize-filename");
-const logger = require("../util/logger");
-const { movieLookup } = require("../tmdb/movie");
-const { showLookup } = require("../tmdb/show");
+import getConfig from "../util/config";
+
+import onServer from "../plex/onServer";
+import sanitize from "sanitize-filename";
+import logger from "../util/logger";
+import {movieLookup} from "../tmdb/movie";
+import {showLookup} from "../tmdb/show";
 
 async function search(term) {
   logger.log("verbose", `TMDB Search ${term}`);
@@ -113,4 +114,4 @@ async function searchCompanies(term) {
   }
 }
 
-module.exports = search;
+export default search;

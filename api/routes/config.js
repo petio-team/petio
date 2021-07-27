@@ -1,9 +1,9 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const fs = require("fs");
-const path = require("path");
-const logger = require("../util/logger");
-const { adminRequired } = require("../middleware/auth");
+import fs from "fs";
+import path from "path";
+import logger from "../util/logger";
+import {adminRequired} from "../middleware/auth";
 
 router.use(adminRequired);
 router.post("/update", async (req, res) => {
@@ -68,4 +68,4 @@ router.get("/current", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

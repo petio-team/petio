@@ -1,8 +1,8 @@
-const request = require("xhr-request");
-const axios = require("axios");
+import request from "xhr-request";
+import axios from "axios";
 
 // Config
-const getConfig = require("../util/config");
+import getConfig from "../util/config";
 
 async function getBandwidth() {
   const prefs = getConfig();
@@ -15,4 +15,4 @@ async function getBandwidth() {
   }
 }
 
-module.exports = getBandwidth;
+export default getBandwidth;

@@ -1,19 +1,20 @@
-const jwt = require("jsonwebtoken");
-const request = require("xhr-request");
-// Config
-const getConfig = require("../util/config");
+import jwt from "jsonwebtoken";
+import request from "xhr-request";
 
-const express = require("express");
+// Config
+import getConfig from "../util/config";
+
+import express from "express";
 const router = express.Router();
-const User = require("../models/user");
-const logger = require("../util/logger");
-const bcrypt = require("bcryptjs");
-const { authenticate } = require("../middleware/auth");
-const getDiscovery = require("../discovery/display");
-const getHistory = require("../plex/history");
-const getTop = require("../plex/top");
-const axios = require("axios");
-const xmlParser = require("xml-js");
+import User from "../models/user";
+import logger from "../util/logger";
+import bcrypt from "bcryptjs";
+import {authenticate} from "../middleware/auth";
+import getDiscovery from "../discovery/display";
+import getHistory from "../plex/history";
+import getTop from "../plex/top";
+import axios from "axios";
+import xmlParser from "xml-js";
 
 router.post("/", async (req, res) => {
   const prefs = getConfig();
@@ -203,4 +204,4 @@ async function saveRequestIp(user, request_ip) {
   }
 }
 
-module.exports = router;
+export default router;

@@ -1,6 +1,6 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const { showLookup, discoverSeries, network } = require("../tmdb/show");
+import {showLookup, discoverSeries, network} from "../tmdb/show";
 
 router.get("/lookup/:id", async (req, res) => {
   let data = await showLookup(req.params.id, false);
@@ -24,4 +24,4 @@ router.get("/network/:id", async (req, res) => {
   res.json(data);
 });
 
-module.exports = router;
+export default router;

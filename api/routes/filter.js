@@ -1,8 +1,8 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const logger = require("../util/logger");
-const { adminRequired } = require("../middleware/auth");
-const Filter = require("../models/filter");
+import logger from "../util/logger";
+import {adminRequired} from "../middleware/auth";
+import Filter from "../models/filter";
 
 router.use(adminRequired);
 
@@ -69,4 +69,4 @@ router.get("/", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

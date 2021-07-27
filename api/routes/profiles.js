@@ -1,9 +1,9 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const Profile = require("../models/profile");
-const User = require("../models/user");
-const logger = require("../util/logger");
-const { adminRequired } = require("../middleware/auth");
+import Profile from "../models/profile";
+import User from "../models/user";
+import logger from "../util/logger";
+import {adminRequired} from "../middleware/auth";
 
 router.use(adminRequired);
 router.get("/all", async (req, res) => {
@@ -132,4 +132,4 @@ router.post("/delete_profile", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

@@ -1,15 +1,15 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const User = require("../models/user");
-const Profile = require("../models/profile");
-const http = require("follow-redirects").http;
-const logger = require("../util/logger");
-const bcrypt = require("bcryptjs");
-const { adminRequired, authRequired } = require("../middleware/auth");
-var multer = require("multer");
-const getConfig = require("../util/config");
-const fs = require("fs");
-const path = require("path");
+import User from "../models/user";
+import Profile from "../models/profile";
+import {http} from "follow-redirects";
+import logger from "../util/logger";
+import bcrypt from "bcryptjs";
+import {adminRequired, authRequired} from "../middleware/auth";
+import multer from "multer";
+import getConfig from "../util/config";
+import fs from "fs";
+import path from "path";
 const uploadPath = process.pkg
   ? path.join(path.dirname(process.execPath), `./config/uploads`)
   : path.join(__dirname, `../config/uploads`);
@@ -381,4 +381,4 @@ async function updateConfig(obj) {
   }
 }
 
-module.exports = router;
+export default router;

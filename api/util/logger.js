@@ -1,5 +1,5 @@
-var path = require("path");
-const winston = require("winston");
+import path from "path";
+import winston from "winston";
 
 let logfile = process.pkg
   ? path.join(path.dirname(process.execPath), "./logs/logfile.log")
@@ -54,4 +54,4 @@ const logger = winston.createLogger({
   ],
 });
 
-module.exports = logger;
+export default logger;

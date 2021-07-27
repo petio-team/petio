@@ -1,4 +1,4 @@
-const axios = require("axios");
+import axios from "axios";
 
 // Config
 
@@ -12,4 +12,4 @@ async function testConnection(prot, ip, port, token) {
   }
 }
 
-module.exports = testConnection;
+export default testConnection;

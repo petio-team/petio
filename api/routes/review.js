@@ -1,9 +1,9 @@
 require("dotenv/config");
 
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const Review = require("../models/review");
-const User = require("../models/user");
+import Review from "../models/review";
+import User from "../models/user";
 
 router.post("/add", async (req, res) => {
   let item = req.body.item;
@@ -52,4 +52,4 @@ router.get("/all/:id", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

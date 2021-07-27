@@ -1,11 +1,11 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const Issue = require("../models/issue");
-const logger = require("../util/logger");
-const Mailer = require("../mail/mailer");
-const User = require("../models/user");
-const { movieLookup } = require("../tmdb/movie");
-const { showLookup } = require("../tmdb/show");
+import Issue from "../models/issue";
+import logger from "../util/logger";
+import Mailer from "../mail/mailer";
+import User from "../models/user";
+import {movieLookup} from "../tmdb/movie";
+import {showLookup} from "../tmdb/show";
 
 router.post("/add", async (req, res) => {
   const newIssue = new Issue({
@@ -121,4 +121,4 @@ async function mailIssueResolve(user_id, media_id, type, title, message) {
   );
 }
 
-module.exports = router;
+export default router;

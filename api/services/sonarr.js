@@ -1,8 +1,8 @@
-const Request = require("../models/request");
-const fs = require("fs");
-const path = require("path");
-const logger = require("../util/logger");
-const axios = require("axios");
+import Request from "../models/request";
+import fs from "fs";
+import path from "path";
+import logger from "../util/logger";
+import axios from "axios";
 
 class Sonarr {
   constructor() {
@@ -361,4 +361,4 @@ class Sonarr {
   }
 }
 
-module.exports = Sonarr;
+export default Sonarr;

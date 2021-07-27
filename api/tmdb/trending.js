@@ -1,21 +1,21 @@
-const http = require("http");
+import http from "http";
 const agent = new http.Agent({ family: 4 });
-const axios = require("axios");
-const Promise = require("bluebird");
+import axios from "axios";
+import Promise from "bluebird";
 
 // Config
-const getConfig = require("../util/config");
-const { movieLookup } = require("../tmdb/movie");
-const { showLookup } = require("../tmdb/show");
+import getConfig from "../util/config";
 
-const cacheManager = require("cache-manager");
+import {movieLookup} from "../tmdb/movie";
+import {showLookup} from "../tmdb/show";
+import cacheManager from "cache-manager";
 const memoryCache = cacheManager.caching({
   store: "memory",
   max: 3,
   ttl: 86400 /*seconds*/,
 });
 
-const logger = require("../util/logger");
+import logger from "../util/logger";
 
 async function trending() {
   logger.log("verbose", `TMDB Trending lookup`);
@@ -226,4 +226,4 @@ async function showsData() {
   }
 }
 
-module.exports = trending;
+export default trending;

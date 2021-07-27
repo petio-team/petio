@@ -1,7 +1,7 @@
-const axios = require("axios");
+import axios from "axios";
 
 // Config
-const getConfig = require("../util/config");
+import getConfig from "../util/config";
 
 async function getServerInfo() {
   const prefs = getConfig();
@@ -14,4 +14,4 @@ async function getServerInfo() {
   }
 }
 
-module.exports = getServerInfo;
+export default getServerInfo;

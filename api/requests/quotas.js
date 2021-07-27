@@ -1,5 +1,5 @@
-const User = require("../models/user");
-const logger = require("../util/logger");
+import User from "../models/user";
+import logger from "../util/logger";
 
 class QuotaSystem {
   async reset() {
@@ -8,4 +8,4 @@ class QuotaSystem {
   }
 }
 
-module.exports = QuotaSystem;
+export default QuotaSystem;

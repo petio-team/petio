@@ -1,9 +1,9 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const getHistory = require("../plex/history");
-const getBandwidth = require("../plex/bandwidth");
-const getServerInfo = require("../plex/serverInfo");
-const logger = require("../util/logger");
+import getHistory from "../plex/history";
+import getBandwidth from "../plex/bandwidth";
+import getServerInfo from "../plex/serverInfo";
+import logger from "../util/logger";
 
 router.post("/", async (req, res) => {
   let id = req.body.id;
@@ -40,4 +40,4 @@ router.get("/server", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

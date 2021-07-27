@@ -1,10 +1,10 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const fs = require("fs");
-const path = require("path");
-const Mailer = require("../mail/mailer");
-const logger = require("../util/logger");
-const { adminRequired } = require("../middleware/auth");
+import fs from "fs";
+import path from "path";
+import Mailer from "../mail/mailer";
+import logger from "../util/logger";
+import {adminRequired} from "../middleware/auth";
 
 router.use(adminRequired);
 router.post("/create", async (req, res) => {
@@ -112,4 +112,4 @@ function createConfig(data) {
   });
 }
 
-module.exports = router;
+export default router;

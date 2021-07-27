@@ -1,11 +1,11 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const request = require("xhr-request");
-const Movie = require("../models/movie");
-const { movieLookup, discoverMovie } = require("../tmdb/movie");
+import request from "xhr-request";
+import Movie from "../models/movie";
+import {movieLookup, discoverMovie} from "../tmdb/movie";
 
 // Config
-const getConfig = require("../util/config");
+import getConfig from "../util/config";
 
 router.get("/:id/movie", async (req, res) => {
   let id = req.params.id;
@@ -110,4 +110,4 @@ function getHistory(id) {
   });
 }
 
-module.exports = router;
+export default router;
