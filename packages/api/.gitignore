@@ -1,5 +1,6 @@
 .env
-/node_modules/**/*
+node_modules/
+logs/
 petio-rest-linux
 petio-rest-macos
 *.exe
