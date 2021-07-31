@@ -2,4 +2,4 @@
 . "$(dirname "$0")/_/husky.sh"
 
 yarn lint
-yarn --cwd ./api test
+yarn --cwd ./packages/api test
