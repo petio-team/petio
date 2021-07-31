@@ -343,6 +343,7 @@ class LibraryUpdate {
       } catch (err) {
         logger.log("error", `LIB CRON: Unable to get library content`);
         logger.log({ level: "error", message: err });
+        console.log(err.stack);
       }
     }
   }
@@ -418,6 +419,13 @@ class LibraryUpdate {
           return;
         }
         for (let guid of movieObj.Guid) {
+          if (!guid.id) {
+            logger.log(
+              "warn",
+              `LIB CRON: Movie couldn't be matched - ${title} - no GUID ID`
+            );
+            return;
+          }
           let source = guid.id.split("://");
           externalIds[source[0] + "_id"] = source[1];
           if (source[0] === "tmdb") tmdbId = source[1];
@@ -454,10 +462,19 @@ class LibraryUpdate {
       if (idSource === "themoviedb") {
         idSource = "tmdb";
       }
-      externalId = movieObj.guid
-        .replace("com.plexapp.agents.", "")
-        .split("://")[1]
-        .split("?")[0];
+
+      try {
+        externalId = movieObj.guid
+          .replace("com.plexapp.agents.", "")
+          .split("://")[1]
+          .split("?")[0];
+      } catch (e) {
+        logger.log(
+          "warn",
+          `LIB CRON: Movie couldn't be matched - ${title} - GUID Error #2 - GUID is - ${movieObj.guid}`
+        );
+        return;
+      }
 
       if (idSource !== "tmdb") {
         try {
@@ -633,6 +650,13 @@ class LibraryUpdate {
           return;
         }
         for (let guid of showObj.Guid) {
+          if (!guid.id) {
+            logger.log(
+              "warn",
+              `LIB CRON: Show couldn't be matched - ${title} - no GUID ID`
+            );
+            return;
+          }
           let source = guid.id.split("://");
           externalIds[source[0] + "_id"] = source[1];
           if (source[0] === "tmdb") tmdbId = source[1];

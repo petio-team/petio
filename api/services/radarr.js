@@ -52,15 +52,20 @@ class Radarr {
       let key = val;
       paramsString += `${i === 0 ? "?" : "&"}${key}=${params[val]}`;
     });
-    let url = `${this.config.protocol}://${this.config.hostname}${
-      this.config.port ? ":" + this.config.port : ""
-    }${this.config.urlBase}/api/v3/${endpoint}${paramsString}`;
+    let url = `${this.config.protocol}://${this.config.hostname}${this.config.port ? ":" + this.config.port : ""
+      }${this.config.urlBase}/api/v3/${endpoint}${paramsString}`;
     try {
       if (method === "post" && body) {
         let res = await axios.post(url, body);
+        if (typeof res.data !== 'object') {
+          reject("not a valid object");
+        }
         return res.data;
       } else {
         let res = await axios.get(url);
+        if (typeof res.data !== 'object') {
+          reject("not a valid object");
+        }
         return res.data;
       }
     } catch (err) {

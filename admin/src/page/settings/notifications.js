@@ -210,6 +210,10 @@ class Notifications extends React.Component {
       }
     }
 
+    componentDidMount() {
+      this.loadConfigs();
+    }    
+
     render() {
       return (
         <>

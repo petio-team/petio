@@ -185,14 +185,16 @@ class Requests extends React.Component {
           let uuid = Object.keys(r)[0];
           let child =
             req.children && req.children[i] ? req.children[i].info : {};
+          let path = false;
+          if (child.path) {
+            path = child.path
+              .replace(`/${req.title} (${child.year})`, "")
+              .replace(`\\${req.title} (${child.year})`, "");
+          }
           edit_radarr[uuid] = {
             active: true,
             profile: child.qualityProfileId ? child.qualityProfileId : false,
-            path: child.path
-              ? child.path
-                  .replace(`/${req.title} (${child.year})`, "")
-                  .replace(`\\${req.title} (${child.year})`, "")
-              : false,
+            path: path,
           };
         });
       } else {
@@ -214,14 +216,14 @@ class Requests extends React.Component {
         req.sonarrId.map((r, i) => {
           let uuid = Object.keys(r)[0];
           let child = req.children[i] ? req.children[i].info : {};
+          let path = false;
+          if (child.rootFolderPath) {
+            path = child.rootFolderPath.slice(0, -1);
+          }
           edit_sonarr[uuid] = {
             active: true,
             profile: child.qualityProfileId ? child.qualityProfileId : false,
-            path: child.path
-              ? child.path
-                  .replace(`${req.title} (${child.year})`, "")
-                  .replace(`${req.title} (${child.year})`, "")
-              : false,
+            path: path,
           };
         });
       } else {
@@ -276,6 +278,7 @@ class Requests extends React.Component {
 
   renderReqEdit(server, type) {
     let editable = this.state.activeRequest[`${type}Id`].length === 0;
+
     return (
       <div
         className="request-edit--server--wrap"
@@ -343,8 +346,13 @@ class Requests extends React.Component {
                 data-id={server.uuid}
                 name="path"
                 value={
-                  this.state[`edit_${type}`][server.uuid]
-                    ? this.state[`edit_${type}`][server.uuid].path
+                  this.state[`edit_${type}`][server.uuid]?.path
+                    ? this.state[`edit_${type}`][server.uuid]?.path
+                    : false
+                }
+                dataValue={
+                  this.state[`edit_${type}`][server.uuid]?.path
+                    ? this.state[`edit_${type}`][server.uuid]?.path
                     : false
                 }
                 onChange={this.changeServerSettings}
@@ -530,14 +538,7 @@ class Requests extends React.Component {
               : false
           }
           delete={this.deleteReq}
-          submit={
-            this.state.activeRequest
-              ? this.state.activeRequest.sonarrId.length > 0 ||
-                this.state.activeRequest.radarrId.length > 0
-                ? false
-                : this.updateReq
-              : false
-          }
+          submit={this.updateReq}
         >
           {this.state.activeRequest ? (
             <>
