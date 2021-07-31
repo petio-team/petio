@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "app-root-path": "^3.0.0",
     "axios": "^0.21.1",
     "bcryptjs": "2.4.3",
     "bluebird": "^3.7.2",
@@ -20,6 +21,7 @@
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "cron": "^1.8.2",
+    "env-var": "^7.0.1",
     "express": "^4.17.1",
     "express-cache-middleware": "^1.0.1",
     "follow-redirects": "^1.13.3",
@@ -48,13 +50,14 @@
     "zod": "^3.5.1"
   },
   "devDependencies": {
+    "@types/app-root-path": "^1.2.4",
     "@types/jest": "^26.0.24",
     "dotenv": "^8.2.0",
     "jest": "^27.0.6",
     "ts-jest": "^27.0.3",
-    "typescript": "^4.3.5",
     "ts-node": "^10.1.0",
-    "ts-node-dev": "^1.1.8"
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.3.5"
   },
   "bin": "app.js",
   "targets": [

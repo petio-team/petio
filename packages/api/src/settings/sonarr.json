@@ -1,0 +1,16 @@
+[
+    {
+        "active": true,
+        "title": "TV",
+        "protocol": "https",
+        "hostname": "sonarr-4k-seed-02.asprexstudios.co.uk",
+        "apiKey": "xpTNCE9rYK$3$AfTGCsSE$Koak38",
+        "port": "443",
+        "urlBase": "",
+        "path": "2",
+        "path_title": "/mnt/unionfs/tv-4k",
+        "profile": "7",
+        "profile_title": "4K",
+        "uuid": "77d7aadd-decd-40e8-9a76-7079a8d16e5f"
+    }
+]

@@ -1,13 +1,23 @@
-import path from "path";
-import * as Config from "./config";
+import * as Settings from "./settings";
 import * as T from "./types";
 
-test("load config file", async () => {
+import path from "path";
+
+const testDir = path.join(process.cwd(), "src", "settings", "__test__");
+
+test("validate resource availability", async () => {
   const file = path.join(
-    process.cwd(),
-    "config",
-    "__test__",
-    "full_config.yaml"
+    testDir,
+    "full.yaml"
+  );
+
+  expect(await Settings.IsResourceAvailable(file)).toStrictEqual(true);
+});
+
+test("load settings file", async () => {
+  const file = path.join(
+    testDir,
+    "full.yaml"
   );
   const data: T.Config = {
     discovery: {
@@ -47,11 +57,11 @@ test("load config file", async () => {
     },
   };
 
-  expect(await Config.LoadConfig(file)).toStrictEqual(data);
+  expect(await Settings.LoadSettingsFile(file)).toStrictEqual(data);
 });
 
 test("load legacy config files", async () => {
-  const dir = path.join(process.cwd(), "config", "__test__", "oldConfigs");
+  const dir = path.join(testDir, "oldConfigs");
   const data: T.LegacyConfigs = {
     sonarr: [
       {
@@ -118,12 +128,12 @@ test("load legacy config files", async () => {
     },
   };
 
-  expect(await Config.LoadLegacyConfigs(dir)).toStrictEqual(data);
+  expect(await Settings.LoadLegacyConfigFiles(dir)).toStrictEqual(data);
 });
 
 test("parse legacy config files into a new schema", async () => {
-  const dir = path.join(process.cwd(), "config", "__test__", "oldConfigs");
-  const configs = await Config.LoadLegacyConfigs(dir);
+  const dir = path.join(testDir, "oldConfigs");
+  const configs = await Settings.LoadLegacyConfigFiles(dir);
   const data: T.Config = {
     general: {
       basePath: "/base_path",
@@ -208,11 +218,11 @@ test("parse legacy config files into a new schema", async () => {
     ],
   };
 
-  expect(Config.UpgradeLegacyConfigs(configs)).toStrictEqual(data);
+  expect(Settings.UpgradeLegacyConfigs(configs)).toStrictEqual(data);
 });
 
-test("write config data to file", async () => {
-  const source = path.join(process.cwd(), "config", "__test__", "petio.yaml");
+test("write settings data to file", async () => {
+  const source = path.join(testDir, "petio.yaml");
   const data: T.Config = {
     general: {
       basePath: "/base_path",
@@ -297,6 +307,6 @@ test("write config data to file", async () => {
     ],
   };
 
-  await Config.WriteConfig(source, data);
-  expect(await Config.LoadConfig(source)).toStrictEqual(data);
+  await Settings.WriteConfig(source, data);
+  expect(await Settings.LoadSettingsFile(source)).toStrictEqual(data);
 });

@@ -1,0 +1,16 @@
+[
+    {
+        "active": false,
+        "title": "4K",
+        "protocol": "https",
+        "hostname": "radarr-4k-seed-02.asprexstudios.co.uk",
+        "apiKey": "xpTNCE9rYK$3$AfTGCsSE$Koak38",
+        "port": "443",
+        "urlBase": "",
+        "path": "3",
+        "path_title": "/mnt/unionfs/movies-4k",
+        "profile": "7",
+        "profile_title": "4K",
+        "uuid": "08108733-3b30-46cd-af4c-111af03d7f4e"
+    }
+]

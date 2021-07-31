@@ -1,0 +1,8 @@
+{
+    "emailEnabled": true,
+    "emailUser": "sdsdds",
+    "emailPass": "sddsds",
+    "emailServer": "sdsdds",
+    "emailPort": "234",
+    "emailSecure": true
+}

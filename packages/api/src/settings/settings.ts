@@ -1,74 +1,94 @@
-import fs from "fs/promises";
-import path from "path";
-import xdg from "xdg-app-paths";
-import yaml from "yaml";
 import * as T from "./types";
 
-// configName provides the name of the main config file
-const configName = "petio.yaml";
+import { access, readFile, stat, writeFile } from "fs/promises";
+
+import { constants } from 'fs';
+import locals from "../app/locals";
+import path from "path";
+import yaml from "yaml";
 
 /**
- * GetConfigPath gets a path to the config file
- *
- * @returns a full path to the config file
+ * configName stores the name of our config file
  */
-export const GetConfigPath = (): string => {
-  return path.join(xdg.config(), "petio", configName);
+const settingsName = "petio.yaml";
+
+/**
+ * GetSettingsPath gets a path to the settings file
+ *
+ * @returns a full path to the settings file
+ */
+export const GetSettingsPath = (): string => {
+  return path.join(locals.CONFIG_DIR, settingsName);
+};
+
+export const LoadSettings = async (): Promise<T.Config> => {
+  const legacyConfigDir = path.join(locals.APP_DIR, "./packages/api/config");
+  const legacyConfigs = await LoadLegacyConfigFiles(legacyConfigDir);
+  let settings: T.Config = {};
+  if (Object.keys(legacyConfigs).length) {
+    settings = UpgradeLegacyConfigs(legacyConfigs);
+  }
+
+  if (!Object.keys(settings).length) {
+    settings = await LoadSettingsFile(GetSettingsPath());
+  }
+
+  return settings;
 };
 
 /**
- * LoadConfig attempts to load a config file
+ * LoadSettingsFile attempts to load a settings file
  *
- * @param configPath the path of which the config is located
+ * @param settingsPath the path of which the setting file is located
  * @returns a new instance of a config
  */
-export const LoadConfig = async (
-  configPath: string
-): Promise<T.Config | undefined> => {
-  const stat = await fs.stat(configPath);
-  if (!stat.isFile()) {
-    return;
+export const LoadSettingsFile = async (
+  settingsPath: string
+): Promise<T.Config> => {
+  const exists = await IsResourceAvailable(settingsPath);
+  if (!exists) {
+    return {};
   }
 
-  const file = await fs.readFile(configPath, "utf-8");
+  const file = await readFile(settingsPath, "utf-8");
   const raw = yaml.parse(file.toString());
 
   return T.ConfigSchema.parse(raw);
 };
 
 /**
- * Loads all legacy config files
+ * LoadLegacyConfigFiles loads all legacy config files
  *
  * @returns an object of legacy config files
  */
-export const LoadLegacyConfigs = async (
+export const LoadLegacyConfigFiles = async (
   legacyConfigPath: string
 ): Promise<T.LegacyConfigs> => {
   const legacyConfig: T.LegacyConfigs = {};
   let source = "";
 
   source = path.join(legacyConfigPath, "config.json");
-  let stat = await fs.stat(source);
-  if (stat.isFile()) {
-    const file = await fs.readFile(source, {
+  let exists = await IsResourceAvailable(source);
+  if (exists) {
+    const file = await readFile(source, {
       encoding: "utf-8",
     });
     legacyConfig.config = T.LegacyConfigSchema.parse(JSON.parse(file));
   }
 
   source = path.join(legacyConfigPath, "email.json");
-  stat = await fs.stat(source);
-  if (stat.isFile()) {
-    const file = await fs.readFile(source, {
+  exists = await IsResourceAvailable(source);
+  if (exists) {
+    const file = await readFile(source, {
       encoding: "utf-8",
     });
     legacyConfig.email = T.LegacyEmailConfigSchema.parse(JSON.parse(file));
   }
 
   source = path.join(legacyConfigPath, "radarr.json");
-  stat = await fs.stat(source);
-  if (stat.isFile()) {
-    const file = await fs.readFile(source, {
+  exists = await IsResourceAvailable(source);
+  if (exists) {
+    const file = await readFile(source, {
       encoding: "utf-8",
     });
     const instances = T.LegacyArrConfigSchema.array().parse(JSON.parse(file));
@@ -76,9 +96,9 @@ export const LoadLegacyConfigs = async (
   }
 
   source = path.join(legacyConfigPath, "sonarr.json");
-  stat = await fs.stat(source);
-  if (stat.isFile()) {
-    const file = await fs.readFile(source, {
+  exists = await IsResourceAvailable(source);
+  if (exists) {
+    const file = await readFile(source, {
       encoding: "utf-8",
     });
     const instances = T.LegacyArrConfigSchema.array().parse(JSON.parse(file));
@@ -227,5 +247,16 @@ export const WriteConfig = async (
   configPath: string,
   data: T.Config
 ): Promise<void> => {
-  await fs.writeFile(configPath, yaml.stringify(data));
+  await writeFile(configPath, yaml.stringify(data));
 };
+
+export const IsResourceAvailable = async (resourcePath: string): Promise<boolean> => {
+  try {
+    await stat(resourcePath);
+    return true;
+  }
+  catch (err) {
+    console.log(err);
+    return false;
+  }
+ };
