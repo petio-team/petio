@@ -346,13 +346,13 @@ class Requests extends React.Component {
                 data-id={server.uuid}
                 name="path"
                 value={
-                  this.state[`edit_${type}`][server.uuid].path
-                    ? this.state[`edit_${type}`][server.uuid].path
+                  this.state[`edit_${type}`][server.uuid]?.path
+                    ? this.state[`edit_${type}`][server.uuid]?.path
                     : false
                 }
                 dataValue={
-                  this.state[`edit_${type}`][server.uuid].path
-                    ? this.state[`edit_${type}`][server.uuid].path
+                  this.state[`edit_${type}`][server.uuid]?.path
+                    ? this.state[`edit_${type}`][server.uuid]?.path
                     : false
                 }
                 onChange={this.changeServerSettings}
