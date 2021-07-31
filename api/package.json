@@ -4,7 +4,8 @@
   "description": "Rest Api for Petio",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "ts-node app.js",
+    "dev": "ts-node-dev app.js",
     "test": "jest"
   },
   "author": "",
@@ -51,7 +52,9 @@
     "dotenv": "^8.2.0",
     "jest": "^27.0.6",
     "ts-jest": "^27.0.3",
-    "typescript": "^4.3.5"
+    "typescript": "^4.3.5",
+    "ts-node": "^10.1.0",
+    "ts-node-dev": "^1.1.8"
   },
   "bin": "app.js",
   "targets": [
