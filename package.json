@@ -5,6 +5,10 @@
   "main": "petio.js",
   "author": "",
   "license": "ISC",
+  "private": "true",
+  "workspaces": [
+    "packages/*"
+  ],
   "dependencies": {
     "cluster": "^0.7.7",
     "express": "^4.17.1",
@@ -14,10 +18,10 @@
     "url": "^0.11.0"
   },
   "scripts": {
-    "start": "node petio.js",
-    "lint": "yarn eslint ./api --ext .ts,.tsx",
-    "version": "npm -s run env echo '$npm_package_version'",
-    "stamp-version": "mv petio.zip petio-${npm_package_version}.zip",
+    "dev:api": "yarn workspace petio-api dev",
+    "dev:frontend": "yarn workspace petio-frontend dev",
+    "dev:admin": "yarn workspace petio-admin dev",
+    "lint": "yarn eslint . --ext .ts,.tsx",
     "prepare": "husky install"
   },
   "devDependencies": {
