@@ -15,7 +15,7 @@
   },
   "scripts": {
     "start": "node petio.js",
-    "lint": "yarn eslint . --ext .ts,.tsx",
+    "lint": "yarn eslint ./api --ext .ts,.tsx",
     "version": "npm -s run env echo '$npm_package_version'",
     "stamp-version": "mv petio.zip petio-${npm_package_version}.zip",
     "prepare": "husky install"
