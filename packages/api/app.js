@@ -1,54 +1,51 @@
-import express from "express";
-const app = express();
-import mongoose from "mongoose";
-import cors from "cors";
 import "dotenv/config";
-import fs from "fs";
-import path from "path";
-import pjson from "./package.json";
 import "cache-manager";
-import logger from "./util/logger";
-import cluster from "cluster";
-import trending from "./tmdb/trending";
-import bcrypt from "bcryptjs";
-import cookieParser from "cookie-parser";
 
-// Config
-import getConfig from "./util/config";
-
-import setupReady from "./util/setupReady";
 import Worker from "./worker";
-
-// Plex
-import testConnection from "./plex/testConnection";
-
+import { authRequired } from "./src/middleware/auth";
+import batchRoute from "./src/routes/batch";
+import bcrypt from "bcryptjs";
+import cluster from "cluster";
+import configRoute from "./src/routes/config";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import discoveryRoute from "./src/routes/discovery";
+import express from "express";
+import filterRoute from "./src/routes/filter";
+import fs from "fs";
+import genieRoute from "./src/routes/genie";
+// Config
+import getConfig from "./src/util/config";
+import historyRoute from "./src/routes/history";
+import issueRoute from "./src/routes/issue";
+import logger from "./src/util/logger";
+import loginRoute from "./src/routes/login";
+import logsRoute from "./src/routes/log";
+import mailRoute from "./src/routes/mail";
+import mongoose from "mongoose";
 // Routes
-import movieRoute from "./routes/movie";
+import movieRoute from "./src/routes/movie";
+import notificationsRoute from "./src/routes/notifications";
+import path from "path";
+import personRoute from "./src/routes/person";
+import pjson from "./package.json";
+import plexRoute from "./src/routes/plex";
+import profileRoute from "./src/routes/profiles";
+import requestRoute from "./src/routes/request";
+import reviewRoute from "./src/routes/review";
+import searchRoute from "./src/routes/search";
+import servicesRoute from "./src/routes/services";
+import sessionsRoute from "./src/routes/sessions";
+import setupReady from "./src/util/setupReady";
+import showRoute from "./src/routes/show";
+// Plex
+import testConnection from "./src/plex/testConnection";
+import topRoute from "./src/routes/top";
+import trending from "./src/tmdb/trending";
+import trendingRoute from "./src/routes/trending";
+import userRoute from "./src/routes/user";
 
-import showRoute from "./routes/show";
-import searchRoute from "./routes/search";
-import personRoute from "./routes/person";
-import loginRoute from "./routes/login";
-import trendingRoute from "./routes/trending";
-import requestRoute from "./routes/request";
-import topRoute from "./routes/top";
-import historyRoute from "./routes/history";
-import plexRoute from "./routes/plex";
-import reviewRoute from "./routes/review";
-import userRoute from "./routes/user";
-import genieRoute from "./routes/genie";
-import sessionsRoute from "./routes/sessions";
-import servicesRoute from "./routes/services";
-import mailRoute from "./routes/mail";
-import issueRoute from "./routes/issue";
-import profileRoute from "./routes/profiles";
-import configRoute from "./routes/config";
-import logsRoute from "./routes/log";
-import filterRoute from "./routes/filter";
-import discoveryRoute from "./routes/discovery";
-import notificationsRoute from "./routes/notifications";
-import batchRoute from "./routes/batch";
-import { authRequired } from "./middleware/auth";
+const app = express();
 
 class Main {
   constructor() {
