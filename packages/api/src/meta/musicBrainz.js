@@ -1,7 +1,7 @@
-import {MusicBrainzApi} from "musicbrainz-api";
-import pjson from "../package.json";
-import sanitize from "sanitize-filename";
+import { MusicBrainzApi } from "musicbrainz-api";
 import logger from "../util/logger";
+import pjson from "../../package.json";
+import sanitize from "sanitize-filename";
 
 class MusicMeta {
   constructor() {
