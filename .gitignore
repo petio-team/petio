@@ -22,3 +22,4 @@ api/.DS_Store
 api/imdb_dump.txt
 package-lock.json
 yarn.lock
+.env
