@@ -1,9 +1,11 @@
 import * as env from "env-var";
 
+import XDGAppPaths from "xdg-app-paths";
 import appPath from "app-root-path";
 import { config } from "dotenv";
 import path from "path";
-import xdg from "xdg-app-paths";
+
+const xdgAppPaths = XDGAppPaths({ name: "petio" });
 
 config({
   path: path.join(appPath.toString(), ".env"),
@@ -23,9 +25,7 @@ export default {
     .get("MONGODB_URL")
     .default("mongodb://localhost:27017/petio")
     .asString(),
-  CONFIG_DIR: env
-    .get("CONFIG_DIR")
-    .default(path.join(xdg.config(), "petio"))
+  CONFIG_DIR: env.get("CONFIG_DIR").default(xdgAppPaths.config()).asString(),
     .asString(),
   TRUSTED_PROXIES: env.get("TRUSTED_PROXIES").default("").asString().split(","),
   TMDB_API_KEY: env.get("TMDB_API_KEY").default("1af5ad19a2d972a67cd27eb033979c4c").asString(),
