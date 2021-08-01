@@ -6,35 +6,22 @@ import path from "path";
 const testDir = path.join(process.cwd(), "src", "settings", "__test__");
 
 test("validate resource availability", async () => {
-  const file = path.join(
-    testDir,
-    "full.yaml"
-  );
+  const file = path.join(testDir, "full.yaml");
 
   expect(await Settings.IsResourceAvailable(file)).toStrictEqual(true);
 });
 
 test("load settings file", async () => {
-  const file = path.join(
-    testDir,
-    "full.yaml"
-  );
+  const file = path.join(testDir, "full.yaml");
   const data: T.Config = {
     discovery: {
       popular: true,
-    },
-    thirdpartyapis: {
-      tmdb: "6DgcB?iQn!XPQ9d46ttH@sBaAF8&",
-      fanart: "xK!j?SN$8zMocYBsD3hgx?R&JJzp",
     },
     plex: {
       ip: "127.0.0.1",
       port: 9000,
       token: "RGKsgNx?Yqf?m8T7Y7H9kpTDn9k9",
       clientId: "EaotctDr7nNYnyYT7m6kBmK4YRm5o94a9Q7NPMqP",
-    },
-    db: {
-      url: "mongodb://127.0.0.1:9077/petio",
     },
     admin: {
       id: 763878558877,
@@ -135,15 +122,8 @@ test("parse legacy config files into a new schema", async () => {
   const dir = path.join(testDir, "oldConfigs");
   const configs = await Settings.LoadLegacyConfigFiles(dir);
   const data: T.Config = {
-    general: {
-      basePath: "/base_path",
-    },
     discovery: {
       popular: true,
-    },
-    thirdpartyapis: {
-      tmdb: "Eizb6EBc&B$G$S!5fBCd4b!xazGJ",
-      fanart: "Eizb6EBc&B$G$S!5fBCd4b!xazGJ",
     },
     plex: {
       ip: "12-34-87-177.fyAE5mgr8RzGGhzjBycCFgHGgbzX.petio.direct",
@@ -151,9 +131,6 @@ test("parse legacy config files into a new schema", async () => {
       token: "fyAE5mgr8RzGGhzjBycCFgHGgbzX",
       clientId: "BeTX8bRYjPTS47qhn3xphgp6eEHJnDhL9eBmTfgY",
       protocol: "https",
-    },
-    db: {
-      url: "mongodb://192.168.1.10:27017/petio",
     },
     admin: {
       id: 34385839843,
@@ -224,15 +201,8 @@ test("parse legacy config files into a new schema", async () => {
 test("write settings data to file", async () => {
   const source = path.join(testDir, "petio.yaml");
   const data: T.Config = {
-    general: {
-      basePath: "/base_path",
-    },
     discovery: {
       popular: true,
-    },
-    thirdpartyapis: {
-      tmdb: "Eizb6EBc&B$G$S!5fBCd4b!xazGJ",
-      fanart: "Eizb6EBc&B$G$S!5fBCd4b!xazGJ",
     },
     plex: {
       ip: "12-34-87-177.fyAE5mgr8RzGGhzjBycCFgHGgbzX.petio.direct",
@@ -240,9 +210,6 @@ test("write settings data to file", async () => {
       token: "fyAE5mgr8RzGGhzjBycCFgHGgbzX",
       clientId: "BeTX8bRYjPTS47qhn3xphgp6eEHJnDhL9eBmTfgY",
       protocol: "https",
-    },
-    db: {
-      url: "mongodb://192.168.1.10:27017/petio",
     },
     admin: {
       id: 34385839843,

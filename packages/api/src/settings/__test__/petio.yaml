@@ -1,18 +1,11 @@
-general:
-  basePath: /base_path
 discovery:
   popular: true
-thirdpartyapis:
-  tmdb: Eizb6EBc&B$G$S!5fBCd4b!xazGJ
-  fanart: Eizb6EBc&B$G$S!5fBCd4b!xazGJ
 plex:
   ip: 12-34-87-177.fyAE5mgr8RzGGhzjBycCFgHGgbzX.petio.direct
   port: 32400
   token: fyAE5mgr8RzGGhzjBycCFgHGgbzX
   clientId: BeTX8bRYjPTS47qhn3xphgp6eEHJnDhL9eBmTfgY
   protocol: https
-db:
-  url: mongodb://192.168.1.10:27017/petio
 admin:
   id: 34385839843
   username: admin

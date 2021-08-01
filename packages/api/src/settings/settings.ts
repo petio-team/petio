@@ -1,8 +1,7 @@
 import * as T from "./types";
 
-import { access, readFile, stat, writeFile } from "fs/promises";
+import { readFile, stat, writeFile } from "fs/promises";
 
-import { constants } from 'fs';
 import locals from "../app/locals";
 import path from "path";
 import yaml from "yaml";
@@ -122,9 +121,7 @@ export const UpgradeLegacyConfigs = (configs: T.LegacyConfigs): T.Config => {
       return {};
     }
     const lc: T.LegacyConfig = configs.config;
-    mainConfig.general = { basePath: lc.base_path };
     mainConfig.discovery = { popular: lc.plexPopular };
-    mainConfig.thirdpartyapis = { tmdb: lc.tmdbApi, fanart: lc.fanartApi };
     mainConfig.plex = {
       ip: lc.plexIp,
       port: lc.plexPort ? parseInt(lc.plexPort) : 32400,
@@ -139,9 +136,6 @@ export const UpgradeLegacyConfigs = (configs: T.LegacyConfigs): T.Config => {
       email: lc.adminEmail,
       displayName: lc.adminDisplayName,
       thumbnail: lc.adminThumb,
-    };
-    mainConfig.db = {
-      url: lc.DB_URL,
     };
     mainConfig.notifications = {
       discord: {
@@ -250,13 +244,13 @@ export const WriteConfig = async (
   await writeFile(configPath, yaml.stringify(data));
 };
 
-export const IsResourceAvailable = async (resourcePath: string): Promise<boolean> => {
+export const IsResourceAvailable = async (
+  resourcePath: string
+): Promise<boolean> => {
   try {
     await stat(resourcePath);
     return true;
-  }
-  catch (err) {
-    console.log(err);
+  } catch (err) {
     return false;
   }
- };
+};

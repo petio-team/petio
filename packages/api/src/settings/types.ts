@@ -1,20 +1,9 @@
 import { z } from "zod";
 
 export const ConfigSchema = z.object({
-  general: z
-    .object({
-      basePath: z.string().optional(),
-    })
-    .optional(),
   discovery: z
     .object({
       popular: z.boolean().optional(),
-    })
-    .optional(),
-  thirdpartyapis: z
-    .object({
-      tmdb: z.string().optional(),
-      fanart: z.string().optional(),
     })
     .optional(),
   plex: z
@@ -24,11 +13,6 @@ export const ConfigSchema = z.object({
       token: z.string().optional(),
       clientId: z.string().optional(),
       protocol: z.string().optional(),
-    })
-    .optional(),
-  db: z
-    .object({
-      url: z.string().optional(),
     })
     .optional(),
   admin: z
