@@ -3,6 +3,7 @@ import * as env from "env-var";
 import XDGAppPaths from "xdg-app-paths";
 import appPath from "app-root-path";
 import { config } from "dotenv";
+import isIp from "is-ip";
 import path from "path";
 
 const xdgAppPaths = XDGAppPaths({ name: "petio" });
@@ -26,6 +27,12 @@ export default {
     .default("mongodb://localhost:27017/petio")
     .asString(),
   CONFIG_DIR: env.get("CONFIG_DIR").default(xdgAppPaths.config()).asString(),
+  TRUSTED_PROXIES: env
+    .get("TRUSTED_PROXIES")
+    .default("")
+    .asString()
+    .split(",")
+    .filter((addr) => isIp(addr)),
     .asString(),
   TRUSTED_PROXIES: env.get("TRUSTED_PROXIES").default("").asString().split(","),
   TMDB_API_KEY: env.get("TMDB_API_KEY").default("1af5ad19a2d972a67cd27eb033979c4c").asString(),
