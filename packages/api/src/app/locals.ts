@@ -33,8 +33,12 @@ export default {
     .asString()
     .split(",")
     .filter((addr) => isIp(addr)),
+  TMDB_API_KEY: env
+    .get("TMDB_API_KEY")
+    .default("1af5ad19a2d972a67cd27eb033979c4c")
     .asString(),
-  TRUSTED_PROXIES: env.get("TRUSTED_PROXIES").default("").asString().split(","),
-  TMDB_API_KEY: env.get("TMDB_API_KEY").default("1af5ad19a2d972a67cd27eb033979c4c").asString(),
-  FANART_API_KEY: env.get("FANART_API_KEY").default("ee409f6fb0c5cd2352e7a454d3f580d4").asString(),
+  FANART_API_KEY: env
+    .get("FANART_API_KEY")
+    .default("ee409f6fb0c5cd2352e7a454d3f580d4")
+    .asString(),
 };
