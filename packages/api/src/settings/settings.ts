@@ -20,6 +20,12 @@ export const GetSettingsPath = (): string => {
   return path.join(locals.CONFIG_DIR, settingsName);
 };
 
+/**
+ * LoadSettings attempts to load a config file, while also checking for legacy
+ * config files and upgrading them to the new config schema if found
+ *
+ * @returns ConfigSchema an object representing a Config
+ */
 export const LoadSettings = async (): Promise<T.Config> => {
   const legacyConfigDir = path.join(locals.APP_DIR, "./packages/api/config");
   const legacyConfigs = await LoadLegacyConfigFiles(legacyConfigDir);
@@ -244,6 +250,12 @@ export const WriteConfig = async (
   await writeFile(configPath, yaml.stringify(data));
 };
 
+/**
+ * IsResourceAvailable attempts to validate the existence of a resource
+ *
+ * @param resourcePath the path to the resource itself
+ * @returns boolean true if the resource path exists and false if errors are thrown
+ */
 export const IsResourceAvailable = async (
   resourcePath: string
 ): Promise<boolean> => {
