@@ -1,4 +1,4 @@
-FROM node:16.3.0-alpine3.13 as builder
+FROM node:16.6.0-alpine3.13 as builder
 
 RUN apk add --no-cache git
 COPY ./ /source/
