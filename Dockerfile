@@ -30,7 +30,7 @@ RUN mv /build/frontend/build /build/views/frontend && \
     rm -rf /build/admin && \
     chmod -R u=rwX,go=rX /build
 
-FROM alpine:3.13
+FROM alpine:3.14.2
 
 EXPOSE 7777
 VOLUME ["/app/api/config", "/app/logs"]
