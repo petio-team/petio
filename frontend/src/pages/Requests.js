@@ -19,10 +19,12 @@ class Requests extends React.Component {
       archive: false,
       loaded: false,
       calendar: false,
+      calendarData: false,
     };
 
     this.getRequests = this.getRequests.bind(this);
     this.getCalendar = this.getCalendar.bind(this);
+    this.getCalendarData = this.getCalendarData.bind(this);
     this.getArchive = this.getArchive.bind(this);
     this.typeIcon = this.typeIcon.bind(this);
   }
@@ -42,9 +44,47 @@ class Requests extends React.Component {
       this.setState({
         calendar: data,
       });
+      this.getCalendarData();
     } catch (err) {
       console.log(err);
     }
+  }
+
+  getCalendarData() {
+    let calendarData = this.state.calendar.map((item) => {
+      if (item.series) {
+        let time = new Date(item.airDateUtc);
+        return ({
+          title: `${item.series.title} - S${item.seasonNumber.toLocaleString(
+            "en-US",
+            {
+              minimumIntegerDigits: 2,
+              useGrouping: false,
+            }
+          )}E${item.episodeNumber.toLocaleString("en-US", {
+            minimumIntegerDigits: 2,
+            useGrouping: false,
+          })}`,
+          allDay: false,
+          start: time,
+          end: time,
+          resource: item,
+        });
+      } else {
+        let time = new Date(item.inCinemas);
+        return ({
+          title: item.title,
+          allDay: true,
+          start: time,
+          end: time,
+          resource: item,
+        });
+      }
+    });
+
+    this.setState({
+      calendarData
+    });
   }
 
   async getRequests() {
@@ -100,40 +140,6 @@ class Requests extends React.Component {
 
   render() {
     const localizer = momentLocalizer(moment);
-    let calendarData = false;
-    if (this.state.calendar) {
-      calendarData = [];
-      this.state.calendar.map((item) => {
-        if (item.series) {
-          let time = new Date(item.airDateUtc);
-          calendarData.push({
-            title: `${item.series.title} - S${item.seasonNumber.toLocaleString(
-              "en-US",
-              {
-                minimumIntegerDigits: 2,
-                useGrouping: false,
-              }
-            )}E${item.episodeNumber.toLocaleString("en-US", {
-              minimumIntegerDigits: 2,
-              useGrouping: false,
-            })}`,
-            allDay: false,
-            start: time,
-            end: time,
-            resource: item,
-          });
-        } else {
-          let time = new Date(item.inCinemas);
-          calendarData.push({
-            title: item.title,
-            allDay: true,
-            start: time,
-            end: time,
-            resource: item,
-          });
-        }
-      });
-    }
     if (!this.state.loaded) {
       return (
         <div className="requests-page">
@@ -149,15 +155,12 @@ class Requests extends React.Component {
       return (
         <div className="calendar--event--wrap">
           <div
-            className={`calendar--event ${
-              event.resource.hasFile ? "recorded" : ""
-            } ${
-              this.isToday(new Date(event.resource.airDateUtc))
+            className={`calendar--event ${event.resource.hasFile ? "recorded" : ""
+              } ${this.isToday(new Date(event.resource.airDateUtc))
                 ? "airsToday"
                 : ""
-            } ${
-              new Date(event.resource.airDateUtc) < new Date() ? "hasAired" : ""
-            }`}
+              } ${new Date(event.resource.airDateUtc) < new Date() ? "hasAired" : ""
+              }`}
           >
             <div className="calendar--event--icon">
               {event.resource.series ? <TvIcon /> : <MovieIcon />}
@@ -212,10 +215,10 @@ class Requests extends React.Component {
         <section className="request-guide">
           <h3 className="sub-title mb--1">Guide</h3>
           <p>Upcoming TV airings and Movie releases.</p>
-          {calendarData ? (
+          {this.state.calendarData ? (
             <Calendar
               localizer={localizer}
-              events={calendarData}
+              events={this.state.calendarData}
               startAccessor="start"
               endAccessor="end"
               components={{
@@ -244,15 +247,13 @@ class Requests extends React.Component {
                   return (
                     <tr
                       key={req._id}
-                      className={`generic-table--row--${
-                        req.removed ? "bad" : req.complete ? "good" : "normal"
-                      }`}
+                      className={`generic-table--row--${req.removed ? "bad" : req.complete ? "good" : "normal"
+                        }`}
                     >
                       <td>
                         <Link
-                          to={`/${req.type === "movie" ? "movie" : "series"}/${
-                            req.tmdb_id
-                          }`}
+                          to={`/${req.type === "movie" ? "movie" : "series"}/${req.tmdb_id
+                            }`}
                         >
                           {req.title}
                         </Link>
@@ -263,8 +264,8 @@ class Requests extends React.Component {
                         {req.removed
                           ? "Removed"
                           : req.complete
-                          ? "Completed"
-                          : "other"}
+                            ? "Completed"
+                            : "other"}
                       </td>
                     </tr>
                   );

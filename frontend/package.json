@@ -1,6 +1,6 @@
 {
   "name": "petio",
-  "version": "0.5.2-alpha",
+  "version": "0.5.4-alpha",
   "private": true,
   "homepage": ".",
   "dependencies": {

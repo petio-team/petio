@@ -170,14 +170,16 @@ function reqState(req, children) {
           if (children[r].info.seasons) {
             let missing = false;
             for (let season of children[r].info.seasons) {
-              if (
-                season.statistics &&
-                season.statistics.percentOfEpisodes !== 100
-              )
-                missing = true;
+              if (season.monitored) {
+                if (
+                  season.statistics &&
+                  season.statistics.percentOfEpisodes !== 100
+                )
+                  missing = true;
+              }
             }
 
-            if (!missing && children[r].info.totalEpisodeCount > 0) {
+            if (!missing && children[r].info.statistics.totalEpisodeCount > 0) {
               return {
                 status: "good",
                 message: "Downloaded",

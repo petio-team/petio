@@ -26,7 +26,7 @@ This application can be installed to run in docker or as a standalone binary tha
 Binary (executable file) guides
 **note:** this method requires a local mongodb instance to be installed
 <ul>
-<li><a target="_blank" href="hhttps://docs.petio.tv/install-guides/windows">Windows</a> </li>
+<li><a target="_blank" href="https://docs.petio.tv/install-guides/windows">Windows</a> </li>
 <li><a target="_blank" href="https://docs.petio.tv/install-guides/linux">Linux</a> </li>
   <li><a target="_blank" href="https://docs.petio.tv/install-guides/macos">MacOS</a></li>
 </ul>

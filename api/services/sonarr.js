@@ -42,12 +42,14 @@ class Sonarr {
       let key = val;
       paramsString += `${i === 0 ? "?" : "&"}${key}=${params[val]}`;
     });
-    let url = `${this.config.protocol}://${this.config.hostname}${
-      this.config.port ? ":" + this.config.port : ""
-    }${this.config.urlBase}/api/v3/${endpoint}${paramsString}`;
+    let url = `${this.config.protocol}://${this.config.hostname}${this.config.port ? ":" + this.config.port : ""
+      }${this.config.urlBase}/api/v3/${endpoint}${paramsString}`;
     try {
       if (method === "post" && body) {
         let res = await axios.post(url, body);
+        if (typeof res.data !== 'object') {
+          reject("not a valid object");
+        }
         return res.data;
       } else if (method === "delete") {
         let res = await axios.delete(url);
@@ -57,6 +59,9 @@ class Sonarr {
         return res.data;
       } else {
         let res = await axios.get(url);
+        if (typeof res.data !== 'object') {
+          reject("not a valid object");
+        }
         return res.data;
       }
     } catch (err) {
@@ -223,9 +228,8 @@ class Sonarr {
       showData.qualityProfileId =
         filter && filter.profile ? filter.profile : this.config.profile;
       showData.seasonFolder = true;
-      showData.rootFolderPath = `${
-        filter && filter.path ? filter.path : this.config.path_title
-      }`;
+      showData.rootFolderPath = `${filter && filter.path ? filter.path : this.config.path_title
+        }`;
       showData.addOptions = {
         searchForMissingEpisodes: true,
       };
@@ -320,19 +324,19 @@ class Sonarr {
         this.config = server;
 
         try {
-          const seriesInfo = await this.get("/series");
+          const seriesInfo = await this.get("/series").then(this.transformSeriesData);
           let serverCal = await this.get("/calendar", {
             unmonitored: true,
             start: new Date(
               now.getFullYear(),
               now.getMonth() - 1,
               1
-            ).toISOString(),
+            ).toISOString().split('T')[0],
             end: new Date(
               now.getFullYear(),
               now.getMonth() + 2,
               1
-            ).toISOString(),
+            ).toISOString().split('T')[0],
           });
           serverCal.map((item) => {
             const seriesId = item.seriesId;
@@ -352,6 +356,14 @@ class Sonarr {
     logger.log("verbose", "SONARR: Calendar returned");
 
     return mainCalendar;
+  }
+
+  transformSeriesData(seriesArray) {
+    return seriesArray.reduce((acc, curr) => {
+      const { id, ...rest } = curr;
+      acc[id] = rest;
+      return acc;
+    }, {});
   }
 }
 
