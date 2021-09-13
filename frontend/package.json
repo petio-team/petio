@@ -5,7 +5,7 @@
   "homepage": ".",
   "dependencies": {
     "@testing-library/jest-dom": "^5.14.1",
-    "@testing-library/react": "^11.2.7",
+    "@testing-library/react": "^12.1.0",
     "@testing-library/user-event": "^13.1.9",
     "axios": "^0.21.1",
     "dateformat": "^4.5.1",
