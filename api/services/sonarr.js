@@ -226,7 +226,7 @@ class Sonarr {
         }
       }
       showData.qualityProfileId =
-        filter && filter.profile ? filter.profile : this.config.profile;
+        parseInt(filter && filter.profile ? filter.profile : this.config.profile);
       showData.seasonFolder = true;
       showData.rootFolderPath = `${filter && filter.path ? filter.path : this.config.path_title
         }`;
