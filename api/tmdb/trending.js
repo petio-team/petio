@@ -30,12 +30,24 @@ async function trending() {
     movies.results,
     async (result, i) => {
       let movieData = await movieLookup(result.id, true);
+      let videoResults = movieData.videos.results;
       movies.results[i] = {
         on_server: movieData.on_server,
         title: movieData.title,
         poster_path: movieData.poster_path,
         release_date: movieData.release_date,
         id: movieData.id,
+        backdrop_path: movieData.backdrop_path,
+        videos: {
+          results: [
+            ...videoResults.filter(
+              (obj) => obj.type == "Teaser" && obj.site == "YouTube"
+            ),
+            ...videoResults.filter(
+              (obj) => obj.type == "Trailer" && obj.site == "YouTube"
+            ),
+          ],
+        },
       };
     },
     { concurrency: 10 }
@@ -45,27 +57,40 @@ async function trending() {
     tv.results,
     async (result, i) => {
       let showData = await showLookup(result.id, true);
+      let videoResults = showData.videos.results;
       tv.results[i] = {
         on_server: showData.on_server,
         name: showData.name,
         poster_path: showData.poster_path,
         first_air_date: showData.first_air_date,
         id: showData.id,
+        backdrop_path: showData.backdrop_path,
+        videos: {
+          results: [
+            ...videoResults.filter(
+              (obj) => obj.type == "Teaser" && obj.site == "YouTube"
+            ),
+            ...videoResults.filter(
+              (obj) => obj.type == "Trailer" && obj.site == "YouTube"
+            ),
+          ],
+        },
       };
     },
     { concurrency: 10 }
   );
 
-  for (let i = 0; i < tv.results.length; i++) {
-    let showData = await showLookup(tv.results[i].id, true);
-    tv.results[i] = {
-      on_server: showData.on_server,
-      name: showData.name,
-      poster_path: showData.poster_path,
-      first_air_date: showData.first_air_date,
-      id: showData.id,
-    };
-  }
+  // for (let i = 0; i < tv.results.length; i++) {
+  //   let showData = await showLookup(tv.results[i].id, true);
+  //   tv.results[i] = {
+  //     on_server: showData.on_server,
+  //     name: showData.name,
+  //     poster_path: showData.poster_path,
+  //     first_air_date: showData.first_air_date,
+  //     id: showData.id,
+  //     backdrop_path: showData.backdrop_path,
+  //   };
+  // }
 
   await Promise.map(person.results, async (result, i) => {
     person.results[i] = {
@@ -203,7 +228,7 @@ async function moviesData() {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}trending/movie/week?api_key=${tmdbApikey}&append_to_response=images`;
+  let url = `${tmdb}trending/movie/week?api_key=${tmdbApikey}&append_to_response=images,videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -217,7 +242,7 @@ async function showsData() {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}trending/tv/week?api_key=${tmdbApikey}&append_to_response=images`;
+  let url = `${tmdb}trending/tv/week?api_key=${tmdbApikey}&append_to_response=images,videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;

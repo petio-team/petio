@@ -105,7 +105,7 @@ async function movieLookup(id, minified = false) {
       // delete movie.production_companies;
       if (minified) {
         delete movie.credits;
-        delete movie.backdrop_path;
+        // delete movie.backdrop_path;
         delete movie.belongs_to_collection;
         delete movie.genres;
         delete movie.homepage;
@@ -116,15 +116,14 @@ async function movieLookup(id, minified = false) {
         delete movie.spoken_languages;
         delete movie.status;
         delete movie.tagline;
-        delete movie.videos;
+        // delete movie.videos;
         delete movie.vote_average;
         delete movie.vote_count;
         delete movie.adult;
-        delete movie.backdrop_path;
         delete movie.genre_ids;
         delete movie.original_language;
         delete movie.overview;
-        delete movie.video;
+        // delete movie.video;
       } else {
         movie.original_language_format = getLanguage(movie.original_language);
       }
@@ -217,7 +216,7 @@ async function recommendationData(id, page = 1) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}movie/${id}/recommendations?api_key=${tmdbApikey}&page=${page}`;
+  let url = `${tmdb}movie/${id}/recommendations?api_key=${tmdbApikey}&page=${page}&append_to_response=videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -230,7 +229,7 @@ async function collectionData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}collection/${id}?api_key=${tmdbApikey}`;
+  let url = `${tmdb}collection/${id}?api_key=${tmdbApikey}&append_to_response=videos`;
 
   try {
     let res = await axios.get(url, { httpAgent: agent });
@@ -284,7 +283,7 @@ async function discoverMovie(page = 1, params = {}) {
   Object.keys(params).map((i) => {
     par += `&${i}=${params[i]}`;
   });
-  let url = `${tmdb}discover/movie?api_key=${tmdbApikey}${par}&page=${page}`;
+  let url = `${tmdb}discover/movie?api_key=${tmdbApikey}${par}&page=${page}&append_to_response=videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;

@@ -6,7 +6,6 @@ const Movie = require("../tmdb/movie");
 const Show = require("../tmdb/show");
 const getHistory = require("../plex/history");
 const onServer = require("../plex/onServer");
-const trending = require("../tmdb/trending");
 const Promise = require("bluebird");
 
 const cacheManager = require("cache-manager");
@@ -22,8 +21,7 @@ module.exports = async function getDiscoveryData(id, type = "movie") {
   const discoveryPrefs = await Discovery.findOne({ id: id });
   const config = getConfig();
   let popular = [];
-  let [trendingData, upcoming, popularData] = await Promise.all([
-    trending(),
+  let [upcoming, popularData] = await Promise.all([
     comingSoon(type),
     getTop(type === "movie" ? 1 : 2),
   ]);
@@ -45,11 +43,6 @@ module.exports = async function getDiscoveryData(id, type = "movie") {
         title:
           type === "movie" ? "Popular Movies on Plex" : "Popular Shows on Plex",
         results: popular,
-      },
-      {
-        title:
-          type === "movie" ? "Trending Movies Online" : "Trending Shows Online",
-        results: type === "movie" ? trendingData.movies : trendingData.tv,
       },
       {
         title: type === "movie" ? "Movies coming soon" : "Shows coming soon",
@@ -272,11 +265,6 @@ module.exports = async function getDiscoveryData(id, type = "movie") {
       title:
         type === "movie" ? "Popular Movies on Plex" : "Popular Shows on Plex",
       results: popular,
-    },
-    {
-      title:
-        type === "movie" ? "Trending Movies Online" : "Trending Shows Online",
-      results: type === "movie" ? trendingData.movies : trendingData.tv,
     },
     {
       title: type === "movie" ? "Movies coming soon" : "Shows coming soon",
@@ -504,7 +492,7 @@ function discoverMovie(page = 1, params = {}) {
   Object.keys(params).map((i) => {
     par += `&${i}=${params[i]}`;
   });
-  let url = `${tmdb}discover/movie?api_key=${tmdbApikey}${par}&page=${page}`;
+  let url = `${tmdb}discover/movie?api_key=${tmdbApikey}${par}&page=${page}&append_to_response=videos`;
   return new Promise((resolve, reject) => {
     request(
       url,
@@ -531,7 +519,7 @@ function discoverShow(page = 1, params = {}) {
   Object.keys(params).map((i) => {
     par += `&${i}=${params[i]}`;
   });
-  let url = `${tmdb}discover/tv?api_key=${tmdbApikey}${par}&page=${page}`;
+  let url = `${tmdb}discover/tv?api_key=${tmdbApikey}${par}&page=${page}&append_to_response=videos`;
   return new Promise((resolve, reject) => {
     request(
       url,
@@ -603,7 +591,6 @@ function formatResult(result, type) {
     delete result.spoken_languages;
     delete result.status;
     delete result.tagline;
-    delete result.videos;
     delete result.vote_average;
     delete result.vote_count;
     delete result.adult;
@@ -611,7 +598,6 @@ function formatResult(result, type) {
     delete result.genre_ids;
     delete result.original_language;
     delete result.overview;
-    delete result.video;
   } else {
     delete result.created_by;
     delete result.credits;
@@ -626,7 +612,6 @@ function formatResult(result, type) {
     delete result.overview;
     delete result.popularity;
     delete result.status;
-    delete result.videos;
     delete result.vote_average;
     delete result.vote_count;
     delete result.seasons;
@@ -676,6 +661,7 @@ async function comingSoon(type) {
                 poster_path: result.poster_path,
                 release_date: result.release_date,
                 id: result.id,
+                videos: result.videos,
               }
             : {
                 on_server: onPlex.exists,
@@ -683,6 +669,7 @@ async function comingSoon(type) {
                 poster_path: result.poster_path,
                 first_air_date: result.first_air_date,
                 id: result.id,
+                videos: result.videos,
               };
       },
       { concurrency: 10 }

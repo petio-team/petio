@@ -40,21 +40,15 @@ async function showLookup(id, minified = false) {
     }
 
     try {
-      let [
-        imdb_data,
-        fanart,
-        recommendations,
-        seasonsLookup,
-        reviews,
-        onPlex,
-      ] = await Promise.all([
-        !minified && external.imdb_id ? imdb(external.imdb_id) : false,
-        minified ? false : fanartLookup(external.tvdb_id, "tv"),
-        !minified ? getRecommendations(id) : false,
-        !minified ? getSeasons(show.seasons, id) : false,
-        !minified ? getReviews(id) : false,
-        onServer("show", external.imdb_id, external.tvdb_id, id),
-      ]);
+      let [imdb_data, fanart, recommendations, seasonsLookup, reviews, onPlex] =
+        await Promise.all([
+          !minified && external.imdb_id ? imdb(external.imdb_id) : false,
+          minified ? false : fanartLookup(external.tvdb_id, "tv"),
+          !minified ? getRecommendations(id) : false,
+          !minified ? getSeasons(show.seasons, id) : false,
+          !minified ? getReviews(id) : false,
+          onServer("show", external.imdb_id, external.tvdb_id, id),
+        ]);
 
       if (fanart) {
         if (fanart.hdtvlogo) {
@@ -124,12 +118,12 @@ async function showLookup(id, minified = false) {
         delete show.overview;
         delete show.popularity;
         delete show.status;
-        delete show.videos;
+        // delete show.videos;
         delete show.vote_average;
         delete show.vote_count;
         delete show.seasons;
         delete show.age_rating;
-        delete show.backdrop_path;
+        // delete show.backdrop_path;
         delete show.episode_run_time;
         delete show.imdb_id;
         delete show.keywords;
