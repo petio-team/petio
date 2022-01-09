@@ -102,6 +102,7 @@ async function showLookup(id, minified = false) {
         show.seasonData = seasonData;
         show.recommendations = recommendationsData;
         show.reviews = reviews.results;
+        show.keywords = show.keywords.results;
       }
 
       if (minified) {
@@ -126,7 +127,7 @@ async function showLookup(id, minified = false) {
         // delete show.backdrop_path;
         delete show.episode_run_time;
         delete show.imdb_id;
-        delete show.keywords;
+        // delete show.keywords;
         delete show.last_episode_to_air;
         delete show.networks;
         delete show.original_language;
