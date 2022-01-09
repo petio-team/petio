@@ -95,8 +95,9 @@ async function movieLookup(id, minified = false) {
 
       movie.recommendations = recommendationsData;
       movie.collection = collectionData;
-      movie.keywords.results = movie.keywords.keywords;
-      movie.keywords.keywords = {};
+      // movie.keywords.results = movie.keywords.keywords;
+      // movie.keywords.keywords = {};
+      movie.keywords = movie.keywords.keywords;
 
       delete movie.production_countries;
       delete movie.budget;
@@ -286,6 +287,14 @@ async function discoverMovie(page = 1, params = {}) {
   let url = `${tmdb}discover/movie?api_key=${tmdbApikey}${par}&page=${page}&append_to_response=videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
+    if (res.data && res.data.results.length > 0) {
+      await Promise.all(
+        res.data.results.map(async (movie) => {
+          const check = await onServer("movie", false, false, movie.id);
+          movie.on_server = check.exists;
+        })
+      );
+    }
     return res.data;
   } catch (err) {
     throw err;

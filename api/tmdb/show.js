@@ -306,7 +306,13 @@ async function reviewsData(id) {
 function findEnLogo(logos) {
   let logoUrl = false;
   logos.forEach((logo) => {
-    if (logo.lang === "en" && !logoUrl) {
+    // For some reason fanart defaults to this obscure logo sometimes so lets exclude it
+    if (
+      logo.lang === "en" &&
+      !logoUrl &&
+      logo.url !==
+        "https://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png"
+    ) {
       logoUrl = logo.url;
     }
   });
@@ -349,6 +355,14 @@ async function discoverSeries(page = 1, params = {}) {
   let url = `${tmdb}discover/tv?api_key=${tmdbApikey}${par}&page=${page}`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
+    if (res.data && res.data.results.length > 0) {
+      await Promise.all(
+        res.data.results.map(async (show) => {
+          const check = await onServer("show", false, false, show.id);
+          show.on_server = check.exists;
+        })
+      );
+    }
     return res.data;
   } catch (err) {
     throw err;
