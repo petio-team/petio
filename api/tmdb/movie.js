@@ -100,7 +100,7 @@ async function movieLookup(id, minified = false) {
       movie.keywords = movie.keywords.keywords;
 
       delete movie.production_countries;
-      delete movie.budget;
+      // delete movie.budget;
       delete movie.adult;
       delete movie.original_title;
       // delete movie.production_companies;

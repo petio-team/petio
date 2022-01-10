@@ -35,7 +35,7 @@
     "nodemailer": "^6.5.0",
     "sanitize-filename": "^1.6.3",
     "saslprep": "^1.0.3",
-    "winston": "^3.3.3",
+    "winston": "^3.3.4",
     "xhr-request": "^1.1.0",
     "xml-js": "^1.6.11",
     "zlib": "^1.0.5"
