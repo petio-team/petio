@@ -30,7 +30,7 @@
     "line-reader": "^0.4.0",
     "mongoose": "^5.12.1",
     "multer": "^1.4.2",
-    "musicbrainz-api": "^0.6.0",
+    "musicbrainz-api": "^0.7.2",
     "nodejs-nodemailer-outlook": "^1.2.4",
     "nodemailer": "^6.5.0",
     "sanitize-filename": "^1.6.3",
