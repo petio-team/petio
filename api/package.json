@@ -41,7 +41,7 @@
     "zlib": "^1.0.5"
   },
   "devDependencies": {
-    "dotenv": "^8.2.0"
+    "dotenv": "^11.0.0"
   },
   "bin": "app.js",
   "targets": [
