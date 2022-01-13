@@ -470,8 +470,8 @@ class MovieShowOverview extends React.Component {
                     </Link>
                   );
                 })}
-                {Object.keys(this.props.mediaData.keywords.results).length > 0
-                  ? this.props.mediaData.keywords.results.map((genre) => {
+                {Object.keys(this.props.mediaData.keywords).length > 0
+                  ? this.props.mediaData.keywords.map((genre) => {
                       let customGenres = [210024];
                       if (customGenres.includes(genre.id))
                         return (

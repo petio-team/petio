@@ -102,7 +102,7 @@ async function showLookup(id, minified = false) {
         show.seasonData = seasonData;
         show.recommendations = recommendationsData;
         show.reviews = reviews.results;
-        show.keywords = show.keywords.results;
+        show.keywords = show.keywords;
       }
 
       if (minified) {
