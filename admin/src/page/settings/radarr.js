@@ -32,10 +32,10 @@ class Radarr extends React.Component {
         id: null,
         location: '',
       },
-      subpath: "",
+      subpath: "/",
       key: "",
       activeServer: false,
-      uuid: false,
+      uuid: '',
       needsTest: false,
     };
 
@@ -156,7 +156,7 @@ class Radarr extends React.Component {
 
   inputChange(e) {
     const target = e.target;
-    let name = target.name;
+    const name = target.name;
     let value = target.value;
 
     if (target.classList.contains("frt")) {
@@ -172,14 +172,19 @@ class Radarr extends React.Component {
 
     if (target.type === "select-one") {
       let title = target.options[target.selectedIndex].text;
-      this.setState({
-        [`${name}`]: {
-          id: value,
-          [this.state[name].name != undefined ? 'name' : 'location']: title,
-        },
-      });
+      if (this.state[name] instanceof Object) {
+        this.setState({
+          [`${name}`]: {
+            id: value,
+            [this.state[name].name != undefined ? 'name' : 'location']: title,
+          },
+        });
+      } else {
+        this.setState({
+          [name]: value,
+        });
+      }
     } else {
-      console.log("key: " + name, ", value: " + value);
       this.setState({
         [name]: value,
       });
@@ -255,7 +260,7 @@ class Radarr extends React.Component {
       protocol: "http",
       host: "localhost",
       port: null,
-      subpath: "",
+      subpath: "/",
       key: "",
       profiles: false,
       paths: false,
@@ -270,7 +275,7 @@ class Radarr extends React.Component {
       wizardOpen: false,
       editWizardOpen: false,
       activeServer: false,
-      uuid: false,
+      uuid: '',
       newServer: false,
     });
   }
@@ -394,7 +399,7 @@ class Radarr extends React.Component {
             className="styled-input--input frt"
             type="number"
             name="port"
-            value={this.state.port ? this.state.port : '7878'}
+            value={this.state.port ? this.state.port : 7878}
             onChange={this.inputChange}
           />
           <label>URL Base</label>

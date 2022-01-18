@@ -36,11 +36,13 @@ router.post("/update", async (req, res) => {
   }
 
   try {
-    WriteConfig();
+    await WriteConfig();
   } catch (err) {
-    logger.log({ level: "error", message: err });
+    logger.error(err);
     res.status(500).send("Config Not Found");
   }
+
+  res.status(200).send("config updated");
 });
 
 router.get("/current", async (req, res) => {

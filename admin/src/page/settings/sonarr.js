@@ -23,7 +23,7 @@ class Sonarr extends React.Component {
       title: "",
       protocol: "http",
       host: "localhost",
-      port: "",
+      port: 8989,
       profile: {
         id: null,
         name: '',
@@ -32,10 +32,10 @@ class Sonarr extends React.Component {
         id: null,
         location: '',
       },
-      subpath: "",
+      subpath: "/",
       key: "",
       activeServer: false,
-      uuid: false,
+      uuid: '',
       needsTest: false,
     };
 
@@ -60,11 +60,11 @@ class Sonarr extends React.Component {
     let servers = this.state.servers;
 
     servers[this.state.activeServer] = {
-      enabled: this.state.active,
+      enabled: this.state.enabled,
       title: this.state.title,
       protocol: this.state.protocol,
       host: this.state.host,
-      key: this.state.apikey,
+      key: this.state.key,
       port: this.state.port,
       subpath: this.state.subpath === "/" ? "" : this.state.subpath,
       path: {
@@ -170,12 +170,18 @@ class Sonarr extends React.Component {
 
     if (target.type === "select-one") {
       let title = target.options[target.selectedIndex].text;
-      this.setState({
-        [`${name}`]: {
-          id: value,
-          [this.state[name].name != undefined ? 'name' : 'location']: title,
-        },
-      });
+      if (this.state[name] instanceof Object) {
+        this.setState({
+          [`${name}`]: {
+            id: value,
+            [this.state[name].name != undefined ? 'name' : 'location']: title,
+          },
+        });
+      } else {
+        this.setState({
+          [name]: value,
+        });
+      }
     } else {
       this.setState({
         [name]: value,
@@ -251,8 +257,8 @@ class Sonarr extends React.Component {
       title: "",
       protocol: "http",
       host: "localhost",
-      port: null,
-      subpath: "",
+      port: 8989,
+      subpath: "/",
       key: "",
       profiles: false,
       paths: false,
@@ -286,7 +292,7 @@ class Sonarr extends React.Component {
       protocol: "http",
       host: "localhost",
       port: null,
-      subpath: "",
+      subpath: "/",
       key: "",
       profiles: false,
       paths: false,
@@ -389,7 +395,7 @@ class Sonarr extends React.Component {
             className="styled-input--input frt"
             type="number"
             name="port"
-            value={this.state.port ? this.state.port : '8989'}
+            value={this.state.port ? this.state.port : 8989}
             onChange={this.inputChange}
           />
           <label>URL Base</label>
@@ -404,7 +410,7 @@ class Sonarr extends React.Component {
           <input
             className="styled-input--input frt"
             type="text"
-            name="apikey"
+            name="key"
             value={this.state.key ? this.state.key : ''}
             onChange={this.inputChange}
           />
@@ -421,7 +427,7 @@ class Sonarr extends React.Component {
           >
             <select
               name="profile"
-              value={this.state.profile}
+              value={this.state.profile.id}
               onChange={this.inputChange}
             >
               {this.state.profiles &&
@@ -483,7 +489,7 @@ class Sonarr extends React.Component {
             <div className="checkbox-wrap mb--2">
               <input
                 type="checkbox"
-                name="active"
+                name="enabled"
                 checked={this.state.enabled}
                 onChange={this.inputChange}
               />
