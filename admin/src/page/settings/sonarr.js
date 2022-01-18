@@ -402,7 +402,7 @@ class Sonarr extends React.Component {
           <input
             className="styled-input--input frt"
             type="text"
-            name="base"
+            name="subpath"
             value={this.state.subpath ? this.state.subpath : '/'}
             onChange={this.inputChange}
           />
