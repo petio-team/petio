@@ -72,15 +72,12 @@ class Telegram {
   async postMessage(text) {
     try {
       const params = new URLSearchParams();
-      console.log(text);
       params.append("chat_id", this.chatId);
       params.append("text", text);
       params.append("parse_mode", "HTML");
       if (this.sendSilently) {
         params.append("disable_notification", "true");
       }
-
-      console.log(params);
 
       await axios.get(
         `https://api.telegram.org/bot${this.botToken}/sendMessage`,
@@ -91,7 +88,6 @@ class Telegram {
       logger.info("Telegram: message sent");
       return true;
     } catch (err) {
-      console.log(err);
       logger.warn("Telegram: Failed to send message");
       return false;
     }

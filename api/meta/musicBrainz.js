@@ -15,7 +15,6 @@ class MusicMeta {
   async search(query) {
     let term = sanitize(query);
     let res = await this.api.searchArtist(term);
-    console.log(res.artists[0].tags);
   }
 
   async match(name, genres) {
@@ -64,7 +63,7 @@ class MusicMeta {
       }
       return match;
     } catch (e) {
-      console.log(e);
+      logger.error(e);
       return { id: "error", title: false };
     }
   }

@@ -65,8 +65,6 @@ router.post("/sonarr/config", adminRequired, async (req, res) => {
   let data = req.body.data;
   ConvertToConfig('sonarr', JSON.parse(data));
 
-  console.log(data);
-
   try {
     WriteConfig();
     res.json(data);
@@ -157,8 +155,6 @@ router.get("/radarr/test", adminRequired, async (req, res) => {
 router.post("/radarr/config", adminRequired, async (req, res) => {
   let data = req.body.data;
   ConvertToConfig('radarr', JSON.parse(data));
-
-  console.log(data);
 
   try {
     WriteConfig();

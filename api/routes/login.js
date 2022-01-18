@@ -163,7 +163,7 @@ router.post("/plex_login", async (req, res) => {
     success(dbUser.toObject(), isAdmin, res);
     saveRequestIp(dbUser, request_ip);
   } catch (err) {
-    console.log(err);
+    logger.error(err);
     res
       .status(401)
       .json({ loggedIn: false, user: null, admin: false, token: null });
@@ -179,7 +179,7 @@ async function plexOauth(token) {
     let user = data.elements[0].attributes;
     return user.id;
   } catch (err) {
-    console.log(err);
+    logger.error(err);
     throw "Plex authentication failed";
   }
 }

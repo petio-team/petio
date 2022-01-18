@@ -141,7 +141,7 @@ async function showLookup(id, minified = false) {
     } catch (err) {
       logger.log("warn", `Error processing show data - ${id}`);
       logger.log({ level: "error", message: err });
-      console.log(err);
+      logger.error(err);
       return { error: "not found" };
     }
   }
@@ -329,7 +329,7 @@ async function idLookup(id) {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
   } catch (err) {
-    console.log(url);
+    logger.error(err);
     throw err;
   }
 }

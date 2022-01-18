@@ -342,7 +342,7 @@ class LibraryUpdate {
       } catch (err) {
         logger.log("error", `LIB CRON: Unable to get library content`);
         logger.log({ level: "error", message: err });
-        console.log(err.stack);
+        logger.error(err.stack);
       }
     }
   }

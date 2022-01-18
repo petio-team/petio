@@ -24,7 +24,7 @@ router.post("/add", async (req, res) => {
     mailIssue(req.body.user, req.body.mediaId, req.body.type, req.body.title);
     res.json(savedIssue);
   } catch (err) {
-    console.log(err);
+    logger.error(err);
     logger.log("warn", "ROUTE: Error addding issue");
     logger.log("error", err.stack);
     res.status(500).json({ error: "Error adding issue" });
@@ -47,7 +47,7 @@ router.post("/remove", async (req, res) => {
     await Issue.findByIdAndDelete(issue_id);
     res.status(200).send();
   } catch (err) {
-    console.log(err);
+    logger.error(err);
     logger.log("warn", "ROUTE: Error removing issue");
     logger.log("error", err.stack);
     res.status(500).json({ error: "Error removing issue" });

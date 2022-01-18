@@ -52,7 +52,7 @@ class App {
       cluster.fork();
 
     } catch (e) {
-      console.log(e);
+      logger.error(e);
       wrkr.close();
       process.exit(0);
     }

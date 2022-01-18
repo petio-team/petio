@@ -110,7 +110,7 @@ async function getRequests(user = false, all = false) {
       )
     );
   } catch (err) {
-    console.log(err.stack);
+    logger.error(err.stack);
     logger.log("error", `ROUTE: Error getting requests display`);
     logger.log({ level: "error", message: err });
     data = requests;
@@ -157,7 +157,7 @@ function reqState(req, children) {
         if (req.type === "tv" && children[r].info) {
           if (
             children[r].info.episodeCount ===
-              children[r].info.episodeFileCount &&
+            children[r].info.episodeFileCount &&
             children[r].info.episodeCount > 0
           ) {
             return {

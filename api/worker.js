@@ -58,7 +58,7 @@ class Worker {
       logger.log("verbose", `API: Registering Quota reset job`);
       this.resetQuotas.start();
     } catch (err) {
-      console.log(err);
+      logger.error(err);
       logger.error("CRONW: Failed to start crons!");
     }
   }

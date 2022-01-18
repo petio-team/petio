@@ -241,7 +241,7 @@ class Sonarr {
             `SERVICE - SONARR: [${this.config.title}] Sonnar job updated for ${request.title}`
           );
         } catch (err) {
-          console.log(err);
+          logger.error(err);
           logger.log(
             "error",
             `SERVICE - SONARR: [${this.config.title}] Unable to update series`
@@ -284,7 +284,7 @@ class Sonarr {
           });
         await dbRequest.save();
       } catch (err) {
-        console.log(err.stack);
+        logger.error(err.stack);
         logger.log("error", `SERVICE - SONARR: Can't update request in Db`);
         logger.log({ level: "error", message: err });
       }

@@ -96,7 +96,7 @@ class Discord {
       logger.info("DSCRD: Webhook fired");
       return true;
     } catch (err) {
-      console.log(err);
+      logger.error(err);
       logger.warn("DSCRD: Failed to send webhook");
       return false;
     }

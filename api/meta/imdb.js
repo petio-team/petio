@@ -54,7 +54,7 @@ async function storeCache(firstTime = false) {
         await parseData(tempFile);
         logger.verbose("IMDB: Cache Finished");
       } catch (e) {
-        console.log(e);
+        logger.error(e);
         logger.error("IMDB: Cache failed - db write issue");
       }
     });

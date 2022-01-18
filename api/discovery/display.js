@@ -669,7 +669,7 @@ async function comingSoon(type) {
     );
     return data;
   } catch (e) {
-    console.log(e);
+    logger.error(e);
     return [];
   }
 }
