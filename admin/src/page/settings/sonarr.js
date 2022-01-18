@@ -171,8 +171,10 @@ class Sonarr extends React.Component {
     if (target.type === "select-one") {
       let title = target.options[target.selectedIndex].text;
       this.setState({
-        [name]: value,
-        [`${name}_title`]: title,
+        [`${name}`]: {
+          id: value,
+          [this.state[name].name != undefined ? 'name' : 'location']: title,
+        },
       });
     } else {
       this.setState({
@@ -213,9 +215,7 @@ class Sonarr extends React.Component {
         newServer: false,
         editWizardOpen: true,
         activeServer: id,
-        enabled: this.state.servers[id].enabled
-          ? this.state.servers[id].enabled
-          : false,
+        enabled: this.state.servers[id].enabled,
         title: this.state.servers[id].title,
         protocol: this.state.servers[id].protocol,
         host: this.state.servers[id].host,
@@ -453,7 +453,7 @@ class Sonarr extends React.Component {
           >
             <select
               name="path"
-              value={this.state.path.location}
+              value={this.state.path.id}
               onChange={this.inputChange}
             >
               {this.state.paths && !this.state.needsTest ? (
@@ -477,14 +477,14 @@ class Sonarr extends React.Component {
             </select>
           </div>
           {!this.state.newServer &&
-            this.state.path &&
-            this.state.profile &&
+            this.state.path.id != null &&
+            this.state.profile.id != null &&
             !this.state.needsTest ? (
             <div className="checkbox-wrap mb--2">
               <input
                 type="checkbox"
                 name="active"
-                checked={this.state.active}
+                checked={this.state.enabled}
                 onChange={this.inputChange}
               />
               <p>Enabled</p>
@@ -513,10 +513,10 @@ class Sonarr extends React.Component {
                     <p>Status: {server.enabled ? "Enabled" : "Disabled"}</p>
                     <p>
                       Profile:{" "}
-                      {server.profile.name ? server.profile.name : "Not set"}
+                      {server.profile.name != "" ? server.profile.name : "Not set"}
                     </p>
                     <p>
-                      Path: {server.path.name ? server.path.name : "Not set"}
+                      Path: {server.path.location != "" ? server.path.location : "Not set"}
                     </p>
                     <p className="small">
                       ID: {server.uuid ? server.uuid : "Error"}
