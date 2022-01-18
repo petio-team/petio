@@ -22,10 +22,10 @@ async function setupReady() {
       };
     }
   } catch {
-    logger.error("CHK: Fatal Error unable to write Db to file!");
+    logger.error("setup ready check failed to get ready");
     return {
       ready: false,
-      error: "Database write error",
+      error: "setup ready failed",
     };
   }
 }

@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const request = require("xhr-request");
-// Config
-const getConfig = require("../util/config");
+
+const { conf } = require("../util/config");
 
 const express = require("express");
 const router = express.Router();
@@ -16,36 +16,35 @@ const axios = require("axios");
 const xmlParser = require("xml-js");
 
 router.post("/", async (req, res) => {
-  const prefs = getConfig();
   const request_ip = req.ip;
   const {
     user: { username, password },
   } = req.body || { user: {} };
 
-  if (!prefs) {
+  if (conf.get("admin.id") == null) {
     res.status(500).send("This Petio API is not setup");
     return;
   }
 
-  if (!prefs.login_type) {
-    prefs.login_type = 1;
+  if (!conf.get('auth.type')) {
+    conf.set('auth.type', 1);
   }
 
-  logger.log("info", `LOGIN: New login attempted`);
-  logger.log("info", `LOGIN: Request IP: ${request_ip}`);
+  logger.log("verbose", `LOGIN: New login attempted`);
+  logger.log("verbose", `LOGIN: Request IP: ${request_ip}`);
 
   // check for existing jwt
   try {
     const user = await authenticate(req);
     success(user, req.jwtUser.admin, res);
-    logger.log("info", `LOGIN: Request User: ${user.username}`);
+    logger.log("verbose", `LOGIN: Request User: ${user.username}`);
     return;
   } catch (e) {
     // if existing jwt failed, continue onto normal login flow
-    logger.log("info", `LOGIN: No JWT: ${req.body.user.username}`);
+    logger.log("verbose", `LOGIN: No JWT: ${req.body.user.username}`);
   }
 
-  logger.log("info", `LOGIN: Request User: ${username}`);
+  logger.log("verbose", `LOGIN: Request User: ${username}`);
 
   try {
     // Find user in db
@@ -63,7 +62,7 @@ router.post("/", async (req, res) => {
 
     let isAdmin = dbUser.role === "admin" || dbUser.role === "moderator";
 
-    if (parseInt(prefs.login_type) === 1 || password) {
+    if (conf.get('auth.type') === 1 || password) {
       if (dbUser.password) {
         if (!bcrypt.compareSync(password, dbUser.password)) {
           throw "Password is incorrect";
@@ -88,9 +87,8 @@ router.post("/", async (req, res) => {
 });
 
 function success(user, isAdmin = false, res) {
-  const prefs = getConfig();
   user.password = null;
-  const token = jwt.sign({ ...user, admin: isAdmin }, prefs.plexToken);
+  const token = jwt.sign({ ...user, admin: isAdmin }, conf.get('plex.token'));
   res
     .cookie("petio_jwt", token, {
       maxAge: 2419200000,

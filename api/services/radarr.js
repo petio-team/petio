@@ -1,68 +1,55 @@
 const axios = require("axios");
+const { URL, URLSearchParams } = require('url');
+
 const Request = require("../models/request");
-const fs = require("fs");
-const path = require("path");
 const logger = require("../util/logger");
+
+const { conf } = require('../util/config');
 
 class Radarr {
   constructor(id = false, forced = false, profileOvr = false, pathOvr = false) {
-    let project_folder, configFile;
-    if (process.pkg) {
-      project_folder = path.dirname(process.execPath);
-      configFile = path.join(project_folder, "./config/radarr.json");
-    } else {
-      project_folder = __dirname;
-      configFile = path.join(project_folder, "../config/radarr.json");
-    }
-    const configData = fs.readFileSync(configFile);
-    const configParse = JSON.parse(configData);
-    this.fullConfig = configParse;
+    this.fullConfig = conf.get('radarr');
+    this.config = false;
     this.forced = forced;
+
     if (id !== false) {
-      this.config = this.findUuid(id, configParse);
-      if (profileOvr) this.config.profile = profileOvr;
-      if (pathOvr) this.config.path_title = pathOvr;
-
-      if (!this.config) {
-        this.config = {};
-        this.config.title = "Server Removed";
+      this.config = this.fullConfig.filter((i) => i.uuid == id)[0];
+      if (profileOvr) {
+        this.config.profile.id = profileOvr;
+      }
+      if (pathOvr) {
+        this.config.path.location = pathOvr;
       }
     }
   }
 
-  findUuid(uuid, config) {
-    for (var i = 0; i < config.length; i++) {
-      if (config[i].uuid === uuid) {
-        return config[i];
-      }
-    }
-  }
-
-  async process(method, endpoint, params, body = false) {
-    if (!this.config.hostname) {
+  async process(method, endpoint, params = {}, body = false) {
+    if (!this.config.host) {
       reject("");
       return;
     }
-    if (!params) {
-      params = {};
+    const baseurl = `${this.config.protocol}://${this.config.host}${this.config.port ? ":" + this.config.port : ""}${this.config.subpath == "/" ? '' : this.config.subpath}/api/v3/`;
+    const apiurl = new URL(endpoint, baseurl);
+    const prms = new URLSearchParams();
+
+    for (let key in params) {
+      if (params.hasOwnProperty(key)) {
+        prms.set(key, params[key]);
+      }
     }
-    params.apikey = this.config.apiKey;
-    let paramsString = "";
-    Object.keys(params).map((val, i) => {
-      let key = val;
-      paramsString += `${i === 0 ? "?" : "&"}${key}=${params[val]}`;
-    });
-    let url = `${this.config.protocol}://${this.config.hostname}${this.config.port ? ":" + this.config.port : ""
-      }${this.config.urlBase}/api/v3/${endpoint}${paramsString}`;
+
+    prms.set('apikey', this.config.key);
+    apiurl.search = prms;
+
     try {
       if (method === "post" && body) {
-        let res = await axios.post(url, body);
+        let res = await axios.post(apiurl.toString(), body);
         if (typeof res.data !== 'object') {
           reject("not a valid object");
         }
         return res.data;
       } else {
-        let res = await axios.get(url);
+        let res = await axios.get(apiurl.toString());
         if (typeof res.data !== 'object') {
           reject("not a valid object");
         }
@@ -77,15 +64,15 @@ class Radarr {
     return this.fullConfig;
   }
 
-  async get(endpoint, params = false) {
+  async get(endpoint, params = {}) {
     return this.process("get", endpoint, params);
   }
 
-  async delete(endpoint, params = false) {
+  async delete(endpoint, params = {}) {
     return this.process("delete", endpoint, params);
   }
 
-  async post(endpoint, params = false, body = {}) {
+  async post(endpoint, params = {}, body = {}) {
     return this.process("post", endpoint, params, body);
   }
 
@@ -93,7 +80,7 @@ class Radarr {
     if (!this.config || this.config.title == "Server Removed") {
       return false;
     }
-    if (!this.config.active && !test) {
+    if (!this.config.enabled && !test) {
       logger.log("verbose", "SERVICE - RADARR: Radarr not enabled");
       return false;
     }
@@ -205,9 +192,9 @@ class Radarr {
 
   async add(movieData, path = false, profile = false, tag = false) {
     movieData.qualityProfileId = parseInt(
-      profile ? profile : this.config.profile
+      profile ? profile : this.config.profile.id
     );
-    movieData.rootFolderPath = `${path ? path : this.config.path_title}`;
+    movieData.rootFolderPath = `${path ? path : this.config.path.location}`;
     movieData.addOptions = {
       searchForMovie: true,
     };
@@ -354,9 +341,9 @@ class Radarr {
   }
 
   async processRequest(id) {
-    logger.log("info", `SERVICE - RADARR: Processing request`);
+    logger.log("verbose", `SERVICE - RADARR: Processing request`);
     if (!this.fullConfig || this.fullConfig.length === 0) {
-      logger.log("warn", `SERVICE - RADARR: No active servers`);
+      logger.log("verbose", `SERVICE - RADARR: No active servers`);
       return;
     }
 
@@ -374,7 +361,7 @@ class Radarr {
             `SERVICE - RADARR: Request requires approval - ${req.title}`
           );
         } else {
-          logger.log("info", "SERVICE - RADARR: Request passed to queue");
+          logger.log("verbose", "SERVICE - RADARR: Request passed to queue");
           this.processJobs([req]);
         }
       }

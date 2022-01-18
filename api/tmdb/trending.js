@@ -4,7 +4,7 @@ const axios = require("axios");
 const Promise = require("bluebird");
 
 // Config
-const getConfig = require("../util/config");
+const { conf } = require("../util/config");
 const { movieLookup } = require("../tmdb/movie");
 const { showLookup } = require("../tmdb/show");
 
@@ -211,10 +211,8 @@ async function getShows() {
 
 async function personData() {
   logger.log("verbose", "Person from source not cache");
-  const config = getConfig();
-  const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}trending/person/week?api_key=${tmdbApikey}&append_to_response=images`;
+  let url = `${tmdb}trending/person/week?api_key=${conf.get('general.tmdb')}&append_to_response=images`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -225,10 +223,8 @@ async function personData() {
 
 async function moviesData() {
   logger.log("verbose", "Movies from source not cache");
-  const config = getConfig();
-  const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}trending/movie/week?api_key=${tmdbApikey}&append_to_response=images,videos`;
+  let url = `${tmdb}trending/movie/week?api_key=${conf.get('general.tmdb')}&append_to_response=images,videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -239,10 +235,8 @@ async function moviesData() {
 
 async function showsData() {
   logger.log("verbose", "Shows from source not cache");
-  const config = getConfig();
-  const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}trending/tv/week?api_key=${tmdbApikey}&append_to_response=images,videos`;
+  let url = `${tmdb}trending/tv/week?api_key=${conf.get('general.tmdb')}&append_to_response=images,videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;

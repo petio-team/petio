@@ -3,7 +3,7 @@ const agent = new http.Agent({ family: 4 });
 const axios = require("axios");
 
 // Config
-const getConfig = require("../util/config");
+const { conf } = require("../util/config");
 
 const fanartLookup = require("../fanart");
 const onServer = require("../plex/onServer");
@@ -30,10 +30,10 @@ async function movieLookup(id, minified = false) {
     data = await getMovieData(id);
     movie = Object.assign({}, data);
   } catch {
-    return { error: "not found" };
+    return { error: "unable to get movie data" };
   }
   if (movie.success === false) {
-    return { error: "not found" };
+    return { error: "movie was invalid" };
   }
   if (movie) {
     if (!movie.id) {
@@ -195,10 +195,8 @@ async function getCollection(id) {
 // Lookup Layer
 
 async function tmdbData(id) {
-  const config = getConfig();
-  const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}movie/${id}?api_key=${tmdbApikey}&append_to_response=credits,videos,keywords,release_dates`;
+  let url = `${tmdb}movie/${id}?api_key=${conf.get('general.tmdb')}&append_to_response=credits,videos,keywords,release_dates`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     let data = res.data;
@@ -214,10 +212,8 @@ async function tmdbData(id) {
 }
 
 async function recommendationData(id, page = 1) {
-  const config = getConfig();
-  const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}movie/${id}/recommendations?api_key=${tmdbApikey}&page=${page}&append_to_response=videos`;
+  let url = `${tmdb}movie/${id}/recommendations?api_key=${conf.get('general.tmdb')}&page=${page}&append_to_response=videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -227,10 +223,8 @@ async function recommendationData(id, page = 1) {
 }
 
 async function collectionData(id) {
-  const config = getConfig();
-  const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}collection/${id}?api_key=${tmdbApikey}&append_to_response=videos`;
+  let url = `${tmdb}collection/${id}?api_key=${conf.get('general.tmdb')}&append_to_response=videos`;
 
   try {
     let res = await axios.get(url, { httpAgent: agent });
@@ -241,10 +235,8 @@ async function collectionData(id) {
 }
 
 async function reviewsData(id) {
-  const config = getConfig();
-  const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}movie/${id}/reviews?api_key=${tmdbApikey}`;
+  let url = `${tmdb}movie/${id}/reviews?api_key=${conf.get('general.tmdb')}`;
 
   try {
     let res = await axios.get(url, { httpAgent: agent });
@@ -277,14 +269,12 @@ function findEnRating(data) {
 }
 
 async function discoverMovie(page = 1, params = {}) {
-  const config = getConfig();
-  const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
   let par = "";
   Object.keys(params).map((i) => {
     par += `&${i}=${params[i]}`;
   });
-  let url = `${tmdb}discover/movie?api_key=${tmdbApikey}${par}&page=${page}&append_to_response=videos`;
+  let url = `${tmdb}discover/movie?api_key=${conf.get('general.tmdb')}${par}&page=${page}&append_to_response=videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     if (res.data && res.data.results.length > 0) {
@@ -302,10 +292,8 @@ async function discoverMovie(page = 1, params = {}) {
 }
 
 async function company(id) {
-  const config = getConfig();
-  const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}company/${id}?api_key=${tmdbApikey}`;
+  let url = `${tmdb}company/${id}?api_key=${conf.get('general.tmdb')}`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;

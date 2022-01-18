@@ -3,8 +3,7 @@ const plexLookup = require("../plex/plexLookup");
 const Movie = require("../tmdb/movie");
 const Show = require("../tmdb/show");
 
-// Config
-const getConfig = require("../util/config");
+const MakePlexURL = require('./util');
 
 const cacheManager = require("cache-manager");
 const logger = require("../util/logger");
@@ -30,14 +29,23 @@ async function getHistory(id, type) {
 
 function getHistoryData(id, type) {
   logger.info("History returned from source");
-  const prefs = getConfig();
   return new Promise((resolve, reject) => {
     let d = new Date();
     d.setMonth(d.getMonth() - 1);
     d.setHours(0, 0, 0);
     d.setMilliseconds(0);
-    let timestamp = (d / 1000) | 0;
-    let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/status/sessions/history/all?sort=viewedAt%3Adesc&accountID=${id}&viewedAt>=0&X-Plex-Container-Start=0&X-Plex-Container-Size=100&X-Plex-Token=${prefs.plexToken}`;
+
+    const url = MakePlexURL(
+      "status/sessions/history/all",
+      {
+        "sort": "viewedAt:desc",
+        "accountID": id,
+        "viewedAt>=": "0",
+        "X-Plex-Container-Start": 0,
+        "X-Plex-Container-Size": 100,
+      }
+    ).toString();
+
     request(
       url,
       {

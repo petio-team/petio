@@ -19,17 +19,21 @@ class Sonarr extends React.Component {
       isError: false,
       isMsg: false,
       wizardOpen: false,
-      active: false,
+      enabled: false,
       title: "",
       protocol: "http",
       host: "localhost",
       port: "",
-      profile: "",
-      profile_title: "",
-      path: "",
-      path_title: "",
-      base: "",
-      apikey: "",
+      profile: {
+        id: null,
+        name: '',
+      },
+      path: {
+        id: null,
+        location: '',
+      },
+      subpath: "",
+      key: "",
       activeServer: false,
       uuid: false,
       needsTest: false,
@@ -41,7 +45,6 @@ class Sonarr extends React.Component {
     this.deleteServer = this.deleteServer.bind(this);
     this.openWizard = this.openWizard.bind(this);
     this.closeWizard = this.closeWizard.bind(this);
-    // this.test = this.test.bind(this);
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.getSettings = this.getSettings.bind(this);
@@ -57,22 +60,24 @@ class Sonarr extends React.Component {
     let servers = this.state.servers;
 
     servers[this.state.activeServer] = {
-      active: this.state.active,
+      enabled: this.state.active,
       title: this.state.title,
       protocol: this.state.protocol,
-      hostname: this.state.host,
-      apiKey: this.state.apikey,
+      host: this.state.host,
+      key: this.state.apikey,
       port: this.state.port,
-      urlBase: this.state.base === "/" ? "" : this.state.base,
-      path: this.state.path,
-      path_title: this.state.path_title,
-      profile: this.state.profile,
-      profile_title: this.state.profile_title,
+      subpath: this.state.subpath === "/" ? "" : this.state.subpath,
+      path: {
+        id: this.state.path.id,
+        location: this.state.path.location,
+      },
+      profile: {
+        id: this.state.profile.id,
+        name: this.state.profile.name,
+      },
       uuid: this.state.uuid,
     };
 
-    console.log(servers);
-    // return;
     await Api.saveSonarrConfig(servers);
     this.getSonarr(true);
 
@@ -94,8 +99,6 @@ class Sonarr extends React.Component {
 
     servers.splice(this.state.activeServer, 1);
 
-    console.log(servers);
-    // return;
     await Api.saveSonarrConfig(servers);
     this.getSonarr();
     if (!silent) {
@@ -109,9 +112,9 @@ class Sonarr extends React.Component {
   }
 
   async test(id, add = false) {
-    if (!this.state.base.startsWith("/") && this.state.base.length > 0) {
+    if (!this.state.subpath.startsWith("/") && this.state.subpath.length > 0) {
       this.setState({
-        base: "/" + this.state.base,
+        subpath: "/" + this.state.subpath,
       });
       setTimeout(() => {
         this.test(id, add);
@@ -157,7 +160,7 @@ class Sonarr extends React.Component {
     if (target.classList.contains("frt")) {
       this.setState({
         needsTest: true,
-        active: false,
+        enabled: false,
       });
     }
 
@@ -210,19 +213,23 @@ class Sonarr extends React.Component {
         newServer: false,
         editWizardOpen: true,
         activeServer: id,
-        active: this.state.servers[id].active
-          ? this.state.servers[id].active
+        enabled: this.state.servers[id].enabled
+          ? this.state.servers[id].enabled
           : false,
         title: this.state.servers[id].title,
         protocol: this.state.servers[id].protocol,
-        host: this.state.servers[id].hostname,
+        host: this.state.servers[id].host,
         port: this.state.servers[id].port,
-        base: this.state.servers[id].urlBase,
-        apikey: this.state.servers[id].apiKey,
-        profile: this.state.servers[id].profile,
-        profile_title: this.state.servers[id].profile_title,
-        path: this.state.servers[id].path,
-        path_title: this.state.servers[id].path_title,
+        subpath: this.state.servers[id].subpath,
+        key: this.state.servers[id].key,
+        profile: {
+          id: this.state.servers[id].profile.id,
+          name: this.state.servers[id].profile.name,
+        },
+        path: {
+          id: this.state.servers[id].path.id,
+          location: this.state.servers[id].path.location,
+        },
         uuid: this.state.servers[id].uuid,
         needsTest: false,
       });
@@ -240,17 +247,23 @@ class Sonarr extends React.Component {
 
   closeWizard() {
     this.setState({
-      active: false,
+      enabled: false,
       title: "",
       protocol: "http",
       host: "localhost",
       port: null,
-      base: "",
-      apikey: "",
+      subpath: "",
+      key: "",
       profiles: false,
       paths: false,
-      path: false,
-      profile: false,
+      path: {
+        id: null,
+        location: '',
+      },
+      profile: {
+        id: null,
+        name: '',
+      },
       wizardOpen: false,
       editWizardOpen: false,
       activeServer: false,
@@ -268,17 +281,23 @@ class Sonarr extends React.Component {
   closeModal(id) {
     this.setState({
       [`${id}Open`]: false,
-      active: false,
+      enabled: false,
       title: "",
       protocol: "http",
       host: "localhost",
       port: null,
-      base: "",
-      apikey: "",
+      subpath: "",
+      key: "",
       profiles: false,
       paths: false,
-      path: false,
-      profile: false,
+      path: {
+        id: null,
+        location: '',
+      },
+      profile: {
+        id: null,
+        name: '',
+      },
       wizardOpen: false,
       editWizardOpen: false,
       activeServer: false,
@@ -323,18 +342,18 @@ class Sonarr extends React.Component {
             this.state.needsTest
               ? false
               : () => {
-                  this.saveServer();
-                  this.closeModal("addServer");
-                }
+                this.saveServer();
+                this.closeModal("addServer");
+              }
           }
           close={() => this.closeModal("addServer")}
           delete={
             this.state.newServer
               ? false
               : () => {
-                  this.deleteServer();
-                  this.closeModal("addServer");
-                }
+                this.deleteServer();
+                this.closeModal("addServer");
+              }
           }
         >
           <label>Title</label>
@@ -370,7 +389,7 @@ class Sonarr extends React.Component {
             className="styled-input--input frt"
             type="number"
             name="port"
-            value={this.state.port ? this.state.port : false}
+            value={this.state.port ? this.state.port : '8989'}
             onChange={this.inputChange}
           />
           <label>URL Base</label>
@@ -378,7 +397,7 @@ class Sonarr extends React.Component {
             className="styled-input--input frt"
             type="text"
             name="base"
-            value={this.state.base}
+            value={this.state.subpath ? this.state.subpath : '/'}
             onChange={this.inputChange}
           />
           <label>API Key</label>
@@ -386,7 +405,7 @@ class Sonarr extends React.Component {
             className="styled-input--input frt"
             type="text"
             name="apikey"
-            value={this.state.apikey}
+            value={this.state.key ? this.state.key : ''}
             onChange={this.inputChange}
           />
           <button
@@ -397,9 +416,8 @@ class Sonarr extends React.Component {
           </button>
           <label>Profile</label>
           <div
-            className={`styled-input--select ${
-              this.state.profiles || this.state.needsTest ? "" : "disabled"
-            }`}
+            className={`styled-input--select ${this.state.profiles || this.state.needsTest ? "" : "disabled"
+              }`}
           >
             <select
               name="profile"
@@ -407,8 +425,8 @@ class Sonarr extends React.Component {
               onChange={this.inputChange}
             >
               {this.state.profiles &&
-              !this.state.newServer &&
-              !this.state.needsTest ? (
+                !this.state.newServer &&
+                !this.state.needsTest ? (
                 <>
                   <option value="">Choose an option</option>
                   {this.state.profiles.map((item) => {
@@ -430,13 +448,12 @@ class Sonarr extends React.Component {
           </div>
           <label>Path</label>
           <div
-            className={`styled-input--select ${
-              this.state.profiles || this.state.needsTest ? "" : "disabled"
-            }`}
+            className={`styled-input--select ${this.state.profiles || this.state.needsTest ? "" : "disabled"
+              }`}
           >
             <select
               name="path"
-              value={this.state.path}
+              value={this.state.path.location}
               onChange={this.inputChange}
             >
               {this.state.paths && !this.state.needsTest ? (
@@ -460,9 +477,9 @@ class Sonarr extends React.Component {
             </select>
           </div>
           {!this.state.newServer &&
-          this.state.path &&
-          this.state.profile &&
-          !this.state.needsTest ? (
+            this.state.path &&
+            this.state.profile &&
+            !this.state.needsTest ? (
             <div className="checkbox-wrap mb--2">
               <input
                 type="checkbox"
@@ -492,14 +509,14 @@ class Sonarr extends React.Component {
                   <div className="sr--instance--inner">
                     <ServerIcon />
                     <p className="sr--title">{server.title}</p>
-                    <p>{`${server.protocol}://${server.hostname}:${server.port}`}</p>
-                    <p>Status: {server.active ? "Enabled" : "Disabled"}</p>
+                    <p>{`${server.protocol}://${server.host}:${server.port}`}</p>
+                    <p>Status: {server.enabled ? "Enabled" : "Disabled"}</p>
                     <p>
                       Profile:{" "}
-                      {server.profile_title ? server.profile_title : "Not set"}
+                      {server.profile.name ? server.profile.name : "Not set"}
                     </p>
                     <p>
-                      Path: {server.path_title ? server.path_title : "Not set"}
+                      Path: {server.path.name ? server.path.name : "Not set"}
                     </p>
                     <p className="small">
                       ID: {server.uuid ? server.uuid : "Error"}

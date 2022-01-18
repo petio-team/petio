@@ -4,8 +4,7 @@ const request = require("xhr-request");
 const Movie = require("../models/movie");
 const { movieLookup, discoverMovie } = require("../tmdb/movie");
 
-// Config
-const getConfig = require("../util/config");
+const MakePlexURL = require('../plex/util');
 
 router.get("/:id/movie", async (req, res) => {
   let id = req.params.id;
@@ -91,9 +90,17 @@ async function buildData(id) {
 }
 
 function getHistory(id) {
-  const prefs = getConfig();
   return new Promise((resolve, reject) => {
-    let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/status/sessions/history/all?sort=viewedAt%3Adesc&accountID=${id}&viewedAt>=0&limit=200&X-Plex-Token=${prefs.plexToken}`;
+    const url = MakePlexURL(
+      "/status/sessions/history/all",
+      {
+        "sort": "viewedAt:desc",
+        "accountID": id,
+        "viewedAt>=": "0",
+        "limit": 200,
+      }
+    ).toString();
+
     request(
       url,
       {

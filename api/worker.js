@@ -2,25 +2,24 @@ const CronJob = require("cron").CronJob;
 const logger = require("./util/logger");
 const LibraryUpdate = require("./plex/libraryUpdate");
 const QuotaSystem = require("./requests/quotas");
-const getConfig = require("./util/config");
+const { conf } = require("./util/config");
 const mongoose = require("mongoose");
 const buildDiscovery = require("./discovery/build");
 const { storeCache: imdbCache } = require("./meta/imdb");
 
 class Worker {
   async connnectDb() {
-    const config = getConfig();
-    if (!config) {
-      logger.log("info", "CRONW: Failed to connect to DB");
+    if (conf.get('admin.id') == null) {
+      logger.log("error", "CRONW: Failed to connect to DB");
       throw "Failed to connect to DB";
     }
 
-    await mongoose.connect(config.DB_URL, {
+    await mongoose.connect(conf.get('db.url'), {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
 
-    logger.log("info", "CRONW: Connected to Database");
+    logger.log("verbose", "CRONW: Connected to Database");
   }
 
   async startCrons() {
@@ -35,20 +34,20 @@ class Worker {
       // Runs every night at 00:00
       this.cron = new CronJob("0 0 * * *", function () {
         const d = new Date();
-        logger.log("info", `CRONW: Full Scan Started @ ${d.toDateString()}`);
+        logger.log("verbose", `CRONW: Full Scan Started @ ${d.toDateString()}`);
         run(1);
       });
 
       // Runs every 30 mins
       this.partial = new CronJob("0 */30 * * * *", function () {
         const d = new Date();
-        logger.log("info", `CRONW: Partial Scan Started @ ${d.toDateString()}`);
+        logger.log("verbose", `CRONW: Partial Scan Started @ ${d.toDateString()}`);
         run(2);
       });
 
       // Every Sunday at 11pm
       this.resetQuotas = new CronJob("0 11 * * sun", function () {
-        logger.log("info", "CRONW: Quotas Cleared");
+        logger.log("verbose", "CRONW: Quotas Cleared");
         run(3);
       });
 
@@ -78,6 +77,12 @@ class Worker {
         imdbCache();
       default:
         logger.log("warn", "CRONW: Invalid cron");
+    }
+  }
+
+  close() {
+    if (this.cron != undefined) {
+      this.cron.stop();
     }
   }
 }

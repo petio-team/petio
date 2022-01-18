@@ -3,7 +3,7 @@ const logger = require("../util/logger");
 
 class QuotaSystem {
   async reset() {
-    logger.log("info", "QUOTA: Reseting Quotas");
+    logger.log("verbose", "QUOTA: Reseting Quotas");
     await User.updateMany({}, { $set: { quotaCount: 0 } });
   }
 }

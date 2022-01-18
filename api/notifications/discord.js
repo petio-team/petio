@@ -1,22 +1,13 @@
 const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
+
 const logger = require("../util/logger");
+const { conf } = require("../util/config");
 
 class Discord {
   constructor() {
-    let project_folder, configFile, mconfigFile;
-    if (process.pkg) {
-      project_folder = path.dirname(process.execPath);
-      configFile = path.join(project_folder, "./config/config.json");
-    } else {
-      project_folder = __dirname;
-      configFile = path.join(project_folder, "../config/config.json");
-    }
-    const configData = fs.readFileSync(configFile);
-    const configParse = JSON.parse(configData);
-    this.config = configParse;
-    this.webhook = configParse.discord_webhook || false;
+    this.webhook = conf.get('notifications.discord.url') || false;
   }
 
   check() {

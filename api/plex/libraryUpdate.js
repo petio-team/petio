@@ -8,7 +8,6 @@ const User = require("../models/user");
 const Request = require("../models/request");
 const Profile = require("../models/profile");
 const Mailer = require("../mail/mailer");
-const getConfig = require("../util/config");
 const processRequest = require("../requests/process");
 const logger = require("../util/logger");
 const Discord = require("../notifications/discord");
@@ -17,10 +16,10 @@ const { showLookup } = require("../tmdb/show");
 const bcrypt = require("bcryptjs");
 const axios = require("axios");
 const MusicMeta = require("../meta/musicBrainz");
+const { conf } = require("../util/config");
 
 class LibraryUpdate {
   constructor() {
-    this.config = getConfig();
     this.mailer = [];
     this.tmdb = "https://api.themoviedb.org/3/";
     this.full = true;
@@ -32,7 +31,7 @@ class LibraryUpdate {
   }
 
   async partial() {
-    logger.log("info", `LIB CRON: Running Partial`);
+    logger.log("verbose", `LIB CRON: Running Partial`);
     this.full = false;
     let recent = false;
     try {
@@ -57,7 +56,7 @@ class LibraryUpdate {
           if (!matched[obj.ratingKey]) {
             matched[obj.ratingKey] = true;
             await this.saveMovie(obj);
-            logger.log("info", `LIB CRON: Partial scan - ${obj.title}`);
+            logger.log("verbose", `LIB CRON: Partial scan - ${obj.title}`);
           }
         } else if (obj.type === "artist") {
           if (!matched[obj.ratingKey]) {
@@ -68,7 +67,7 @@ class LibraryUpdate {
           if (matched[obj.ratingKey]) {
             matched[obj.ratingKey] = true;
             await this.saveShow(obj);
-            logger.log("info", `LIB CRON: Partial scan - ${obj.title}`);
+            logger.log("verbose", `LIB CRON: Partial scan - ${obj.title}`);
           }
         } else if (obj.type === "season") {
           if (!matched[obj.parentRatingKey]) {
@@ -102,7 +101,7 @@ class LibraryUpdate {
 
             await this.saveShow(parent);
             logger.log(
-              "info",
+              "verbose",
               `LIB CRON: Partial scan - ${parent.title} - Built from series`
             );
           }
@@ -116,14 +115,14 @@ class LibraryUpdate {
       { concurrency: 10 }
     );
     this.execMail();
-    logger.log("info", "LIB CRON: Partial Scan Complete");
+    logger.log("verbose", "Partial Scan Complete");
     this.checkOldRequests();
     return;
   }
 
   async scan() {
     this.timestamp = new Date().toString();
-    logger.log("info", `LIB CRON: Running Full`);
+    logger.log("verbose", `Running Full`);
     await this.createAdmin();
     await this.updateFriends();
     let libraries = false;
@@ -138,7 +137,7 @@ class LibraryUpdate {
       await this.saveLibraries(libraries);
       await this.updateLibraryContent(libraries);
       this.execMail();
-      logger.log("info", "LIB CRON: Full Scan Complete");
+      logger.log("verbose", "Full Scan Complete");
       this.checkOldRequests();
       await this.deleteOld();
     } else {
@@ -148,22 +147,22 @@ class LibraryUpdate {
 
   async createAdmin() {
     let adminFound = await User.findOne({
-      id: this.config.adminId,
+      id: conf.get('admin.id'),
     });
     if (!adminFound) {
-      logger.log("info", "LIB CRON: Creating admin user");
+      logger.log("verbose", "LIB CRON: Creating admin user");
       try {
         let adminData = new User({
-          id: this.config.adminId,
-          email: this.config.adminEmail,
-          thumb: this.config.adminThumb,
-          title: this.config.adminDisplayName,
-          nameLower: this.config.adminDisplayName.toLowerCase(),
-          username: this.config.adminUsername,
+          id: conf.get('admin.id'),
+          email: conf.get('admin.email'),
+          thumb: conf.get('admin.thumbnail'),
+          title: conf.get('admin.display'),
+          nameLower: conf.get('admin.display').toLowerCase(),
+          username: conf.get('admin.username'),
           password:
-            this.config.adminPass.substring(0, 3) === "$2a"
-              ? this.config.adminPass
-              : bcrypt.hashSync(this.config.adminPass, 10),
+            conf.get('admin.password').substring(0, 3) === "$2a"
+              ? conf.get('admin.password')
+              : bcrypt.hashSync(conf.get('admin.password'), 10),
           altId: 1,
           role: "admin",
         });
@@ -175,20 +174,20 @@ class LibraryUpdate {
     } else {
       try {
         logger.log(
-          "info",
-          `LIB CRON: Admin Updating ${this.config.adminDisplayName}`
+          "verbose",
+          `LIB CRON: Admin Updating ${conf.get('admin.display')}`
         );
-        adminFound.email = this.config.adminEmail;
-        adminFound.thumb = this.config.adminThumb;
-        adminFound.title = this.config.adminDisplayName;
-        adminFound.nameLower = this.config.adminDisplayName.toLowerCase();
-        adminFound.username = this.config.adminUsername;
-        if (this.config.adminPass.substring(0, 3) !== "$2a")
-          adminFound.password = bcrypt.hashSync(this.config.adminPass, 10);
+        adminFound.email = conf.get('admin.email');
+        adminFound.thumb = conf.get('admin.thumbnail');
+        adminFound.title = conf.get('admin.display');
+        adminFound.nameLower = conf.get('admin.display').toLowerCase();
+        adminFound.username = conf.get('admin.username');
+        if (conf.get('admin.password').substring(0, 3) !== "$2a")
+          adminFound.password = bcrypt.hashSync(conf.get('admin.password'), 10);
         await adminFound.save();
         logger.log(
-          "info",
-          `LIB CRON: Admin Updated ${this.config.adminDisplayName}`
+          "verbose",
+          `LIB CRON: Admin Updated ${conf.get('admin.display')}`
         );
       } catch (err) {
         logger.log("error", `LIB CRON: Admin Update Failed ${obj.title}`);
@@ -198,10 +197,10 @@ class LibraryUpdate {
   }
 
   async getLibraries() {
-    let url = `${this.config.plexProtocol}://${this.config.plexIp}:${this.config.plexPort}/library/sections/?X-Plex-Token=${this.config.plexToken}`;
+    let url = `${conf.get('plex.protocol')}://${conf.get('plex.host')}:${conf.get('plex.port')}/library/sections/?X-Plex-Token=${conf.get('plex.token')}`;
     try {
       let res = await axios.get(url);
-      logger.log("info", "LIB CRON: Found Libraries");
+      logger.log("verbose", "LIB CRON: Found Libraries");
       return res.data.MediaContainer;
     } catch (e) {
       logger.log("warn", "LIB CRON: Library update failed!");
@@ -210,10 +209,10 @@ class LibraryUpdate {
   }
 
   async getRecent() {
-    let url = `${this.config.plexProtocol}://${this.config.plexIp}:${this.config.plexPort}/library/recentlyAdded/?X-Plex-Token=${this.config.plexToken}`;
+    let url = `${conf.get('plex.protocol')}://${conf.get('plex.host')}:${conf.get('plex.port')}/library/recentlyAdded/?X-Plex-Token=${conf.get('plex.token')}`;
     try {
       let res = await axios.get(url);
-      logger.log("info", "LIB CRON: Recently Added received");
+      logger.log("verbose", "LIB CRON: Recently Added received");
       return res.data.MediaContainer;
     } catch {
       logger.log("warn", "LIB CRON: Recently added failed!");
@@ -234,7 +233,7 @@ class LibraryUpdate {
     try {
       libraryItem = await Library.findOne({ uuid: lib.uuid });
     } catch {
-      logger.log("info", "LIB CRON: Library Not found, attempting to create");
+      logger.log("verbose", "LIB CRON: Library Not found, attempting to create");
     }
     if (!libraryItem) {
       try {
@@ -301,7 +300,7 @@ class LibraryUpdate {
         logger.log({ level: "error", message: err });
       }
       if (updatedLibraryItem) {
-        logger.log("info", "LIB CRON: Library Updated " + lib.title);
+        logger.log("verbose", "LIB CRON: Library Updated " + lib.title);
       }
     }
   }
@@ -330,7 +329,7 @@ class LibraryUpdate {
             } else if (obj.type === "show") {
               await this.saveShow(obj);
             } else {
-              logger.log("info", `LIB CRON: Unknown media type - ${obj.type}`);
+              logger.log("verbose", `LIB CRON: Unknown media type - ${obj.type}`);
             }
           },
           { concurrency: 10 }
@@ -349,7 +348,7 @@ class LibraryUpdate {
   }
 
   async getLibrary(id) {
-    let url = `${this.config.plexProtocol}://${this.config.plexIp}:${this.config.plexPort}/library/sections/${id}/all?X-Plex-Token=${this.config.plexToken}`;
+    let url = `${conf.get('plex.protocol')}://${conf.get('plex.host')}:${conf.get('plex.port')}/library/sections/${id}/all?X-Plex-Token=${conf.get('plex.token')}`;
     try {
       let res = await axios.get(url);
       return res.data.MediaContainer;
@@ -359,7 +358,7 @@ class LibraryUpdate {
   }
 
   async getMeta(id) {
-    let url = `${this.config.plexProtocol}://${this.config.plexIp}:${this.config.plexPort}/library/metadata/${id}?includeChildren=1&X-Plex-Token=${this.config.plexToken}`;
+    let url = `${conf.get('plex.protocol')}://${conf.get('plex.host')}:${conf.get('plex.port')}/library/metadata/${id}?includeChildren=1&X-Plex-Token=${conf.get('plex.token')}`;
     try {
       let res = await axios.get(url);
       return res.data.MediaContainer.Metadata[0];
@@ -369,7 +368,7 @@ class LibraryUpdate {
   }
 
   async getSeason(id) {
-    let url = `${this.config.plexProtocol}://${this.config.plexIp}:${this.config.plexPort}/library/metadata/${id}/children?X-Plex-Token=${this.config.plexToken}`;
+    let url = `${conf.get('plex.protocol')}://${conf.get('plex.host')}:${conf.get('plex.port')}/library/metadata/${id}/children?X-Plex-Token=${conf.get('plex.token')}`;
     try {
       let res = await axios.get(url);
       return res.data.MediaContainer.Metadata;
@@ -439,7 +438,7 @@ class LibraryUpdate {
               type
             );
             logger.log(
-              "info",
+              "verbose",
               `LIB CRON: Got external ID - ${title} - using agent ${type} : ${tmdbId}`
             );
           } catch {
@@ -480,7 +479,7 @@ class LibraryUpdate {
         try {
           tmdbId = await this.externalIdMovie(externalId, idSource);
           logger.log(
-            "info",
+            "verbose",
             `LIB CRON: Got external ID - ${title} - using agent ${idSource} : ${tmdbId}`
           );
         } catch {
@@ -535,7 +534,7 @@ class LibraryUpdate {
       await movieDb.save();
       if (added) {
         await this.mailAdded(movieObj, movieDb.tmdb_id);
-        logger.log("info", `LIB CRON: Movie Added - ${movieObj.title}`);
+        logger.log("verbose", `LIB CRON: Movie Added - ${movieObj.title}`);
       }
     } catch (err) {
       logger.error(`LIB CRON: Failed to save ${title} to Db`);
@@ -560,7 +559,7 @@ class LibraryUpdate {
       match = { id: musicDb.metaId, name: musicDb.metaTitle };
     }
     if (match && musicDb.metaId === "no genres" && musicObj.Genre) {
-      logger.info(
+      logger.verbose(
         `LIB CRON: Music - "${title}" Now has genres, attempting to match`
       );
       match = false;
@@ -581,7 +580,7 @@ class LibraryUpdate {
       await musicDb.save();
       if (added) {
         await this.mailAdded(musicObj, musicDb.metaId);
-        logger.log("info", `LIB CRON: Music Added - ${musicObj.title}`);
+        logger.log("verbose", `LIB CRON: Music Added - ${musicObj.title}`);
       }
     } catch (err) {
       logger.error(`LIB CRON: Failed to save ${title} to Db`);
@@ -744,7 +743,7 @@ class LibraryUpdate {
       await showDb.save();
       if (added) {
         await this.mailAdded(showObj, showDb.tmdb_id);
-        logger.log("info", `LIB CRON: Show Added - ${showObj.title}`);
+        logger.log("verbose", `LIB CRON: Show Added - ${showObj.title}`);
       }
     } catch (err) {
       logger.error(`LIB CRON: Failed to save ${title} to Db`);
@@ -753,7 +752,7 @@ class LibraryUpdate {
   }
 
   async updateFriends() {
-    logger.info("LIB CRON: Updating Friends");
+    logger.verbose("LIB CRON: Updating Friends");
     let friendList = false;
     try {
       friendList = await this.getFriends();
@@ -771,7 +770,7 @@ class LibraryUpdate {
   }
 
   async getFriends() {
-    let url = `https://plex.tv/pms/friends/all?X-Plex-Token=${this.config.plexToken}`;
+    let url = `https://plex.tv/pms/friends/all?X-Plex-Token=${conf.get('plex.token')}`;
     try {
       let res = await axios.get(url);
       let dataParse = JSON.parse(
@@ -820,7 +819,7 @@ class LibraryUpdate {
         logger.log({ level: "error", message: err });
       }
       if (friendDb) {
-        logger.log("info", `LIB CRON: User Created ${obj.title}`);
+        logger.log("verbose", `LIB CRON: User Created ${obj.title}`);
       } else {
         logger.log("warn", `LIB CRON: User Failed to Create ${obj.title}`);
       }
@@ -860,7 +859,7 @@ class LibraryUpdate {
       [userData.title],
     ]);
 
-    logger.log("info", `LIB CRON: Mailer updated`);
+    logger.log("verbose", `LIB CRON: Mailer updated`);
   }
 
   discordNotify(user, request) {
@@ -876,7 +875,7 @@ class LibraryUpdate {
   }
 
   execMail() {
-    logger.log("info", "MAILER: Parsing mail queue");
+    logger.log("verbose", "MAILER: Parsing mail queue");
     this.mailer.forEach((mail, index) => {
       setTimeout(() => {
         new Mailer().mail(mail[0], mail[1], mail[2], mail[3], mail[4], mail[5]);
@@ -886,7 +885,7 @@ class LibraryUpdate {
   }
 
   async externalIdTv(id, type) {
-    let url = `${this.tmdb}find/${id}?api_key=${this.config.tmdbApi}&language=en-US&external_source=${type}_id`;
+    let url = `${this.tmdb}find/${id}?api_key=${conf.get('general.tmdb')}&language=en-US&external_source=${type}_id`;
     try {
       let res = await axios.get(url);
       return res.data.tv_results[0].id;
@@ -896,7 +895,7 @@ class LibraryUpdate {
   }
 
   async tmdbExternalIds(id) {
-    let url = `${this.tmdb}tv/${id}/external_ids?api_key=${this.config.tmdbApi}`;
+    let url = `${this.tmdb}tv/${id}/external_ids?api_key=${conf.get('general.tmdb')}`;
     try {
       let res = await axios.get(url);
       return res.data;
@@ -906,7 +905,7 @@ class LibraryUpdate {
   }
 
   async externalIdMovie(id, type) {
-    let url = `${this.tmdb}find/${id}?api_key=${this.config.tmdbApi}&language=en-US&external_source=${type}_id`;
+    let url = `${this.tmdb}find/${id}?api_key=${conf.get('general.tmdb')}&language=en-US&external_source=${type}_id`;
     try {
       let res = await axios.get(url);
       return res.data.movie_results[0].id;
@@ -916,7 +915,7 @@ class LibraryUpdate {
   }
 
   async checkOldRequests() {
-    logger.info("LIB CRON: Checking old requests");
+    logger.verbose("LIB CRON: Checking old requests");
     let requests = await Request.find();
     for (let i = 0; i < requests.length; i++) {
       let onServer = false;
@@ -924,7 +923,7 @@ class LibraryUpdate {
       if (request.type === "tv") {
         onServer = await Show.findOne({ tmdb_id: request.tmdb_id });
         if (!request.tvdb_id) {
-          logger.info(
+          logger.verbose(
             `LIB CRON: No TVDB ID for request: ${request.title}, attempting to pull meta`
           );
           let lookup = await showLookup(request.tmdb_id, true);
@@ -932,7 +931,7 @@ class LibraryUpdate {
           request.tvdb_id = lookup.tvdb_id;
           try {
             await request.save();
-            logger.info(
+            logger.verbose(
               `LIB CRON: Meta updated for request: ${request.title}, processing request with updated meta`
             );
             if (request.tvdb_id)
@@ -947,7 +946,7 @@ class LibraryUpdate {
                 approved: request.approved,
               }).sendToDvr(false);
           } catch (err) {
-            logger.info(
+            logger.warn(
               `LIB CRON: Failed to update meta for request: ${request.title}`
             );
           }

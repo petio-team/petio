@@ -1,8 +1,7 @@
 const User = require("../models/user");
 const Discovery = require("../models/discovery");
 const request = require("xhr-request");
-// const { movieLookup, discoverMovie } = require("../tmdb/movie");
-const getConfig = require("../util/config");
+const { conf } = require("../util/config");
 const logger = require("../util/logger");
 const Movie = require("../models/movie");
 const Show = require("../models/show");
@@ -82,10 +81,7 @@ async function create(id) {
       });
       newDiscover.save();
     }
-  } catch (err) {
-    //
-    // console.log(err);
-  }
+  } catch (_) { }
   return;
 }
 
@@ -298,15 +294,9 @@ function cert(cert, type) {
 }
 
 function getHistory(id, library = false) {
-  const prefs = getConfig();
   return new Promise((resolve, reject) => {
-    let url = `${prefs.plexProtocol}://${prefs.plexIp}:${
-      prefs.plexPort
-    }/status/sessions/history/all?sort=viewedAt%3Adesc&accountID=${id}&viewedAt>=0${
-      library ? "&librarySectionID=" + library : ""
-    }&X-Plex-Container-Start=0&X-Plex-Container-Size=500&X-Plex-Token=${
-      prefs.plexToken
-    }`;
+    let url = `${conf.get('plex.protocol')}://${conf.get('plex.host')}:${conf.get('plex.port')}/status/sessions/history/all?sort=viewedAt%3Adesc&accountID=${id}&viewedAt>=0${library ? "&librarySectionID=" + library : ""
+      }&X-Plex-Container-Start=0&X-Plex-Container-Size=500&X-Plex-Token=${conf.get('plex.token')}`;
     request(
       url,
       {

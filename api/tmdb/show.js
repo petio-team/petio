@@ -2,8 +2,7 @@ const http = require("http");
 const agent = new http.Agent({ family: 4 });
 const axios = require("axios");
 
-// Config
-const getConfig = require("../util/config");
+const { conf } = require("../util/config");
 const fanartLookup = require("../fanart");
 const onServer = require("../plex/onServer");
 const { lookup: imdb } = require("../meta/imdb");
@@ -218,10 +217,8 @@ async function getSeasons(seasons, id) {
 // Lookup layer
 
 async function tmdbData(id) {
-  const config = getConfig();
-  const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}tv/${id}?api_key=${tmdbApikey}&append_to_response=aggregate_credits,videos,keywords,content_ratings,credits`;
+  let url = `${tmdb}tv/${id}?api_key=${conf.get('general.tmdb')}&append_to_response=aggregate_credits,videos,keywords,content_ratings,credits`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     let data = res.data;
@@ -251,10 +248,8 @@ async function tmdbData(id) {
 }
 
 async function recommendationData(id, page = 1) {
-  const config = getConfig();
-  const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}tv/${id}/recommendations?api_key=${tmdbApikey}&page=${page}`;
+  let url = `${tmdb}tv/${id}/recommendations?api_key=${conf.get('general.tmdb')}&page=${page}`;
 
   try {
     let res = await axios.get(url, { httpAgent: agent });
@@ -277,10 +272,8 @@ async function seasonsAsync(seasonList, id) {
 }
 
 async function getSeason(id, season) {
-  const config = getConfig();
-  const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}tv/${id}/season/${season}?api_key=${tmdbApikey}`;
+  let url = `${tmdb}tv/${id}/season/${season}?api_key=${conf.get('general.tmdb')}`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -290,10 +283,8 @@ async function getSeason(id, season) {
 }
 
 async function reviewsData(id) {
-  const config = getConfig();
-  const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}tv/${id}/reviews?api_key=${tmdbApikey}`;
+  let url = `${tmdb}tv/${id}/reviews?api_key=${conf.get('general.tmdb')}`;
 
   try {
     let res = await axios.get(url, { httpAgent: agent });
@@ -312,7 +303,7 @@ function findEnLogo(logos) {
       logo.lang === "en" &&
       !logoUrl &&
       logo.url !==
-        "https://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png"
+      "https://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png"
     ) {
       logoUrl = logo.url;
     }
@@ -332,10 +323,8 @@ function findEnRating(data) {
 }
 
 async function idLookup(id) {
-  const config = getConfig();
-  const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}tv/${id}/external_ids?api_key=${tmdbApikey}`;
+  let url = `${tmdb}tv/${id}/external_ids?api_key=${conf.get('general.tmdb')}`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -346,14 +335,12 @@ async function idLookup(id) {
 }
 
 async function discoverSeries(page = 1, params = {}) {
-  const config = getConfig();
-  const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
   let par = "";
   Object.keys(params).map((i) => {
     par += `&${i}=${params[i]}`;
   });
-  let url = `${tmdb}discover/tv?api_key=${tmdbApikey}${par}&page=${page}`;
+  let url = `${tmdb}discover/tv?api_key=${conf.get('general.tmdb')}${par}&page=${page}`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     if (res.data && res.data.results.length > 0) {
@@ -371,10 +358,8 @@ async function discoverSeries(page = 1, params = {}) {
 }
 
 async function network(id) {
-  const config = getConfig();
-  const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}network/${id}?api_key=${tmdbApikey}`;
+  let url = `${tmdb}network/${id}?api_key=${conf.get('general.tmdb')}`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;

@@ -1,22 +1,11 @@
 const Request = require("../models/request");
-const fs = require("fs");
-const path = require("path");
 const logger = require("../util/logger");
 const axios = require("axios");
+const { conf } = require('../util/config');
 
 class Sonarr {
   constructor() {
-    let project_folder, configFile;
-    if (process.pkg) {
-      project_folder = path.dirname(process.execPath);
-      configFile = path.join(project_folder, "./config/sonarr.json");
-    } else {
-      project_folder = __dirname;
-      configFile = path.join(project_folder, "../config/sonarr.json");
-    }
-    const configData = fs.readFileSync(configFile);
-    const configParse = JSON.parse(configData);
-    this.fullConfig = configParse;
+    this.fullConfig = conf.get('sonarr');
     this.config = false;
   }
 
@@ -28,37 +17,39 @@ class Sonarr {
     }
   }
 
-  async process(method, endpoint, params, body = false) {
-    if (!this.config.hostname) {
+  async process(method, endpoint, params = {}, body = false) {
+    if (!this.config.host) {
       reject("");
       return;
     }
-    if (!params) {
-      params = {};
+    const baseurl = `${this.config.protocol}://${this.config.host}${this.config.port ? ":" + this.config.port : ""}${this.config.subpath == "/" ? '' : this.config.subpath}/api/v3/`;
+    const apiurl = new URL(endpoint, baseurl);
+    const prms = new URLSearchParams();
+
+    for (let key in params) {
+      if (params.hasOwnProperty(key)) {
+        prms.set(key, params[key]);
+      }
     }
-    params.apikey = this.config.apiKey;
-    let paramsString = "";
-    Object.keys(params).map((val, i) => {
-      let key = val;
-      paramsString += `${i === 0 ? "?" : "&"}${key}=${params[val]}`;
-    });
-    let url = `${this.config.protocol}://${this.config.hostname}${this.config.port ? ":" + this.config.port : ""
-      }${this.config.urlBase}/api/v3/${endpoint}${paramsString}`;
+
+    prms.set('apikey', this.config.key);
+    apiurl.search = prms;
+
     try {
       if (method === "post" && body) {
-        let res = await axios.post(url, body);
+        let res = await axios.post(apiurl.toString(), body);
         if (typeof res.data !== 'object') {
           reject("not a valid object");
         }
         return res.data;
       } else if (method === "delete") {
-        let res = await axios.delete(url);
+        let res = await axios.delete(apiurl.toString());
         return res.data;
       } else if (method === "put" && body) {
-        let res = await axios.put(url, body);
+        let res = await axios.put(apiurl.toString(), body);
         return res.data;
       } else {
-        let res = await axios.get(url);
+        let res = await axios.get(apiurl.toString());
         if (typeof res.data !== 'object') {
           reject("not a valid object");
         }
@@ -73,19 +64,19 @@ class Sonarr {
     return this.fullConfig;
   }
 
-  async get(endpoint, params = false) {
+  async get(endpoint, params = {}) {
     return this.process("get", endpoint, params);
   }
 
-  async delete(endpoint, params = false) {
+  async delete(endpoint, params = {}) {
     return this.process("delete", endpoint, params);
   }
 
-  async post(endpoint, params = false, body = {}) {
+  async post(endpoint, params = {}, body = {}) {
     return this.process("post", endpoint, params, body);
   }
 
-  async put(endpoint, params = false, body = {}) {
+  async put(endpoint, params = {}, body = {}) {
     return this.process("put", endpoint, params, body);
   }
 
@@ -200,7 +191,7 @@ class Sonarr {
   async addShow(server, request, filter = false) {
     let sonarrId = false;
     if (!this.fullConfig || this.fullConfig.length === 0) {
-      logger.log("info", `SERVICE - SONARR: No active servers`);
+      logger.log("verbose", `SERVICE - SONARR: No active servers`);
       return;
     }
     if (!request.tvdb_id) {
@@ -226,9 +217,9 @@ class Sonarr {
         }
       }
       showData.qualityProfileId =
-        parseInt(filter && filter.profile ? filter.profile : this.config.profile);
+        parseInt(filter && filter.profile ? filter.profile : this.config.profile.id);
       showData.seasonFolder = true;
-      showData.rootFolderPath = `${filter && filter.path ? filter.path : this.config.path_title
+      showData.rootFolderPath = `${filter && filter.path ? filter.path : this.config.path.location
         }`;
       showData.addOptions = {
         searchForMissingEpisodes: true,

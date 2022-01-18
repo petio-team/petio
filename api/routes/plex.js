@@ -1,12 +1,11 @@
-require("dotenv/config");
 const express = require("express");
+
 const router = express.Router();
 const plexLookup = require("../plex/plexLookup");
-const getConfig = require("../util/config");
+const { conf, WriteConfig } = require("../util/config");
 const logger = require("../util/logger");
+const MakePlexURL = require('../plex/util');
 const axios = require("axios");
-const fs = require("fs");
-const path = require("path");
 
 router.get("/lookup/:type/:id", async (req, res) => {
   let type = req.params.type;
@@ -20,17 +19,16 @@ router.get("/lookup/:type/:id", async (req, res) => {
 });
 
 router.get("/test_plex", async (req, res) => {
-  const prefs = getConfig();
-  let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}?X-Plex-Token=${prefs.plexToken}`;
+  const url = MakePlexURL("/").toString();
   try {
     await axios.get(
-      `https://plex.tv/pms/resources?X-Plex-Token=${prefs.plexToken}`
+      `https://plex.tv/pms/resources?X-Plex-Token=${conf.get('plex.token')}`
     );
     let connection = await axios.get(url);
     let data = connection.data.MediaContainer;
     if (
-      data.myPlexUsername === prefs.adminUsername ||
-      data.myPlexUsername === prefs.adminEmail
+      data.myPlexUsername === conf.get('admin.username') ||
+      data.myPlexUsername === conf.get('admin.email')
     ) {
       updateCredentials({ plexClientID: data.machineIdentifier });
       res.json({
@@ -55,29 +53,13 @@ router.get("/test_plex", async (req, res) => {
 });
 
 function updateCredentials(obj) {
-  let project_folder, configFile;
-  if (process.pkg) {
-    project_folder = path.dirname(process.execPath);
-    configFile = path.join(project_folder, "./config/config.json");
-  } else {
-    project_folder = __dirname;
-    configFile = path.join(project_folder, "../config/config.json");
+  if (obj.plexClientID == undefined) {
+    throw "plex client id does not exist in object";
   }
 
-  let userConfig = false;
+  conf.set('plex.client', obj.plexClientID);
   try {
-    userConfig = fs.readFileSync(configFile);
-    let configParse = JSON.parse(userConfig);
-    let updatedConfig = JSON.stringify({ ...configParse, ...obj });
-    fs.writeFile(configFile, updatedConfig, (err) => {
-      if (err) {
-        logger.log({ level: "error", message: err });
-        logger.error("PLX: Error updating config");
-      } else {
-        logger.info("PLX: Config Updated");
-      }
-    });
-    // return JSON.parse(userConfig);
+    WriteConfig();
   } catch (err) {
     logger.log({ level: "error", message: err });
     logger.error("PLX: Error config not found");

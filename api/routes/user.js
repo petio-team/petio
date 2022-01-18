@@ -7,12 +7,13 @@ const logger = require("../util/logger");
 const bcrypt = require("bcryptjs");
 const { adminRequired, authRequired } = require("../middleware/auth");
 var multer = require("multer");
-const getConfig = require("../util/config");
+const { conf, WriteConfig } = require("../util/config");
 const fs = require("fs");
 const path = require("path");
-const uploadPath = process.pkg
-  ? path.join(path.dirname(process.execPath), `./config/uploads`)
-  : path.join(__dirname, `../config/uploads`);
+
+const UPLOAD_DIR = process.pkg ?
+  path.join(path.dirname(process.execPath), './uploads') :
+  path.join(process.cwd(), './config/uploads');
 
 router.get("/thumb/:id", async (req, res) => {
   let userData = false;
@@ -25,7 +26,7 @@ router.get("/thumb/:id", async (req, res) => {
 
   if (userData) {
     if (userData.custom_thumb) {
-      res.sendFile(`${uploadPath}/${userData.custom_thumb}`);
+      res.sendFile(`${UPLOAD_DIR}/${userData.custom_thumb}`);
       return;
     }
     let url = userData.thumb;
@@ -189,17 +190,15 @@ router.post("/edit", adminRequired, async (req, res) => {
     }
 
     if (user.role === "admin" && !user.password) {
-      let prefs = getConfig();
       userObj.password =
-        prefs.adminPass.substring(0, 3) === "$2a"
-          ? prefs.adminPass
-          : bcrypt.hashSync(prefs.adminPass, 10);
+        conf.get('admin.password').substring(0, 3) === "$2a"
+          ? conf.get('admin.password')
+          : bcrypt.hashSync(conf.get('admin.password'), 10);
     }
 
     if (user.role === "admin" && user.email) {
-      updateConfig({
-        adminEmail: user.email,
-      });
+      conf.set('admin.email', user.email);
+      WriteConfig();
     }
 
     await User.findOneAndUpdate(
@@ -289,7 +288,7 @@ router.post("/delete_user", adminRequired, async (req, res) => {
 
 let storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, uploadPath);
+    cb(null, UPLOAD_DIR);
   },
   filename: function (req, file, cb) {
     req.newThumb =
@@ -299,12 +298,12 @@ let storage = multer.diskStorage({
 });
 
 router.use((req, res, next) => {
-  if (fs.existsSync(uploadPath)) {
+  if (fs.existsSync(UPLOAD_DIR)) {
     next();
     return;
   }
   logger.info("ROUTE: Creating upload dir");
-  fs.mkdirSync(uploadPath);
+  fs.mkdirSync(UPLOAD_DIR);
   logger.info("ROUTE: Upload dir created");
   next();
 });
@@ -352,33 +351,5 @@ router.post("/thumb/:id", adminRequired, async (req, res) => {
     res.sendStatus(500);
   }
 });
-
-async function updateConfig(obj) {
-  let project_folder, configFile;
-  if (process.pkg) {
-    project_folder = path.dirname(process.execPath);
-    configFile = path.join(project_folder, "./config/config.json");
-  } else {
-    project_folder = __dirname;
-    configFile = path.join(project_folder, "../config/config.json");
-  }
-
-  let userConfig = false;
-  try {
-    userConfig = fs.readFileSync(configFile);
-    let configParse = JSON.parse(userConfig);
-    let updatedConfig = JSON.stringify({ ...configParse, ...obj });
-    fs.writeFile(configFile, updatedConfig, (err) => {
-      if (err) {
-        logger.error("ROUTE: Usr unable to update config");
-        logger.log({ level: "error", message: err });
-      }
-    });
-    // return JSON.parse(userConfig);
-  } catch (err) {
-    logger.error("ROUTE: Usr unable to update config");
-    logger.log({ level: "error", message: err });
-  }
-}
 
 module.exports = router;

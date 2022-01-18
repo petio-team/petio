@@ -2,11 +2,10 @@ const jwt = require("jsonwebtoken");
 
 const logger = require("../util/logger");
 
-const getConfig = require("../util/config");
+const { conf } = require("../util/config");
 const User = require("../models/user");
 
 async function authenticate(req) {
-  const prefs = getConfig();
   const { authorization: header } = req.headers;
   let petioJwt;
   if (req.body.authToken) {
@@ -19,7 +18,7 @@ async function authenticate(req) {
   } else {
     throw `AUTH: No auth token provided - route ${req.path}`;
   }
-  req.jwtUser = jwt.verify(petioJwt, prefs.plexToken);
+  req.jwtUser = jwt.verify(petioJwt, conf.get('plex.token'));
 
   try {
     let userData = await User.findOne({ id: req.jwtUser.id });

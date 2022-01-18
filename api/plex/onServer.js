@@ -1,11 +1,10 @@
 const Movie = require("../models/movie");
 // const Music = require('../models/artist'); // to be added when music added
 const Show = require("../models/show");
-const getConfig = require("../util/config");
+const { conf } = require("../util/config");
 
 async function onServer(type, imdb, tvdb, tmdb) {
-  let config = getConfig();
-  let clientId = config.plexClientID;
+  let clientId = conf.get('plex.client');
   if (type === "movie") {
     let foundItemsImdb = false;
     let foundItemsTvdb = false;

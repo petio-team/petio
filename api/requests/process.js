@@ -234,9 +234,9 @@ class processRequest {
         { $set: { pendingDefault: pending } }
       );
 
-      logger.log("info", "REQ: Pending Defaults set for later");
+      logger.log("verbose", "REQ: Pending Defaults set for later");
     } else {
-      logger.log("info", "REQ: No Pending Defaults to Set");
+      logger.log("verbose", "REQ: No Pending Defaults to Set");
     }
   }
 
@@ -248,7 +248,7 @@ class processRequest {
         "info",
         "REQ: Matched on custom filter, sending to specified server"
       );
-      logger.log("info", "REQ: Sending to DVR");
+      logger.log("verbose", "REQ: Sending to DVR");
       if (this.request.type === "movie") {
         for (let i = 0; i < filterMatch.length; i++) {
           new Radarr(filterMatch[i].server).manualAdd(
@@ -267,7 +267,7 @@ class processRequest {
       }
       return;
     }
-    logger.log("info", "REQ: Sending to DVR");
+    logger.log("verbose", "REQ: Sending to DVR");
     // If profile is set use arrs from profile
     if (profile) {
       if (profile.radarr && this.request.type === "movie") {
@@ -288,7 +288,7 @@ class processRequest {
       }
     } else {
       // No profile set send to all arrs
-      logger.log("info", "REQ: No profile for DVR");
+      logger.log("verbose", "REQ: No profile for DVR");
       if (this.request.type === "tv") new Sonarr().addShow(false, this.request);
       if (this.request.type === "movie")
         new Radarr().processRequest(this.request.id);
@@ -413,7 +413,7 @@ class processRequest {
           logger.log("error", `REQ: Archive Error`);
           logger.log({ level: "error", message: err });
         } else {
-          logger.log("info", `REQ: Request ${oldReq.title} Archived!`);
+          logger.log("verbose", `REQ: Request ${oldReq.title} Archived!`);
         }
       }
     );

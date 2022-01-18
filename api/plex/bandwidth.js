@@ -1,12 +1,15 @@
-const request = require("xhr-request");
 const axios = require("axios");
 
-// Config
-const getConfig = require("../util/config");
+const MakePlexURL = require('./util');
 
 async function getBandwidth() {
-  const prefs = getConfig();
-  let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/statistics/bandwidth?timespan=6&X-Plex-Token=${prefs.plexToken}`;
+  const url = MakePlexURL(
+    "/statistics/bandwidth",
+    {
+      timespan: 6,
+    }
+  ).toString();
+
   try {
     let res = await axios.get(url);
     return res.data;

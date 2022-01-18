@@ -24,7 +24,7 @@ async function storeCache(firstTime = false) {
   if (firstTime) {
     let exists = await Imdb.findOne({});
     if (exists) {
-      logger.info("IMDB: Cache exists skipping setup");
+      logger.verbose("IMDB: Cache exists skipping setup");
       return;
     }
   }
@@ -37,22 +37,22 @@ async function storeCache(firstTime = false) {
     project_folder = __dirname;
     tempFile = path.join(project_folder, "../imdb_dump.txt");
   }
-  logger.info("IMDB: Rebuilding Cache");
+  logger.verbose("IMDB: Rebuilding Cache");
   try {
-    logger.info("IMDB: Cache Downloading latest cache");
+    logger.verbose("IMDB: Cache Downloading latest cache");
     const res = await axios({
       url: "https://datasets.imdbws.com/title.ratings.tsv.gz",
       method: "GET",
       responseType: "stream",
     });
-    logger.info("IMDB: Cache Storing to temp");
+    logger.verbose("IMDB: Cache Storing to temp");
     const fileStream = fs.createWriteStream(tempFile);
     res.data.pipe(unzip).pipe(fileStream);
     fileStream.on("close", async () => {
-      logger.info("IMDB: Cache Download complete");
+      logger.verbose("IMDB: Cache Download complete");
       try {
         await parseData(tempFile);
-        logger.info("IMDB: Cache Finished");
+        logger.verbose("IMDB: Cache Finished");
       } catch (e) {
         console.log(e);
         logger.error("IMDB: Cache failed - db write issue");
@@ -64,10 +64,10 @@ async function storeCache(firstTime = false) {
 }
 
 async function parseData(file) {
-  logger.info("IMDB: Cache Emptying old cache");
+  logger.verbose("IMDB: Cache Emptying old cache");
   await Imdb.deleteMany({});
-  logger.info("IMDB: Cache cleared");
-  logger.info("IMDB: Cache parsing download, updating local cache");
+  logger.verbose("IMDB: Cache cleared");
+  logger.verbose("IMDB: Cache parsing download, updating local cache");
   return new Promise((resolve, reject) => {
     let buffer = [];
     lineReader.eachLine(file, async (line, last, cb) => {

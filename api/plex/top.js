@@ -4,8 +4,7 @@ const Movie = require("../tmdb/movie");
 const Show = require("../tmdb/show");
 const logger = require("../util/logger");
 
-// Config
-const getConfig = require("../util/config");
+const MakePlexURL = require('./util');
 
 const cacheManager = require("cache-manager");
 const memoryCache = cacheManager.caching({
@@ -29,13 +28,21 @@ async function getTop(type) {
 }
 
 async function getTopData(type) {
-  const prefs = getConfig();
   let d = new Date();
   d.setMonth(d.getMonth() - 1);
   d.setHours(0, 0, 0);
   d.setMilliseconds(0);
   let timestamp = (d / 1000) | 0;
-  let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/library/all/top?type=${type}&viewedAt>=${timestamp}&limit=20&X-Plex-Token=${prefs.plexToken}`;
+
+  const url = MakePlexURL(
+    "/library/all/top",
+    {
+      "type": type,
+      "viewedAt>=": timestamp,
+      "limit": 20,
+    }
+  ).toString();
+
   try {
     let res = await axios.get(url);
     return parseTop(res.data, type);

@@ -6,6 +6,7 @@ const fs = require("fs");
 const path = require("path");
 const logger = require("../util/logger");
 const { adminRequired } = require("../middleware/auth");
+const { conf, WriteConfig } = require("../util/config");
 
 // Sonarr
 router.get("/sonarr/paths/:id", adminRequired, async (req, res) => {
@@ -62,8 +63,12 @@ router.get("/sonarr/config", adminRequired, async (req, res) => {
 
 router.post("/sonarr/config", adminRequired, async (req, res) => {
   let data = req.body.data;
+  ConvertToConfig('sonarr', JSON.parse(data));
+
+  console.log(data);
+
   try {
-    await saveSonarrConfig(data);
+    WriteConfig();
     res.json(data);
     return;
   } catch (err) {
@@ -73,29 +78,6 @@ router.post("/sonarr/config", adminRequired, async (req, res) => {
     return;
   }
 });
-
-function saveSonarrConfig(data) {
-  return new Promise((resolve, reject) => {
-    let project_folder, configFile;
-    if (process.pkg) {
-      project_folder = path.dirname(process.execPath);
-      configFile = path.join(project_folder, "./config/sonarr.json");
-    } else {
-      project_folder = __dirname;
-      configFile = path.join(project_folder, "../config/sonarr.json");
-    }
-    fs.writeFile(configFile, data, (err) => {
-      if (err) {
-        logger.log("error", `ROUTE: Error writing sonarr config`);
-        logger.log({ level: "error", message: err });
-        reject(err);
-      } else {
-        logger.log("info", "ROUTE: Sonarr Config updated");
-        resolve(data);
-      }
-    });
-  });
-}
 
 router.get("/calendar", async (req, res) => {
   try {
@@ -174,8 +156,12 @@ router.get("/radarr/test", adminRequired, async (req, res) => {
 
 router.post("/radarr/config", adminRequired, async (req, res) => {
   let data = req.body.data;
+  ConvertToConfig('radarr', JSON.parse(data));
+
+  console.log(data);
+
   try {
-    await saveRadarrConfig(data);
+    WriteConfig();
     res.json(data);
     return;
   } catch (err) {
@@ -186,27 +172,58 @@ router.post("/radarr/config", adminRequired, async (req, res) => {
   }
 });
 
-function saveRadarrConfig(data) {
-  return new Promise((resolve, reject) => {
-    let project_folder, configFile;
-    if (process.pkg) {
-      project_folder = path.dirname(process.execPath);
-      configFile = path.join(project_folder, "./config/radarr.json");
-    } else {
-      project_folder = __dirname;
-      configFile = path.join(project_folder, "../config/radarr.json");
-    }
-    fs.writeFile(configFile, data, (err) => {
-      if (err) {
-        logger.log("error", `ROUTE: Error writing radarr config`);
-        logger.log({ level: "error", message: err });
-        reject(err);
-      } else {
-        logger.log("info", "ROUTE: Radarr Config updated");
-        resolve();
-      }
-    });
-  });
-}
-
 module.exports = router;
+
+const ConvertToConfig = (entry, obj) => {
+  if (obj == null || typeof obj !== 'object') {
+    return;
+  }
+
+  if (obj.length == 0) {
+    return;
+  }
+
+  const data = [];
+  for (const [_, i] of Object.entries(obj)) {
+    const item = {};
+    item.enabled = Boolean(i.enabled);
+    item.title = String(i.title);
+    item.protocol = String(i.protocol);
+    item.host = i.host;
+    item.port = parseInt(i.port);
+    item.key = i.key;
+    item.subpath = String(i.subpath);
+    if (i.subpath == "") {
+      item.subpath = "/";
+    }
+
+    item.path = {};
+    if (i.path.id != null) {
+      item.path.id = Number(i.path.id);
+    } else {
+      item.path.id = null;
+    }
+    if (i.path.location != undefined) {
+      item.path.location = String(i.path.location);
+    } else {
+      item.path.location = "";
+    }
+
+    item.profile = {};
+    if (i.profile.id != null) {
+      item.profile.id = Number(i.profile.id);
+    } else {
+      item.profile.id = null;
+    }
+    if (i.profile.name != undefined) {
+      item.profile.name = String(i.profile.name);
+    } else {
+      item.profile.name = "";
+    }
+    item.uuid = i.uuid;
+
+    data.push(item);
+  };
+
+  conf.set(entry, data);
+};

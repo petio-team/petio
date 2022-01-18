@@ -1,11 +1,11 @@
 const axios = require("axios");
-
-// Config
-const getConfig = require("../util/config");
+const MakePlexURL = require('./util');
 
 async function getSessions() {
-  const prefs = getConfig();
-  let url = `${prefs.plexProtocol}://${prefs.plexIp}:${prefs.plexPort}/status/sessions?X-Plex-Token=${prefs.plexToken}`;
+  const url = MakePlexURL(
+    "/status/sessions",
+  ).toString();
+
   try {
     let res = await axios.get(url);
     return res.data;

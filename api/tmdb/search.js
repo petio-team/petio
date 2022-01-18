@@ -4,7 +4,7 @@ const axios = require("axios");
 const Promise = require("bluebird");
 
 // Config
-const getConfig = require("../util/config");
+const { conf } = require("../util/config");
 const onServer = require("../plex/onServer");
 const sanitize = require("sanitize-filename");
 const logger = require("../util/logger");
@@ -50,10 +50,8 @@ async function search(term) {
 }
 
 async function searchMovies(term) {
-  const config = getConfig();
-  const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}search/movie?query=${term}&include_adult=false&api_key=${tmdbApikey}&append_to_response=credits,videos`;
+  let url = `${tmdb}search/movie?query=${term}&include_adult=false&api_key=${conf.get('general.tmdb')}&append_to_response=credits,videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -66,10 +64,8 @@ async function searchMovies(term) {
 }
 
 async function searchShows(term) {
-  const config = getConfig();
-  const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}search/tv?query=${term}&include_adult=false&api_key=${tmdbApikey}&append_to_response=credits,videos`;
+  let url = `${tmdb}search/tv?query=${term}&include_adult=false&api_key=${conf.get('general.tmdb')}&append_to_response=credits,videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -82,10 +78,8 @@ async function searchShows(term) {
 }
 
 async function searchPeople(term) {
-  const config = getConfig();
-  const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}search/person?query=${term}&include_adult=false&api_key=${tmdbApikey}&append_to_response=credits,videos`;
+  let url = `${tmdb}search/person?query=${term}&include_adult=false&api_key=${conf.get('general.tmdb')}&append_to_response=credits,videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -98,10 +92,8 @@ async function searchPeople(term) {
 }
 
 async function searchCompanies(term) {
-  const config = getConfig();
-  const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}search/company?query=${term}&api_key=${tmdbApikey}`;
+  let url = `${tmdb}search/company?query=${term}&api_key=${conf.get('general.tmdb')}`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
