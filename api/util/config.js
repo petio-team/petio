@@ -83,8 +83,8 @@ const conf = convict({
   auth: {
     type: {
       doc: 'The type of auth to use',
-      format: [0, 1],
-      default: 0,
+      format: [1, 2],
+      default: 1,
     }
   },
   db: {
@@ -271,6 +271,7 @@ const conf = convict({
           doc: 'The id of the path',
           format: Number,
           default: null,
+          nullable: true,
         },
         location: {
           doc: 'The location of the path',
@@ -283,11 +284,12 @@ const conf = convict({
           doc: 'The id of the profile',
           format: Number,
           default: null,
+          nullable: true,
         },
         name: {
           doc: 'The name of the profile',
           format: String,
-          default: null,
+          default: '',
         }
       },
       uuid: {
