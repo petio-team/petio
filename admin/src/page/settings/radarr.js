@@ -23,7 +23,7 @@ class Radarr extends React.Component {
       title: "",
       protocol: "http",
       host: "localhost",
-      port: "",
+      port: 7878,
       profile: {
         id: null,
         name: '',
@@ -259,7 +259,7 @@ class Radarr extends React.Component {
       title: "",
       protocol: "http",
       host: "localhost",
-      port: null,
+      port: 7878,
       subpath: "/",
       key: "",
       profiles: false,
