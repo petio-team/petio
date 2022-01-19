@@ -1,4 +1,4 @@
-import { get, post, upload } from "../http";
+import { get, post, upload, del } from "../http";
 
 export async function popular() {
   return get("/trending");
@@ -71,6 +71,9 @@ export async function sonarrConfig() {
 export async function saveSonarrConfig(config) {
   return post(`/services/sonarr/config`, config);
 }
+export function deleteSonarrInstance(uuid) {
+  return del(`/services/sonarr/${uuid}`);
+}
 
 export async function testSonarr(id) {
   return get(`/services/sonarr/test/${id}`);
@@ -110,6 +113,10 @@ export async function testRadarr(id) {
 
 export function saveRadarrConfig(config) {
   return post(`/services/radarr/config`, config);
+}
+
+export function deleteRadarrInstance(uuid) {
+  return del(`/services/radarr/${uuid}`);
 }
 
 export function saveEmailConfig(config) {

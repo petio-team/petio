@@ -305,6 +305,10 @@ export async function sonarrConfig() {
   return config;
 }
 
+export async function sonarrDeleteInstance(uuid) {
+  return await api.deleteSonarrInstance(uuid);
+}
+
 export async function sonarrOptions(id) {
   let [paths, profiles, tags] = await Promise.all([
     api.sonarrPaths(id),
@@ -323,6 +327,10 @@ export async function radarrConfig() {
   let config = await api.radarrConfig();
 
   return config;
+}
+
+export async function radarrDeleteInstance(uuid) {
+  return await api.deleteRadarrInstance(uuid);
 }
 
 export async function radarrOptions(id) {

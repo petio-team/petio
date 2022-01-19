@@ -91,22 +91,33 @@ class Radarr extends React.Component {
 
   async deleteServer(silent = false) {
     if (this.state.activeServer === false) {
-      console.log("error");
+      this.props.msg({
+        message: "something went wrong",
+        type: "error",
+      });
       return;
     }
 
     let servers = this.state.servers;
 
-    servers.splice(this.state.activeServer, 1);
+    let res = await Api.radarrDeleteInstance(servers[this.state.activeServer].uuid);
+    if (res.status == "error") {
+      this.props.msg({
+        message: res.error,
+        type: "error",
+      });
+      return;
+    }
 
-    await Api.saveRadarrConfig(servers);
+    servers.splice(this.state.activeServer, 1);
     this.getRadarr(true);
+
     if (!silent) {
       this.closeModal("addServer");
       this.closeWizard();
 
       this.props.msg({
-        message: "Radarr Server Removed",
+        message: res.message,
         type: "good",
       });
     }

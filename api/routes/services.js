@@ -77,6 +77,56 @@ router.post("/sonarr/config", adminRequired, async (req, res) => {
   }
 });
 
+router.delete("/sonarr/:uuid", adminRequired, async (req, res) => {
+  let uuid = req.params.uuid;
+  if (uuid == undefined) {
+    res.status(400).json({
+      status: 'error',
+      error: 'missing the required `uuid` field',
+      message: null,
+      data: {},
+    });
+    return;
+  }
+
+  let sonarrs = conf.get('sonarr');
+  const match = sonarrs.filter((el) => el.uuid == uuid);
+  if (match.length == 0) {
+    res.status(400).json({
+      status: 'error',
+      error: 'no matching instance exists with the uuid: ' + uuid,
+      message: null,
+      data: {},
+    });
+    return;
+  }
+
+  sonarrs = sonarrs.filter((el) => el.uuid != uuid);
+  conf.set('sonarr', sonarrs);
+
+  try {
+    await WriteConfig();
+  } catch (e) {
+    logger.error(e);
+    res.status(500).json({
+      status: 'error',
+      error: 'failed to write to config file',
+      message: null,
+      data: {},
+    });
+    return;
+  }
+
+  res.status(200).json({
+    status: 'success',
+    error: null,
+    message: 'instance successfully removed',
+    data: sonarrs,
+  });
+  return;
+});
+
+
 router.get("/calendar", async (req, res) => {
   try {
     let sonarr = await new Sonarr().calendar();
@@ -168,7 +218,54 @@ router.post("/radarr/config", adminRequired, async (req, res) => {
   }
 });
 
-module.exports = router;
+router.delete("/radarr/:uuid", adminRequired, async (req, res) => {
+  let uuid = req.params.uuid;
+  if (uuid == undefined) {
+    res.status(400).json({
+      status: 'error',
+      error: 'missing the required `uuid` field',
+      message: null,
+      data: {},
+    });
+    return;
+  }
+
+  let radarrs = conf.get('radarr');
+  const match = radarrs.filter((el) => el.uuid == uuid);
+  if (match.length == 0) {
+    res.status(400).json({
+      status: 'error',
+      error: 'no matching instance exists with the uuid: ' + uuid,
+      message: null,
+      data: {},
+    });
+    return;
+  }
+
+  radarrs = radarrs.filter((el) => el.uuid != uuid);
+  conf.set('radarr', radarrs);
+
+  try {
+    await WriteConfig();
+  } catch (e) {
+    logger.error(e);
+    res.status(500).json({
+      status: 'error',
+      error: 'failed to write to config file',
+      message: null,
+      data: {},
+    });
+    return;
+  }
+
+  res.status(200).json({
+    status: 'success',
+    error: null,
+    message: 'instance successfully removed',
+    data: radarrs,
+  });
+  return;
+});
 
 const ConvertToConfig = (entry, obj) => {
   if (obj == null || typeof obj !== 'object') {
@@ -223,3 +320,5 @@ const ConvertToConfig = (entry, obj) => {
 
   conf.set(entry, data);
 };
+
+module.exports = router;
