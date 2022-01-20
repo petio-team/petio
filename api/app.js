@@ -2,8 +2,7 @@ const cluster = require("cluster");
 const mongoose = require("mongoose");
 const numCPUs = require("os").cpus().length;
 require("dotenv/config");
-
-require("./node_modules/cache-manager/lib/stores/memory.js");
+require("cache-manager/lib/stores/memory");
 
 const logger = require("./util/logger");
 const pjson = require("./package.json");
