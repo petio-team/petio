@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Issue = require("../models/issue");
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 const Mailer = require("../mail/mailer");
 const User = require("../models/user");
 const { movieLookup } = require("../tmdb/movie");

@@ -3,8 +3,8 @@ const agent = new http.Agent({ family: 4 });
 const axios = require("axios");
 
 // Config
-const { conf } = require("../util/config");
-const logger = require("../util/logger");
+const { conf } = require("../app/config");
+const logger = require("../app/logger");
 
 async function personLookup(id) {
   logger.log("verbose", `TMDB Person Lookup ${id}`);

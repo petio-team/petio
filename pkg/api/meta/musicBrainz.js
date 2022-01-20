@@ -1,7 +1,7 @@
 const MusicBrainzApi = require("musicbrainz-api").MusicBrainzApi;
 const pjson = require("../package.json");
 const sanitize = require("sanitize-filename");
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 
 class MusicMeta {
   constructor() {

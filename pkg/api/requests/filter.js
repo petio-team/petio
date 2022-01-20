@@ -1,4 +1,4 @@
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 const Filter = require("../models/filter");
 const { movieLookup } = require("../tmdb/movie");
 const { showLookup } = require("../tmdb/show");

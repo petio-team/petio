@@ -1,12 +1,12 @@
 const jwt = require("jsonwebtoken");
 const request = require("xhr-request");
 
-const { conf } = require("../util/config");
+const { conf } = require("../app/config");
 
 const express = require("express");
 const router = express.Router();
 const User = require("../models/user");
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 const bcrypt = require("bcryptjs");
 const { authenticate } = require("../middleware/auth");
 const getDiscovery = require("../discovery/display");

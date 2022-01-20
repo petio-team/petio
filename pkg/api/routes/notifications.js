@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 const Discord = require("../notifications/discord");
 const Telegram = require("../notifications/telegram");
 

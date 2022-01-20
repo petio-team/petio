@@ -3,10 +3,10 @@ const mongoose = require("mongoose");
 
 const router = express.Router();
 
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 const testConnection = require('../plex/testConnection');
 const bcrypt = require("bcryptjs");
-const { WriteConfig, conf } = require("../util/config");
+const { WriteConfig, conf } = require("../app/config");
 
 router.post("/test_server", async (req, res) => {
     let server = req.body.server;

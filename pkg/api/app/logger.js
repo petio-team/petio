@@ -2,11 +2,8 @@ var path = require("path");
 const winston = require("winston");
 require('winston-daily-rotate-file');
 
+const { logsFolder } = require('./env');
 const { conf } = require("./config");
-
-const LOG_DIR = process.pkg ?
-  path.join(path.dirname(process.execPath), './logs') :
-  path.join(process.cwd(), './logs');
 
 const logger = winston.createLogger({
   transports: [
@@ -25,7 +22,7 @@ const logger = winston.createLogger({
     }),
     new winston.transports.DailyRotateFile({
       level: conf.get('logger.level'),
-      filename: path.join(LOG_DIR, `petio-%DATE%.log`),
+      filename: path.join(logsFolder, `petio-%DATE%.log`),
       maxSize: '20m',
       maxFiles: '7d',
       format: winston.format.combine(
@@ -36,7 +33,7 @@ const logger = winston.createLogger({
       ),
     }),
     new winston.transports.File({
-      filename: path.join(LOG_DIR, 'live.log'),
+      filename: path.join(logsFolder, 'live.log'),
       level: "silly",
       maxsize: 100000,
       maxFiles: 1,

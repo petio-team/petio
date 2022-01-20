@@ -3,14 +3,14 @@ const agent = new http.Agent({ family: 4 });
 const axios = require("axios");
 
 // Config
-const { conf } = require("../util/config");
+const { conf } = require("../app/config");
 
 const fanartLookup = require("../fanart");
 const onServer = require("../plex/onServer");
 const { lookup: imdb } = require("../meta/imdb");
 const getLanguage = require("./languages");
 
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 
 const cacheManager = require("cache-manager");
 const memoryCache = cacheManager.caching({

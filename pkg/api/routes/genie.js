@@ -5,7 +5,7 @@ const Movie = require("../models/movie");
 const { movieLookup, discoverMovie } = require("../tmdb/movie");
 
 const MakePlexURL = require('../plex/util');
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 
 router.get("/:id/movie", async (req, res) => {
   let id = req.params.id;

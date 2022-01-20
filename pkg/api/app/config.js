@@ -4,12 +4,9 @@ const convict = require('convict');
 const convict_format_with_validator = require('convict-format-with-validator');
 
 const logger = require('./logger');
+const { configFolder } = require('./env');
 
-const CONFIG_DIR = process.pkg ?
-  path.join(path.dirname(process.execPath), './config') :
-  path.join(process.cwd(), './config');
-
-const CONFIG_FILE = path.join(CONFIG_DIR, './petio.json');
+const CONFIG_FILE = path.join(configFolder, './petio.json');
 
 convict.addFormats(convict_format_with_validator);
 

@@ -9,7 +9,7 @@ const Radarr = require("../services/radarr");
 const processRequest = require("../requests/process");
 const { getRequests } = require("../requests/display");
 const { getArchive } = require("../requests/archive");
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 
 router.post("/add", async (req, res) => {
   let user = req.body.user;
@@ -84,14 +84,11 @@ router.post("/remove", async (req, res) => {
     })
   );
   new Mailer().mail(
-    `Your request was ${request.approved ? "removed" : "denied"} for ${
-      request.title
+    `Your request was ${request.approved ? "removed" : "denied"} for ${request.title
     }`,
-    `Your request was ${request.approved ? "removed" : "denied"} for ${
-      request.title
+    `Your request was ${request.approved ? "removed" : "denied"} for ${request.title
     }`,
-    `Unfortunately your request could not be processed.${
-      reason ? ` This is because - ${reason}.` : ""
+    `Unfortunately your request could not be processed.${reason ? ` This is because - ${reason}.` : ""
     } Thanks for your request anyway!`,
     `https://image.tmdb.org/t/p/w500${request.thumb}`,
     emails,

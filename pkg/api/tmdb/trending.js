@@ -4,7 +4,7 @@ const axios = require("axios");
 const Promise = require("bluebird");
 
 // Config
-const { conf } = require("../util/config");
+const { conf } = require("../app/config");
 const { movieLookup } = require("../tmdb/movie");
 const { showLookup } = require("../tmdb/show");
 
@@ -15,7 +15,7 @@ const memoryCache = cacheManager.caching({
   ttl: 86400 /*seconds*/,
 });
 
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 
 async function trending() {
   logger.log("verbose", `TMDB Trending lookup`);

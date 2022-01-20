@@ -9,14 +9,14 @@ const Request = require("../models/request");
 const Profile = require("../models/profile");
 const Mailer = require("../mail/mailer");
 const processRequest = require("../requests/process");
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 const Discord = require("../notifications/discord");
 const Telegram = require("../notifications/telegram");
 const { showLookup } = require("../tmdb/show");
 const bcrypt = require("bcryptjs");
 const axios = require("axios");
 const MusicMeta = require("../meta/musicBrainz");
-const { conf } = require("../util/config");
+const { conf } = require("../app/config");
 
 class LibraryUpdate {
   constructor() {

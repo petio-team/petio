@@ -4,9 +4,9 @@ const Sonarr = require("../services/sonarr");
 const Radarr = require("../services/radarr");
 const fs = require("fs");
 const path = require("path");
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 const { adminRequired } = require("../middleware/auth");
-const { conf, WriteConfig } = require("../util/config");
+const { conf, WriteConfig } = require("../app/config");
 
 // Sonarr
 router.get("/sonarr/paths/:id", adminRequired, async (req, res) => {

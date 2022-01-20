@@ -1,10 +1,10 @@
 // Config
-const { conf } = require("../util/config");
+const { conf } = require("../app/config");
 
 const request = require("xhr-request");
 
 const cacheManager = require("cache-manager");
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 const memoryCache = cacheManager.caching({ store: "memory", max: 500, ttl: 86400 /*seconds*/ });
 
 async function fanart(id, type) {

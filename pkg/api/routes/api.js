@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 
 // Routes
 const movieRoute = require("./movie");
@@ -29,7 +29,7 @@ const notificationsRoute = require("./notifications");
 const batchRoute = require("./batch");
 const setupRoute = require("./setup");
 const { authRequired } = require("../middleware/auth");
-const { conf } = require("../util/config");
+const { conf } = require("../app/config");
 const setupReady = require("../util/setupReady");
 
 router.get("/config", async (req, res) => {

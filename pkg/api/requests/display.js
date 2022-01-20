@@ -3,7 +3,7 @@ const { showLookup } = require("../tmdb/show");
 const Request = require("../models/request");
 const Sonarr = require("../services/sonarr");
 const Radarr = require("../services/radarr");
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 const Promise = require("bluebird");
 
 async function getRequests(user = false, all = false) {

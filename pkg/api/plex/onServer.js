@@ -1,7 +1,7 @@
 const Movie = require("../models/movie");
 // const Music = require('../models/artist'); // to be added when music added
 const Show = require("../models/show");
-const { conf } = require("../util/config");
+const { conf } = require("../app/config");
 
 async function onServer(type, imdb, tvdb, tmdb) {
   let clientId = conf.get('plex.client');

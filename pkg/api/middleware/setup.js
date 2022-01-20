@@ -1,4 +1,4 @@
-const { conf } = require('../util/config');
+const { conf } = require('../app/config');
 
 const checkSetup = (req, res, next) => {
     if (conf.get('admin.id') == null) {

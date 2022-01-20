@@ -1,7 +1,7 @@
 const Movie = require("../models/movie");
 const Show = require("../models/show");
 const User = require("../models/user");
-const logger = require("./logger");
+const logger = require("../app/logger");
 
 async function setupReady() {
   try {

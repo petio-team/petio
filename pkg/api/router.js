@@ -4,9 +4,9 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 
 const apiRoutes = require("./routes/api");
-const { conf } = require("./util/config");
+const { conf } = require("./app/config");
 const checkSetup = require('./middleware/setup');
-const logger = require("./util/logger");
+const logger = require("./app/logger");
 
 // setups the core of the router
 const SetupRouter = (restartFunc) => {

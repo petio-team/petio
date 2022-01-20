@@ -1,5 +1,5 @@
 const { URL, URLSearchParams } = require('url');
-const { conf } = require("../util/config");
+const { conf } = require("../app/config");
 
 const MakePlexURL = (url, params = {}) => {
     const baseurl = new URL(url, `${conf.get('plex.protocol')}://${conf.get('plex.host')}:${conf.get('plex.port')}`);

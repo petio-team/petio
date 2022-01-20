@@ -4,8 +4,8 @@ require("cache-manager/lib/stores/memory");
 
 const App = require('./app/app');
 const Worker = require("./worker");
-const logger = require("./util/logger");
-const { loadConfig } = require("./util/config");
+const logger = require("./app/logger");
+const { loadConfig } = require("./app/config");
 
 // load config
 try {

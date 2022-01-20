@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 const { movieLookup } = require("../tmdb/movie");
 const showLookup = require("../tmdb/show");
 

@@ -2,8 +2,8 @@ const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
 
-const logger = require("../util/logger");
-const { conf } = require("../util/config");
+const logger = require("../app/logger");
+const { conf } = require("../app/config");
 
 class Telegram {
   constructor() {

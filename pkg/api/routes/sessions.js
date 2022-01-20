@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const getSessions = require("../plex/sessions");
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 const { adminRequired } = require("../middleware/auth");
 
 router.use(adminRequired);

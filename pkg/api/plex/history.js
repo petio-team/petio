@@ -6,7 +6,7 @@ const Show = require("../tmdb/show");
 const MakePlexURL = require('./util');
 
 const cacheManager = require("cache-manager");
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 const memoryCache = cacheManager.caching({
   store: "memory",
   max: 500,

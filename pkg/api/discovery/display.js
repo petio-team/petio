@@ -1,6 +1,6 @@
 const Discovery = require("../models/discovery");
-const logger = require("../util/logger");
-const { conf } = require("../util/config");
+const logger = require("../app/logger");
+const { conf } = require("../app/config");
 const request = require("xhr-request");
 const Movie = require("../tmdb/movie");
 const Show = require("../tmdb/show");

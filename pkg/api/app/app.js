@@ -2,10 +2,10 @@ const mongoose = require("mongoose");
 const numCPUs = require("os").cpus().length;
 const cluster = require("cluster");
 
-const logger = require("../util/logger");
+const logger = require("./logger");
+const { conf } = require("./config");
 const { SetupRouter } = require("../router");
 const trending = require("../tmdb/trending");
-const { conf } = require("../util/config");
 const version = require("../package.json").version;
 
 let server = null;

@@ -2,10 +2,10 @@ const express = require("express");
 const router = express.Router();
 
 const Mailer = require("../mail/mailer");
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 
 const { adminRequired } = require("../middleware/auth");
-const { conf, WriteConfig } = require("../util/config");
+const { conf, WriteConfig } = require("../app/config");
 
 router.use(adminRequired);
 router.post("/create", async (req, res) => {

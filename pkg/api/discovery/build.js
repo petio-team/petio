@@ -1,8 +1,8 @@
 const User = require("../models/user");
 const Discovery = require("../models/discovery");
 const request = require("xhr-request");
-const { conf } = require("../util/config");
-const logger = require("../util/logger");
+const { conf } = require("../app/config");
+const logger = require("../app/logger");
 const Movie = require("../models/movie");
 const Show = require("../models/show");
 const Promise = require("bluebird");

@@ -4,10 +4,10 @@ const axios = require("axios");
 const Promise = require("bluebird");
 
 // Config
-const { conf } = require("../util/config");
+const { conf } = require("../app/config");
 const onServer = require("../plex/onServer");
 const sanitize = require("sanitize-filename");
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 const { movieLookup } = require("../tmdb/movie");
 const { showLookup } = require("../tmdb/show");
 

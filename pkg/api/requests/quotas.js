@@ -1,5 +1,5 @@
 const User = require("../models/user");
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 
 class QuotaSystem {
   async reset() {

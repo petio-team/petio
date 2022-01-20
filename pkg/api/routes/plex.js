@@ -2,8 +2,8 @@ const express = require("express");
 
 const router = express.Router();
 const plexLookup = require("../plex/plexLookup");
-const { conf, WriteConfig } = require("../util/config");
-const logger = require("../util/logger");
+const { conf, WriteConfig } = require("../app/config");
+const logger = require("../app/logger");
 const MakePlexURL = require('../plex/util');
 const axios = require("axios");
 

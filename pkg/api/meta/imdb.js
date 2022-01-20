@@ -1,6 +1,6 @@
 // https://www.imdb.com/title/tt6475714/
 const axios = require("axios");
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 const zlib = require("zlib");
 const fs = require("fs");
 const path = require("path");

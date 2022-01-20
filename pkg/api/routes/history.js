@@ -3,7 +3,7 @@ const router = express.Router();
 const getHistory = require("../plex/history");
 const getBandwidth = require("../plex/bandwidth");
 const getServerInfo = require("../plex/serverInfo");
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 
 router.post("/", async (req, res) => {
   let id = req.body.id;

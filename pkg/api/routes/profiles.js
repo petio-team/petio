@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Profile = require("../models/profile");
 const User = require("../models/user");
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 const { adminRequired } = require("../middleware/auth");
 
 router.use(adminRequired);

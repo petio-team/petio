@@ -3,11 +3,11 @@ const router = express.Router();
 const User = require("../models/user");
 const Profile = require("../models/profile");
 const http = require("follow-redirects").http;
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 const bcrypt = require("bcryptjs");
 const { adminRequired, authRequired } = require("../middleware/auth");
 var multer = require("multer");
-const { conf, WriteConfig } = require("../util/config");
+const { conf, WriteConfig } = require("../app/config");
 const fs = require("fs");
 const path = require("path");
 

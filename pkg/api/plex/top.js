@@ -2,7 +2,7 @@ const axios = require("axios");
 const plexLookup = require("../plex/plexLookup");
 const Movie = require("../tmdb/movie");
 const Show = require("../tmdb/show");
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 
 const MakePlexURL = require('./util');
 

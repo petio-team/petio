@@ -1,8 +1,8 @@
 const CronJob = require("cron").CronJob;
-const logger = require("./util/logger");
+const logger = require("./app/logger");
 const LibraryUpdate = require("./plex/libraryUpdate");
 const QuotaSystem = require("./requests/quotas");
-const { conf } = require("./util/config");
+const { conf } = require("./app/config");
 const mongoose = require("mongoose");
 const buildDiscovery = require("./discovery/build");
 const { storeCache: imdbCache } = require("./meta/imdb");

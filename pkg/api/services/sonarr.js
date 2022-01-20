@@ -1,7 +1,7 @@
 const Request = require("../models/request");
-const logger = require("../util/logger");
+const logger = require("../app/logger");
 const axios = require("axios");
-const { conf } = require('../util/config');
+const { conf } = require('../app/config');
 
 class Sonarr {
   constructor() {
