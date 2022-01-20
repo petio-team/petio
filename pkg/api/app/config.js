@@ -409,7 +409,7 @@ const loadConfig = () => {
 };
 
 const WriteConfig = async () => {
-  fs.mkdir(CONFIG_DIR, { recursive: true }, (err) => {
+  fs.mkdir(configFolder, { recursive: true }, (err) => {
     if (err) {
       throw err;
     }
@@ -425,21 +425,21 @@ const WriteConfig = async () => {
 
 const GetLegacyConfig = () => {
   try {
-    fs.statSync(CONFIG_DIR);
+    fs.statSync(configFolder);
   } catch (_) {
     return;
   }
 
-  const configFile = path.join(CONFIG_DIR, 'config.json');
+  const configFile = path.join(configFolder, 'config.json');
   const config = GetConfigFile(configFile);
 
-  const emailFile = path.join(CONFIG_DIR, 'email.json');
+  const emailFile = path.join(configFolder, 'email.json');
   const emailConfig = GetConfigFile(emailFile);
 
-  const radarrFile = path.join(CONFIG_DIR, 'radarr.json');
+  const radarrFile = path.join(configFolder, 'radarr.json');
   const radarrConfig = GetConfigFile(radarrFile);
 
-  const sonarrFile = path.join(CONFIG_DIR, 'sonarr.json');
+  const sonarrFile = path.join(configFolder, 'sonarr.json');
   const sonarrConfig = GetConfigFile(sonarrFile);
 
   return {
