@@ -92,14 +92,6 @@ router.post("/test_mongo", async (req, res) => {
 
 router.post("/set", async (req, res) => {
     logger.log("verbose", "Attempting to create config file");
-    if (this.config) {
-        res.status(403).send("Config exists");
-        logger.log(
-            "warn",
-            "Error: Config creation blocked, config already exists, this is likely malicious"
-        );
-        return;
-    }
     let user = req.body.user;
     let server = req.body.server;
     let db = req.body.db;
