@@ -11,7 +11,7 @@ const version = require("../package.json").version;
 let server = null;
 
 const app = () => {
-    logger.info(`Petio - v${version}`);
+    logger.info(`Petio v${version}`);
     try {
         // check the num of cpu cores
         if (numCPUs < 2) {
