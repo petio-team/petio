@@ -1,7 +1,7 @@
 const axios = require('axios').default;
 
-const logger = require("./util/logger");
-const { conf } = require('./util/config');
+const logger = require("./app/logger");
+const { conf } = require('./app/config');
 
 const url = new URL(`http://${conf.get('petio.host')}:${conf.get('petio.port')}${conf.get('petio.subpath')}`);
 
