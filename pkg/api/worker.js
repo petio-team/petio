@@ -9,21 +9,20 @@ const { storeCache: imdbCache } = require("./meta/imdb");
 
 class Worker {
   async connnectDb() {
-    if (conf.get('admin.id') == null) {
-      logger.log("error", "CRONW: Failed to connect to DB");
-      throw "Failed to connect to DB";
-    }
-
     await mongoose.connect(conf.get('db.url'), {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
 
-    logger.log("verbose", "CRONW: Connected to Database");
+    logger.verbose("CRONW: Connected to Database");
   }
 
   async startCrons() {
-    // return; // for debug local
+    if (conf.get('admin.id') == null) {
+      logger.debug("Worker: Setup not complete, skipping");
+      return 1;
+    }
+
     try {
       await this.connnectDb();
       await imdbCache(true);
