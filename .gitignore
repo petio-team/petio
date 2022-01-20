@@ -1,5 +1,8 @@
 .idea/
 build/
+config/
+db/
+logs/
 .eslintcache
 *.log
 .DS_Store
