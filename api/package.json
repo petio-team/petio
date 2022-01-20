@@ -7,9 +7,9 @@
     "start": "node app.js"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^0.25.0",
     "bcryptjs": "2.4.3",
     "bluebird": "^3.7.2",
     "cache-manager": "^3.4.1",
@@ -19,10 +19,9 @@
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "cron": "^1.8.2",
-    "env-var": "^7.1.1",
     "express": "^4.17.1",
     "express-cache-middleware": "^1.0.1",
-    "follow-redirects": "^1.13.3",
+    "follow-redirects": "^1.14.7",
     "jsonwebtoken": "^8.5.1",
     "line-reader": "^0.4.0",
     "mongoose": "^5.12.1",
@@ -33,7 +32,8 @@
     "winston": "^3.3.4",
     "winston-daily-rotate-file": "^4.5.5",
     "xhr-request": "^1.1.0",
-    "xml-js": "^1.6.11"
+    "xml-js": "^1.6.11",
+    "zod": "^3.11.6"
   },
   "devDependencies": {
     "dotenv": "^8.2.0"
