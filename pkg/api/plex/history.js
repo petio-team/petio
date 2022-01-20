@@ -28,7 +28,7 @@ async function getHistory(id, type) {
 }
 
 function getHistoryData(id, type) {
-  logger.info("History returned from source");
+  logger.verbose("History returned from source");
   return new Promise((resolve, reject) => {
     let d = new Date();
     d.setMonth(d.getMonth() - 1);
