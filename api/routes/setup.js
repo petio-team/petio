@@ -127,7 +127,7 @@ router.post("/set", async (req, res) => {
 
 const WaitBeforeRestart = async (res) => {
     setTimeout(() => {
-        res.app.settings['app'].Restart();
+        res.app.settings['restart']();
     }, 1000);
 };
 

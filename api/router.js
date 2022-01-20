@@ -9,7 +9,7 @@ const checkSetup = require('./middleware/setup');
 const logger = require("./util/logger");
 
 // setups the core of the router
-const SetupRouter = (app) => {
+const SetupRouter = (restartFunc) => {
     const router = express();
 
     // setup the middleware that modify requests and responses
@@ -26,7 +26,7 @@ const SetupRouter = (app) => {
     router.use(cookieParser());
     router.use(checkSetup);
     router.set("trust proxy", conf.get('petio.proxies'));
-    router.set("app", app);
+    router.set("restart", restartFunc);
 
     // setup the different routes
     routes(router);

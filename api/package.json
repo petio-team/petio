@@ -2,9 +2,9 @@
   "name": "petio",
   "version": "0.5.4",
   "description": "Petio API",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node main.js"
   },
   "author": "",
   "license": "MIT",
@@ -38,7 +38,7 @@
   "devDependencies": {
     "dotenv": "^8.2.0"
   },
-  "bin": "./app.js",
+  "bin": "./main.js",
   "pkg": {
     "assets": [
       "../frontend/build/**/*",
