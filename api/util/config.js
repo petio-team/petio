@@ -44,12 +44,6 @@ const conf = convict({
       format: Boolean,
       default: false,
     },
-    loglevel: {
-      doc: 'The level of output the log provides',
-      format: ['error', 'warn', 'info', 'verbose', 'debug', 'silly'],
-      default: 'info',
-      args: 'loglevel',
-    }
   },
   petio: {
     host: {
@@ -78,6 +72,15 @@ const conf = convict({
       format: Array,
       default: [],
       env: 'PETIO_TRUSTED_PROXIES',
+    },
+  },
+  logger: {
+    level: {
+      doc: 'The level of output the log provides',
+      format: ['error', 'warn', 'info', 'verbose', 'debug', 'silly'],
+      default: 'info',
+      env: 'LOG_LEVEL',
+      args: 'loglevel',
     },
   },
   auth: {

@@ -1,6 +1,7 @@
 var path = require("path");
 const winston = require("winston");
 require('winston-daily-rotate-file');
+
 const { conf } = require("./config");
 
 const LOG_DIR = process.pkg ?
@@ -10,7 +11,7 @@ const LOG_DIR = process.pkg ?
 const logger = winston.createLogger({
   transports: [
     new winston.transports.Console({
-      level: conf.get('general.loglevel'),
+      level: conf.get('logger.level'),
       format: winston.format.combine(
         winston.format.colorize(),
         winston.format.timestamp({
@@ -23,7 +24,7 @@ const logger = winston.createLogger({
       handleExceptions: true,
     }),
     new winston.transports.DailyRotateFile({
-      level: conf.get('general.loglevel'),
+      level: conf.get('logger.level'),
       filename: path.join(LOG_DIR, `petio-%DATE%.log`),
       maxSize: '20m',
       maxFiles: '7d',
