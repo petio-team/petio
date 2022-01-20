@@ -12,7 +12,7 @@ const MakePlexURL = (url, params = {}) => {
     }
 
     prms.set('X-Plex-Token', conf.get('plex.token'));
-    baseurl.search = prms;
+    baseurl.search = prms.toString();
 
     return baseurl;
 };
