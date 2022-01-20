@@ -11,7 +11,7 @@ const version = require("../package.json").version;
 let server = null;
 
 const app = () => {
-    logger.log("info", `Petio - ${version}`);
+    logger.info(`Petio - v${version}`);
     try {
         // check the num of cpu cores
         if (numCPUs < 2) {
@@ -38,11 +38,11 @@ const app = () => {
         process.exit(0);
     }
 
-    logger.log("info", "Listening on: " + conf.get('petio.host') + ":" + conf.get('petio.port'));
+    logger.info("Listening on: " + conf.get('petio.host') + ":" + conf.get('petio.port'));
 
     // check if admin id is set else we tell the user they need to go through setup
     if (conf.get('admin.id') == null) {
-        logger.log("warn", "Initial setup is required");
+        logger.warn("Initial setup is required, please proceed to the webui to begin the setup");
     }
 };
 
@@ -60,8 +60,8 @@ const connect = async () => {
             useUnifiedTopology: true,
         });
     } catch (err) {
-        logger.log("error", "Error connecting to database");
-        logger.log({ level: "error", message: err });
+        logger.error("Error connecting to database");
+        logger.error(err);
     }
 };
 
