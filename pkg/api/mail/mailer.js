@@ -1,6 +1,4 @@
 const nodemailer = require("nodemailer");
-const fs = require("fs");
-const path = require("path");
 
 const logger = require("../app/logger");
 const { conf } = require("../app/config");
@@ -62,7 +60,7 @@ class Mailer {
         false,
         [conf.get('admin.email')]
       );
-      logger.log("verbose", "MAILER: Verified");
+      logger.verbose("MAILER: Verified");
       if (verify === true) {
         return {
           result: true,
@@ -75,8 +73,8 @@ class Mailer {
         };
       }
     } catch (err) {
-      logger.log("warn", "MAILER: Verification failed");
-      logger.log({ level: "error", message: err });
+      logger.verbose("MAILER: Verification failed");
+      logger.verbose(err);
       return { result: false, error: err };
     }
   }
@@ -84,12 +82,11 @@ class Mailer {
   // Build email and send to transport
   mail(subject, title, text, img, to = [], name = []) {
     if (!conf.get('email.enabled')) {
-      logger.log("warn", "MAILER: Email disabled, skipping sending emails");
+      logger.verbose("MAILER: Email disabled, skipping sending emails");
       return;
     }
     if (!this.transport) {
-      logger.log(
-        "warn",
+      logger.verbose(
         "MAILER: Email not configured, skipping sending emails"
       );
       return;
@@ -102,8 +99,7 @@ class Mailer {
         let username = name[i] || "";
         i++;
         setTimeout(async () => {
-          logger.log(
-            "info",
+          logger.verbose(
             `MAILER: Sending email from: ${conf.get('email.from')} to ${send} with the subject ${subject}`
           );
           try {

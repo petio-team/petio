@@ -9,15 +9,12 @@ router.get("/movies", async (req, res) => {
     res.sendStatus(404);
   }
   try {
-    logger.log({
-      level: "info",
-      message: `ROUTE: Movie Discovery Profile returned for ${userId}`,
-    });
+    logger.verbose(`ROUTE: Movie Discovery Profile returned for ${userId}`);
     let data = await getDiscovery(userId, "movie");
     if (data.error) throw data.error;
     res.json(data);
   } catch (err) {
-    logger.log({ level: "error", message: err });
+    logger.error(err);
     res.sendStatus(500);
   }
 });
@@ -28,15 +25,12 @@ router.get("/shows", async (req, res) => {
     res.sendStatus(404);
   }
   try {
-    logger.log({
-      level: "info",
-      message: `ROUTE: TV Discovery Profile returned for ${userId}`,
-    });
+    logger.verbose(`ROUTE: TV Discovery Profile returned for ${userId}`);
     let data = await getDiscovery(userId, "show");
     if (data.error) throw data.error;
     res.json(data);
   } catch (err) {
-    logger.log({ level: "error", message: err });
+    logger.error(err);
     res.sendStatus(500);
   }
 });
