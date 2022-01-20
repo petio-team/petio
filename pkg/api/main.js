@@ -1,14 +1,19 @@
-const cluster = require("cluster");
 require("dotenv/config");
 require("cache-manager/lib/stores/memory");
+
+const cluster = require("cluster");
 
 const App = require('./app/app');
 const Worker = require("./worker");
 const logger = require("./app/logger");
 const { loadConfig } = require("./app/config");
+const checkPerms = require("./util/perms");
 
-// load config
 try {
+  // attempt to check config/logs folders are readable/writable else try to make them readable/writable
+  // throws error if fails
+  checkPerms();
+  // load config
   loadConfig();
 } catch (e) {
   logger.log(e);
