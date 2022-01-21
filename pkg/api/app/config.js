@@ -26,16 +26,6 @@ convict.addFormat({
 // Our config schema
 const conf = convict({
   general: {
-    fanart: {
-      doc: 'The fanart api key',
-      format: String,
-      default: 'ee409f6fb0c5cd2352e7a454d3f580d4',
-    },
-    tmdb: {
-      doc: 'The tmdb api key',
-      format: String,
-      default: '1af5ad19a2d972a67cd27eb033979c4c',
-    },
     popular: {
       doc: 'Enabled showing popular media',
       format: Boolean,
@@ -469,12 +459,6 @@ const MergeLegacyConfig = (c) => {
     conf.set('notifications.telegram.silent', c.telegram_send_silently);
   }
   // general
-  if (c.tmdbApi != undefined) {
-    conf.set('general.tmdb', c.tmdbApi);
-  }
-  if (c.fanartApi != undefined) {
-    conf.set('general.fanart', c.fanartApi);
-  }
   if (c.plexPopular != undefined) {
     conf.set('general.popular', c.plexPopular);
   }

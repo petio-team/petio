@@ -5,6 +5,7 @@ const axios = require("axios");
 // Config
 const { conf } = require("../app/config");
 const logger = require("../app/logger");
+const { tmdbApiKey } = require("../app/env");
 
 async function personLookup(id) {
   logger.log("verbose", `TMDB Person Lookup ${id}`);
@@ -23,7 +24,7 @@ async function personLookup(id) {
 
 async function getPersonInfo(id) {
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}person/${id}?api_key=${conf.get('general.tmdb')}&append_to_response=images`;
+  let url = `${tmdb}person/${id}?api_key=${tmdbApiKey}&append_to_response=images`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -34,7 +35,7 @@ async function getPersonInfo(id) {
 
 async function getPersonMovies(id) {
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}person/${id}/movie_credits?api_key=${conf.get('general.tmdb')}&append_to_response=credits,videos`;
+  let url = `${tmdb}person/${id}/movie_credits?api_key=${tmdbApiKey}&append_to_response=credits,videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -45,7 +46,7 @@ async function getPersonMovies(id) {
 
 async function getPersonShows(id) {
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}person/${id}/tv_credits?api_key=${conf.get('general.tmdb')}&append_to_response=credits,videos`;
+  let url = `${tmdb}person/${id}/tv_credits?api_key=${tmdbApiKey}&append_to_response=credits,videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;

@@ -13,6 +13,7 @@ const getLanguage = require("./languages");
 const logger = require("../app/logger");
 
 const cacheManager = require("cache-manager");
+const { tmdbApiKey } = require("../app/env");
 const memoryCache = cacheManager.caching({
   store: "memory",
   max: 500,
@@ -196,7 +197,7 @@ async function getCollection(id) {
 
 async function tmdbData(id) {
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}movie/${id}?api_key=${conf.get('general.tmdb')}&append_to_response=credits,videos,keywords,release_dates`;
+  let url = `${tmdb}movie/${id}?api_key=${tmdbApiKey}&append_to_response=credits,videos,keywords,release_dates`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     let data = res.data;
@@ -213,7 +214,7 @@ async function tmdbData(id) {
 
 async function recommendationData(id, page = 1) {
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}movie/${id}/recommendations?api_key=${conf.get('general.tmdb')}&page=${page}&append_to_response=videos`;
+  let url = `${tmdb}movie/${id}/recommendations?api_key=${tmdbApiKey}&page=${page}&append_to_response=videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -224,7 +225,7 @@ async function recommendationData(id, page = 1) {
 
 async function collectionData(id) {
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}collection/${id}?api_key=${conf.get('general.tmdb')}&append_to_response=videos`;
+  let url = `${tmdb}collection/${id}?api_key=${tmdbApiKey}&append_to_response=videos`;
 
   try {
     let res = await axios.get(url, { httpAgent: agent });
@@ -236,7 +237,7 @@ async function collectionData(id) {
 
 async function reviewsData(id) {
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}movie/${id}/reviews?api_key=${conf.get('general.tmdb')}`;
+  let url = `${tmdb}movie/${id}/reviews?api_key=${tmdbApiKey}`;
 
   try {
     let res = await axios.get(url, { httpAgent: agent });
@@ -274,7 +275,7 @@ async function discoverMovie(page = 1, params = {}) {
   Object.keys(params).map((i) => {
     par += `&${i}=${params[i]}`;
   });
-  let url = `${tmdb}discover/movie?api_key=${conf.get('general.tmdb')}${par}&page=${page}&append_to_response=videos`;
+  let url = `${tmdb}discover/movie?api_key=${tmdbApiKey}${par}&page=${page}&append_to_response=videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     if (res.data && res.data.results.length > 0) {
@@ -293,7 +294,7 @@ async function discoverMovie(page = 1, params = {}) {
 
 async function company(id) {
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}company/${id}?api_key=${conf.get('general.tmdb')}`;
+  let url = `${tmdb}company/${id}?api_key=${tmdbApiKey}`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;

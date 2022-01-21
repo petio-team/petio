@@ -10,6 +10,7 @@ const Promise = require("bluebird");
 
 const cacheManager = require("cache-manager");
 const getTop = require("../plex/top");
+const { tmdbApiKey } = require("../app/env");
 const memoryCache = cacheManager.caching({
   store: "memory",
   // max: 500,
@@ -489,7 +490,7 @@ function discoverMovie(page = 1, params = {}) {
   Object.keys(params).map((i) => {
     par += `&${i}=${params[i]}`;
   });
-  let url = `${tmdb}discover/movie?api_key=${conf.get('general.tmdb')}${par}&page=${page}&append_to_response=videos`;
+  let url = `${tmdb}discover/movie?api_key=${tmdbApiKey}${par}&page=${page}&append_to_response=videos`;
   return new Promise((resolve, reject) => {
     request(
       url,
@@ -514,7 +515,7 @@ function discoverShow(page = 1, params = {}) {
   Object.keys(params).map((i) => {
     par += `&${i}=${params[i]}`;
   });
-  let url = `${tmdb}discover/tv?api_key=${conf.get('general.tmdb')}${par}&page=${page}&append_to_response=videos`;
+  let url = `${tmdb}discover/tv?api_key=${tmdbApiKey}${par}&page=${page}&append_to_response=videos`;
   return new Promise((resolve, reject) => {
     request(
       url,
@@ -535,7 +536,7 @@ function discoverShow(page = 1, params = {}) {
 
 function searchPeople(term) {
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}search/person?query=${term}&include_adult=false&api_key=${conf.get('general.tmdb')}`;
+  let url = `${tmdb}search/person?query=${term}&include_adult=false&api_key=${tmdbApiKey}`;
   return new Promise((resolve, reject) => {
     request(
       url,

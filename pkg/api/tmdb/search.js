@@ -10,6 +10,7 @@ const sanitize = require("sanitize-filename");
 const logger = require("../app/logger");
 const { movieLookup } = require("../tmdb/movie");
 const { showLookup } = require("../tmdb/show");
+const { tmdbApiKey } = require("../app/env");
 
 async function search(term) {
   logger.log("verbose", `TMDB Search ${term}`);
@@ -51,7 +52,7 @@ async function search(term) {
 
 async function searchMovies(term) {
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}search/movie?query=${term}&include_adult=false&api_key=${conf.get('general.tmdb')}&append_to_response=credits,videos`;
+  let url = `${tmdb}search/movie?query=${term}&include_adult=false&api_key=${tmdbApiKey}&append_to_response=credits,videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -65,7 +66,7 @@ async function searchMovies(term) {
 
 async function searchShows(term) {
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}search/tv?query=${term}&include_adult=false&api_key=${conf.get('general.tmdb')}&append_to_response=credits,videos`;
+  let url = `${tmdb}search/tv?query=${term}&include_adult=false&api_key=${tmdbApiKey}&append_to_response=credits,videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -79,7 +80,7 @@ async function searchShows(term) {
 
 async function searchPeople(term) {
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}search/person?query=${term}&include_adult=false&api_key=${conf.get('general.tmdb')}&append_to_response=credits,videos`;
+  let url = `${tmdb}search/person?query=${term}&include_adult=false&api_key=${tmdbApiKey}&append_to_response=credits,videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -93,7 +94,7 @@ async function searchPeople(term) {
 
 async function searchCompanies(term) {
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}search/company?query=${term}&api_key=${conf.get('general.tmdb')}`;
+  let url = `${tmdb}search/company?query=${term}&api_key=${tmdbApiKey}`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;

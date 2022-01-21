@@ -17,6 +17,7 @@ const bcrypt = require("bcryptjs");
 const axios = require("axios");
 const MusicMeta = require("../meta/musicBrainz");
 const { conf } = require("../app/config");
+const { tmdbApiKey } = require("../app/env");
 
 class LibraryUpdate {
   constructor() {
@@ -823,7 +824,7 @@ class LibraryUpdate {
   }
 
   async externalIdTv(id, type) {
-    let url = `${this.tmdb}find/${id}?api_key=${conf.get('general.tmdb')}&language=en-US&external_source=${type}_id`;
+    let url = `${this.tmdb}find/${id}?api_key=${tmdbApiKey}&language=en-US&external_source=${type}_id`;
     try {
       let res = await axios.get(url);
       return res.data.tv_results[0].id;
@@ -833,7 +834,7 @@ class LibraryUpdate {
   }
 
   async tmdbExternalIds(id) {
-    let url = `${this.tmdb}tv/${id}/external_ids?api_key=${conf.get('general.tmdb')}`;
+    let url = `${this.tmdb}tv/${id}/external_ids?api_key=${tmdbApiKey}`;
     try {
       let res = await axios.get(url);
       return res.data;
@@ -843,7 +844,7 @@ class LibraryUpdate {
   }
 
   async externalIdMovie(id, type) {
-    let url = `${this.tmdb}find/${id}?api_key=${conf.get('general.tmdb')}&language=en-US&external_source=${type}_id`;
+    let url = `${this.tmdb}find/${id}?api_key=${tmdbApiKey}&language=en-US&external_source=${type}_id`;
     try {
       let res = await axios.get(url);
       return res.data.movie_results[0].id;

@@ -16,6 +16,7 @@ const memoryCache = cacheManager.caching({
 });
 
 const logger = require("../app/logger");
+const { tmdbApiKey } = require("../app/env");
 
 async function trending() {
   logger.log("verbose", `TMDB Trending lookup`);
@@ -212,7 +213,7 @@ async function getShows() {
 async function personData() {
   logger.log("verbose", "Person from source not cache");
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}trending/person/week?api_key=${conf.get('general.tmdb')}&append_to_response=images`;
+  let url = `${tmdb}trending/person/week?api_key=${tmdbApiKey}&append_to_response=images`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -224,7 +225,7 @@ async function personData() {
 async function moviesData() {
   logger.log("verbose", "Movies from source not cache");
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}trending/movie/week?api_key=${conf.get('general.tmdb')}&append_to_response=images,videos`;
+  let url = `${tmdb}trending/movie/week?api_key=${tmdbApiKey}&append_to_response=images,videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -236,7 +237,7 @@ async function moviesData() {
 async function showsData() {
   logger.log("verbose", "Shows from source not cache");
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}trending/tv/week?api_key=${conf.get('general.tmdb')}&append_to_response=images,videos`;
+  let url = `${tmdb}trending/tv/week?api_key=${tmdbApiKey}&append_to_response=images,videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
