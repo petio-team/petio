@@ -112,8 +112,8 @@ tasks:
 
   release:prepare:
     cmds:
-      task: pkg
-      task: docker:latest
+      - task: pkg
+      - task: docker:latest
 
   release:dry:
     dir: pkg/api
