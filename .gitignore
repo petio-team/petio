@@ -1,6 +1,7 @@
 .idea/
 build/
 config/
+data/
 db/
 logs/
 .eslintcache
