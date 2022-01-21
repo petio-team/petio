@@ -1,6 +1,6 @@
 {
     "branches": [
-        "cleanup"
+        "master"
     ],
     "release": {
         "tagFormat": "v${version}"
