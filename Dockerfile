@@ -1,50 +1,17 @@
-FROM node:16.3.0-alpine3.13 as builder
-
-RUN apk add --no-cache git
-COPY ./ /source/
-
-WORKDIR /build
-RUN cp /source/petio.js . && \
-    cp /source/router.js . && \
-    cp /source/package.json . && \
-    npm install && \
-    cp -R /source/frontend . && \
-    cp -R /source/admin . && \
-    cp -R /source/api .
-
-WORKDIR /build/frontend
-RUN npm install && \
-    npm run build
-
-WORKDIR /build/admin
-RUN npm install --legacy-peer-deps && \
-    npm run build
-
-WORKDIR /build/api
-RUN npm install --legacy-peer-deps
-
-WORKDIR /build/views
-RUN mv /build/frontend/build /build/views/frontend && \
-    rm -rf /build/frontend && \
-    mv /build/admin/build /build/views/admin && \
-    rm -rf /build/admin && \
-    chmod -R u=rwX,go=rX /build
-
-FROM alpine:3.13
-
+FROM alpine:3.15.0
+RUN apk add ca-certificates; addgroup -S petio && adduser -S petio -G petio; mkdir /data; touch /data/init;
+FROM scratch
+COPY --from=0 /etc/passwd /etc/passwd
+COPY --from=0 /etc/group /etc/group
+COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=0 --chown=petio:petio --chmod=0755 /data /data
+COPY --chown=petio:petio --chmod=0755 ./releases/petio-linuxstatic-x64 /
+USER petio
+VOLUME ["/data"]
 EXPOSE 7777
-VOLUME ["/app/api/config", "/app/logs"]
-WORKDIR /app
-ENTRYPOINT ["/sbin/tini", "--"]
-CMD [ "node", "petio.js" ]
-
-RUN apk add --no-cache nodejs tzdata tini
-
-COPY --from=builder /build/ /app/
-
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD ["/petio-linuxstatic-x64", "--host", "0.0.0.0", "--port", "7777", "--healthcheck"]
+ENTRYPOINT ["/petio-linuxstatic-x64", "--host", "0.0.0.0", "--port", "7777"]
 LABEL org.opencontainers.image.vendor="petio-team"
 LABEL org.opencontainers.image.url="https://github.com/petio-team/petio"
 LABEL org.opencontainers.image.documentation="https://docs.petio.tv/"
 LABEL org.opencontainers.image.licenses="MIT"
-
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD [ "wget", "--spider", "http://localhost:7777/health" ]
