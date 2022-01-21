@@ -2,8 +2,10 @@ var path = require("path");
 const winston = require("winston");
 require('winston-daily-rotate-file');
 
-const { logsFolder } = require('./env');
+const { dataFolder } = require('./env');
 const { conf } = require("./config");
+
+const logsFolder = path.join(dataFolder, './logs');
 
 const logger = winston.createLogger({
   transports: [

@@ -1,34 +1,24 @@
 const fs = require('fs');
 
 const {
-    configFolder,
-    logsFolder,
+    dataFolder,
     pgid,
     puid,
 } = require('../app/env');
+const logger = require("../app/logger");
 
-const checkPerms = async () => {
-    // check we can read and write to the config folder
-    fs.access(configFolder, fs.constants.R_OK | fs.constants.W_OK, (err) => {
-        if (err) {
-            fs.chown(configFolder, puid, pgid, (error) => {
-                if (error) {
-                    throw new Error("failed to change ownership of config folder");
-                }
-            });
-        }
-    });
+const doPerms = () => {
+    if (isNaN(puid) || isNaN(pgid)) {
+        throw new Error("puid or puid is not a valid number");
+    }
 
-    // check we can read and write to the logs folder
-    fs.access(logsFolder, fs.constants.R_OK | fs.constants.W_OK, (err) => {
-        if (err) {
-            fs.chown(configFolder, puid, pgid, (error) => {
-                if (error) {
-                    throw new Error("failed to change ownership of logs folder");
-                }
-            });
-        }
-    });
+    // attempt to set the correct ownership of the files
+    try {
+        fs.chownSync(dataFolder, puid, pgid);
+    } catch (e) {
+        logger.error(e);
+        throw new Error("failed to set ownership/permissions of config and log folder");
+    }
 };
 
-module.exports = checkPerms;
+module.exports = doPerms;

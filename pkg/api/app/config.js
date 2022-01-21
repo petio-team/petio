@@ -4,9 +4,9 @@ const convict = require('convict');
 const convict_format_with_validator = require('convict-format-with-validator');
 
 const logger = require('./logger');
-const { configFolder } = require('./env');
+const { dataFolder } = require('./env');
 
-const CONFIG_FILE = path.join(configFolder, './petio.json');
+const CONFIG_FILE = path.join(dataFolder, './petio.json');
 
 convict.addFormats(convict_format_with_validator);
 
@@ -399,12 +399,6 @@ const loadConfig = () => {
 };
 
 const WriteConfig = async () => {
-  fs.mkdir(configFolder, { recursive: true }, (err) => {
-    if (err) {
-      throw err;
-    }
-  });
-
   const data = JSON.stringify(conf.getProperties(), null, 2);
   fs.writeFile(CONFIG_FILE, data, (err) => {
     if (err) {
@@ -414,22 +408,16 @@ const WriteConfig = async () => {
 };
 
 const GetLegacyConfig = () => {
-  try {
-    fs.statSync(configFolder);
-  } catch (_) {
-    return;
-  }
-
-  const configFile = path.join(configFolder, 'config.json');
+  const configFile = path.join(dataFolder, 'config.json');
   const config = GetConfigFile(configFile);
 
-  const emailFile = path.join(configFolder, 'email.json');
+  const emailFile = path.join(dataFolder, 'email.json');
   const emailConfig = GetConfigFile(emailFile);
 
-  const radarrFile = path.join(configFolder, 'radarr.json');
+  const radarrFile = path.join(dataFolder, 'radarr.json');
   const radarrConfig = GetConfigFile(radarrFile);
 
-  const sonarrFile = path.join(configFolder, 'sonarr.json');
+  const sonarrFile = path.join(dataFolder, 'sonarr.json');
   const sonarrConfig = GetConfigFile(sonarrFile);
 
   return {
