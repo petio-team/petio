@@ -37,6 +37,12 @@
     "zod": "^3.11.6"
   },
   "devDependencies": {
+    "@semantic-release/changelog": "^6.0.1",
+    "@semantic-release/commit-analyzer": "^9.0.2",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/github": "^8.0.2",
+    "@semantic-release/release-notes-generator": "^10.0.3",
+    "conventional-changelog-cli": "^2.2.2",
     "dotenv": "^8.2.0"
   },
   "bin": "./main.js",

@@ -71,7 +71,7 @@ tasks:
     env:
       DOCKER_BUILDKIT: 1
 
-  # Publish the dirty hash of the image
+  # Publish the hash of the image
   docker:hash:
     deps: ['docker:build']
     cmds:
@@ -79,7 +79,7 @@ tasks:
       - docker push {{.DOCKER_IMAGE_REPO}}:{{.DOCKER_IMAGE_REPO_VERSION}}
     vars:
       DOCKER_IMAGE_REPO_VERSION:
-        sh: git describe --tags --dirty --always
+        sh: git describe --tags --always
 
   # Publish the nightly image
   docker:nightly:
@@ -101,6 +101,24 @@ tasks:
     cmds:
       - docker tag petio:local {{.DOCKER_IMAGE_REPO}}:latest
       - docker push {{.DOCKER_IMAGE_REPO}}:latest
+
+  # -
+  # Release
+  # -
+  release:
+    dir: pkg/api
+    cmds:
+      - npx semantic-release --extends ../../semantic-release.json
+
+  release:prepare:
+    cmds:
+      task: pkg
+      task: docker:latest
+
+  release:dry:
+    dir: pkg/api
+    cmds:
+      - npx semantic-release --extends ../../semantic-release.json --dry-run --no-ci
 
 # Global Vars
 vars:
