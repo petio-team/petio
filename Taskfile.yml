@@ -85,21 +85,21 @@ tasks:
   docker:nightly:
     deps: ['docker:hash']
     cmds:
-      - docker tag petio:local {{.DOCKER_IMAGE_REPO}}:nightly
+      - docker tag {{.DOCKER_IMAGE_REPO}}:local {{.DOCKER_IMAGE_REPO}}:nightly
       - docker push {{.DOCKER_IMAGE_REPO}}:nightly
 
   # Publish the preview image
   docker:preview:
     deps: ['docker:hash']
     cmds:
-      - docker tag petio:local {{.DOCKER_IMAGE_REPO}}:preview
+      - docker tag {{.DOCKER_IMAGE_REPO}}:local {{.DOCKER_IMAGE_REPO}}:preview
       - docker push {{.DOCKER_IMAGE_REPO}}:preview
 
   # Publish the latest image
   docker:latest:
     deps: ['docker:hash']
     cmds:
-      - docker tag petio:local {{.DOCKER_IMAGE_REPO}}:latest
+      - docker tag {{.DOCKER_IMAGE_REPO}}:local {{.DOCKER_IMAGE_REPO}}:latest
       - docker push {{.DOCKER_IMAGE_REPO}}:latest
 
   # -
