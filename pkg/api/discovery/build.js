@@ -6,6 +6,7 @@ const logger = require("../app/logger");
 const Movie = require("../models/movie");
 const Show = require("../models/show");
 const Promise = require("bluebird");
+const MakePlexURL = require("../plex/util");
 
 module.exports = async function buildDiscovery() {
   logger.verbose("DISC: Started building discovery profiles");
@@ -295,10 +296,24 @@ function cert(cert, type) {
 
 function getHistory(id, library = false) {
   return new Promise((resolve, reject) => {
-    let url = `${conf.get('plex.protocol')}://${conf.get('plex.host')}:${conf.get('plex.port')}/status/sessions/history/all?sort=viewedAt%3Adesc&accountID=${id}&viewedAt>=0${library ? "&librarySectionID=" + library : ""
-      }&X-Plex-Container-Start=0&X-Plex-Container-Size=500&X-Plex-Token=${conf.get('plex.token')}`;
+    const params = {
+      "sort": "viewedAt:desc",
+      "accountID": id,
+      "viewedAt>=": "0",
+      "X-Plex-Container-Start": 0,
+      "X-Plex-Container-Size": 500,
+    };
+
+    if (library) {
+      params['librarySectionID'] = library;
+    }
+
+    const url = MakePlexURL(
+      '/status/sessions/history/all',
+      params,
+    );
     request(
-      url,
+      url.toString(),
       {
         method: "GET",
         json: true,
