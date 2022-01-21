@@ -9,7 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -43,11 +42,11 @@ jobs:
       - name: Build docker image with tag
         run: task docker:hash
 
-      - name: Build docker image for preview
-        if: contains(github.ref, "preview")
+      - if: "contains(github.ref, 'preview')"
+        name: Build docker image for preview
         run: task docker:preview
 
-      - name: Build docker image for dev
-        if: contains(github.ref, "dev")
+      - if: "contains(github.ref, 'dev')"
+        name: Build docker image for dev
         run: task docker:nightly
 
