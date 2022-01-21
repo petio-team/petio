@@ -43,7 +43,11 @@ jobs:
       - name: Build binaries for docker
         run: task pkg:docker
 
-      - name: Build docker image with tag
+      - if: |
+          !contains(github.ref, 'preview') ||
+          !contains(github.ref, 'dev') ||
+          !contains(github.ref, 'master')
+        name: Build docker image with tag
         run: task docker:hash
 
       - if: "contains(github.ref, 'preview')"
