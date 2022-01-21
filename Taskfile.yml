@@ -44,7 +44,7 @@ tasks:
       - npm run build
 
   build:api:
-    dir: api
+    dir: pkg/api
     cmds:
       - npm install --legacy-peer-deps
 
