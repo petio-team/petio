@@ -3,7 +3,7 @@
 <p align="center">
   <img src="https://img.shields.io/github/package-json/v/petio-team/petio/master?label=Latest">
   <img src="https://img.shields.io/github/package-json/v/petio-team/petio/preview?label=Preview">
-  <img src="https://img.shields.io/github/package-json/v/petio-team/petio/dev?label=Development">
+  <img src="https://img.shields.io/github/package-json/v/petio-team/petio/dev?filename=%2Fpkg%2Fapi%2Fpackage.json&label=Development">
 </p>
 
 <p align="center">
