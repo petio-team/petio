@@ -2,21 +2,13 @@ const fs = require('fs');
 
 const {
     dataFolder,
-    pgid,
-    puid,
 } = require('../app/env');
 
 const doPerms = () => {
-    if (isNaN(puid) || isNaN(pgid)) {
-        throw new Error("puid or puid is not a valid number");
-    }
-
-    // attempt to set the correct ownership of the files
     try {
-        fs.chownSync(dataFolder, puid, pgid);
+        fs.accessSync(dataFolder, fs.constants.R_OK | fs.constants.W_OK);
     } catch (e) {
-        console.log(e);
-        throw new Error("failed to set ownership/permissions of config and log folder");
+        throw new Error("data folder is not readable and writable");
     }
 };
 
