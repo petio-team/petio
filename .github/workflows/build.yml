@@ -20,6 +20,10 @@ jobs:
         with:
           node-version: '16.x'
           cache: 'npm'
+          cache-dependency-path: |
+            pkg/api/package-lock.json
+            pkg/frontend/package-lock.json
+            pkg/admin/package-lock.json
       - run: npm ci
       - run: npm install -g pkg
 
