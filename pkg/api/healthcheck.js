@@ -1,34 +1,26 @@
-const axios = require('axios').default;
+const fetch = require('node-fetch');
 
 const logger = require("./app/logger");
 const { conf } = require('./app/config');
 
-const url = new URL(`http://${conf.get('petio.host')}:${conf.get('petio.port')}${conf.get('petio.subpath')}`);
+const url = new URL(`/health`, `http://${conf.get('petio.host')}:${conf.get('petio.port')}${conf.get('petio.subpath')}`);
 
-axios({
-    url: '/health',
-    method: 'get',
-    timeout: 2000,
-});
-
-const healthCheck = () => {
-    return axios.get(url.toString()).then(res => {
-        logger.debug(`Health Check: ${res.status}`);
-        if (res.status != 200) {
-            process.exit(1);
-        } else {
-            process.exit(0);
-        }
-    }).catch((err) => {
-        logger.debug(err);
-        logger.debug("health check failed");
+const healthCheck = async () => {
+    const res = await fetch(url.toString());
+    if (res.status == 200) {
+        console.log("Health Check: Healthy");
+        process.exit(0);
+    } else {
+        console.log("Health Check: Bad");
         process.exit(1);
-    });
+    }
 };
 
-try {
-    healthCheck();
-} catch (err) {
-    logger.debug(err);
-    process.exit(1);
-}
+(async () => {
+    try {
+        await healthCheck();
+    } catch (err) {
+        logger.debug(err);
+        process.exit(1);
+    }
+})();
