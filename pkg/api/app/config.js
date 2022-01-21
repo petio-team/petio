@@ -510,6 +510,9 @@ const MergeLegacyEmailConfig = (c) => {
   if (c.emailSecure != undefined) {
     conf.set('email.ssl', c.emailSecure);
   }
+  if (c.emailFrom != undefined) {
+    conf.set('email.from', c.emailFrom);
+  }
 };
 
 const MergeLegacySonarrConfig = (c) => {
