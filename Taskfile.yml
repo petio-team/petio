@@ -59,7 +59,7 @@ tasks:
   pkg:docker:
     dir: pkg/api
     cmds:
-      - pkg --targets node16-linuxstatic-x64 --public-packages "*" --output ../../releases/petio-linuxstatic-x64 ./app.js
+      - pkg --targets node16-linuxstatic-x64 --public-packages "*" --output ../../releases/petio-linuxstatic-x64 ./main.js
 
   # -
   # Docker
