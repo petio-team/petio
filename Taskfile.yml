@@ -1,0 +1,125 @@
+version: '3'
+dotenv: ['.env']
+tasks:
+  # -
+  # Run CI related tasks
+  # -
+  ci:
+    cmds:
+      - npm ci
+
+  # -
+  # Run development related tasks
+  # -
+  dev:
+    dir: pkg/api
+    cmds:
+      - node ./main.js --port 8000
+
+  dev:compose:
+    cmds:
+      - docker-compose up -d
+      - docker-compose logs -f petio
+
+  # -
+  # Run build related tasks
+  # -
+  build:
+    deps: [
+      'build:frontend',
+      'build:admin',
+      'build:api'
+    ]
+
+  build:frontend:
+    dir: pkg/frontend
+    cmds:
+      - npm install
+      - npm run build
+
+  build:admin:
+    dir: pkg/admin
+    cmds:
+      - npm install
+      - npm run build
+
+  build:api:
+    dir: pkg/api
+    cmds:
+      - npm install --legacy-peer-deps
+
+  # -
+  # Package
+  # -
+  pkg:
+    dir: pkg/api
+    cmds:
+      - pkg . --no-bytecode --public-packages "*"
+
+  pkg:docker:
+    dir: pkg/api
+    cmds:
+      - pkg --targets node16-linuxstatic-x64 --public-packages "*" --output ../../releases/petio-linuxstatic-x64 ./main.js
+
+  # -
+  # Docker
+  # -
+  # Build the image itself
+  docker:build:
+    cmds:
+      - docker build -t {{.DOCKER_IMAGE_REPO}}:local .
+    env:
+      DOCKER_BUILDKIT: 1
+
+  # Publish the hash of the image
+  docker:hash:
+    deps: ['docker:build']
+    cmds:
+      - docker tag {{.DOCKER_IMAGE_REPO}}:local {{.DOCKER_IMAGE_REPO}}:{{.DOCKER_IMAGE_REPO_VERSION}}
+      - docker push {{.DOCKER_IMAGE_REPO}}:{{.DOCKER_IMAGE_REPO_VERSION}}
+    vars:
+      DOCKER_IMAGE_REPO_VERSION:
+        sh: git log -1 --format=%H
+
+  # Publish the nightly image
+  docker:nightly:
+    deps: ['docker:hash']
+    cmds:
+      - docker tag petio:local {{.DOCKER_IMAGE_REPO}}:nightly
+      - docker push {{.DOCKER_IMAGE_REPO}}:nightly
+
+  # Publish the preview image
+  docker:preview:
+    deps: ['docker:hash']
+    cmds:
+      - docker tag petio:local {{.DOCKER_IMAGE_REPO}}:preview
+      - docker push {{.DOCKER_IMAGE_REPO}}:preview
+
+  # Publish the latest image
+  docker:latest:
+    deps: ['docker:hash']
+    cmds:
+      - docker tag petio:local {{.DOCKER_IMAGE_REPO}}:latest
+      - docker push {{.DOCKER_IMAGE_REPO}}:latest
+
+  # -
+  # Release
+  # -
+  release:
+    dir: pkg/api
+    cmds:
+      - npx semantic-release --extends ../../semantic-release.json
+
+  release:prepare:
+    cmds:
+      - task: pkg
+      - task: docker:latest
+
+  release:dry:
+    dir: pkg/api
+    cmds:
+      - npx semantic-release --extends ../../semantic-release.json --dry-run --no-ci
+
+# Global Vars
+vars:
+  DOCKER_IMAGE_REPO: ghcr.io/petio-team/petio

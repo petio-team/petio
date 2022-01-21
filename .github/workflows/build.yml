@@ -1,0 +1,60 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - "*"
+      - "!master"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16.x'
+          cache: 'npm'
+          cache-dependency-path: |
+            pkg/api/package-lock.json
+            pkg/frontend/package-lock.json
+            pkg/admin/package-lock.json
+      - run: npm ci --prefix ./pkg/api
+      - run: npm install -g pkg
+
+      - name: Install task
+        uses: arduino/setup-task@v1
+
+      - name: Build frontend and api
+        run: task build
+
+      - name: Authenticate with github's docker registry
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Build binaries for docker
+        run: task pkg:docker
+
+      - if: |
+          !contains(github.ref, 'preview') ||
+          !contains(github.ref, 'dev') ||
+          !contains(github.ref, 'master')
+        name: Build docker image with tag
+        run: task docker:hash
+
+      - if: "contains(github.ref, 'preview')"
+        name: Build docker image for preview
+        run: task docker:preview
+
+      - if: "contains(github.ref, 'dev')"
+        name: Build docker image for dev
+        run: task docker:nightly
+

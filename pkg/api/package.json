@@ -1,0 +1,66 @@
+{
+  "name": "petio",
+  "version": "0.5.4",
+  "description": "Petio API",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.25.0",
+    "bcryptjs": "2.4.3",
+    "bluebird": "^3.7.2",
+    "cache-manager": "3.6.0",
+    "config": "^3.3.7",
+    "convict": "^6.2.1",
+    "convict-format-with-validator": "^6.2.0",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "cron": "^1.8.2",
+    "express": "^4.17.1",
+    "express-cache-middleware": "^1.0.1",
+    "follow-redirects": "^1.14.7",
+    "jsonwebtoken": "^8.5.1",
+    "line-reader": "^0.4.0",
+    "mongoose": "^5.12.1",
+    "multer": "^1.4.2",
+    "musicbrainz-api": "^0.6.0",
+    "node-fetch": "2.0",
+    "nodemailer": "^6.5.0",
+    "sanitize-filename": "^1.6.3",
+    "winston": "^3.3.4",
+    "winston-daily-rotate-file": "^4.5.5",
+    "xhr-request": "^1.1.0",
+    "xml-js": "^1.6.11",
+    "zod": "^3.11.6"
+  },
+  "devDependencies": {
+    "@semantic-release/changelog": "^6.0.1",
+    "@semantic-release/commit-analyzer": "^9.0.2",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/github": "^8.0.2",
+    "@semantic-release/release-notes-generator": "^10.0.3",
+    "conventional-changelog-cli": "^2.2.2",
+    "dotenv": "^8.2.0"
+  },
+  "bin": "./main.js",
+  "pkg": {
+    "assets": [
+      "../frontend/build/**/*",
+      "../admin/build/**/*"
+    ],
+    "targets": [
+      "node16-alpine-arm64",
+      "node16-alpine-x64",
+      "node16-linux-arm64",
+      "node16-linux-x64",
+      "node16-linuxstatic-arm64",
+      "node16-linuxstatic-x64",
+      "node16-win-x64",
+      "node16-win-arm64"
+    ],
+    "outputPath": "../../releases"
+  }
+}

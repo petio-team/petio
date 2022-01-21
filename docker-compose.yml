@@ -1,4 +1,4 @@
-version: "3"
+version: "3.9"
 
 networks:
   petio-network:
@@ -6,30 +6,27 @@ networks:
 
 services:
   petio:
-    image: ghcr.io/petio-team/petio:latest
-    container_name: "petio"
-    hostname: petio
+    image: ghcr.io/petio-team/petio:${PETIO_DOCKER_TAG:-latest}
+    container_name: "${PETIO_DOCKER_CONT_NAME:-petio}"
+    hostname: ${PETIO_DOCKER_HOSTNAME:-petio}
     ports:
-      - "7777:7777"
+      - "${PETIO_DOCKER_ADDRESS:-127.0.0.1}:${PETIO_DOCKER_PORT:-7777}:7777"
     networks:
       - petio-network
     depends_on:
       - mongo
-    user: "1000:1000"
-    environment:
-      - TZ=Etc/UTC
+    user: "${PUID:-1000}:${PGID:-1000}"
     volumes:
-      - ./config:/app/api/config
-      - ./logs:/app/logs
+      - ${PETIO_DATA_VOLUME:-./data}:/data
 
   mongo:
-    image: mongo:latest
-    container_name: "mongo"
-    hostname: mongo
+    image: mongo:${MONGODB_DOCKER_TAG:-4.4.11}
+    container_name: "${MONGODB_DOCKER_CONT_NAME:-mongo}"
+    hostname: ${MONGODB_DOCKER_HOSTNAME:-mongo}
     ports:
-      - "27017:27017"
+      - "${MONGODB_DOCKER_PORT:-27017}:27017"
     networks:
       - petio-network
-    user: "1000:1000"
+    user: "${PUID:-1000}:${PGID:-1000}"
     volumes:
-      - ./db:/data/db
+      - ${MONGODB_DATA_VOLUME:-./data/db}:/data/db

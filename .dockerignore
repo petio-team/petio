@@ -1,5 +1,2 @@
-node_modules
-api/node_modules
-api/config.json
-admin/node_modules
-frontend/node_modules
+*
+!releases/
