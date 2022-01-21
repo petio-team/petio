@@ -5,7 +5,6 @@ const {
     pgid,
     puid,
 } = require('../app/env');
-const logger = require("../app/logger");
 
 const doPerms = () => {
     if (isNaN(puid) || isNaN(pgid)) {
@@ -16,7 +15,7 @@ const doPerms = () => {
     try {
         fs.chownSync(dataFolder, puid, pgid);
     } catch (e) {
-        logger.error(e);
+        console.log(e);
         throw new Error("failed to set ownership/permissions of config and log folder");
     }
 };
