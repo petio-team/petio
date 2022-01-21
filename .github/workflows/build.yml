@@ -43,7 +43,7 @@ jobs:
           password: ${{ secrets.GHCR_TOKEN }}
 
       - name: Build binaries for docker
-        run: task pkg:docker
+        run: task pkg
 
       - if: |
           !contains(github.ref, 'preview') ||
