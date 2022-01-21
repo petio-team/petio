@@ -57,9 +57,9 @@ tasks:
       - pkg . --no-bytecode --public-packages "*"
 
   pkg:docker:
-    dir: api
+    dir: pkg/api
     cmds:
-      - pkg --targets node16-linuxstatic-x64 --public-packages "*" --output ../pkg/petio-linuxstatic-x64 ./app.js
+      - pkg --targets node16-linuxstatic-x64 --public-packages "*" --output ../../releases/petio-linuxstatic-x64 ./app.js
 
   # -
   # Docker
