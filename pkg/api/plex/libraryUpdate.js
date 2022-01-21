@@ -414,7 +414,7 @@ class LibraryUpdate {
             logger.verbose(`CRON: Got external ID - ${title} - using agent ${type} : ${tmdbId}`);
           } catch {
             tmdbId = false;
-            logger.warn(`CRON: Couldn't get external ID - ${title} - using agent ${type}`);
+            logger.verbose(`CRON: Couldn't get external ID - ${title} - using agent ${type}`);
           }
         }
       } catch (e) {
@@ -442,7 +442,7 @@ class LibraryUpdate {
           tmdbId = await this.externalIdMovie(externalId, idSource);
           logger.verbose(`CRON: Got external ID - ${title} - using agent ${idSource} : ${tmdbId}`);
         } catch {
-          logger.warn(`CRON: Couldn't get external ID - ${title} - using agent ${idSource}`);
+          logger.verbose(`CRON: Couldn't get external ID - ${title} - using agent ${idSource}`);
           tmdbId = false;
         }
       }
