@@ -5,7 +5,6 @@ const cluster = require("cluster");
 
 const App = require('./app/app');
 const Worker = require("./worker");
-const logger = require("./app/logger");
 const { loadConfig } = require("./app/config");
 const doPerms = require("./util/perms");
 
@@ -27,6 +26,6 @@ try {
     }
   }
 } catch (e) {
-  logger.error(e);
+  console.log(e);
   process.exit(1);
 }
