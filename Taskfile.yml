@@ -79,7 +79,7 @@ tasks:
       - docker push {{.DOCKER_IMAGE_REPO}}:{{.DOCKER_IMAGE_REPO_VERSION}}
     vars:
       DOCKER_IMAGE_REPO_VERSION:
-        sh: git describe --tags --always
+        sh: git log -1 --format=%H
 
   # Publish the nightly image
   docker:nightly:
