@@ -8,10 +8,10 @@ const Show = require("../models/show");
 const Promise = require("bluebird");
 
 module.exports = async function buildDiscovery() {
-  logger.info("DISC: Started building discovery profiles");
+  logger.verbose("DISC: Started building discovery profiles");
   let users = await User.find();
   if (!users || users.length === 0) {
-    logger.warn("DISC: No Users");
+    logger.verbose("DISC: No Users");
     return;
   }
   let userIds = [];
@@ -29,7 +29,7 @@ module.exports = async function buildDiscovery() {
     },
     { concurrency: 10 }
   );
-  logger.info("DISC: Finished building discovery profiles");
+  logger.verbose("DISC: Finished building discovery profiles");
 };
 
 function userBuild(id) {
@@ -288,7 +288,7 @@ function cert(cert, type) {
       return false;
 
     default:
-      logger.info(`DISC: Unmapped Cert Rating - ${cert}`);
+      logger.verbose(`DISC: Unmapped Cert Rating - ${cert}`);
       return false;
   }
 }
