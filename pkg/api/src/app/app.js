@@ -6,7 +6,7 @@ const logger = require("./logger");
 const { conf } = require("./config");
 const { SetupRouter } = require("../router");
 const trending = require("../tmdb/trending");
-const version = require("../package.json").version;
+const version = require("../../package.json").version;
 
 let server = null;
 

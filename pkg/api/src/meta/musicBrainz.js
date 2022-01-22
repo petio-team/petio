@@ -1,5 +1,5 @@
 const MusicBrainzApi = require("musicbrainz-api").MusicBrainzApi;
-const pjson = require("../package.json");
+const pjson = require("../../package.json");
 const sanitize = require("sanitize-filename");
 const logger = require("../app/logger");
 
