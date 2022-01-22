@@ -50,11 +50,11 @@ const routes = (router) => {
         res.status(200).send(".");
     });
     baseRouter.use("/api", apiRoutes);
-    baseRouter.use(express.static(path.resolve(__dirname, '../frontend/build')));
+    baseRouter.use(express.static(path.resolve(__dirname, '../../frontend/build')));
 
     const admin = express();
     baseRouter.use("/admin", admin);
-    admin.use("/", express.static(path.resolve(__dirname, '../admin/build')));
+    admin.use("/", express.static(path.resolve(__dirname, '../../admin/build')));
 
     if (conf.get('petio.subpath') !== "/") {
         router.use(`${conf.get('petio.subpath')}`, baseRouter);
