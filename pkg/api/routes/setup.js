@@ -116,6 +116,7 @@ router.post("/set", async (req, res) => {
 
     try {
         WriteConfig();
+        logger.info("restarting to apply new configurations");
         await WaitBeforeRestart(res);
     } catch (err) {
         res.status(500).send("Error Creating config");
@@ -128,7 +129,6 @@ router.post("/set", async (req, res) => {
 const WaitBeforeRestart = async (res) => {
     setTimeout(() => {
         res.app.settings['restart']();
-        logger.info("restarting to apply new confiurations");
     }, 1000);
 };
 
