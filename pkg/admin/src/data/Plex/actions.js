@@ -171,7 +171,7 @@ async function getUser(token) {
         ] = {
           name: server.getAttribute("name"),
           host: details.hostname,
-          port: details.port,
+          port: connection.getAttribute('port'),
           protocol: details.protocol,
           platform: server.getAttribute("platform"),
           status: "pending",
