@@ -28,7 +28,7 @@ jobs:
             pkg/frontend/package-lock.json
             pkg/admin/package-lock.json
       - run: npm ci --prefix ./pkg/api
-      - run: npm install -g pkg
+      - run: npm install -g pkg typescript
 
       - name: Install task
         uses: arduino/setup-task@v1

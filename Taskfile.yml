@@ -47,6 +47,7 @@ tasks:
     dir: pkg/api
     cmds:
       - npm install --legacy-peer-deps
+      - npm run build
 
   # -
   # Package
@@ -108,17 +109,17 @@ tasks:
   release:
     dir: pkg/api
     cmds:
-      - npx semantic-release --extends ../../semantic-release.json
+      - npx semantic-release --extends ../../semantic-release.json --dry-run --no-ci
 
   release:prepare:
     cmds:
       - task: pkg
       - task: docker:latest
 
-  release:dry:
+  release:ci:
     dir: pkg/api
     cmds:
-      - npx semantic-release --extends ../../semantic-release.json --dry-run --no-ci
+      - npx semantic-release --extends ../../semantic-release.json
 
 # Global Vars
 vars:

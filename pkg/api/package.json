@@ -4,7 +4,9 @@
   "description": "Petio API",
   "main": "main.js",
   "scripts": {
-    "start": "node main.js"
+    "start": "tsc-node main.js",
+    "build": "tsc main.js",
+    "dev": "tsc-node-dev main.js"
   },
   "author": "",
   "license": "MIT",
@@ -40,12 +42,14 @@
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/commit-analyzer": "^9.0.2",
     "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^8.0.2",
     "@semantic-release/release-notes-generator": "^10.0.3",
+    "@types/node": "^17.0.10",
     "conventional-changelog-cli": "^2.2.2",
     "dotenv": "^8.2.0"
   },
-  "bin": "./main.js",
+  "bin": "./dist/main.js",
   "pkg": {
     "assets": [
       "../frontend/build/**/*",

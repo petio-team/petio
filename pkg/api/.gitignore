@@ -1,5 +1,6 @@
 node_modules/
 .DS_Store
 imdb_dump.txt
-/config
-/logs
+config/
+logs/
+dist/
