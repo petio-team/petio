@@ -3,10 +3,10 @@ require("cache-manager/lib/stores/memory");
 
 const cluster = require("cluster");
 
-const App = require('./app/app');
-const Worker = require("./worker");
-const { loadConfig } = require("./app/config");
-const doPerms = require("./util/perms");
+const App = require('./src/app/app');
+const Worker = require("./src/worker");
+const { loadConfig } = require("./src/app/config");
+const doPerms = require("./src/util/perms");
 
 try {
   // attempt to check config/logs folders are readable/writable else try to make them readable/writable
