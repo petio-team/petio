@@ -1,11 +1,13 @@
 // https://www.imdb.com/title/tt6475714/
 const axios = require("axios");
-const logger = require("../app/logger");
+const lineReader = require("line-reader");
 const zlib = require("zlib");
 const fs = require("fs");
 const path = require("path");
-const lineReader = require("line-reader");
+
+const logger = require("../app/logger");
 const Imdb = require("../models/imdb");
+const { dataFolder } = require('../app/env');
 
 async function lookup(imdb_id) {
   if (!imdb_id) {
@@ -29,14 +31,7 @@ async function storeCache(firstTime = false) {
     }
   }
   const unzip = zlib.createGunzip();
-  let project_folder, tempFile;
-  if (process.pkg) {
-    project_folder = path.dirname(process.execPath);
-    tempFile = path.join(project_folder, "./imdb_dump.txt");
-  } else {
-    project_folder = __dirname;
-    tempFile = path.join(project_folder, "../imdb_dump.txt");
-  }
+  let tempFile = path.join(dataFolder, "../imdb_dump.txt");
   logger.verbose("IMDB: Rebuilding Cache");
   try {
     logger.verbose("IMDB: Cache Downloading latest cache");
