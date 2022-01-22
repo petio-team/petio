@@ -1,17 +1,15 @@
 const http = require("http");
 const agent = new http.Agent({ family: 4 });
 const axios = require("axios");
+const cacheManager = require("cache-manager");
 
-const { conf } = require("../app/config");
+const logger = require("../app/logger");
 const fanartLookup = require("../fanart");
 const onServer = require("../plex/onServer");
 const { lookup: imdb } = require("../meta/imdb");
 const getLanguage = require("./languages");
-
-const logger = require("../app/logger");
-
-const cacheManager = require("cache-manager");
 const { tmdbApiKey } = require("../app/env");
+
 const memoryCache = cacheManager.caching({
   store: "memory",
   max: 500,
