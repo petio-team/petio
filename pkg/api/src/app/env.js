@@ -1,7 +1,11 @@
 const path = require("path");
 
 const ROOT_DIR = process.pkg ? path.dirname(process.execPath) : process.cwd();
-
+const APP_DIR = process.pkg ?
+    process.env.APP_DIR ?
+        process.env.APP_DIR :
+        path.join(__dirname, "../../../../") :
+    path.join(__dirname, "../../../");
 
 module.exports = {
     rootDir: ROOT_DIR,
@@ -9,7 +13,7 @@ module.exports = {
     puid: process.env.PUID ? parseInt(process.env.PUID) : 1000,
     pgid: process.env.PGID ? parseInt(process.env.PGID) : 1000,
     dataFolder: process.env.DATA_FOLDER ?? path.join(ROOT_DIR, "./data"),
-    viewFolder: process.env.VIEWS_FOLDER ?? path.join(__dirname, '../../../'),
+    viewFolder: process.env.VIEWS_FOLDER ?? APP_DIR,
     tmdbApiKey: '1af5ad19a2d972a67cd27eb033979c4c',
     fanartApiKey: 'ee409f6fb0c5cd2352e7a454d3f580d4',
 };
