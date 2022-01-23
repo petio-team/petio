@@ -7,6 +7,7 @@ const apiRoutes = require("./routes/api");
 const { conf } = require("./app/config");
 const checkSetup = require('./middleware/setup');
 const logger = require("./app/logger");
+const { viewFolder } = require("./app/env");
 
 // setups the core of the router
 const SetupRouter = (restartFunc) => {
@@ -48,11 +49,11 @@ const routes = (router) => {
         res.status(200).send(".");
     });
     baseRouter.use("/api", apiRoutes);
-    baseRouter.use(express.static(path.resolve(__dirname, '../../../frontend/build')));
+    baseRouter.use(express.static(path.resolve(viewFolder, './frontend/build')));
 
     const admin = express();
     baseRouter.use("/admin", admin);
-    admin.use("/", express.static(path.resolve(__dirname, '../../../admin/build')));
+    admin.use("/", express.static(path.resolve(viewFolder, './admin/build')));
 
     if (conf.get('petio.subpath') !== "/") {
         router.use(`${conf.get('petio.subpath')}`, baseRouter);
