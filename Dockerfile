@@ -1,5 +1,5 @@
 FROM alpine:3.15.0
-RUN apk add ca-certificates bash;addgroup -g 1000 petio && adduser -u 1000 -D petio -G petio;
+RUN apk add ca-certificates shadow bash;addgroup -g 1000 petio && adduser -u 1000 -D petio -G petio;
 COPY --chown=petio:petio --chmod=0755 ./releases/petio-alpine-x64 /
 COPY ./docker /
 RUN chmod +x /init.sh
