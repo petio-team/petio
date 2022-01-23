@@ -3,10 +3,11 @@ name: Build
 on:
   push:
     paths:
-      - !*
       - .github/**/*
       - docker/**/*
       - pkg/**/*
+    paths_ignore:
+      - /*
     branches:
       - "*"
       - "!master"
