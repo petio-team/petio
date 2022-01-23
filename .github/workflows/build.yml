@@ -8,6 +8,9 @@ on:
     branches:
       - "*"
       - "!master"
+  workflow_dispatch:
+    branches:
+      - master
 
 jobs:
   build:
