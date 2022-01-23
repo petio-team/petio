@@ -2,10 +2,10 @@ const path = require("path");
 
 const ROOT_DIR = process.pkg ? path.dirname(process.execPath) : process.cwd();
 const APP_DIR = process.pkg ?
+    path.join(__dirname, "../../../../") :
     process.env.APP_DIR ?
         process.env.APP_DIR :
-        path.join(__dirname, "../../../../") :
-    path.join(__dirname, "../../../");
+        path.join(__dirname, "../../../");
 
 module.exports = {
     rootDir: ROOT_DIR,
