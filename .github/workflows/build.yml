@@ -4,11 +4,12 @@ on:
   push:
     paths:
       - pkg/**
-      - .github/workflows
+      - .github/
+      - docker/
+      - Dockerfile
     branches:
       - "*"
       - "!master"
-  workflow_dispatch:
 
 jobs:
   build:
