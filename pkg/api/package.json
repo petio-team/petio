@@ -33,7 +33,7 @@
     "nodemailer": "^6.7.2",
     "sanitize-filename": "^1.6.3",
     "winston": "^3.4.0",
-    "winston-daily-rotate-file": "^4.5.5",
+    "winston-daily-rotate-file": "^4.6.0",
     "xhr-request": "^1.1.0",
     "xml-js": "^1.6.11",
     "zod": "^3.11.6"
