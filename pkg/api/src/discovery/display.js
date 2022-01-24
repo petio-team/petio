@@ -25,12 +25,8 @@ module.exports = async function getDiscoveryData(id, type = "movie") {
     comingSoon(type),
     getTop(type === "movie" ? 1 : 2),
   ]);
-  const plr = conf.get('general.popular');
-  if (
-    plr ||
-    plr === null ||
-    plr === undefined
-  ) {
+  const plr = conf.get("general.popular");
+  if (plr || plr === null || plr === undefined) {
     for (p in popularData) {
       popular.push(popularData[p]);
     }
@@ -104,8 +100,9 @@ module.exports = async function getDiscoveryData(id, type = "movie") {
       );
 
       return {
-        title: `${genre.name} ${type === "movie" ? "movies" : "shows"
-          } you might like`,
+        title: `${genre.name} ${
+          type === "movie" ? "movies" : "shows"
+        } you might like`,
         results: results,
         genre_id: id,
         ratings: `${genre.lowestRating} - ${genre.highestRating}`,
@@ -194,13 +191,13 @@ module.exports = async function getDiscoveryData(id, type = "movie") {
         let related =
           type === "movie"
             ? await Promise.all([
-              Movie.getRecommendations(recent.id, 1),
-              Movie.getRecommendations(recent.id, 2),
-            ])
+                Movie.getRecommendations(recent.id, 1),
+                Movie.getRecommendations(recent.id, 2),
+              ])
             : await Promise.all([
-              Show.getRecommendations(recent.id, 1),
-              Show.getRecommendations(recent.id, 2),
-            ]);
+                Show.getRecommendations(recent.id, 1),
+                Show.getRecommendations(recent.id, 2),
+              ]);
         if (!related[0].results) related[0].results = [];
         if (!related[1].results) related[1].results = [];
         related = {
@@ -237,7 +234,7 @@ module.exports = async function getDiscoveryData(id, type = "movie") {
           });
           return {
             title: `Because you watched "${recent.title || recent.name}"`,
-            results: recommendations.results,
+            results: newRelated,
           };
         } else {
           let newRelated = [];
@@ -631,15 +628,15 @@ async function comingSoon(type) {
     let data =
       type === "movie"
         ? await discoverMovie(1, {
-          sort_by: "popularity.desc",
-          "primary_release_date.gte": now,
-          with_original_language: "en",
-        })
+            sort_by: "popularity.desc",
+            "primary_release_date.gte": now,
+            with_original_language: "en",
+          })
         : await discoverShow(1, {
-          sort_by: "popularity.desc",
-          "first_air_date.gte": now,
-          with_original_language: "en",
-        });
+            sort_by: "popularity.desc",
+            "first_air_date.gte": now,
+            with_original_language: "en",
+          });
     await Promise.map(
       data.results,
       async (result, i) => {
@@ -650,21 +647,21 @@ async function comingSoon(type) {
         data.results[i] =
           type === "movie"
             ? {
-              on_server: onPlex.exists,
-              title: result.title,
-              poster_path: result.poster_path,
-              release_date: result.release_date,
-              id: result.id,
-              videos: result.videos,
-            }
+                on_server: onPlex.exists,
+                title: result.title,
+                poster_path: result.poster_path,
+                release_date: result.release_date,
+                id: result.id,
+                videos: result.videos,
+              }
             : {
-              on_server: onPlex.exists,
-              name: result.name,
-              poster_path: result.poster_path,
-              first_air_date: result.first_air_date,
-              id: result.id,
-              videos: result.videos,
-            };
+                on_server: onPlex.exists,
+                name: result.name,
+                poster_path: result.poster_path,
+                first_air_date: result.first_air_date,
+                id: result.id,
+                videos: result.videos,
+              };
       },
       { concurrency: 10 }
     );
