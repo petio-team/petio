@@ -26,23 +26,24 @@ router.post("/", async (req, res) => {
     return;
   }
 
-  if (!conf.get('auth.type')) {
-    conf.set('auth.type', 1);
+  if (!conf.get("auth.type")) {
+    conf.set("auth.type", 1);
   }
 
   logger.log("verbose", `LOGIN: New login attempted`);
   logger.log("verbose", `LOGIN: Request IP: ${request_ip}`);
 
-  // check for existing jwt
-  try {
-    const user = await authenticate(req);
-    success(user, req.jwtUser.admin, res);
-    logger.log("verbose", `LOGIN: Request User: ${user.username}`);
-    return;
-  } catch (e) {
-    // if existing jwt failed, continue onto normal login flow
-    logger.log("verbose", `LOGIN: No JWT: ${req.body.user.username}`);
-  }
+  // check for existing jwt (skip if performing admin auth)
+  if (!password)
+    try {
+      const user = await authenticate(req);
+      success(user, req.jwtUser.admin, res);
+      logger.log("verbose", `LOGIN: Request User: ${user.username}`);
+      return;
+    } catch (e) {
+      // if existing jwt failed, continue onto normal login flow
+      logger.log("verbose", `LOGIN: No JWT: ${req.body.user.username}`);
+    }
 
   logger.log("verbose", `LOGIN: Request User: ${username}`);
 
@@ -62,7 +63,7 @@ router.post("/", async (req, res) => {
 
     let isAdmin = dbUser.role === "admin" || dbUser.role === "moderator";
 
-    if (conf.get('auth.type') === 1 || password) {
+    if (conf.get("auth.type") === 1 || password) {
       if (dbUser.password) {
         if (!bcrypt.compareSync(password, dbUser.password)) {
           throw "Password is incorrect";
@@ -88,7 +89,7 @@ router.post("/", async (req, res) => {
 
 function success(user, isAdmin = false, res) {
   user.password = null;
-  const token = jwt.sign({ ...user, admin: isAdmin }, conf.get('plex.token'));
+  const token = jwt.sign({ ...user, admin: isAdmin }, conf.get("plex.token"));
   res
     .cookie("petio_jwt", token, {
       maxAge: 2419200000,
