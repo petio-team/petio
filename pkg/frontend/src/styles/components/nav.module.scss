@@ -1,0 +1,263 @@
+@import '../global/variables.module.scss';
+
+.nav {
+	padding: 15px 0;
+	padding-top: calc(15px + env(safe-area-inset-top));
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: 500;
+	backdrop-filter: blur(20px);
+	border-bottom: solid 1px rgba($white, 0.2);
+	background: rgba($grey, 0.6);
+	// height: 51px;
+
+	@media (min-width: $lg) {
+		padding: 28px 0;
+		backdrop-filter: none;
+		border-bottom: none;
+		background: none;
+		transition: none;
+
+		&__search_open {
+			height: auto;
+		}
+
+		&:after {
+			content: '';
+			background: linear-gradient(
+				0deg,
+				rgba(17, 17, 17, 0) 0%,
+				rgba(17, 17, 17, 0.8) 80%,
+				rgba(17, 17, 17, 0.8) 100%
+			);
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 200px;
+			opacity: 0.5;
+			z-index: -1;
+			pointer-events: none;
+		}
+	}
+
+	&__inner {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-wrap: nowrap;
+
+		@media (min-width: $lg) {
+			justify-content: space-between;
+		}
+	}
+
+	&__logo {
+		display: none;
+
+		@media (min-width: $lg) {
+			margin-right: 60px;
+			display: flex;
+		}
+
+		a {
+			display: flex;
+		}
+
+		svg {
+			height: 20px;
+		}
+
+		@media (min-width: $lg) {
+			svg {
+				height: 24px;
+			}
+		}
+	}
+
+	&__thumb {
+		display: block;
+		width: 35px;
+		height: 35px;
+		min-width: 24px;
+		background: $white;
+		border-radius: 50%;
+		overflow: hidden;
+		position: absolute;
+		top: 15px;
+		top: calc(env(safe-area-inset-top) + 15px);
+		right: 20px;
+
+		img {
+			width: 100%;
+			height: 100%;
+		}
+		@media (min-width: $lg) {
+			position: relative;
+			margin-left: 20px;
+			top: initial;
+			right: initial;
+			display: block;
+		}
+	}
+
+	&__search_icon {
+		display: none;
+		width: 24px;
+		min-width: 24px;
+		height: 24px;
+		position: absolute;
+		top: 14px;
+		right: 20px;
+		align-items: center;
+		cursor: pointer;
+
+		svg {
+			width: 100%;
+			height: 100%;
+		}
+
+		@media (min-width: $lg) {
+			margin-left: 20px;
+			position: static;
+			display: flex;
+		}
+	}
+
+	&__menu {
+		display: none;
+
+		@media (min-width: $lg) {
+			display: block;
+			a {
+				margin-right: 60px;
+				transition: color 0.3s ease;
+
+				&:hover {
+					color: $orange;
+				}
+			}
+		}
+	}
+
+	&__left {
+		display: flex;
+	}
+
+	&__right {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		width: 100%;
+		margin-right: 50px;
+
+		@media (min-width: $lg) {
+			width: auto;
+			margin-right: 0;
+		}
+	}
+}
+
+.collapse_search {
+	position: static;
+	max-width: 100%;
+	transition: width 0.3s ease;
+	max-height: initial;
+	width: 100%;
+
+	@media (min-width: $lg) {
+		width: auto;
+		transition: max-width 0.3s ease;
+
+		input {
+			border: solid 2px $white;
+		}
+	}
+
+	form {
+		overflow: hidden;
+	}
+
+	&__collapsed {
+		max-width: initial;
+
+		@media (min-width: $lg) {
+			max-width: 0;
+		}
+	}
+}
+
+.mobile_nav {
+	position: fixed;
+	bottom: -1px;
+	left: 0;
+	width: 100%;
+	height: 60px;
+	height: calc(60px + env(safe-area-inset-bottom));
+	backdrop-filter: blur(20px);
+	border-top: solid 1px rgba($white, 0.2);
+	background: rgba($grey, 0.6);
+	z-index: 500;
+	padding: 0 20px;
+	padding-bottom: env(safe-area-inset-bottom);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+
+	&__item {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-direction: column;
+
+		span {
+			display: block;
+
+			svg {
+				fill: $white;
+
+				height: 20px;
+				width: auto;
+
+				path {
+					fill: $white;
+				}
+			}
+		}
+
+		&__active {
+			color: $orange;
+
+			span svg {
+				fill: $orange;
+
+				path {
+					fill: $orange;
+				}
+			}
+		}
+	}
+}
+
+.back_btn {
+	height: 35px;
+	margin-right: 15px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	cursor: pointer;
+
+	@media (min-width: $lg) {
+		display: none;
+	}
+
+	span {
+		display: flex;
+		svg {
+			fill: $white;
+			width: 15px;
+		}
+	}
+}

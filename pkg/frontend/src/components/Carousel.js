@@ -1,190 +1,121 @@
-import React from "react";
-import { ReactComponent as LeftArrow } from "../assets/svg/back.svg";
-import { ReactComponent as RightArrow } from "../assets/svg/forward.svg";
-import { throttle } from "lodash";
-// import CarouselLoading from "./CarouselLoading";
+import carousel from '../styles/components/carousel.module.scss';
+import typo from '../styles/components/typography.module.scss';
+import cards from '../styles/components/card.module.scss';
 
-class Carousel extends React.Component {
-  constructor(props) {
-    super(props);
+import { connect } from 'react-redux';
+import { useHistory } from 'react-router-dom';
+// import { useRouter } from 'next/router';
 
-    this.state = {
-      offset: 0,
-      pos: 0,
-      init: false,
-      width: false,
-      inView: false,
-    };
+import Card from './card';
+import { useEffect, useRef } from 'react';
 
-    this.carouselRef = React.createRef();
-    this.wrapper = React.createRef();
-    this.next = this.next.bind(this);
-    this.prev = this.prev.bind(this);
-    this.init = this.init.bind(this);
-    this.scroll = throttle(this.scroll.bind(this), 1000);
-    this.isInViewport = throttle(this.isInViewport.bind(this), 1000);
-  }
+const mapStateToProps = (state) => {
+	return {
+		redux_pos: state.pos.pages,
+	};
+};
 
-  componentDidMount() {
-    let page = document.querySelectorAll(".page-wrap")[0];
-    page.scrollTop = 0;
-    window.scrollTo(0, 0);
-    this.init();
-    window.addEventListener("resize", this.init);
-    page.addEventListener("scroll", this.isInViewport);
-    this.isInViewport();
-  }
+function Carousel({ data, title, type = 'movie', id, redux_pos }) {
+	const placeholderRow = [];
+	const rowId = id;
+	// const router = useRouter();
+	const track = useRef(null);
+	const history = useHistory();
 
-  componentDidUpdate(prevProps) {
-    if (this.props !== prevProps) {
-      this.init();
-    } else if (this.state.inView && !this.state.init) {
-      this.init();
-    }
-  }
+	for (let i = 0; i < 10; i++) {
+		placeholderRow.push(
+			<div className={cards.wrap} key={`${rowId}_${i}`}>
+				<div
+					className={
+						type === 'company'
+							? cards.placeholder__wide
+							: cards.placeholder
+					}
+				></div>
+			</div>
+		);
+	}
 
-  componentWillUnmount() {
-    window.removeEventListener("resize", this.init);
-    window.removeEventListener("resize", this.isInViewport);
-  }
+	useEffect(() => {
+		if (!track || !data || data.length === 0) return;
+		const current = history.location.pathname;
+		const reduxPage = redux_pos[current];
+		if (reduxPage) {
+			const carousels = reduxPage.carousels;
+			if (!carousels) return;
+			const thisCarousel = carousels[id];
+			if (thisCarousel) {
+				track.current.scrollLeft = thisCarousel.scroll;
+			}
+		}
+	}, [history.location.pathname, track, data]);
 
-  init() {
-    if (!this.state.inView) {
-      return;
-    }
-    let carousel = this.carouselRef.current;
-    let wrapper = this.wrapper.current;
-    let cards = carousel.getElementsByClassName("card");
-    let exampleCard = cards[0];
-    let style = exampleCard
-      ? exampleCard.currentStyle || window.getComputedStyle(exampleCard)
-      : null;
-    let cardWidth = exampleCard
-      ? exampleCard.offsetWidth + parseFloat(style.marginRight)
-      : 0;
-    let wrapperWidth = wrapper.offsetWidth;
-    let cardsPerView = Math.floor(wrapperWidth / cardWidth);
-    let max = carousel.scrollWidth - carousel.offsetWidth;
-
-    this.setState({
-      cardsPerView: cardsPerView,
-      wrapperWidth: wrapperWidth,
-      cardWidth: cardWidth,
-      init: true,
-      width: carousel.offsetWidth,
-      max: max,
-    });
-  }
-
-  isInViewport() {
-    if (this.state.inView) {
-      let page = document.querySelectorAll(".page-wrap")[0];
-      page.removeEventListener("scroll", this.isInViewport);
-      return;
-    }
-    let carousel = this.wrapper.current;
-    if (!carousel) return;
-    const top = carousel.getBoundingClientRect().top;
-    const wH = window.innerHeight;
-    if (top <= wH * 1.5) {
-      this.setState({
-        inView: true,
-      });
-    } else {
-      this.setState({
-        inView: this.state.inView ? true : false,
-      });
-    }
-  }
-
-  scroll() {
-    let carousel = this.carouselRef.current;
-    if (!carousel) return;
-    let position = carousel.scrollLeft; //+ carousel.offsetWidth;
-    let max = carousel.scrollWidth - carousel.offsetWidth;
-    this.setState({
-      width: carousel.offsetWidth,
-      pos: position,
-      max: max,
-    });
-  }
-
-  next() {
-    let carousel = this.carouselRef.current;
-    let scrollAmount = this.state.cardWidth * this.state.cardsPerView;
-    let start = carousel.scrollLeft;
-    let movement =
-      Math.floor((start + scrollAmount) / this.state.cardWidth) *
-      this.state.cardWidth;
-    carousel.scrollTo({
-      top: 0,
-      left: movement,
-      behavior: "smooth",
-    });
-  }
-
-  prev() {
-    let carousel = this.carouselRef.current;
-    let scrollAmount = this.state.cardWidth * this.state.cardsPerView;
-    let start = carousel.scrollLeft;
-    let movement =
-      Math.floor((start - scrollAmount) / this.state.cardWidth) *
-      this.state.cardWidth;
-    carousel.scrollTo({
-      top: 0,
-      left: movement,
-      behavior: "smooth",
-    });
-  }
-
-  render() {
-    const childrenWithProps = React.Children.map(
-      this.props.children,
-      (child) => {
-        if (React.isValidElement(child)) {
-          return React.cloneElement(child, {
-            pos: this.state.pos,
-            width: this.state.width ? this.state.width : 0,
-          });
-        }
-        return child;
-      }
-    );
-    return (
-      <div
-        className={`carousel--wrap ${
-          this.state.inView ? "visible" : "not-visible"
-        }`}
-        ref={this.wrapper}
-      >
-        <div className="carousel--controls">
-          <div
-            className={`carousel--controls--item carousel--prev ${
-              this.state.pos > 0 ? "" : "disabled"
-            }`}
-            onClick={this.prev}
-          >
-            <LeftArrow />
-          </div>
-          <div
-            className={`carousel--controls--item carousel--next ${
-              this.state.pos < this.state.max ? "" : "disabled"
-            }`}
-            onClick={this.next}
-          >
-            <RightArrow />
-          </div>
-        </div>
-        <div
-          className={`carousel`}
-          ref={this.carouselRef}
-          onScroll={this.scroll}
-        >
-          <div className="carousel--inner">{childrenWithProps}</div>
-        </div>
-      </div>
-    );
-  }
+	return (
+		<div className="container">
+			<div className={carousel.wrap}>
+				<p className={typo.carousel_title}>
+					{title ? title : 'Loading...'}
+				</p>
+				<div
+					className={`${carousel.track} carousel-store`}
+					id={rowId}
+					ref={track}
+				>
+					{data && data.length > 0
+						? data.map((item, i) => {
+								if (item === 'watched') return null;
+								const video =
+									item.videos &&
+									item.videos.results.length > 0
+										? item.videos.results[0].key
+										: false;
+								const date =
+									type === 'movie'
+										? item.release_date
+										: type === 'tv'
+										? item.first_air_date
+										: '';
+								const poster =
+									type === 'movie' || type === 'tv'
+										? item.poster_path
+										: type === 'people'
+										? item.profile_path
+										: item.logo_path;
+								if (
+									typeof item === 'string' ||
+									typeof item === 'number'
+								)
+									item = { id: item, load: true };
+								return (
+									<Card
+										key={`${rowId}__carousel__${item.id}__${i}`}
+										title={
+											type === 'movie'
+												? item.title
+												: item.name
+										}
+										poster={poster}
+										video={video}
+										year={
+											date
+												? new Date(date).getFullYear()
+												: false
+										}
+										type={type}
+										id={item.id}
+										character={item.character}
+										credit={item.credit}
+										name={item.name}
+										item={item}
+										load={item.load}
+									/>
+								);
+						  })
+						: placeholderRow}
+				</div>
+			</div>
+		</div>
+	);
 }
 
-export default Carousel;
+export default connect(mapStateToProps)(Carousel);

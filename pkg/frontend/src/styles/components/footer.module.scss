@@ -1,0 +1,55 @@
+@import '../global/variables.module.scss';
+
+.footer {
+	margin-top: auto;
+	height: 70px;
+
+	@media (min-width: $lg) {
+		height: auto;
+	}
+}
+
+.inner {
+	display: none;
+
+	@media (min-width: $lg) {
+		display: block;
+		border-top: solid 1px $orange;
+
+		&__content {
+			display: flex;
+			justify-content: space-between;
+			padding-top: 40px;
+			margin: 0 -20px;
+			padding-bottom: 40px;
+		}
+	}
+}
+
+.col1 {
+	width: 20%;
+	padding: 0 20px;
+}
+
+.col2,
+.col3 {
+	width: 40%;
+	padding: 0 20px;
+}
+
+.links {
+	padding-top: 10px;
+	column-count: 2;
+
+	p {
+		padding-right: 10px;
+
+		a {
+			transition: color 0.3s ease;
+
+			&:hover {
+				color: $orange;
+			}
+		}
+	}
+}

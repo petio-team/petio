@@ -1,0 +1,122 @@
+html,
+body {
+	padding: 0;
+	margin: 0;
+	background: $black;
+	color: $white;
+	font-family: $font;
+	-webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 991px) {
+	::-webkit-scrollbar {
+		display: none;
+	}
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+	user-select: none;
+}
+
+img,
+svg {
+	user-select: none;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+	margin: 0;
+}
+
+hr {
+	margin: 0;
+	height: 1px;
+	background: $grey;
+	border: none;
+
+	&.spaced {
+		margin: $spacing 0;
+	}
+}
+
+.loading-screen {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: $black;
+	color: $white;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 1000;
+
+	svg {
+		width: 50px;
+		height: 50px;
+	}
+}
+
+.not-visible {
+	visibility: hidden;
+}
+
+.score {
+	&-bg {
+		fill: none;
+		stroke: darken($orange, 30);
+		stroke-width: 4;
+	}
+
+	&-value {
+		fill: none;
+		stroke-width: 4;
+		stroke-linecap: square;
+		animation: progress 3s ease-out forwards;
+		stroke: $orange;
+	}
+}
+
+@keyframes progress {
+	0% {
+		stroke-dasharray: 0 100;
+	}
+}
+
+.Toastify {
+	position: fixed;
+	z-index: 500;
+
+	&__toast {
+		background: $grey;
+		color: white;
+
+		&--info {
+			// color: blue;
+		}
+	}
+}
+
+.e404 {
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: flex-start;
+
+	h1 {
+		color: $orange;
+	}
+}

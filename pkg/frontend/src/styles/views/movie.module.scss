@@ -1,0 +1,218 @@
+@import '../global/variables.module.scss';
+
+.overview {
+	position: relative;
+	z-index: 3;
+	padding: 70px 0 20px;
+
+	@media (min-width: $lg) {
+		padding: 150px 0 50px;
+	}
+
+	&__logo {
+		height: 176px;
+		margin-bottom: $spacing;
+		display: flex;
+		align-items: center;
+		width: 100%;
+		max-width: 550px;
+		padding: 0 20px;
+
+		@media (min-width: $lg) {
+			width: 50%;
+			align-items: flex-end;
+			padding: 0;
+		}
+
+		span {
+			width: 100%;
+			height: 100%;
+		}
+
+		img {
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
+			object-position: center;
+
+			@media (min-width: $lg) {
+				object-position: bottom left;
+			}
+		}
+	}
+
+	&__content {
+		margin-top: $spacing;
+		margin-bottom: #{$spacing * 2};
+		width: 100%;
+		max-width: 550px;
+
+		@media (min-width: $lg) {
+			width: 50%;
+		}
+	}
+
+	&__info {
+		display: flex;
+
+		flex-direction: column;
+
+		@media (min-width: $lg) {
+			flex-direction: row;
+			align-items: center;
+		}
+
+		p {
+			display: flex;
+			align-items: center;
+		}
+	}
+
+	&__credits {
+		position: relative;
+		z-index: 3;
+		padding-bottom: #{$spacing * 5};
+		margin-top: #{$spacing * 10};
+		display: flex;
+		justify-content: space-between;
+
+		&__item {
+			padding-top: $spacing;
+			border-top: solid 1.5px $orange;
+			width: 235px;
+		}
+	}
+
+	&__genres {
+		margin-top: $spacing;
+		width: 100%;
+		max-width: 550px;
+
+		@media (min-width: $md) {
+			width: 50%;
+		}
+
+		span {
+			margin-right: #{$spacing * 2};
+
+			a {
+				transition: color 0.3s ease;
+
+				&:hover {
+					color: $orange;
+				}
+			}
+		}
+	}
+
+	&__wrap {
+		background: rgba($grey, 0.1);
+		padding: #{$spacing * 2};
+		backdrop-filter: blur(10px);
+		border-radius: 5px;
+
+		@media (min-width: $lg) {
+			background: none;
+			padding: 0;
+			backdrop-filter: none;
+			border-radius: 0;
+		}
+	}
+}
+
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	width: 100%;
+	justify-content: center;
+
+	@media (min-width: $md) {
+		justify-content: flex-start;
+	}
+
+	&__request {
+		display: flex;
+		margin-bottom: #{$spacing * 2};
+		width: 100%;
+
+		@media (min-width: $md) {
+			margin-bottom: 0;
+			margin-right: #{$spacing * 4};
+			width: auto;
+		}
+
+		&__main_btn {
+			width: 100%;
+			// min-width: 100%;
+
+			// button {
+			// 	width: 250px;
+			// 	max-width: 100%;
+			// }
+
+			@media (min-width: $md) {
+				width: 200px;
+				min-width: initial;
+			}
+		}
+	}
+
+	&__btn {
+		margin: 0 #{$spacing * 1};
+
+		@media (min-width: $lg) {
+			margin-left: 0;
+			margin-right: #{$spacing * 2};
+		}
+	}
+}
+
+.details {
+	margin: #{$spacing * 2} 0;
+
+	@media (min-width: $lg) {
+		margin: #{$spacing * 10} 0;
+	}
+
+	&__content {
+		border-top: solid 1px $orange;
+		padding-top: $spacing;
+		margin-top: $spacing;
+
+		&__inner {
+			display: flex;
+			flex-wrap: wrap;
+			width: 100%;
+			@media (min-width: $lg) {
+				margin-left: -10px;
+				margin-right: -10px;
+			}
+		}
+
+		&__item {
+			width: 50%;
+			margin-bottom: $spacing;
+			// display: flex;
+
+			a {
+				transition: color 0.3s ease;
+
+				&:hover {
+					color: $orange;
+				}
+			}
+
+			&__title {
+				margin-right: #{$spacing * 2};
+			}
+
+			@media (min-width: $md) {
+				width: calc(100% / 3);
+			}
+
+			@media (min-width: $lg) {
+				padding: 0 10px;
+			}
+		}
+	}
+}

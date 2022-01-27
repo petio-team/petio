@@ -1,0 +1,30 @@
+@import '../global/variables.module.scss';
+
+.wrap {
+	position: relative;
+	z-index: 2;
+	margin: #{$spacing * 2} 0;
+
+	@media (min-width: $lg) {
+		margin: #{$spacing * 10} 0;
+	}
+}
+
+.track {
+	display: flex;
+	flex-wrap: nowrap;
+	overflow: auto visible;
+	padding: 20px 20px;
+	margin: -10px -20px -20px;
+	overscroll-behavior-x: none;
+
+	@media (min-width: $lg) {
+		padding: 100px $containerGutter;
+		margin: -90px -#{$containerGutter} -100px;
+	}
+
+	&::-webkit-scrollbar {
+		width: 0; /* Remove scrollbar space */
+		background: transparent; /* Optional: just make scrollbar invisible */
+	}
+}

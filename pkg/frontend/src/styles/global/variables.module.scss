@@ -1,0 +1,38 @@
+$black: #000;
+$darkGrey: #111111;
+$grey: #202020;
+$white: #fff;
+$orange: #ff8300;
+$green: #3cff00;
+$red: #ff0000;
+$blue: #0077ff;
+$font: 'Montserrat', sans-serif;
+$spacing: 10px;
+$containerGutterSm: 50px;
+$containerGutter: 140px;
+$xs: 0;
+$sm: 350px;
+$md: 768px;
+$lg: 1100px;
+$xl: 1440px;
+$xxl: 1920px;
+
+:export {
+	black: $black;
+	darkGrey: $darkGrey;
+	grey: $grey;
+	white: $white;
+	orange: $orange;
+	green: $green;
+	blue: $blue;
+	red: $red;
+	font: $font;
+	containerGutterSm: $containerGutterSm;
+	containerGutter: $containerGutter;
+	xs: $xs;
+	sm: $sm;
+	md: $md;
+	lg: $lg;
+	xl: $xl;
+	xxl: $xxl;
+}

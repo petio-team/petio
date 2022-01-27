@@ -1,0 +1,99 @@
+@import '../global/variables.module.scss';
+
+.xltitle {
+	font-size: 40px;
+	letter-spacing: 0;
+	line-height: 44px;
+
+	@media (min-width: $lg) {
+		font-size: 80px;
+		line-height: 90px;
+	}
+}
+
+.title {
+	font-size: 30px;
+	letter-spacing: 0;
+	line-height: 34px;
+
+	@media (min-width: $lg) {
+		font-size: 40px;
+		line-height: 44px;
+	}
+}
+
+.smtitle {
+	font-size: 13px;
+	letter-spacing: 0;
+	line-height: 22px;
+
+	@media (min-width: $lg) {
+		font-size: 20px;
+		line-height: 24px;
+	}
+}
+
+.body {
+	font-size: 10px;
+	line-height: 18px;
+
+	@media (min-width: $lg) {
+		font-size: 13px;
+		line-height: 22px;
+	}
+}
+
+.xsmall {
+	font-size: 8px;
+	line-height: 16px;
+}
+
+.small {
+	font-size: 8px;
+	line-height: 16px;
+
+	@media (min-width: $lg) {
+		font-size: 10px;
+		line-height: 20px;
+	}
+}
+
+.uppercase {
+	text-transform: uppercase;
+	letter-spacing: 1px;
+}
+
+.medium {
+	font-weight: 500;
+}
+
+.bold {
+	font-weight: 700;
+}
+
+.carousel_title {
+	@extend .body;
+	@extend .uppercase;
+	@extend .bold;
+}
+
+.featured_title {
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	font-size: 10px;
+	line-height: 20px;
+	text-align: center;
+}
+
+.orange {
+	color: $orange;
+}
+
+.vertical_spacer {
+	margin: 0 $spacing;
+	height: 8px;
+	width: 1px;
+	background: $white;
+	display: inline-block;
+}

@@ -1,20 +1,7 @@
 {
-  "env": {
-    "browser": true,
-    "es2021": true
-  },
-  "extends": ["eslint:recommended", "plugin:react/recommended"],
-  "parserOptions": {
-    "ecmaFeatures": {
-      "jsx": true
-    },
-    "ecmaVersion": 12,
-    "sourceType": "module"
-  },
-  "plugins": ["react", "prettier"],
-  "rules": {
-    "react/prop-types": 0,
-    "no-class-assign": 0,
-    "no-useless-catch": 0
-  }
+	"extends": ["react-app"],
+	"rules": {
+		"no-throw-literal": 0,
+		"import/no-anonymous-default-export": 0
+	}
 }

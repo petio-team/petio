@@ -1,0 +1,8 @@
+@import '../global/variables.module.scss';
+
+.wrap {
+	position: fixed;
+	bottom: 25px;
+	right: 25px;
+	z-index: 5000;
+}

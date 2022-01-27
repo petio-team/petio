@@ -1,0 +1,16 @@
+@import '../global/variables.module.scss';
+
+.container {
+	width: 100%;
+	padding: 0 #{$spacing * 2};
+	max-width: 1920px;
+	margin: 0 auto;
+
+	@media (min-width: $lg) {
+		padding: 0 $containerGutterSm;
+	}
+
+	@media (min-width: $xl) {
+		padding: 0 $containerGutter;
+	}
+}

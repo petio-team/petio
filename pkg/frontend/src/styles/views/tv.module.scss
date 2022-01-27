@@ -1,0 +1,153 @@
+@import '../global/variables.module.scss';
+@import './movie.module.scss';
+@import '../components/typography.module.scss';
+
+.episodes {
+	margin: 20px 0;
+
+	@media (min-width: $lg) {
+		margin: 100px 0;
+	}
+
+	&__top {
+		position: relative;
+		margin-bottom: $spacing;
+	}
+
+	&__title {
+		@extend .carousel_title;
+
+		&__dropdown {
+			transition: color 0.3s ease;
+			display: inline-flex;
+			align-items: center;
+			cursor: pointer;
+
+			svg path {
+				transition: fill 0.3s ease;
+			}
+
+			&:hover {
+				color: $orange;
+
+				svg path {
+					fill: $orange;
+				}
+			}
+		}
+
+		svg {
+			width: 6px;
+			height: auto;
+			transform: rotate(90deg);
+			margin-left: $spacing;
+		}
+	}
+
+	&__all {
+		position: absolute;
+		z-index: 10;
+		top: calc(100% + 10px);
+		left: 0;
+		background: $grey;
+		padding: $spacing #{$spacing * 2};
+		border-radius: 2px;
+
+		&:before {
+			content: '';
+			width: 10px;
+			height: 10px;
+			position: absolute;
+			top: -5px;
+			left: #{$spacing * 2};
+			transform: rotate(45deg);
+			background: $grey;
+		}
+
+		p {
+			padding: 2px 0;
+			cursor: pointer;
+			transition: color 0.3s ease;
+
+			&:hover {
+				color: $orange;
+			}
+
+			&:first-child {
+				padding-top: 0;
+			}
+
+			&:last-child {
+				padding-bottom: 0;
+			}
+		}
+	}
+
+	&__grid {
+		display: flex;
+		flex-wrap: wrap;
+		margin: 0 -#{$spacing};
+	}
+
+	&__more {
+		display: flex;
+		justify-content: center;
+
+		p {
+			color: $orange;
+			cursor: pointer;
+		}
+	}
+}
+
+.episode {
+	width: calc(100% / 2);
+	padding: 0 $spacing #{$spacing * 2} $spacing;
+
+	@media (min-width: $lg) {
+		width: calc(100% / 3);
+	}
+
+	&__overview {
+		margin-top: $spacing;
+	}
+
+	&__image {
+		padding-bottom: 56%;
+		position: relative;
+		overflow: hidden;
+		border-radius: 2px;
+		margin-bottom: $spacing;
+		width: 100%;
+
+		img {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		&__placeholder {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: $grey;
+		}
+	}
+}
+
+.no_poster {
+	height: 100%;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: #{$spacing * 2};
+	white-space: initial !important;
+	color: $orange;
+	word-break: break-word;
+}
