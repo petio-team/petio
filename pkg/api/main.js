@@ -14,16 +14,11 @@ try {
   doPerms();
   // load config
   loadConfig();
-  // check if healthcheck flag is set and run healthcheck!
-  const args = process.argv.slice(2).filter((arg) => arg == "--healthcheck");
-  if (args.length) {
-    require("./healthcheck");
+
+  if (cluster.isPrimary) {
+    App();
   } else {
-    if (cluster.isPrimary) {
-      App();
-    } else {
-      new Worker().startCrons();
-    }
+    new Worker().startCrons();
   }
 } catch (e) {
   console.log(e.stack);
