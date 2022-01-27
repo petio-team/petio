@@ -61,7 +61,6 @@ const routes = (router) => {
                 frontendPath = frontendBuildPath;
             }
         }
-        console.log(frontendPath);
         baseRouter.use(express.static(frontendPath));
 
         const admin = express();
@@ -76,7 +75,6 @@ const routes = (router) => {
                 adminPath = adminBuildPath;
             }
         }
-        console.log(adminPath);
         admin.use("/", express.static(adminPath));
     }
 
