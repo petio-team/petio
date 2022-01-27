@@ -19,7 +19,7 @@ services:
       - ${PETIO_DATA_VOLUME:-./data}:/data
 
   mongo:
-    image: mongo:${MONGODB_DOCKER_TAG:-4.4.11}
+    image: mongo:${MONGODB_DOCKER_TAG:-4.4.0}
     container_name: "${MONGODB_DOCKER_CONT_NAME:-mongo}"
     hostname: ${MONGODB_DOCKER_HOSTNAME:-mongo}
     ports:
