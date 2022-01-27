@@ -1,11 +1,11 @@
 #!/bin/bash
 if [[ ! "${PUID}" -eq 0 ]] && [[ ! "${PGID}" -eq 0 ]]; then
-    usermod -o -u "${PUID}" petio
-    groupmod -o -g "${PGID}" petio
-    usermod -d "/data" petio
+    usermod -o -u "${PUID}" node
+    groupmod -o -g "${PGID}" node
+    usermod -d "/data" node
 fi
 
 chmod "=rwx" "/data"
-chown petio:petio "/data"
+chown node:node "/data"
 
-su petio -c "/petio-alpine-x64 --host 0.0.0.0 --port 7777"
+su node -c "/usr/local/bin/node ./api/main.js --host 0.0.0.0 --port 7777"

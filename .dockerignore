@@ -1,3 +1,6 @@
 *
-!releases/
 !docker/
+!/pkg/admin/build/
+!/pkg/frontend/build/
+!/pkg/api/dist/
+!/pkg/api/node_modules
