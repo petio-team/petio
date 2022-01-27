@@ -34,7 +34,7 @@ const app = () => {
         cluster.fork();
 
     } catch (e) {
-        logger.error(e);
+        console.log(e.stack);
         process.exit(0);
     }
 

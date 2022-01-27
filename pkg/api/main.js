@@ -26,6 +26,6 @@ try {
     }
   }
 } catch (e) {
-  console.log(e);
+  console.log(e.stack);
   process.exit(1);
 }
