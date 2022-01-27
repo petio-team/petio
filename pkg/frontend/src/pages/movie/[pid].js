@@ -41,7 +41,6 @@ function Movie({
 }) {
   const [mobile, setMobile] = useState(false);
   const { pid } = useParams();
-  const keywords = [210024, 207317, 3335, 4344, 3149, 10123, 5565, 9672, 10391];
   const movieData = redux_movies[pid];
 
   useEffect(() => {
