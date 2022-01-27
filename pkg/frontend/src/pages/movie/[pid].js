@@ -21,6 +21,7 @@ import { ReactComponent as ThumbUp } from "../../assets/svg/thumb-up.svg";
 import { ReactComponent as ThumbDown } from "../../assets/svg/thumb-down.svg";
 import { ReactComponent as IssueIcon } from "../../assets/svg/issue.svg";
 import { ReactComponent as TrailerIcon } from "../../assets/svg/trailer.svg";
+import { ReactComponent as WatchlistIcon } from "../../assets/svg/watchlist.svg";
 import NotFound from "../404";
 import { matchGenre } from "../../helpers/genres";
 
@@ -272,6 +273,11 @@ function Movie({
                   </button>
                   <button className={`${buttons.icon} ${styles.actions__btn}`}>
                     <TrailerIcon viewBox="0 0 24 24" />
+                  </button>
+                  <button
+                    className={`${buttons.icon} ${styles.actions__btn} ${styles.actions__btn__disabled}`}
+                  >
+                    <WatchlistIcon />
                   </button>
                 </div>
               ) : null}
