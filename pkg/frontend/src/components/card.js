@@ -202,6 +202,7 @@ function Card({
             height="100%"
             playsinline={true}
             loop={true}
+            muted={true}
           />
         ) : null}
         <div className={styles.hover_info}>

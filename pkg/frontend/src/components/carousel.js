@@ -7,7 +7,8 @@ import { useHistory } from "react-router-dom";
 // import { useRouter } from 'next/router';
 
 import Card from "./card";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useLayoutEffect, useState } from "react";
+import { storePosition } from "../services/position.service";
 
 const mapStateToProps = (state) => {
   return {
@@ -16,6 +17,7 @@ const mapStateToProps = (state) => {
 };
 
 function Carousel({ data, title, type = "movie", id, redux_pos }) {
+  const [waitForScroll, setWaitForScroll] = useState(true);
   const placeholderRow = [];
   const rowId = id;
   // const router = useRouter();
@@ -34,8 +36,35 @@ function Carousel({ data, title, type = "movie", id, redux_pos }) {
     );
   }
 
+  useLayoutEffect(() => {
+    if (!track || !track.current || !data || data.length === 0) return;
+    const el = track.current;
+    let bounce = false;
+    function checkScroll() {
+      clearTimeout(bounce);
+      bounce = setTimeout(() => {
+        storePosition(history.location.pathname, false, {
+          [id]: { scroll: el.scrollLeft },
+        });
+      }, 500);
+    }
+
+    el.addEventListener("scroll", checkScroll);
+
+    return () => {
+      el.removeEventListener("scroll", checkScroll);
+    };
+  }, [history, track, id, data]);
+
   useEffect(() => {
-    if (!track || !data || data.length === 0) return;
+    if (
+      !track ||
+      !track.current ||
+      !data ||
+      data.length === 0 ||
+      !waitForScroll
+    )
+      return;
     const current = history.location.pathname;
     const reduxPage = redux_pos[current];
     if (reduxPage) {
@@ -46,7 +75,8 @@ function Carousel({ data, title, type = "movie", id, redux_pos }) {
         track.current.scrollLeft = thisCarousel.scroll;
       }
     }
-  }, [history.location.pathname, track, data, id, redux_pos]);
+    setWaitForScroll(false);
+  }, [history.location.pathname, track, data, id, redux_pos, waitForScroll]);
 
   return (
     <div className="container">

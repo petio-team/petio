@@ -4,7 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import { useLocation, withRouter, useHistory } from "react-router-dom";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useLayoutEffect } from "react";
 import { ToastContainer, toast, Slide } from "react-toastify";
 import { Switch, Route } from "react-router-dom";
 
@@ -165,29 +165,45 @@ function Petio({ redux_pos }) {
 
   // Store Scroll Pos
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     let bounce = false;
     function checkScroll() {
       clearTimeout(bounce);
       bounce = setTimeout(() => {
-        const carousels = document.querySelectorAll(".carousel-store");
-        let carouselData = {};
-        carousels.forEach((carousel) => {
-          carouselData[carousel.id] = {
-            scroll: carousel.scrollLeft,
-          };
-        });
-        storePosition(history.location.pathname, window.scrollY, carouselData);
+        storePosition(history.location.pathname, window.scrollY);
       }, 500);
     }
-    window.addEventListener("mousemove", checkScroll);
-    window.addEventListener("touchmove", checkScroll);
+
+    window.addEventListener("scroll", checkScroll);
 
     return () => {
-      window.removeEventListener("mousemove", checkScroll);
-      window.removeEventListener("touchmove", checkScroll);
+      window.removeEventListener("scroll", checkScroll);
     };
-  }, [history.location.pathname]);
+  }, [history]);
+
+  // useEffect(() => {
+  //   let bounce = false;
+  //   function checkScroll() {
+  //     clearTimeout(bounce);
+  //     bounce = setTimeout(() => {
+  //       const carousels = document.querySelectorAll(".carousel-store");
+  //       let carouselData = {};
+  //       carousels.forEach((carousel) => {
+  //         carouselData[carousel.id] = {
+  //           scroll: carousel.scrollLeft,
+  //         };
+  //       });
+  //       storePosition(history.location.pathname, window.scrollY, carouselData);
+  //     }, 500);
+  //   }
+  //   window.addEventListener("mousemove", checkScroll);
+  //   window.addEventListener("touchmove", checkScroll);
+
+  //   return () => {
+  //     window.removeEventListener("mousemove", checkScroll);
+  //     window.removeEventListener("touchmove", checkScroll);
+  //   };
+  // }, [history.location.pathname]);
 
   useEffect(() => {
     const oldPath = currentPath;
