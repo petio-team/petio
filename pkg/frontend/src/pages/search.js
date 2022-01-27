@@ -24,7 +24,6 @@ function Search({ searchQuery, searchResults, newNotification }) {
     async function submitSearch() {
       try {
         media.search(searchQuery);
-        setDisplay(searchQuery);
         setLoading(false);
       } catch (e) {
         newNotification({ type: "error", message: e });
