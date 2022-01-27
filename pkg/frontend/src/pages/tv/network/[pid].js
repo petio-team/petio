@@ -31,7 +31,7 @@ export default function Network() {
         });
         setCoData(showData);
         setTv(tvLookup.results);
-        setTotal(tvLookup.totalPages);
+        // setTotal(tvLookup.totalPages);
         setFeaturedMovie(tvLookup.results[0]);
       } catch (e) {
         console.log(e);

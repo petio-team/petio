@@ -28,7 +28,7 @@ export default function Genre() {
         setGenreName(genreMatch.name);
         const moviesLookup = await media.lookup("movie", 1, genreMatch.query);
         setMovies(moviesLookup.results);
-        setTotal(moviesLookup.totalPages);
+        // setTotal(moviesLookup.totalPages);
         setFeaturedMovie(moviesLookup.results[0]);
       } catch (e) {
         console.log(e);

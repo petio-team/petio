@@ -30,7 +30,7 @@ export default function Studio() {
         });
         setCoData(movieData);
         setMovies(moviesLookup.results);
-        setTotal(moviesLookup.totalPages);
+        // setTotal(moviesLookup.totalPages);
         setFeaturedMovie(moviesLookup.results[0]);
       } catch (e) {
         console.log(e);

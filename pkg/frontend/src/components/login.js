@@ -44,26 +44,15 @@ export function Login(props) {
   async function loginOauth() {
     try {
       let plexWindow = oAuthWindow("", "Login with Plex", 500, 500);
-      setLoading(true);
       let res = await plexAuthLogin(plexWindow);
-      setLoading(false);
-
       if (res.error) {
         props.newNotification({ type: "error", message: res.error });
-
         return;
       }
-
-      console.log(res.user);
-
       props.setCurrentUser(res.user);
       props.setIsLoggedIn(true);
-
-      //   User.getRequests();
     } catch (err) {
       console.log(err);
-      // this.props.msg({ message: err, typo: "error" });
-      setLoading(false);
       props.newNotification({ message: "Login Failed", type: "error" });
     }
   }

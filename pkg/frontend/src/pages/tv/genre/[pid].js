@@ -28,7 +28,7 @@ export default function Genre() {
         setGenreName(genreMatch.name);
         const showsLookup = await media.lookup("show", 1, genreMatch.query);
         setShows(showsLookup.results);
-        setTotal(showsLookup.totalPages);
+        // setTotal(showsLookup.totalPages);
         setfeaturedShow(showsLookup.results[0]);
       } catch (e) {
         console.log(e);
