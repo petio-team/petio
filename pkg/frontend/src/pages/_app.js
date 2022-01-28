@@ -38,6 +38,7 @@ import Studio from "./movie/studio/[pid]";
 import Network from "./tv/network/[pid]";
 import NotFound from "./404";
 import Search from "./search";
+import Modal from "../components/modal";
 
 const mapStateToProps = (state) => {
   return {
@@ -181,30 +182,6 @@ function Petio({ redux_pos }) {
     };
   }, [history]);
 
-  // useEffect(() => {
-  //   let bounce = false;
-  //   function checkScroll() {
-  //     clearTimeout(bounce);
-  //     bounce = setTimeout(() => {
-  //       const carousels = document.querySelectorAll(".carousel-store");
-  //       let carouselData = {};
-  //       carousels.forEach((carousel) => {
-  //         carouselData[carousel.id] = {
-  //           scroll: carousel.scrollLeft,
-  //         };
-  //       });
-  //       storePosition(history.location.pathname, window.scrollY, carouselData);
-  //     }, 500);
-  //   }
-  //   window.addEventListener("mousemove", checkScroll);
-  //   window.addEventListener("touchmove", checkScroll);
-
-  //   return () => {
-  //     window.removeEventListener("mousemove", checkScroll);
-  //     window.removeEventListener("touchmove", checkScroll);
-  //   };
-  // }, [history.location.pathname]);
-
   useEffect(() => {
     const oldPath = currentPath;
     const newPath = router.pathname;
@@ -341,6 +318,7 @@ function Petio({ redux_pos }) {
         transition={Slide}
         theme={"petio"}
       />
+      <Modal />
     </Layout>
   );
 }
