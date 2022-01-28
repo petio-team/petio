@@ -281,6 +281,10 @@ async function batchLookup(ids, type = "movie", minified = true) {
       if (!data) throw "Batch lookup failed";
       data.forEach((item) => {
         items[item.id] = item;
+        if (items[item.id].collection === false) {
+          // For some reason batch lookup returns false for collections?
+          delete items[item.id].collection;
+        }
       });
       if (type === "movie")
         updateStore({ type: "media/store-movies", movies: items });
