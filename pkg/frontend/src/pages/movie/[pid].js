@@ -24,6 +24,7 @@ import { ReactComponent as TrailerIcon } from "../../assets/svg/trailer.svg";
 import { ReactComponent as WatchlistIcon } from "../../assets/svg/watchlist.svg";
 import NotFound from "../404";
 import { matchGenre } from "../../helpers/genres";
+import { Loading } from "../../components/loading";
 
 const mapStateToProps = (state) => {
   return {
@@ -171,6 +172,7 @@ function Movie({
   return (
     <div className={styles.wrap} key={`movie_single_${pid}`}>
       <Meta title={movieData ? movieData.title : ""} />
+      {!movieData.ready || !pid ? <Loading /> : null}
       <div className={hero.single}>
         <div className="container">
           <div className={styles.overview}>

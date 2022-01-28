@@ -59,7 +59,7 @@ async function getMovie(id, minified = false) {
     if (data.error) throw "error";
     updateStore({
       type: "media/store-movies",
-      movies: { [data.id]: data },
+      movies: { [data.id]: { ...data, ready: true } },
     });
     if (data.recommendations) batchLookup(data.recommendations, "movie");
     if (data.collection) batchLookup(data.collection, "movie");
@@ -80,7 +80,7 @@ async function getTv(id, minified = false) {
     if (data.error) throw "error";
     updateStore({
       type: "media/store-shows",
-      shows: { [data.id]: data },
+      shows: { [data.id]: { ...data, ready: true } },
     });
     batchLookup(data.recommendations, "tv");
     return data;
@@ -157,6 +157,7 @@ async function lookup(type, page, params = {}) {
       data.results.forEach((movie) => {
         if (movie.id) {
           movies[movie.id] = movie;
+          movies[movie.id].ready = true;
         }
       });
       updateStore({ type: "media/store-movies", movies: movies });
@@ -164,7 +165,10 @@ async function lookup(type, page, params = {}) {
     } else if (type === "show") {
       let shows = {};
       data.results.forEach((show) => {
-        if (show.id) shows[show.id] = show;
+        if (show.id) {
+          shows[show.id] = show;
+          shows[show.id].ready = true;
+        }
       });
       console.log(shows);
       updateStore({ type: "media/store-shows", shows: shows });

@@ -8,6 +8,7 @@ import { useEffect } from "react";
 
 import media from "../services/media.service";
 import { myRequests, myRequestsArchive } from "../services/user.service";
+import { Loading } from "../components/loading";
 
 const mapStateToProps = (state) => {
   return {
@@ -39,6 +40,7 @@ function Requests({ requests, currentUser }) {
   return (
     <div className={styles.wrap}>
       <Meta title={`Your Requests`} />
+      {requests === null ? <Loading /> : null}
       <div className="container">
         <p className={`${styles.title} ${typo.xltitle} ${typo.bold}`}>
           Your Requests

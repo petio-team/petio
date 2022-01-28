@@ -11,6 +11,7 @@ import typo from "../../styles/components/typography.module.scss";
 
 import Meta from "../../components/meta";
 import Carousel from "../../components/carousel";
+import { Loading } from "../../components/loading";
 
 const mapStateToProps = (state) => {
   return {
@@ -36,8 +37,6 @@ function Person({ redux_people }) {
     setShowMore(false);
     getPersonDetails();
   }, [pid]);
-
-  if (!personData) return null;
 
   // if (personData === 'error') {
   // 	router.push('/404', null, { shallow: true });
@@ -117,7 +116,8 @@ function Person({ redux_people }) {
   }
 
   // Credits Movie
-  let movieCredits = personData.movies;
+  let movieCredits =
+    personData && personData.movies ? personData.movies : false;
   let moviesList = false;
 
   if (movieCredits) {
@@ -133,7 +133,7 @@ function Person({ redux_people }) {
   }
 
   // Credits TV
-  let tvCredits = personData.tv;
+  let tvCredits = personData && personData.tv ? personData.tv : false;
   let showsList = false;
 
   if (tvCredits) {
@@ -151,6 +151,7 @@ function Person({ redux_people }) {
   return (
     <div className={styles.wrap}>
       <Meta title={personData && personData.info ? personData.info.name : ""} />
+      {!personData ? <Loading /> : null}
       <div className="container">
         <div className={styles.info}>
           <div className={styles.info__overview}>
@@ -161,7 +162,9 @@ function Person({ redux_people }) {
             </div>
             <div className={styles.info__knownfor}>
               <p className={`${typo.body} ${typo.bold}`}>
-                {personData.info.known_for_department}
+                {personData && personData.info
+                  ? personData.info.known_for_department
+                  : ""}
               </p>
             </div>
             <div className={styles.info__biography}>

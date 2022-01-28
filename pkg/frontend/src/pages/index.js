@@ -11,6 +11,7 @@ import hero from "../styles/components/hero.module.scss";
 import typo from "../styles/components/typography.module.scss";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/opacity.css";
+import { Loading } from "../components/loading";
 
 const mapStateToProps = (state) => {
   return {
@@ -86,6 +87,7 @@ function Home({
   return (
     <>
       <Meta title={"Home"} />
+      {!redux_featured ? <Loading /> : null}
       <div>
         <div className={hero.discovery}>
           <div className="container">
