@@ -172,7 +172,7 @@ function Movie({
   return (
     <div className={styles.wrap} key={`movie_single_${pid}`}>
       <Meta title={movieData ? movieData.title : ""} />
-      {!movieData.ready || !pid ? <Loading /> : null}
+      {!movieData || !movieData.ready || !pid ? <Loading /> : null}
       <div className={hero.single}>
         <div className="container">
           <div className={styles.overview}>

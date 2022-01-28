@@ -1,5 +1,6 @@
 import { connect } from "react-redux";
 import { Login } from "../../components/login";
+import Modal from "../../components/modal";
 
 const mapStateToProps = (state) => {
   return {
@@ -19,7 +20,12 @@ function Admin({
   }
 
   if (redux_user.isAdminLogin)
-    return <p>Admin: {redux_user.isAdminLogin.toString()}</p>;
+    return (
+      <div>
+        <p>Admin: {redux_user.isAdminLogin.toString()}</p>
+        <Modal>Modal content test</Modal>
+      </div>
+    );
 
   return (
     <Login

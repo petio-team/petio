@@ -38,7 +38,7 @@ import Studio from "./movie/studio/[pid]";
 import Network from "./tv/network/[pid]";
 import NotFound from "./404";
 import Search from "./search";
-import Modal from "../components/modal";
+// import Modal from "../components/modal";
 
 const mapStateToProps = (state) => {
   return {
@@ -318,7 +318,6 @@ function Petio({ redux_pos }) {
         transition={Slide}
         theme={"petio"}
       />
-      <Modal />
     </Layout>
   );
 }

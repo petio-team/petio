@@ -7,6 +7,7 @@
   width: 100%;
   height: 100%;
   z-index: 1000;
+  touch-action: none;
 }
 
 .blackout {
@@ -17,7 +18,8 @@
   height: 100%;
   background: rgba($black, 0.5);
   z-index: 999;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(5px);
+  opacity: 0;
 }
 
 .inner {
@@ -28,9 +30,13 @@
   height: 70%;
   background: rgba($white, 0.2);
   border-radius: 5px 5px 0 0;
-  backdrop-filter: blur(30px);
+  backdrop-filter: blur(20px);
   padding: 70px 20px 50px;
   overflow: hidden;
+
+  &__anim {
+    transition: transform 0.3s ease;
+  }
 
   &__pull {
     position: absolute;
@@ -38,6 +44,16 @@
     left: 0;
     width: 100%;
     height: 50px;
-    background: green;
+    background: rgba($white, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &__handle {
+      width: 80px;
+      height: 5px;
+      border-radius: 2px;
+      background: $grey;
+    }
   }
 }

@@ -178,7 +178,7 @@ function Tv({
   return (
     <div className={styles.wrap} key={`tv_single_${pid}`}>
       <Meta title={tvData ? tvData.name : ""} />
-      {!tvData.ready ? <Loading /> : null}
+      {tvData || !tvData.ready ? <Loading /> : null}
       <div className={hero.single}>
         <div className="container">
           <div className={styles.overview}>
