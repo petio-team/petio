@@ -11,6 +11,7 @@ on:
     branches:
       - "*"
       - "!master"
+  pull_requests:
 
 jobs:
   build:
