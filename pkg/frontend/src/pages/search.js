@@ -23,7 +23,7 @@ function Search({ searchQuery, searchResults, newNotification }) {
     setLoading(true);
     async function submitSearch() {
       try {
-        media.search(searchQuery);
+        await media.search(searchQuery);
         setLoading(false);
       } catch (e) {
         newNotification({ type: "error", message: e });
