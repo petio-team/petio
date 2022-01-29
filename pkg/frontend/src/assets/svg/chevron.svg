@@ -1,0 +1,10 @@
+
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g transform="translate(-1277.000000, -45.000000)" fill="#fff" fill-rule="nonzero">
+            <g transform="translate(1277.000000, 45.000000)">
+                <path d="M12,0 C5.383,0 0,5.383 0,12 C0,18.617 5.383,24 12,24 C18.617,24 24,18.617 24,12 C24,5.383 18.617,0 12,0 Z M10,17.414 L8.586,16 L12.586,12 L8.586,8 L10,6.586 L15.414,12 L10,17.414 Z" id="Shape"></path>
+            </g>
+        </g>
+    </g>
+</svg>

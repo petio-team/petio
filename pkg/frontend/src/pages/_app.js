@@ -38,6 +38,7 @@ import Studio from "./movie/studio/[pid]";
 import Network from "./tv/network/[pid]";
 import NotFound from "./404";
 import Search from "./search";
+import Error from "../components/error";
 // import Modal from "../components/modal";
 
 const mapStateToProps = (state) => {
@@ -117,6 +118,10 @@ function Petio({ redux_pos }) {
         setGlobalConfig(config);
       } catch (e) {
         console.log(e);
+        newNotification({
+          type: "error",
+          message: "Unable to communciate with Petio API",
+        });
         setGlobalConfig({
           config: {
             error: e,
@@ -202,6 +207,14 @@ function Petio({ redux_pos }) {
     setupMode = true;
   }
 
+  if (globalConfig.config.error) {
+    return (
+      <Layout isLoggedIn={isLoggedIn} currentUser={currentUser}>
+        <Error />;
+      </Layout>
+    );
+  }
+
   return (
     <Layout isLoggedIn={isLoggedIn} currentUser={currentUser}>
       {setupMode ? (
@@ -232,7 +245,7 @@ function Petio({ redux_pos }) {
               newNotification={newNotification}
             />
           </Route>
-          <Route exact path="/admin">
+          <Route path="/admin">
             <Admin
               setIsLoggedIn={setIsLoggedIn}
               currentUser={currentUser}

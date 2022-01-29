@@ -1,99 +1,133 @@
-@import '../global/variables.module.scss';
+@import "../global/variables.module.scss";
 
 .xltitle {
-	font-size: 40px;
-	letter-spacing: 0;
-	line-height: 44px;
+  font-size: 40px;
+  letter-spacing: 0;
+  line-height: 44px;
 
-	@media (min-width: $lg) {
-		font-size: 80px;
-		line-height: 90px;
-	}
+  @media (min-width: $lg) {
+    font-size: 80px;
+    line-height: 90px;
+  }
 }
 
 .title {
-	font-size: 30px;
-	letter-spacing: 0;
-	line-height: 34px;
+  font-size: 30px;
+  letter-spacing: 0;
+  line-height: 34px;
 
-	@media (min-width: $lg) {
-		font-size: 40px;
-		line-height: 44px;
-	}
+  @media (min-width: $lg) {
+    font-size: 40px;
+    line-height: 44px;
+  }
 }
 
 .smtitle {
-	font-size: 13px;
-	letter-spacing: 0;
-	line-height: 22px;
+  font-size: 13px;
+  letter-spacing: 0;
+  line-height: 22px;
 
-	@media (min-width: $lg) {
-		font-size: 20px;
-		line-height: 24px;
-	}
+  @media (min-width: $lg) {
+    font-size: 20px;
+    line-height: 24px;
+  }
 }
 
 .body {
-	font-size: 10px;
-	line-height: 18px;
+  font-size: 10px;
+  line-height: 18px;
 
-	@media (min-width: $lg) {
-		font-size: 13px;
-		line-height: 22px;
-	}
+  @media (min-width: $lg) {
+    font-size: 13px;
+    line-height: 22px;
+  }
 }
 
 .xsmall {
-	font-size: 8px;
-	line-height: 16px;
+  font-size: 8px;
+  line-height: 16px;
 }
 
 .small {
-	font-size: 8px;
-	line-height: 16px;
+  font-size: 8px;
+  line-height: 16px;
 
-	@media (min-width: $lg) {
-		font-size: 10px;
-		line-height: 20px;
-	}
+  @media (min-width: $lg) {
+    font-size: 10px;
+    line-height: 20px;
+  }
 }
 
 .uppercase {
-	text-transform: uppercase;
-	letter-spacing: 1px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .medium {
-	font-weight: 500;
+  font-weight: 500;
 }
 
 .bold {
-	font-weight: 700;
+  font-weight: 700;
 }
 
 .carousel_title {
-	@extend .body;
-	@extend .uppercase;
-	@extend .bold;
+  @extend .body;
+  @extend .uppercase;
+  @extend .bold;
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    transition: color 0.3s ease;
+
+    .carousel_title__icon {
+      transition: border-color 0.3s ease;
+    }
+
+    &:hover {
+      color: $orange;
+
+      .carousel_title__icon {
+        border-color: $orange;
+      }
+    }
+  }
+
+  &__icon {
+    border-top: solid 2px $white;
+    border-right: solid 2px $white;
+    transform: rotate(45deg);
+
+    width: 6px;
+    height: 6px;
+    margin-left: 5px;
+
+    @media (min-width: $lg) {
+      width: 8px;
+      height: 8px;
+      margin-left: 10px;
+    }
+  }
 }
 
 .featured_title {
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 1px;
-	font-size: 10px;
-	line-height: 20px;
-	text-align: center;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 10px;
+  line-height: 20px;
+  text-align: center;
 }
 
 .orange {
-	color: $orange;
+  color: $orange;
 }
 
 .vertical_spacer {
-	margin: 0 $spacing;
-	height: 8px;
-	width: 1px;
-	background: $white;
-	display: inline-block;
+  margin: 0 $spacing;
+  height: 8px;
+  width: 1px;
+  background: $white;
+  display: inline-block;
 }

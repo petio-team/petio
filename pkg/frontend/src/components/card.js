@@ -33,6 +33,7 @@ function Card({
   redux_movies,
   redux_tv,
   redux_requests,
+  logo = false,
 }) {
   const [showTrailer, setShowTrailer] = useState(false);
   const [delayHandler, setDelayHandler] = useState(null);
@@ -146,6 +147,35 @@ function Card({
               {title}
             </p>
           )}
+        </div>
+      </Link>
+    );
+  }
+
+  if (type === "request") {
+    return (
+      <Link to={`/${type}/${id}`} className={styles.wrap}>
+        <div className={styles.request}>
+          {logo ? (
+            <LazyLoadImage
+              className={styles.request__logo}
+              src={logo}
+              effect="opacity"
+            />
+          ) : (
+            <p
+              className={`${typo.smtitle} ${typo.medium} ${styles.request__nologo}`}
+            >
+              {title}
+            </p>
+          )}
+          {poster ? (
+            <LazyLoadImage
+              className={styles.request__image}
+              src={`https://image.tmdb.org/t/p/w500${poster}`}
+              alt={title}
+            />
+          ) : null}
         </div>
       </Link>
     );

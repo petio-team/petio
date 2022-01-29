@@ -1,0 +1,63 @@
+@import "../global/variables.module.scss";
+
+.wrap {
+  margin-top: 120px;
+
+  @media (min-width: $lg) {
+    margin-top: 170px;
+  }
+}
+
+.menu {
+  display: flex;
+  width: 100%;
+  padding-bottom: 10px;
+  border-bottom: solid 1px $orange;
+  margin-top: 50px;
+
+  &__item {
+    margin-right: 50px;
+
+    a {
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: $orange;
+      }
+    }
+  }
+}
+
+.viewport {
+  padding: 50px 0;
+  margin-bottom: 50px;
+}
+
+.dashboard {
+  &__grid {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -10px;
+  }
+
+  &__item {
+    padding: 0 10px 10px;
+  }
+
+  &__module {
+    background: $grey;
+    padding: 10px;
+    border-radius: 5px;
+  }
+
+  &__metrics {
+    @extend .dashboard__item;
+    width: 34%;
+  }
+
+  &__activity,
+  &__issues {
+    @extend .dashboard__item;
+    width: 33%;
+  }
+}

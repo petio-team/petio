@@ -3,7 +3,7 @@ import typo from "../styles/components/typography.module.scss";
 import cards from "../styles/components/card.module.scss";
 
 import { connect } from "react-redux";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 // import { useRouter } from 'next/router';
 
 import Card from "./card";
@@ -16,7 +16,7 @@ const mapStateToProps = (state) => {
   };
 };
 
-function Carousel({ data, title, type = "movie", id, redux_pos }) {
+function Carousel({ data, title, type = "movie", id, redux_pos, link }) {
   const [waitForScroll, setWaitForScroll] = useState(true);
   const placeholderRow = [];
   const rowId = id;
@@ -29,7 +29,9 @@ function Carousel({ data, title, type = "movie", id, redux_pos }) {
       <div className={cards.wrap} key={`${rowId}_${i}`}>
         <div
           className={
-            type === "company" ? cards.placeholder__wide : cards.placeholder
+            type === "company" || type === "request"
+              ? cards.placeholder__wide
+              : cards.placeholder
           }
         ></div>
       </div>
@@ -80,16 +82,49 @@ function Carousel({ data, title, type = "movie", id, redux_pos }) {
 
   return (
     <div className="container">
-      <div className={carousel.wrap}>
-        <p className={typo.carousel_title}>{title ? title : "Loading..."}</p>
+      <div
+        className={`${carousel.wrap} ${
+          type === "request" ? carousel.wrap__nospacing : ""
+        }`}
+      >
+        {link ? (
+          <p className={typo.carousel_title}>
+            {title ? (
+              <Link to={link}>
+                {title}
+                <div className={typo.carousel_title__icon}></div>
+              </Link>
+            ) : (
+              "Loading..."
+            )}
+          </p>
+        ) : (
+          <p className={typo.carousel_title}>{title ? title : "Loading..."}</p>
+        )}
         <div
-          className={`${carousel.track} carousel-store`}
+          className={`${carousel.track} ${
+            type === "request" ? carousel.track__nospacing : ""
+          } carousel-store`}
           id={rowId}
           ref={track}
         >
           {data && data.length > 0
             ? data.map((item, i) => {
                 if (item === "watched") return null;
+
+                if (type === "request") {
+                  return (
+                    <Card
+                      key={`${rowId}__carousel__${item.id}__${i}`}
+                      title={item.title}
+                      poster={item.poster}
+                      logo={item.logo}
+                      video={false}
+                      type={type}
+                      id={item.id}
+                    />
+                  );
+                }
                 const video =
                   item.videos && item.videos.results.length > 0
                     ? item.videos.results[0].key
@@ -108,6 +143,7 @@ function Carousel({ data, title, type = "movie", id, redux_pos }) {
                     : item.logo_path;
                 if (typeof item === "string" || typeof item === "number")
                   item = { id: item, load: true };
+
                 return (
                   <Card
                     key={`${rowId}__carousel__${item.id}__${i}`}
