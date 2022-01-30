@@ -251,6 +251,7 @@ export async function getServerDetails() {
   try {
     const serverData = await get("/history/server");
     if (!serverData) throw "No response";
+    serverData.StatisticsResources.reverse();
     updateStore({
       type: "system/server",
       server: serverData.StatisticsResources[0],
@@ -324,10 +325,11 @@ export async function getSessions() {
   try {
     const sessionData = await get("/sessions");
     if (!sessionData) throw "No response";
-    updateStore({
-      type: "system/sessions",
-      sessions: sessionData.Metadata,
-    });
+    if (sessionData.Metadata)
+      updateStore({
+        type: "system/sessions",
+        sessions: sessionData.Metadata,
+      });
   } catch (e) {
     console.log(e);
     throw "Unable to get server details";

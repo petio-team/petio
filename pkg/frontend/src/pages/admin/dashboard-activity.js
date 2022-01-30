@@ -43,7 +43,7 @@ function Activity({ system }) {
 
   return (
     <div className={styles.dashboard__activity__wrap}>
-      {system.sessions && system.session.length > 0 ? (
+      {system.sessions && system.sessions.length > 0 ? (
         system.sessions.map((session) => {
           let media = null;
           let selectedMedia = false;
@@ -80,7 +80,10 @@ function Activity({ system }) {
                 type={type}
                 session={session}
                 progress={
-                  session.Media.length > 0 && session.viewOffset
+                  session.Media &&
+                  session.Media.length > 0 &&
+                  session.viewOffset &&
+                  session.viewOffset
                     ? (session.viewOffset / session.Media[0].duration) * 100
                     : 0
                 }
@@ -91,10 +94,12 @@ function Activity({ system }) {
           );
         })
       ) : (
-        <div className={styles.dashboard__module}>
-          <p className={`${typo.body} ${typo.medium}`}>
-            Nothing is currently being played.
-          </p>
+        <div className={styles.dashboard__activity__empty}>
+          <div className={styles.dashboard__module}>
+            <p className={`${typo.body} ${typo.medium}`}>
+              Nothing is currently being played.
+            </p>
+          </div>
         </div>
       )}
     </div>
