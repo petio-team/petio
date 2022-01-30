@@ -1,4 +1,5 @@
 import { connect } from "react-redux";
+import styles from "../../styles/views/admin.module.scss";
 
 const mapStateToProps = (state) => {
   return {
@@ -9,7 +10,11 @@ const mapStateToProps = (state) => {
 };
 
 function Issues() {
-  return <p>Issues</p>;
+  return (
+    <div className={styles.dashboard__module}>
+      <p>Issues</p>
+    </div>
+  );
 }
 
 export default connect(mapStateToProps)(Issues);

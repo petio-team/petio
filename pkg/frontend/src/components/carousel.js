@@ -92,7 +92,7 @@ function Carousel({ data, title, type = "movie", id, redux_pos, link }) {
             {title ? (
               <Link to={link}>
                 {title}
-                <div className={typo.carousel_title__icon}></div>
+                <span className={typo.carousel_title__icon}></span>
               </Link>
             ) : (
               "Loading..."

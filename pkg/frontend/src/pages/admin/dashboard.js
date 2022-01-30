@@ -1,6 +1,6 @@
 import { connect } from "react-redux";
 import styles from "../../styles/views/admin.module.scss";
-// import typo from "../../styles/components/typography.module.scss";
+import typo from "../../styles/components/typography.module.scss";
 import Carousel from "../../components/carousel";
 import Metrics from "./dashboard-metrics";
 import Activity from "./dashboard-activity";
@@ -61,31 +61,43 @@ function AdminDashboard({ requests, redux_movies, redux_tv }) {
   return (
     <div className={styles.dashboard}>
       <div className={styles.dasboard__requests}>
-        <Carousel
-          key={`admin_requests`}
-          id={`admin_requests`}
-          title={"Active Requests"}
-          data={activeRequests}
-          type="request"
-          link="/admin/requests"
-        />
+        {activeRequests.length > 0 ? (
+          <Carousel
+            key={`admin_requests`}
+            id={`admin_requests`}
+            title={"Active Requests"}
+            data={activeRequests}
+            type="request"
+            link="/admin/requests"
+          />
+        ) : (
+          <div className="container">
+            <p className={`${typo.body} ${typo.uppercase} ${typo.bold} mb-1`}>
+              Active Requests
+            </p>
+            <p className={`${typo.body} ${typo.medium} mb-5`}>No requests</p>
+          </div>
+        )}
       </div>
       <div className="container">
         <div className={styles.dashboard__grid}>
           <div className={styles.dashboard__metrics}>
-            <div className={styles.dashboard__module}>
-              <Metrics />
-            </div>
+            <p className={`${typo.body} ${typo.uppercase} ${typo.bold} mb-1`}>
+              Server Details
+            </p>
+            <Metrics />
           </div>
           <div className={styles.dashboard__activity}>
-            <div className={styles.dashboard__module}>
-              <Activity />
-            </div>
+            <p className={`${typo.body} ${typo.uppercase} ${typo.bold} mb-1`}>
+              Server Activity
+            </p>
+            <Activity />
           </div>
           <div className={styles.dashboard__issues}>
-            <div className={styles.dashboard__module}>
-              <Issues />
-            </div>
+            <p className={`${typo.body} ${typo.uppercase} ${typo.bold} mb-1`}>
+              Active Issues
+            </p>
+            <Issues />
           </div>
         </div>
       </div>

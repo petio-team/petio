@@ -124,3 +124,12 @@ hr {
     color: $orange;
   }
 }
+
+.recharts-active-dot .recharts-dot {
+  fill: $white;
+  stroke: $white;
+}
+
+.recharts-tooltip-cursor {
+  stroke: rgba($white, 0.2);
+}
