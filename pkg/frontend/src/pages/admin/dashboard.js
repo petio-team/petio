@@ -30,6 +30,7 @@ function AdminDashboard({ requests, redux_movies, redux_tv }) {
           poster: redux_movies[id].backdrop_path || false,
           logo: redux_movies[id].logo || false,
           id: id,
+          requestType: "movie",
         });
       }
 
@@ -39,6 +40,7 @@ function AdminDashboard({ requests, redux_movies, redux_tv }) {
           poster: redux_tv[id].backdrop_path || false,
           logo: redux_tv[id].logo || false,
           id: id,
+          requestType: "tv",
         });
       }
     });

@@ -122,6 +122,7 @@ function Carousel({ data, title, type = "movie", id, redux_pos, link }) {
                       video={false}
                       type={type}
                       id={item.id}
+                      requestType={item.requestType}
                     />
                   );
                 }

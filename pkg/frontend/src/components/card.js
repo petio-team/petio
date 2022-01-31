@@ -24,6 +24,7 @@ function Card({
   video,
   year,
   type,
+  requestType,
   id,
   character,
   credit,
@@ -174,7 +175,7 @@ function Card({
 
   if (type === "request") {
     return (
-      <Link to={`/${type}/${id}`} className={styles.wrap}>
+      <Link to={`/${requestType}/${id}`} className={styles.wrap}>
         <div className={styles.request}>
           {logo ? (
             <LazyLoadImage

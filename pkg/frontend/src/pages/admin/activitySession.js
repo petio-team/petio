@@ -43,12 +43,12 @@ function ActivitySession({
         if (!id) return;
         if (type === "movie") {
           if (redux_movies[id]) return;
-          await media.getMovie(id, false);
+          await media.getMovie(id, false, true);
           return;
         }
         if (type === "tv") {
           if (redux_tv[id]) return;
-          await media.getTv(id, false);
+          await media.getTv(id, false, true);
           return;
         }
       } catch (e) {
@@ -57,7 +57,7 @@ function ActivitySession({
     }
 
     getDetails();
-  }, [id, redux_movies, redux_tv, type]);
+  }, [id, redux_movies[id], redux_tv[id], type]);
 
   function pad(num, places = 2) {
     var zero = places - num.toString().length + 1;

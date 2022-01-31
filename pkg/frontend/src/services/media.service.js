@@ -56,7 +56,7 @@ async function featuredMovie(id) {
   }
 }
 
-async function getMovie(id, minified = false) {
+async function getMovie(id, minified = false, noextras = false) {
   if (!id) throw "No ID";
   try {
     const data = await get(`/movie/lookup/${id}${minified ? "/minified" : ""}`);
@@ -65,6 +65,7 @@ async function getMovie(id, minified = false) {
       type: "media/store-movies",
       movies: { [data.id]: { ...data, ready: true } },
     });
+    if (minified || noextras) return;
     if (data.recommendations) batchLookup(data.recommendations, "movie");
     if (data.collection) batchLookup(data.collection, "movie");
     return data;
@@ -77,7 +78,7 @@ async function getMovie(id, minified = false) {
   }
 }
 
-async function getTv(id, minified = false) {
+async function getTv(id, minified = false, noextras = false) {
   if (!id) throw "No ID";
   try {
     const data = await get(`/show/lookup/${id}${minified ? "/minified" : ""}`);
@@ -86,6 +87,7 @@ async function getTv(id, minified = false) {
       type: "media/store-shows",
       shows: { [data.id]: { ...data, ready: true } },
     });
+    if (minified || noextras) return;
     batchLookup(data.recommendations, "tv");
     return data;
   } catch (e) {
