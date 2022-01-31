@@ -37,17 +37,20 @@ function ActivitySession({
     getDetails();
   }, [ratingKey, type]);
 
+  const reduxMovie = redux_movies[id];
+  const reduxShow = redux_tv[id];
+
   useEffect(() => {
     async function getDetails() {
       try {
         if (!id) return;
         if (type === "movie") {
-          if (redux_movies[id]) return;
+          if (reduxMovie) return;
           await media.getMovie(id, false, true);
           return;
         }
         if (type === "tv") {
-          if (redux_tv[id]) return;
+          if (reduxShow) return;
           await media.getTv(id, false, true);
           return;
         }
@@ -57,7 +60,7 @@ function ActivitySession({
     }
 
     getDetails();
-  }, [id, redux_movies[id], redux_tv[id], type]);
+  }, [id, reduxMovie, reduxShow, type]);
 
   function pad(num, places = 2) {
     var zero = places - num.toString().length + 1;
