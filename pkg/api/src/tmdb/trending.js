@@ -194,17 +194,17 @@ async function trending() {
         name: "Disney+",
       },
       {
-        id: 158524,
-        logo_path: "/giOP9msXSWCe2i2cHP08xYodQpr.png",
-        name: "Discovery+",
+        id: 64,
+        logo_path: "/tmttRFo2OiXQD0EHMxxlw8EzUuZ.png",
+        name: "Discovery",
       },
       {
-        id: 3268,
+        id: 49,
         logo_path: "/tuomPhY2UtuPTqqFnKMVHvSb724.png",
         name: "HBO",
       },
       {
-        id: 3507,
+        id: 65,
         logo_path: "/m7iLIC5UfC2Pp60bkjXMWLFrmp6.png",
         name: "History",
       },
