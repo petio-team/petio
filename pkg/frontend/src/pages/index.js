@@ -144,6 +144,13 @@ function Home({
           key="trending_s"
           id="trending_s"
         />
+        <Carousel
+          title="TV Networks"
+          data={redux_trending.networks}
+          type="network"
+          key="trending_n"
+          id="trending_n"
+        />
         {discoveryMovies.map((row, i) => {
           if (!row || !row.results || row.results.length === 0) return null;
           if (row.results === "placeholder") row.results = false;

@@ -162,6 +162,58 @@ async function trending() {
         name: "Metro-Goldwyn-Mayer",
       },
     ],
+    networks: [
+      {
+        id: 213,
+        logo_path: "/wwemzKWzjKYJFfCeiB57q3r4Bcm.png",
+        name: "Netflix",
+      },
+      {
+        id: 2,
+        logo_path: "/2uy2ZWcplrSObIyt4x0Y9rkG6qO.png",
+        name: "ABC (US)",
+      },
+      {
+        id: 19,
+        logo_path: "/1DSpHrWyOORkL9N2QHX7Adt31mQ.png",
+        name: "FOX (US)",
+      },
+      {
+        id: 453,
+        logo_path: "/pqUTCleNUiTLAVlelGxUgWn1ELh.png",
+        name: "Hulu",
+      },
+      {
+        id: 67,
+        logo_path: "/Allse9kbjiP6ExaQrnSpIhkurEi.png",
+        name: "Showtime",
+      },
+      {
+        id: 2739,
+        logo_path: "/gJ8VX6JSu3ciXHuC2dDGAo2lvwM.png",
+        name: "Disney+",
+      },
+      {
+        id: 158524,
+        logo_path: "/giOP9msXSWCe2i2cHP08xYodQpr.png",
+        name: "Discovery+",
+      },
+      {
+        id: 3268,
+        logo_path: "/tuomPhY2UtuPTqqFnKMVHvSb724.png",
+        name: "HBO",
+      },
+      {
+        id: 3507,
+        logo_path: "/m7iLIC5UfC2Pp60bkjXMWLFrmp6.png",
+        name: "History",
+      },
+      {
+        id: 6,
+        logo_path: "/nGRVQlfmPBmfkNgCFpx5m7luTxG.png",
+        name: "NBC",
+      },
+    ],
   };
 
   return data;

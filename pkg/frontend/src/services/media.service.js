@@ -16,6 +16,7 @@ async function getTrending() {
       tv: [],
       people: [],
       companies: [],
+      networks: [],
     };
     const r = Math.floor(Math.random() * (10 - 0 + 1) + 0);
     data.movies.forEach((movie, i) => {
@@ -29,6 +30,9 @@ async function getTrending() {
     });
     data.companies.forEach((company) => {
       trending.companies.push(company);
+    });
+    data.networks.forEach((company) => {
+      trending.networks.push(company);
     });
     updateStore({ type: "media/store-movies", movies: movies });
     updateStore({ type: "media/store-shows", shows: shows });

@@ -152,6 +152,26 @@ function Card({
     );
   }
 
+  if (type === "network") {
+    return (
+      <Link to={`/tv/network/${id}`} className={styles.wrap}>
+        <div className={styles.wide}>
+          {poster ? (
+            <LazyLoadImage
+              className={styles.logo}
+              src={`https://image.tmdb.org/t/p/w500_filter(duotone,ff8300,cc6800)${poster}`}
+              effect="opacity"
+            />
+          ) : (
+            <p className={`${typo.smtitle} ${typo.medium} ${styles.no_logo}`}>
+              {title}
+            </p>
+          )}
+        </div>
+      </Link>
+    );
+  }
+
   if (type === "request") {
     return (
       <Link to={`/${type}/${id}`} className={styles.wrap}>
