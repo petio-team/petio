@@ -32,7 +32,7 @@ function Activity({ system }) {
 
       intervalSessions = setInterval(() => {
         updateSessions();
-      }, 30000);
+      }, 5000);
     }
 
     return () => {
@@ -40,6 +40,18 @@ function Activity({ system }) {
       clearInterval(intervalSessions);
     };
   }, [liveUpdate]);
+
+  function formatBytes(bytes, decimals = 2) {
+    if (bytes === 0) return "0 bps";
+
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ["bps", "Kbps", "Mbps", "Gbps", "TB", "PB", "EB", "ZB", "YB"];
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+  }
 
   return (
     <div className={styles.dashboard__activity__wrap}>
@@ -53,6 +65,16 @@ function Activity({ system }) {
               selectedMedia = item;
             }
           }
+
+          if (!selectedMedia.Part) {
+            return null;
+          }
+
+          if (!selectedMedia.Part[0].Stream) {
+            return null;
+          }
+
+          const bitrate = formatBytes(session.Session.bandwidth * 1000, 0);
 
           let playback = selectedMedia.Part
             ? selectedMedia.Part[0].decision
@@ -70,6 +92,7 @@ function Activity({ system }) {
               media = null;
               if (!media) return null;
           }
+
           return (
             <div
               key={`activity_sesion_${session.ratingKey}`}
@@ -89,6 +112,7 @@ function Activity({ system }) {
                 }
                 selectedMedia={selectedMedia}
                 playback={playback}
+                bitrate={bitrate}
               />
             </div>
           );

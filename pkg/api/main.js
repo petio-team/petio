@@ -3,7 +3,7 @@ require("cache-manager/lib/stores/memory");
 
 const cluster = require("cluster");
 
-const App = require('./src/app/app');
+const App = require("./src/app/app");
 const Worker = require("./src/worker");
 const { loadConfig } = require("./src/app/config");
 const doPerms = require("./src/util/perms");
@@ -18,7 +18,7 @@ try {
   if (cluster.isPrimary) {
     App();
   } else {
-    new Worker().startCrons();
+    // new Worker().startCrons();
   }
 } catch (e) {
   console.log(e.stack);

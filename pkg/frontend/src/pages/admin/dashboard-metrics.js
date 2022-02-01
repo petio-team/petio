@@ -145,12 +145,12 @@ function Metrics({ system }) {
           >{`${payload[0].payload.name} ago`}</p>
           <div className={styles.dashboard__metrics__graph__tooltip__remote}>
             <p className={`${typo.body} ${typo.bold}`}>
-              Remote: {formatBytes(payload[0].value)}
+              Remote: {formatBytes(payload[0].value, 0)}
             </p>
           </div>
           <div className={styles.dashboard__metrics__graph__tooltip__local}>
             <p className={`${typo.body} ${typo.bold}`}>
-              Local: {formatBytes(payload[1].value)}
+              Local: {formatBytes(payload[1].value, 0)}
             </p>
           </div>
         </div>
@@ -160,6 +160,8 @@ function Metrics({ system }) {
     return null;
   };
 
+  console.log(system.bandwidth.length);
+
   return (
     <div className={styles.dashboard__metrics__wrap}>
       <div className={styles.dashboard__metrics__activity}>
@@ -167,7 +169,16 @@ function Metrics({ system }) {
           <p
             className={`${styles.dashboard__metrics__graph__line__title} ${typo.body} ${typo.bold}`}
           >
-            Bandwidth
+            Bandwidth{" "}
+            <span className={typo.small}>
+              {system.bandwidth && system.bandwidth[system.bandwidth.length - 1]
+                ? `(${formatBytes(
+                    system.bandwidth[system.bandwidth.length - 1].Remote +
+                      system.bandwidth[system.bandwidth.length - 1].Local,
+                    0
+                  )})`
+                : null}
+            </span>
           </p>
           <div className={styles.dashboard__metrics__activity__inner}>
             <div

@@ -21,7 +21,7 @@ router.post("/", async (req, res) => {
 router.get("/bandwidth", async (req, res) => {
   try {
     let data = await getBandwidth();
-    res.json(data.MediaContainer.StatisticsBandwidth);
+    res.json(data);
   } catch (err) {
     logger.log("warn", "ROUTE: Error getting bandwidth");
     logger.log({ level: "error", message: err });
