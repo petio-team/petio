@@ -160,8 +160,6 @@ function Metrics({ system }) {
     return null;
   };
 
-  console.log(system.bandwidth.length);
-
   return (
     <div className={styles.dashboard__metrics__wrap}>
       <div className={styles.dashboard__metrics__activity}>

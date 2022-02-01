@@ -30,6 +30,15 @@ function ActivitySession({
 }) {
   const [id, setId] = useState(false);
   const [meta, setMeta] = useState(false);
+  const [reduxShow, setReduxShow] = useState(false);
+  const [reduxMovie, setReduxMovie] = useState(false);
+
+  useEffect(() => {
+    if (!id) return;
+    setReduxShow(redux_tv[id]);
+    setReduxMovie(redux_movies[id]);
+  }, [id, redux_movies, redux_tv]);
+
   useEffect(() => {
     if (!ratingKey) return;
     async function getDetails() {
@@ -44,15 +53,13 @@ function ActivitySession({
     getDetails();
   }, [ratingKey, type]);
 
-  const reduxMovie = redux_movies[id];
-  const reduxShow = redux_tv[id];
-
   useEffect(() => {
     async function getDetails() {
       try {
         if (!id) return;
         if (type === "movie") {
           if (reduxMovie) return;
+
           await media.getMovie(id, false, true);
           return;
         }
@@ -70,13 +77,14 @@ function ActivitySession({
   }, [id, reduxMovie, reduxShow, type]);
 
   useEffect(() => {
+    let redux = false;
     if (type === "movie") redux = redux_movies;
     if (type === "tv") redux = redux_tv;
 
     if (!redux || !id || !redux[id]) return null;
 
     setMeta(redux[id]);
-  }, [redux_movies, redux_tv, id]);
+  }, [redux_movies, redux_tv, id, type]);
 
   function pad(num, places = 2) {
     var zero = places - num.toString().length + 1;
@@ -128,8 +136,6 @@ function ActivitySession({
     return playbackState;
   }
 
-  let redux = false;
-
   const progressWidth = `${Math.ceil(progress)}%`;
 
   return (
@@ -170,7 +176,7 @@ function ActivitySession({
         <p
           className={`${typo.medium} ${typo.body} ${styles.session__card__content__title}`}
         >
-          {type === "movie" ? meta.title : meta.name}
+          {type === "movie" ? meta.title || " " : meta.name || " "}
           {session.live ? " (Live)" : ""}
         </p>
         {session.type === "episode" ? (

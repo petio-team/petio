@@ -207,6 +207,7 @@
 
   &__card {
     position: relative;
+    overflow: hidden;
 
     &:after {
       content: "";
