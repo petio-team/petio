@@ -18,7 +18,7 @@ try {
   if (cluster.isPrimary) {
     App();
   } else {
-    // new Worker().startCrons();
+    new Worker().startCrons();
   }
 } catch (e) {
   console.log(e.stack);
