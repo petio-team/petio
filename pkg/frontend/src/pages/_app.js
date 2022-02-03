@@ -123,9 +123,7 @@ function Petio({ redux_pos }) {
           message: "Unable to communciate with Petio API",
         });
         setGlobalConfig({
-          config: {
-            error: e,
-          },
+          error: e,
         });
       }
     }
@@ -200,17 +198,33 @@ function Petio({ redux_pos }) {
   }, [router, redux_pos, currentPath]);
 
   if (!globalConfig) {
-    return null;
+    return <Loading />;
   }
 
   if (globalConfig.config === false) {
     setupMode = true;
   }
 
-  if (globalConfig.config.error) {
+  console.log(globalConfig);
+
+  if (globalConfig && globalConfig.error) {
     return (
       <Layout isLoggedIn={isLoggedIn} currentUser={currentUser}>
         <Error />;
+        <ToastContainer
+          className={notifications.wrap}
+          position="bottom-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          transition={Slide}
+          theme={"petio"}
+        />
       </Layout>
     );
   }
