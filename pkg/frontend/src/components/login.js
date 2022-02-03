@@ -66,12 +66,19 @@ export function Login(props) {
         </div>
         <hr className="spaced" />
         <h1 className={typo.title + " mb-2"}>Login</h1>
-        <input
-          type="text"
-          className={inputs.text + " mb-2"}
-          placeholder={"Username / Email"}
-          onChange={(e) => setUsername(e.target.value)}
-        />
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            submitLogin();
+          }}
+        >
+          <input
+            type="text"
+            className={inputs.text + " mb-2"}
+            placeholder={"Username / Email"}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        </form>
         {logintype === 1 || history.location.pathname === "/admin" ? (
           <>
             <input
