@@ -205,8 +205,6 @@ function Petio({ redux_pos }) {
     setupMode = true;
   }
 
-  console.log(globalConfig);
-
   if (globalConfig && globalConfig.error) {
     return (
       <Layout isLoggedIn={isLoggedIn} currentUser={currentUser}>
@@ -220,7 +218,7 @@ function Petio({ redux_pos }) {
           closeOnClick
           rtl={false}
           pauseOnFocusLoss
-          draggable
+          draggable={true}
           pauseOnHover
           transition={Slide}
           theme={"petio"}

@@ -109,8 +109,27 @@ hr {
     background: $grey;
     color: white;
 
+    @media (max-width: $lg) {
+      background: rgba($grey, 0.8);
+      backdrop-filter: blur(20px);
+      margin-top: 5px;
+      border-radius: 5px !important;
+    }
+
+    .Toastify__spinner {
+      border-right-color: transparent;
+    }
+
     &--info {
       // color: blue;
+    }
+  }
+
+  .Toastify__toast-container {
+    @media (max-width: $lg) {
+      bottom: 60px;
+      bottom: calc(env(safe-area-inset-bottom) + 60px);
+      padding: 10px;
     }
   }
 }
