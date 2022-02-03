@@ -1,259 +1,261 @@
-@import '../global/variables.module.scss';
+@import "../global/variables.module.scss";
 
 .wrap {
-	width: 400px;
-	max-width: calc(100% - 40px);
-	margin: auto;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	min-height: 100vh;
-	padding: #{$spacing * 5} 0;
+  width: 400px;
+  max-width: calc(100% - 40px);
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: calc(
+    100vh - (env(safe-area-inset-top) + env(safe-area-inset-bottom))
+  );
+  padding: #{$spacing * 5} 0;
 }
 
 .steps {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 50px;
 
-	span {
-		height: 2px;
-		width: 100%;
-		background: $white;
-		opacity: 0.2;
-		margin: 0 5px;
+  span {
+    height: 2px;
+    width: 100%;
+    background: $white;
+    opacity: 0.2;
+    margin: 0 5px;
 
-		&:last-of-type {
-			display: none;
-		}
-	}
+    &:last-of-type {
+      display: none;
+    }
+  }
 }
 
 .step {
-	height: 25px;
-	width: 25px;
-	min-width: 25px;
-	border: solid 2px $white;
-	border-radius: 50%;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	font-weight: 700;
-	font-size: 12px;
-	opacity: 0.2;
-	transition: color 0.5s ease, opacity 0.5s ease, border-color 0.5s ease;
+  height: 25px;
+  width: 25px;
+  min-width: 25px;
+  border: solid 2px $white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  font-size: 12px;
+  opacity: 0.2;
+  transition: color 0.5s ease, opacity 0.5s ease, border-color 0.5s ease;
 
-	&__complete {
-		border-color: white;
-		color: $white;
-		opacity: 0.8;
-	}
+  &__complete {
+    border-color: white;
+    color: $white;
+    opacity: 0.8;
+  }
 
-	&__active {
-		border-color: $orange;
-		color: $orange;
-		opacity: 1;
-	}
+  &__active {
+    border-color: $orange;
+    color: $orange;
+    opacity: 1;
+  }
 }
 
 .content {
-	min-height: 400px;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .server_option {
-	border: solid 2px $white;
-	border-radius: 5px;
-	margin-bottom: $spacing;
-	padding: $spacing;
-	display: flex;
-	align-items: center;
-	cursor: pointer;
-	height: 80px;
+  border: solid 2px $white;
+  border-radius: 5px;
+  margin-bottom: $spacing;
+  padding: $spacing;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  height: 80px;
 
-	&:hover:not(.server_option__selected) {
-		background: rgba($white, 0.15);
-	}
+  &:hover:not(.server_option__selected) {
+    background: rgba($white, 0.15);
+  }
 
-	* {
-		pointer-events: none;
-	}
+  * {
+    pointer-events: none;
+  }
 
-	&__icon {
-		height: 50px;
-		width: 50px;
-		min-height: 50px;
-		min-width: 50px;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		margin-right: #{$spacing * 2};
+  &__icon {
+    height: 50px;
+    width: 50px;
+    min-height: 50px;
+    min-width: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: #{$spacing * 2};
 
-		svg {
-			height: 100%;
-			width: 100%;
-		}
-	}
+    svg {
+      height: 100%;
+      width: 100%;
+    }
+  }
 
-	&__name {
-		padding-right: #{$spacing * 2};
-		max-width: 60%;
-		word-break: break-all;
+  &__name {
+    padding-right: #{$spacing * 2};
+    max-width: 60%;
+    word-break: break-all;
 
-		&__top {
-			display: flex;
-			align-items: center;
-		}
-	}
+    &__top {
+      display: flex;
+      align-items: center;
+    }
+  }
 
-	&__lock {
-		height: 10px;
-		display: flex;
-		align-items: center;
-		margin-left: #{$spacing * 2};
+  &__lock {
+    height: 10px;
+    display: flex;
+    align-items: center;
+    margin-left: #{$spacing * 2};
 
-		svg {
-			height: 100%;
-			width: auto;
-		}
+    svg {
+      height: 100%;
+      width: auto;
+    }
 
-		&__secure {
-			svg,
-			path {
-				fill: $green;
-			}
-		}
+    &__secure {
+      svg,
+      path {
+        fill: $green;
+      }
+    }
 
-		&__insecure {
-			svg,
-			path {
-				fill: $red;
-			}
-		}
-	}
+    &__insecure {
+      svg,
+      path {
+        fill: $red;
+      }
+    }
+  }
 
-	&__status {
-		margin-left: auto;
+  &__status {
+    margin-left: auto;
 
-		&__item {
-			display: none;
+    &__item {
+      display: none;
 
-			span {
-				display: flex;
-				width: 30px;
-				height: 30px;
-			}
+      span {
+        display: flex;
+        width: 30px;
+        height: 30px;
+      }
 
-			svg {
-				width: 30px;
-				height: 30px;
-			}
+      svg {
+        width: 30px;
+        height: 30px;
+      }
 
-			&__good {
-				svg {
-					fill: $green;
-				}
-			}
+      &__good {
+        svg {
+          fill: $green;
+        }
+      }
 
-			&__bad {
-				svg,
-				svg path {
-					fill: $red;
-				}
-			}
-		}
+      &__bad {
+        svg,
+        svg path {
+          fill: $red;
+        }
+      }
+    }
 
-		&__active {
-			display: block;
-		}
-	}
+    &__active {
+      display: block;
+    }
+  }
 
-	&__selected {
-		background: $orange;
-		color: $black;
-		border-color: darken($orange, 10);
+  &__selected {
+    background: $orange;
+    color: $black;
+    border-color: darken($orange, 10);
 
-		svg,
-		svg path {
-			fill: $black;
-		}
-	}
+    svg,
+    svg path {
+      fill: $black;
+    }
+  }
 
-	&__disabled {
-		pointer-events: none;
-		opacity: 0.4;
-	}
+  &__disabled {
+    pointer-events: none;
+    opacity: 0.4;
+  }
 }
 
 .db {
-	&_tabs {
-		display: flex;
-		border-bottom: solid 1px $orange;
-		padding-bottom: $spacing;
-		margin-bottom: #{$spacing * 1};
+  &_tabs {
+    display: flex;
+    border-bottom: solid 1px $orange;
+    padding-bottom: $spacing;
+    margin-bottom: #{$spacing * 1};
 
-		&__item {
-			margin-right: #{$spacing * 2};
-			cursor: pointer;
+    &__item {
+      margin-right: #{$spacing * 2};
+      cursor: pointer;
 
-			&__active {
-				color: $orange;
-			}
-		}
-	}
+      &__active {
+        color: $orange;
+      }
+    }
+  }
 
-	&_content {
-		display: flex;
-		align-items: center;
+  &_content {
+    display: flex;
+    align-items: center;
 
-		&__icon {
-			width: 30px;
-			height: 30px;
-			min-width: 30px;
-			min-height: 30px;
-			margin-right: #{$spacing * 1};
+    &__icon {
+      width: 30px;
+      height: 30px;
+      min-width: 30px;
+      min-height: 30px;
+      margin-right: #{$spacing * 1};
 
-			svg {
-				height: 100%;
-				width: 100%;
-			}
-		}
+      svg {
+        height: 100%;
+        width: 100%;
+      }
+    }
 
-		&__status {
-			min-width: 30px;
-			height: 30px;
-			margin-left: $spacing;
+    &__status {
+      min-width: 30px;
+      height: 30px;
+      margin-left: $spacing;
 
-			&__item {
-				display: none;
-				width: 30px;
-				height: 30px;
+      &__item {
+        display: none;
+        width: 30px;
+        height: 30px;
 
-				svg {
-					width: 30px;
-					height: 30px;
-				}
+        svg {
+          width: 30px;
+          height: 30px;
+        }
 
-				&__good {
-					svg {
-						fill: $green;
-					}
-				}
+        &__good {
+          svg {
+            fill: $green;
+          }
+        }
 
-				&__bad {
-					svg,
-					svg path {
-						fill: $red;
-					}
-				}
+        &__bad {
+          svg,
+          svg path {
+            fill: $red;
+          }
+        }
 
-				&__active {
-					display: block;
-				}
-			}
-		}
-	}
+        &__active {
+          display: block;
+        }
+      }
+    }
+  }
 }

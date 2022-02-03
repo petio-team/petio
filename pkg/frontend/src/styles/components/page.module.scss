@@ -1,6 +1,8 @@
 .wrap {
-	min-height: 100vh;
-	display: flex;
-	flex-direction: column;
-	overflow-x: hidden;
+  min-height: calc(
+    100vh - (env(safe-area-inset-top) + env(safe-area-inset-bottom))
+  );
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
 }

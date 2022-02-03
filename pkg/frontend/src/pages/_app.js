@@ -179,6 +179,12 @@ function Petio({ redux_pos }) {
     }
 
     window.addEventListener("scroll", checkScroll);
+    window.addEventListener("touchend", () => {
+      storePosition(history.location.pathname, window.scrollY);
+    });
+    window.addEventListener("mouseup", () => {
+      storePosition(history.location.pathname, window.scrollY);
+    });
 
     return () => {
       window.removeEventListener("scroll", checkScroll);
@@ -208,7 +214,7 @@ function Petio({ redux_pos }) {
   if (globalConfig && globalConfig.error) {
     return (
       <Layout isLoggedIn={isLoggedIn} currentUser={currentUser}>
-        <Error />;
+        <Error />
         <ToastContainer
           className={notifications.wrap}
           position="bottom-right"

@@ -1,27 +1,29 @@
-@import '../global/variables.module.scss';
+@import "../global/variables.module.scss";
 
 .wrap {
-	height: 100vh;
-	display: flex;
-	justify-content: center;
-	align-items: center;
+  height: calc(
+    100vh - (env(safe-area-inset-top) + env(safe-area-inset-bottom))
+  );
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .inner {
-	width: 300px;
+  width: 300px;
 }
 
 .divide {
-	margin: $spacing 0;
-	text-align: center;
-	font-size: 13px;
-	font-weight: 500;
+  margin: $spacing 0;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .footer {
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	width: 100%;
-	z-index: 3;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 3;
 }
