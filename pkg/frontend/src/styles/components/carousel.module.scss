@@ -38,6 +38,9 @@
   }
 
   &::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 0;
+    height: 0;
     display: none;
     width: 0; /* Remove scrollbar space */
     background: transparent; /* Optional: just make scrollbar invisible */
