@@ -45,25 +45,27 @@ export default function Episodes({ data, mobile }) {
           </p>
           {dropdownOpen ? (
             <div className={styles.episodes__all}>
-              {data.seasons.map((season) => {
-                let style = {};
-                if (season.name === currentSeasonData.name) {
-                  style = {
-                    opacity: 0.5,
-                    pointerEvents: "none",
-                  };
-                }
-                return (
-                  <p
-                    key={`season_${data.id}_${season.season_number}`}
-                    className={styles.episodes__title}
-                    style={style}
-                    onClick={() => changeSeason(season.name)}
-                  >
-                    {season.name}
-                  </p>
-                );
-              })}
+              <div className={styles.episodes__all__inner}>
+                {data.seasons.map((season) => {
+                  let style = {};
+                  if (season.name === currentSeasonData.name) {
+                    style = {
+                      opacity: 0.5,
+                      pointerEvents: "none",
+                    };
+                  }
+                  return (
+                    <p
+                      key={`season_${data.id}_${season.season_number}`}
+                      className={styles.episodes__title}
+                      style={style}
+                      onClick={() => changeSeason(season.name)}
+                    >
+                      {season.name}
+                    </p>
+                  );
+                })}
+              </div>
             </div>
           ) : null}
         </div>

@@ -1,153 +1,159 @@
-@import '../global/variables.module.scss';
-@import './movie.module.scss';
-@import '../components/typography.module.scss';
+@import "../global/variables.module.scss";
+@import "./movie.module.scss";
+@import "../components/typography.module.scss";
 
 .episodes {
-	margin: 20px 0;
+  margin: 20px 0;
 
-	@media (min-width: $lg) {
-		margin: 100px 0;
-	}
+  @media (min-width: $lg) {
+    margin: 100px 0;
+  }
 
-	&__top {
-		position: relative;
-		margin-bottom: $spacing;
-	}
+  &__top {
+    position: relative;
+    margin-bottom: $spacing;
+  }
 
-	&__title {
-		@extend .carousel_title;
+  &__title {
+    @extend .carousel_title;
 
-		&__dropdown {
-			transition: color 0.3s ease;
-			display: inline-flex;
-			align-items: center;
-			cursor: pointer;
+    &__dropdown {
+      transition: color 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
 
-			svg path {
-				transition: fill 0.3s ease;
-			}
+      svg path {
+        transition: fill 0.3s ease;
+      }
 
-			&:hover {
-				color: $orange;
+      &:hover {
+        color: $orange;
 
-				svg path {
-					fill: $orange;
-				}
-			}
-		}
+        svg path {
+          fill: $orange;
+        }
+      }
+    }
 
-		svg {
-			width: 6px;
-			height: auto;
-			transform: rotate(90deg);
-			margin-left: $spacing;
-		}
-	}
+    svg {
+      width: 6px;
+      height: auto;
+      transform: rotate(90deg);
+      margin-left: $spacing;
+    }
+  }
 
-	&__all {
-		position: absolute;
-		z-index: 10;
-		top: calc(100% + 10px);
-		left: 0;
-		background: $grey;
-		padding: $spacing #{$spacing * 2};
-		border-radius: 2px;
+  &__all {
+    position: absolute;
+    z-index: 10;
+    top: calc(100% + 10px);
+    left: 0;
+    background: $grey;
+    border-radius: 2px;
 
-		&:before {
-			content: '';
-			width: 10px;
-			height: 10px;
-			position: absolute;
-			top: -5px;
-			left: #{$spacing * 2};
-			transform: rotate(45deg);
-			background: $grey;
-		}
+    &__inner {
+      max-height: 50vh;
+      overflow-y: auto;
+      padding: $spacing #{$spacing * 2};
+    }
 
-		p {
-			padding: 2px 0;
-			cursor: pointer;
-			transition: color 0.3s ease;
+    &:before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      position: absolute;
+      top: -5px;
+      left: #{$spacing * 2};
+      transform: rotate(45deg);
+      background: $grey;
+      z-index: -1;
+    }
 
-			&:hover {
-				color: $orange;
-			}
+    p {
+      padding: 2px 0;
+      cursor: pointer;
+      transition: color 0.3s ease;
 
-			&:first-child {
-				padding-top: 0;
-			}
+      &:hover {
+        color: $orange;
+      }
 
-			&:last-child {
-				padding-bottom: 0;
-			}
-		}
-	}
+      &:first-child {
+        padding-top: 0;
+      }
 
-	&__grid {
-		display: flex;
-		flex-wrap: wrap;
-		margin: 0 -#{$spacing};
-	}
+      &:last-child {
+        padding-bottom: 0;
+      }
+    }
+  }
 
-	&__more {
-		display: flex;
-		justify-content: center;
+  &__grid {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -#{$spacing};
+  }
 
-		p {
-			color: $orange;
-			cursor: pointer;
-		}
-	}
+  &__more {
+    display: flex;
+    justify-content: center;
+
+    p {
+      color: $orange;
+      cursor: pointer;
+    }
+  }
 }
 
 .episode {
-	width: calc(100% / 2);
-	padding: 0 $spacing #{$spacing * 2} $spacing;
+  width: calc(100% / 2);
+  padding: 0 $spacing #{$spacing * 2} $spacing;
 
-	@media (min-width: $lg) {
-		width: calc(100% / 3);
-	}
+  @media (min-width: $lg) {
+    width: calc(100% / 3);
+  }
 
-	&__overview {
-		margin-top: $spacing;
-	}
+  &__overview {
+    margin-top: $spacing;
+  }
 
-	&__image {
-		padding-bottom: 56%;
-		position: relative;
-		overflow: hidden;
-		border-radius: 2px;
-		margin-bottom: $spacing;
-		width: 100%;
+  &__image {
+    padding-bottom: 56%;
+    position: relative;
+    overflow: hidden;
+    border-radius: 2px;
+    margin-bottom: $spacing;
+    width: 100%;
 
-		img {
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			object-fit: cover;
-		}
+    img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-		&__placeholder {
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			background: $grey;
-		}
-	}
+    &__placeholder {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: $grey;
+    }
+  }
 }
 
 .no_poster {
-	height: 100%;
-	width: 100%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: #{$spacing * 2};
-	white-space: initial !important;
-	color: $orange;
-	word-break: break-word;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: #{$spacing * 2};
+  white-space: initial !important;
+  color: $orange;
+  word-break: break-word;
 }
