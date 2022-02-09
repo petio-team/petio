@@ -1,6 +1,6 @@
 import styles from "../styles/components/trailer.module.scss";
 import ReactPlayer from "react-player/youtube";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/opacity.css";
 import { ReactComponent as PlayIcon } from "../assets/svg/play.svg";
@@ -24,10 +24,6 @@ export default function Trailer({ videoId, callback }) {
   function handleProgress(e) {
     if (seeking) return;
     setProgress(e);
-  }
-
-  function handleDuration(e) {
-    console.log(e);
   }
 
   function handleSeekMouseDown(e) {
