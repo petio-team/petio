@@ -8,9 +8,8 @@ export default function Grid({ data, title, type = "movie", id }) {
 
   for (let i = 0; i < 10; i++) {
     placeholderRow.push(
-      <div className={cards.grid__wrap}>
+      <div className={cards.grid__wrap} key={`${id}__grid__placeholder__${i}`}>
         <div
-          key={`${id}_${i}`}
           className={
             type === "company"
               ? cards.placeholder__grid__wide
@@ -24,7 +23,6 @@ export default function Grid({ data, title, type = "movie", id }) {
   return (
     <div className="container">
       <div className={grid.wrap}>
-        {/* <p className={typo.grid_title}>{title}</p> */}
         <div className={grid.inner}>
           {data && data.length > 0
             ? data.map((item, i) => {

@@ -81,6 +81,7 @@ export default function Studio() {
         data={movies}
         type="movie"
         key={`company_${pid}_movies`}
+        id={`company_${pid}_movies`}
       />
     </div>
   );

@@ -176,7 +176,6 @@ async function lookup(type, page, params = {}) {
           shows[show.id].ready = true;
         }
       });
-      console.log(shows);
       updateStore({ type: "media/store-shows", shows: shows });
       return data;
     }
