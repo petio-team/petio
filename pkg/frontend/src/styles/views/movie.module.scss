@@ -16,7 +16,11 @@
     align-items: center;
     width: 100%;
     max-width: 550px;
-    padding: 0 20px;
+    padding: 0;
+
+    p {
+      margin-top: auto;
+    }
 
     @media (min-width: $lg) {
       width: 50%;

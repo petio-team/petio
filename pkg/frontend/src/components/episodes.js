@@ -28,6 +28,37 @@ export default function Episodes({ data, mobile }) {
     setExpand(false);
   }
 
+  function daysTillAir(airDate) {
+    if (!airDate) return <span className="not-aired">Unknown</span>;
+    var oneDay = 24 * 60 * 60 * 1000;
+    var secondDate = new Date();
+    var firstDate = new Date(airDate);
+    let days = Math.round(
+      Math.abs(
+        (firstDate.setHours(0, 0, 0, 0) - secondDate.setHours(0, 0, 0, 0)) /
+          oneDay
+      )
+    );
+
+    if (firstDate < secondDate) {
+      return <span className={styles.episode__info__aired}>Aired</span>;
+    }
+
+    if (days === 0) {
+      return (
+        <span className={styles.episode__info__airsToday}>Airs today</span>
+      );
+    }
+
+    return days < 100 ? (
+      <span className={styles.episode__info__notAired}>
+        Airs in {days} {days > 1 ? "days" : "day"}
+      </span>
+    ) : (
+      <span className={styles.episode__info__notAired}>Not aired</span>
+    );
+  }
+
   return (
     <div className={styles.episodes}>
       <div className="container">
@@ -73,6 +104,18 @@ export default function Episodes({ data, mobile }) {
         <div className={styles.episodes__grid}>
           {currentSeasonData.episodes.map((episode, i) => {
             if (i > limit && !expand) return null;
+            let airDate = episode.air_date
+              ? Date.parse(episode.air_date)
+              : false;
+            let onServer =
+              data.server_seasons &&
+              data.server_seasons[currentSeasonData.season_number] &&
+              data.server_seasons[currentSeasonData.season_number].episodes &&
+              data.server_seasons[currentSeasonData.season_number].episodes[
+                episode.episode_number
+              ]
+                ? true
+                : false;
             return (
               <div
                 className={styles.episode}
@@ -104,12 +147,24 @@ export default function Episodes({ data, mobile }) {
                   {episode.name}
                 </p>
                 {mobile ? null : (
-                  <p className={`${typo.body} ${styles.episode__overview}`}>
+                  <p className={`${typo.small} ${styles.episode__overview}`}>
                     {episode.overview.length > 160
                       ? episode.overview.substring(0, 157) + "..."
                       : episode.overview}
                   </p>
                 )}
+                <div className={`${styles.episode__info}`}>
+                  <p
+                    className={`${typo.small} ${typo.medium} ${typo.uppercase}`}
+                  >
+                    {daysTillAir(airDate)}
+                  </p>
+                  <p
+                    className={`${typo.small} ${typo.medium} ${typo.uppercase} ${styles.episode__info__onPlex}`}
+                  >
+                    {onServer ? "On Plex" : ""}
+                  </p>
+                </div>
               </div>
             );
           })}

@@ -115,7 +115,30 @@
   }
 
   &__overview {
-    margin-top: $spacing;
+    margin-bottom: $spacing;
+  }
+
+  &__info {
+    display: flex;
+    // justify-content: space-between;
+    // align-items: center;
+
+    &__aired {
+      color: $green;
+    }
+
+    &__airsToday {
+      color: $blue;
+    }
+
+    &__notAired {
+      color: $red;
+    }
+
+    &__onPlex {
+      color: $orange;
+      margin-left: $spacing;
+    }
   }
 
   &__image {
