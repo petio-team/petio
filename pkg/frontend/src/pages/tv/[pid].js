@@ -267,7 +267,11 @@ function Tv({
               <p
                 className={`${typo.body} ${typo.medium} ${styles.overview__content}`}
               >
-                {tvData ? tvData.tagline : null}{" "}
+                {tvData && tvData.tagline
+                  ? `${tvData.tagline}${
+                      !tvData.tagline.endsWith(".") ? "." : ""
+                    }`
+                  : null}{" "}
                 {tvData ? tvData.overview : null}
               </p>
               {tvData ? (

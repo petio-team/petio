@@ -82,6 +82,7 @@ export default function Network() {
         data={tv}
         type="tv"
         key={`network_${pid}_tv`}
+        id={`network_${pid}_tv`}
       />
     </div>
   );
