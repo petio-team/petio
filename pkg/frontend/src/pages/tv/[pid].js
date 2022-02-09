@@ -25,6 +25,7 @@ import { ReactComponent as WatchlistIcon } from "../../assets/svg/watchlist.svg"
 import NotFound from "../404";
 import { matchGenre } from "../../helpers/genres";
 import { Loading } from "../../components/loading";
+import Trailer from "../../components/trailer";
 
 const mapStateToProps = (state) => {
   return {
@@ -41,6 +42,7 @@ function Tv({
   redux_tv,
 }) {
   const [mobile, setMobile] = useState(false);
+  const [trailer, setTrailer] = useState(false);
   const { pid } = useParams();
   const tvData = redux_tv[pid];
 
@@ -180,6 +182,12 @@ function Tv({
       <Meta title={tvData ? tvData.name : ""} />
       {!tvData || !tvData.ready ? <Loading /> : null}
       <div className={hero.single}>
+        {trailer ? (
+          <Trailer
+            videoId={tvData.videos.results[0].key || false}
+            callback={() => setTrailer(false)}
+          />
+        ) : null}
         <div className="container">
           <div className={styles.overview}>
             <div className={styles.overview__logo}>
@@ -296,8 +304,20 @@ function Tv({
                   <button className={`${buttons.icon} ${styles.actions__btn}`}>
                     <IssueIcon viewBox="0 0 24 24" />
                   </button>
-                  <button className={`${buttons.icon} ${styles.actions__btn}`}>
-                    <TrailerIcon viewBox="0 0 24 24" />
+                  <button
+                    className={`${buttons.icon} ${styles.actions__btn} ${
+                      tvData &&
+                      tvData.videos &&
+                      tvData.videos.results &&
+                      tvData.videos.results.length > 0
+                        ? ""
+                        : styles.actions__btn__disabled
+                    }`}
+                  >
+                    <TrailerIcon
+                      onClick={() => setTrailer(true)}
+                      viewBox="0 0 24 24"
+                    />
                   </button>
                   <button
                     className={`${buttons.icon} ${styles.actions__btn} ${styles.actions__btn__disabled}`}

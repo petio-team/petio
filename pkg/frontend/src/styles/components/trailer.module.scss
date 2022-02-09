@@ -1,0 +1,236 @@
+@import "../global/variables.module.scss";
+
+.wrap {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba($black, 0.7);
+  z-index: 1000;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  //   backdrop-filter: blur(20px);
+
+  @media (min-width: $lg) {
+    padding: 100px;
+  }
+}
+
+.inner {
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  max-height: 100%;
+  background: $black;
+  width: 100%;
+
+  &:after {
+    display: block;
+    content: "";
+    padding-bottom: 56%;
+  }
+}
+
+.video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  opacity: 0;
+
+  &__show {
+    opacity: 1;
+  }
+}
+
+.poster {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+  z-index: 2;
+  object-fit: cover;
+  object-position: center;
+  width: 100%;
+  height: 100%;
+
+  &__hide {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  z-index: 10;
+  background: rgba($black, 0.3);
+  backdrop-filter: blur(20px);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  cursor: pointer;
+
+  @media (min-width: $lg) {
+    top: 50px;
+    right: 50px;
+    width: 50px;
+    height: 50px;
+    padding: 12px;
+  }
+
+  svg {
+    height: 100%;
+
+    path {
+      fill: $orange;
+    }
+  }
+}
+
+.controls {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  height: 30px;
+  z-index: 3;
+  background: rgba($black, 0.3);
+  backdrop-filter: blur(20px);
+  border-radius: 5px;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  transform: translateZ(0);
+  padding: 5px 10px;
+
+  @media (min-width: $lg) {
+    bottom: 50px;
+    left: 100px;
+    right: 100px;
+    height: 50px;
+    padding: 0 20px;
+  }
+
+  //   @media (min-width: $lg) {
+  //     transition: opacity 0.3s ease;
+  //     opacity: 0;
+
+  //     &__show {
+  //       opacity: 1;
+  //     }
+  //   }
+
+  &__playPause {
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    height: 100%;
+
+    svg {
+      height: 100%;
+
+      path {
+        fill: $orange;
+      }
+    }
+  }
+
+  &__progress {
+    width: 100%;
+    height: 4px;
+    position: relative;
+    margin: 10px 20px;
+    background: rgba($white, 0.2);
+    cursor: pointer;
+
+    &__buffer {
+      height: 100%;
+      width: 25%;
+      background: rgba(darken($orange, 30), 0.5);
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
+      transition: width 0.2s ease;
+    }
+
+    &__pos {
+      height: 100%;
+      width: 20%;
+      background: $orange;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
+      transition: width 0.2s ease;
+    }
+
+    &__input {
+      appearance: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 3;
+      background: transparent;
+      cursor: pointer;
+
+      &::-webkit-slider-thumb {
+        appearance: none;
+        opacity: 0;
+        border: solid 1px $black;
+        width: 15px;
+        height: 15px;
+        background: $orange;
+        border-radius: 50%;
+      }
+
+      &::-moz-range-thumb {
+        appearance: none;
+        border: none;
+        width: 10px;
+        height: 10px;
+        background: red;
+        border-radius: 50%;
+      }
+
+      &::-ms-thumb {
+        appearance: none;
+        border: none;
+        width: 10px;
+        height: 10px;
+        background: red;
+        border-radius: 50%;
+      }
+    }
+  }
+}
+
+// input[type="range"]::-webkit-slider-thumb {
+//   appearance: none;
+//   border: none;
+//   width: 10px;
+//   height: 10px;
+//   background: red;
+//   border-radius: 50%;
+// }
