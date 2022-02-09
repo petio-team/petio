@@ -38,9 +38,11 @@ $btnWidth: 1.5px;
   border: solid $btnWidth $orange;
   color: $black;
 
-  &:hover:not(.disabled) {
-    background: darken($orange, 10);
-    border-color: darken($orange, 10);
+  @media (min-width: $lg) {
+    &:hover:not(.disabled) {
+      background: darken($orange, 10);
+      border-color: darken($orange, 10);
+    }
   }
 
   &__blue {
@@ -50,9 +52,11 @@ $btnWidth: 1.5px;
     border: solid $btnWidth $blue;
     opacity: 1 !important;
 
-    &:hover:not(.disabled) {
-      background: darken($blue, 10);
-      border-color: darken($blue, 10);
+    @media (min-width: $lg) {
+      &:hover:not(.disabled) {
+        background: darken($blue, 10);
+        border-color: darken($blue, 10);
+      }
     }
   }
 }
@@ -63,10 +67,12 @@ $btnWidth: 1.5px;
   border: solid $btnWidth $orange;
   color: $orange;
 
-  &:hover {
-    background: $orange;
-    border-color: $orange;
-    color: $black;
+  @media (min-width: $lg) {
+    &:hover {
+      background: $orange;
+      border-color: $orange;
+      color: $black;
+    }
   }
 }
 
@@ -102,8 +108,10 @@ $btnWidth: 1.5px;
     }
   }
 
-  &:hover {
-    opacity: 1;
+  @media (min-width: $lg) {
+    &:hover {
+      opacity: 1;
+    }
   }
 }
 
