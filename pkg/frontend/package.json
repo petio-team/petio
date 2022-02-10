@@ -22,6 +22,7 @@
 		"redux-devtools-extension": "^2.13.9",
 		"redux-thunk": "^2.3.0",
 		"sass": "1.34.1",
+		"smoothscroll-polyfill": "^0.4.4",
 		"web-vitals": "^2.1.4"
 	},
 	"scripts": {

@@ -2,6 +2,7 @@ import "../styles/global/main.scss";
 import notifications from "../styles/components/notifications.module.scss";
 import "react-toastify/dist/ReactToastify.css";
 
+import smoothscroll from "smoothscroll-polyfill";
 import { useLocation, withRouter, useHistory } from "react-router-dom";
 
 import { useState, useEffect, useCallback, useLayoutEffect } from "react";
@@ -129,6 +130,7 @@ function Petio({ redux_pos }) {
     }
 
     getConfig();
+    smoothscroll.polyfill();
   }, []);
 
   const updateRequests = useCallback(async () => {

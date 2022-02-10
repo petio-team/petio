@@ -9,6 +9,7 @@ import { Link, useHistory } from "react-router-dom";
 import Card from "./card";
 import { useEffect, useRef, useLayoutEffect, useState } from "react";
 import { storePosition } from "../services/position.service";
+import { ReactComponent as Chevron } from "../assets/svg/chevron.svg";
 
 const mapStateToProps = (state) => {
   return {
@@ -18,6 +19,8 @@ const mapStateToProps = (state) => {
 
 function Carousel({ data, title, type = "movie", id, redux_pos, link }) {
   const [waitForScroll, setWaitForScroll] = useState(true);
+  const [end, setEnd] = useState(false);
+  const [start, setStart] = useState(false);
   const placeholderRow = [];
   const rowId = id;
   // const router = useRouter();
@@ -41,14 +44,32 @@ function Carousel({ data, title, type = "movie", id, redux_pos, link }) {
   useLayoutEffect(() => {
     if (!track || !track.current || !data || data.length === 0) return;
     const el = track.current;
+    updateControls();
     let bounce = false;
     function checkScroll() {
       clearTimeout(bounce);
+      updateControls();
       bounce = setTimeout(() => {
         storePosition(history.location.pathname, false, {
           [id]: { scroll: el.scrollLeft },
         });
       }, 500);
+    }
+
+    function updateControls() {
+      if (
+        track.current.scrollLeft + track.current.offsetWidth >=
+        track.current.scrollWidth
+      ) {
+        setEnd(true);
+      } else {
+        setEnd(false);
+      }
+      if (track.current.scrollLeft < 1) {
+        setStart(true);
+      } else {
+        setStart(false);
+      }
     }
 
     el.addEventListener("scroll", checkScroll);
@@ -80,6 +101,24 @@ function Carousel({ data, title, type = "movie", id, redux_pos, link }) {
     setWaitForScroll(false);
   }, [history.location.pathname, track, data, id, redux_pos, waitForScroll]);
 
+  function scrollBack() {
+    if (!track || !track.current || !data || data.length === 0) return;
+    track.current.scroll({
+      top: 0,
+      left: track.current.scrollLeft - track.current.offsetWidth * 0.8,
+      behavior: "smooth",
+    });
+  }
+
+  function scrollForward() {
+    if (!track || !track.current || !data || data.length === 0) return;
+    track.current.scroll({
+      top: 0,
+      left: track.current.scrollLeft + track.current.offsetWidth * 0.8,
+      behavior: "smooth",
+    });
+  }
+
   return (
     <div className="container">
       <div
@@ -101,6 +140,24 @@ function Carousel({ data, title, type = "movie", id, redux_pos, link }) {
         ) : (
           <p className={typo.carousel_title}>{title ? title : "Loading..."}</p>
         )}
+        <div className={carousel.controls}>
+          <div
+            className={`${carousel.controls__prev} ${
+              start ? carousel.controls__disabled : ""
+            }`}
+            onClick={scrollBack}
+          >
+            <Chevron />
+          </div>
+          <div
+            className={`${carousel.controls__next} ${
+              end ? carousel.controls__disabled : ""
+            }`}
+            onClick={scrollForward}
+          >
+            <Chevron />
+          </div>
+        </div>
         <div
           className={`${carousel.track} ${
             type === "request" ? carousel.track__nospacing : ""
