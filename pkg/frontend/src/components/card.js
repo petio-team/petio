@@ -138,11 +138,18 @@ function Card({
       <Link to={`/movie/studio/${id}`} className={styles.wrap}>
         <div className={styles.wide}>
           {poster ? (
-            <LazyLoadImage
-              className={styles.logo}
-              src={`https://image.tmdb.org/t/p/w500_filter(duotone,ff8300,cc6800)${poster}`}
-              effect="opacity"
-            />
+            <>
+              <LazyLoadImage
+                className={styles.logo}
+                src={`https://image.tmdb.org/t/p/w500_filter(duotone,ff8300,cc6800)${poster}`}
+                effect="opacity"
+              />
+              <LazyLoadImage
+                className={styles.blurBackground}
+                src={`https://image.tmdb.org/t/p/w45${poster}`}
+                effect="opacity"
+              />
+            </>
           ) : (
             <p className={`${typo.smtitle} ${typo.medium} ${styles.no_logo}`}>
               {title}
@@ -158,11 +165,18 @@ function Card({
       <Link to={`/tv/network/${id}`} className={styles.wrap}>
         <div className={styles.wide}>
           {poster ? (
-            <LazyLoadImage
-              className={styles.logo}
-              src={`https://image.tmdb.org/t/p/w500_filter(duotone,ff8300,cc6800)${poster}`}
-              effect="opacity"
-            />
+            <>
+              <LazyLoadImage
+                className={styles.logo}
+                src={`https://image.tmdb.org/t/p/w500_filter(duotone,ff8300,cc6800)${poster}`}
+                effect="opacity"
+              />
+              <LazyLoadImage
+                className={styles.blurBackground}
+                src={`https://image.tmdb.org/t/p/w45${poster}`}
+                effect="opacity"
+              />
+            </>
           ) : (
             <p className={`${typo.smtitle} ${typo.medium} ${styles.no_logo}`}>
               {title}
