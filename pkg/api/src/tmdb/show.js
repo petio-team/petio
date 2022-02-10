@@ -61,6 +61,16 @@ async function showLookup(id, minified = false) {
       show.imdb_id = external.imdb_id;
       show.tvdb_id = external.tvdb_id;
       show.on_server = onPlex.exists;
+      show.videos = {
+        results: [
+          ...show.videos.results.filter(
+            (obj) => obj.type == "Trailer" && obj.site == "YouTube"
+          ),
+          ...show.videos.results.filter(
+            (obj) => obj.type == "Teaser" && obj.site == "YouTube"
+          ),
+        ],
+      };
       delete show.production_companies;
       delete show.homepage;
       delete show.languages;
@@ -302,7 +312,7 @@ function findEnLogo(logos) {
       logo.lang === "en" &&
       !logoUrl &&
       logo.url !==
-      "https://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png"
+        "https://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png"
     ) {
       logoUrl = logo.url;
     }

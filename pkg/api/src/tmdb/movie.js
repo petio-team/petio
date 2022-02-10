@@ -99,7 +99,16 @@ async function movieLookup(id, minified = false) {
       // movie.keywords.results = movie.keywords.keywords;
       // movie.keywords.keywords = {};
       movie.keywords = movie.keywords.keywords;
-
+      movie.videos = {
+        results: [
+          ...movie.videos.results.filter(
+            (obj) => obj.type == "Trailer" && obj.site == "YouTube"
+          ),
+          ...movie.videos.results.filter(
+            (obj) => obj.type == "Teaser" && obj.site == "YouTube"
+          ),
+        ],
+      };
       delete movie.production_countries;
       // delete movie.budget;
       delete movie.adult;
