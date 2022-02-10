@@ -23,6 +23,11 @@
   overscroll-behavior-x: none;
 
   @media (min-width: $lg) {
+    padding: 100px $containerGutterSm;
+    margin: -90px -#{$containerGutterSm} -100px;
+  }
+
+  @media (min-width: $xl) {
     padding: 100px $containerGutter;
     margin: -90px -#{$containerGutter} -100px;
   }
@@ -32,6 +37,11 @@
     padding: 2px 20px;
 
     @media (min-width: $lg) {
+      padding: 2px $containerGutterSm;
+      margin: 8px -#{$containerGutterSm} -2px;
+    }
+
+    @media (min-width: $xl) {
       padding: 2px $containerGutter;
       margin: 8px -#{$containerGutter} -2px;
     }
