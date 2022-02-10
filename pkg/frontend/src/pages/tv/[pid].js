@@ -313,11 +313,9 @@ function Tv({
                         ? ""
                         : styles.actions__btn__disabled
                     }`}
+                    onClick={() => setTrailer(true)}
                   >
-                    <TrailerIcon
-                      onClick={() => setTrailer(true)}
-                      viewBox="0 0 24 24"
-                    />
+                    <TrailerIcon viewBox="0 0 24 24" />
                   </button>
                   <button
                     className={`${buttons.icon} ${styles.actions__btn} ${styles.actions__btn__disabled}`}
