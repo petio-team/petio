@@ -132,7 +132,9 @@ export default function RequestButton({
         type === "movie" ? "play" : "preplay"
       }/?metadataKey=%2Flibrary%2Fmetadata%2F${ratingKey}&metadataType=1&server=${serverKey}`;
     if (OS === "Android")
-      window.location = `plex://server://${serverKey}/com.plexapp.plugins.library/library/metadata/${ratingKey}`;
+      window.open(
+        `plex://server://${serverKey}/com.plexapp.plugins.library/library/metadata/${ratingKey}`
+      );
   }
 
   function requestButton() {
