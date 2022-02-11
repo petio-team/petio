@@ -96,7 +96,28 @@ export default function RequestButton({
     updateRequests();
   }
 
+  function getMobileOperatingSystem() {
+    var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+    // Windows Phone must come first because its UA also contains "Android"
+    if (/windows phone/i.test(userAgent)) {
+      return "Windows Phone";
+    }
+
+    if (/android/i.test(userAgent)) {
+      return "Android";
+    }
+
+    // iOS detection from: http://stackoverflow.com/a/9039885/177710
+    if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+      return "iOS";
+    }
+
+    return "unknown";
+  }
+
   function openInApp(ratingKey, serverKey) {
+    const OS = getMobileOperatingSystem();
     var now = new Date().valueOf();
     setTimeout(function () {
       if (new Date().valueOf() - now > 100) return;
@@ -105,9 +126,13 @@ export default function RequestButton({
         "_blank"
       );
     }, 25);
-    window.location = `plex://${
-      type === "movie" ? "play" : "preplay"
-    }/?metadataKey=%2Flibrary%2Fmetadata%2F${ratingKey}&metadataType=1&server=${serverKey}`;
+
+    if (OS === "iOS")
+      window.location = `plex://${
+        type === "movie" ? "play" : "preplay"
+      }/?metadataKey=%2Flibrary%2Fmetadata%2F${ratingKey}&metadataType=1&server=${serverKey}`;
+    if (OS === "Android")
+      window.location = `plex://server://${serverKey}/com.plexapp.plugins.library/library/metadata/${ratingKey}`;
   }
 
   function requestButton() {
