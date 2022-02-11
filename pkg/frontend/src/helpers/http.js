@@ -6,9 +6,9 @@ const origin = isDev
   : typeof window === "undefined"
   ? ""
   : `${window.location.protocol}//${window.location.host}`;
-const basePath = ""; // get basepath from config
+const basePath = window.location.pathname.replace(/\/$/, "");
 const API_URL = `${origin}${basePath}/api`;
-console.log(origin);
+console.log(window.location.pathname, basePath);
 
 function getCookie(cname) {
   var name = cname + "=";
