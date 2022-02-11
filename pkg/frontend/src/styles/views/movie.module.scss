@@ -144,6 +144,7 @@
 
     &__main_btn {
       width: 100%;
+      cursor: pointer;
 
       @media (min-width: $md) {
         width: 200px;
@@ -226,6 +227,7 @@
         border-radius: 5px;
         padding: 0;
         display: none;
+        overflow: hidden;
 
         &__open {
           display: flex;
@@ -235,6 +237,7 @@
       &__option {
         padding: 10px;
         border-bottom: solid 1px rgba($grey, 0.5);
+        cursor: pointer;
 
         &:last-child {
           border-bottom: none;

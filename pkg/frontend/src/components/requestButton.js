@@ -96,6 +96,18 @@ export default function RequestButton({
     updateRequests();
   }
 
+  function openInApp(ratingKey, serverKey) {
+    var now = new Date().valueOf();
+    setTimeout(function () {
+      if (new Date().valueOf() - now > 100) return;
+      window.open(
+        `https://app.plex.tv/desktop#!/server/${serverKey}/details?key=%2Flibrary%2Fmetadata%2F${ratingKey}`,
+        "_blank"
+      );
+    }, 25);
+    window.location = `plex://play/?metadataKey=%2Flibrary%2Fmetadata%2F${ratingKey}&metadataType=1&server=${serverKey}`;
+  }
+
   function requestButton() {
     let counter = null;
     if (requestCount > 0)
@@ -139,12 +151,12 @@ export default function RequestButton({
               >
                 {onServer.versions.map((version) => {
                   return (
-                    <a
-                      href={`https://app.plex.tv/desktop#!/server/${onServer.serverKey}/details?key=%2Flibrary%2Fmetadata%2F${version.ratingKey}`}
+                    <div
+                      onClick={() =>
+                        openInApp(version.ratingKey, onServer.serverKey)
+                      }
                       key={`watch__${version.ratingKey}`}
                       className={styles.actions__request__dropdown__option}
-                      target="_blank"
-                      rel="noreferrer"
                     >
                       <p
                         className={`${typo.body} ${typo.medium}`}
@@ -154,7 +166,7 @@ export default function RequestButton({
                           ? version.resolution + "p"
                           : version.resolution.toUpperCase()
                       }`}</p>
-                    </a>
+                    </div>
                   );
                 })}
               </div>
@@ -163,14 +175,14 @@ export default function RequestButton({
         );
       return (
         <>
-          <a
-            href={`https://app.plex.tv/desktop#!/server/${onServer.serverKey}/details?key=%2Flibrary%2Fmetadata%2F${onServer.versions[0].ratingKey}`}
+          <div
+            onClick={() =>
+              openInApp(onServer.versions[0].ratingKey, onServer.serverKey)
+            }
             className={`${buttons.secondary} ${styles.actions__request__main_btn}`}
-            target="_blank"
-            rel="noreferrer"
           >
             Watch now
-          </a>
+          </div>
         </>
       );
     }
