@@ -144,16 +144,107 @@
 
     &__main_btn {
       width: 100%;
-      // min-width: 100%;
-
-      // button {
-      // 	width: 250px;
-      // 	max-width: 100%;
-      // }
 
       @media (min-width: $md) {
         width: 200px;
         min-width: initial;
+      }
+    }
+
+    &__dropdown {
+      &__wrap {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+      }
+
+      &__button {
+        width: 100%;
+        padding-right: 45px;
+
+        @media (min-width: $md) {
+          width: 200px;
+          min-width: initial;
+        }
+
+        &__open {
+          background: $orange;
+          color: $black;
+
+          .actions__request__dropdown__arrow {
+            &:after {
+              border-bottom: solid 2px $black;
+              border-right: solid 2px $black;
+              transform: rotate(-135deg);
+              margin-top: 4px;
+            }
+          }
+        }
+
+        @media (min-width: $lg) {
+          &:hover {
+            .actions__request__dropdown__arrow {
+              &:after {
+                border-bottom: solid 2px $black;
+                border-right: solid 2px $black;
+              }
+            }
+          }
+        }
+      }
+
+      &__arrow {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 35px;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-left: solid 1.5px $orange;
+
+        &:after {
+          content: "";
+          display: block;
+          height: 10px;
+          width: 10px;
+          border-bottom: solid 2px $orange;
+          border-right: solid 2px $orange;
+          transform: rotate(45deg);
+          margin-top: -4px;
+          transition: border-color 0.3s ease;
+        }
+      }
+
+      &__options {
+        margin-top: 5px;
+        display: flex;
+        flex-direction: column;
+        background: rgba($white, 0.3);
+        backdrop-filter: blur(10px);
+        border-radius: 5px;
+        padding: 0;
+        display: none;
+
+        &__open {
+          display: flex;
+        }
+      }
+
+      &__option {
+        padding: 10px;
+        border-bottom: solid 1px rgba($grey, 0.5);
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        @media (min-width: $lg) {
+          &:hover {
+            background: rgba($white, 0.3);
+          }
+        }
       }
     }
   }

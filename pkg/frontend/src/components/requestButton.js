@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { addNewRequest } from "../services/user.service";
 import buttons from "../styles/components/button.module.scss";
 import styles from "../styles/views/movie.module.scss";
+import typo from "../styles/components/typography.module.scss";
 
 export default function RequestButton({
   data,
@@ -14,6 +15,7 @@ export default function RequestButton({
   const [pending, setPending] = useState(false);
   const [userHasRequested, setUserHasRequested] = useState(false);
   const [requestCount, setRequestCount] = useState(0);
+  const [versionsOpen, setVersionsOpen] = useState(false);
 
   useEffect(() => {
     if (
@@ -98,17 +100,80 @@ export default function RequestButton({
     let counter = null;
     if (requestCount > 0)
       counter = <div className={`${buttons.counter}`}>{requestCount}</div>;
-    if (data.on_server)
+    if (data.on_server) {
+      const onServer = data.on_server;
+      if (!onServer.serverKey || onServer.versions.length === 0)
+        return (
+          <>
+            <button
+              className={`${buttons.secondary} ${styles.actions__request__main_btn}`}
+              style={{ pointerEvents: "none" }}
+            >
+              On Plex
+            </button>
+          </>
+        );
+      if (onServer.versions.length > 1)
+        return (
+          <>
+            <div className={styles.actions__request__dropdown__wrap}>
+              <button
+                className={`${buttons.secondary} ${
+                  styles.actions__request__dropdown__button
+                } ${
+                  versionsOpen
+                    ? styles.actions__request__dropdown__button__open
+                    : ""
+                }`}
+                onClick={() => setVersionsOpen(!versionsOpen)}
+              >
+                Watch now
+                <div className={styles.actions__request__dropdown__arrow}></div>
+              </button>
+              <div
+                className={`${styles.actions__request__dropdown__options} ${
+                  versionsOpen
+                    ? styles.actions__request__dropdown__options__open
+                    : ""
+                }`}
+              >
+                {onServer.versions.map((version) => {
+                  return (
+                    <a
+                      href={`https://app.plex.tv/desktop#!/server/${onServer.serverKey}/details?key=%2Flibrary%2Fmetadata%2F${version.ratingKey}`}
+                      key={`watch__${version.ratingKey}`}
+                      className={styles.actions__request__dropdown__option}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <p
+                        className={`${typo.body} ${typo.medium}`}
+                      >{`Watch now in ${
+                        version.resolution === "720" ||
+                        version.resolution === "1080"
+                          ? version.resolution + "p"
+                          : version.resolution.toUpperCase()
+                      }`}</p>
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        );
       return (
         <>
-          <button
+          <a
+            href={`https://app.plex.tv/desktop#!/server/${onServer.serverKey}/details?key=%2Flibrary%2Fmetadata%2F${onServer.versions[0].ratingKey}`}
             className={`${buttons.secondary} ${styles.actions__request__main_btn}`}
+            target="_blank"
+            rel="noreferrer"
           >
             Watch now
-          </button>
-          {counter}
+          </a>
         </>
       );
+    }
 
     if (pending)
       return (

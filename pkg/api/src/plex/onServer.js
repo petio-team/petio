@@ -4,7 +4,7 @@ const Show = require("../models/show");
 const { conf } = require("../app/config");
 
 async function onServer(type, imdb, tvdb, tmdb) {
-  let clientId = conf.get('plex.client');
+  let clientId = conf.get("plex.client");
   if (type === "movie") {
     let foundItemsImdb = false;
     let foundItemsTvdb = false;
@@ -38,15 +38,24 @@ async function onServer(type, imdb, tvdb, tmdb) {
       foundItemsTmdb.length
     ) {
       let resolutions = [];
+
       if (found) {
+        let exists = [];
         Object.keys(found).map((i) => {
           let item = found[i];
           if (item.Media.length > 0) {
             resolutions.push(item.Media[0].videoResolution);
+            exists.push({
+              ratingKey: item.ratingKey,
+              resolution: item.Media[0].videoResolution,
+            });
           }
         });
         return {
-          exists: { ratingKey: found[0].ratingKey, serverKey: clientId },
+          exists: {
+            versions: exists,
+            serverKey: clientId,
+          },
           resolutions: resolutions,
         };
       } else {
