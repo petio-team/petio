@@ -105,7 +105,9 @@ export default function RequestButton({
         "_blank"
       );
     }, 25);
-    window.location = `plex://play/?metadataKey=%2Flibrary%2Fmetadata%2F${ratingKey}&metadataType=1&server=${serverKey}`;
+    window.location = `plex://${
+      type === "movie" ? "play" : "preplay"
+    }/?metadataKey=%2Flibrary%2Fmetadata%2F${ratingKey}&metadataType=1&server=${serverKey}`;
   }
 
   function requestButton() {
