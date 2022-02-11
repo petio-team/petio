@@ -34,7 +34,7 @@ async function onServer(type, imdb, tvdb, tmdb) {
 
     let resolutions = [];
 
-    if (found) {
+    if (found && found.length > 0) {
       let exists = [];
       Object.keys(found).forEach((i) => {
         let item = found[i];
@@ -85,7 +85,7 @@ async function onServer(type, imdb, tvdb, tmdb) {
       found = foundItemsTmdb;
     }
 
-    if (found) {
+    if (found && found.length > 0) {
       let exists = [];
       let resolutions = [];
       Object.keys(found).forEach((i) => {
