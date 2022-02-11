@@ -3,6 +3,7 @@ import { addNewRequest } from "../services/user.service";
 import buttons from "../styles/components/button.module.scss";
 import styles from "../styles/views/movie.module.scss";
 import typo from "../styles/components/typography.module.scss";
+import { getMobileOperatingSystem } from "../helpers/getOs";
 
 export default function RequestButton({
   data,
@@ -94,26 +95,6 @@ export default function RequestButton({
     }
     setPending(false);
     updateRequests();
-  }
-
-  function getMobileOperatingSystem() {
-    var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-
-    // Windows Phone must come first because its UA also contains "Android"
-    if (/windows phone/i.test(userAgent)) {
-      return "Windows Phone";
-    }
-
-    if (/android/i.test(userAgent)) {
-      return "Android";
-    }
-
-    // iOS detection from: http://stackoverflow.com/a/9039885/177710
-    if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-      return "iOS";
-    }
-
-    return "unknown";
   }
 
   function openInApp(ratingKey, serverKey) {

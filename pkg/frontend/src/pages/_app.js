@@ -41,6 +41,8 @@ import NotFound from "./404";
 import Search from "./search";
 import Error from "../components/error";
 import PwaInstall from "../components/pwaInstall";
+import PwaAndroid from "../components/pwaAndroid";
+import { getMobileOperatingSystem } from "../helpers/getOs";
 // import Modal from "../components/modal";
 
 const mapStateToProps = (state) => {
@@ -67,9 +69,12 @@ function Petio({ redux_pos }) {
   const [globalConfig, setGlobalConfig] = useState(false);
   const [currentPath, setCurrentPath] = useState(false);
   const [showInstall, setShowInstall] = useState(false);
+  const [showInstallAndroid, setShowInstallAndroid] = useState(false);
+  const [androidInstallPrompt, setAndroidInstallPrompt] = useState(false);
 
   const router = useLocation();
   const history = useHistory();
+  const OS = getMobileOperatingSystem();
   let setupMode = false;
 
   useEffect(() => {
@@ -86,6 +91,17 @@ function Petio({ redux_pos }) {
     if (isIos() && !isInStandaloneMode()) {
       setShowInstall(true);
     }
+
+    window.addEventListener("beforeinstallprompt", (e) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      setAndroidInstallPrompt(e);
+      // Update UI notify the user they can install the PWA
+      alert("test prompt");
+      // Optionally, send analytics event that PWA install promo was shown.
+      console.log(`'beforeinstallprompt' event was fired.`);
+    });
   }, []);
 
   function newNotification(
@@ -263,6 +279,15 @@ function Petio({ redux_pos }) {
         <>
           {showInstall ? (
             <PwaInstall callback={() => setShowInstall(false)} />
+          ) : null}
+          {showInstallAndroid && OS === "Android" ? (
+            <PwaAndroid
+              callback={() => {
+                setShowInstallAndroid(false);
+                setAndroidInstallPrompt(false);
+              }}
+              prompt={androidInstallPrompt}
+            />
           ) : null}
           <Login
             config={globalConfig}

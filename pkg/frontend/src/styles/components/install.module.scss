@@ -27,7 +27,8 @@
   border-bottom: solid 1px #dcdcde;
 
   p {
-    font: -apple-system-headline;
+    font-family: "Droid Sans", sans-serif;
+    font: -apple-system-headline, "Droid Sans";
   }
 }
 
@@ -35,11 +36,13 @@
   padding: 20px;
 
   ul {
+    font-family: "Droid Sans", sans-serif;
     font: -apple-system-footnote;
     padding-left: 15px;
   }
 
   p {
+    font-family: "Droid Sans", sans-serif;
     font: -apple-system-footnote;
     display: flex;
     align-items: center;
@@ -67,4 +70,21 @@
       }
     }
   }
+}
+
+.button {
+  appearance: none;
+  border: none;
+  background: #f9aa33;
+  color: #232f34;
+  text-transform: uppercase;
+  height: 35px;
+  padding: 0 16px;
+  box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
+    0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%);
+  font-size: 14px;
+  letter-spacing: 1.25px;
+  font-weight: 500;
+  font-family: "Droid Sans", sans-serif;
+  border-radius: 4px;
 }
