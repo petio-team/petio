@@ -32,73 +32,93 @@ async function onServer(type, imdb, tvdb, tmdb) {
       found = foundItemsTmdb;
     }
 
-    if (
-      foundItemsImdb.length ||
-      foundItemsTvdb.length ||
-      foundItemsTmdb.length
-    ) {
-      let resolutions = [];
+    let resolutions = [];
 
-      if (found) {
-        let exists = [];
-        Object.keys(found).map((i) => {
-          let item = found[i];
-          if (item.Media.length > 0) {
-            resolutions.push(item.Media[0].videoResolution);
-            exists.push({
-              ratingKey: item.ratingKey,
-              resolution: item.Media[0].videoResolution,
-            });
-          }
-        });
-        return {
-          exists: {
-            versions: exists,
-            serverKey: clientId,
-          },
-          resolutions: resolutions,
-        };
-      } else {
-        return { exists: false, resolutions: resolutions };
-      }
+    if (found) {
+      let exists = [];
+      Object.keys(found).forEach((i) => {
+        let item = found[i];
+        if (item.Media.length > 0) {
+          resolutions.push(item.Media[0].videoResolution);
+          exists.push({
+            ratingKey: item.ratingKey,
+            resolution: item.Media[0].videoResolution,
+          });
+        }
+      });
+      return {
+        exists: {
+          versions: exists,
+          serverKey: clientId,
+        },
+        resolutions: resolutions,
+      };
     } else {
       return { exists: false, resolutions: [] };
     }
   }
 
   if (type === "show" || type === "tv") {
-    let foundItemImdb = false;
-    let foundItemTvdb = false;
-    let foundItemTmdb = false;
-    let seasons = false;
+    let foundItemsImdb = false;
+    let foundItemsTvdb = false;
+    let foundItemsTmdb = false;
+    let found = false;
 
     if (imdb) {
-      foundItemImdb = await Show.findOne({
+      foundItemsImdb = await Show.find({
         imdb_id: imdb.toString(),
       }).exec();
+      found = foundItemsImdb;
     }
 
     if (tvdb) {
-      foundItemTvdb = await Show.findOne({
+      foundItemsTvdb = await Show.find({
         tvdb_id: tvdb.toString(),
       }).exec();
+      found = foundItemsTvdb;
     }
 
     if (tmdb) {
-      foundItemTmdb = await Show.findOne({
+      foundItemsTmdb = await Show.find({
         tmdb_id: tmdb.toString(),
       }).exec();
+      found = foundItemsTmdb;
     }
 
-    if (foundItemImdb || foundItemTvdb || foundItemTmdb) {
-      let found = foundItemImdb || foundItemTvdb || foundItemTmdb;
-      seasons = found.seasonData;
+    if (found) {
+      let exists = [];
+      let resolutions = [];
+      Object.keys(found).forEach((i) => {
+        let item = found[i];
+        seasons = item.seasonData;
+        if (
+          seasons &&
+          seasons[1] &&
+          seasons[1].episodes &&
+          seasons[1].episodes[1] &&
+          seasons[1].episodes[1].resolution
+        ) {
+          resolutions.push(seasons[1].episodes[1].resolution);
+          exists.push({
+            ratingKey: item.ratingKey,
+            seasons: seasons,
+            resolution: seasons[1].episodes[1].resolution,
+          });
+        } else {
+          exists.push({
+            ratingKey: item.ratingKey,
+            seasons: seasons,
+            resolution: "unknown",
+          });
+        }
+      });
       return {
-        exists: { ratingKey: found.ratingKey, serverKey: clientId },
-        resolutions: [],
-        seasons: seasons,
+        exists: {
+          versions: exists,
+          serverKey: clientId,
+        },
+        resolutions: resolutions,
       };
-      // return { exists: true, resolutions: [] };
     } else {
       return { exists: false, resolutions: [] };
     }

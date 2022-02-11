@@ -85,6 +85,8 @@ module.exports = async function getDiscoveryData(id, type = "movie") {
       genreList.push(id);
       let discData = await genreLookup(id, genre, type);
 
+      if (!discData) return null;
+
       let results = await Promise.all(
         discData.map(async (result, i) => {
           if (!watchHistory[result.id]) {

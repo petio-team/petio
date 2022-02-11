@@ -98,7 +98,9 @@ class LibraryUpdate {
             };
 
             await this.saveShow(parent);
-            logger.verbose(`CRON: Partial scan - ${parent.title} - Built from series`);
+            logger.verbose(
+              `CRON: Partial scan - ${parent.title} - Built from series`
+            );
           }
         } else {
           logger.warn(`CRON: Partial scan type not found - ${obj.type}`);
@@ -139,22 +141,22 @@ class LibraryUpdate {
 
   async createAdmin() {
     let adminFound = await User.findOne({
-      id: conf.get('admin.id'),
+      id: conf.get("admin.id"),
     });
     if (!adminFound) {
       logger.verbose("CRON: Creating admin user");
       try {
         let adminData = new User({
-          id: conf.get('admin.id'),
-          email: conf.get('admin.email'),
-          thumb: conf.get('admin.thumbnail'),
-          title: conf.get('admin.display'),
-          nameLower: conf.get('admin.display').toLowerCase(),
-          username: conf.get('admin.username'),
+          id: conf.get("admin.id"),
+          email: conf.get("admin.email"),
+          thumb: conf.get("admin.thumbnail"),
+          title: conf.get("admin.display"),
+          nameLower: conf.get("admin.display").toLowerCase(),
+          username: conf.get("admin.username"),
           password:
-            conf.get('admin.password').substring(0, 3) === "$2a"
-              ? conf.get('admin.password')
-              : bcrypt.hashSync(conf.get('admin.password'), 10),
+            conf.get("admin.password").substring(0, 3) === "$2a"
+              ? conf.get("admin.password")
+              : bcrypt.hashSync(conf.get("admin.password"), 10),
           altId: 1,
           role: "admin",
         });
@@ -165,16 +167,16 @@ class LibraryUpdate {
       }
     } else {
       try {
-        logger.verbose(`CRON: Admin Updating ${conf.get('admin.display')}`);
-        adminFound.email = conf.get('admin.email');
-        adminFound.thumb = conf.get('admin.thumbnail');
-        adminFound.title = conf.get('admin.display');
-        adminFound.nameLower = conf.get('admin.display').toLowerCase();
-        adminFound.username = conf.get('admin.username');
-        if (conf.get('admin.password').substring(0, 3) !== "$2a")
-          adminFound.password = bcrypt.hashSync(conf.get('admin.password'), 10);
+        logger.verbose(`CRON: Admin Updating ${conf.get("admin.display")}`);
+        adminFound.email = conf.get("admin.email");
+        adminFound.thumb = conf.get("admin.thumbnail");
+        adminFound.title = conf.get("admin.display");
+        adminFound.nameLower = conf.get("admin.display").toLowerCase();
+        adminFound.username = conf.get("admin.username");
+        if (conf.get("admin.password").substring(0, 3) !== "$2a")
+          adminFound.password = bcrypt.hashSync(conf.get("admin.password"), 10);
         await adminFound.save();
-        logger.verbose(`CRON: Admin Updated ${conf.get('admin.display')}`);
+        logger.verbose(`CRON: Admin Updated ${conf.get("admin.display")}`);
       } catch (err) {
         logger.error(`CRON: Admin Update Failed ${obj.title}`);
         logger.error(err);
@@ -183,7 +185,11 @@ class LibraryUpdate {
   }
 
   async getLibraries() {
-    let url = `${conf.get('plex.protocol')}://${conf.get('plex.host')}:${conf.get('plex.port')}/library/sections/?X-Plex-Token=${conf.get('plex.token')}`;
+    let url = `${conf.get("plex.protocol")}://${conf.get(
+      "plex.host"
+    )}:${conf.get("plex.port")}/library/sections/?X-Plex-Token=${conf.get(
+      "plex.token"
+    )}`;
     try {
       let res = await axios.get(url);
       logger.verbose("CRON: Found Libraries");
@@ -195,7 +201,11 @@ class LibraryUpdate {
   }
 
   async getRecent() {
-    let url = `${conf.get('plex.protocol')}://${conf.get('plex.host')}:${conf.get('plex.port')}/library/recentlyAdded/?X-Plex-Token=${conf.get('plex.token')}`;
+    let url = `${conf.get("plex.protocol")}://${conf.get(
+      "plex.host"
+    )}:${conf.get("plex.port")}/library/recentlyAdded/?X-Plex-Token=${conf.get(
+      "plex.token"
+    )}`;
     try {
       let res = await axios.get(url);
       logger.verbose("CRON: Recently Added received");
@@ -331,7 +341,11 @@ class LibraryUpdate {
   }
 
   async getLibrary(id) {
-    let url = `${conf.get('plex.protocol')}://${conf.get('plex.host')}:${conf.get('plex.port')}/library/sections/${id}/all?X-Plex-Token=${conf.get('plex.token')}`;
+    let url = `${conf.get("plex.protocol")}://${conf.get(
+      "plex.host"
+    )}:${conf.get(
+      "plex.port"
+    )}/library/sections/${id}/all?X-Plex-Token=${conf.get("plex.token")}`;
     try {
       let res = await axios.get(url);
       return res.data.MediaContainer;
@@ -341,7 +355,13 @@ class LibraryUpdate {
   }
 
   async getMeta(id) {
-    let url = `${conf.get('plex.protocol')}://${conf.get('plex.host')}:${conf.get('plex.port')}/library/metadata/${id}?includeChildren=1&X-Plex-Token=${conf.get('plex.token')}`;
+    let url = `${conf.get("plex.protocol")}://${conf.get(
+      "plex.host"
+    )}:${conf.get(
+      "plex.port"
+    )}/library/metadata/${id}?includeChildren=1&X-Plex-Token=${conf.get(
+      "plex.token"
+    )}`;
     try {
       let res = await axios.get(url);
       return res.data.MediaContainer.Metadata[0];
@@ -351,7 +371,11 @@ class LibraryUpdate {
   }
 
   async getSeason(id) {
-    let url = `${conf.get('plex.protocol')}://${conf.get('plex.host')}:${conf.get('plex.port')}/library/metadata/${id}/children?X-Plex-Token=${conf.get('plex.token')}`;
+    let url = `${conf.get("plex.protocol")}://${conf.get(
+      "plex.host"
+    )}:${conf.get(
+      "plex.port"
+    )}/library/metadata/${id}/children?X-Plex-Token=${conf.get("plex.token")}`;
     try {
       let res = await axios.get(url);
       return res.data.MediaContainer.Metadata;
@@ -380,7 +404,9 @@ class LibraryUpdate {
       .replace("com.plexapp.agents.", "")
       .split("://")[0];
     if (idSource === "local" || idSource === "none") {
-      logger.verbose(`CRON: Item skipped :: Not matched / local only - ${title}`);
+      logger.verbose(
+        `CRON: Item skipped :: Not matched / local only - ${title}`
+      );
       return;
     }
     try {
@@ -392,12 +418,16 @@ class LibraryUpdate {
     if (idSource === "plex") {
       try {
         if (!Array.isArray(movieObj.Guid)) {
-          logger.warn(`CRON: Movie couldn't be matched - ${title} - try rematching in Plex`);
+          logger.warn(
+            `CRON: Movie couldn't be matched - ${title} - try rematching in Plex`
+          );
           return;
         }
         for (let guid of movieObj.Guid) {
           if (!guid.id) {
-            logger.warn(`CRON: Movie couldn't be matched - ${title} - no GUID ID`);
+            logger.warn(
+              `CRON: Movie couldn't be matched - ${title} - no GUID ID`
+            );
             return;
           }
           let source = guid.id.split("://");
@@ -412,15 +442,21 @@ class LibraryUpdate {
               externalIds[Object.keys(externalIds)[0]].replace("/", ""),
               type
             );
-            logger.verbose(`CRON: Got external ID - ${title} - using agent ${type} : ${tmdbId}`);
+            logger.verbose(
+              `CRON: Got external ID - ${title} - using agent ${type} : ${tmdbId}`
+            );
           } catch {
             tmdbId = false;
-            logger.verbose(`CRON: Couldn't get external ID - ${title} - using agent ${type}`);
+            logger.verbose(
+              `CRON: Couldn't get external ID - ${title} - using agent ${type}`
+            );
           }
         }
       } catch (e) {
         logger.log(e);
-        logger.log(`CRON: Movie couldn't be matched - ${title} - try rematching in Plex`);
+        logger.log(
+          `CRON: Movie couldn't be matched - ${title} - try rematching in Plex`
+        );
         return;
       }
     } else {
@@ -434,22 +470,30 @@ class LibraryUpdate {
           .split("://")[1]
           .split("?")[0];
       } catch (e) {
-        logger.warn(`CRON: Movie couldn't be matched - ${title} - GUID Error #2 - GUID is - ${movieObj.guid}`);
+        logger.warn(
+          `CRON: Movie couldn't be matched - ${title} - GUID Error #2 - GUID is - ${movieObj.guid}`
+        );
         return;
       }
 
       if (idSource !== "tmdb") {
         try {
           tmdbId = await this.externalIdMovie(externalId, idSource);
-          logger.verbose(`CRON: Got external ID - ${title} - using agent ${idSource} : ${tmdbId}`);
+          logger.verbose(
+            `CRON: Got external ID - ${title} - using agent ${idSource} : ${tmdbId}`
+          );
         } catch {
-          logger.verbose(`CRON: Couldn't get external ID - ${title} - using agent ${idSource}`);
+          logger.verbose(
+            `CRON: Couldn't get external ID - ${title} - using agent ${idSource}`
+          );
           tmdbId = false;
         }
       }
     }
     if (idSource !== "tmdb" && !tmdbId) {
-      logger.warn(`CRON: Movie couldn't be matched - ${title} - try rematching in Plex`);
+      logger.warn(
+        `CRON: Movie couldn't be matched - ${title} - try rematching in Plex`
+      );
       return;
     }
     if (!movieDb) {
@@ -560,7 +604,9 @@ class LibraryUpdate {
       .replace("com.plexapp.agents.", "")
       .split("://")[0];
     if (idSource === "local" || idSource === "none") {
-      logger.verbose(`CRON: Item skipped :: Not matched / local only - ${title}`);
+      logger.verbose(
+        `CRON: Item skipped :: Not matched / local only - ${title}`
+      );
       return;
     }
     try {
@@ -580,6 +626,9 @@ class LibraryUpdate {
               title: ep.title,
               episodeNumber: ep.index,
               seasonNumber: ep.parentIndex,
+              resolution: ep.Media[0].videoResolution,
+              videoCodec: ep.Media[0].videoCodec,
+              audioCodec: ep.Media[0].audioCodec,
             };
           }
           return thisSeason;
@@ -594,12 +643,16 @@ class LibraryUpdate {
     if (idSource === "plex") {
       try {
         if (!Array.isArray(showObj.Guid)) {
-          logger.warn(`CRON: Show couldn't be matched - ${title} - try rematching in Plex`);
+          logger.warn(
+            `CRON: Show couldn't be matched - ${title} - try rematching in Plex`
+          );
           return;
         }
         for (let guid of showObj.Guid) {
           if (!guid.id) {
-            logger.warn(`CRON: Show couldn't be matched - ${title} - no GUID ID`);
+            logger.warn(
+              `CRON: Show couldn't be matched - ${title} - no GUID ID`
+            );
             return;
           }
           let source = guid.id.split("://");
@@ -607,7 +660,9 @@ class LibraryUpdate {
           if (source[0] === "tmdb") tmdbId = source[1];
         }
       } catch (e) {
-        logger.warn(`CRON: Show couldn't be matched - ${title} - try rematching in Plex`);
+        logger.warn(
+          `CRON: Show couldn't be matched - ${title} - try rematching in Plex`
+        );
         logger.error(e);
         return;
       }
@@ -638,7 +693,9 @@ class LibraryUpdate {
       }
     }
     if (idSource !== "tmdb" && !tmdbId) {
-      logger.warn(`CRON: Show couldn't be matched - ${title} - try rematching in Plex`);
+      logger.warn(
+        `CRON: Show couldn't be matched - ${title} - try rematching in Plex`
+      );
       return;
     }
     if (!showDb) {
@@ -710,7 +767,9 @@ class LibraryUpdate {
   }
 
   async getFriends() {
-    let url = `https://plex.tv/pms/friends/all?X-Plex-Token=${conf.get('plex.token')}`;
+    let url = `https://plex.tv/pms/friends/all?X-Plex-Token=${conf.get(
+      "plex.token"
+    )}`;
     try {
       let res = await axios.get(url);
       let dataParse = JSON.parse(
@@ -862,13 +921,17 @@ class LibraryUpdate {
       if (request.type === "tv") {
         onServer = await Show.findOne({ tmdb_id: request.tmdb_id });
         if (!request.tvdb_id) {
-          logger.verbose(`CRON: No TVDB ID for request: ${request.title}, attempting to pull meta`);
+          logger.verbose(
+            `CRON: No TVDB ID for request: ${request.title}, attempting to pull meta`
+          );
           let lookup = await showLookup(request.tmdb_id, true);
           request.thumb = lookup.poster_path;
           request.tvdb_id = lookup.tvdb_id;
           try {
             await request.save();
-            logger.verbose(`CRON: Meta updated for request: ${request.title}, processing request with updated meta`);
+            logger.verbose(
+              `CRON: Meta updated for request: ${request.title}, processing request with updated meta`
+            );
             if (request.tvdb_id)
               new processRequest({
                 id: request.requestId,

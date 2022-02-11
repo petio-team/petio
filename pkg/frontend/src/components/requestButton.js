@@ -114,7 +114,11 @@ export default function RequestButton({
       counter = <div className={`${buttons.counter}`}>{requestCount}</div>;
     if (data.on_server) {
       const onServer = data.on_server;
-      if (!onServer.serverKey || onServer.versions.length === 0)
+      if (
+        !onServer.serverKey ||
+        !onServer.versions ||
+        onServer.versions.length === 0
+      )
         return (
           <>
             <button
