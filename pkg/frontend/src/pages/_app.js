@@ -98,7 +98,7 @@ function Petio({ redux_pos }) {
       // Stash the event so it can be triggered later.
       setAndroidInstallPrompt(e);
       // Update UI notify the user they can install the PWA
-      alert("test prompt");
+      setShowInstallAndroid(true);
       // Optionally, send analytics event that PWA install promo was shown.
       console.log(`'beforeinstallprompt' event was fired.`);
     });
