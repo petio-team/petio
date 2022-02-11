@@ -40,6 +40,7 @@ import Network from "./tv/network/[pid]";
 import NotFound from "./404";
 import Search from "./search";
 import Error from "../components/error";
+import PwaInstall from "../components/pwaInstall";
 // import Modal from "../components/modal";
 
 const mapStateToProps = (state) => {
@@ -65,10 +66,27 @@ function Petio({ redux_pos }) {
   const [loadingScreen, setLoadingScreen] = useState(false);
   const [globalConfig, setGlobalConfig] = useState(false);
   const [currentPath, setCurrentPath] = useState(false);
+  const [showInstall, setShowInstall] = useState(false);
 
   const router = useLocation();
   const history = useHistory();
   let setupMode = false;
+
+  useEffect(() => {
+    // Detects if device is on iOS
+    const isIos = () => {
+      const userAgent = window.navigator.userAgent.toLowerCase();
+      return /iphone|ipad|ipod/.test(userAgent);
+    };
+    // Detects if device is in standalone mode
+    const isInStandaloneMode = () =>
+      "standalone" in window.navigator && window.navigator.standalone;
+
+    // Checks if should display install popup notification:
+    if (isIos() && !isInStandaloneMode()) {
+      setShowInstall(true);
+    }
+  }, []);
 
   function newNotification(
     data = {
@@ -242,13 +260,18 @@ function Petio({ redux_pos }) {
       ) : null}
       {!setupMode && loadingScreen ? <Loading /> : null}
       {setupMode ? null : !isLoggedIn && globalConfig.config === true ? (
-        <Login
-          config={globalConfig}
-          setIsLoggedIn={setIsLoggedIn}
-          setCurrentUser={setCurrentUser}
-          setLoadingScreen={setLoadingScreen}
-          newNotification={newNotification}
-        />
+        <>
+          {showInstall ? (
+            <PwaInstall callback={() => setShowInstall(false)} />
+          ) : null}
+          <Login
+            config={globalConfig}
+            setIsLoggedIn={setIsLoggedIn}
+            setCurrentUser={setCurrentUser}
+            setLoadingScreen={setLoadingScreen}
+            newNotification={newNotification}
+          />
+        </>
       ) : (
         <Switch>
           <Route exact path="/">

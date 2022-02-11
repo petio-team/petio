@@ -1,0 +1,70 @@
+@import "../global/variables.module.scss";
+
+.wrap {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba($black, 0.6);
+
+  z-index: 5000;
+}
+
+.inner {
+  background: #eeeef0;
+  border-radius: 20px;
+  position: absolute;
+  bottom: 50px;
+  left: 30px;
+  right: 30px;
+  color: $black;
+  z-index: 1;
+}
+
+.top {
+  padding: 20px;
+  border-bottom: solid 1px #dcdcde;
+
+  p {
+    font: -apple-system-headline;
+  }
+}
+
+.body {
+  padding: 20px;
+
+  ul {
+    font: -apple-system-footnote;
+    padding-left: 15px;
+  }
+
+  p {
+    font: -apple-system-footnote;
+    display: flex;
+    align-items: center;
+
+    b {
+      font-weight: bold;
+    }
+
+    u {
+      color: #2479f1;
+    }
+
+    span {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 5px;
+
+      svg {
+        width: 40px;
+
+        path {
+          fill: #2479f1;
+        }
+      }
+    }
+  }
+}
