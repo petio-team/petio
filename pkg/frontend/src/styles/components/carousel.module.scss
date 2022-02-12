@@ -77,6 +77,11 @@
       height: 20px;
       width: 20px;
 
+      @media (min-width: $xxxl) {
+        height: 30px;
+        width: 30px;
+      }
+
       path {
         fill: $orange;
         transition: fill 0.3s ease;

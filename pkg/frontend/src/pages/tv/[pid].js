@@ -188,142 +188,152 @@ function Tv({
             callback={() => setTrailer(false)}
           />
         ) : null}
-        <div className="container">
-          <div className={styles.overview}>
-            <div className={styles.overview__logo}>
-              {tvData && tvData.logo ? (
-                <LazyLoadImage
-                  src={tvData.logo}
-                  alt={tvData.name}
-                  effect="opacity"
-                  visibleByDefault={true}
-                />
-              ) : (
-                <p className={`${typo.title} ${typo.bold}`}>
-                  {tvData && tvData.name}
-                </p>
-              )}
-            </div>
-            <div className={styles.overview__wrap}>
-              {tvData ? (
-                <div className={styles.overview__info}>
-                  <p className={`${typo.body} ${typo.bold}`}>
-                    {tvData && tvData.first_air_date
-                      ? new Date(tvData.first_air_date).getFullYear() +
-                        " - " +
-                        (tvData.status !== "Ended"
-                          ? ""
-                          : new Date(tvData.last_air_date).getFullYear())
-                      : "Coming Soon"}
-                    <span className={typo.vertical_spacer}></span>
-                    {tvData &&
-                    tvData.episode_run_time &&
-                    tvData.episode_run_time.length > 0
-                      ? timeConvert(tvData.episode_run_time[0])
-                      : "Unknown"}
-                    {!mobile ? (
-                      <>
-                        <span className={typo.vertical_spacer}></span>
-                        {tvData && tvData.seasons && tvData.seasons.length}{" "}
-                        Season
-                        {tvData && tvData.seasons && tvData.seasons.length > 1
-                          ? "s"
-                          : ""}{" "}
-                      </>
-                    ) : null}
-                    <span className={typo.vertical_spacer}></span>
-                    {tvData && tvData.original_language_format
-                      ? tvData.original_language_format
-                      : "Unknown Language"}
-                    {tvData && tvData.age_rating ? (
-                      <span className={typo.vertical_spacer}></span>
-                    ) : null}
-                    {tvData && tvData.age_rating ? tvData.age_rating : ""}
+        <div className={hero.center}>
+          <div className="container">
+            <div className={styles.overview}>
+              <div className={styles.overview__logo}>
+                {tvData && tvData.logo ? (
+                  <LazyLoadImage
+                    src={tvData.logo}
+                    alt={tvData.name}
+                    effect="opacity"
+                    visibleByDefault={true}
+                  />
+                ) : (
+                  <p className={`${typo.title} ${typo.bold}`}>
+                    {tvData && tvData.name}
                   </p>
+                )}
+              </div>
+              <div className={styles.overview__wrap}>
+                {tvData ? (
+                  <div className={styles.overview__info}>
+                    <p className={`${typo.body} ${typo.bold}`}>
+                      {tvData && tvData.first_air_date
+                        ? new Date(tvData.first_air_date).getFullYear() +
+                          " - " +
+                          (tvData.status !== "Ended"
+                            ? ""
+                            : new Date(tvData.last_air_date).getFullYear())
+                        : "Coming Soon"}
+                      <span className={typo.vertical_spacer}></span>
+                      {tvData &&
+                      tvData.episode_run_time &&
+                      tvData.episode_run_time.length > 0
+                        ? timeConvert(tvData.episode_run_time[0])
+                        : "Unknown"}
+                      {!mobile ? (
+                        <>
+                          <span className={typo.vertical_spacer}></span>
+                          {tvData &&
+                            tvData.seasons &&
+                            tvData.seasons.length}{" "}
+                          Season
+                          {tvData && tvData.seasons && tvData.seasons.length > 1
+                            ? "s"
+                            : ""}{" "}
+                        </>
+                      ) : null}
+                      <span className={typo.vertical_spacer}></span>
+                      {tvData && tvData.original_language_format
+                        ? tvData.original_language_format
+                        : "Unknown Language"}
+                      {tvData && tvData.age_rating ? (
+                        <span className={typo.vertical_spacer}></span>
+                      ) : null}
+                      {tvData && tvData.age_rating ? tvData.age_rating : ""}
+                    </p>
 
-                  {tvData ? <Critics data={tvData} /> : null}
-                </div>
-              ) : null}
-              {tvData && tvData.genres && tvData.genres.length > 0 ? (
-                <p
-                  className={`${typo.small} ${typo.uppercase} ${styles.overview__genres}`}
-                >
-                  {tvData.genres.map((genre) => {
-                    const match = matchGenre("tv", genre.id);
-                    if (!match) return null;
-                    return (
-                      <span key={`tv_genre_${genre.id}`}>
-                        <Link to={`/tv/genre/${genre.id}`}>{match.name}</Link>
-                      </span>
-                    );
-                  })}
-                  {tvData.keywords.length > 0
-                    ? tvData.keywords.map((genre) => {
-                        const match = matchGenre("tv", genre.id);
-                        if (!match) return null;
-                        return (
-                          <span key={`tv_genre_${genre.id}`}>
-                            <Link to={`/tv/genre/${genre.id}`}>
-                              {match.name}
-                            </Link>
-                          </span>
-                        );
-                      })
-                    : null}
-                </p>
-              ) : null}
-              <p
-                className={`${typo.body} ${typo.medium} ${styles.overview__content}`}
-              >
-                {tvData && tvData.tagline
-                  ? `${tvData.tagline}${
-                      !tvData.tagline.endsWith(".") ? "." : ""
-                    }`
-                  : null}{" "}
-                {tvData ? tvData.overview : null}
-              </p>
-              {tvData ? (
-                <div className={styles.actions}>
-                  <div className={styles.actions__request}>
-                    <RequestButton
-                      data={tvData}
-                      globalRequests={redux_requests}
-                      currentUser={currentUser}
-                      updateRequests={updateRequests}
-                      type="tv"
-                      newNotification={newNotification}
-                      classStyle={styles.actions__request__main_btn}
-                    />
+                    {tvData ? <Critics data={tvData} /> : null}
                   </div>
-                  <button className={`${buttons.icon} ${styles.actions__btn}`}>
-                    <ThumbUp viewBox="0 0 24 24" />
-                  </button>
-                  <button className={`${buttons.icon} ${styles.actions__btn}`}>
-                    <ThumbDown viewBox="0 0 24 24" />
-                  </button>
-                  <button className={`${buttons.icon} ${styles.actions__btn}`}>
-                    <IssueIcon viewBox="0 0 24 24" />
-                  </button>
-                  <button
-                    className={`${buttons.icon} ${styles.actions__btn} ${
-                      tvData &&
-                      tvData.videos &&
-                      tvData.videos.results &&
-                      tvData.videos.results.length > 0
-                        ? ""
-                        : styles.actions__btn__disabled
-                    }`}
-                    onClick={() => setTrailer(true)}
+                ) : null}
+                {tvData && tvData.genres && tvData.genres.length > 0 ? (
+                  <p
+                    className={`${typo.small} ${typo.uppercase} ${styles.overview__genres}`}
                   >
-                    <TrailerIcon viewBox="0 0 24 24" />
-                  </button>
-                  <button
-                    className={`${buttons.icon} ${styles.actions__btn} ${styles.actions__btn__disabled}`}
-                  >
-                    <WatchlistIcon />
-                  </button>
-                </div>
-              ) : null}
+                    {tvData.genres.map((genre) => {
+                      const match = matchGenre("tv", genre.id);
+                      if (!match) return null;
+                      return (
+                        <span key={`tv_genre_${genre.id}`}>
+                          <Link to={`/tv/genre/${genre.id}`}>{match.name}</Link>
+                        </span>
+                      );
+                    })}
+                    {tvData.keywords.length > 0
+                      ? tvData.keywords.map((genre) => {
+                          const match = matchGenre("tv", genre.id);
+                          if (!match) return null;
+                          return (
+                            <span key={`tv_genre_${genre.id}`}>
+                              <Link to={`/tv/genre/${genre.id}`}>
+                                {match.name}
+                              </Link>
+                            </span>
+                          );
+                        })
+                      : null}
+                  </p>
+                ) : null}
+                <p
+                  className={`${typo.body} ${typo.medium} ${styles.overview__content}`}
+                >
+                  {tvData && tvData.tagline
+                    ? `${tvData.tagline}${
+                        !tvData.tagline.endsWith(".") ? "." : ""
+                      }`
+                    : null}{" "}
+                  {tvData ? tvData.overview : null}
+                </p>
+                {tvData ? (
+                  <div className={styles.actions}>
+                    <div className={styles.actions__request}>
+                      <RequestButton
+                        data={tvData}
+                        globalRequests={redux_requests}
+                        currentUser={currentUser}
+                        updateRequests={updateRequests}
+                        type="tv"
+                        newNotification={newNotification}
+                        classStyle={styles.actions__request__main_btn}
+                      />
+                    </div>
+                    <button
+                      className={`${buttons.icon} ${styles.actions__btn}`}
+                    >
+                      <ThumbUp viewBox="0 0 24 24" />
+                    </button>
+                    <button
+                      className={`${buttons.icon} ${styles.actions__btn}`}
+                    >
+                      <ThumbDown viewBox="0 0 24 24" />
+                    </button>
+                    <button
+                      className={`${buttons.icon} ${styles.actions__btn}`}
+                    >
+                      <IssueIcon viewBox="0 0 24 24" />
+                    </button>
+                    <button
+                      className={`${buttons.icon} ${styles.actions__btn} ${
+                        tvData &&
+                        tvData.videos &&
+                        tvData.videos.results &&
+                        tvData.videos.results.length > 0
+                          ? ""
+                          : styles.actions__btn__disabled
+                      }`}
+                      onClick={() => setTrailer(true)}
+                    >
+                      <TrailerIcon viewBox="0 0 24 24" />
+                    </button>
+                    <button
+                      className={`${buttons.icon} ${styles.actions__btn} ${styles.actions__btn__disabled}`}
+                    >
+                      <WatchlistIcon />
+                    </button>
+                  </div>
+                ) : null}
+              </div>
             </div>
           </div>
         </div>

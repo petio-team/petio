@@ -28,6 +28,11 @@
       padding: 0;
     }
 
+    @media (min-width: $xxxl) {
+      max-width: 1000px;
+      height: 300px;
+    }
+
     span {
       width: 100%;
       height: 100%;
@@ -53,6 +58,12 @@
 
     @media (min-width: $lg) {
       width: 50%;
+    }
+
+    @media (min-width: $xxxl) {
+      max-width: 1000px;
+      margin-top: #{$spacing * 2};
+      margin-bottom: #{$spacing * 4};
     }
   }
 
@@ -84,6 +95,10 @@
       padding-top: $spacing;
       border-top: solid 1.5px $orange;
       width: 235px;
+
+      @media (min-width: $xxxl) {
+        width: 400px;
+      }
     }
   }
 
@@ -150,6 +165,10 @@
         width: 200px;
         min-width: initial;
       }
+
+      @media (min-width: $xxxl) {
+        width: 400px;
+      }
     }
 
     &__dropdown {
@@ -166,6 +185,10 @@
         @media (min-width: $md) {
           width: 200px;
           min-width: initial;
+        }
+
+        @media (min-width: $xxxl) {
+          width: 400px;
         }
 
         &__open {

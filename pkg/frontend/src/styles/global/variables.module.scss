@@ -17,6 +17,7 @@ $md: 768px;
 $lg: 1100px;
 $xl: 1440px;
 $xxl: 1920px;
+$xxxl: 2560px;
 
 :export {
   black: $black;
@@ -37,4 +38,5 @@ $xxl: 1920px;
   lg: $lg;
   xl: $xl;
   xxl: $xxl;
+  xxxl: $xxxl;
 }

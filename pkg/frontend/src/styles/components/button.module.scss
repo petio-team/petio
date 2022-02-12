@@ -31,6 +31,12 @@ $btnWidth: 1.5px;
   width: 100%;
   letter-spacing: 1px;
   border: solid $btnWidth transparent;
+
+  @media (min-width: $xxxl) {
+    height: 50px;
+    padding: 0 20px;
+    font-size: 20px;
+  }
 }
 
 // Orange
@@ -114,6 +120,15 @@ $btnWidth: 1.5px;
   @media (min-width: $lg) {
     &:hover {
       opacity: 1;
+    }
+  }
+
+  @media (min-width: $xxxl) {
+    width: 50px;
+
+    svg {
+      width: 20px;
+      height: 20px;
     }
   }
 }

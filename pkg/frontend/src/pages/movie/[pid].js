@@ -182,125 +182,135 @@ function Movie({
             callback={() => setTrailer(false)}
           />
         ) : null}
-        <div className="container">
-          <div className={styles.overview}>
-            <div className={styles.overview__logo}>
-              {movieData && movieData.logo ? (
-                <LazyLoadImage
-                  src={movieData.logo}
-                  alt={movieData.title}
-                  effect="opacity"
-                  visibleByDefault={true}
-                />
-              ) : (
-                <p className={`${typo.title} ${typo.bold}`}>
-                  {movieData ? movieData.title : ""}
-                </p>
-              )}
-            </div>
-            <div className={styles.overview__wrap}>
-              {movieData ? (
-                <div className={styles.overview__info}>
-                  <p className={`${typo.body} ${typo.bold}`}>
-                    {movieData && movieData.release_date
-                      ? new Date(movieData.release_date).getFullYear()
-                      : "Coming Soon"}
-                    <span className={typo.vertical_spacer}></span>
-                    {movieData && movieData.runtime
-                      ? timeConvert(movieData.runtime)
-                      : "Unknown"}
-                    <span className={typo.vertical_spacer}></span>
-                    {movieData && movieData.original_language_format
-                      ? movieData.original_language_format
-                      : "Unknown Language"}
-                    {movieData && movieData.age_rating ? (
-                      <span className={typo.vertical_spacer}></span>
-                    ) : null}
-                    {movieData && movieData.age_rating
-                      ? movieData.age_rating
-                      : ""}
+        <div className={hero.center}>
+          <div className="container">
+            <div className={styles.overview}>
+              <div className={styles.overview__logo}>
+                {movieData && movieData.logo ? (
+                  <LazyLoadImage
+                    src={movieData.logo}
+                    alt={movieData.title}
+                    effect="opacity"
+                    visibleByDefault={true}
+                  />
+                ) : (
+                  <p className={`${typo.title} ${typo.bold}`}>
+                    {movieData ? movieData.title : ""}
                   </p>
-                  {movieData ? <Critics data={movieData} /> : null}
-                </div>
-              ) : null}
-              {movieData && movieData.genres && movieData.genres.length > 0 ? (
-                <p
-                  className={`${typo.xsmall} ${typo.uppercase} ${styles.overview__genres}`}
-                >
-                  {movieData.genres.map((genre) => {
-                    const match = matchGenre("movie", genre.id);
-                    if (!match) return null;
-                    return (
-                      <span key={`movie_genre_${genre.id}`}>
-                        <Link to={`/movie/genre/${genre.id}`}>
-                          {match.name}
-                        </Link>
-                      </span>
-                    );
-                  })}
-                  {movieData.keywords.length > 0
-                    ? movieData.keywords.map((genre) => {
-                        const match = matchGenre("movie", genre.id);
-                        if (!match) return null;
-                        return (
-                          <span key={`movie_genre_${genre.id}`}>
-                            <Link to={`/movie/genre/${genre.id}`}>
-                              {match.name}
-                            </Link>
-                          </span>
-                        );
-                      })
-                    : null}
-                </p>
-              ) : null}
-              {movieData ? (
-                <p
-                  className={`${typo.body} ${typo.medium} ${styles.overview__content}`}
-                >
-                  {movieData.tagline} {movieData.overview}
-                </p>
-              ) : null}
-              {movieData ? (
-                <div className={styles.actions}>
-                  <div className={styles.actions__request}>
-                    <RequestButton
-                      data={movieData}
-                      globalRequests={redux_requests}
-                      currentUser={currentUser}
-                      updateRequests={updateRequests}
-                      newNotification={newNotification}
-                      classStyle={styles.actions__request__main_btn}
-                    />
+                )}
+              </div>
+              <div className={styles.overview__wrap}>
+                {movieData ? (
+                  <div className={styles.overview__info}>
+                    <p className={`${typo.body} ${typo.bold}`}>
+                      {movieData && movieData.release_date
+                        ? new Date(movieData.release_date).getFullYear()
+                        : "Coming Soon"}
+                      <span className={typo.vertical_spacer}></span>
+                      {movieData && movieData.runtime
+                        ? timeConvert(movieData.runtime)
+                        : "Unknown"}
+                      <span className={typo.vertical_spacer}></span>
+                      {movieData && movieData.original_language_format
+                        ? movieData.original_language_format
+                        : "Unknown Language"}
+                      {movieData && movieData.age_rating ? (
+                        <span className={typo.vertical_spacer}></span>
+                      ) : null}
+                      {movieData && movieData.age_rating
+                        ? movieData.age_rating
+                        : ""}
+                    </p>
+                    {movieData ? <Critics data={movieData} /> : null}
                   </div>
-                  <button className={`${buttons.icon} ${styles.actions__btn}`}>
-                    <ThumbUp viewBox="0 0 24 24" />
-                  </button>
-                  <button className={`${buttons.icon} ${styles.actions__btn}`}>
-                    <ThumbDown viewBox="0 0 24 24" />
-                  </button>
-                  <button className={`${buttons.icon} ${styles.actions__btn}`}>
-                    <IssueIcon viewBox="0 0 24 24" />
-                  </button>
-                  <button
-                    className={`${buttons.icon} ${styles.actions__btn} ${
-                      movieData &&
-                      movieData.videos &&
-                      movieData.videos.results &&
-                      movieData.videos.results.length > 0
-                        ? ""
-                        : styles.actions__btn__disabled
-                    }`}
-                    onClick={() => setTrailer(true)}
+                ) : null}
+                {movieData &&
+                movieData.genres &&
+                movieData.genres.length > 0 ? (
+                  <p
+                    className={`${typo.xsmall} ${typo.uppercase} ${styles.overview__genres}`}
                   >
-                    <TrailerIcon viewBox="0 0 24 24" />
-                  </button>
-                  <button
-                    className={`${buttons.icon} ${styles.actions__btn} ${styles.actions__btn__disabled}`}
+                    {movieData.genres.map((genre) => {
+                      const match = matchGenre("movie", genre.id);
+                      if (!match) return null;
+                      return (
+                        <span key={`movie_genre_${genre.id}`}>
+                          <Link to={`/movie/genre/${genre.id}`}>
+                            {match.name}
+                          </Link>
+                        </span>
+                      );
+                    })}
+                    {movieData.keywords.length > 0
+                      ? movieData.keywords.map((genre) => {
+                          const match = matchGenre("movie", genre.id);
+                          if (!match) return null;
+                          return (
+                            <span key={`movie_genre_${genre.id}`}>
+                              <Link to={`/movie/genre/${genre.id}`}>
+                                {match.name}
+                              </Link>
+                            </span>
+                          );
+                        })
+                      : null}
+                  </p>
+                ) : null}
+                {movieData ? (
+                  <p
+                    className={`${typo.body} ${typo.medium} ${styles.overview__content}`}
                   >
-                    <WatchlistIcon />
-                  </button>
-                </div>
-              ) : null}
+                    {movieData.tagline} {movieData.overview}
+                  </p>
+                ) : null}
+                {movieData ? (
+                  <div className={styles.actions}>
+                    <div className={styles.actions__request}>
+                      <RequestButton
+                        data={movieData}
+                        globalRequests={redux_requests}
+                        currentUser={currentUser}
+                        updateRequests={updateRequests}
+                        newNotification={newNotification}
+                        classStyle={styles.actions__request__main_btn}
+                      />
+                    </div>
+                    <button
+                      className={`${buttons.icon} ${styles.actions__btn}`}
+                    >
+                      <ThumbUp viewBox="0 0 24 24" />
+                    </button>
+                    <button
+                      className={`${buttons.icon} ${styles.actions__btn}`}
+                    >
+                      <ThumbDown viewBox="0 0 24 24" />
+                    </button>
+                    <button
+                      className={`${buttons.icon} ${styles.actions__btn}`}
+                    >
+                      <IssueIcon viewBox="0 0 24 24" />
+                    </button>
+                    <button
+                      className={`${buttons.icon} ${styles.actions__btn} ${
+                        movieData &&
+                        movieData.videos &&
+                        movieData.videos.results &&
+                        movieData.videos.results.length > 0
+                          ? ""
+                          : styles.actions__btn__disabled
+                      }`}
+                      onClick={() => setTrailer(true)}
+                    >
+                      <TrailerIcon viewBox="0 0 24 24" />
+                    </button>
+                    <button
+                      className={`${buttons.icon} ${styles.actions__btn} ${styles.actions__btn__disabled}`}
+                    >
+                      <WatchlistIcon />
+                    </button>
+                  </div>
+                ) : null}
+              </div>
             </div>
           </div>
         </div>

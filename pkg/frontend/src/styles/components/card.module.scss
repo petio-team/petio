@@ -22,6 +22,12 @@
 
     @media (min-width: $lg) {
       max-width: 216px;
+      height: 22px;
+    }
+
+    @media (min-width: $xxxl) {
+      max-width: 300px;
+      height: 30px;
     }
 
     p {
@@ -40,6 +46,10 @@
 
         @media (min-width: $lg) {
           animation-name: marqueeLg;
+        }
+
+        @media (min-width: $xxxl) {
+          animation-name: marqueeXxxl;
         }
       }
     }
@@ -91,6 +101,21 @@
   }
 }
 
+@keyframes marqueeXxxl {
+  0% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(0);
+  }
+  80% {
+    transform: translateX(calc(-100% + 300px));
+  }
+  100% {
+    transform: translateX(calc(-100% + 300px));
+  }
+}
+
 .default {
   width: 30vw;
   height: 45vw;
@@ -126,6 +151,11 @@
         opacity: 1;
       }
     }
+  }
+
+  @media (min-width: $xxxl) {
+    width: 300px;
+    height: 450px;
   }
 
   span {
@@ -164,6 +194,11 @@
     &:hover {
       transform: none;
     }
+  }
+
+  @media (min-width: $xxxl) {
+    width: 620px;
+    height: 264px;
   }
 }
 
