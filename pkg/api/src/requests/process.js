@@ -12,6 +12,7 @@ const Telegram = require("../notifications/telegram");
 const { showLookup } = require("../tmdb/show");
 const fs = require("fs");
 const path = require("path");
+const { conf } = require("../app/config");
 
 class processRequest {
   constructor(req = {}, usr = {}) {
@@ -183,45 +184,22 @@ class processRequest {
         };
       }
     } else {
-      let project_folder, configFile, configData, configParse;
       if (this.request.type === "movie") {
-        if (process.pkg) {
-          project_folder = path.dirname(process.execPath);
-          configFile = path.join(project_folder, "./config/radarr.json");
-        } else {
-          project_folder = __dirname;
-          configFile = path.join(project_folder, "../config/radarr.json");
-        }
-        configData = fs.readFileSync(configFile);
-        configParse = JSON.parse(configData);
-
-        for (let s in configParse) {
-          let server = configParse[s];
-          if (profile.radarr && profile.radarr[server.uuid]) {
-            pending[server.uuid] = {
-              path: server.path_title,
-              profile: server.profile,
+        for (let s in conf.get("radarr")) {
+          if (profile.radarr && profile.radarr[s.uuid]) {
+            pending[s.uuid] = {
+              path: s.path.location,
+              profile: s.profile.name,
               tag: false,
             };
           }
         }
       } else {
-        if (process.pkg) {
-          project_folder = path.dirname(process.execPath);
-          configFile = path.join(project_folder, "./config/sonarr.json");
-        } else {
-          project_folder = __dirname;
-          configFile = path.join(project_folder, "../config/sonarr.json");
-        }
-        configData = fs.readFileSync(configFile);
-        configParse = JSON.parse(configData);
-
-        for (let s in configParse) {
-          let server = configParse[s];
-          if (profile.sonarr && profile.sonarr[server.uuid]) {
-            pending[server.uuid] = {
-              path: server.path_title,
-              profile: server.profile,
+        for (let s in conf.get("sonarr")) {
+          if (profile.sonarr && profile.sonarr[s.uuid]) {
+            pending[s.uuid] = {
+              path: s.path.location,
+              profile: s.profile.name,
               tag: false,
             };
           }
