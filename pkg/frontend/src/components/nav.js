@@ -24,6 +24,7 @@ export default function Nav(props) {
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [mobile, setMobile] = useState(false);
+  const [darken, setDarken] = useState(false);
 
   const history = useHistory();
   const inputRef = useRef();
@@ -32,10 +33,21 @@ export default function Nav(props) {
     function handleResize() {
       setMobile(window.innerWidth < 992);
     }
+    function handleScroll() {
+      if (window.scrollY > 500) {
+        setDarken(true);
+      } else {
+        setDarken(false);
+      }
+    }
     window.addEventListener("resize", handleResize);
     handleResize();
+    window.addEventListener("scroll", handleScroll);
 
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   function updateSearch(e) {
@@ -75,7 +87,9 @@ export default function Nav(props) {
   return (
     <>
       <div
-        className={`${styles.nav} ${showSearch ? styles.nav__search_open : ""}`}
+        className={`${styles.nav} ${
+          showSearch ? styles.nav__search_open : ""
+        } ${darken ? styles.nav__darken : ""}`}
       >
         <div className="container">
           <div className={styles.nav__inner}>
