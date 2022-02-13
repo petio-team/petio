@@ -255,7 +255,7 @@ class Radarr {
       } else {
         // Loop for all servers default
         for (let server of this.fullConfig) {
-          if (!server.active) {
+          if (!server.enabled) {
             logger.log(
               "warn",
               `SERVICE - RADARR: [${server.title}] Server not active`
