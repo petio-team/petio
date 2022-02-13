@@ -292,11 +292,7 @@ class Requests extends React.Component {
             data-type={type}
             data-id={server.uuid}
             type="checkbox"
-            checked={
-              this.state[`edit_${type}`][server.uuid]
-                ? this.state[`edit_${type}`][server.uuid].active
-                : false
-            }
+            checked={server.enabled}
             name={"active"}
             onChange={this.changeServerSettings}
           />
@@ -313,11 +309,7 @@ class Requests extends React.Component {
                 data-type={type}
                 data-id={server.uuid}
                 name="profile"
-                value={
-                  this.state[`edit_${type}`][server.uuid]
-                    ? this.state[`edit_${type}`][server.uuid].profile
-                    : false
-                }
+                value={server.profile.id}
                 onChange={this.changeServerSettings}
               >
                 <option value="">Please choose</option>
@@ -345,16 +337,7 @@ class Requests extends React.Component {
                 data-type={type}
                 data-id={server.uuid}
                 name="path"
-                value={
-                  this.state[`edit_${type}`][server.uuid]?.path
-                    ? this.state[`edit_${type}`][server.uuid]?.path
-                    : false
-                }
-                dataValue={
-                  this.state[`edit_${type}`][server.uuid]?.path
-                    ? this.state[`edit_${type}`][server.uuid]?.path
-                    : false
-                }
+                value={server.path.id}
                 onChange={this.changeServerSettings}
               >
                 <option value="">Please choose</option>
@@ -363,7 +346,7 @@ class Requests extends React.Component {
                     return (
                       <option
                         key={`${type}_profile_${server.uuid}_${path.id}`}
-                        value={path.path}
+                        value={path.id}
                       >
                         {path.path}
                       </option>
@@ -543,7 +526,7 @@ class Requests extends React.Component {
           {this.state.activeRequest ? (
             <>
               {this.state.activeRequest.type === "tv" &&
-              !this.state.activeRequest.tvdb_id ? (
+                !this.state.activeRequest.tvdb_id ? (
                 <p className="warning-text">
                   <WarningIcon /> No TVDb ID
                 </p>
@@ -552,7 +535,7 @@ class Requests extends React.Component {
                 {this.state.activeRequest.title}
               </p>
               {this.state.activeRequest.type === "tv" &&
-              !this.state.activeRequest.tvdb_id ? (
+                !this.state.activeRequest.tvdb_id ? (
                 <p>Can&apos;t send to DVR without TVDB ID</p>
               ) : (
                 <>
