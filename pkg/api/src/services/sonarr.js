@@ -84,7 +84,7 @@ class Sonarr {
     if (!this.config || this.config.title == "Server Removed") {
       return false;
     }
-    if (!this.config.active && !test) {
+    if (!this.config.enabled && !test) {
       logger.log(
         "verbose",
         `SERVICE - SONARR: [${this.config.title}] Sonarr not enabled`
@@ -311,7 +311,7 @@ class Sonarr {
     let mainCalendar = [];
     let now = new Date();
     for (let server of this.fullConfig) {
-      if (server.active) {
+      if (server.enabled) {
         this.config = server;
 
         try {
