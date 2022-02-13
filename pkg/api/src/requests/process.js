@@ -10,8 +10,6 @@ const filter = require("./filter");
 const Discord = require("../notifications/discord");
 const Telegram = require("../notifications/telegram");
 const { showLookup } = require("../tmdb/show");
-const fs = require("fs");
-const path = require("path");
 const { conf } = require("../app/config");
 
 class processRequest {
@@ -206,6 +204,7 @@ class processRequest {
         }
       }
     }
+    console.log(pending);
     if (Object.keys(pending).length > 0) {
       await Request.updateOne(
         { requestId: this.request.id },
