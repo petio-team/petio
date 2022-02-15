@@ -6,6 +6,7 @@ import { Route, Switch } from "react-router";
 import AdminDashboard from "./dashboard";
 import { Link } from "react-router-dom";
 import NotFound from "../404";
+import Settings from "./settings";
 
 const mapStateToProps = (state) => {
   return {
@@ -40,6 +41,11 @@ function Admin({
                 <Link to="/admin/requests">Requests</Link>
               </p>
             </div>
+            <div className={styles.menu__item}>
+              <p className={`${typo.body} ${typo.uppercase} ${typo.medium}`}>
+                <Link to="/admin/settings">Settings</Link>
+              </p>
+            </div>
           </div>
         </div>
         <div className={styles.viewport}>
@@ -51,6 +57,9 @@ function Admin({
               <div className="container">
                 <p>Requests</p>
               </div>
+            </Route>
+            <Route path="/admin/settings">
+              <Settings />
             </Route>
             <Route path="*">
               <NotFound />

@@ -1,0 +1,24 @@
+@import "../global/variables.module.scss";
+
+.inner {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.sidebar {
+  background: $grey;
+  width: 300px;
+  margin-right: 40px;
+  border-radius: 5px;
+  overflow: hidden;
+
+  &__item {
+    display: block;
+    padding: 15px 20px;
+
+    &__active,
+    &:hover {
+      background: $orange;
+    }
+  }
+}
