@@ -205,7 +205,7 @@ class Requests extends React.Component {
             edit_radarr[uuid] = {
               active: true,
               profile: server.profile,
-              path: server.path,
+              path: server.path.location,
             };
           });
         }
@@ -234,7 +234,7 @@ class Requests extends React.Component {
             edit_sonarr[uuid] = {
               active: true,
               profile: server.profile,
-              path: server.path,
+              path: server.path.location,
             };
           });
         }
@@ -292,7 +292,13 @@ class Requests extends React.Component {
             data-type={type}
             data-id={server.uuid}
             type="checkbox"
-            checked={server.enabled}
+            checked={
+              this.state[`edit_${type}`] &&
+              this.state[`edit_${type}`][server.uuid] &&
+              this.state[`edit_${type}`][server.uuid].active
+                ? true
+                : false
+            }
             name={"active"}
             onChange={this.changeServerSettings}
           />
@@ -303,13 +309,25 @@ class Requests extends React.Component {
           <>
             <p className="request-edit--server--subtitle">Profile</p>
             <div
-              className={`styled-input--select ${editable ? "" : "disabled"}`}
+              className={`styled-input--select ${
+                editable &&
+                this.state[`edit_${type}`] &&
+                this.state[`edit_${type}`][server.uuid] &&
+                this.state[`edit_${type}`][server.uuid].active
+                  ? ""
+                  : "disabled"
+              }`}
             >
               <select
                 data-type={type}
                 data-id={server.uuid}
                 name="profile"
-                value={server.profile.id}
+                value={
+                  this.state[`edit_${type}`] &&
+                  this.state[`edit_${type}`][server.uuid]
+                    ? this.state[`edit_${type}`][server.uuid].profile
+                    : false
+                }
                 onChange={this.changeServerSettings}
               >
                 <option value="">Please choose</option>
@@ -331,13 +349,26 @@ class Requests extends React.Component {
             </div>
             <p className="request-edit--server--subtitle">Root Path</p>
             <div
-              className={`styled-input--select ${editable ? "" : "disabled"}`}
+              className={`styled-input--select ${
+                editable &&
+                this.state[`edit_${type}`] &&
+                this.state[`edit_${type}`][server.uuid] &&
+                this.state[`edit_${type}`][server.uuid].active
+                  ? ""
+                  : "disabled"
+              }`}
             >
               <select
                 data-type={type}
                 data-id={server.uuid}
                 name="path"
-                value={server.path.id}
+                value={
+                  this.state[`edit_${type}`] &&
+                  this.state[`edit_${type}`][server.uuid] &&
+                  this.state[`edit_${type}`][server.uuid].path
+                    ? this.state[`edit_${type}`][server.uuid].path
+                    : false
+                }
                 onChange={this.changeServerSettings}
               >
                 <option value="">Please choose</option>
@@ -346,7 +377,7 @@ class Requests extends React.Component {
                     return (
                       <option
                         key={`${type}_profile_${server.uuid}_${path.id}`}
-                        value={path.id}
+                        value={path.path}
                       >
                         {path.path}
                       </option>
@@ -526,7 +557,7 @@ class Requests extends React.Component {
           {this.state.activeRequest ? (
             <>
               {this.state.activeRequest.type === "tv" &&
-                !this.state.activeRequest.tvdb_id ? (
+              !this.state.activeRequest.tvdb_id ? (
                 <p className="warning-text">
                   <WarningIcon /> No TVDb ID
                 </p>
@@ -535,7 +566,7 @@ class Requests extends React.Component {
                 {this.state.activeRequest.title}
               </p>
               {this.state.activeRequest.type === "tv" &&
-                !this.state.activeRequest.tvdb_id ? (
+              !this.state.activeRequest.tvdb_id ? (
                 <p>Can&apos;t send to DVR without TVDB ID</p>
               ) : (
                 <>
