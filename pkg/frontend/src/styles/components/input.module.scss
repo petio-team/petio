@@ -12,15 +12,10 @@
   // border: solid 1px $darkGrey;
   font-weight: 700;
   color: $white;
+  display: block;
 
   &::placeholder {
     color: $white;
-  }
-
-  &.disabled,
-  &:read-only {
-    opacity: 0.5;
-    cursor: no-drop;
   }
 
   @media (min-width: $xxxl) {
@@ -32,6 +27,18 @@
 
 .text {
   @extend .base;
+
+  &__light {
+    @extend .base;
+    background: lighten($grey, 10);
+  }
+
+  &.disabled,
+  &:read-only {
+    opacity: 0.5;
+    cursor: no-drop;
+    pointer-events: none;
+  }
 }
 
 .prefix {
@@ -123,6 +130,37 @@
     &:before,
     &:after {
       width: 20px;
+    }
+  }
+}
+
+.select {
+  @extend .base;
+
+  &__light {
+    @extend .base;
+    background: lighten($grey, 10);
+  }
+}
+
+.checkboxes {
+  &__item {
+    display: flex;
+    align-items: center;
+
+    input {
+      appearance: none;
+      background: none;
+      border: solid 1px $orange;
+      width: 15px;
+      height: 15px;
+      min-width: 15px;
+      margin-right: 20px;
+      cursor: pointer;
+
+      &:checked {
+        background: $orange;
+      }
     }
   }
 }

@@ -1,5 +1,6 @@
 import { post, get } from "../helpers";
 import store from "../redux/store.js";
+import { updateConfig } from "./config.service";
 import { login } from "./user.service";
 
 const plexHeaders = {
@@ -31,12 +32,29 @@ function validatePin(id) {
   return process(url, headers, method).then((response) => response.json());
 }
 
-async function waitForPin(plexWindow, id, setup = false, login = false) {
+async function waitForPin(
+  plexWindow,
+  id,
+  setup = false,
+  login = false,
+  reAuth = false
+) {
   await timeout(1000);
   let response = await validatePin(id);
   if (response.authToken) {
     plexWindow.close();
-    if (setup) {
+    if (reAuth) {
+      if (response.authToken) {
+        updateConfig({
+          plexToken: response.authToken,
+        });
+        return {};
+      } else {
+        return {
+          error: "Auth Failed",
+        };
+      }
+    } else if (setup) {
       updateStore({
         type: "user/plex-token",
         token: response.authToken,
@@ -74,7 +92,7 @@ async function waitForPin(plexWindow, id, setup = false, login = false) {
       error: "Plex window closed",
     };
   } else {
-    return await waitForPin(plexWindow, id, setup, login);
+    return await waitForPin(plexWindow, id, setup, login, reAuth);
   }
 }
 
@@ -312,4 +330,21 @@ function process(url, headers, method, body = null) {
   }
 
   return fetch(url, args);
+}
+
+export async function plexToken(plexWindow) {
+  let pins = await getPins();
+  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=fc684eb1-cdff-46cc-a807-a3720696ae9f&code=${pins.code}`;
+  let data = await waitForPin(plexWindow, pins.id, false, false, true);
+  if (data.error) throw data.error;
+  return data;
+}
+
+export async function testPlex() {
+  try {
+    const data = await get(`/plex/test_plex`);
+    return data;
+  } catch (e) {
+    throw e;
+  }
 }

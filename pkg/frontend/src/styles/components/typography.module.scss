@@ -166,3 +166,9 @@
   background: $white;
   display: inline-block;
 }
+
+code {
+  font-size: inherit;
+  line-height: inherit;
+  background: darken($orange, 10);
+}

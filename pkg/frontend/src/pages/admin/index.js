@@ -7,6 +7,7 @@ import AdminDashboard from "./dashboard";
 import { Link } from "react-router-dom";
 import NotFound from "../404";
 import Settings from "./settings";
+import Meta from "../../components/meta";
 
 const mapStateToProps = (state) => {
   return {
@@ -28,6 +29,7 @@ function Admin({
   if (redux_user.isAdminLogin)
     return (
       <div className={styles.wrap}>
+        <Meta title="Admin" />
         <div className="container">
           <p className={`${typo.title} ${typo.bold}`}>Admin Area</p>
           <div className={styles.menu}>
@@ -51,7 +53,7 @@ function Admin({
         <div className={styles.viewport}>
           <Switch>
             <Route exact path="/admin">
-              <AdminDashboard />
+              <AdminDashboard newNotification={newNotification} />
             </Route>
             <Route exact path="/admin/requests">
               <div className="container">
@@ -59,7 +61,7 @@ function Admin({
               </div>
             </Route>
             <Route path="/admin/settings">
-              <Settings />
+              <Settings newNotification={newNotification} />
             </Route>
             <Route path="*">
               <NotFound />
