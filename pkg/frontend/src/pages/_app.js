@@ -208,6 +208,7 @@ function Petio({ redux_pos }) {
   useLayoutEffect(() => {
     let bounce = false;
     function checkScroll() {
+      if (history.location.pathname.startsWith("/admin")) return;
       clearTimeout(bounce);
       bounce = setTimeout(() => {
         storePosition(history.location.pathname, window.scrollY);
@@ -216,9 +217,11 @@ function Petio({ redux_pos }) {
 
     window.addEventListener("scroll", checkScroll);
     window.addEventListener("touchend", () => {
+      if (history.location.pathname.startsWith("/admin")) return;
       storePosition(history.location.pathname, window.scrollY);
     });
     window.addEventListener("mouseup", () => {
+      if (history.location.pathname.startsWith("/admin")) return;
       storePosition(history.location.pathname, window.scrollY);
     });
 

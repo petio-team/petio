@@ -67,6 +67,21 @@ $btnWidth: 1.5px;
       }
     }
   }
+
+  &__red {
+    @extend .primary;
+    background: $red;
+    color: $white;
+    border: solid $btnWidth $red;
+    opacity: 1 !important;
+
+    @media (min-width: $lg) {
+      &:hover:not(.disabled) {
+        background: darken($red, 10);
+        border-color: darken($red, 10);
+      }
+    }
+  }
 }
 
 .secondary {

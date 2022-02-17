@@ -8,7 +8,6 @@ const origin = isDev
   : `${window.location.protocol}//${window.location.host}`;
 const basePath = window.location.pathname.replace(/\/$/, "");
 const API_URL = `${origin}${basePath}/api`;
-console.log(window.location.pathname, basePath);
 
 function getCookie(cname) {
   var name = cname + "=";

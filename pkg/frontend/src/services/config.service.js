@@ -38,6 +38,35 @@ export async function getConfig() {
   return data;
 }
 
+export function getRadarr() {
+  return get("/services/radarr/config");
+}
+
+export function saveRadarrConfig(config) {
+  if (!config) throw "No config provided";
+
+  return post(`/services/radarr/config`, { data: JSON.stringify(config) });
+}
+
+export async function testRadarr(id) {
+  if (!id) throw "No ID";
+  return get(`/services/radarr/test/${id}`);
+}
+
+export async function getRadarrOptions(id) {
+  let [paths, profiles, tags] = await Promise.all([
+    get(`/services/radarr/paths/${id}`),
+    get(`/services/radarr/profiles/${id}`),
+    get(`/services/radarr/tags/${id}`),
+  ]);
+
+  return {
+    paths: paths,
+    profiles: profiles,
+    tags: tags,
+  };
+}
+
 function updateStore(data = false) {
   if (!data) return false;
   return store.dispatch(data);

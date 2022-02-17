@@ -10,12 +10,13 @@
   padding: 0 10px;
   background: $grey;
   // border: solid 1px $darkGrey;
-  font-weight: 700;
+  font-weight: 500;
   color: $white;
   display: block;
 
   &::placeholder {
-    color: $white;
+    color: rgba($white, 0.6);
+    font-weight: normal;
   }
 
   @media (min-width: $xxxl) {

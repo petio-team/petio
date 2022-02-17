@@ -172,3 +172,8 @@ code {
   line-height: inherit;
   background: darken($orange, 10);
 }
+
+.link {
+  color: $orange;
+  text-decoration: underline;
+}

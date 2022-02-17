@@ -56,7 +56,7 @@ function Activity({ system }) {
   return (
     <div className={styles.dashboard__activity__wrap}>
       {system.sessions && system.sessions.length > 0 ? (
-        system.sessions.map((session) => {
+        system.sessions.map((session, i) => {
           let media = null;
           let selectedMedia = false;
           let type = false;
@@ -95,7 +95,7 @@ function Activity({ system }) {
 
           return (
             <div
-              key={`activity_sesion_${session.ratingKey}`}
+              key={`activity_sesion_${session.ratingKey}__${i}`}
               className={styles.dashboard__activity__item}
             >
               <ActivitySession

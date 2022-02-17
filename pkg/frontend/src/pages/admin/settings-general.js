@@ -6,7 +6,7 @@ import inputs from "../../styles/components/input.module.scss";
 import oAuthWindow from "../../components/oAuthWindow";
 import { plexToken, testPlex } from "../../services/plex.service";
 import { connect } from "react-redux";
-import { getConfig } from "../../services/config.service";
+import { getConfig, updateConfig } from "../../services/config.service";
 import { useState, useEffect } from "react";
 
 const mapStateToProps = (state) => {
@@ -96,6 +96,29 @@ function SettingsGeneral(props) {
     });
   }
 
+  async function save(key) {
+    if (!key) return;
+    const n = props.newNotification({
+      message: "Saving Settings",
+      type: "loading",
+    });
+    try {
+      await updateConfig({ [key]: config[key] });
+      props.newNotification({
+        message: "Settings Saved",
+        type: "success",
+        id: n,
+      });
+    } catch (e) {
+      console.log(e);
+      props.newNotification({
+        message: "Error: Failed to Save Settings",
+        type: "error",
+        id: n,
+      });
+    }
+  }
+
   if (!config) return null;
 
   return (
@@ -151,6 +174,7 @@ function SettingsGeneral(props) {
         <br />
         <button
           className={`${buttons.primary} ${!config ? buttons.disabled : ""}`}
+          onClick={() => save("base_path")}
         >
           Save
         </button>
@@ -181,6 +205,7 @@ function SettingsGeneral(props) {
         <br />
         <button
           className={`${buttons.primary} ${!config ? buttons.disabled : ""}`}
+          onClick={() => save("login_type")}
         >
           Save
         </button>
@@ -203,6 +228,7 @@ function SettingsGeneral(props) {
         <br />
         <button
           className={`${buttons.primary} ${!config ? buttons.disabled : ""}`}
+          onClick={() => save("plexPopular")}
         >
           Save
         </button>
