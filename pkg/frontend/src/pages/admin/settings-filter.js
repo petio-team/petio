@@ -67,77 +67,91 @@ export default function SettingsFilter(props) {
               <p className={`${typo.smtitle} ${typo.bold}`}>
                 {key === "movie_filters" ? "Movie" : "TV"} Filters
               </p>
-              {filters[key].map((item, i) => {
-                // const actions = item.actions;
-                const required = item.rows.filter(
-                  (r) => r.comparison === "and"
-                );
-                const optional = item.rows.filter(
-                  (r) => r.comparison !== "and"
-                );
-                return (
-                  <div className={styles.filter__grid__item}>
-                    <p className={`${typo.body} ${typo.medium}`}>
-                      {item.title || `Movie Filter #${i + 1}`}
-                    </p>
-                    <div className={styles.filter__grid__item__section}>
-                      <p className={`${typo.body} ${typo.medium}`}>Criteria</p>
-                      {optional && optional.length > 0
-                        ? optional.map((option) => {
-                            return (
-                              <div
-                                className={
-                                  styles.filter__grid__item__section__item
-                                }
-                              >
-                                <p>{option.condition}</p>
-                              </div>
-                            );
-                          })
-                        : null}
-                      <div className={styles.filter__grid__item__section__add}>
-                        <button className={`${buttons.secondary}`}>
-                          Add Condition +
+              {filters[key] && filters[key].length > 0
+                ? filters[key].map((item, i) => {
+                    // const actions = item.actions;
+                    const required = item.rows.filter(
+                      (r) => r.comparison === "and"
+                    );
+                    const optional = item.rows.filter(
+                      (r) => r.comparison !== "and"
+                    );
+                    return (
+                      <div className={styles.filter__grid__item}>
+                        <p className={`${typo.body} ${typo.medium}`}>
+                          {item.title || `Movie Filter #${i + 1}`}
+                        </p>
+                        <div className={styles.filter__grid__item__section}>
+                          <p className={`${typo.body} ${typo.medium}`}>
+                            Criteria
+                          </p>
+                          {optional && optional.length > 0
+                            ? optional.map((option) => {
+                                return (
+                                  <div
+                                    className={
+                                      styles.filter__grid__item__section__item
+                                    }
+                                  >
+                                    <p>{option.condition}</p>
+                                  </div>
+                                );
+                              })
+                            : null}
+                          <div
+                            className={styles.filter__grid__item__section__add}
+                          >
+                            <button className={`${buttons.secondary}`}>
+                              Add Condition +
+                            </button>
+                          </div>
+                        </div>
+                        <div className={styles.filter__grid__item__section}>
+                          <p className={`${typo.body} ${typo.medium}`}>
+                            Required
+                          </p>
+                          {required && required.length > 0
+                            ? required.map((option) => {
+                                return (
+                                  <div
+                                    className={
+                                      styles.filter__grid__item__section__item
+                                    }
+                                  >
+                                    <p>{option.condition}</p>
+                                  </div>
+                                );
+                              })
+                            : null}
+                          <div
+                            className={styles.filter__grid__item__section__add}
+                          >
+                            <button className={`${buttons.secondary}`}>
+                              Add Condition +
+                            </button>
+                          </div>
+                        </div>
+                        <div className={styles.filter__grid__item__section}>
+                          <p className={`${typo.body} ${typo.medium}`}>
+                            Actions
+                          </p>
+                          <div
+                            className={styles.filter__grid__item__section__add}
+                          >
+                            <button className={`${buttons.secondary}`}>
+                              Add Action +
+                            </button>
+                          </div>
+                        </div>
+                        <button
+                          className={`${styles.filter__grid__item__remove} ${buttons.primary__red}`}
+                        >
+                          Remove
                         </button>
                       </div>
-                    </div>
-                    <div className={styles.filter__grid__item__section}>
-                      <p className={`${typo.body} ${typo.medium}`}>Required</p>
-                      {required && required.length > 0
-                        ? required.map((option) => {
-                            return (
-                              <div
-                                className={
-                                  styles.filter__grid__item__section__item
-                                }
-                              >
-                                <p>{option.condition}</p>
-                              </div>
-                            );
-                          })
-                        : null}
-                      <div className={styles.filter__grid__item__section__add}>
-                        <button className={`${buttons.secondary}`}>
-                          Add Condition +
-                        </button>
-                      </div>
-                    </div>
-                    <div className={styles.filter__grid__item__section}>
-                      <p className={`${typo.body} ${typo.medium}`}>Actions</p>
-                      <div className={styles.filter__grid__item__section__add}>
-                        <button className={`${buttons.secondary}`}>
-                          Add Action +
-                        </button>
-                      </div>
-                    </div>
-                    <button
-                      className={`${styles.filter__grid__item__remove} ${buttons.primary__red}`}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                );
-              })}
+                    );
+                  })
+                : null}
               <div className={styles.filter__grid__add}>
                 <button className={`${buttons.primary}`}>Add Filter +</button>
               </div>
