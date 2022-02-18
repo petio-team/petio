@@ -594,6 +594,17 @@ export default function SettingsArr(props) {
                   </button>
                   <br />
                   <button
+                    className={`${buttons.secondary} ${
+                      currentServer.path.id && currentServer.profile.id
+                        ? ""
+                        : buttons.disabled
+                    }`}
+                    onClick={() => testServer(currentServer.uuid)}
+                  >
+                    Test
+                  </button>
+                  <br />
+                  <button
                     className={`${buttons.primary} ${
                       currentServer.path.id && currentServer.profile.id
                         ? ""
