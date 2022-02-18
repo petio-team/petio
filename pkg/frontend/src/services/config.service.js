@@ -96,6 +96,14 @@ export async function getSonarrOptions(id) {
   };
 }
 
+export function updateFilters(movie, tv) {
+  return post(`/filter/update`, { movie, tv });
+}
+
+export function getFilters() {
+  return get(`/filter`);
+}
+
 function updateStore(data = false) {
   if (!data) return false;
   return store.dispatch(data);

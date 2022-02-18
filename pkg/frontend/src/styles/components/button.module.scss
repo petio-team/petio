@@ -97,6 +97,20 @@ $btnWidth: 1.5px;
       color: $black;
     }
   }
+
+  &__red {
+    @extend .secondary;
+    border: solid $btnWidth $red;
+    color: $red;
+
+    @media (min-width: $lg) {
+      &:hover {
+        background: $red;
+        border-color: $red;
+        color: $white;
+      }
+    }
+  }
 }
 
 .disabled {

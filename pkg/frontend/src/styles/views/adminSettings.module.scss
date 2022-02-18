@@ -182,3 +182,59 @@
     }
   }
 }
+
+.filter {
+  &__wrap {
+    width: 100%;
+
+    // p {
+    //   width: 500px;
+    //   max-width: 100%;
+    // }
+  }
+
+  &__grid {
+    margin-top: 10px;
+
+    &__section {
+      margin-bottom: 20px;
+    }
+
+    &__add {
+      background: $grey;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+
+    &__item {
+      background: $grey;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+
+      &__section {
+        background: rgba($white, 0.1);
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 10px;
+
+        &__item {
+          background: rgba($white, 0.1);
+          padding: 10px;
+          border-radius: 5px;
+          margin-top: 10px;
+        }
+
+        &__add {
+          margin-top: 10px;
+          cursor: pointer;
+        }
+      }
+
+      &__remove {
+        margin-top: 10px;
+      }
+    }
+  }
+}
