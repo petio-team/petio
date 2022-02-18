@@ -1,7 +1,8 @@
 {
-	"extends": ["react-app"],
-	"rules": {
-		"no-throw-literal": 0,
-		"import/no-anonymous-default-export": 0
-	}
+  "extends": ["react-app"],
+  "rules": {
+    "no-throw-literal": 0,
+    "import/no-anonymous-default-export": 0,
+    "eqeqeq": 0
+  }
 }

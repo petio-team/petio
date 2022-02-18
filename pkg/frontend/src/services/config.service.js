@@ -67,6 +67,35 @@ export async function getRadarrOptions(id) {
   };
 }
 
+export function getSonarr() {
+  return get("/services/sonarr/config");
+}
+
+export function saveSonarrConfig(config) {
+  if (!config) throw "No config provided";
+
+  return post(`/services/sonarr/config`, { data: JSON.stringify(config) });
+}
+
+export async function testSonarr(id) {
+  if (!id) throw "No ID";
+  return get(`/services/sonarr/test/${id}`);
+}
+
+export async function getSonarrOptions(id) {
+  let [paths, profiles, tags] = await Promise.all([
+    get(`/services/sonarr/paths/${id}`),
+    get(`/services/sonarr/profiles/${id}`),
+    get(`/services/sonarr/tags/${id}`),
+  ]);
+
+  return {
+    paths: paths,
+    profiles: profiles,
+    tags: tags,
+  };
+}
+
 function updateStore(data = false) {
   if (!data) return false;
   return store.dispatch(data);

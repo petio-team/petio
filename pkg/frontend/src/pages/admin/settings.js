@@ -3,7 +3,7 @@ import AdminSettingsSidebar from "../../components/adminSettingsSidebar";
 import NotFound from "../404";
 import SettingsGeneral from "./settings-general";
 import styles from "../../styles/views/adminSettings.module.scss";
-import SettingsRadarr from "./settings-radarr";
+import SettingsArr from "./settings-arr";
 import Meta from "../../components/meta";
 
 export default function Settings({ newNotification }) {
@@ -20,7 +20,10 @@ export default function Settings({ newNotification }) {
               <SettingsGeneral newNotification={newNotification} />
             </Route>
             <Route exact path="/admin/settings/radarr">
-              <SettingsRadarr newNotification={newNotification} />
+              <SettingsArr type="radarr" newNotification={newNotification} />
+            </Route>
+            <Route exact path="/admin/settings/sonarr">
+              <SettingsArr type="sonarr" newNotification={newNotification} />
             </Route>
             <Route path="*">
               <NotFound />

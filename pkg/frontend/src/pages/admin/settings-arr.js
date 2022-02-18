@@ -9,10 +9,14 @@ import {
   getRadarrOptions,
   saveRadarrConfig,
   testRadarr,
+  getSonarr,
+  getSonarrOptions,
+  saveSonarrConfig,
+  testSonarr,
 } from "../../services/config.service";
 import { v4 as uuidv4 } from "uuid";
 
-export default function SettingsRadarr(props) {
+export default function SettingsArr(props) {
   const [servers, setServers] = useState([]);
   const [openAdd, setOpenAdd] = useState(false);
   const serverDefaults = {
@@ -40,15 +44,18 @@ export default function SettingsRadarr(props) {
     profiles: false,
     paths: false,
   });
+  const type = props.type;
 
   useEffect(() => {
+    closeModal();
+    setServers([]);
     getServers();
     //eslint-disable-next-line
-  }, []);
+  }, [type]);
 
   async function getServers() {
     try {
-      const servers = await getRadarr();
+      const servers = type === "radarr" ? await getRadarr() : await getSonarr();
       setServers(servers);
       return servers;
     } catch (e) {
@@ -129,7 +136,11 @@ export default function SettingsRadarr(props) {
         ...newServer,
         uuid: uuid,
       });
-      await saveRadarrConfig(data);
+      if (type === "radarr") {
+        await saveRadarrConfig(data);
+      } else {
+        await saveSonarrConfig(data);
+      }
       const test = await testServer(uuid);
       if (!test) failed = true;
     } catch (e) {
@@ -148,7 +159,11 @@ export default function SettingsRadarr(props) {
         id: n,
       });
       try {
-        await saveRadarrConfig(servers);
+        if (type === "radarr") {
+          await saveRadarrConfig(servers);
+        } else {
+          await saveSonarrConfig(servers);
+        }
       } catch (e) {
         console.log(e);
       }
@@ -156,7 +171,11 @@ export default function SettingsRadarr(props) {
     } else {
       await getServers();
 
-      setCurrentServer(newServer);
+      setCurrentServer({
+        ...newServer,
+        uuid: uuid,
+      });
+      getSettings(uuid);
 
       setUpdating(false);
       props.newNotification({
@@ -173,7 +192,8 @@ export default function SettingsRadarr(props) {
       type: "loading",
     });
     try {
-      const test = await testRadarr(uuid);
+      const test =
+        type === "radarr" ? await testRadarr(uuid) : await testSonarr(uuid);
       if (!test.connection) throw "Test Failed";
       props.newNotification({
         message: "Server test passed",
@@ -202,7 +222,10 @@ export default function SettingsRadarr(props) {
 
   async function getSettings(uuid) {
     try {
-      let settings = await getRadarrOptions(uuid);
+      let settings =
+        type === "radarr"
+          ? await getRadarrOptions(uuid)
+          : await getSonarrOptions(uuid);
       if (settings.profiles.error || settings.paths.error) {
         return;
       }
@@ -220,23 +243,127 @@ export default function SettingsRadarr(props) {
     }
   }
 
+  function closeModal() {
+    setOpenAdd(false);
+    setCurrentServer(false);
+    setNewServer(serverDefaults);
+    setOptions({
+      profiles: false,
+      paths: false,
+    });
+  }
+
+  async function deleteServer(uuid) {
+    if (updating) return;
+    setUpdating(true);
+    const n = props.newNotification({
+      message: "Removing server",
+      type: "loading",
+    });
+    closeModal();
+    try {
+      let data = servers.filter(function (s) {
+        return s.uuid !== uuid;
+      });
+      if (type === "radarr") {
+        await saveRadarrConfig(data);
+      } else {
+        await saveSonarrConfig(data);
+      }
+
+      await getServers();
+      props.newNotification({
+        message: "Server removed",
+        type: "success",
+        id: n,
+      });
+      setUpdating(false);
+    } catch (e) {
+      console.log(e);
+      props.newNotification({
+        message: "Failed to remove server",
+        type: "error",
+        id: n,
+      });
+      setUpdating(false);
+    }
+  }
+
+  async function updateServer(uuid) {
+    if (updating) return;
+    setUpdating(true);
+    const n = props.newNotification({
+      message: "Updating server",
+      type: "loading",
+    });
+    try {
+      let data = [...servers];
+      data.forEach((s, i) => {
+        if (s.uuid === uuid) {
+          data[i] = currentServer;
+        }
+      });
+
+      if (type === "radarr") {
+        await saveRadarrConfig(data);
+      } else {
+        await saveSonarrConfig(data);
+      }
+      await getServers();
+      props.newNotification({
+        message: "Server updated",
+        type: "success",
+        id: n,
+      });
+      closeModal();
+      setUpdating(false);
+    } catch (e) {
+      console.log(e);
+      closeModal();
+      props.newNotification({
+        message: "Failed to update server",
+        type: "error",
+        id: n,
+      });
+      setUpdating(false);
+    }
+  }
+
   return (
     <div className={styles.arr__wrap}>
-      <p className={`${typo.smtitle} ${typo.bold}`}>Radarr</p>
-      <br />
-      <p className={`${typo.body}`}>
-        Connect Radarr to Petio to allow Radarr to automatically process your
-        movie requests. <br />
-        More information about Radarr can be found{" "}
-        <a
-          href="https://radarr.video/"
-          className={typo.link}
-          target="_blank"
-          rel="noreferrer"
-        >
-          here
-        </a>
+      <p className={`${typo.smtitle} ${typo.bold}`}>
+        {type === "radarr" ? "Radarr" : "Sonarr"}
       </p>
+      <br />
+      {type === "radarr" ? (
+        <p className={`${typo.body}`}>
+          Connect Radarr to Petio to allow Radarr to automatically process your
+          movie requests. <br />
+          More information about Radarr can be found{" "}
+          <a
+            href="https://radarr.video/"
+            className={typo.link}
+            target="_blank"
+            rel="noreferrer"
+          >
+            here
+          </a>
+        </p>
+      ) : (
+        <p className={`${typo.body}`}>
+          Connect Sonarr to Petio to allow Sonarr to automatically process your
+          TV requests. <br />
+          More information about Sonarr can be found{" "}
+          <a
+            href="https://sonarr.tv/"
+            className={typo.link}
+            target="_blank"
+            rel="noreferrer"
+          >
+            here
+          </a>
+        </p>
+      )}
       <br />
       <p className={`${typo.smtitle} ${typo.bold}`}>Servers</p>
       <br />
@@ -250,7 +377,7 @@ export default function SettingsRadarr(props) {
                       ? styles.arr__item__active
                       : styles.arr__item__disabled
                   }`}
-                  key={`radarr_server__${i}`}
+                  key={`${type}_server__${i}`}
                   onClick={() => selectServer(server.uuid)}
                 >
                   <div className={styles.arr__item__content}>
@@ -297,15 +424,7 @@ export default function SettingsRadarr(props) {
             <div className={styles.arr__modal__close}>
               <p
                 className={`${typo.small} ${typo.uppercase} ${typo.medium}`}
-                onClick={() => {
-                  setOpenAdd(false);
-                  setCurrentServer(false);
-                  setNewServer(serverDefaults);
-                  setOptions({
-                    profiles: false,
-                    paths: false,
-                  });
-                }}
+                onClick={closeModal}
               >
                 Close
               </p>
@@ -373,7 +492,7 @@ export default function SettingsRadarr(props) {
               <input
                 type="text"
                 className={inputs.text__light}
-                placeholder="/ or /radarr etc"
+                placeholder={`/ or /${type} etc`}
                 name="subpath"
                 value={
                   currentServer ? currentServer.subpath : newServer.subpath
@@ -387,7 +506,9 @@ export default function SettingsRadarr(props) {
               <input
                 type="text"
                 className={inputs.text__light}
-                placeholder="API Key from Radarr"
+                placeholder={`API Key from ${
+                  type === "radarr" ? "Radarr" : "Sonarr"
+                }`}
                 name="key"
                 value={currentServer ? currentServer.key : newServer.key}
                 onChange={handleChange}
@@ -465,7 +586,12 @@ export default function SettingsRadarr(props) {
               ) : null}
               {currentServer ? (
                 <>
-                  <button className={buttons.primary__red}>Delete</button>
+                  <button
+                    className={buttons.primary__red}
+                    onClick={() => deleteServer(currentServer.uuid)}
+                  >
+                    Delete
+                  </button>
                   <br />
                   <button
                     className={`${buttons.primary} ${
@@ -473,6 +599,7 @@ export default function SettingsRadarr(props) {
                         ? ""
                         : buttons.disabled
                     }`}
+                    onClick={() => updateServer(currentServer.uuid)}
                   >
                     Save
                   </button>
