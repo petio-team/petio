@@ -310,16 +310,18 @@ export async function sonarrDeleteInstance(uuid) {
 }
 
 export async function sonarrOptions(id) {
-  let [paths, profiles, tags] = await Promise.all([
+  let [paths, profiles, tags, languages] = await Promise.all([
     api.sonarrPaths(id),
     api.sonarrProfiles(id),
     api.sonarrTags(id),
+    api.sonarrLanguageProfiles(id),
   ]);
 
   return {
     paths: paths,
     profiles: profiles,
     tags: tags,
+    languages: languages,
   };
 }
 
@@ -334,16 +336,18 @@ export async function radarrDeleteInstance(uuid) {
 }
 
 export async function radarrOptions(id) {
-  let [paths, profiles, tags] = await Promise.all([
+  let [paths, profiles, tags, languages] = await Promise.all([
     api.radarrPaths(id),
     api.radarrProfiles(id),
     api.radarrTags(id),
+    api.radarrLanguageProfiles(id),
   ]);
 
   return {
     paths: paths,
     profiles: profiles,
     tags: tags,
+    languages: languages,
   };
 }
 

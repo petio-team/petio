@@ -70,8 +70,8 @@ class FilterAction extends React.Component {
                       <>
                         <option value="">Please Select</option>
                         {this.props.settings[item.server] &&
-                        this.props.settings[item.server].paths &&
-                        this.props.settings[item.server].paths.length > 0 ? (
+                          this.props.settings[item.server].paths &&
+                          this.props.settings[item.server].paths.length > 0 ? (
                           this.props.settings[item.server].paths.map(
                             (path, i) => {
                               return (
@@ -107,8 +107,8 @@ class FilterAction extends React.Component {
                     value={item.profile}
                   >
                     {item.server &&
-                    this.props.settings[item.server] &&
-                    this.props.settings[item.server].profiles ? (
+                      this.props.settings[item.server] &&
+                      this.props.settings[item.server].profiles ? (
                       <>
                         <option value="">Please Select</option>
                         {this.props.settings[item.server].profiles.map(
@@ -119,6 +119,42 @@ class FilterAction extends React.Component {
                                 value={profile.id}
                               >
                                 {profile.name}
+                              </option>
+                            );
+                          }
+                        )}
+                      </>
+                    ) : (
+                      <option value="">Choose Server</option>
+                    )}
+                  </select>
+                </div>
+              </div>
+              <div className="filter--row--item">
+                <p className="filter--row--item--title">Language</p>
+                <div className="select-wrap">
+                  <select
+                    data-type={this.props.type}
+                    data-row="action"
+                    data-action-row={i}
+                    data-item={this.props.item}
+                    name="language"
+                    onChange={this.props.inputChange}
+                    value={item.language}
+                  >
+                    {item.server &&
+                      this.props.settings[item.server] &&
+                      this.props.settings[item.server].languages ? (
+                      <>
+                        <option value="">Please Select</option>
+                        {this.props.settings[item.server].languages.map(
+                          (language, i) => {
+                            return (
+                              <option
+                                key={`${fs}__${this.props.item}__pf_${i}`}
+                                value={language.id}
+                              >
+                                {language.name}
                               </option>
                             );
                           }

@@ -1,30 +1,41 @@
 const fs = require("fs");
 const path = require("path");
-const convict = require('convict');
-const convict_format_with_validator = require('convict-format-with-validator');
+const blueconfig = require('blueconfig');
+const blueconfig_format_with_validator = require('blueconfig-format-with-validator');
 
-const logger = require('./logger');
 const { dataFolder } = require('./env');
 
 const CONFIG_FILE = path.join(dataFolder, './petio.json');
 
-convict.addFormats(convict_format_with_validator);
+blueconfig.addFormats(blueconfig_format_with_validator);
 
-convict.addFormat({
+blueconfig.addFormat({
   name: 'source-array',
-  validate: function (sources, schema) {
-    if (!Array.isArray(sources)) {
-      throw new Error('must be of type Array');
+  validate: function (children, schema, fullname) {
+    const errors = [];
+
+    if (!Array.isArray(children)) {
+      throw new Error('must be an Array');
     }
 
-    for (source of sources) {
-      convict(schema.children).load(source).validate();
+    children.forEach((child, keyname) => {
+      try {
+        const conf = blueconfig(schema.children).merge(children[keyname]).validate();
+        this.set(fullname + '.' + keyname, conf.getProperties());
+      } catch (err) {
+        err.parent = fullname + '.' + keyname;
+        errors.push(err);
+      }
+    });
+
+    if (errors.length !== 0) {
+      throw new LISTOFERRORS(errors);
     }
   }
 });
 
 // Our config schema
-const conf = convict({
+const conf = blueconfig({
   general: {
     popular: {
       doc: 'Enabled showing popular media',
@@ -89,9 +100,8 @@ const conf = convict({
     discord: {
       url: {
         doc: 'The webhook url for discord',
-        format: 'url',
-        default: null,
-        nullable: true,
+        format: String,
+        default: undefined,
       }
     },
     telegram: {
@@ -99,13 +109,11 @@ const conf = convict({
         doc: 'The telegram token for authentication',
         format: String,
         default: null,
-        nullable: true,
       },
       id: {
         doc: 'The id of the chat',
-        format: String,
+        format: Number,
         default: null,
-        nullable: true,
       },
       silent: {
         doc: 'Enable to prevent being notified of messages',
@@ -280,6 +288,19 @@ const conf = convict({
           doc: 'The name of the profile',
           format: String,
           default: '',
+        },
+      },
+      language: {
+        id: {
+          doc: 'The id of the language profile',
+          format: Number,
+          default: null,
+          nullable: true,
+        },
+        name: {
+          doc: 'The name of the language profile',
+          format: String,
+          default: '',
         }
       },
       uuid: {
@@ -356,6 +377,18 @@ const conf = convict({
           default: null,
         }
       },
+      language: {
+        id: {
+          doc: 'The id of the language profile',
+          format: Number,
+          default: 0,
+        },
+        name: {
+          doc: 'The name of the language profile',
+          format: String,
+          default: 'Default',
+        }
+      },
       uuid: {
         doc: 'The internal identifer for this instance',
         format: '*',
@@ -376,8 +409,8 @@ const loadConfig = () => {
       conf.loadFile(CONFIG_FILE).validate();
     } catch (e) {
       if (e instanceof SyntaxError) {
-        logger.error("config is in an invalid format");
-        logger.info("if it can not be fixed, please delete it");
+        console.error("config is in an invalid format");
+        console.info("if it can not be fixed, please delete it");
       }
       throw e;
     }

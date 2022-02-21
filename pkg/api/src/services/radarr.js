@@ -119,6 +119,10 @@ class Radarr {
     return await this.get("qualityProfile");
   }
 
+  async getLanguageProfiles() {
+    return await this.get("language");
+  }
+
   async getTags() {
     return await this.get("tag");
   }

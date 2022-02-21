@@ -32,6 +32,10 @@ class Sonarr extends React.Component {
         id: null,
         location: '',
       },
+      language: {
+        id: null,
+        name: '',
+      },
       subpath: "/",
       key: "",
       activeServer: false,
@@ -74,6 +78,10 @@ class Sonarr extends React.Component {
       profile: {
         id: this.state.profile.id,
         name: this.state.profile.name,
+      },
+      language: {
+        id: this.state.language.id,
+        name: this.state.language.name,
       },
       uuid: this.state.uuid,
     };
@@ -248,6 +256,10 @@ class Sonarr extends React.Component {
           id: this.state.servers[id].path.id,
           location: this.state.servers[id].path.location,
         },
+        language: {
+          id: this.state.servers[id].language.id,
+          name: this.state.servers[id].language.name,
+        },
         uuid: this.state.servers[id].uuid,
         needsTest: false,
       });
@@ -279,6 +291,10 @@ class Sonarr extends React.Component {
         location: '',
       },
       profile: {
+        id: null,
+        name: '',
+      },
+      language: {
         id: null,
         name: '',
       },
@@ -316,6 +332,10 @@ class Sonarr extends React.Component {
         id: null,
         name: '',
       },
+      language: {
+        id: null,
+        name: '',
+      },
       wizardOpen: false,
       editWizardOpen: false,
       activeServer: false,
@@ -333,6 +353,7 @@ class Sonarr extends React.Component {
         this.setState({
           profiles: settings.profiles.length > 0 ? settings.profiles : false,
           paths: settings.paths.length > 0 ? settings.paths : false,
+          languages: settings.languages.length > 0 ? settings.languages : false,
         });
     } catch {
       return;
@@ -494,6 +515,36 @@ class Sonarr extends React.Component {
               )}
             </select>
           </div>
+          <label>Language</label>
+          <div
+            className={`styled-input--select ${this.state.languages || this.state.needsTest ? "" : "disabled"
+              }`}
+          >
+            <select
+              name="language"
+              value={this.state.language.id}
+              onChange={this.inputChange}
+            >
+              {this.state.languages && !this.state.needsTest ? (
+                <>
+                  <option value="">Choose an option</option>
+                  {this.state.languages.map((item) => {
+                    return (
+                      <option key={`pp__${item.id}`} value={item.id}>
+                        {item.name}
+                      </option>
+                    );
+                  })}
+                </>
+              ) : (
+                <option value="">
+                  {this.state.newServer || this.state.needsTest
+                    ? "Please test connection"
+                    : "Loading..."}
+                </option>
+              )}
+            </select>
+          </div>
           {!this.state.newServer &&
             this.state.path.id != null &&
             this.state.profile.id != null &&
@@ -535,6 +586,9 @@ class Sonarr extends React.Component {
                     </p>
                     <p>
                       Path: {server.path.location != "" ? server.path.location : "Not set"}
+                    </p>
+                    <p>
+                      Language: {server.language.name != "" ? server.language.name : "Not set"}
                     </p>
                     <p className="small">
                       ID: {server.uuid ? server.uuid : "Error"}

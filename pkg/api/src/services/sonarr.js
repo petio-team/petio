@@ -22,9 +22,8 @@ class Sonarr {
       reject("");
       return;
     }
-    const baseurl = `${this.config.protocol}://${this.config.host}${
-      this.config.port ? ":" + this.config.port : ""
-    }${this.config.subpath == "/" ? "" : this.config.subpath}/api/v3/`;
+    const baseurl = `${this.config.protocol}://${this.config.host}${this.config.port ? ":" + this.config.port : ""
+      }${this.config.subpath == "/" ? "" : this.config.subpath}/api/v3/`;
     const apiurl = new URL(endpoint, baseurl);
     const prms = new URLSearchParams();
 
@@ -130,6 +129,11 @@ class Sonarr {
     return await this.get("qualityprofile");
   }
 
+  async getLanguageProfiles(serverId) {
+    this.config = this.findUuid(serverId, this.fullConfig);
+    return await this.get("languageprofile");
+  }
+
   async getTags(serverId) {
     this.config = this.findUuid(serverId, this.fullConfig);
     return await this.get("tag");
@@ -223,13 +227,14 @@ class Sonarr {
         filter && filter.profile ? filter.profile : this.config.profile.id
       );
       showData.seasonFolder = true;
-      showData.rootFolderPath = `${
-        filter && filter.path ? filter.path : this.config.path.location
-      }`;
+      showData.rootFolderPath = `${filter && filter.path ? filter.path : this.config.path.location
+        }`;
       showData.addOptions = {
         searchForMissingEpisodes: true,
       };
-      showData.languageProfileId = 1;
+      showData.languageProfileId = parseInt(
+        filter && filter.language ? filter.language : this.config.language.id
+      );
       if (filter && filter.type) showData.seriesType = filter.type;
       if (filter && filter.tag) showData.tags = [parseInt(filter.tag)];
 
