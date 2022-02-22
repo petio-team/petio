@@ -18,7 +18,7 @@ class Worker {
   }
 
   async startCrons() {
-    if (conf.get('admin.id') == null) {
+    if (conf.get('admin.id') == -1) {
       logger.debug("Worker: Setup not complete, skipping");
       return 1;
     }

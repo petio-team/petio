@@ -101,19 +101,19 @@ const conf = blueconfig({
       url: {
         doc: 'The webhook url for discord',
         format: String,
-        default: undefined,
+        default: "",
       }
     },
     telegram: {
       token: {
         doc: 'The telegram token for authentication',
         format: String,
-        default: null,
+        default: "",
       },
       id: {
         doc: 'The id of the chat',
         format: Number,
-        default: null,
+        default: -1,
       },
       silent: {
         doc: 'Enable to prevent being notified of messages',
@@ -126,38 +126,34 @@ const conf = blueconfig({
     id: {
       doc: 'The id of the admin account',
       format: '*',
-      default: null,
-      nullable: true,
+      default: -1,
     },
     username: {
       doc: 'The username of the admin account',
       format: String,
-      default: null,
-      nullable: true,
+      default: "",
     },
     email: {
       doc: 'The email of the admin account',
       format: 'email',
-      default: null,
-      nullable: true,
+      default: "admin@admin.com",
     },
     password: {
       doc: 'The generated hashed password for the admin account',
       format: String,
-      default: null,
-      nullable: true,
+      default: "",
       sensitive: true,
     },
     thumbnail: {
       doc: 'The thumbnail url to be used as the avatar for the admin account',
-      format: 'url',
-      default: null,
+      format: String,
+      default: "",
       nullable: true,
     },
     display: {
       doc: 'The display name used for the admin account',
       format: String,
-      default: null,
+      default: "",
       nullable: true,
     }
   },
@@ -179,14 +175,14 @@ const conf = blueconfig({
     },
     token: {
       doc: 'The token used to authenticate',
-      format: '*',
-      default: null,
+      format: String,
+      default: "",
       sensitive: true,
     },
     client: {
       doc: 'The client id',
       format: '*',
-      default: null,
+      default: -1,
       sensitive: true,
     },
   },
@@ -236,7 +232,7 @@ const conf = blueconfig({
       title: {
         doc: 'The instances display name',
         format: String,
-        default: null,
+        default: "",
       },
       protocol: {
         doc: 'The http protocol to use',
@@ -260,16 +256,15 @@ const conf = blueconfig({
       },
       key: {
         doc: 'The key used to authenticate',
-        format: '*',
-        default: null,
+        format: String,
+        default: "",
         sensitive: true,
       },
       path: {
         id: {
           doc: 'The id of the path',
           format: Number,
-          default: null,
-          nullable: true,
+          default: 0,
         },
         location: {
           doc: 'The location of the path',
@@ -281,8 +276,7 @@ const conf = blueconfig({
         id: {
           doc: 'The id of the profile',
           format: Number,
-          default: null,
-          nullable: true,
+          default: 0,
         },
         name: {
           doc: 'The name of the profile',
@@ -294,8 +288,7 @@ const conf = blueconfig({
         id: {
           doc: 'The id of the language profile',
           format: Number,
-          default: null,
-          nullable: true,
+          default: 0,
         },
         name: {
           doc: 'The name of the language profile',
@@ -305,8 +298,8 @@ const conf = blueconfig({
       },
       uuid: {
         doc: 'The internal identifer for this instance',
-        format: '*',
-        default: null,
+        format: String,
+        default: "",
       },
       enabled: {
         doc: 'Enables the use of this instance',
@@ -323,7 +316,7 @@ const conf = blueconfig({
       title: {
         doc: 'The instances display name',
         format: String,
-        default: null,
+        default: "",
       },
       protocol: {
         doc: 'The http protocol to use',
@@ -347,16 +340,15 @@ const conf = blueconfig({
       },
       key: {
         doc: 'The key used to authenticate',
-        format: '*',
-        default: null,
+        format: String,
+        default: "",
         sensitive: true,
       },
       path: {
         id: {
           doc: 'The id of the path',
           format: Number,
-          default: null,
-          nullable: true,
+          default: 0,
         },
         location: {
           doc: 'The location of the path',
@@ -368,13 +360,12 @@ const conf = blueconfig({
         id: {
           doc: 'The id of the profile',
           format: Number,
-          default: null,
-          nullable: true,
+          default: 0,
         },
         name: {
           doc: 'The name of the profile',
           format: String,
-          default: null,
+          default: "",
         }
       },
       language: {
@@ -391,8 +382,8 @@ const conf = blueconfig({
       },
       uuid: {
         doc: 'The internal identifer for this instance',
-        format: '*',
-        default: null,
+        format: String,
+        default: "",
       },
       enabled: {
         doc: 'Enables the use of this instance',

@@ -34,7 +34,7 @@ const setupReady = require("../util/setupReady");
 
 router.get("/config", async (req, res) => {
     let ready = false;
-    if (conf.get('admin.id') != null) {
+    if (conf.get('admin.id') != -1) {
         try {
             let setupCheck = await setupReady();
             if (setupCheck.ready) {
@@ -55,7 +55,7 @@ router.get("/config", async (req, res) => {
     }
     res.json(
         {
-            config: conf.get('admin.id') == null ? false : true,
+            config: conf.get('admin.id') == -1 ? false : true,
             login_type: conf.get('auth.type'),
             ready: ready
         }

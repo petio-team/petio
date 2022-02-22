@@ -21,7 +21,7 @@ router.post("/", async (req, res) => {
     user: { username, password },
   } = req.body || { user: {} };
 
-  if (conf.get("admin.id") == null) {
+  if (conf.get("admin.id") == -1) {
     res.status(500).send("This Petio API is not setup");
     return;
   }
