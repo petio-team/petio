@@ -312,7 +312,7 @@
   height: 100%;
   z-index: -1;
   filter: blur(60px);
-  transform: translateZ(0);
+  // transform: translateZ(0);
   // background: $grey;
   pointer-events: none;
 }

@@ -196,6 +196,13 @@
   &__grid {
     margin-top: 10px;
 
+    button {
+      width: 200px;
+      max-width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
     &__section {
       margin-bottom: 20px;
     }
@@ -219,13 +226,6 @@
         border-radius: 5px;
         margin-top: 10px;
 
-        &__item {
-          background: rgba($white, 0.1);
-          padding: 10px;
-          border-radius: 5px;
-          margin-top: 10px;
-        }
-
         &__add {
           margin-top: 10px;
           cursor: pointer;
@@ -234,6 +234,29 @@
 
       &__remove {
         margin-top: 10px;
+      }
+    }
+  }
+
+  &__row {
+    background: rgba($white, 0.1);
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+
+    &__remove {
+      display: inline-block;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    &__content {
+      display: flex;
+      margin: 0 -10px;
+
+      &__item {
+        padding: 0 10px;
+        width: 100%;
       }
     }
   }

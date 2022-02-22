@@ -1,8 +1,10 @@
 import styles from "../../styles/views/adminSettings.module.scss";
 import typo from "../../styles/components/typography.module.scss";
 import buttons from "../../styles/components/button.module.scss";
+
 import { useEffect, useState } from "react";
 import { getFilters } from "../../services/config.service";
+import FilterRow from "../../components/filterRow";
 
 export default function SettingsFilter(props) {
   const [filters, setFilters] = useState({
@@ -86,15 +88,13 @@ export default function SettingsFilter(props) {
                             Criteria
                           </p>
                           {optional && optional.length > 0
-                            ? optional.map((option) => {
+                            ? optional.map((option, o) => {
                                 return (
-                                  <div
-                                    className={
-                                      styles.filter__grid__item__section__item
-                                    }
-                                  >
-                                    <p>{option.condition}</p>
-                                  </div>
+                                  <FilterRow
+                                    option={option}
+                                    type={key}
+                                    itemId={o}
+                                  />
                                 );
                               })
                             : null}
