@@ -330,25 +330,27 @@ class RequestsTable extends React.Component {
                     <td>{this.typeIcon(req.type)}</td>
                     <td>
                       {this.reqState(req)}
-                      {req.sonarrId.length > 0 ? (
+                      {req.sonarrId && req.sonarrId.length > 0 ? (
                         <span className="requests--status requests--status__sonarr">
                           Sonarr
                         </span>
                       ) : null}
-                      {req.radarrId.length > 0 ? (
+                      {req.radarrId && req.radarrId.length > 0 ? (
                         <span className="requests--status requests--status__radarr">
                           Radarr
                         </span>
                       ) : null}
                     </td>
                     <td>
-                      {req.users.map((user, i) => {
-                        return (
-                          <p key={`${req.id}_${user}_${i}`}>
-                            {this.getUsername(user)}
-                          </p>
-                        );
-                      })}
+                      {req.users
+                        ? req.users.map((user, i) => {
+                            return (
+                              <p key={`${req.id}_${user}_${i}`}>
+                                {this.getUsername(user)}
+                              </p>
+                            );
+                          })
+                        : null}
                     </td>
                     <td>{req.approved ? "Yes" : "No"}</td>
                     <td>

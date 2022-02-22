@@ -1,7 +1,7 @@
 const { conf } = require('../app/config');
 
 const checkSetup = (req, res, next) => {
-    if (conf.get('admin.id') == null) {
+    if (conf.get('admin.id') == -1) {
         const path = req.path;
         if (path.startsWith("/api")) {
             if (

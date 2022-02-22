@@ -26,11 +26,15 @@ class Radarr extends React.Component {
       port: 7878,
       profile: {
         id: null,
-        name: '',
+        name: null,
       },
       path: {
         id: null,
-        location: '',
+        location: null,
+      },
+      language: {
+        id: null,
+        name: null,
       },
       subpath: "/",
       key: "",
@@ -74,6 +78,10 @@ class Radarr extends React.Component {
       profile: {
         id: this.state.profile.id,
         name: this.state.profile.name,
+      },
+      language: {
+        id: this.state.language.id,
+        name: this.state.language.name,
       },
       uuid: this.state.uuid,
     };
@@ -249,6 +257,10 @@ class Radarr extends React.Component {
           id: this.state.servers[id].path.id,
           location: this.state.servers[id].path.location
         },
+        language: {
+          id: this.state.servers[id].language.id,
+          name: this.state.servers[id].language.name,
+        },
         uuid: this.state.servers[id].uuid,
         needsTest: false,
       });
@@ -277,11 +289,15 @@ class Radarr extends React.Component {
       paths: false,
       path: {
         id: null,
-        location: '',
+        location: null,
       },
       profile: {
         id: null,
-        name: '',
+        name: null,
+      },
+      language: {
+        id: null,
+        name: null,
       },
       wizardOpen: false,
       editWizardOpen: false,
@@ -312,11 +328,15 @@ class Radarr extends React.Component {
       paths: false,
       path: {
         id: null,
-        location: '',
+        location: null,
       },
       profile: {
         id: null,
-        name: '',
+        name: null,
+      },
+      language: {
+        id: null,
+        name: null,
       },
       wizardOpen: false,
       editWizardOpen: false,
@@ -335,6 +355,7 @@ class Radarr extends React.Component {
         this.setState({
           profiles: settings.profiles.length > 0 ? settings.profiles : false,
           paths: settings.paths.length > 0 ? settings.paths : false,
+          languages: settings.languages.length > 0 ? settings.languages : false,
         });
     } catch {
       return;
@@ -497,6 +518,36 @@ class Radarr extends React.Component {
               )}
             </select>
           </div>
+          <label>Language</label>
+          <div
+            className={`styled-input--select ${this.state.languages ? "" : "disabled"
+              }`}
+          >
+            <select
+              name="language"
+              value={this.state.language.id}
+              onChange={this.inputChange}
+            >
+              {this.state.languages && !this.state.needsTest ? (
+                <>
+                  <option value="">Choose an option</option>
+                  {this.state.languages.map((item) => {
+                    return (
+                      <option key={`pp__${item.id}`} value={item.id}>
+                        {item.name}
+                      </option>
+                    );
+                  })}
+                </>
+              ) : (
+                <option value="">
+                  {this.state.newServer || this.state.needsTest
+                    ? "Please test connection"
+                    : "Loading..."}
+                </option>
+              )}
+            </select>
+          </div>
           {!this.state.newServer &&
             this.state.path.id != null &&
             this.state.profile.id != null &&
@@ -525,6 +576,7 @@ class Radarr extends React.Component {
           <div className="sr--grid">
             {this.state.servers.map((server, i) => {
               serverCount++;
+              console.log(JSON.stringify(server, null, 4));
               return (
                 <div key={server.uuid} className="sr--instance">
                   <div className="sr--instance--inner">
@@ -534,10 +586,13 @@ class Radarr extends React.Component {
                     <p>Status: {server.enabled ? "Enabled" : "Disabled"}</p>
                     <p>
                       Profile:{" "}
-                      {server.profile.name != "" ? server.profile.name : "Not set"}
+                      {server.profile.name ?? "Not set"}
                     </p>
                     <p>
-                      Path: {server.path.location != "" ? server.path.location : "Not set"}
+                      Path: {server.path.location ?? "Not set"}
+                    </p>
+                    <p>
+                      Language: {server.language.name ?? "Not set"}
                     </p>
                     <p className="small">
                       ID: {server.uuid ? server.uuid : "Error"}

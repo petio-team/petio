@@ -23,7 +23,7 @@ const app = () => {
         // setup the core of the router
         server = SetupRouter(restart);
 
-        if (conf.get('admin.id') != null) {
+        if (conf.get('admin.id') != -1) {
             // load db
             connect();
             // pull tending data
@@ -41,7 +41,7 @@ const app = () => {
     logger.info("Listening on: " + conf.get('petio.host') + ":" + conf.get('petio.port'));
 
     // check if admin id is set else we tell the user they need to go through setup
-    if (conf.get('admin.id') == null) {
+    if (conf.get('admin.id') == -1) {
         logger.warn("Initial setup is required, please proceed to the webui to begin the setup");
     }
 };

@@ -47,6 +47,7 @@ class Filter extends React.Component {
           server: false,
           path: false,
           profile: false,
+          language: false,
           tag: false,
           type: false,
         },
@@ -97,6 +98,7 @@ class Filter extends React.Component {
     filters[i].action.push({
       path: false,
       profile: false,
+      language: false,
       server: false,
       tag: false,
       type: false,
@@ -174,12 +176,13 @@ class Filter extends React.Component {
         type === "radarr"
           ? this.state.radarr_settings
           : this.state.sonarr_settings;
-      if (settings.profiles.error || settings.paths.error) {
+      if (settings.profiles.error || settings.paths.error || settings.languages.error) {
         current[uuid] = "error";
       } else {
         current[uuid] = {
           profiles: settings.profiles.length > 0 ? settings.profiles : false,
           paths: settings.paths.length > 0 ? settings.paths : false,
+          languages: settings.languages.length > 0 ? settings.languages : false,
           tags: settings.tags.length > 0 ? settings.tags : false,
         };
       }

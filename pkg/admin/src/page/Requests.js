@@ -205,7 +205,7 @@ class Requests extends React.Component {
             edit_radarr[uuid] = {
               active: true,
               profile: server.profile,
-              path: server.path,
+              path: server.path.location,
             };
           });
         }
@@ -234,7 +234,7 @@ class Requests extends React.Component {
             edit_sonarr[uuid] = {
               active: true,
               profile: server.profile,
-              path: server.path,
+              path: server.path.location,
             };
           });
         }
@@ -293,8 +293,10 @@ class Requests extends React.Component {
             data-id={server.uuid}
             type="checkbox"
             checked={
-              this.state[`edit_${type}`][server.uuid]
-                ? this.state[`edit_${type}`][server.uuid].active
+              this.state[`edit_${type}`] &&
+              this.state[`edit_${type}`][server.uuid] &&
+              this.state[`edit_${type}`][server.uuid].active
+                ? true
                 : false
             }
             name={"active"}
@@ -307,13 +309,21 @@ class Requests extends React.Component {
           <>
             <p className="request-edit--server--subtitle">Profile</p>
             <div
-              className={`styled-input--select ${editable ? "" : "disabled"}`}
+              className={`styled-input--select ${
+                editable &&
+                this.state[`edit_${type}`] &&
+                this.state[`edit_${type}`][server.uuid] &&
+                this.state[`edit_${type}`][server.uuid].active
+                  ? ""
+                  : "disabled"
+              }`}
             >
               <select
                 data-type={type}
                 data-id={server.uuid}
                 name="profile"
                 value={
+                  this.state[`edit_${type}`] &&
                   this.state[`edit_${type}`][server.uuid]
                     ? this.state[`edit_${type}`][server.uuid].profile
                     : false
@@ -339,20 +349,24 @@ class Requests extends React.Component {
             </div>
             <p className="request-edit--server--subtitle">Root Path</p>
             <div
-              className={`styled-input--select ${editable ? "" : "disabled"}`}
+              className={`styled-input--select ${
+                editable &&
+                this.state[`edit_${type}`] &&
+                this.state[`edit_${type}`][server.uuid] &&
+                this.state[`edit_${type}`][server.uuid].active
+                  ? ""
+                  : "disabled"
+              }`}
             >
               <select
                 data-type={type}
                 data-id={server.uuid}
                 name="path"
                 value={
-                  this.state[`edit_${type}`][server.uuid]?.path
-                    ? this.state[`edit_${type}`][server.uuid]?.path
-                    : false
-                }
-                dataValue={
-                  this.state[`edit_${type}`][server.uuid]?.path
-                    ? this.state[`edit_${type}`][server.uuid]?.path
+                  this.state[`edit_${type}`] &&
+                  this.state[`edit_${type}`][server.uuid] &&
+                  this.state[`edit_${type}`][server.uuid].path
+                    ? this.state[`edit_${type}`][server.uuid].path
                     : false
                 }
                 onChange={this.changeServerSettings}

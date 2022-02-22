@@ -119,6 +119,10 @@ class Radarr {
     return await this.get("qualityProfile");
   }
 
+  async getLanguageProfiles() {
+    return await this.get("language");
+  }
+
   async getTags() {
     return await this.get("tag");
   }
@@ -255,7 +259,7 @@ class Radarr {
       } else {
         // Loop for all servers default
         for (let server of this.fullConfig) {
-          if (!server.active) {
+          if (!server.enabled) {
             logger.log(
               "warn",
               `SERVICE - RADARR: [${server.title}] Server not active`
@@ -372,7 +376,7 @@ class Radarr {
     let mainCalendar = [];
     let now = new Date();
     for (let server of this.fullConfig) {
-      if (server.active) {
+      if (server.enabled) {
         this.config = server;
 
         try {

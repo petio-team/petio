@@ -37,6 +37,18 @@ router.get("/sonarr/profiles/:id", adminRequired, async (req, res) => {
   }
 });
 
+router.get("/sonarr/languages/:id", adminRequired, async (req, res) => {
+  if (!req.params.id) {
+    res.status(404).send();
+  }
+  try {
+    let data = await new Sonarr().getLanguageProfiles(req.params.id);
+    res.json(data);
+  } catch {
+    res.json([]);
+  }
+});
+
 router.get("/sonarr/tags/:id", adminRequired, async (req, res) => {
   if (!req.params.id) {
     res.status(404).send();
@@ -165,6 +177,18 @@ router.get("/radarr/profiles/:id", adminRequired, async (req, res) => {
   }
   try {
     let data = await new Radarr(req.params.id).getProfiles();
+    res.json(data);
+  } catch {
+    res.json([]);
+  }
+});
+
+router.get("/radarr/languages/:id", adminRequired, async (req, res) => {
+  if (!req.params.id) {
+    res.status(404).send();
+  }
+  try {
+    let data = await new Radarr(req.params.id).getLanguageProfiles();
     res.json(data);
   } catch {
     res.json([]);
@@ -313,8 +337,20 @@ const ConvertToConfig = (entry, obj) => {
     } else {
       item.profile.name = "";
     }
-    item.uuid = i.uuid;
 
+    item.language = {};
+    if (i.language.id != null) {
+      item.language.id = Number(i.language.id);
+    } else {
+      item.language.id = null;
+    }
+    if (i.language.name != undefined) {
+      item.language.name = String(i.language.name);
+    } else {
+      item.language.name = "";
+    }
+
+    item.uuid = i.uuid;
     data.push(item);
   };
 

@@ -1,11 +1,11 @@
 const Request = require("../models/request");
 const logger = require("../app/logger");
 const axios = require("axios");
-const { conf } = require('../app/config');
+const { conf } = require("../app/config");
 
 class Sonarr {
   constructor() {
-    this.fullConfig = conf.get('sonarr');
+    this.fullConfig = conf.get("sonarr");
     this.config = false;
   }
 
@@ -22,7 +22,8 @@ class Sonarr {
       reject("");
       return;
     }
-    const baseurl = `${this.config.protocol}://${this.config.host}${this.config.port ? ":" + this.config.port : ""}${this.config.subpath == "/" ? '' : this.config.subpath}/api/v3/`;
+    const baseurl = `${this.config.protocol}://${this.config.host}${this.config.port ? ":" + this.config.port : ""
+      }${this.config.subpath == "/" ? "" : this.config.subpath}/api/v3/`;
     const apiurl = new URL(endpoint, baseurl);
     const prms = new URLSearchParams();
 
@@ -32,13 +33,13 @@ class Sonarr {
       }
     }
 
-    prms.set('apikey', this.config.key);
+    prms.set("apikey", this.config.key);
     apiurl.search = prms;
 
     try {
       if (method === "post" && body) {
         let res = await axios.post(apiurl.toString(), body);
-        if (typeof res.data !== 'object') {
+        if (typeof res.data !== "object") {
           reject("not a valid object");
         }
         return res.data;
@@ -50,7 +51,7 @@ class Sonarr {
         return res.data;
       } else {
         let res = await axios.get(apiurl.toString());
-        if (typeof res.data !== 'object') {
+        if (typeof res.data !== "object") {
           reject("not a valid object");
         }
         return res.data;
@@ -84,7 +85,7 @@ class Sonarr {
     if (!this.config || this.config.title == "Server Removed") {
       return false;
     }
-    if (!this.config.active && !test) {
+    if (!this.config.enabled && !test) {
       logger.log(
         "verbose",
         `SERVICE - SONARR: [${this.config.title}] Sonarr not enabled`
@@ -126,6 +127,11 @@ class Sonarr {
   async getProfiles(serverId) {
     this.config = this.findUuid(serverId, this.fullConfig);
     return await this.get("qualityprofile");
+  }
+
+  async getLanguageProfiles(serverId) {
+    this.config = this.findUuid(serverId, this.fullConfig);
+    return await this.get("languageprofile");
   }
 
   async getTags(serverId) {
@@ -207,6 +213,7 @@ class Sonarr {
     }
     for (let i = 0; i < servers.length; i++) {
       this.config = servers[i];
+      if (!this.config) return;
       let lookup = await this.lookup(request.tvdb_id);
       let showData = lookup[0];
       let rSeasons = request.seasons;
@@ -216,15 +223,18 @@ class Sonarr {
           season.monitored = rSeasons[season.seasonNumber] ? true : false;
         }
       }
-      showData.qualityProfileId =
-        parseInt(filter && filter.profile ? filter.profile : this.config.profile.id);
+      showData.qualityProfileId = parseInt(
+        filter && filter.profile ? filter.profile : this.config.profile.id
+      );
       showData.seasonFolder = true;
       showData.rootFolderPath = `${filter && filter.path ? filter.path : this.config.path.location
         }`;
       showData.addOptions = {
         searchForMissingEpisodes: true,
       };
-      showData.languageProfileId = 1;
+      showData.languageProfileId = parseInt(
+        filter && filter.language ? filter.language : this.config.language.id
+      );
       if (filter && filter.type) showData.seriesType = filter.type;
       if (filter && filter.tag) showData.tags = [parseInt(filter.tag)];
 
@@ -311,23 +321,21 @@ class Sonarr {
     let mainCalendar = [];
     let now = new Date();
     for (let server of this.fullConfig) {
-      if (server.active) {
+      if (server.enabled) {
         this.config = server;
 
         try {
-          const seriesInfo = await this.get("/series").then(this.transformSeriesData);
+          const seriesInfo = await this.get("/series").then(
+            this.transformSeriesData
+          );
           let serverCal = await this.get("/calendar", {
             unmonitored: true,
-            start: new Date(
-              now.getFullYear(),
-              now.getMonth() - 1,
-              1
-            ).toISOString().split('T')[0],
-            end: new Date(
-              now.getFullYear(),
-              now.getMonth() + 2,
-              1
-            ).toISOString().split('T')[0],
+            start: new Date(now.getFullYear(), now.getMonth() - 1, 1)
+              .toISOString()
+              .split("T")[0],
+            end: new Date(now.getFullYear(), now.getMonth() + 2, 1)
+              .toISOString()
+              .split("T")[0],
           });
           serverCal.map((item) => {
             const seriesId = item.seriesId;

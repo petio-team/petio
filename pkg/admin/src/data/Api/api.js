@@ -87,6 +87,10 @@ export async function sonarrProfiles(id) {
   return get(`/services/sonarr/profiles/${id}`);
 }
 
+export async function sonarrLanguageProfiles(id) {
+  return get(`/services/sonarr/languages/${id}`);
+}
+
 export async function sonarrTags(id) {
   return get(`/services/sonarr/tags/${id}`);
 }
@@ -101,6 +105,10 @@ export async function radarrPaths(id) {
 
 export async function radarrProfiles(id) {
   return get(`/services/radarr/profiles/${id}`);
+}
+
+export async function radarrLanguageProfiles(id) {
+  return get(`/services/radarr/languages/${id}`);
 }
 
 export async function radarrTags(id) {
