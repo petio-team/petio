@@ -221,6 +221,7 @@ export default function FilterRow(props) {
                       </option>
                     );
                   }
+                  return null;
                 })}
               </>
             ) : (
