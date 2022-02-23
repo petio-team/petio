@@ -50,6 +50,7 @@ jobs:
       - if: |
           !contains(github.ref, 'preview') ||
           !contains(github.ref, 'dev') ||
+          !contains(github.ref, 'new-ui') ||
           !contains(github.ref, 'master')
         name: Build docker image with tag
         run: task docker:hash
@@ -61,4 +62,8 @@ jobs:
       - if: "contains(github.ref, 'dev')"
         name: Build docker image for dev
         run: task docker:nightly
+
+      - if: "contains(github.ref, 'new-ui')"
+        name: Build docker image for new-ui
+        run: task docker:new-ui
 

@@ -82,6 +82,13 @@ tasks:
       DOCKER_IMAGE_REPO_VERSION:
         sh: git log -1 --format=%H
 
+  # Publish the new-ui image
+  docker:new-ui:
+    deps: ['docker:hash']
+    cmds:
+      - docker tag {{.DOCKER_IMAGE_REPO}}:local {{.DOCKER_IMAGE_REPO}}:nightly
+      - docker push {{.DOCKER_IMAGE_REPO}}:new-ui
+
   # Publish the nightly image
   docker:nightly:
     deps: ['docker:hash']
