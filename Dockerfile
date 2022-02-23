@@ -3,7 +3,6 @@ ENV APP_DIR="/app" VIEWS_FOLDER="/app/views" DATA_FOLDER="/data"
 RUN apk add --no-cache ca-certificates shadow bash wget;
 RUN mkdir -p /app && chown node:node /app
 COPY --chown=node:node --chmod=0755 ./pkg/frontend/build /app/views/frontend
-COPY --chown=node:node --chmod=0755 ./pkg/admin/build /app/views/admin
 COPY --chown=node:node --chmod=0755 ./pkg/api/dist /app/api
 COPY --chown=node:node --chmod=0755 ./pkg/api/node_modules /app/api/node_modules
 COPY ./docker /
