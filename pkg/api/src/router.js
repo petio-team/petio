@@ -62,20 +62,6 @@ const routes = (router) => {
             }
         }
         baseRouter.use(express.static(frontendPath));
-
-        const admin = express();
-        baseRouter.use("/admin", admin);
-
-        let adminPath = path.resolve(adminView);
-        if (!fs.existsSync(path.join(adminPath, 'index.html'))) {
-            const adminBuildPath = path.join(adminPath, './build');
-            if (!fs.existsSync(path.join(adminBuildPath, 'index.html'))) {
-                throw new Error("unable to find views files for admin");
-            } else {
-                adminPath = adminBuildPath;
-            }
-        }
-        admin.use("/", express.static(adminPath));
     }
 
     if (conf.get('petio.subpath') !== "/") {

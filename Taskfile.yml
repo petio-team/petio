@@ -27,18 +27,11 @@ tasks:
   build:
     deps: [
       'build:frontend',
-      'build:admin',
       'build:api'
     ]
 
   build:frontend:
     dir: pkg/frontend
-    cmds:
-      - npm install
-      - npm run build
-
-  build:admin:
-    dir: pkg/admin
     cmds:
       - npm install
       - npm run build
