@@ -86,7 +86,7 @@ tasks:
   docker:new-ui:
     deps: ['docker:hash']
     cmds:
-      - docker tag {{.DOCKER_IMAGE_REPO}}:local {{.DOCKER_IMAGE_REPO}}:nightly
+      - docker tag {{.DOCKER_IMAGE_REPO}}:local {{.DOCKER_IMAGE_REPO}}:new-ui
       - docker push {{.DOCKER_IMAGE_REPO}}:new-ui
 
   # Publish the nightly image
