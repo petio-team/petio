@@ -14,7 +14,7 @@ tasks:
   dev:
     dir: pkg/api
     cmds:
-      - node ./main.js --port 8000
+      -  node-dev ./main.ts
 
   dev:compose:
     cmds:

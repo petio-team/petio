@@ -4,9 +4,9 @@
   "description": "Petio API",
   "main": "main.js",
   "scripts": {
-    "start": "ts-node main.js",
+    "start": "ts-node main.ts",
     "build": "tsc",
-    "dev": "ts-node-dev main.js"
+    "dev": "ts-node-dev main.ts"
   },
   "author": "",
   "license": "MIT",
@@ -25,7 +25,7 @@
     "follow-redirects": "^1.14.7",
     "jsonwebtoken": "^8.5.1",
     "line-reader": "^0.4.0",
-    "mongoose": "^6.1.7",
+    "mongoose": "^6.2.3",
     "multer": "^1.4.4",
     "musicbrainz-api": "^0.7.2",
     "nodemailer": "^6.7.2",
@@ -42,9 +42,11 @@
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^8.0.2",
     "@semantic-release/release-notes-generator": "^10.0.3",
-    "@types/node": "^16.11.7",
+    "@types/node": "^16.11.25",
     "conventional-changelog-cli": "^2.2.2",
-    "dotenv": "^14.2.0"
+    "dotenv": "^14.2.0",
+    "ts-migrate": "^0.1.28",
+    "ts-node": "^10.5.0"
   },
   "bin": "./dist/main.js",
   "pkg": {
