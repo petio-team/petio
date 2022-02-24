@@ -1,9 +1,10 @@
-const CronJob = require("cron").CronJob;
+const Agenda = require("agenda");
+const mongoose = require("mongoose");
+
 const logger = require("./app/logger");
 const LibraryUpdate = require("./plex/libraryUpdate");
 const QuotaSystem = require("./requests/quotas");
 const { conf } = require("./app/config");
-const mongoose = require("mongoose");
 const buildDiscovery = require("./discovery/build");
 const { storeCache: imdbCache } = require("./meta/imdb");
 
@@ -14,7 +15,7 @@ class Worker {
       useUnifiedTopology: true,
     });
 
-    logger.verbose("CRONW: Connected to Database");
+    logger.verbose("Worker: Connected to Database");
   }
 
   async startCrons() {
@@ -26,62 +27,64 @@ class Worker {
     try {
       await this.connnectDb();
       await imdbCache(true);
-      const libUpdate = new LibraryUpdate();
-      await libUpdate.scan();
-      buildDiscovery();
-      const run = this.runCron;
-      // Runs every night at 00:00
-      this.cron = new CronJob("0 0 * * *", function () {
-        const d = new Date();
-        logger.log("verbose", `CRONW: Full Scan Started @ ${d.toDateString()}`);
-        run(1);
+
+      const agenda = new Agenda(
+        {
+          db: {
+            address: conf.get('db.url'),
+            collection: "jobs",
+          }
+        }
+      );
+
+      agenda.on("start", (job) => {
+        logger.debug(`Task ${job.attrs.name} starting`);
       });
 
-      // Runs every 30 mins
-      this.partial = new CronJob("0 */30 * * * *", function () {
-        const d = new Date();
-        logger.log("verbose", `CRONW: Partial Scan Started @ ${d.toDateString()}`);
-        run(2);
+      agenda.define('fullPlexLibraryScan', {
+        priority: "high",
+        concurrency: 10,
+      }, async (_) => {
+        await LibraryUpdate().scan();
+        await buildDiscovery();
       });
 
-      // Every Sunday at 11pm
-      this.resetQuotas = new CronJob("0 11 * * sun", function () {
-        logger.log("verbose", "CRONW: Quotas Cleared");
-        run(3);
+      agenda.define('partialPlexLibraryScan', {
+        priority: "high",
+        concurrency: 5,
+      }, async (_) => {
+        await LibraryUpdate().partial();
       });
 
-      logger.log("verbose", `API: Registering Full Scan job`);
-      this.cron.start();
-      logger.log("verbose", `API: Registering Partial Scan job`);
-      this.partial.start();
-      logger.log("verbose", `API: Registering Quota reset job`);
-      this.resetQuotas.start();
+      agenda.define('resetUserQuotas', {
+        priority: "low",
+        concurrency: 2,
+      }, async (_) => {
+        await QuotaSystem().reset();
+        await imdbCache();
+      });
+
+      await agenda.start();
+
+      // Tasks to run
+      await agenda.every(
+        conf.get('tasks.library.full'),
+        "fullPlexLibraryScan"
+      );
+
+      await agenda.every(
+        conf.get('tasks.library.partial'),
+        "partialPlexLibraryScan"
+      );
+
+      await agenda.every(
+        conf.get('tasks.quotas'),
+        "resetUserQuotas"
+      );
+
     } catch (err) {
+      logger.error("Worker: Failed to run jobs");
       logger.error(err);
-      logger.error("CRONW: Failed to start crons!");
-    }
-  }
-
-  async runCron(type = 1) {
-    switch (type) {
-      case 1:
-        new LibraryUpdate().scan();
-        buildDiscovery();
-        break;
-      case 2:
-        new LibraryUpdate().partial();
-        break;
-      case 3:
-        new QuotaSystem().reset();
-        imdbCache();
-      default:
-        logger.log("warn", "CRONW: Invalid cron");
-    }
-  }
-
-  close() {
-    if (this.cron != undefined) {
-      this.cron.stop();
     }
   }
 }
