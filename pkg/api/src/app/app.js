@@ -12,6 +12,8 @@ let server = null;
 
 const app = () => {
     logger.info(`Petio v${version}`);
+    logger.info(`Log level: ${conf.get('logger.level')}`);
+
     try {
         // check the num of cpu cores
         if (numCPUs < 2) {
