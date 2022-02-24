@@ -96,6 +96,25 @@ const conf = blueconfig({
       env: 'DB_URL',
     },
   },
+  tasks: {
+    library: {
+      full: {
+        doc: 'The interval time for performing a full plex library scan',
+        format: String,
+        default: '1 day',
+      },
+      partial: {
+        doc: 'The interval time for performing a partial plex library scan',
+        format: String,
+        default: '30 minutes',
+      }
+    },
+    quotas: {
+      doc: 'The interval time for performing a reset of user quotas',
+      format: String,
+      default: '0 11 * * sun',
+    }
+  },
   notifications: {
     discord: {
       url: {
@@ -398,6 +417,7 @@ const loadConfig = () => {
   if (fs.existsSync(CONFIG_FILE)) {
     try {
       conf.loadFile(CONFIG_FILE).validate();
+      WriteConfig();
     } catch (e) {
       if (e instanceof SyntaxError) {
         console.error("config is in an invalid format");
