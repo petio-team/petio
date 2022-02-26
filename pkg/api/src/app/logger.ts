@@ -1,48 +1,46 @@
 import path from "path";
-import winston from "winston";
-import 'winston-daily-rotate-file';
+import winston, { format } from "winston";
+import "winston-daily-rotate-file";
+const { combine, timestamp, printf, splat, colorize } = format;
 
-import { dataFolder } from './env';
+import { dataFolder } from "./env";
 import { conf } from "./config";
 
-const logsFolder = path.join(dataFolder, './logs');
+const logsFolder = path.join(dataFolder, "./logs");
+
+const customFormat = printf(({ level, label, message, timestamp }) => {
+  const lbl = label ? `[${label}] ` : "";
+  return `${timestamp} ${lbl}${level}: ${message}`;
+});
 
 export default winston.createLogger({
+  level: conf.get("logger.level"),
+  format: combine(
+    splat(),
+    timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+    customFormat
+  ),
   transports: [
     new winston.transports.Console({
-      level: conf.get('logger.level'),
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.timestamp({
-          format: "YYYY-MM-DD HH:mm:ss",
-        }),
-        winston.format.printf(
-          (info) => `${info.timestamp} ${info.level}: ${info.message}`
-        )
-      ),
       handleExceptions: true,
+      format: combine(colorize(), splat(), timestamp(), customFormat),
     }),
     new winston.transports.DailyRotateFile({
-      level: conf.get('logger.level'),
       filename: path.join(logsFolder, `petio-%DATE%.log`),
-      maxSize: '20m',
-      maxFiles: '7d',
-      format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.printf(
-          (info) => `${info.timestamp} ${info.level}: ${info.message}`
-        )
-      ),
+      maxSize: "20m",
+      maxFiles: "7d",
+      createSymlink: true,
+      symlinkName: "petio.log",
     }),
     new winston.transports.File({
-      filename: path.join(logsFolder, 'live.log'),
+      filename: path.join(logsFolder, "live.log"),
       level: "silly",
       maxsize: 100000,
       maxFiles: 1,
       tailable: true,
-      format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.printf((info) => {
+      format: combine(
+        timestamp(),
+        printf((info) => {
           return `${JSON.stringify({
             [info.timestamp]: {
               type: info.level,
