@@ -184,13 +184,18 @@ export default function FilterRow(props) {
           <select
             className={inputs.select__light}
             value={props.option.condition}
+            onChange={props.handleChange}
+            data-rowindex={props.option.rowIndex}
+            data-index={props.option.index}
+            data-key="condition"
+            data-type={props.type}
           >
             <option value="">Please Select</option>
             {Object.keys(conditions).map((i) => {
               let condition = conditions[i];
               return (
                 <option
-                  key={`${props.type}__o__${props.itemId}__c_${i}`}
+                  key={`${props.itemId}__condition__${i}`}
                   value={condition.value}
                 >
                   {condition.label}
@@ -204,6 +209,11 @@ export default function FilterRow(props) {
           <select
             className={inputs.select__light}
             value={props.option.operator}
+            onChange={props.handleChange}
+            data-rowindex={props.option.rowIndex}
+            data-index={props.option.index}
+            data-key="operator"
+            data-type={props.type}
           >
             {props.option.condition ? (
               <>
@@ -214,7 +224,7 @@ export default function FilterRow(props) {
                   if (operator.type === "any" || operator.type === type) {
                     return (
                       <option
-                        key={`${props.type}__${props.itemId}__o_${i}`}
+                        key={`${props.itemId}__operator__${i}`}
                         value={operator.value}
                       >
                         {operator.label}
@@ -232,89 +242,82 @@ export default function FilterRow(props) {
         <div className={styles.filter__row__content__item}>
           <p className={`${typo.body}`}>Value</p>
           {props.option.condition === "genre" ? (
-            <div className="select-wrap">
-              <select
-                data-type={props.type}
-                data-row={props.row}
-                data-item={props.itemId}
-                name="value"
-                onChange={props.inputChange}
-                value={props.option.value}
-              >
-                <option value="">Select Genre</option>
-                {genres[props.type].map((genre) => {
-                  return (
-                    <option
-                      key={`${props.type}__${props.itemId}__g_${genre.id}`}
-                      value={genre.id}
-                    >
-                      {genre.name}
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
+            <select
+              className={inputs.select__light}
+              value={props.option.value}
+              onChange={props.handleChange}
+              data-rowindex={props.option.rowIndex}
+              data-index={props.option.index}
+              data-key="value"
+              data-type={props.type}
+            >
+              <option value="">Select Genre</option>
+              {genres[props.type].map((genre, i) => {
+                return (
+                  <option key={`${props.itemId}__value__${i}`} value={genre.id}>
+                    {genre.name}
+                  </option>
+                );
+              })}
+            </select>
           ) : props.option.condition === "age_rating" ? (
-            <div className="select-wrap">
-              <select
-                data-type={props.type}
-                data-row={props.row}
-                data-item={props.itemId}
-                name="value"
-                onChange={props.inputChange}
-                value={props.option.value}
-              >
-                <option value="">Select Rating</option>
-                {ageRatings[props.type].map((ar, i) => {
-                  return (
-                    <option
-                      key={`${props.type}__${props.itemId}__ar_${i}`}
-                      value={ar.certification}
-                    >
-                      {ar.certification}
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
+            <select
+              className={inputs.select__light}
+              value={props.option.value}
+              onChange={props.handleChange}
+              data-rowindex={props.option.rowIndex}
+              data-index={props.option.index}
+              data-key="value"
+              data-type={props.type}
+            >
+              <option value="">Select Rating</option>
+              {ageRatings[props.type].map((ar, i) => {
+                return (
+                  <option
+                    key={`${props.itemId}__value__${i}`}
+                    value={ar.certification}
+                  >
+                    {ar.certification}
+                  </option>
+                );
+              })}
+            </select>
           ) : props.option.condition === "language" ? (
-            <div className="select-wrap">
-              <select
-                data-type={props.type}
-                data-row={props.row}
-                data-item={props.itemId}
-                name="value"
-                onChange={props.inputChange}
-                value={props.option.value}
-              >
-                <option value="">Select Language</option>
-                {languages.map((lang, i) => {
-                  return (
-                    <option
-                      key={`${props.type}__${props.itemId}__ar_${i}`}
-                      value={lang.code}
-                    >
-                      {lang.name}
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
+            <select
+              className={inputs.select__light}
+              value={props.option.value}
+              onChange={props.handleChange}
+              data-rowindex={props.option.rowIndex}
+              data-index={props.option.index}
+              data-key="value"
+              data-type={props.type}
+            >
+              <option value="">Select Language</option>
+              {languages.map((lang, i) => {
+                return (
+                  <option
+                    key={`${props.itemId}__value__${i}`}
+                    value={lang.code}
+                  >
+                    {lang.name}
+                  </option>
+                );
+              })}
+            </select>
           ) : (
             <input
+              className={inputs.text__light}
               type={`${conditionType === "number" ? "number" : "text"}`}
-              readOnly={!props.option.condition}
-              data-type={props.type}
-              data-row={props.row}
-              data-item={props.itemId}
-              name="value"
-              onChange={props.inputChange}
               value={!props.option.value ? "" : props.option.value}
+              onChange={props.handleChange}
+              data-rowindex={props.option.rowIndex}
+              data-index={props.option.index}
+              data-key="value"
+              data-type={props.type}
             />
           )}
         </div>
       </div>
-      <p>{props.option.condition}</p>
     </div>
   );
 }
