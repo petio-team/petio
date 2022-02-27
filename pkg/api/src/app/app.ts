@@ -1,37 +1,24 @@
 import mongoose from "mongoose";
-import os from "os";
-import cluster from "cluster";
 
 import logger from "./logger";
 import { conf } from "./config";
 import { SetupRouter } from "../router";
-import trending from "../tmdb/trending";
 import pkg from "../../package.json";
 
 let server: any = null;
 
-const app = () => {
+const app = async () => {
   logger.info(`Petio v${pkg.version} [${conf.get("logger.level")}]`);
   try {
-    // check the num of cpu cores
-    if (os.cpus().length < 2) {
-      logger.warn(
-        "You have less then the recommended logical cores (2 cores) available, performance will be affected"
-      );
-    }
-
     // setup the core of the router
     server = SetupRouter(restart);
 
     if (conf.get("admin.id") != -1) {
-      // load db
-      connect();
-      // pull tending data
-      trending();
+      // connect to db
+      await connect();
+      // run tasks
+      import("../tasks");
     }
-
-    // fork process for worker to run on
-    cluster.fork();
   } catch (e) {
     console.log(e.stack);
     process.exit(0);
