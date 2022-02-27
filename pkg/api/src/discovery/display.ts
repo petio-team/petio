@@ -22,7 +22,7 @@ export default async (id, type = "movie") => {
   if (!id) return { error: "No ID" };
   const discoveryPrefs = await Discovery.findOne({ id: id });
   let popular: any = [];
-  let [upcoming, popularData] = await Promise.all([
+  let [upcoming, popularData]: any = await Promise.all([
     comingSoon(type),
     getTop(type === "movie" ? 1 : 2),
   ]);
@@ -123,7 +123,7 @@ export default async (id, type = "movie") => {
   if (actorsSorted.length > 4) actorsSorted.length = 4;
   let peopleData = await Promise.all(
     actorsSorted.map(async (actor) => {
-      let lookup = await searchPeople(actor.name);
+      let lookup: any = await searchPeople(actor.name);
       if (lookup.results && lookup.results.length > 0) {
         let match = lookup.results[0];
         let discData: any = await actorLookup(match, type);
@@ -160,7 +160,7 @@ export default async (id, type = "movie") => {
   if (directorsSorted.length > 4) directorsSorted.length = 4;
   let directorData = await Promise.all(
     directorsSorted.map(async (director) => {
-      let lookup = await searchPeople(director.name);
+      let lookup: any = await searchPeople(director.name);
       if (lookup.results && lookup.results.length > 0) {
         let match = lookup.results[0];
         let discData: any = await actorLookup(match, type);
@@ -186,12 +186,12 @@ export default async (id, type = "movie") => {
     })
   );
   let recentlyViewed = await getHistory(id, type);
-  let recentData = await Promise.map(
+  let recentData: any = await Promise.map(
     Object.keys(recentlyViewed).slice(0, 5),
     async (r) => {
       let recent = recentlyViewed[r];
       if (recent.id) {
-        let related =
+        let related: any =
           type === "movie"
             ? await Promise.all([
                 getMovieRecommendations(recent.id, 1),
@@ -220,7 +220,7 @@ export default async (id, type = "movie") => {
             }
             params.with_genres = genres;
           }
-          let recommendations =
+          let recommendations: any =
             type === "movie"
               ? await discoverMovie(1, params)
               : await discoverShow(1, params);
@@ -306,7 +306,7 @@ async function actorLookupData(match, type) {
     "vote_count.gte": 100,
     with_people: match.id,
   };
-  let discData =
+  let discData: any =
     type === "movie"
       ? await Promise.all([discoverMovie(1, args), discoverMovie(2, args)])
       : await Promise.all([discoverShow(1, args), discoverShow(2, args)]);
@@ -349,7 +349,7 @@ async function genreLookupData(id, genre, type) {
     });
   }
   if (certifications.length > 0) args.certification = certifications.join("|");
-  let discData =
+  let discData: any =
     type === "movie"
       ? await Promise.all([discoverMovie(1, args), discoverMovie(2, args)])
       : await Promise.all([discoverShow(1, args), discoverShow(2, args)]);
@@ -618,7 +618,7 @@ function formatResult(result, type) {
 async function comingSoon(type) {
   let now = new Date().toISOString().split("T")[0];
   try {
-    let data =
+    let data: any =
       type === "movie"
         ? await discoverMovie(1, {
             sort_by: "popularity.desc",
@@ -632,11 +632,13 @@ async function comingSoon(type) {
           });
     await Promise.map(
       data.results,
-      async (result, i) => {
+      async (result: any, i) => {
         let onPlex: any =
           type === "movie"
             ? await onServer("movie", false, false, result.id)
             : await onServer("show", false, false, result.id);
+
+
         data.results[i] =
           type === "movie"
             ? {

@@ -27,40 +27,38 @@ import discoveryRoute from "./discovery";
 import notificationsRoute from "./notifications";
 import batchRoute from "./batch";
 import setupRoute from "./setup";
-import { authRequired  } from "../middleware/auth";
+import { authRequired } from "../middleware/auth";
 import { conf } from "../app/config";
 import setupReady from "../util/setupReady";
 
 const router = express.Router();
 
 router.get("/config", async (req, res) => {
-    let ready = false;
-    if (conf.get('admin.id') != -1) {
-        try {
-            let setupCheck = await setupReady();
-            if (setupCheck.ready) {
-                ready = true;
-            }
-            if (setupCheck.error) {
-                res.status(500).json({
-                    error: "An error has occured",
-                });
-                return;
-            }
-        } catch {
-            res.status(500).json({
-                error: "An error has occured",
-            });
-            return;
-        }
+  let ready = false;
+  if (conf.get("admin.id") != -1) {
+    try {
+      let setupCheck = await setupReady();
+      if (setupCheck.ready) {
+        ready = true;
+      }
+      if (setupCheck.error) {
+        res.status(500).json({
+          error: "An error has occured",
+        });
+        return;
+      }
+    } catch {
+      res.status(500).json({
+        error: "An error has occured",
+      });
+      return;
     }
-    res.json(
-        {
-            config: conf.get('admin.id') == -1 ? false : true,
-            login_type: conf.get('auth.type'),
-            ready: ready
-        }
-    );
+  }
+  res.json({
+    config: conf.get("admin.id") == -1 ? false : true,
+    login_type: conf.get("auth.type"),
+    ready: ready,
+  });
 });
 
 router.use("/login", loginRoute);
@@ -90,9 +88,9 @@ router.use("/hooks", authRequired, notificationsRoute);
 router.use("/batch", authRequired, batchRoute);
 
 router.use((req, res, next) => {
-    if (req.path !== "/logs/stream")
-        logger.log("verbose", `API: Route ${req.path}`);
-    next();
+  if (req.path !== "/logs/stream")
+    logger.log("verbose", `API: Route ${req.path}`);
+  next();
 });
 
 export default router;

@@ -53,7 +53,7 @@ router.get("/min", async (req, res) => {
   res.json(data);
 });
 
-router.get("/me", async (req, res) => {
+router.get("/me", async (req: any, res) => {
   let userId = req.jwtUser.id;
   if (!userId) {
     res.sendStatus(404);
@@ -85,11 +85,14 @@ router.post("/remove", async (req, res) => {
     })
   );
   new Mailer().mail(
-    `Your request was ${request.approved ? "removed" : "denied"} for ${request.title
+    `Your request was ${request.approved ? "removed" : "denied"} for ${
+      request.title
     }`,
-    `Your request was ${request.approved ? "removed" : "denied"} for ${request.title
+    `Your request was ${request.approved ? "removed" : "denied"} for ${
+      request.title
     }`,
-    `Unfortunately your request could not be processed.${reason ? ` This is because - ${reason}.` : ""
+    `Unfortunately your request could not be processed.${
+      reason ? ` This is because - ${reason}.` : ""
     } Thanks for your request anyway!`,
     `https://image.tmdb.org/t/p/w500${request.thumb}`,
     emails,

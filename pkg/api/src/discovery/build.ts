@@ -99,7 +99,7 @@ async function build(id) {
     history: {},
     genres: {},
   };
-  let data = await getHistory(id);
+  let data: any = await getHistory(id);
   if (data.MediaContainer.size === 0) {
     logger.verbose(`DISC: No history for user - ${id}`);
     return {

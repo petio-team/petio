@@ -14,7 +14,7 @@ import { dataFolder } from "../app/env";
 
 const router = express.Router();
 
-const UPLOAD_DIR =  path.join(dataFolder, './uploads');
+const UPLOAD_DIR = path.join(dataFolder, "./uploads");
 
 router.get("/thumb/:id", async (req, res) => {
   let userData: any = false;
@@ -59,7 +59,7 @@ router.get("/thumb/:id", async (req, res) => {
   }
 });
 
-router.get("/quota", authRequired, async (req, res) => {
+router.get("/quota", authRequired, async (req: any, res) => {
   if (!req.jwtUser) {
     res.sendStatus(404);
     return;
@@ -194,13 +194,13 @@ router.post("/edit", adminRequired, async (req, res) => {
 
     if (user.role === "admin" && !user.password) {
       userObj.password =
-        conf.get('admin.password').substring(0, 3) === "$2a"
-          ? conf.get('admin.password')
-          : bcrypt.hashSync(conf.get('admin.password'), 10);
+        conf.get("admin.password").substring(0, 3) === "$2a"
+          ? conf.get("admin.password")
+          : bcrypt.hashSync(conf.get("admin.password"), 10);
     }
 
     if (user.role === "admin" && user.email) {
-      conf.set('admin.email', user.email);
+      conf.set("admin.email", user.email);
       WriteConfig();
     }
 
@@ -331,7 +331,7 @@ router.use((req, res, next) => {
   });
 });
 
-router.post("/thumb/:id", adminRequired, async (req, res) => {
+router.post("/thumb/:id", adminRequired, async (req: any, res) => {
   if (!req.params.id) {
     logger.warn("ROUTE: No user ID");
     res.sendStatus(400);

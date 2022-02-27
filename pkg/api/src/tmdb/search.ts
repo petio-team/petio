@@ -23,7 +23,7 @@ async function search(term) {
 
   await Promise.map(
     movies.results,
-    async (result, i) => {
+    async (result: any, i) => {
       movieLookup(result.id, true);
       let res: any = await onServer("movie", false, false, result.id);
       movies.results[i].on_server = res.exists;
@@ -33,7 +33,7 @@ async function search(term) {
 
   await Promise.map(
     shows.results,
-    async (result, i) => {
+    async (result: any, i) => {
       showLookup(result.id, true);
       let res: any = await onServer("show", false, false, result.id);
       shows.results[i].on_server = res.exists;

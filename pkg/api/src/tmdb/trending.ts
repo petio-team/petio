@@ -3,7 +3,6 @@ import http from "http";
 import axios from "axios";
 import Promise from "bluebird";
 
-import { conf } from "../app/config";
 import { movieLookup } from "../tmdb/movie";
 import { showLookup } from "../tmdb/show";
 import logger from "../app/logger";
@@ -19,7 +18,7 @@ const memoryCache = cacheManager.caching({
 async function trending() {
   logger.log("verbose", `TMDB Trending lookup`);
 
-  let [person, movies, tv] = await Promise.all([
+  let [person, movies, tv]: any = await Promise.all([
     getPerson(),
     getMovies(),
     getShows(),
@@ -27,7 +26,7 @@ async function trending() {
 
   await Promise.map(
     movies.results,
-    async (result, i) => {
+    async (result: any, i) => {
       let movieData = await movieLookup(result.id, true);
       let videoResults = movieData.videos.results;
       movies.results[i] = {
@@ -54,7 +53,7 @@ async function trending() {
 
   await Promise.map(
     tv.results,
-    async (result, i) => {
+    async (result: any, i) => {
       let showData = await showLookup(result.id, true);
       let videoResults = showData.videos.results;
       tv.results[i] = {
@@ -78,7 +77,7 @@ async function trending() {
     },
     { concurrency: 10 }
   );
-  await Promise.map(person.results, async (result, i) => {
+  await Promise.map(person.results, async (result: any, i) => {
     person.results[i] = {
       id: result.id,
       name: result.name,

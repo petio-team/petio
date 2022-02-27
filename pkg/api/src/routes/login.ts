@@ -15,7 +15,7 @@ import getTop from "../plex/top";
 
 const router = express.Router();
 
-router.post("/", async (req, res) => {
+router.post("/", async (req: any, res) => {
   const request_ip = req.ip;
   const {
     user: { username, password },

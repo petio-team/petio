@@ -599,7 +599,7 @@ export default class LibraryUpdate {
     let tmdbId = false;
     let externalId = false;
     let added = false;
-    let seasons = [];
+    let seasons: any = [];
     logger.verbose(`CRON: TV Job: ${title}`);
     try {
       showDb = await Show.findOne({ ratingKey: parseInt(showObj.ratingKey) });
@@ -619,7 +619,7 @@ export default class LibraryUpdate {
       showObj = await this.getMeta(showObj.ratingKey);
       seasons = await Promise.map(
         showObj.Children.Metadata,
-        async (season) => {
+        async (season: any) => {
           let seasonData = await this.getSeason(season.ratingKey);
           let thisSeason = {
             seasonNumber: season.index,

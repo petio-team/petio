@@ -5,7 +5,7 @@ import getDiscovery from "../discovery/display";
 
 const router = express.Router();
 
-router.get("/movies", async (req, res) => {
+router.get("/movies", async (req: any, res) => {
   let userId = req.jwtUser.altId ? req.jwtUser.altId : req.jwtUser.id;
   if (!userId) {
     res.sendStatus(404);
@@ -21,7 +21,7 @@ router.get("/movies", async (req, res) => {
   }
 });
 
-router.get("/shows", async (req, res) => {
+router.get("/shows", async (req: any, res) => {
   let userId = req.jwtUser.altId ? req.jwtUser.altId : req.jwtUser.id;
   if (!userId) {
     res.sendStatus(404);
