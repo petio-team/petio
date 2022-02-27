@@ -6,7 +6,6 @@ import QuotaSystem from "./requests/quotas";
 import { conf } from "./app/config";
 import buildDiscovery from "./discovery/build";
 import { storeCache } from "./meta/imdb";
-import { buildComingSoon } from "./services/fetcher/tmdb/comingsoon";
 import trending from "./tmdb/trending";
 
 const agenda = new Agenda({
@@ -88,7 +87,7 @@ agenda.define(TASK_NAME.IMDB_CACHE, async (job: any, done: any) => {
 
 agenda.define(TASK_NAME.TMDB_CACHE, async (job: any, done: any) => {
   try {
-    Promise.all([buildComingSoon(3), trending()]);
+    trending();
   } catch (err) {
     logger.error(
       "an error occured while attempting to run task '" +
