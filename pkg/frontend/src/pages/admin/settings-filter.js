@@ -37,6 +37,41 @@ export default function SettingsFilter(props) {
     }
   }
 
+  function handleChangeRow(e) {
+    const target = e.currentTarget;
+    const row = target.dataset.rowindex;
+    const item = target.dataset.index;
+    const key = target.dataset.key;
+    const value = target.value;
+    const type = target.dataset.type;
+    let existingFilters = { ...filters };
+    if (
+      existingFilters[type] &&
+      existingFilters[type][row] &&
+      existingFilters[type][row].rows &&
+      existingFilters[type][row].rows[item]
+    ) {
+      existingFilters[type][row].rows[item][key] = value;
+      if (key === "condition")
+        existingFilters[type][row].rows[item].value = false;
+      setFilters(existingFilters);
+    } else {
+      console.log(target);
+      console.log("Failed to update filter");
+    }
+  }
+
+  function addCondition(type, index, optional = true) {
+    let existingFilters = { ...filters };
+    existingFilters[type][index].rows.push({
+      condition: false,
+      operator: false,
+      value: false,
+      comparison: optional ? "or" : "and",
+    });
+    setFilters(existingFilters);
+  }
+
   console.log(filters);
 
   return (
@@ -65,21 +100,30 @@ export default function SettingsFilter(props) {
       <div className={styles.filter__grid}>
         {Object.keys(filters).map((key) => {
           return (
-            <div className={styles.filter__grid__section}>
+            <div
+              className={styles.filter__grid__section}
+              key={`filter__${key}`}
+            >
               <p className={`${typo.smtitle} ${typo.bold}`}>
                 {key === "movie_filters" ? "Movie" : "TV"} Filters
               </p>
               {filters[key] && filters[key].length > 0
                 ? filters[key].map((item, i) => {
                     // const actions = item.actions;
-                    const required = item.rows.filter(
-                      (r) => r.comparison === "and"
-                    );
-                    const optional = item.rows.filter(
-                      (r) => r.comparison !== "and"
-                    );
+                    let required = [];
+                    let optional = [];
+                    item.rows.forEach((item, index) => {
+                      if (item.comparison === "and") {
+                        required.push({ ...item, index: index, rowIndex: i });
+                      } else {
+                        optional.push({ ...item, index: index, rowIndex: i });
+                      }
+                    });
                     return (
-                      <div className={styles.filter__grid__item}>
+                      <div
+                        className={styles.filter__grid__item}
+                        key={`filter__${key}__${i + 1}`}
+                      >
                         <p className={`${typo.body} ${typo.medium}`}>
                           {item.title || `Movie Filter #${i + 1}`}
                         </p>
@@ -93,7 +137,13 @@ export default function SettingsFilter(props) {
                                   <FilterRow
                                     option={option}
                                     type={key}
-                                    itemId={o}
+                                    itemId={`filter__${key}__${
+                                      i + 1
+                                    }__optional__row__${o}`}
+                                    handleChange={handleChangeRow}
+                                    key={`filter__${key}__${
+                                      i + 1
+                                    }__optional__row__${o}`}
                                   />
                                 );
                               })
@@ -101,7 +151,10 @@ export default function SettingsFilter(props) {
                           <div
                             className={styles.filter__grid__item__section__add}
                           >
-                            <button className={`${buttons.secondary}`}>
+                            <button
+                              className={`${buttons.secondary}`}
+                              onClick={() => addCondition(key, i, true)}
+                            >
                               Add Condition +
                             </button>
                           </div>
@@ -111,22 +164,29 @@ export default function SettingsFilter(props) {
                             Required
                           </p>
                           {required && required.length > 0
-                            ? required.map((option) => {
+                            ? required.map((option, o) => {
                                 return (
-                                  <div
-                                    className={
-                                      styles.filter__grid__item__section__item
-                                    }
-                                  >
-                                    <p>{option.condition}</p>
-                                  </div>
+                                  <FilterRow
+                                    option={option}
+                                    type={key}
+                                    itemId={`filter__${key}__${
+                                      i + 1
+                                    }__required__row__${o}`}
+                                    handleChange={handleChangeRow}
+                                    key={`filter__${key}__${
+                                      i + 1
+                                    }__required__row__${o}`}
+                                  />
                                 );
                               })
                             : null}
                           <div
                             className={styles.filter__grid__item__section__add}
                           >
-                            <button className={`${buttons.secondary}`}>
+                            <button
+                              className={`${buttons.secondary}`}
+                              onClick={() => addCondition(key, i, false)}
+                            >
                               Add Condition +
                             </button>
                           </div>
