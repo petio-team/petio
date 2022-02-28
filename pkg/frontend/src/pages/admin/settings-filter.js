@@ -3,17 +3,36 @@ import typo from "../../styles/components/typography.module.scss";
 import buttons from "../../styles/components/button.module.scss";
 
 import { useEffect, useState } from "react";
-import { getFilters } from "../../services/config.service";
+import {
+  getFilters,
+  getRadarr,
+  getRadarrOptions,
+  getSonarr,
+  getSonarrOptions,
+} from "../../services/config.service";
 import FilterRow from "../../components/filterRow";
+import FilterAction from "../../components/filterAction";
+import {
+  genres,
+  // operators,
+  conditions,
+  // ageRatings,
+} from "../../components/filterRow";
+import languages from "../../helpers/languages";
 
 export default function SettingsFilter(props) {
   const [filters, setFilters] = useState({
     movie_filters: false,
     tv_filters: false,
   });
+  const [radarrServers, setRadarrServers] = useState("loading");
+  const [sonarrServers, setSonarrServers] = useState("loading");
+  const [radarrSettings, setRadarrSettings] = useState({});
+  const [sonarrSettings, setSonarrSettings] = useState({});
 
   useEffect(() => {
     getData();
+    getArrs();
     // eslint-disable-next-line
   }, []);
 
@@ -61,6 +80,28 @@ export default function SettingsFilter(props) {
     }
   }
 
+  function handleChangeAction(e) {
+    const target = e.currentTarget;
+    const item = target.dataset.index;
+    const key = target.dataset.key;
+    const value = target.value;
+    const type = target.dataset.type;
+    const row = target.dataset.row;
+    let existingFilters = { ...filters };
+    if (
+      existingFilters[type] &&
+      existingFilters[type][item] &&
+      existingFilters[type][item].action &&
+      existingFilters[type][item].action[row]
+    ) {
+      existingFilters[type][item].action[row][key] = value;
+      setFilters(existingFilters);
+    } else {
+      console.log(target);
+      console.log("Failed to update filter");
+    }
+  }
+
   function addCondition(type, index, optional = true) {
     let existingFilters = { ...filters };
     existingFilters[type][index].rows.push({
@@ -72,7 +113,217 @@ export default function SettingsFilter(props) {
     setFilters(existingFilters);
   }
 
-  console.log(filters);
+  function addAction(type, index) {
+    let existingFilters = { ...filters };
+    existingFilters[type][index].action.push({
+      server: false,
+      path: false,
+      profile: false,
+      language: false,
+      tag: false,
+      type: false,
+    });
+    setFilters(existingFilters);
+  }
+
+  function removeRow(type, row, index) {
+    let existingFilters = { ...filters };
+    existingFilters[type][row].rows.splice(index, 1);
+    setFilters(existingFilters);
+  }
+
+  function removeAction(type, index, row) {
+    let existingFilters = { ...filters };
+    existingFilters[type][index].action.splice(row, 1);
+    setFilters(existingFilters);
+  }
+
+  function addFilter(type) {
+    let existingFilters = { ...filters };
+    existingFilters[type].push({
+      action: [],
+      rows: [
+        {
+          condition: false,
+          operator: false,
+          value: false,
+          comparison: false,
+        },
+      ],
+      collapse: false,
+    });
+    setFilters(existingFilters);
+  }
+
+  function removeFilter(type, index) {
+    let existingFilters = { ...filters };
+    existingFilters[type].splice(index, 1);
+    setFilters(existingFilters);
+  }
+
+  function toggleCollapse(type, index) {
+    let existingFilters = { ...filters };
+    existingFilters[type][index].collapse =
+      !existingFilters[type][index].collapse;
+    setFilters(existingFilters);
+  }
+
+  async function getArrs() {
+    try {
+      let radarr = await getRadarr();
+      let sonarr = await getSonarr();
+      setRadarrServers(radarr);
+      setSonarrServers(sonarr);
+      let settingsRadarr = {};
+      let settingsSonarr = {};
+      radarr.forEach((item) => {
+        getSettings(item.uuid, "radarr", settingsRadarr);
+      });
+      sonarr.forEach((item) => {
+        getSettings(item.uuid, "sonarr", settingsSonarr);
+      });
+    } catch (err) {
+      console.log(err);
+      setRadarrServers("error");
+      setSonarrServers("error");
+    }
+  }
+
+  async function getSettings(uuid, type = "radarr" || "sonarr", current) {
+    try {
+      let settings =
+        type === "radarr"
+          ? await getRadarrOptions(uuid)
+          : await getSonarrOptions(uuid);
+
+      current[uuid] = {
+        profiles:
+          settings.profiles && settings.profiles.length > 0
+            ? settings.profiles
+            : false,
+        paths:
+          settings.paths && settings.paths.length > 0 ? settings.paths : false,
+        languages:
+          settings.languages && settings.languages.length > 0
+            ? settings.languages
+            : false,
+        tags: settings.tags && settings.tags.length > 0 ? settings.tags : false,
+      };
+
+      if (type === "radarr") {
+        setRadarrSettings(current);
+        console.log(current);
+      } else {
+        setSonarrSettings({ ...sonarrSettings, ...current });
+      }
+      return;
+    } catch (e) {
+      console.log(e);
+      return;
+    }
+  }
+
+  function filterToText(type, index) {
+    function formatOperator(operator) {
+      switch (operator) {
+        case "equal":
+          return "equal to";
+        case "not":
+          return "not equal to";
+        case "greater":
+          return "greater than";
+        case "less":
+          return "less than";
+        default:
+          return operator;
+      }
+    }
+
+    function formatValue(item) {
+      switch (item.condition) {
+        case "genre":
+          let genre = genres[type].filter(
+            (g) => g.id.toString() === item.value.toString()
+          );
+          return genre[0].name;
+        case "language":
+          let lang = languages.filter((l) => l.code === item.value);
+          return lang[0].name;
+        default:
+          return item.value;
+      }
+    }
+
+    function formatProfile(id, uuid) {
+      let profiles = false;
+      if (type === "movie_filters") {
+        profiles = radarrSettings[uuid].profiles;
+      } else {
+        profiles = sonarrSettings[uuid].profiles;
+      }
+      let profile = profiles.filter((p) => p.id.toString() === id.toString());
+      return profile[0].name;
+    }
+
+    function formatServer(uuid) {
+      let servers = false;
+      if (type === "movie_filters") {
+        servers = radarrServers;
+      } else {
+        servers = sonarrServers;
+      }
+      let server = servers.filter((s) => s.uuid === uuid);
+      return server[0].title;
+    }
+
+    const filter = filters[type][index];
+    if (!filter) return null;
+    let required = [];
+    let optional = [];
+    filter.rows.forEach((item, index) => {
+      if (item.comparison === "and") {
+        required.push(item);
+      } else {
+        optional.push(item);
+      }
+    });
+    let output = "";
+    optional.forEach((item, i) => {
+      if (i === 0) output += "<b>If</b> ";
+      if (i > 0) output += " <b>or if</b> ";
+      output += `${conditions[item.condition].label} is ${formatOperator(
+        item.operator
+      )} ${formatValue(item)}`;
+    });
+    required.forEach((item, i) => {
+      output += " <b>and</b> ";
+      output += `${conditions[item.condition].label} is always ${formatOperator(
+        item.operator
+      )} ${formatValue(item)}`;
+    });
+    if (filter.action.length === 0) {
+      output += " <b>then</b> do nothing";
+    } else {
+      filter.action.forEach((action, i) => {
+        if (!action.server) {
+          output += " <b>then</b> do nothing";
+        } else {
+          if (i === 0) output += " <b>then</b> send to ";
+          if (i > 0) output += " <b>and</b> also send to ";
+          output += `${formatServer(
+            action.server
+          )} with the quality profile ${formatProfile(
+            action.profile,
+            action.server
+          )} and use the root path <code>${action.path}</code>`;
+        }
+      });
+    }
+    output += ".";
+    return output;
+  }
+
+  // console.log(filters);
 
   return (
     <div className={styles.filter__wrap}>
@@ -109,7 +360,32 @@ export default function SettingsFilter(props) {
               </p>
               {filters[key] && filters[key].length > 0
                 ? filters[key].map((item, i) => {
-                    // const actions = item.actions;
+                    if (item.collapse)
+                      return (
+                        <div
+                          className={styles.filter__grid__item}
+                          key={`filter__${key}__${i + 1}`}
+                        >
+                          <p className={`${typo.body} ${typo.medium}`}>
+                            {item.title || `Movie Filter #${i + 1}`}
+                          </p>
+                          <p
+                            className={`${typo.small} ${typo.uppercase} ${typo.medium} ${styles.filter__grid__item__collapse}`}
+                            onClick={() => toggleCollapse(key, i)}
+                          >
+                            Expand
+                          </p>
+                          <div className={styles.filter__grid__item__section}>
+                            <p
+                              className={`${typo.body}`}
+                              dangerouslySetInnerHTML={{
+                                __html: filterToText(key, i),
+                              }}
+                            ></p>
+                          </div>
+                        </div>
+                      );
+                    const actions = item.action;
                     let required = [];
                     let optional = [];
                     item.rows.forEach((item, index) => {
@@ -127,6 +403,12 @@ export default function SettingsFilter(props) {
                         <p className={`${typo.body} ${typo.medium}`}>
                           {item.title || `Movie Filter #${i + 1}`}
                         </p>
+                        <p
+                          className={`${typo.small} ${typo.uppercase} ${typo.medium} ${styles.filter__grid__item__collapse}`}
+                          onClick={() => toggleCollapse(key, i)}
+                        >
+                          Collapse
+                        </p>
                         <div className={styles.filter__grid__item__section}>
                           <p className={`${typo.body} ${typo.medium}`}>
                             Criteria
@@ -141,6 +423,7 @@ export default function SettingsFilter(props) {
                                       i + 1
                                     }__optional__row__${o}`}
                                     handleChange={handleChangeRow}
+                                    removeRow={removeRow}
                                     key={`filter__${key}__${
                                       i + 1
                                     }__optional__row__${o}`}
@@ -173,6 +456,7 @@ export default function SettingsFilter(props) {
                                       i + 1
                                     }__required__row__${o}`}
                                     handleChange={handleChangeRow}
+                                    removeRow={removeRow}
                                     key={`filter__${key}__${
                                       i + 1
                                     }__required__row__${o}`}
@@ -191,20 +475,56 @@ export default function SettingsFilter(props) {
                             </button>
                           </div>
                         </div>
-                        <div className={styles.filter__grid__item__section}>
+                        <div
+                          className={styles.filter__grid__item__section__action}
+                        >
                           <p className={`${typo.body} ${typo.medium}`}>
                             Actions
                           </p>
+                          {actions && actions.length > 0
+                            ? actions.map((action, a) => {
+                                return (
+                                  <FilterAction
+                                    action={action}
+                                    index={i}
+                                    row={a}
+                                    type={key}
+                                    itemId={`filter__${key}__${
+                                      i + 1
+                                    }__action__row__${a}`}
+                                    handleChange={handleChangeAction}
+                                    removeAction={removeAction}
+                                    key={`filter__${key}__${
+                                      i + 1
+                                    }__action__row__${a}`}
+                                    servers={
+                                      key === "movie_filters"
+                                        ? radarrServers
+                                        : sonarrServers
+                                    }
+                                    settings={
+                                      key === "movie_filters"
+                                        ? radarrSettings
+                                        : sonarrSettings
+                                    }
+                                  />
+                                );
+                              })
+                            : null}
                           <div
                             className={styles.filter__grid__item__section__add}
                           >
-                            <button className={`${buttons.secondary}`}>
+                            <button
+                              className={`${buttons.secondary}`}
+                              onClick={() => addAction(key, i)}
+                            >
                               Add Action +
                             </button>
                           </div>
                         </div>
                         <button
                           className={`${styles.filter__grid__item__remove} ${buttons.primary__red}`}
+                          onClick={() => removeFilter(key, i)}
                         >
                           Remove
                         </button>
@@ -213,7 +533,12 @@ export default function SettingsFilter(props) {
                   })
                 : null}
               <div className={styles.filter__grid__add}>
-                <button className={`${buttons.primary}`}>Add Filter +</button>
+                <button
+                  className={`${buttons.primary}`}
+                  onClick={() => addFilter(key)}
+                >
+                  Add Filter +
+                </button>
               </div>
             </div>
           );

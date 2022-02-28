@@ -174,7 +174,9 @@
 code {
   font-size: inherit;
   line-height: inherit;
-  background: darken($orange, 10);
+  background: $black;
+  font-size: 0.6rem;
+  padding: 0.25rem;
 }
 
 .link {
