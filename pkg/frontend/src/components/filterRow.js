@@ -3,181 +3,192 @@ import styles from "../styles/views/adminSettings.module.scss";
 import typo from "../styles/components/typography.module.scss";
 import languages from "../helpers/languages";
 
-export default function FilterRow(props) {
-  const conditions = {
-    genre: {
-      type: "string",
-      value: "genre",
-      label: "Genre",
+const conditions = {
+  genre: {
+    type: "string",
+    value: "genre",
+    label: "Genre",
+  },
+  year: {
+    type: "number",
+    value: "year",
+    label: "Year",
+  },
+  age_rating: {
+    type: "string",
+    value: "age_rating",
+    label: "Age Rating",
+  },
+  keyword: {
+    type: "string",
+    value: "keyword",
+    label: "Keyword",
+  },
+  language: {
+    type: "string",
+    value: "language",
+    label: "Language",
+  },
+  popularity: {
+    type: "number",
+    value: "popularity",
+    label: "Popularity",
+  },
+  network: {
+    type: "string",
+    value: "network",
+    label: "Network",
+  },
+  studio: {
+    type: "string",
+    value: "studio",
+    label: "Studio",
+  },
+  adult: {
+    type: "string",
+    value: "adult",
+    label: "Adult",
+  },
+  status: {
+    type: "string",
+    value: "status",
+    label: "Status",
+  },
+};
+const operators = {
+  equals: {
+    type: "any",
+    value: "equal",
+    label: "Is Equal To",
+  },
+  not: {
+    type: "any",
+    value: "not",
+    label: "Is Not Equal To",
+  },
+  greater: {
+    type: "number",
+    value: "greater",
+    label: "Greater Than",
+  },
+  less: {
+    type: "number",
+    value: "less",
+    label: "Less Than",
+  },
+};
+const genres = {
+  movie_filters: [
+    { id: 28, name: "Action" },
+    { id: 12, name: "Adventure" },
+    { id: 16, name: "Animation" },
+    { id: "anime", name: "Anime" },
+    { id: 35, name: "Comedy" },
+    { id: 80, name: "Crime" },
+    { id: 99, name: "Documentary" },
+    { id: 18, name: "Drama" },
+    { id: 10751, name: "Family" },
+    { id: 14, name: "Fantasy" },
+    { id: 36, name: "History" },
+    { id: 27, name: "Horror" },
+    { id: 10402, name: "Music" },
+    { id: 9648, name: "Mystery" },
+    { id: 10749, name: "Romance" },
+    { id: 878, name: "Science Fiction" },
+    { id: 10770, name: "TV Movie" },
+    { id: 53, name: "Thriller" },
+    { id: 10752, name: "War" },
+    { id: 37, name: "Western" },
+  ],
+  tv_filters: [
+    { id: 10759, name: "Action & Adventure" },
+    { id: 16, name: "Animation" },
+    { id: "anime", name: "Anime" },
+    { id: 35, name: "Comedy" },
+    { id: 80, name: "Crime" },
+    { id: 99, name: "Documentary" },
+    { id: 18, name: "Drama" },
+    { id: 10751, name: "Family" },
+    { id: 10762, name: "Kids" },
+    { id: 9648, name: "Mystery" },
+    { id: 10763, name: "News" },
+    { id: 10764, name: "Reality" },
+    { id: 10765, name: "Sci-Fi & Fantasy" },
+    { id: 10766, name: "Soap" },
+    { id: 10767, name: "Talk" },
+    { id: 10768, name: "War & Politics" },
+    { id: 37, name: "Western" },
+  ],
+};
+const ageRatings = {
+  movie_filters: [
+    {
+      certification: "G",
     },
-    year: {
-      type: "number",
-      value: "year",
-      label: "Year",
+    {
+      certification: "PG-13",
     },
-    age_rating: {
-      type: "string",
-      value: "age_rating",
-      label: "Age Rating",
+    {
+      certification: "R",
     },
-    keyword: {
-      type: "string",
-      value: "keyword",
-      label: "Keyword",
+    {
+      certification: "NC-17",
     },
-    language: {
-      type: "string",
-      value: "language",
-      label: "Language",
+    {
+      certification: "NR",
     },
-    popularity: {
-      type: "number",
-      value: "popularity",
-      label: "Popularity",
+    {
+      certification: "PG",
     },
-    network: {
-      type: "string",
-      value: "network",
-      label: "Network",
+  ],
+  tv_filters: [
+    {
+      certification: "NR",
     },
-    studio: {
-      type: "string",
-      value: "studio",
-      label: "Studio",
+    {
+      certification: "TV-Y",
     },
-    adult: {
-      type: "string",
-      value: "adult",
-      label: "Adult",
+    {
+      certification: "TV-Y7",
     },
-    status: {
-      type: "string",
-      value: "status",
-      label: "Status",
+    {
+      certification: "TV-G",
     },
-  };
-  const operators = {
-    equals: {
-      type: "any",
-      value: "equal",
-      label: "Is Equal To",
+    {
+      certification: "TV-PG",
     },
-    not: {
-      type: "any",
-      value: "not",
-      label: "Is Not Equal To",
+    {
+      certification: "TV-14",
     },
-    greater: {
-      type: "number",
-      value: "greater",
-      label: "Greater Than",
+    {
+      certification: "TV-MA",
     },
-    less: {
-      type: "number",
-      value: "less",
-      label: "Less Than",
-    },
-  };
-  const genres = {
-    movie_filters: [
-      { id: 28, name: "Action" },
-      { id: 12, name: "Adventure" },
-      { id: 16, name: "Animation" },
-      { id: "anime", name: "Anime" },
-      { id: 35, name: "Comedy" },
-      { id: 80, name: "Crime" },
-      { id: 99, name: "Documentary" },
-      { id: 18, name: "Drama" },
-      { id: 10751, name: "Family" },
-      { id: 14, name: "Fantasy" },
-      { id: 36, name: "History" },
-      { id: 27, name: "Horror" },
-      { id: 10402, name: "Music" },
-      { id: 9648, name: "Mystery" },
-      { id: 10749, name: "Romance" },
-      { id: 878, name: "Science Fiction" },
-      { id: 10770, name: "TV Movie" },
-      { id: 53, name: "Thriller" },
-      { id: 10752, name: "War" },
-      { id: 37, name: "Western" },
-    ],
-    tv_filters: [
-      { id: 10759, name: "Action & Adventure" },
-      { id: 16, name: "Animation" },
-      { id: "anime", name: "Anime" },
-      { id: 35, name: "Comedy" },
-      { id: 80, name: "Crime" },
-      { id: 99, name: "Documentary" },
-      { id: 18, name: "Drama" },
-      { id: 10751, name: "Family" },
-      { id: 10762, name: "Kids" },
-      { id: 9648, name: "Mystery" },
-      { id: 10763, name: "News" },
-      { id: 10764, name: "Reality" },
-      { id: 10765, name: "Sci-Fi & Fantasy" },
-      { id: 10766, name: "Soap" },
-      { id: 10767, name: "Talk" },
-      { id: 10768, name: "War & Politics" },
-      { id: 37, name: "Western" },
-    ],
-  };
-  const ageRatings = {
-    movie_filters: [
-      {
-        certification: "G",
-      },
-      {
-        certification: "PG-13",
-      },
-      {
-        certification: "R",
-      },
-      {
-        certification: "NC-17",
-      },
-      {
-        certification: "NR",
-      },
-      {
-        certification: "PG",
-      },
-    ],
-    tv_filters: [
-      {
-        certification: "NR",
-      },
-      {
-        certification: "TV-Y",
-      },
-      {
-        certification: "TV-Y7",
-      },
-      {
-        certification: "TV-G",
-      },
-      {
-        certification: "TV-PG",
-      },
-      {
-        certification: "TV-14",
-      },
-      {
-        certification: "TV-MA",
-      },
-    ],
-  };
+  ],
+};
 
+export { genres, operators, conditions, ageRatings };
+
+export default function FilterRow(props) {
   let conditionType = conditions[props.option.condition]
     ? conditions[props.option.condition].type
     : "text";
 
   return (
     <div className={styles.filter__row}>
-      <p
-        className={`${typo.small} ${typo.medium} ${typo.red} ${styles.filter__row__remove}`}
-      >
-        Remove
-      </p>
+      {props.option.index > 0 ? (
+        <p
+          className={`${typo.small} ${typo.medium} ${typo.red} ${styles.filter__row__remove}`}
+          onClick={() =>
+            props.removeRow(
+              props.type,
+              props.option.rowIndex,
+              props.option.index
+            )
+          }
+        >
+          Remove
+        </p>
+      ) : null}
       <div className={styles.filter__row__content}>
         <div className={styles.filter__row__content__item}>
           <p className={`${typo.body}`}>Condition</p>
