@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { SortByType, WatchMonetizationType } from "../types";
+import { WatchMonetizationType } from "../types";
+import { SortByType } from "./types";
 
 export const Parameters = [
   {

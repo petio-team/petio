@@ -1,7 +1,7 @@
 import { z, defaultEndpointsFactory } from "express-zod-api";
-import { SortByType } from "../../../tmdb/discover/types";
+import { SortByType } from "../../../tmdb/discover/movie/types";
 import { TMDBAPI } from "../../../tmdb/tmdb";
-import { MovieResultSchema } from "../../../tmdb/discover/movie/schema";
+import { MovieResultSchema } from "@root/tmdb/discover/movie/schema";
 
 export const getMovieComingSoonEndpoint = defaultEndpointsFactory.build({
   method: "get",
