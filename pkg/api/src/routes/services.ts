@@ -1,8 +1,8 @@
 import express from "express";
-import Sonarr from "../services/sonarr";
-import Radarr from "../services/radarr";
+import Sonarr from "../downloaders/sonarr";
+import Radarr from "../downloaders/radarr";
 import logger from "../app/logger";
-import { adminRequired  } from "../middleware/auth";
+import { adminRequired } from "../middleware/auth";
 import { conf, WriteConfig } from "../app/config";
 
 const router = express.Router();
@@ -74,7 +74,7 @@ router.get("/sonarr/config", adminRequired, async (req, res) => {
 
 router.post("/sonarr/config", adminRequired, async (req, res) => {
   let data = req.body.data;
-  ConvertToConfig('sonarr', JSON.parse(data));
+  ConvertToConfig("sonarr", JSON.parse(data));
 
   try {
     WriteConfig();
@@ -92,20 +92,20 @@ router.delete("/sonarr/:uuid", adminRequired, async (req, res) => {
   let uuid = req.params.uuid;
   if (uuid == undefined) {
     res.status(400).json({
-      status: 'error',
-      error: 'missing the required `uuid` field',
+      status: "error",
+      error: "missing the required `uuid` field",
       message: null,
       data: {},
     });
     return;
   }
 
-  let sonarrs = conf.get('sonarr');
+  let sonarrs = conf.get("sonarr");
   const match = sonarrs.filter((el) => el.uuid == uuid);
   if (match.length == 0) {
     res.status(400).json({
-      status: 'error',
-      error: 'no matching instance exists with the uuid: ' + uuid,
+      status: "error",
+      error: "no matching instance exists with the uuid: " + uuid,
       message: null,
       data: {},
     });
@@ -113,15 +113,15 @@ router.delete("/sonarr/:uuid", adminRequired, async (req, res) => {
   }
 
   sonarrs = sonarrs.filter((el) => el.uuid != uuid);
-  conf.set('sonarr', sonarrs);
+  conf.set("sonarr", sonarrs);
 
   try {
     await WriteConfig();
   } catch (e) {
     logger.error(e);
     res.status(500).json({
-      status: 'error',
-      error: 'failed to write to config file',
+      status: "error",
+      error: "failed to write to config file",
       message: null,
       data: {},
     });
@@ -129,14 +129,13 @@ router.delete("/sonarr/:uuid", adminRequired, async (req, res) => {
   }
 
   res.status(200).json({
-    status: 'success',
+    status: "success",
     error: null,
-    message: 'instance successfully removed',
+    message: "instance successfully removed",
     data: sonarrs,
   });
   return;
 });
-
 
 router.get("/calendar", async (req, res) => {
   try {
@@ -227,7 +226,7 @@ router.get("/radarr/test", adminRequired, async (req, res) => {
 
 router.post("/radarr/config", adminRequired, async (req, res) => {
   let data = req.body.data;
-  ConvertToConfig('radarr', JSON.parse(data));
+  ConvertToConfig("radarr", JSON.parse(data));
 
   try {
     WriteConfig();
@@ -245,20 +244,20 @@ router.delete("/radarr/:uuid", adminRequired, async (req, res) => {
   let uuid = req.params.uuid;
   if (uuid == undefined) {
     res.status(400).json({
-      status: 'error',
-      error: 'missing the required `uuid` field',
+      status: "error",
+      error: "missing the required `uuid` field",
       message: null,
       data: {},
     });
     return;
   }
 
-  let radarrs = conf.get('radarr');
+  let radarrs = conf.get("radarr");
   const match = radarrs.filter((el) => el.uuid == uuid);
   if (match.length == 0) {
     res.status(400).json({
-      status: 'error',
-      error: 'no matching instance exists with the uuid: ' + uuid,
+      status: "error",
+      error: "no matching instance exists with the uuid: " + uuid,
       message: null,
       data: {},
     });
@@ -266,15 +265,15 @@ router.delete("/radarr/:uuid", adminRequired, async (req, res) => {
   }
 
   radarrs = radarrs.filter((el) => el.uuid != uuid);
-  conf.set('radarr', radarrs);
+  conf.set("radarr", radarrs);
 
   try {
     await WriteConfig();
   } catch (e) {
     logger.error(e);
     res.status(500).json({
-      status: 'error',
-      error: 'failed to write to config file',
+      status: "error",
+      error: "failed to write to config file",
       message: null,
       data: {},
     });
@@ -282,16 +281,16 @@ router.delete("/radarr/:uuid", adminRequired, async (req, res) => {
   }
 
   res.status(200).json({
-    status: 'success',
+    status: "success",
     error: null,
-    message: 'instance successfully removed',
+    message: "instance successfully removed",
     data: radarrs,
   });
   return;
 });
 
 const ConvertToConfig = (entry, obj) => {
-  if (obj == null || typeof obj !== 'object') {
+  if (obj == null || typeof obj !== "object") {
     return;
   }
 
@@ -352,7 +351,7 @@ const ConvertToConfig = (entry, obj) => {
 
     item.uuid = val.uuid;
     data.push(item);
-  };
+  }
 
   conf.set(entry, data);
 };

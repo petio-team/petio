@@ -3,8 +3,8 @@ import Archive from "../models/archive";
 import User from "../models/user";
 import Profile from "../models/profile";
 import Mailer from "../mail/mailer";
-import Sonarr from "../services/sonarr";
-import Radarr from "../services/radarr";
+import Sonarr from "../downloaders/sonarr";
+import Radarr from "../downloaders/radarr";
 import logger from "../app/logger";
 import filter from "./filter";
 import Discord from "../notifications/discord";
@@ -322,12 +322,7 @@ export default class processRequest {
     const subtitle: any = `A new request has been added for the ${type} "${requestData.title}"`;
     const image: any = `https://image.tmdb.org/t/p/w500${requestData.thumb}`;
     [new Discord(), new Telegram()].forEach((notification) =>
-      notification.send(
-        title,
-        subtitle,
-        userData.title,
-        image
-      )
+      notification.send(title, subtitle, userData.title, image)
     );
   }
 

@@ -3,8 +3,8 @@ import Promise from "bluebird";
 import { movieLookup } from "../tmdb/movie";
 import { showLookup } from "../tmdb/show";
 import Request from "../models/request";
-import Sonarr from "../services/sonarr";
-import Radarr from "../services/radarr";
+import Sonarr from "../downloaders/sonarr";
+import Radarr from "../downloaders/radarr";
 import logger from "../app/logger";
 
 export const getRequests = async (user = false, all = false) => {
