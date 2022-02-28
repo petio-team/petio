@@ -32,6 +32,9 @@ export const SetupRouter = (restartFunc) => {
   router.set("trust proxy", conf.get("petio.proxies"));
   router.set("restart", restartFunc);
 
+  // setup the different routes
+  routes(router);
+
   const config = createConfig({
     app: router,
     cors: true,
@@ -40,9 +43,6 @@ export const SetupRouter = (restartFunc) => {
   });
   const { notFoundHandler } = attachRouting(config, routing);
   router.use(notFoundHandler);
-
-  // setup the different routes
-  routes(router);
 
   try {
     // listen on the address and port specified in the settings
