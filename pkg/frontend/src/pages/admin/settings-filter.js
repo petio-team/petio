@@ -14,10 +14,11 @@ import FilterRow from "../../components/filterRow";
 import FilterAction from "../../components/filterAction";
 import {
   genres,
-  operators,
+  // operators,
   conditions,
-  ageRatings,
+  // ageRatings,
 } from "../../components/filterRow";
+import languages from "../../helpers/languages";
 
 export default function SettingsFilter(props) {
   const [filters, setFilters] = useState({
@@ -237,6 +238,7 @@ export default function SettingsFilter(props) {
           return operator;
       }
     }
+
     function formatValue(item) {
       switch (item.condition) {
         case "genre":
@@ -244,10 +246,25 @@ export default function SettingsFilter(props) {
             (g) => g.id.toString() === item.value.toString()
           );
           return genre[0].name;
+        case "language":
+          let lang = languages.filter((l) => l.code === item.value);
+          return lang[0].name;
         default:
           return item.value;
       }
     }
+
+    function formatProfile(id, uuid) {
+      let profiles = false;
+      if (type === "movie_filters") {
+        profiles = radarrSettings[uuid].profiles;
+      } else {
+        profiles = sonarrSettings[uuid].profiles;
+      }
+      let profile = profiles.filter((p) => p.id.toString() === id.toString());
+      return profile[0].name;
+    }
+
     function formatServer(uuid) {
       let servers = false;
       if (type === "movie_filters") {
@@ -258,6 +275,7 @@ export default function SettingsFilter(props) {
       let server = servers.filter((s) => s.uuid === uuid);
       return server[0].title;
     }
+
     const filter = filters[type][index];
     if (!filter) return null;
     let required = [];
@@ -271,32 +289,33 @@ export default function SettingsFilter(props) {
     });
     let output = "";
     optional.forEach((item, i) => {
-      if (i === 0) output += "If ";
-      if (i > 0) output += " or if ";
-      output += `<b>${conditions[item.condition].label}</b> is ${formatOperator(
+      if (i === 0) output += "<b>If</b> ";
+      if (i > 0) output += " <b>or if</b> ";
+      output += `${conditions[item.condition].label} is ${formatOperator(
         item.operator
-      )} <b>${formatValue(item)}</b>`;
+      )} ${formatValue(item)}`;
     });
     required.forEach((item, i) => {
-      output += " and ";
+      output += " <b>and</b> ";
       output += `${conditions[item.condition].label} is always ${formatOperator(
         item.operator
       )} ${formatValue(item)}`;
     });
     if (filter.action.length === 0) {
-      output += " then <b>do nothing</b>";
+      output += " <b>then</b> do nothing";
     } else {
       filter.action.forEach((action, i) => {
         if (!action.server) {
-          output += " then <b>do nothing</b>";
+          output += " <b>then</b> do nothing";
         } else {
-          if (i === 0) output += " then send to ";
-          if (i > 0) output += " and also send to ";
-          output += `<b>${formatServer(
+          if (i === 0) output += " <b>then</b> send to ";
+          if (i > 0) output += " <b>and</b> also send to ";
+          output += `${formatServer(
             action.server
-          )}</b> with the quality profile <b>${
-            action.profile
-          }</b> and use the root path <b>${action.path}</b>`;
+          )} with the quality profile ${formatProfile(
+            action.profile,
+            action.server
+          )} and use the root path <code>${action.path}</code>`;
         }
       });
     }
