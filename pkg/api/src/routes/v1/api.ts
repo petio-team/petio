@@ -1,21 +1,21 @@
-import { Routing, DependsOnMethod } from "express-zod-api";
-import { comingSoonMovieEndpoint } from "./discovery/movie/comingsoon";
-import { comingSoonTVEndpoint } from "./discovery/tv/comingsoon";
+import { Routing } from "express-zod-api";
+import { getMovieComingSoonEndpoint } from "./movie/comingsoon";
+import { getTVComingSoonEndpoint } from "./tv/comingsoon";
 
 export const routing: Routing = {
   api: {
     v1: {
-      discovery: {
-        movie: {
-          comingsoon: new DependsOnMethod({
-            get: comingSoonMovieEndpoint,
-          }),
-        },
-        tv: {
-          comingsoon: new DependsOnMethod({
-            get: comingSoonTVEndpoint,
-          }),
-        },
+      movie: {
+        comingsoon: getMovieComingSoonEndpoint,
+        popular: {},
+        trending: {},
+        ":id": {},
+      },
+      tv: {
+        comingsoon: getTVComingSoonEndpoint,
+        popular: {},
+        trending: {},
+        ":id": {},
       },
     },
   },
