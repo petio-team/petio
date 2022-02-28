@@ -247,6 +247,13 @@
           margin-top: 10px;
           cursor: pointer;
         }
+
+        &__overview {
+          b {
+            font-weight: 500;
+            color: $orange;
+          }
+        }
       }
 
       &__remove {

@@ -225,6 +225,7 @@ export default function SettingsFilter(props) {
 
   function filterToText(type, index) {
     function formatOperator(operator) {
+      if (!operator) return "not set";
       switch (operator) {
         case "equal":
           return "equal to";
@@ -240,6 +241,7 @@ export default function SettingsFilter(props) {
     }
 
     function formatValue(item) {
+      if (!item.value) return "not set";
       switch (item.condition) {
         case "genre":
           let genre = genres[type].filter(
@@ -255,6 +257,7 @@ export default function SettingsFilter(props) {
     }
 
     function formatProfile(id, uuid) {
+      if (!id) return "not set";
       let profiles = false;
       if (type === "movie_filters") {
         profiles = radarrSettings[uuid].profiles;
@@ -289,17 +292,21 @@ export default function SettingsFilter(props) {
     });
     let output = "";
     optional.forEach((item, i) => {
-      if (i === 0) output += "<b>If</b> ";
-      if (i > 0) output += " <b>or if</b> ";
-      output += `${conditions[item.condition].label} is ${formatOperator(
-        item.operator
-      )} ${formatValue(item)}`;
+      if (conditions[item.condition]) {
+        if (i === 0) output += "<b>If</b> ";
+        if (i > 0) output += " <b>or if</b> ";
+        output += `${conditions[item.condition].label} is ${formatOperator(
+          item.operator
+        )} ${formatValue(item)}`;
+      }
     });
     required.forEach((item, i) => {
-      output += " <b>and</b> ";
-      output += `${conditions[item.condition].label} is always ${formatOperator(
-        item.operator
-      )} ${formatValue(item)}`;
+      if (conditions[item.condition]) {
+        output += " <b>and</b> ";
+        output += `${
+          conditions[item.condition].label
+        } is always ${formatOperator(item.operator)} ${formatValue(item)}`;
+      }
     });
     if (filter.action.length === 0) {
       output += " <b>then</b> do nothing";
@@ -377,7 +384,7 @@ export default function SettingsFilter(props) {
                           </p>
                           <div className={styles.filter__grid__item__section}>
                             <p
-                              className={`${typo.body}`}
+                              className={`${typo.body} ${styles.filter__grid__item__section__overview}`}
                               dangerouslySetInnerHTML={{
                                 __html: filterToText(key, i),
                               }}
