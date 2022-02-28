@@ -78,7 +78,7 @@
     "outputPath": "../../releases"
   },
   "_moduleAliases": {
-    "@root": "src",
+    "@root": "src/",
     "@app": "src/app",
     "@models": "src/models",
     "@routes": "src/routes",
