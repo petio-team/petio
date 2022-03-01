@@ -31,6 +31,7 @@ export const SetupRouter = (restartFunc) => {
   router.use(checkSetup);
   router.set("trust proxy", conf.get("petio.proxies"));
   router.set("restart", restartFunc);
+  router.disable("x-powered-by");
 
   // setup the different routes
   routes(router);
