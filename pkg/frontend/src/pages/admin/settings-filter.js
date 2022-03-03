@@ -212,7 +212,6 @@ export default function SettingsFilter(props) {
 
       if (type === "radarr") {
         setRadarrSettings(current);
-        console.log(current);
       } else {
         setSonarrSettings({ ...sonarrSettings, ...current });
       }
@@ -330,7 +329,50 @@ export default function SettingsFilter(props) {
     return output;
   }
 
-  // console.log(filters);
+  function validateFilters() {
+    for (let key in filters) {
+      const type = filters[key];
+      for (let i in type) {
+        const filter = type[i];
+        for (let a in filter.action) {
+          const action = filter.action[a];
+          if (!action.path || !action.profile || !action.server || !action.type)
+            return false;
+        }
+        for (let r in filter.rows) {
+          const row = filter.rows[r];
+          if (!row.condition || !row.operator || row.value === false)
+            return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  async function saveFilters() {
+    const n = props.newNotification({
+      message: "Validating filters",
+      type: "loading",
+    });
+    const validation = await validateFilters();
+    console.log(validation);
+    if (!validation) {
+      props.newNotification({
+        message: "Failed to validate filters",
+        type: "error",
+        id: n,
+      });
+    } else {
+      props.newNotification({
+        message: "Filters validated",
+        type: "success",
+        id: n,
+      });
+    }
+    console.log("save");
+  }
+
+  console.log(filters);
 
   return (
     <div className={styles.filter__wrap}>
@@ -354,7 +396,13 @@ export default function SettingsFilter(props) {
         Note: Filters are read from top to bottom and will only match once.
       </p>
       <br />
-
+      <button
+        className={`${buttons.primary} ${buttons.small}`}
+        onClick={saveFilters}
+      >
+        Save filters
+      </button>
+      <br />
       <div className={styles.filter__grid}>
         {Object.keys(filters).map((key) => {
           return (
@@ -551,6 +599,13 @@ export default function SettingsFilter(props) {
           );
         })}
       </div>
+      <br />
+      <button
+        className={`${buttons.primary} ${buttons.small}`}
+        onClick={saveFilters}
+      >
+        Save filters
+      </button>
     </div>
   );
 }

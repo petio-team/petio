@@ -27,7 +27,7 @@ export default function Settings({ newNotification }) {
               <SettingsArr type="sonarr" newNotification={newNotification} />
             </Route>
             <Route exact path="/admin/settings/filter">
-              <SettingsFilter />
+              <SettingsFilter newNotification={newNotification} />
             </Route>
             <Route path="*">
               <p className={`${typo.title} ${typo.bold}`}>Not found</p>
