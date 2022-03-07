@@ -9,3 +9,4 @@ logs/
 .DS_Store
 releases/
 *.env
+node_modules/

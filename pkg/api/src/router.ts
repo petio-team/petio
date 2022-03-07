@@ -8,9 +8,9 @@ import apiRoutes from "./routes/api";
 import { conf } from "./app/config";
 import checkSetup from "./middleware/setup";
 import { frontendView, env } from "./app/env";
-import { routing } from "@routes/v1/api";
 import logger from "./app/logger";
 import { attachRouting, createConfig } from "express-zod-api";
+import { routing } from "./routes/v1/api";
 
 // setups the core of the router
 export const SetupRouter = (restartFunc) => {

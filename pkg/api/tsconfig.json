@@ -7,11 +7,14 @@
     "outDir": "dist",
     "rootDir": ".",
     "strict": false,
+    "skipLibCheck": true,
     "esModuleInterop": true /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */,
     "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */,
     "declaration": true /* Generates corresponding '.d.ts' file. */,
     "strictNullChecks": true,
     "resolveJsonModule": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "sourceMap": true,
     "baseUrl": "src",
     "paths": {
@@ -19,9 +22,10 @@
       "@app/*": ["app/*"],
       "@models/*": ["models/*"],
       "@routes/*": ["routes/*"],
-      "@services/*": ["services/*"]
+      "@services/*": ["services/*"],
+      "@db/*": ["db/*"]
     }
   },
-  "exclude": ["node_modules", "dist"],
-  "include": ["*", "./package.json", "./src"]
+  "exclude": ["node_modules/**", "dist"],
+  "include": ["*", "./package.json"]
 }
