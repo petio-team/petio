@@ -1,35 +1,34 @@
 import mongoose from "mongoose";
 
 import logger from "./logger";
-import { conf } from "./config";
+import { conf, loadConfig } from "./config";
 import { SetupRouter } from "../router";
 import pkg from "../../package.json";
 
 let server: any = null;
 
 const app = async () => {
+  // load config
+  loadConfig();
+  // set log level again to config level
+  logger.transports[0].level = conf.get("logger.level");
+  // setup the core of the router
+  server = SetupRouter(restartApp);
+
   logger.info(`Petio v${pkg.version} [${conf.get("logger.level")}]`);
-  try {
-    // setup the core of the router
-    server = SetupRouter(restart);
-
-    if (conf.get("admin.id") != -1) {
-      // connect to db
-      await connect();
-      // run tasks
-      import("../tasks");
-    }
-  } catch (e) {
-    console.log(e.stack);
-    process.exit(0);
-  }
-
   logger.info(
-    "Listening on " + conf.get("petio.host") + ":" + conf.get("petio.port")
+    "Listening on http://" +
+      conf.get("petio.host") +
+      ":" +
+      conf.get("petio.port")
   );
 
-  // check if admin id is set else we tell the user they need to go through setup
-  if (conf.get("admin.id") == -1) {
+  if (conf.get("admin.id") != -1) {
+    // connect to db
+    await mongoose.connect(conf.get("db.url"));
+    // run tasks
+    import("../tasks");
+  } else {
     logger.warn(
       "Initial setup is required, please proceed to the webui to begin the setup"
     );
@@ -37,18 +36,18 @@ const app = async () => {
 };
 export default app;
 
-const restart = () => {
+const restartApp = () => {
   if (server != null) {
     server.close();
   }
   app();
 };
 
-const connect = async () => {
+(async function () {
   try {
-    mongoose.connect(conf.get("db.url"));
-  } catch (err) {
-    logger.error("Error connecting to database");
-    logger.error(err);
+    await app();
+  } catch (e) {
+    console.log(e.stack);
+    process.exit(0);
   }
-};
+})();
