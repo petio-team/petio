@@ -4,10 +4,14 @@ import cacheManager from "cache-manager";
 import logger from "../app/logger";
 import { fanartApiKey } from "../app/env";
 
-const memoryCache = cacheManager.caching({ store: "memory", max: 500, ttl: 86400 /*seconds*/ });
+const memoryCache = cacheManager.caching({
+  store: "memory",
+  max: 500,
+  ttl: 86400 /*seconds*/,
+});
 
 export default async (id, type) => {
-  let data = false;
+  let data: any = false;
   try {
     data = await memoryCache.wrap(id, function () {
       return fanartData(id, type);
@@ -16,7 +20,7 @@ export default async (id, type) => {
     logger.error(err);
   }
   return data;
-}
+};
 
 async function fanartData(id, type) {
   let url = `https://webservice.fanart.tv/v3/${type}/${id}?api_key=${fanartApiKey}`;

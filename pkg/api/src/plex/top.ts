@@ -5,7 +5,7 @@ import plexLookup from "../plex/plexLookup";
 import { movieLookup } from "../tmdb/movie";
 import { showLookup } from "../tmdb/show";
 import logger from "../app/logger";
-import MakePlexURL from './util';
+import MakePlexURL from "./util";
 
 const memoryCache = cacheManager.caching({
   store: "memory",
@@ -14,7 +14,7 @@ const memoryCache = cacheManager.caching({
 });
 
 export default async (type) => {
-  let data = false;
+  let data: any = false;
   try {
     data = await memoryCache.wrap(`pop__${type}`, function () {
       return getTopData(type);
@@ -25,7 +25,7 @@ export default async (type) => {
     return [];
   }
   return data;
-}
+};
 
 async function getTopData(type) {
   let d = new Date();
@@ -34,14 +34,11 @@ async function getTopData(type) {
   d.setMilliseconds(0);
   let timestamp = (d.getTime() / 1000) | 0;
 
-  const url = MakePlexURL(
-    "/library/all/top",
-    {
-      "type": type,
-      "viewedAt>=": timestamp,
-      "limit": 20,
-    }
-  ).toString();
+  const url = MakePlexURL("/library/all/top", {
+    type: type,
+    "viewedAt>=": timestamp,
+    limit: 20,
+  }).toString();
 
   try {
     let res = await axios.get(url);

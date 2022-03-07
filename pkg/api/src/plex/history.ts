@@ -4,7 +4,7 @@ import cacheManager from "cache-manager";
 import plexLookup from "../plex/plexLookup";
 import { movieLookup } from "../tmdb/movie";
 import { showLookup } from "../tmdb/show";
-import MakePlexURL from './util';
+import MakePlexURL from "./util";
 import logger from "../app/logger";
 
 const memoryCache = cacheManager.caching({
@@ -14,7 +14,7 @@ const memoryCache = cacheManager.caching({
 });
 
 export default async (id, type) => {
-  let data = false;
+  let data: any = false;
   try {
     data = await memoryCache.wrap(`hist__${id}__${type}`, function () {
       return getHistoryData(id, type);
@@ -25,7 +25,7 @@ export default async (id, type) => {
     return [];
   }
   return data;
-}
+};
 
 function getHistoryData(id, type) {
   logger.verbose("History returned from source");
@@ -35,16 +35,13 @@ function getHistoryData(id, type) {
     d.setHours(0, 0, 0);
     d.setMilliseconds(0);
 
-    const url = MakePlexURL(
-      "status/sessions/history/all",
-      {
-        "sort": "viewedAt:desc",
-        "accountID": id,
-        "viewedAt>=": "0",
-        "X-Plex-Container-Start": 0,
-        "X-Plex-Container-Size": 100,
-      }
-    ).toString();
+    const url = MakePlexURL("status/sessions/history/all", {
+      sort: "viewedAt:desc",
+      accountID: id,
+      "viewedAt>=": "0",
+      "X-Plex-Container-Start": 0,
+      "X-Plex-Container-Size": 100,
+    }).toString();
 
     request(
       url,

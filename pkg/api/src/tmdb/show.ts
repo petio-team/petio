@@ -39,15 +39,21 @@ export async function showLookup(id, minified = false) {
     }
 
     try {
-      let [imdb_data, fanart, recommendations, seasonsLookup, reviews, onPlex]: any =
-        await Promise.all([
-          !minified && external.imdb_id ? imdb(external.imdb_id) : false,
-          minified ? false : fanartLookup(external.tvdb_id, "tv"),
-          !minified ? getRecommendations(id) : false,
-          !minified ? getSeasons(show.seasons, id) : false,
-          !minified ? getReviews(id) : false,
-          onServer("show", external.imdb_id, external.tvdb_id, id),
-        ]);
+      let [
+        imdb_data,
+        fanart,
+        recommendations,
+        seasonsLookup,
+        reviews,
+        onPlex,
+      ]: any = await Promise.all([
+        !minified && external.imdb_id ? imdb(external.imdb_id) : false,
+        minified ? false : fanartLookup(external.tvdb_id, "tv"),
+        !minified ? getRecommendations(id) : false,
+        !minified ? getSeasons(show.seasons, id) : false,
+        !minified ? getReviews(id) : false,
+        onServer("show", external.imdb_id, external.tvdb_id, id),
+      ]);
 
       if (fanart) {
         if (fanart.hdtvlogo) {
@@ -210,7 +216,7 @@ async function getReviews(id) {
 }
 
 async function getSeasons(seasons, id) {
-  let data = false;
+  let data: any = false;
   try {
     data = await memoryCache.wrap(`seasons_${id}`, async function () {
       return await seasonsData(seasons, id);
