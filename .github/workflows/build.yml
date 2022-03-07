@@ -6,6 +6,8 @@ on:
       - .github/**/*
       - docker/**/*
       - pkg/**/*
+      - ./Dockerfile
+      - ./**/package.json
     paths_ignore:
       - /*
     branches:
