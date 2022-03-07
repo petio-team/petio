@@ -30,7 +30,7 @@ jobs:
           node-version-file: ".node-version"
           cache: "yarn"
           cache-dependency-path: "**/yarn.lock"
-      - run: yarn add --global typescript
+      - run: yarn global add typescript
       - name: Install task
         uses: arduino/setup-task@v1
 
