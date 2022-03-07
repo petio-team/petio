@@ -34,7 +34,6 @@ const app = async () => {
     );
   }
 };
-export default app;
 
 const restartApp = () => {
   if (server != null) {
