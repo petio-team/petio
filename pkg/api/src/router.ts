@@ -3,6 +3,7 @@ import cors from "cors";
 import path from "path";
 import cookieParser from "cookie-parser";
 import fs from "fs";
+import helmet from "helmet";
 
 import apiRoutes from "./routes/api";
 import { conf } from "./app/config";
@@ -29,9 +30,11 @@ export const SetupRouter = (restartFunc) => {
   router.use(express.urlencoded({ extended: true }));
   router.use(cookieParser());
   router.use(checkSetup);
+  router.use(helmet());
+
+  // set specific options
   router.set("trust proxy", conf.get("petio.proxies"));
   router.set("restart", restartFunc);
-  router.disable("x-powered-by");
 
   // setup the different routes
   routes(router);
