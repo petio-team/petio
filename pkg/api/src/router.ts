@@ -30,7 +30,39 @@ export const SetupRouter = (restartFunc) => {
   router.use(express.urlencoded({ extended: true }));
   router.use(cookieParser());
   router.use(checkSetup);
-  router.use(helmet());
+  router.use(
+    helmet.contentSecurityPolicy({
+      directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        "default-src": ["'self'", "plex.tv"],
+        "connect-src": ["'self'", "plex.tv"],
+        "img-src": [
+          "'self'",
+          "data:",
+          "fanart.tv",
+          "assets.fanart.tv",
+          "tmdb.org",
+          "image.tmdb.org",
+          "plex.tv",
+          "assets.plex.tv",
+        ],
+      },
+    })
+  );
+  router.use(helmet.crossOriginEmbedderPolicy());
+  router.use(helmet.crossOriginOpenerPolicy());
+  router.use(helmet.crossOriginResourcePolicy());
+  router.use(helmet.dnsPrefetchControl());
+  router.use(helmet.expectCt());
+  router.use(helmet.frameguard());
+  router.use(helmet.hidePoweredBy());
+  router.use(helmet.hsts());
+  router.use(helmet.ieNoOpen());
+  router.use(helmet.noSniff());
+  router.use(helmet.originAgentCluster());
+  router.use(helmet.permittedCrossDomainPolicies());
+  router.use(helmet.referrerPolicy());
+  router.use(helmet.xssFilter());
 
   // set specific options
   router.set("trust proxy", conf.get("petio.proxies"));
