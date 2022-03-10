@@ -204,8 +204,8 @@ export default function SettingsFilter(props) {
         paths:
           settings.paths && settings.paths.length > 0 ? settings.paths : false,
         languages:
-          settings.languages && settings.languages.length > 0
-            ? settings.languages
+          settings.languages[0].languages && settings.languages[0].languages.length > 0
+            ? settings.languages[0].languages
             : false,
         tags: settings.tags && settings.tags.length > 0 ? settings.tags : false,
       };
@@ -302,9 +302,8 @@ export default function SettingsFilter(props) {
     required.forEach((item, i) => {
       if (conditions[item.condition]) {
         output += " <b>and</b> ";
-        output += `${
-          conditions[item.condition].label
-        } is always ${formatOperator(item.operator)} ${formatValue(item)}`;
+        output += `${conditions[item.condition].label
+          } is always ${formatOperator(item.operator)} ${formatValue(item)}`;
       }
     });
     if (filter.action.length === 0) {
@@ -415,41 +414,7 @@ export default function SettingsFilter(props) {
               </p>
               {filters[key] && filters[key].length > 0
                 ? filters[key].map((item, i) => {
-                    if (item.collapse)
-                      return (
-                        <div
-                          className={styles.filter__grid__item}
-                          key={`filter__${key}__${i + 1}`}
-                        >
-                          <p className={`${typo.body} ${typo.medium}`}>
-                            {item.title || `Movie Filter #${i + 1}`}
-                          </p>
-                          <p
-                            className={`${typo.small} ${typo.uppercase} ${typo.medium} ${styles.filter__grid__item__collapse}`}
-                            onClick={() => toggleCollapse(key, i)}
-                          >
-                            Expand
-                          </p>
-                          <div className={styles.filter__grid__item__section}>
-                            <p
-                              className={`${typo.body} ${styles.filter__grid__item__section__overview}`}
-                              dangerouslySetInnerHTML={{
-                                __html: filterToText(key, i),
-                              }}
-                            ></p>
-                          </div>
-                        </div>
-                      );
-                    const actions = item.action;
-                    let required = [];
-                    let optional = [];
-                    item.rows.forEach((item, index) => {
-                      if (item.comparison === "and") {
-                        required.push({ ...item, index: index, rowIndex: i });
-                      } else {
-                        optional.push({ ...item, index: index, rowIndex: i });
-                      }
-                    });
+                  if (item.collapse)
                     return (
                       <div
                         className={styles.filter__grid__item}
@@ -462,130 +427,158 @@ export default function SettingsFilter(props) {
                           className={`${typo.small} ${typo.uppercase} ${typo.medium} ${styles.filter__grid__item__collapse}`}
                           onClick={() => toggleCollapse(key, i)}
                         >
-                          Collapse
+                          Expand
                         </p>
                         <div className={styles.filter__grid__item__section}>
-                          <p className={`${typo.body} ${typo.medium}`}>
-                            Criteria
-                          </p>
-                          {optional && optional.length > 0
-                            ? optional.map((option, o) => {
-                                return (
-                                  <FilterRow
-                                    option={option}
-                                    type={key}
-                                    itemId={`filter__${key}__${
-                                      i + 1
-                                    }__optional__row__${o}`}
-                                    handleChange={handleChangeRow}
-                                    removeRow={removeRow}
-                                    key={`filter__${key}__${
-                                      i + 1
-                                    }__optional__row__${o}`}
-                                  />
-                                );
-                              })
-                            : null}
-                          <div
-                            className={styles.filter__grid__item__section__add}
-                          >
-                            <button
-                              className={`${buttons.secondary}`}
-                              onClick={() => addCondition(key, i, true)}
-                            >
-                              Add Condition +
-                            </button>
-                          </div>
+                          <p
+                            className={`${typo.body} ${styles.filter__grid__item__section__overview}`}
+                            dangerouslySetInnerHTML={{
+                              __html: filterToText(key, i),
+                            }}
+                          ></p>
                         </div>
-                        <div className={styles.filter__grid__item__section}>
-                          <p className={`${typo.body} ${typo.medium}`}>
-                            Required
-                          </p>
-                          {required && required.length > 0
-                            ? required.map((option, o) => {
-                                return (
-                                  <FilterRow
-                                    option={option}
-                                    type={key}
-                                    itemId={`filter__${key}__${
-                                      i + 1
-                                    }__required__row__${o}`}
-                                    handleChange={handleChangeRow}
-                                    removeRow={removeRow}
-                                    key={`filter__${key}__${
-                                      i + 1
-                                    }__required__row__${o}`}
-                                  />
-                                );
-                              })
-                            : null}
-                          <div
-                            className={styles.filter__grid__item__section__add}
-                          >
-                            <button
-                              className={`${buttons.secondary}`}
-                              onClick={() => addCondition(key, i, false)}
-                            >
-                              Add Condition +
-                            </button>
-                          </div>
-                        </div>
-                        <div
-                          className={styles.filter__grid__item__section__action}
-                        >
-                          <p className={`${typo.body} ${typo.medium}`}>
-                            Actions
-                          </p>
-                          {actions && actions.length > 0
-                            ? actions.map((action, a) => {
-                                return (
-                                  <FilterAction
-                                    action={action}
-                                    index={i}
-                                    row={a}
-                                    type={key}
-                                    itemId={`filter__${key}__${
-                                      i + 1
-                                    }__action__row__${a}`}
-                                    handleChange={handleChangeAction}
-                                    removeAction={removeAction}
-                                    key={`filter__${key}__${
-                                      i + 1
-                                    }__action__row__${a}`}
-                                    servers={
-                                      key === "movie_filters"
-                                        ? radarrServers
-                                        : sonarrServers
-                                    }
-                                    settings={
-                                      key === "movie_filters"
-                                        ? radarrSettings
-                                        : sonarrSettings
-                                    }
-                                  />
-                                );
-                              })
-                            : null}
-                          <div
-                            className={styles.filter__grid__item__section__add}
-                          >
-                            <button
-                              className={`${buttons.secondary}`}
-                              onClick={() => addAction(key, i)}
-                            >
-                              Add Action +
-                            </button>
-                          </div>
-                        </div>
-                        <button
-                          className={`${styles.filter__grid__item__remove} ${buttons.primary__red}`}
-                          onClick={() => removeFilter(key, i)}
-                        >
-                          Remove
-                        </button>
                       </div>
                     );
-                  })
+                  const actions = item.action;
+                  let required = [];
+                  let optional = [];
+                  item.rows.forEach((item, index) => {
+                    if (item.comparison === "and") {
+                      required.push({ ...item, index: index, rowIndex: i });
+                    } else {
+                      optional.push({ ...item, index: index, rowIndex: i });
+                    }
+                  });
+                  return (
+                    <div
+                      className={styles.filter__grid__item}
+                      key={`filter__${key}__${i + 1}`}
+                    >
+                      <p className={`${typo.body} ${typo.medium}`}>
+                        {item.title || `Movie Filter #${i + 1}`}
+                      </p>
+                      <p
+                        className={`${typo.small} ${typo.uppercase} ${typo.medium} ${styles.filter__grid__item__collapse}`}
+                        onClick={() => toggleCollapse(key, i)}
+                      >
+                        Collapse
+                      </p>
+                      <div className={styles.filter__grid__item__section}>
+                        <p className={`${typo.body} ${typo.medium}`}>
+                          Criteria
+                        </p>
+                        {optional && optional.length > 0
+                          ? optional.map((option, o) => {
+                            return (
+                              <FilterRow
+                                option={option}
+                                type={key}
+                                itemId={`filter__${key}__${i + 1
+                                  }__optional__row__${o}`}
+                                handleChange={handleChangeRow}
+                                removeRow={removeRow}
+                                key={`filter__${key}__${i + 1
+                                  }__optional__row__${o}`}
+                              />
+                            );
+                          })
+                          : null}
+                        <div
+                          className={styles.filter__grid__item__section__add}
+                        >
+                          <button
+                            className={`${buttons.secondary}`}
+                            onClick={() => addCondition(key, i, true)}
+                          >
+                            Add Condition +
+                          </button>
+                        </div>
+                      </div>
+                      <div className={styles.filter__grid__item__section}>
+                        <p className={`${typo.body} ${typo.medium}`}>
+                          Required
+                        </p>
+                        {required && required.length > 0
+                          ? required.map((option, o) => {
+                            return (
+                              <FilterRow
+                                option={option}
+                                type={key}
+                                itemId={`filter__${key}__${i + 1
+                                  }__required__row__${o}`}
+                                handleChange={handleChangeRow}
+                                removeRow={removeRow}
+                                key={`filter__${key}__${i + 1
+                                  }__required__row__${o}`}
+                              />
+                            );
+                          })
+                          : null}
+                        <div
+                          className={styles.filter__grid__item__section__add}
+                        >
+                          <button
+                            className={`${buttons.secondary}`}
+                            onClick={() => addCondition(key, i, false)}
+                          >
+                            Add Condition +
+                          </button>
+                        </div>
+                      </div>
+                      <div
+                        className={styles.filter__grid__item__section__action}
+                      >
+                        <p className={`${typo.body} ${typo.medium}`}>
+                          Actions
+                        </p>
+                        {actions && actions.length > 0
+                          ? actions.map((action, a) => {
+                            return (
+                              <FilterAction
+                                action={action}
+                                index={i}
+                                row={a}
+                                type={key}
+                                itemId={`filter__${key}__${i + 1
+                                  }__action__row__${a}`}
+                                handleChange={handleChangeAction}
+                                removeAction={removeAction}
+                                key={`filter__${key}__${i + 1
+                                  }__action__row__${a}`}
+                                servers={
+                                  key === "movie_filters"
+                                    ? radarrServers
+                                    : sonarrServers
+                                }
+                                settings={
+                                  key === "movie_filters"
+                                    ? radarrSettings
+                                    : sonarrSettings
+                                }
+                              />
+                            );
+                          })
+                          : null}
+                        <div
+                          className={styles.filter__grid__item__section__add}
+                        >
+                          <button
+                            className={`${buttons.secondary}`}
+                            onClick={() => addAction(key, i)}
+                          >
+                            Add Action +
+                          </button>
+                        </div>
+                      </div>
+                      <button
+                        className={`${styles.filter__grid__item__remove} ${buttons.primary__red}`}
+                        onClick={() => removeFilter(key, i)}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  );
+                })
                 : null}
               <div className={styles.filter__grid__add}>
                 <button

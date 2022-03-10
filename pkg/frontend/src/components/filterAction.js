@@ -134,14 +134,14 @@ export default function FilterAction(props) {
               props.settings[props.action.server].languages.length > 0 ? (
               <>
                 <option value="">Please Select</option>
-                {props.settings[props.action.server].langauges.map(
+                {props.settings[props.action.server].languages.map(
                   (lang, i) => {
                     return (
                       <option
-                        key={`${props.itemId}__tag__${i}`}
-                        value={lang.id}
+                        key={`${props.itemId}__language__${i}`}
+                        value={lang.language.id}
                       >
-                        {lang.name}
+                        {lang.language.name}
                       </option>
                     );
                   }
@@ -195,8 +195,8 @@ export default function FilterAction(props) {
             data-type={props.type}
           >
             {props.action.server &&
-            props.settings &&
-            props.settings[props.action.server] ? (
+              props.settings &&
+              props.settings[props.action.server] ? (
               <>
                 <option value="">Please Select</option>
                 <option value="standard">Standard</option>
