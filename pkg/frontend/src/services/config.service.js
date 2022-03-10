@@ -54,16 +54,18 @@ export async function testRadarr(id) {
 }
 
 export async function getRadarrOptions(id) {
-  let [paths, profiles, tags] = await Promise.all([
+  let [paths, profiles, tags, languages] = await Promise.all([
     get(`/services/radarr/paths/${id}`),
     get(`/services/radarr/profiles/${id}`),
     get(`/services/radarr/tags/${id}`),
+    get(`/services/radarr/languages/${id}`),
   ]);
 
   return {
-    paths: paths,
-    profiles: profiles,
-    tags: tags,
+    paths,
+    profiles,
+    tags,
+    languages,
   };
 }
 
@@ -83,16 +85,18 @@ export async function testSonarr(id) {
 }
 
 export async function getSonarrOptions(id) {
-  let [paths, profiles, tags] = await Promise.all([
+  let [paths, profiles, tags, languages] = await Promise.all([
     get(`/services/sonarr/paths/${id}`),
     get(`/services/sonarr/profiles/${id}`),
     get(`/services/sonarr/tags/${id}`),
+    get(`/services/sonarr/languages/${id}`),
   ]);
 
   return {
-    paths: paths,
-    profiles: profiles,
-    tags: tags,
+    paths,
+    profiles,
+    tags,
+    languages,
   };
 }
 

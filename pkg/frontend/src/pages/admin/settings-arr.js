@@ -36,6 +36,10 @@ export default function SettingsArr(props) {
       id: null,
       name: null,
     },
+    language: {
+      id: null,
+      name: null,
+    },
   };
   const [newServer, setNewServer] = useState(serverDefaults);
   const [currentServer, setCurrentServer] = useState(false);
@@ -43,6 +47,7 @@ export default function SettingsArr(props) {
   const [options, setOptions] = useState({
     profiles: false,
     paths: false,
+    languages: false,
   });
   const type = props.type;
 
@@ -94,6 +99,15 @@ export default function SettingsArr(props) {
           path: {
             id: value,
             location: path[0].path,
+          },
+        });
+      } else if (name === "language") {
+        const language = options.languages.filter((o) => o.language.id == value);
+        setCurrentServer({
+          ...currentServer,
+          language: {
+            id: value,
+            name: language[0].language.name,
           },
         });
       } else {
@@ -232,12 +246,14 @@ export default function SettingsArr(props) {
       setOptions({
         profiles: settings.profiles.length > 0 ? settings.profiles : false,
         paths: settings.paths.length > 0 ? settings.paths : false,
+        languages: settings.languages[0].languages,
       });
     } catch (e) {
       console.log(e);
       setOptions({
         profiles: false,
         paths: false,
+        languages: false,
       });
       return;
     }
@@ -250,6 +266,7 @@ export default function SettingsArr(props) {
     setOptions({
       profiles: false,
       paths: false,
+      languages: false,
     });
   }
 
@@ -370,37 +387,36 @@ export default function SettingsArr(props) {
       <div className={styles.grid}>
         {servers && servers.length > 0
           ? servers.map((server, i) => {
-              return (
-                <div
-                  className={`${styles.arr__item} ${
-                    server.enabled
-                      ? styles.arr__item__active
-                      : styles.arr__item__disabled
+            return (
+              <div
+                className={`${styles.arr__item} ${server.enabled
+                  ? styles.arr__item__active
+                  : styles.arr__item__disabled
                   }`}
-                  key={`${type}_server__${i}`}
-                  onClick={() => selectServer(server.uuid)}
-                >
-                  <div className={styles.arr__item__content}>
-                    <div className={styles.arr__item__icon}>
-                      <ServerIcon />
-                    </div>
-                    <div>
-                      <p
-                        className={`${typo.body} ${typo.uppercase} ${typo.medium}`}
-                      >
-                        {server.title} (
-                        {server.enabled ? "active" : "not active"})
-                      </p>
-                      <p
-                        className={`${typo.xsmall} ${typo.uppercase} ${typo.medium}`}
-                      >
-                        {server.uuid}
-                      </p>
-                    </div>
+                key={`${type}_server__${i}`}
+                onClick={() => selectServer(server.uuid)}
+              >
+                <div className={styles.arr__item__content}>
+                  <div className={styles.arr__item__icon}>
+                    <ServerIcon />
+                  </div>
+                  <div>
+                    <p
+                      className={`${typo.body} ${typo.uppercase} ${typo.medium}`}
+                    >
+                      {server.title} (
+                      {server.enabled ? "active" : "not active"})
+                    </p>
+                    <p
+                      className={`${typo.xsmall} ${typo.uppercase} ${typo.medium}`}
+                    >
+                      {server.uuid}
+                    </p>
                   </div>
                 </div>
-              );
-            })
+              </div>
+            );
+          })
           : null}
         <div className={styles.arr__add} onClick={() => setOpenAdd(true)}>
           <div className={styles.arr__item__content}>
@@ -506,9 +522,8 @@ export default function SettingsArr(props) {
               <input
                 type="text"
                 className={inputs.text__light}
-                placeholder={`API Key from ${
-                  type === "radarr" ? "Radarr" : "Sonarr"
-                }`}
+                placeholder={`API Key from ${type === "radarr" ? "Radarr" : "Sonarr"
+                  }`}
                 name="key"
                 value={currentServer ? currentServer.key : newServer.key}
                 onChange={handleChange}
@@ -527,7 +542,7 @@ export default function SettingsArr(props) {
                     value={currentServer.profile.id || ""}
                     onChange={handleChange}
                   >
-                    {options.paths && options.paths.length ? (
+                    {options.profiles && options.profiles.length ? (
                       <>
                         <option value="">Please select</option>
                         {options.profiles.map((profile) => {
@@ -570,6 +585,33 @@ export default function SettingsArr(props) {
                     )}
                   </select>
                   <br />
+                  <p
+                    className={`${typo.xsmall} ${typo.uppercase} ${typo.medium}`}
+                  >
+                    Default Language
+                  </p>
+                  <select
+                    className={inputs.select__light}
+                    name="language"
+                    value={currentServer.language.id || ""}
+                    onChange={handleChange}
+                  >
+                    {options.languages && options.languages.length ? (
+                      <>
+                        <option value="">Please select</option>
+                        {options.languages.map((language) => {
+                          return (
+                            <option key={language.language.id} value={language.language.id}>
+                              {language.language.name}
+                            </option>
+                          );
+                        })}
+                      </>
+                    ) : (
+                      <option value="">Loading</option>
+                    )}
+                  </select>
+                  <br />
                   <div className={inputs.checkboxes}>
                     <div className={inputs.checkboxes__item}>
                       <input
@@ -594,22 +636,20 @@ export default function SettingsArr(props) {
                   </button>
                   <br />
                   <button
-                    className={`${buttons.secondary} ${
-                      currentServer.path.id && currentServer.profile.id
-                        ? ""
-                        : buttons.disabled
-                    }`}
+                    className={`${buttons.secondary} ${currentServer.path.id && currentServer.profile.id
+                      ? ""
+                      : buttons.disabled
+                      }`}
                     onClick={() => testServer(currentServer.uuid)}
                   >
                     Test
                   </button>
                   <br />
                   <button
-                    className={`${buttons.primary} ${
-                      currentServer.path.id && currentServer.profile.id
-                        ? ""
-                        : buttons.disabled
-                    }`}
+                    className={`${buttons.primary} ${currentServer.path.id && currentServer.profile.id
+                      ? ""
+                      : buttons.disabled
+                      }`}
                     onClick={() => updateServer(currentServer.uuid)}
                   >
                     Save

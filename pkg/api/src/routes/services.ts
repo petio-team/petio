@@ -309,41 +309,41 @@ const ConvertToConfig = (entry, obj) => {
     item.port = parseInt(val.port);
     item.key = val.key;
     item.subpath = String(val.subpath);
-    if (val.subpath == "") {
+    if (val.subpath === "") {
       item.subpath = "/";
     }
 
     item.path = {};
-    if (val.path.id != null) {
+    if (val.path.id !== null) {
       item.path.id = Number(val.path.id);
     } else {
-      item.path.id = null;
+      item.path.id = 0;
     }
-    if (val.path.location != undefined) {
+    if (val.path.location !== null) {
       item.path.location = String(val.path.location);
     } else {
       item.path.location = "";
     }
 
     item.profile = {};
-    if (val.profile.id != null) {
+    if (val.profile?.id !== null) {
       item.profile.id = Number(val.profile.id);
     } else {
-      item.profile.id = null;
+      item.profile.id = 0;
     }
-    if (val.profile.name != undefined) {
+    if (val.profile.name !== undefined) {
       item.profile.name = String(val.profile.name);
     } else {
       item.profile.name = "";
     }
 
     item.language = {};
-    if (val.language.id != null) {
+    if (val.language.id !== null) {
       item.language.id = Number(val.language.id);
     } else {
-      item.language.id = null;
+      item.language.id = 0;
     }
-    if (val.language.name != undefined) {
+    if (val.language.name !== null) {
       item.language.name = String(val.language.name);
     } else {
       item.language.name = "";
