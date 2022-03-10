@@ -34,24 +34,13 @@ export const SetupRouter = (restartFunc) => {
     helmet.contentSecurityPolicy({
       directives: {
         ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-        "default-src": ["'self'", "plex.tv"],
+        "default-src": ["'self'"],
         "connect-src": ["'self'", "plex.tv"],
-        "img-src": [
-          "'self'",
-          "data:",
-          "fanart.tv",
-          "assets.fanart.tv",
-          "tmdb.org",
-          "image.tmdb.org",
-          "plex.tv",
-          "assets.plex.tv",
-        ],
+        "img-src": ["*"],
+        "script-src": ["'self'", "*.youtube.com"],
       },
     })
   );
-  router.use(helmet.crossOriginEmbedderPolicy());
-  router.use(helmet.crossOriginOpenerPolicy());
-  router.use(helmet.crossOriginResourcePolicy());
   router.use(helmet.dnsPrefetchControl());
   router.use(helmet.expectCt());
   router.use(helmet.frameguard());
