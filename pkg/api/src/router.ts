@@ -37,6 +37,7 @@ export const SetupRouter = (restartFunc) => {
         "default-src": ["'self'"],
         "connect-src": ["'self'", "plex.tv"],
         "img-src": ["*"],
+        "frame-src": ["youtube.com", "www.youtube.com"],
         "script-src-attr": null,
         "script-src": ["'self'", "www.youtube.com", "'unsafe-inline'"],
       },
