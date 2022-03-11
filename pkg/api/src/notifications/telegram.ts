@@ -8,9 +8,9 @@ export default class Telegram {
   chatId: any;
   sendSilently: any;
   constructor() {
-    this.botToken = conf.get('notifications.telegram.token') || null;
-    this.chatId = conf.get('notifications.telegram.id') || null;
-    this.sendSilently = conf.get('notifications.telegram.silent') || false;
+    this.botToken = conf.get("notifications.telegram.token") || null;
+    this.chatId = conf.get("notifications.telegram.id") || null;
+    this.sendSilently = conf.get("notifications.telegram.silent") || false;
   }
 
   check() {
@@ -29,24 +29,32 @@ export default class Telegram {
 
   async test() {
     if (!this.check()) {
-      logger.warn("Telegram: Chat id or bot token missing");
+      logger.verbose("Telegram: Chat id or bot token missing", {
+        label: "notifications.telegram",
+      });
       return {
         result: false,
         error: "Chat id or bot token missing",
       };
     }
-    logger.info("Telegram: Sending test message");
+    logger.verbose("Telegram: Sending test message", {
+      label: "notifications.telegram",
+    });
     const defaultText: any = "Petio Test";
     let text = this.buildText(defaultText);
     let test = await this.postMessage(text);
     if (!test) {
-      logger.warn("Telegram: Test Failed");
+      logger.verbose("Telegram: Test Failed", {
+        label: "notifications.telegram",
+      });
       return {
         result: false,
         error: "Failed to send message",
       };
     }
-    logger.info("Telegram: Test passed");
+    logger.verbose("Telegram: Test passed", {
+      label: "notifications.telegram",
+    });
     return {
       result: true,
       error: false,
@@ -55,13 +63,17 @@ export default class Telegram {
 
   send(title = null, content = null, username = null, image = null) {
     if (!this.check()) {
-      logger.warn("Telegram: No config defined");
+      logger.verbose("Telegram: No config defined", {
+        label: "notifications.telegram",
+      });
       return {
         result: false,
         error: "No config found",
       };
     }
-    logger.info(`Telegram: Sending message - ${content}`);
+    logger.verbose(`Telegram: Sending message - ${content}`, {
+      label: "notifications.telegram",
+    });
     const text = this.buildText(null, {
       title: title,
       content: content,
@@ -87,10 +99,14 @@ export default class Telegram {
           params,
         }
       );
-      logger.info("Telegram: message sent");
+      logger.verbose("Telegram: message sent", {
+        label: "notifications.telegram",
+      });
       return true;
     } catch (err) {
-      logger.warn("Telegram: Failed to send message");
+      logger.verbose("Telegram: Failed to send message", {
+        label: "notifications.telegram",
+      });
       return false;
     }
   }
