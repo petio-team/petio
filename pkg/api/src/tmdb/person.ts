@@ -7,7 +7,9 @@ import { tmdbApiKey } from "../app/env";
 const agent = new http.Agent({ family: 4 });
 
 async function personLookup(id) {
-  logger.log("verbose", `TMDB Person Lookup ${id}`);
+  logger.verbose(`TMDB Person Lookup ${id}`, {
+    label: "tmdb.person",
+  });
   let info = await getPersonInfo(id);
   let movies = await getPersonMovies(id);
   let tv = await getPersonShows(id);

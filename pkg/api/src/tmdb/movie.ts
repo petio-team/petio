@@ -17,7 +17,7 @@ const memoryCache = cacheManager.caching({
 });
 
 export async function movieLookup(id, minified = false) {
-  logger.log("verbose", `TMDB Movie Lookup ${id}`);
+  logger.verbose(`TMDB Movie Lookup ${id}`, { label: "tmdb.movie" });
   if (!id || id == "false") {
     return "No ID";
   }
@@ -131,8 +131,10 @@ export async function movieLookup(id, minified = false) {
 
       return movie;
     } catch (err) {
-      logger.log("warn", `Error processing movie data - ${id}`);
-      logger.log({ level: "error", message: err });
+      logger.warn(`Error processing movie data - ${id}`, {
+        label: "tmdb.movie",
+      });
+      logger.error(err, { label: "tmdb.movie" });
       return { error: "not found" };
     }
   }
@@ -145,8 +147,8 @@ async function getMovieData(id) {
       return await tmdbData(id);
     });
   } catch (err) {
-    logger.log("warn", `Error getting movie data - ${id}`);
-    logger.log({ level: "error", message: err });
+    logger.warn(`Error getting movie data - ${id}`, { label: "tmdb.movie" });
+    logger.error(err, { label: "tmdb.movie" });
   }
   return data;
 }
@@ -158,8 +160,10 @@ export async function getRecommendations(id, page = 1) {
       return await recommendationData(id, page);
     });
   } catch (err) {
-    logger.log("debug", `Error getting movie recommendations - ${id}`);
-    logger.log({ level: "debug", message: err });
+    logger.warn(`Error getting movie recommendations - ${id}`, {
+      label: "tmdb.movie",
+    });
+    logger.error(err, { label: "tmdb.movie" });
   }
   return data;
 }
@@ -171,8 +175,8 @@ async function getReviews(id) {
       return await reviewsData(id);
     });
   } catch (err) {
-    logger.log("warn", `Error getting movie reviews - ${id}`);
-    logger.log({ level: "error", message: err });
+    logger.warn(`Error getting movie reviews - ${id}`, { label: "tmdb.movie" });
+    logger.log(err, { label: "tmdb.movie" });
   }
   return data;
 }
@@ -184,8 +188,10 @@ async function getCollection(id) {
       return await collectionData(id);
     });
   } catch (err) {
-    logger.log("warn", `Error getting movie collections - ${id}`);
-    logger.log({ level: "error", message: err });
+    logger.warn(`Error getting movie collections - ${id}`, {
+      label: "tmdb.movie",
+    });
+    logger.error(err, { label: "tmdb.movie" });
   }
   return data;
 }

@@ -16,7 +16,7 @@ const memoryCache = cacheManager.caching({
 });
 
 async function trending() {
-  logger.log("verbose", `TMDB Trending lookup`);
+  logger.verbose(`TMDB Trending lookup`, { label: "tmdb.trending" });
 
   let [person, movies, tv]: any = await Promise.all([
     getPerson(),
@@ -213,8 +213,10 @@ async function getPerson() {
       return personData();
     });
   } catch (err) {
-    logger.log("warn", `Error getting trending people`);
-    logger.log({ level: "error", message: err });
+    logger.warn(`Error getting trending people`, {
+      label: "tmdb.trending",
+    });
+    logger.error(err, { label: "tmdb.trending" });
   }
   return data;
 }
@@ -226,8 +228,10 @@ async function getMovies() {
       return await moviesData();
     });
   } catch (err) {
-    logger.log("warn", `Error getting trending movies`);
-    logger.log({ level: "error", message: err });
+    logger.warn(`Error getting trending movies`, {
+      label: "tmdb.trending",
+    });
+    logger.error(err, { label: "tmdb.trending" });
   }
   return data;
 }
@@ -239,8 +243,10 @@ async function getShows() {
       return await showsData();
     });
   } catch (err) {
-    logger.log("warn", `Error getting trending shows`);
-    logger.log({ level: "error", message: err });
+    logger.warn(`Error getting trending shows`, {
+      label: "tmdb.trending",
+    });
+    logger.error(err, { label: "tmdb.trending" });
   }
   return data;
 }
@@ -248,7 +254,9 @@ async function getShows() {
 // Lookup layer
 
 async function personData() {
-  logger.log("verbose", "Person from source not cache");
+  logger.verbose("Person from source not cache", {
+    label: "tmdb.trending",
+  });
   const tmdb = "https://api.themoviedb.org/3/";
   let url = `${tmdb}trending/person/week?api_key=${tmdbApiKey}&append_to_response=images`;
   try {
@@ -260,7 +268,9 @@ async function personData() {
 }
 
 async function moviesData() {
-  logger.log("verbose", "Movies from source not cache");
+  logger.verbose("Movies from source not cache", {
+    label: "tmdb.trending",
+  });
   const tmdb = "https://api.themoviedb.org/3/";
   let url = `${tmdb}trending/movie/week?api_key=${tmdbApiKey}&append_to_response=images,videos`;
   try {
@@ -272,7 +282,9 @@ async function moviesData() {
 }
 
 async function showsData() {
-  logger.log("verbose", "Shows from source not cache");
+  logger.verbose("Shows from source not cache", {
+    label: "tmdb.trending",
+  });
   const tmdb = "https://api.themoviedb.org/3/";
   let url = `${tmdb}trending/tv/week?api_key=${tmdbApiKey}&append_to_response=images,videos`;
   try {

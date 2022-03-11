@@ -20,7 +20,9 @@ export async function showLookup(id, minified = false) {
   if (!id || id == "false") {
     return "No ID";
   }
-  logger.log("verbose", `TMDB Show Lookup ${id}`);
+  logger.debug(`TMDB Show Lookup ${id}`, {
+    label: "tmdb.show",
+  });
   let external: any = await externalId(id);
   let show: any = false;
   let data: any;
@@ -152,9 +154,10 @@ export async function showLookup(id, minified = false) {
 
       return show;
     } catch (err) {
-      logger.log("warn", `Error processing show data - ${id}`);
-      logger.log({ level: "error", message: err });
-      logger.error(err);
+      logger.warn(`Error processing show data - ${id}`, {
+        label: "tmdb.show",
+      });
+      logger.error(err, { label: "tmdb.show" });
       return { error: "not found" };
     }
   }
@@ -170,8 +173,10 @@ async function getShowData(id) {
       return await tmdbData(id);
     });
   } catch (err) {
-    logger.log("warn", `Error getting show data - ${id}`);
-    logger.log({ level: "error", message: err });
+    logger.warn(`Error getting show data - ${id}`, {
+      label: "tmdb.show",
+    });
+    logger.error(err, { label: "tmdb.show" });
   }
   return data;
 }
@@ -183,8 +188,10 @@ async function externalId(id) {
       return await idLookup(id);
     });
   } catch (err) {
-    logger.log("warn", `Error getting external ID - ${id}`);
-    logger.log({ level: "error", message: err });
+    logger.warn(`Error getting external ID - ${id}`, {
+      label: "tmdb.show",
+    });
+    logger.error(err, { label: "tmdb.show" });
   }
   return data;
 }
@@ -196,8 +203,10 @@ export async function getRecommendations(id, page = 1) {
       return await recommendationData(id, page);
     });
   } catch (err) {
-    logger.log("warn", `Error getting recommendation data - ${id}`);
-    logger.log({ level: "error", message: err });
+    logger.warn(`Error getting recommendation data - ${id}`, {
+      label: "tmdb.show",
+    });
+    logger.error(err, { label: "tmdb.show" });
   }
   return data;
 }
@@ -209,8 +218,10 @@ async function getReviews(id) {
       return await reviewsData(id);
     });
   } catch (err) {
-    logger.log("warn", `Error getting review data - ${id}`);
-    logger.log({ level: "error", message: err });
+    logger.warn(`Error getting review data - ${id}`, {
+      label: "tmdb.show",
+    });
+    logger.error(err, { label: "tmdb.show" });
   }
   return data;
 }
@@ -222,8 +233,10 @@ async function getSeasons(seasons, id) {
       return await seasonsData(seasons, id);
     });
   } catch (err) {
-    logger.log("warn", `Error getting season data - ${id}`);
-    logger.log({ level: "error", message: err });
+    logger.warn(`Error getting season data - ${id}`, {
+      label: "tmdb.show",
+    });
+    logger.error(err, { label: "tmdb.show" });
   }
   return data;
 }
@@ -343,7 +356,7 @@ async function idLookup(id) {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
   } catch (err) {
-    logger.error(err);
+    logger.error(err, { label: "tmdb.show" });
     throw err;
   }
 }

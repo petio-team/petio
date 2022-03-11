@@ -12,7 +12,7 @@ import { tmdbApiKey } from "../app/env";
 const agent = new http.Agent({ family: 4 });
 
 async function search(term) {
-  logger.log("verbose", `TMDB Search ${term}`);
+  logger.verbose(`TMDB Search ${term}`, { label: "tmdb.search" });
 
   let [movies, shows, people, companies] = await Promise.all([
     searchMovies(sanitize(term)),
@@ -57,7 +57,9 @@ async function searchMovies(term) {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
   } catch (err) {
-    logger.error("Error searching for movies");
+    logger.error("Error searching for movies", {
+      label: "tmdb.search",
+    });
     return {
       results: [],
     };
@@ -71,7 +73,9 @@ async function searchShows(term) {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
   } catch (err) {
-    logger.error("Error searching for shows");
+    logger.error("Error searching for shows", {
+      label: "tmdb.search",
+    });
     return {
       results: [],
     };
@@ -85,7 +89,9 @@ async function searchPeople(term) {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
   } catch (err) {
-    logger.error("Error searching for people");
+    logger.error("Error searching for people", {
+      label: "tmdb.search",
+    });
     return {
       results: [],
     };
@@ -99,7 +105,9 @@ async function searchCompanies(term) {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
   } catch (err) {
-    logger.error("Error searching for companies");
+    logger.error("Error searching for companies", {
+      label: "tmdb.search",
+    });
     return {
       results: [],
     };
