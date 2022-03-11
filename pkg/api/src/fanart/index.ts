@@ -17,7 +17,7 @@ export default async (id, type) => {
       return fanartData(id, type);
     });
   } catch (err) {
-    logger.error(err);
+    logger.error(err, { label: "fanart.index" });
   }
   return data;
 };
