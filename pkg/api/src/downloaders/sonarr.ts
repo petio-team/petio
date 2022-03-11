@@ -24,8 +24,9 @@ export default class Sonarr {
     if (!this.config.host) {
       return;
     }
-    const baseurl = `${this.config.protocol}://${this.config.host}${this.config.port ? ":" + this.config.port : ""
-      }${this.config.subpath == "/" ? "" : this.config.subpath}/api/v3/`;
+    const baseurl = `${this.config.protocol}://${this.config.host}${
+      this.config.port ? ":" + this.config.port : ""
+    }${this.config.subpath == "/" ? "" : this.config.subpath}/api/v3/`;
     const apiurl = new URL(endpoint, baseurl);
     const prms = new URLSearchParams();
 
@@ -88,34 +89,34 @@ export default class Sonarr {
       return false;
     }
     if (!this.config.enabled && !test) {
-      logger.log(
-        "verbose",
-        `SERVICE - SONARR: [${this.config.title}] Sonarr not enabled`
+      logger.verbose(
+        `SERVICE - SONARR: [${this.config.title}] Sonarr not enabled`,
+        { label: "downloaders.sonarr" }
       );
       return false;
     }
     try {
       let check = await this.get("system/status");
       if (check.error) {
-        logger.log(
-          "warn",
-          `SERVICE - SONARR: [${this.config.title}] ERR Connection failed`
+        logger.verbose(
+          `SERVICE - SONARR: [${this.config.title}] ERR Connection failed`,
+          { label: "downloaders.sonarr" }
         );
         return false;
       }
       if (check) {
         return true;
       } else {
-        logger.log(
-          "warn",
-          `SERVICE - SONARR: [${this.config.title}] ERR Connection failed`
+        logger.verbose(
+          `SERVICE - SONARR: [${this.config.title}] ERR Connection failed`,
+          { label: "downloaders.sonarr" }
         );
         return false;
       }
     } catch (err) {
-      logger.log(
-        "warn",
-        `SERVICE - SONARR: [${this.config.title}] ERR Connection failed`
+      logger.verbose(
+        `SERVICE - SONARR: [${this.config.title}] ERR Connection failed`,
+        { label: "downloaders.sonarr" }
       );
       return false;
     }
@@ -199,13 +200,15 @@ export default class Sonarr {
   async addShow(server, request, filter: any = false) {
     let sonarrId = false;
     if (!this.fullConfig || this.fullConfig.length === 0) {
-      logger.log("verbose", `SERVICE - SONARR: No active servers`);
+      logger.verbose(`SERVICE - SONARR: No active servers`, {
+        label: "downloaders.sonarr",
+      });
       return;
     }
     if (!request.tvdb_id) {
-      logger.log(
-        "warn",
-        `SERVICE - SONARR: TVDB ID not found for ${request.title}`
+      logger.verbose(
+        `SERVICE - SONARR: TVDB ID not found for ${request.title}`,
+        { label: "downloaders.sonarr" }
       );
       return;
     }
@@ -229,8 +232,9 @@ export default class Sonarr {
         filter && filter.profile ? filter.profile : this.config.profile.id
       );
       showData.seasonFolder = true;
-      showData.rootFolderPath = `${filter && filter.path ? filter.path : this.config.path.location
-        }`;
+      showData.rootFolderPath = `${
+        filter && filter.path ? filter.path : this.config.path.location
+      }`;
       showData.addOptions = {
         searchForMissingEpisodes: true,
       };
@@ -242,40 +246,39 @@ export default class Sonarr {
 
       if (showData.id) {
         sonarrId = showData.id;
-        logger.log(
-          "info",
-          `SERVICE - SONARR: Request exists - Updating ${request.title}`
+        logger.verbose(
+          `SERVICE - SONARR: Request exists - Updating ${request.title}`,
+          { label: "downloaders.sonarr" }
         );
         try {
           await this.put(`series/${showData.id}`, false, showData);
-          logger.log(
-            "info",
-            `SERVICE - SONARR: [${this.config.title}] Sonnar job updated for ${request.title}`
+          logger.verbose(
+            `SERVICE - SONARR: [${this.config.title}] Sonnar job updated for ${request.title}`,
+            { label: "downloaders.sonarr" }
           );
         } catch (err) {
-          logger.error(err);
-          logger.log(
-            "error",
-            `SERVICE - SONARR: [${this.config.title}] Unable to update series`
+          logger.error(
+            `SERVICE - SONARR: [${this.config.title}] Unable to update series`,
+            { label: "downloaders.sonarr" }
           );
-          logger.log({ level: "error", message: err });
+          logger.error(err, { label: "downloaders.sonarr" });
           return false;
         }
       } else {
         try {
           let add = await this.post("series", false, showData);
           if (!add.id) throw add.message;
-          logger.log(
-            "info",
-            `SERVICE - SONARR: [${this.config.title}] Sonnar job added for ${request.title}`
+          logger.verbose(
+            `SERVICE - SONARR: [${this.config.title}] Sonnar job added for ${request.title}`,
+            { label: "downloaders.sonarr" }
           );
           sonarrId = add.id;
         } catch (err) {
-          logger.log(
-            "error",
-            `SERVICE - SONARR: [${this.config.title}] Unable to add series`
+          logger.error(
+            `SERVICE - SONARR: [${this.config.title}] Unable to add series`,
+            { label: "downloaders.sonarr" }
           );
-          logger.log({ level: "error", message: err });
+          logger.error(err, { label: "downloaders.sonarr" });
           return false;
         }
       }
@@ -296,9 +299,11 @@ export default class Sonarr {
           });
         await dbRequest.save();
       } catch (err) {
-        logger.error(err.stack);
-        logger.log("error", `SERVICE - SONARR: Can't update request in Db`);
-        logger.log({ level: "error", message: err });
+        logger.error(err.stack, { label: "downloaders.sonarr" });
+        logger.error(`SERVICE - SONARR: Can't update request in Db`, {
+          label: "downloaders.sonarr",
+        });
+        logger.error(err, { label: "downloaders.sonarr" });
       }
     }
   }
@@ -315,7 +320,9 @@ export default class Sonarr {
         addImportListExclusion: false,
       });
     } catch {
-      logger.warn("SONARR: Unable to remove job, likely already removed");
+      logger.warn("SONARR: Unable to remove job, likely already removed", {
+        label: "downloaders.sonarr",
+      });
     }
   }
 
@@ -348,13 +355,17 @@ export default class Sonarr {
           });
           mainCalendar = [...mainCalendar, ...serverCal];
         } catch (err) {
-          logger.log("error", "SONARR: Calendar error");
-          logger.log({ level: "error", message: err });
+          logger.error("SONARR: Calendar error", {
+            label: "downloaders.sonarr",
+          });
+          logger.error(err, { label: "downloaders.sonarr" });
         }
       }
     }
 
-    logger.log("verbose", "SONARR: Calendar returned");
+    logger.verbose("SONARR: Calendar returned", {
+      label: "downloaders.sonarr",
+    });
 
     return mainCalendar;
   }

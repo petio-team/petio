@@ -1,16 +1,21 @@
 import axios from "axios";
-import { URL, URLSearchParams } from 'url';
+import { URL, URLSearchParams } from "url";
 
 import Request from "../models/request";
 import logger from "../app/logger";
-import { conf } from '../app/config';
+import { conf } from "../app/config";
 
 export default class Radarr {
   config: any;
   forced: any;
   fullConfig: any;
-  constructor(id: any = false, forced = false, profileOvr = false, pathOvr = false) {
-    this.fullConfig = conf.get('radarr');
+  constructor(
+    id: any = false,
+    forced = false,
+    profileOvr = false,
+    pathOvr = false
+  ) {
+    this.fullConfig = conf.get("radarr");
     this.config = false;
     this.forced = forced;
 
@@ -29,7 +34,9 @@ export default class Radarr {
     if (!this.config.host) {
       return;
     }
-    const baseurl = `${this.config.protocol}://${this.config.host}${this.config.port ? ":" + this.config.port : ""}${this.config.subpath == "/" ? '' : this.config.subpath}/api/v3/`;
+    const baseurl = `${this.config.protocol}://${this.config.host}${
+      this.config.port ? ":" + this.config.port : ""
+    }${this.config.subpath == "/" ? "" : this.config.subpath}/api/v3/`;
     const apiurl = new URL(endpoint, baseurl);
     const prms = new URLSearchParams();
 
@@ -39,19 +46,19 @@ export default class Radarr {
       }
     }
 
-    prms.set('apikey', this.config.key);
+    prms.set("apikey", this.config.key);
     apiurl.search = prms.toString();
 
     try {
       if (method === "post" && body) {
         let res = await axios.post(apiurl.toString(), body);
-        if (typeof res.data !== 'object') {
+        if (typeof res.data !== "object") {
           return Error("not a valid object");
         }
         return res.data;
       } else {
         let res = await axios.get(apiurl.toString());
-        if (typeof res.data !== 'object') {
+        if (typeof res.data !== "object") {
           return Error("not a valid object");
         }
         return res.data;
@@ -82,31 +89,33 @@ export default class Radarr {
       return false;
     }
     if (!this.config.enabled && !test) {
-      logger.log("verbose", "SERVICE - RADARR: Radarr not enabled");
+      logger.verbose("SERVICE - RADARR: Radarr not enabled", {
+        label: "downloaders.radarr",
+      });
       return false;
     }
     try {
       let check = await this.get("system/status");
       if (check.error) {
-        logger.log(
-          "warn",
-          `SERVICE - RADARR: [${this.config.title}] ERR Connection failed`
+        logger.warn(
+          `SERVICE - RADARR: [${this.config.title}] ERR Connection failed`,
+          { label: "downloaders.radarr" }
         );
         return false;
       }
       if (check) {
         return check;
       } else {
-        logger.log(
-          "warn",
-          `SERVICE - RADARR: [${this.config.title}] ERR Connection failed`
+        logger.warn(
+          `SERVICE - RADARR: [${this.config.title}] ERR Connection failed`,
+          { label: "downloaders.radarr" }
         );
         return false;
       }
     } catch (err) {
-      logger.log(
-        "warn",
-        `SERVICE - RADARR: [${this.config.title}] ERR Connection failed`
+      logger.warn(
+        `SERVICE - RADARR: [${this.config.title}] ERR Connection failed`,
+        { label: "downloaders.radarr" }
       );
       return false;
     }
@@ -160,7 +169,9 @@ export default class Radarr {
     try {
       return this.delete(`movie/${id}`);
     } catch {
-      logger.warn("RADARR: Unable to remove job, likely already removed");
+      logger.warn("RADARR: Unable to remove job, likely already removed", {
+        label: "downloaders.radarr",
+      });
     }
   }
 
@@ -214,11 +225,11 @@ export default class Radarr {
       }
       return add.id;
     } catch (err) {
-      logger.log(
-        "warn",
-        `SERVICE - RADARR: [${this.config.title}] Unable to add movie`
+      logger.warn(
+        `SERVICE - RADARR: [${this.config.title}] Unable to add movie`,
+        { label: "downloaders.radarr" }
       );
-      logger.log({ level: "error", message: err });
+      logger.log(err, { label: "downloaders.radarr" });
       throw err;
     }
   }
@@ -231,16 +242,16 @@ export default class Radarr {
           let radarrData = await this.lookup(job.tmdb_id);
           let radarrId = false;
           if (radarrData[0].id) {
-            logger.log(
-              "warn",
-              `SERVICE - RADARR: [${this.config.title}] Job skipped already found for ${job.title}`
+            logger.verbose(
+              `SERVICE - RADARR: [${this.config.title}] Job skipped already found for ${job.title}`,
+              { label: "downloaders.radarr" }
             );
             radarrId = radarrData[0].id;
           } else {
             radarrId = await this.add(radarrData[0]);
-            logger.log(
-              "info",
-              `SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`
+            logger.verbose(
+              `SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`,
+              { label: "downloaders.radarr" }
             );
           }
           await Request.findOneAndUpdate(
@@ -251,19 +262,19 @@ export default class Radarr {
             { useFindAndModify: false }
           );
         } catch (err) {
-          logger.log(
-            "warn",
-            `SERVICE - RADARR: [${this.config.title}] Unable to add movie ${job.title}`
+          logger.error(
+            `SERVICE - RADARR: [${this.config.title}] Unable to add movie ${job.title}`,
+            { label: "downloaders.radarr" }
           );
-          logger.log({ level: "error", message: err });
+          logger.error(err, { label: "downloaders.radarr" });
         }
       } else {
         // Loop for all servers default
         for (let server of this.fullConfig) {
           if (!server.enabled) {
-            logger.log(
-              "warn",
-              `SERVICE - RADARR: [${server.title}] Server not active`
+            logger.verbose(
+              `SERVICE - RADARR: [${server.title}] Server not active`,
+              { label: "downloaders.radarr" }
             );
             return;
           }
@@ -273,16 +284,16 @@ export default class Radarr {
             let radarrData = await this.lookup(job.tmdb_id);
             let radarrId = false;
             if (radarrData[0].id) {
-              logger.log(
-                "warn",
-                `SERVICE - RADARR: [${this.config.title}] Job skipped already found for ${job.title}`
+              logger.verbose(
+                `SERVICE - RADARR: [${this.config.title}] Job skipped already found for ${job.title}`,
+                { label: "downloaders.radarr" }
               );
               radarrId = radarrData[0].id;
             } else {
               radarrId = await this.add(radarrData[0]);
-              logger.log(
-                "info",
-                `SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`
+              logger.verbose(
+                `SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`,
+                { label: "downloaders.radarr" }
               );
             }
 
@@ -294,11 +305,11 @@ export default class Radarr {
               { useFindAndModify: false }
             );
           } catch (err) {
-            logger.log(
-              "warn",
-              `SERVICE - RADARR: [${this.config.title}] Unable to add movie ${job.title}`
+            logger.error(
+              `SERVICE - RADARR: [${this.config.title}] Unable to add movie ${job.title}`,
+              { label: "downloaders.radarr" }
             );
-            logger.log({ level: "error", message: err });
+            logger.log(err, { label: "downloaders.radarr" });
           }
         }
       }
@@ -311,9 +322,9 @@ export default class Radarr {
         let radarrData = await this.lookup(job.id);
         let radarrId = false;
         if (radarrData[0] && radarrData[0].id) {
-          logger.log(
-            "warn",
-            `SERVICE - RADARR: [${this.config.title}] Job skipped already found for ${job.title}`
+          logger.verbose(
+            `SERVICE - RADARR: [${this.config.title}] Job skipped already found for ${job.title}`,
+            { label: "downloaders.radarr" }
           );
           radarrId = radarrData[0].id;
         } else {
@@ -323,9 +334,9 @@ export default class Radarr {
             manual.profile,
             manual.tag
           );
-          logger.log(
-            "info",
-            `SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`
+          logger.verbose(
+            `SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`,
+            { label: "downloaders.radarr" }
           );
         }
         await Request.findOneAndUpdate(
@@ -336,37 +347,42 @@ export default class Radarr {
           { useFindAndModify: false }
         );
       } catch (err) {
-        logger.log(
-          "warn",
-          `SERVICE - RADARR: [${this.config.title}] Unable to add movie ${job.title}`
+        logger.error(
+          `SERVICE - RADARR: [${this.config.title}] Unable to add movie ${job.title}`,
+          { label: "downloaders.radarr" }
         );
-        logger.log({ level: "error", message: err });
+        logger.log(err, { label: "downloaders.radarr" });
       }
     }
   }
 
   async processRequest(id) {
-    logger.log("verbose", `SERVICE - RADARR: Processing request`);
+    logger.verbose(`SERVICE - RADARR: Processing request`, {
+      label: "downloaders.radarr",
+    });
     if (!this.fullConfig || this.fullConfig.length === 0) {
-      logger.log("verbose", `SERVICE - RADARR: No active servers`);
+      logger.verbose(`SERVICE - RADARR: No active servers`, {
+        label: "downloaders.radarr",
+      });
       return;
     }
 
     const req = await Request.findOne({ requestId: id });
     if (req.type === "movie") {
       if (!req.tmdb_id) {
-        logger.log(
-          "warn",
-          `SERVICE - RADARR: TMDB ID not found for ${req.title}`
-        );
+        logger.verbose(`SERVICE - RADARR: TMDB ID not found for ${req.title}`, {
+          label: "downloaders.radarr",
+        });
       } else if (req.radarrId.length === 0) {
         if (!req.approved) {
-          logger.log(
-            "warn",
-            `SERVICE - RADARR: Request requires approval - ${req.title}`
+          logger.verbose(
+            `SERVICE - RADARR: Request requires approval - ${req.title}`,
+            { label: "downloaders.radarr" }
           );
         } else {
-          logger.log("verbose", "SERVICE - RADARR: Request passed to queue");
+          logger.verbose("SERVICE - RADARR: Request passed to queue", {
+            label: "downloaders.radarr",
+          });
           this.processJobs([req]);
         }
       }
@@ -397,13 +413,16 @@ export default class Radarr {
 
           mainCalendar = [...mainCalendar, ...serverCal];
         } catch (err) {
-          logger.log("error", "RADARR: Calendar error");
-          logger.log({ level: "error", message: err });
+          logger.error("RADARR: Calendar error", {
+            label: "downloaders.radarr",
+          });
+          logger.error(err, { label: "downloaders.radarr" });
         }
       }
     }
-
-    logger.log("verbose", "RADARR: Calendar returned");
+    logger.verbose("RADARR: Calendar returned", {
+      label: "downloaders.radarr",
+    });
 
     return mainCalendar;
   }
