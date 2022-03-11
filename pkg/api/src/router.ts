@@ -4,6 +4,7 @@ import path from "path";
 import cookieParser from "cookie-parser";
 import fs from "fs";
 import helmet from "helmet";
+import morgan from "morgan";
 
 import apiRoutes from "./routes/api";
 import { conf } from "./app/config";
@@ -29,6 +30,21 @@ export const SetupRouter = (restartFunc) => {
   router.use(express.json());
   router.use(express.urlencoded({ extended: true }));
   router.use(cookieParser());
+  router.use(
+    morgan(function (tokens, req, res) {
+      const msg = [
+        tokens.method(req, res),
+        tokens.url(req, res),
+        tokens.status(req, res),
+        tokens.res(req, res, "content-length"),
+        "-",
+        tokens["response-time"](req, res),
+        "ms",
+      ].join(" ");
+      logger.http(msg);
+      return null;
+    })
+  );
   router.use(checkSetup);
   router.use(
     helmet.contentSecurityPolicy({
