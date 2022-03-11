@@ -2,7 +2,7 @@ import http from "http";
 import axios from "axios";
 import Promise from "bluebird";
 
-import onServer from "../plex/onServer";
+import onServer from "../plex/server";
 import sanitize from "sanitize-filename";
 import logger from "../app/logger";
 import { movieLookup } from "../tmdb/movie";

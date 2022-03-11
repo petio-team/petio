@@ -1,7 +1,7 @@
 import { Agenda } from "agenda";
 
 import logger from "./app/logger";
-import LibraryUpdate from "./plex/libraryUpdate";
+import LibraryUpdate from "./plex/library";
 import QuotaSystem from "./requests/quotas";
 import { conf } from "./app/config";
 import buildDiscovery from "./discovery/build";

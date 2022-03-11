@@ -1,7 +1,7 @@
 import express from "express";
 import axios from "axios";
 
-import plexLookup from "../plex/plexLookup";
+import plexLookup from "../plex/lookup";
 import { conf, WriteConfig } from "../app/config";
 import logger from "../app/logger";
 import MakePlexURL from '../plex/util';

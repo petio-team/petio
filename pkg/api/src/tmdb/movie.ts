@@ -3,7 +3,7 @@ import axios from "axios";
 import cacheManager from "cache-manager";
 
 import fanartLookup from "../fanart";
-import onServer from "../plex/onServer";
+import onServer from "../plex/server";
 import { lookup } from "../meta/imdb";
 import getLanguage from "./languages";
 import logger from "../app/logger";

@@ -1,7 +1,7 @@
 import request from "xhr-request";
 import cacheManager from "cache-manager";
 
-import plexLookup from "../plex/plexLookup";
+import plexLookup from "./lookup";
 import { movieLookup } from "../tmdb/movie";
 import { showLookup } from "../tmdb/show";
 import MakePlexURL from "./util";
@@ -20,15 +20,17 @@ export default async (id, type) => {
       return getHistoryData(id, type);
     });
   } catch (err) {
-    logger.warn(`Error getting history data - ${id}`);
-    logger.error(err);
+    logger.warn(`Error getting history data - ${id}`, {
+      label: "plex.history",
+    });
+    logger.error(err, { label: "plex.history" });
     return [];
   }
   return data;
 };
 
 function getHistoryData(id, type) {
-  logger.verbose("History returned from source");
+  logger.verbose("History returned from source", { label: "plex.history" });
   return new Promise((resolve, reject) => {
     let d = new Date();
     d.setMonth(d.getMonth() - 1);

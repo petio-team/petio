@@ -8,7 +8,7 @@ import { conf } from "../app/config";
 import { movieLookup, getRecommendations as getMovieRecommendations } from "../tmdb/movie";
 import { showLookup, getRecommendations as getShowRecommendations } from "../tmdb/show";
 import getHistory from "../plex/history";
-import onServer from "../plex/onServer";
+import onServer from "../plex/server";
 import getTop from "../plex/top";
 import { tmdbApiKey } from "../app/env";
 

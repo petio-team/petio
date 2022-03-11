@@ -56,7 +56,7 @@ export default async () => {
     bWidth.reverse();
     return bWidth;
   } catch (e) {
-    console.log(e.stack);
+    console.log(e.stack, { label: "plex.bandwidth" });
     // Do nothing
   }
-}
+};

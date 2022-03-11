@@ -2,7 +2,7 @@ import { z, defaultEndpointsFactory } from "express-zod-api";
 import { SortByType } from "../../../tmdb/discover/movie/types";
 import { TMDBAPI } from "../../../tmdb/tmdb";
 import { ComingSoonSchema, ComingSoon } from "@models/comingsoon/model";
-import onServer from "@root/plex/onServer";
+import onServer from "@root/plex/server";
 import dayjs from "dayjs";
 
 export const getMovieComingSoonEndpoint = defaultEndpointsFactory.build({

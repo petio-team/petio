@@ -37,15 +37,15 @@ export default class LibraryUpdate {
   }
 
   async partial() {
-    logger.verbose(`CRON: Running Partial`);
+    logger.verbose(`CRON: Running Partial`, { label: "plex.library" });
     this.full = false;
     let recent: any = false;
     try {
       await this.updateFriends();
       recent = await this.getRecent();
     } catch (err) {
-      logger.warn(`CRON: Partial scan failed - unable to get recent`);
-      logger.error(err);
+      logger.warn(`CRON: Partial scan failed - unable to get recent`, { label: "plex.library" });
+      logger.error(err, { label: "plex.library" });
       return;
     }
     let matched = {};
@@ -59,7 +59,7 @@ export default class LibraryUpdate {
           if (!matched[obj.ratingKey]) {
             matched[obj.ratingKey] = true;
             await this.saveMovie(obj);
-            logger.verbose(`CRON: Partial scan - ${obj.title}`);
+            logger.verbose(`CRON: Partial scan - ${obj.title}`, { label: "plex.library" });
           }
         } else if (obj.type === "artist") {
           if (!matched[obj.ratingKey]) {
@@ -70,7 +70,7 @@ export default class LibraryUpdate {
           if (matched[obj.ratingKey]) {
             matched[obj.ratingKey] = true;
             await this.saveShow(obj);
-            logger.verbose(`CRON: Partial scan - ${obj.title}`);
+            logger.verbose(`CRON: Partial scan - ${obj.title}`, { label: "plex.library" });
           }
         } else if (obj.type === "season") {
           if (!matched[obj.parentRatingKey]) {
@@ -104,31 +104,32 @@ export default class LibraryUpdate {
 
             await this.saveShow(parent);
             logger.verbose(
-              `CRON: Partial scan - ${parent.title} - Built from series`
+              `CRON: Partial scan - ${parent.title} - Built from series`,
+              { label: "plex.library" }
             );
           }
         } else {
-          logger.warn(`CRON: Partial scan type not found - ${obj.type}`);
+          logger.warn(`CRON: Partial scan type not found - ${obj.type}`, { label: "plex.library" });
         }
       },
       { concurrency: 10 }
     );
     this.execMail();
-    logger.verbose("Partial Scan Complete");
+    logger.verbose("Partial Scan Complete", { label: "plex.library" });
     this.checkOldRequests();
     return;
   }
 
   async scan() {
     this.timestamp = new Date().toString();
-    logger.verbose(`CRON: Running Full`);
+    logger.verbose(`CRON: Running Full`, { label: "plex.library" });
     await this.createAdmin();
     await this.updateFriends();
     let libraries = false;
     try {
       libraries = await this.getLibraries();
     } catch (err) {
-      logger.error(`CRON: Error`);
+      logger.error(`CRON: Error`, { label: "plex.library" });
       logger.error(err);
     }
 
@@ -136,11 +137,11 @@ export default class LibraryUpdate {
       await this.saveLibraries(libraries);
       await this.updateLibraryContent(libraries);
       this.execMail();
-      logger.verbose("CRON: Full Scan Complete");
+      logger.verbose("CRON: Full Scan Complete", { label: "plex.library" });
       this.checkOldRequests();
       await this.deleteOld();
     } else {
-      logger.warn("CRON: Couldn't update libraries");
+      logger.warn("CRON: Couldn't update libraries", { label: "plex.library" });
     }
   }
 
@@ -149,7 +150,7 @@ export default class LibraryUpdate {
       id: conf.get("admin.id"),
     });
     if (!adminFound) {
-      logger.verbose("CRON: Creating admin user");
+      logger.verbose("CRON: Creating admin user", { label: "plex.library" });
       try {
         let adminData = new User({
           id: conf.get("admin.id"),
@@ -167,12 +168,12 @@ export default class LibraryUpdate {
         });
         await adminData.save();
       } catch (err) {
-        logger.error(`CRON: Error creating admin user`);
-        logger.error(err);
+        logger.error(`CRON: Error creating admin user`, { label: "plex.library" });
+        logger.error(err, { label: "plex.library" });
       }
     } else {
       try {
-        logger.verbose(`CRON: Admin Updating ${conf.get("admin.display")}`);
+        logger.verbose(`CRON: Admin Updating ${conf.get("admin.display")}`, { label: "plex.library" });
         adminFound.email = conf.get("admin.email");
         adminFound.thumb = conf.get("admin.thumbnail");
         adminFound.title = conf.get("admin.display");
@@ -181,10 +182,10 @@ export default class LibraryUpdate {
         if (conf.get("admin.password").substring(0, 3) !== "$2a")
           adminFound.password = bcrypt.hashSync(conf.get("admin.password"), 10);
         await adminFound.save();
-        logger.verbose(`CRON: Admin Updated ${conf.get("admin.display")}`);
+        logger.verbose(`CRON: Admin Updated ${conf.get("admin.display")}`, { label: "plex.library" });
       } catch (err) {
         // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'obj'.
-        logger.error(`CRON: Admin Update Failed ${obj.title}`);
+        logger.error(`CRON: Admin Update Failed ${obj.title}`, { label: "plex.library" });
         logger.error(err);
       }
     }
@@ -198,10 +199,10 @@ export default class LibraryUpdate {
     )}`;
     try {
       let res = await axios.get(url);
-      logger.verbose("CRON: Found Libraries");
+      logger.verbose("CRON: Found Libraries", { label: "plex.library" });
       return res.data.MediaContainer;
     } catch (e) {
-      logger.warn("CRON: Library update failed!");
+      logger.warn("CRON: Library update failed!", { label: "plex.library" });
       throw e;
     }
   }
@@ -214,10 +215,10 @@ export default class LibraryUpdate {
     )}`;
     try {
       let res = await axios.get(url);
-      logger.verbose("CRON: Recently Added received");
+      logger.verbose("CRON: Recently Added received", { label: "plex.library" });
       return res.data.MediaContainer;
     } catch {
-      logger.warn("CRON: Recently added failed!");
+      logger.warn("CRON: Recently added failed!", { label: "plex.library" });
       throw "Recently added failed";
     }
   }
@@ -235,7 +236,7 @@ export default class LibraryUpdate {
     try {
       libraryItem = await Library.findOne({ uuid: lib.uuid });
     } catch {
-      logger.verbose("CRON: Library Not found, attempting to create");
+      logger.verbose("CRON: Library Not found, attempting to create", { label: "plex.library" });
     }
     if (!libraryItem) {
       try {
@@ -263,8 +264,8 @@ export default class LibraryUpdate {
         });
         libraryItem = await newLibrary.save();
       } catch (err) {
-        logger.error(`CRON: Error`);
-        logger.error(err);
+        logger.error(`CRON: Error`, { label: "plex.library" });
+        logger.error(err, { label: "plex.library" });
       }
     } else {
       let updatedLibraryItem: any = false;
@@ -298,11 +299,11 @@ export default class LibraryUpdate {
           { useFindAndModify: false }
         );
       } catch (err) {
-        logger.error(`CRON: Error`);
-        logger.log(err);
+        logger.error(`CRON: Error`, { label: "plex.library" });
+        logger.log(err, { label: "plex.library" });
       }
       if (updatedLibraryItem) {
-        logger.log("verbose", "CRON: Library Updated " + lib.title);
+        logger.log("verbose", "CRON: Library Updated " + lib.title, { label: "plex.library" });
       }
     }
   }
@@ -314,7 +315,7 @@ export default class LibraryUpdate {
       try {
         let libContent = await this.getLibrary(lib.key);
         if (!libContent || !libContent.Metadata) {
-          logger.warn(`CRON: No content in library skipping - ${lib.title}`);
+          logger.warn(`CRON: No content in library skipping - ${lib.title}`, { label: "plex.library" });
           return;
         }
         await Promise.map(
@@ -328,7 +329,7 @@ export default class LibraryUpdate {
             } else if (obj.type === "show") {
               await this.saveShow(obj);
             } else {
-              logger.verbose(`CRON: Unknown media type - ${obj.type}`);
+              logger.verbose(`CRON: Unknown media type - ${obj.type}`, { label: "plex.library" });
             }
           },
           { concurrency: 10 }
@@ -339,9 +340,9 @@ export default class LibraryUpdate {
           await this.timeout(20);
         }
       } catch (err) {
-        logger.error(`CRON: Unable to get library content`);
-        logger.error(err);
-        logger.error(err.stack);
+        logger.error(`CRON: Unable to get library content`, { label: "plex.library" });
+        logger.error(err, { label: "plex.library" });
+        logger.error(err.stack, { label: "plex.library" });
       }
     }
   }
@@ -386,7 +387,7 @@ export default class LibraryUpdate {
       let res = await axios.get(url);
       return res.data.MediaContainer.Metadata;
     } catch (e) {
-      logger.log({ level: "error", message: e });
+      logger.error(e, { label: "plex.library" });
       throw "Unable to get meta";
     }
   }
@@ -398,7 +399,7 @@ export default class LibraryUpdate {
     let tmdbId = false;
     let externalId: any = false;
     let added = false;
-    logger.verbose(`CRON: Movie Job: ${title}`);
+    logger.verbose(`CRON: Movie Job: ${title}`, { label: "plex.library" });
     try {
       movieDb = await Movie.findOne({
         ratingKey: parseInt(movieObj.ratingKey),
@@ -411,28 +412,31 @@ export default class LibraryUpdate {
       .split("://")[0];
     if (idSource === "local" || idSource === "none") {
       logger.verbose(
-        `CRON: Item skipped :: Not matched / local only - ${title}`
+        `CRON: Item skipped :: Not matched / local only - ${title}`,
+        { label: "plex.library" }
       );
       return;
     }
     try {
       movieObj = await this.getMeta(movieObj.ratingKey);
     } catch {
-      logger.warn(`CRON: Unable to fetch meta for ${title}`);
+      logger.warn(`CRON: Unable to fetch meta for ${title}`, { label: "plex.library" });
       return;
     }
     if (idSource === "plex") {
       try {
         if (!Array.isArray(movieObj.Guid)) {
           logger.warn(
-            `CRON: Movie couldn't be matched - ${title} - try rematching in Plex`
+            `CRON: Movie couldn't be matched - ${title} - try rematching in Plex`,
+            { label: "plex.library" }
           );
           return;
         }
         for (let guid of movieObj.Guid) {
           if (!guid.id) {
             logger.warn(
-              `CRON: Movie couldn't be matched - ${title} - no GUID ID`
+              `CRON: Movie couldn't be matched - ${title} - no GUID ID`,
+              { label: "plex.library" }
             );
             return;
           }
@@ -449,19 +453,22 @@ export default class LibraryUpdate {
               type
             );
             logger.verbose(
-              `CRON: Got external ID - ${title} - using agent ${type} : ${tmdbId}`
+              `CRON: Got external ID - ${title} - using agent ${type} : ${tmdbId}`,
+              { label: "plex.library" }
             );
           } catch {
             tmdbId = false;
             logger.verbose(
-              `CRON: Couldn't get external ID - ${title} - using agent ${type}`
+              `CRON: Couldn't get external ID - ${title} - using agent ${type}`,
+              { label: "plex.library" }
             );
           }
         }
       } catch (e) {
         logger.log(e);
         logger.warn(
-          `CRON: Movie couldn't be matched - ${title} - try rematching in Plex`
+          `CRON: Movie couldn't be matched - ${title} - try rematching in Plex`,
+          { label: "plex.library" }
         );
         return;
       }
@@ -477,7 +484,8 @@ export default class LibraryUpdate {
           .split("?")[0];
       } catch (e) {
         logger.warn(
-          `CRON: Movie couldn't be matched - ${title} - GUID Error #2 - GUID is - ${movieObj.guid}`
+          `CRON: Movie couldn't be matched - ${title} - GUID Error #2 - GUID is - ${movieObj.guid}`,
+          { label: "plex.library" }
         );
         return;
       }
@@ -486,11 +494,13 @@ export default class LibraryUpdate {
         try {
           tmdbId = await this.externalIdMovie(externalId, idSource);
           logger.verbose(
-            `CRON: Got external ID - ${title} - using agent ${idSource} : ${tmdbId}`
+            `CRON: Got external ID - ${title} - using agent ${idSource} : ${tmdbId}`,
+            { label: "plex.library" }
           );
         } catch {
           logger.verbose(
-            `CRON: Couldn't get external ID - ${title} - using agent ${idSource}`
+            `CRON: Couldn't get external ID - ${title} - using agent ${idSource}`,
+            { label: "plex.library" }
           );
           tmdbId = false;
         }
@@ -498,7 +508,8 @@ export default class LibraryUpdate {
     }
     if (idSource !== "tmdb" && !tmdbId) {
       logger.warn(
-        `CRON: Movie couldn't be matched - ${title} - try rematching in Plex`
+        `CRON: Movie couldn't be matched - ${title} - try rematching in Plex`,
+        { label: "plex.library" }
       );
       return;
     }
@@ -538,10 +549,10 @@ export default class LibraryUpdate {
       await movieDb.save();
       if (added) {
         await this.mailAdded(movieObj, movieDb.tmdb_id);
-        logger.verbose(`CRON: Movie Added - ${movieObj.title}`);
+        logger.verbose(`CRON: Movie Added - ${movieObj.title}`, { label: "plex.library" });
       }
     } catch (err) {
-      logger.error(`CRON: Failed to save ${title} to Db`);
+      logger.error(`CRON: Failed to save ${title} to Db`, { label: "plex.library" });
       logger.log(err);
     }
   }
@@ -551,7 +562,7 @@ export default class LibraryUpdate {
     let title = musicObj.title;
     let added = false;
     let match: any = false;
-    logger.verbose(`CRON: Music Job: ${title}`);
+    logger.verbose(`CRON: Music Job: ${title}`, { label: "plex.library" });
     try {
       musicDb = await Music.findOne({
         ratingKey: parseInt(musicObj.ratingKey),
@@ -564,7 +575,8 @@ export default class LibraryUpdate {
     }
     if (match && musicDb.metaId === "no genres" && musicObj.Genre) {
       logger.verbose(
-        `CRON: Music - "${title}" Now has genres, attempting to match`
+        `CRON: Music - "${title}" Now has genres, attempting to match`,
+        { label: "plex.library" }
       );
       match = false;
     }
@@ -584,11 +596,11 @@ export default class LibraryUpdate {
       await musicDb.save();
       if (added) {
         await this.mailAdded(musicObj, musicDb.metaId);
-        logger.verbose(`CRON: Music Added - ${musicObj.title}`);
+        logger.verbose(`CRON: Music Added - ${musicObj.title}`, { label: "plex.library" });
       }
     } catch (err) {
-      logger.error(`CRON: Failed to save ${title} to Db`);
-      logger.error(err);
+      logger.error(`CRON: Failed to save ${title} to Db`, { label: "plex.library" });
+      logger.error(err, { label: "plex.library" });
     }
   }
 
@@ -600,7 +612,7 @@ export default class LibraryUpdate {
     let externalId = false;
     let added = false;
     let seasons: any = [];
-    logger.verbose(`CRON: TV Job: ${title}`);
+    logger.verbose(`CRON: TV Job: ${title}`, { label: "plex.library" });
     try {
       showDb = await Show.findOne({ ratingKey: parseInt(showObj.ratingKey) });
     } catch {
@@ -611,7 +623,8 @@ export default class LibraryUpdate {
       .split("://")[0];
     if (idSource === "local" || idSource === "none") {
       logger.verbose(
-        `CRON: Item skipped :: Not matched / local only - ${title}`
+        `CRON: Item skipped :: Not matched / local only - ${title}`,
+        { label: "plex.library" }
       );
       return;
     }
@@ -642,22 +655,24 @@ export default class LibraryUpdate {
         { concurrency: 2 }
       );
     } catch (e) {
-      logger.warn(`CRON: Unable to fetch meta for ${title}`);
-      logger.error(e);
+      logger.warn(`CRON: Unable to fetch meta for ${title}`, { label: "plex.library" });
+      logger.error(e, { label: "plex.library" });
       return;
     }
     if (idSource === "plex") {
       try {
         if (!Array.isArray(showObj.Guid)) {
           logger.warn(
-            `CRON: Show couldn't be matched - ${title} - try rematching in Plex`
+            `CRON: Show couldn't be matched - ${title} - try rematching in Plex`,
+            { label: "plex.library" }
           );
           return;
         }
         for (let guid of showObj.Guid) {
           if (!guid.id) {
             logger.warn(
-              `CRON: Show couldn't be matched - ${title} - no GUID ID`
+              `CRON: Show couldn't be matched - ${title} - no GUID ID`,
+              { label: "plex.library" }
             );
             return;
           }
@@ -667,9 +682,10 @@ export default class LibraryUpdate {
         }
       } catch (e) {
         logger.warn(
-          `CRON: Show couldn't be matched - ${title} - try rematching in Plex`
+          `CRON: Show couldn't be matched - ${title} - try rematching in Plex`,
+          { label: "plex.library" }
         );
-        logger.error(e);
+        logger.error(e, { label: "plex.library" });
         return;
       }
     } else {
@@ -694,13 +710,14 @@ export default class LibraryUpdate {
         try {
           externalIds = await this.tmdbExternalIds(externalId);
         } catch (err) {
-          logger.log({ level: "warn", message: err });
+          logger.error(err, { label: "plex.library" });
         }
       }
     }
     if (idSource !== "tmdb" && !tmdbId) {
       logger.warn(
-        `CRON: Show couldn't be matched - ${title} - try rematching in Plex`
+        `CRON: Show couldn't be matched - ${title} - try rematching in Plex`,
+        { label: "plex.library" }
       );
       return;
     }
@@ -746,22 +763,22 @@ export default class LibraryUpdate {
       await showDb.save();
       if (added) {
         await this.mailAdded(showObj, showDb.tmdb_id);
-        logger.verbose(`CRON: Show Added - ${showObj.title}`);
+        logger.verbose(`CRON: Show Added - ${showObj.title}`, { label: "plex.library" });
       }
     } catch (err) {
-      logger.error(`CRON: Failed to save ${title} to Db`);
-      logger.error(err);
+      logger.error(`CRON: Failed to save ${title} to Db`, { label: "plex.library" });
+      logger.error(err, { label: "plex.library" });
     }
   }
 
   async updateFriends() {
-    logger.verbose("CRON: Updating Friends");
+    logger.verbose("CRON: Updating Friends", { label: "plex.library" });
     let friendList = false;
     try {
       friendList = await this.getFriends();
     } catch (err) {
-      logger.error(`CRON: Error getting friend list`);
-      logger.error(err);
+      logger.error(`CRON: Error getting friend list`, { label: "plex.library" });
+      logger.error(err, { label: "plex.library" });
     }
     if (friendList) {
       await Promise.all(
@@ -783,8 +800,8 @@ export default class LibraryUpdate {
       );
       return dataParse.elements[0].elements;
     } catch (e) {
-      logger.error("CRON: Unable to get friends");
-      logger.error(e);
+      logger.error("CRON: Unable to get friends", { label: "plex.library" });
+      logger.error(e, { label: "plex.library" });
       throw "Unable to get friends";
     }
   }
@@ -845,12 +862,12 @@ export default class LibraryUpdate {
   async sendMail(user, i, request) {
     let userData = await User.findOne({ id: user });
     if (!userData) {
-      logger.error("CRON: Err: No user data");
+      logger.error("CRON: Err: No user data", { label: "plex.library" });
       return;
     }
     this.discordNotify(userData, request);
     if (!userData.email) {
-      logger.warn("CRON: Err: User has no email");
+      logger.warn("CRON: Err: User has no email", { label: "plex.library" });
       return;
     }
 
@@ -863,7 +880,7 @@ export default class LibraryUpdate {
       [userData.title],
     ]);
 
-    logger.verbose(`CRON: Mailer updated`);
+    logger.verbose(`CRON: Mailer updated`, { label: "plex.library" });
   }
 
   discordNotify(user, request) {
@@ -922,7 +939,7 @@ export default class LibraryUpdate {
   }
 
   async checkOldRequests() {
-    logger.verbose("CRON: Checking old requests");
+    logger.verbose("CRON: Checking old requests", { label: "plex.library" });
     let requests = await Request.find();
     for (let i = 0; i < requests.length; i++) {
       let onServer: any = false;
@@ -931,7 +948,8 @@ export default class LibraryUpdate {
         onServer = await Show.findOne({ tmdb_id: request.tmdb_id });
         if (!request.tvdb_id) {
           logger.verbose(
-            `CRON: No TVDB ID for request: ${request.title}, attempting to pull meta`
+            `CRON: No TVDB ID for request: ${request.title}, attempting to pull meta`,
+            { label: "plex.library" }
           );
           let lookup = await showLookup(request.tmdb_id, true);
           request.thumb = lookup.poster_path;
@@ -939,7 +957,8 @@ export default class LibraryUpdate {
           try {
             await request.save();
             logger.verbose(
-              `CRON: Meta updated for request: ${request.title}, processing request with updated meta`
+              `CRON: Meta updated for request: ${request.title}, processing request with updated meta`,
+              { label: "plex.library" }
             );
             if (request.tvdb_id)
               new processRequest({
@@ -954,7 +973,8 @@ export default class LibraryUpdate {
               }).sendToDvr(false);
           } catch (err) {
             logger.warn(
-              `CRON: Failed to update meta for request: ${request.title}`
+              `CRON: Failed to update meta for request: ${request.title}`,
+              { label: "plex.library" }
             );
           }
         }
@@ -964,7 +984,7 @@ export default class LibraryUpdate {
       }
 
       if (onServer) {
-        logger.verbose(`CRON: Found missed request - ${request.title}`);
+        logger.verbose(`CRON: Found missed request - ${request.title}`, { label: "plex.library" });
         new processRequest(request, false).archive(true, false, false);
         let emails: any = [];
         let titles: any = [];
@@ -995,7 +1015,8 @@ export default class LibraryUpdate {
     for (let i in deleteMovies) {
       let deleteMovie = deleteMovies[i];
       logger.warn(
-        `CRON: Deleting Movie - ${deleteMovie.title} - no longer found in Plex`
+        `CRON: Deleting Movie - ${deleteMovie.title} - no longer found in Plex`,
+        { label: "plex.library" }
       );
       await Movie.findOneAndRemove(
         { _id: deleteMovie._id },
@@ -1008,7 +1029,8 @@ export default class LibraryUpdate {
     for (let i in deleteShows) {
       let deleteShow = deleteShows[i];
       logger.warn(
-        `CRON: Deleting TV Show - ${deleteShow.title} - no longer found in Plex`
+        `CRON: Deleting TV Show - ${deleteShow.title} - no longer found in Plex`,
+        { label: "plex.library" }
       );
       await Show.findOneAndRemove(
         { _id: deleteShow._id },

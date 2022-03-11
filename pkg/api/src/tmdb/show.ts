@@ -4,7 +4,7 @@ import cacheManager from "cache-manager";
 
 import logger from "../app/logger";
 import fanartLookup from "../fanart";
-import onServer from "../plex/onServer";
+import onServer from "../plex/server";
 import { lookup as imdb } from "../meta/imdb";
 import getLanguage from "./languages";
 import { tmdbApiKey } from "../app/env";

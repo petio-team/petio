@@ -1,7 +1,7 @@
 import axios from "axios";
 import cacheManager from "cache-manager";
 
-import plexLookup from "../plex/plexLookup";
+import plexLookup from "./lookup";
 import { movieLookup } from "../tmdb/movie";
 import { showLookup } from "../tmdb/show";
 import logger from "../app/logger";
@@ -20,8 +20,8 @@ export default async (type) => {
       return getTopData(type);
     });
   } catch (err) {
-    logger.log("warn", `Error getting top data - ${type}`);
-    logger.log({ level: "error", message: err });
+    logger.warn(`Error getting top data - ${type}`, { label: "plex.top" });
+    logger.error(err, { label: "plex.top" });
     return [];
   }
   return data;
