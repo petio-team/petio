@@ -6,7 +6,7 @@ import path from "path";
 
 import logger from "../app/logger";
 import Imdb from "../models/imdb";
-import { dataFolder } from '../app/env';
+import { dataFolder } from "../app/env";
 
 export async function lookup(imdb_id) {
   if (!imdb_id) {
@@ -25,43 +25,51 @@ export async function storeCache(firstTime = false) {
   if (firstTime) {
     let exists = await Imdb.findOne({});
     if (exists) {
-      logger.verbose("IMDB: Cache exists skipping setup");
+      logger.verbose("IMDB: Cache exists skipping setup", {
+        label: "meta.imdb",
+      });
       return;
     }
   }
   const unzip = zlib.createGunzip();
   let tempFile = path.join(dataFolder, "./imdb_dump.txt");
-  logger.verbose("IMDB: Rebuilding Cache");
+  logger.verbose("IMDB: Rebuilding Cache", { label: "meta.imdb" });
   try {
-    logger.verbose("IMDB: Cache Downloading latest cache");
+    logger.verbose("IMDB: Cache Downloading latest cache", {
+      label: "meta.imdb",
+    });
     const res = await axios({
       url: "https://datasets.imdbws.com/title.ratings.tsv.gz",
       method: "GET",
       responseType: "stream",
     });
-    logger.verbose("IMDB: Cache Storing to temp");
+    logger.verbose("IMDB: Cache Storing to temp", { label: "meta.imdb" });
     const fileStream = fs.createWriteStream(tempFile);
     res.data.pipe(unzip).pipe(fileStream);
     fileStream.on("close", async () => {
-      logger.verbose("IMDB: Cache Download complete");
+      logger.verbose("IMDB: Cache Download complete", { label: "meta.imdb" });
       try {
         await parseData(tempFile);
-        logger.verbose("IMDB: Cache Finished");
+        logger.verbose("IMDB: Cache Finished", { label: "meta.imdb" });
       } catch (e) {
-        logger.error(e);
-        logger.error("IMDB: Cache failed - db write issue");
+        logger.error(e, { label: "meta.imdb" });
+        logger.error("IMDB: Cache failed - db write issue", {
+          label: "meta.imdb",
+        });
       }
     });
   } catch (e) {
-    logger.log({ level: "error", message: e });
+    logger.error(e, { label: "meta.imdb" });
   }
 }
 
 async function parseData(file): Promise<any> {
-  logger.verbose("IMDB: Cache Emptying old cache");
+  logger.verbose("IMDB: Cache Emptying old cache", { label: "meta.imdb" });
   await Imdb.deleteMany({});
-  logger.verbose("IMDB: Cache cleared");
-  logger.verbose("IMDB: Cache parsing download, updating local cache");
+  logger.verbose("IMDB: Cache cleared", { label: "meta.imdb" });
+  logger.verbose("IMDB: Cache parsing download, updating local cache", {
+    label: "meta.imdb",
+  });
   return new Promise((resolve, reject) => {
     let buffer: any = [];
     lineReader.eachLine(file, async (line, last, cb) => {

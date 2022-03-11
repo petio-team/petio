@@ -20,7 +20,9 @@ export default class MusicMeta {
   }
 
   async match(name, genres) {
-    logger.info(`MB: Attempting to match ${name}`);
+    logger.info(`MB: Attempting to match ${name}`, {
+      label: "meta.musicbrainz",
+    });
     if (!genres) return { id: "no genres", title: false };
     // return true;
     let term = sanitize(name);
@@ -28,7 +30,7 @@ export default class MusicMeta {
       let res = await this.api.searchArtist(term);
       let artists = res.artists;
       if (artists.length === 0) {
-        logger.warn(`MB: No match for ${term}`);
+        logger.warn(`MB: No match for ${term}`, { label: "meta.musicbrainz" });
         return false;
       }
       let match = false;
@@ -65,7 +67,7 @@ export default class MusicMeta {
       }
       return match;
     } catch (e) {
-      logger.error(e);
+      logger.error(e, { label: "meta.musicbrainz" });
       return { id: "error", title: false };
     }
   }
