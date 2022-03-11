@@ -112,13 +112,14 @@ export const getRequests = async (user = false, all = false) => {
     );
   } catch (err) {
     logger.error(err.stack);
-    logger.log("error", `ROUTE: Error getting requests display`);
-    logger.log({ level: "error", message: err });
+    logger.error(`ROUTE: Error getting requests display`, {
+      label: "requests.display",
+    });
+    logger.error(err, { label: "requests.display" });
     data = requests;
   }
   return data;
-}
-
+};
 
 function reqState(req, children) {
   let diff;
@@ -159,7 +160,7 @@ function reqState(req, children) {
         if (req.type === "tv" && children[r].info) {
           if (
             children[r].info.episodeCount ===
-            children[r].info.episodeFileCount &&
+              children[r].info.episodeFileCount &&
             children[r].info.episodeCount > 0
           ) {
             return {
@@ -195,7 +196,9 @@ function reqState(req, children) {
                   message: "Awaiting Info",
                   step: 3,
                 };
-              diff = Math.ceil(new Date(airDate).getTime() - new Date().getTime());
+              diff = Math.ceil(
+                new Date(airDate).getTime() - new Date().getTime()
+              );
               if (diff > 0) {
                 return {
                   status: "blue",
@@ -219,7 +222,8 @@ function reqState(req, children) {
           if (children[r].info.inCinemas || children[r].info.digitalRelease) {
             if (children[r].info.inCinemas) {
               diff = Math.ceil(
-                new Date(children[r].info.inCinemas).getTime() - new Date().getTime()
+                new Date(children[r].info.inCinemas).getTime() -
+                  new Date().getTime()
               );
               if (diff > 0) {
                 return {
@@ -241,7 +245,8 @@ function reqState(req, children) {
             } else {
               if (children[r].info.inCinemas) {
                 diff = Math.ceil(
-                  new Date().getTime() - new Date(children[r].info.inCinemas).getTime()
+                  new Date().getTime() -
+                    new Date(children[r].info.inCinemas).getTime()
                 );
                 if (cinemaWindow(diff)) {
                   return {

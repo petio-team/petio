@@ -55,13 +55,15 @@ export default async (item) => {
       compulsoryPass &&
       (optionalMatch > 0 || f.rows.length === 1)
     ) {
-      logger.info(`FILT: Match on filter ${i + 1}`);
+      logger.info(`FILT: Match on filter ${i + 1}`, {
+        label: "requests.filter",
+      });
       action = f.action;
     }
   });
 
   return action;
-}
+};
 
 function filterCompare(condition, value, operator, media) {
   let mediaValues: any = getValue(condition, media);

@@ -115,7 +115,7 @@ const languages = [
   { code: "om", name: "Oromo" },
   { code: "os", name: "Ossetian; Ossetic" },
   { code: "pi", name: "Pali" },
-  { code: "pl", name: "Polish"},
+  { code: "pl", name: "Polish" },
   { code: "pt", name: "Portuguese" },
   { code: "qu", name: "Quechua" },
   { code: "rm", name: "Raeto-Romance" },
@@ -195,9 +195,9 @@ const languages = [
  * @returns string A language name
  */
 export default (code: string): string => {
-  var language = languages.
-    filter(lang => lang.code === code).
-    map(lang => lang.code);
+  var language = languages
+    .filter((lang) => lang.code === code)
+    .map((lang) => lang.code);
 
   return language[0] ?? "Unknown";
-}
+};

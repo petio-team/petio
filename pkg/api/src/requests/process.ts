@@ -43,8 +43,8 @@ export default class processRequest {
         this.mailRequest();
         this.discordNotify();
       } catch (err) {
-        logger.log("error", "REQ: Error");
-        logger.log({ level: "error", message: err });
+        logger.error("REQ: Error", { label: "requests.process" });
+        logger.error(err, { label: "requests.process" });
         out = {
           message: "failed",
           error: true,
@@ -146,12 +146,16 @@ export default class processRequest {
       if (autoApprove) {
         this.sendToDvr(profile);
       } else {
-        logger.info("REQ: Request requires approval, waiting");
+        logger.info("REQ: Request requires approval, waiting", {
+          label: "requests.process",
+        });
         this.pendingDefaults(profile);
       }
     } catch (err) {
-      logger.log("error", `REQ: Unable to save request`);
-      logger.log({ level: "error", message: err });
+      logger.error(`REQ: Unable to save request`, {
+        label: "requests.process",
+      });
+      logger.error(err, { label: "requests.process" });
       return {
         message: "failed",
         error: true,
@@ -171,9 +175,9 @@ export default class processRequest {
     let pending: any = {};
     let filterMatch: any = await filter(this.request);
     if (filterMatch) {
-      logger.log(
-        "info",
-        "REQ: Pending Request Matched on custom filter, setting default"
+      logger.info(
+        "REQ: Pending Request Matched on custom filter, setting default",
+        { label: "requests.process" }
       );
       for (let f = 0; f < filterMatch.length; f++) {
         let filter = filterMatch[f];
@@ -215,9 +219,13 @@ export default class processRequest {
         { $set: { pendingDefault: pending } }
       );
 
-      logger.log("verbose", "REQ: Pending Defaults set for later");
+      logger.verbose("REQ: Pending Defaults set for later", {
+        label: "requests.process",
+      });
     } else {
-      logger.log("verbose", "REQ: No Pending Defaults to Set");
+      logger.verbose("REQ: No Pending Defaults to Set", {
+        label: "requests.process",
+      });
     }
   }
 
@@ -225,11 +233,11 @@ export default class processRequest {
     let filterMatch: any = await filter(this.request);
     if (filterMatch) {
       if (!Array.isArray(filterMatch)) filterMatch = [filterMatch];
-      logger.log(
-        "info",
-        "REQ: Matched on custom filter, sending to specified server"
+      logger.info(
+        "REQ: Matched on custom filter, sending to specified server",
+        { label: "requests.process" }
       );
-      logger.log("verbose", "REQ: Sending to DVR");
+      logger.verbose("REQ: Sending to DVR", { label: "requests.process" });
       if (this.request.type === "movie") {
         for (let i = 0; i < filterMatch.length; i++) {
           new Radarr(filterMatch[i].server).manualAdd(
@@ -248,7 +256,7 @@ export default class processRequest {
       }
       return;
     }
-    logger.log("verbose", "REQ: Sending to DVR");
+    logger.verbose("REQ: Sending to DVR", { label: "requests.process" });
     // If profile is set use arrs from profile
     if (profile) {
       if (profile.radarr && this.request.type === "movie") {
@@ -269,7 +277,7 @@ export default class processRequest {
       }
     } else {
       // No profile set send to all arrs
-      logger.log("verbose", "REQ: No profile for DVR");
+      logger.verbose("REQ: No profile for DVR", { label: "requests.process" });
       if (this.request.type === "tv") new Sonarr().addShow(false, this.request);
       if (this.request.type === "movie")
         new Radarr().processRequest(this.request.id);
@@ -286,12 +294,15 @@ export default class processRequest {
           let server = new Radarr(serverUuid);
           try {
             server.remove(rId);
-            logger.log(
-              "info",
-              `REQ: ${this.request.title} removed from Radarr server - ${serverUuid}`
+            logger.info(
+              `REQ: ${this.request.title} removed from Radarr server - ${serverUuid}`,
+              { label: "requests.process" }
             );
           } catch (err) {
-            logger.log("error", `REQ: Error unable to remove from Radarr`, err);
+            logger.error(`REQ: Error unable to remove from Radarr`, {
+              label: "requests.process",
+            });
+            logger.error(err, { label: "requests.process" });
           }
         }
       }
@@ -302,12 +313,15 @@ export default class processRequest {
           let serverUuid = Object.keys(sonarrIds)[0];
           try {
             new Sonarr().remove(serverUuid, sId);
-            logger.log(
-              "info",
-              `REQ: ${this.request.title} removed from Sonarr server - ${serverUuid}`
+            logger.info(
+              `REQ: ${this.request.title} removed from Sonarr server - ${serverUuid}`,
+              { label: "requests.process" }
             );
           } catch (err) {
-            logger.log("error", `REQ: Error unable to remove from Sonarr`, err);
+            logger.error(`REQ: Error unable to remove from Sonarr`, {
+              label: "requests.process",
+            });
+            logger.error(err, { label: "requests.process" });
           }
         }
       }
@@ -329,7 +343,7 @@ export default class processRequest {
   async mailRequest() {
     let userData: any = this.user;
     if (!userData.email) {
-      logger.log("warn", "MAILER: No user email");
+      logger.warn("MAILER: No user email", { label: "requests.process" });
       return;
     }
     const requestData: any = this.request;
@@ -391,10 +405,12 @@ export default class processRequest {
       { useFindAndModify: false },
       function (err, data) {
         if (err) {
-          logger.error(`REQ: Archive Error`);
-          logger.error(err);
+          logger.error(`REQ: Archive Error`, { label: "requests.process" });
+          logger.error(err.message, { label: "requests.process" });
         } else {
-          logger.verbose(`REQ: Request ${oldReq.title} Archived!`);
+          logger.verbose(`REQ: Request ${oldReq.title} Archived!`, {
+            label: "requests.process",
+          });
         }
       }
     );
