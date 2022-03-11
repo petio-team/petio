@@ -9,10 +9,12 @@ import Show from "../models/show";
 import MakePlexURL from "../plex/util";
 
 export default async () => {
-  logger.verbose("DISC: Started building discovery profiles");
+  logger.verbose("DISC: Started building discovery profiles", {
+    label: "discovery.build",
+  });
   let users = await User.find();
   if (!users || users.length === 0) {
-    logger.verbose("DISC: No Users");
+    logger.verbose("DISC: No Users", { label: "discovery.build" });
     return;
   }
   let userIds = [];
@@ -32,7 +34,9 @@ export default async () => {
     },
     { concurrency: 10 }
   );
-  logger.verbose("DISC: Finished building discovery profiles");
+  logger.verbose("DISC: Finished building discovery profiles", {
+    label: "discovery.build",
+  });
 };
 
 function userBuild(id) {
@@ -84,7 +88,7 @@ async function create(id) {
       });
       newDiscover.save();
     }
-  } catch (_) { }
+  } catch (_) {}
   return;
 }
 
@@ -101,7 +105,9 @@ async function build(id) {
   };
   let data: any = await getHistory(id);
   if (data.MediaContainer.size === 0) {
-    logger.verbose(`DISC: No history for user - ${id}`);
+    logger.verbose(`DISC: No history for user - ${id}`, {
+      label: "discovery.build",
+    });
     return {
       movie: movie,
       series: series,
@@ -298,21 +304,18 @@ function cert(cert, type) {
 function getHistory(id, library = false) {
   return new Promise((resolve, reject) => {
     const params = {
-      "sort": "viewedAt:desc",
-      "accountID": id,
+      sort: "viewedAt:desc",
+      accountID: id,
       "viewedAt>=": "0",
       "X-Plex-Container-Start": 0,
       "X-Plex-Container-Size": 500,
     };
 
     if (library) {
-      params['librarySectionID'] = library;
+      params["librarySectionID"] = library;
     }
 
-    const url = MakePlexURL(
-      '/status/sessions/history/all',
-      params,
-    );
+    const url = MakePlexURL("/status/sessions/history/all", params);
     request(
       url.toString(),
       {

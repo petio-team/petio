@@ -5,8 +5,14 @@ import cacheManager from "cache-manager";
 import Discovery from "../models/discovery";
 import logger from "../app/logger";
 import { conf } from "../app/config";
-import { movieLookup, getRecommendations as getMovieRecommendations } from "../tmdb/movie";
-import { showLookup, getRecommendations as getShowRecommendations } from "../tmdb/show";
+import {
+  movieLookup,
+  getRecommendations as getMovieRecommendations,
+} from "../tmdb/movie";
+import {
+  showLookup,
+  getRecommendations as getShowRecommendations,
+} from "../tmdb/show";
 import getHistory from "../plex/history";
 import onServer from "../plex/server";
 import getTop from "../plex/top";
@@ -33,8 +39,9 @@ export default async (id, type = "movie") => {
     }
   }
   if (!discoveryPrefs) {
-    logger.warn(
-      `DISC: No user data yet for ${id} - this is likely still being built, generic discovery returned`
+    logger.verbose(
+      `DISC: No user data yet for ${id} - this is likely still being built, generic discovery returned`,
+      { label: "discovery.build" }
     );
     return [
       {
@@ -280,8 +287,8 @@ async function genreLookup(id, genre, type) {
       return genreLookupData(id, genre, type);
     });
   } catch (err) {
-    logger.log("warn", `Error getting genre data`);
-    logger.log({ level: "error", message: err });
+    logger.error(`Error getting genre data`, { label: "discovery.build" });
+    logger.error(err, { label: "discovery.build" });
   }
   return data;
 }
@@ -293,12 +300,11 @@ async function actorLookup(match, type) {
       return actorLookupData(match, type);
     });
   } catch (err) {
-    logger.log("warn", `Error getting actor data`);
-    logger.log({ level: "error", message: err });
+    logger.error(`Error getting actor data`, { label: "discovery.build" });
+    logger.error(err, { label: "discovery.build" });
   }
   return data;
 }
-
 
 async function actorLookupData(match, type) {
   let args = {
@@ -418,7 +424,9 @@ function genreID(genreName, type) {
         return 37;
 
       default:
-        logger.warn(`DISC: Genre not mapped ${genreName}`);
+        logger.verbose(`DISC: Genre not mapped ${genreName}`, {
+          label: "discovery.build",
+        });
         return false;
     }
   } else {
@@ -470,7 +478,9 @@ function genreID(genreName, type) {
       case "Western":
         return 37;
       default:
-        logger.warn(`DISC: Genre not mapped ${genreName}`);
+        logger.verbose(`DISC: Genre not mapped ${genreName}`, {
+          label: "discovery.build",
+        });
         return false;
     }
   }
@@ -638,7 +648,6 @@ async function comingSoon(type) {
             ? await onServer("movie", false, false, result.id)
             : await onServer("show", false, false, result.id);
 
-
         data.results[i] =
           type === "movie"
             ? {
@@ -662,7 +671,7 @@ async function comingSoon(type) {
     );
     return data;
   } catch (e) {
-    logger.error(e);
+    logger.error(e, { label: "discovery.build" });
     return [];
   }
 }
