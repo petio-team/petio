@@ -17,7 +17,7 @@ export async function authenticate(req) {
   } else {
     throw `AUTH: No auth token provided - route ${req.path}`;
   }
-  req.jwtUser = jwt.verify(petioJwt, conf.get('plex.token'));
+  req.jwtUser = jwt.verify(petioJwt, conf.get("plex.token"));
 
   try {
     let userData = await User.findOne({ id: req.jwtUser.id });
@@ -31,8 +31,8 @@ export const authRequired = async (req, res, next) => {
   try {
     await authenticate(req);
   } catch (e) {
-    logger.log("warn", `AUTH: user is not logged in`);
-    logger.warn(e);
+    logger.verbose(`AUTH: user is not logged in`, { label: "middleware.auth" });
+    logger.debug(e, { label: "middleware.auth" });
     res.sendStatus(401);
     return;
   }
@@ -44,6 +44,6 @@ export const adminRequired = (req, res, next) => {
     next();
   } else {
     res.sendStatus(403);
-    logger.log("warn", `AUTH: User not admin`);
+    logger.warn(`AUTH: User not admin`, { label: "middleware.auth" });
   }
 };
