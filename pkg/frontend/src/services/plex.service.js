@@ -11,11 +11,22 @@ const plexHeaders = {
   "X-Plex-Product": "Petio",
   "X-Plex-Version": "v1.0",
   "X-Plex-Platform-Version": "v1.0",
-  "X-Plex-Client-Identifier": "fc684eb1-cdff-46cc-a807-a3720696ae9f",
+  "X-Plex-Client-Identifier": getClientId(),
 };
 
 function timeout(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function getClientId() {
+  const name = "petioPlexClientId";
+  let clientId = localStorage.getItem(name);
+  if (!clientId) {
+    const uuid = "petio_" + crypto.randomUUID();
+    localStorage.setItem(name, uuid);
+    clientId = uuid;
+  }
+  return clientId;
 }
 
 function getPins() {
@@ -98,14 +109,14 @@ async function waitForPin(
 
 export async function plexAuth(plexWindow) {
   let pins = await getPins();
-  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=fc684eb1-cdff-46cc-a807-a3720696ae9f&code=${pins.code}`;
+  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=${getClientId()}&code=${pins.code}`;
   let data = await waitForPin(plexWindow, pins.id, true, false);
   return data;
 }
 
 export async function plexAuthLogin(plexWindow) {
   let pins = await getPins();
-  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=fc684eb1-cdff-46cc-a807-a3720696ae9f&code=${pins.code}`;
+  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=${getClientId()}&code=${pins.code}`;
   let data = await waitForPin(plexWindow, pins.id, false, true);
   return data;
 }
@@ -220,9 +231,8 @@ function getUser(token) {
 }
 
 function getServers(token, ssl = false) {
-  let url = `https://plex.tv/pms/resources?${
-    ssl ? "includeHttps=1&" : ""
-  }X-Plex-Token=${token}`;
+  let url = `https://plex.tv/pms/resources?${ssl ? "includeHttps=1&" : ""
+    }X-Plex-Token=${token}`;
   let method = "get";
   let headers = plexHeaders;
   return process(url, headers, method)
@@ -334,7 +344,7 @@ function process(url, headers, method, body = null) {
 
 export async function plexToken(plexWindow) {
   let pins = await getPins();
-  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=fc684eb1-cdff-46cc-a807-a3720696ae9f&code=${pins.code}`;
+  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=${getClientId()}&code=${pins.code}`;
   let data = await waitForPin(plexWindow, pins.id, false, false, true);
   if (data.error) throw data.error;
   return data;
