@@ -20,4 +20,8 @@ export const frontendView = path.join(VIEW_FOLDER, "./frontend");
 export const adminView = path.join(VIEW_FOLDER, "./admin");
 export const tmdbApiKey = "1af5ad19a2d972a67cd27eb033979c4c";
 export const fanartApiKey = "ee409f6fb0c5cd2352e7a454d3f580d4";
-export const appVersion = require(path.join(ROOT_DIR, "package.json")).version;
+export const appVersion = require(path.join(
+  ROOT_DIR,
+  "api",
+  "package.json"
+)).version;
