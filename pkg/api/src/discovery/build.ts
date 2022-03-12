@@ -297,7 +297,7 @@ function cert(cert, type) {
       return false;
 
     default:
-      logger.verbose(`DISC: Unmapped Cert Rating - ${cert}`);
+      logger.verbose(`DISC: Unmapped Cert Rating - ${cert}`, { label: "discovery.build" });
       return false;
   }
 }

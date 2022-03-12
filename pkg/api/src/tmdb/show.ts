@@ -188,10 +188,10 @@ async function externalId(id) {
       return await idLookup(id);
     });
   } catch (err) {
-    logger.warn(`Error getting external ID - ${id}`, {
+    logger.verbose(`Error getting external ID - ${id}`, {
       label: "tmdb.show",
     });
-    logger.error(err, { label: "tmdb.show" });
+    logger.debug(err, { label: "tmdb.show" });
   }
   return data;
 }
@@ -356,6 +356,7 @@ async function idLookup(id) {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
   } catch (err) {
+    logger.error(`failed to look up show ${id}`, { label: "tmdb.show" });
     logger.error(err, { label: "tmdb.show" });
     throw err;
   }
