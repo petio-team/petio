@@ -4,6 +4,7 @@ import blueconfig from "blueconfig";
 import blueconfig_format_with_validator from "blueconfig-format-with-validator";
 
 import { dataFolder } from "./env";
+import { randomUUID } from "crypto";
 
 const CONFIG_FILE = path.join(dataFolder, "./petio.json");
 
@@ -205,7 +206,7 @@ export const conf = blueconfig({
     client: {
       doc: "The client id",
       format: "*",
-      default: -1,
+      default: "petio_" + randomUUID(),
       sensitive: true,
     },
   },
