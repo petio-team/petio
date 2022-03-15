@@ -9,6 +9,7 @@ import {
   getRadarrOptions,
   getSonarr,
   getSonarrOptions,
+  updateFilters,
 } from "../../services/config.service";
 import FilterRow from "../../components/filterRow";
 import FilterAction from "../../components/filterAction";
@@ -204,7 +205,8 @@ export default function SettingsFilter(props) {
         paths:
           settings.paths && settings.paths.length > 0 ? settings.paths : false,
         languages:
-          settings.languages[0].languages && settings.languages[0].languages.length > 0
+          settings.languages[0].languages &&
+          settings.languages[0].languages.length > 0
             ? settings.languages[0].languages
             : false,
         tags: settings.tags && settings.tags.length > 0 ? settings.tags : false,
@@ -302,8 +304,9 @@ export default function SettingsFilter(props) {
     required.forEach((item, i) => {
       if (conditions[item.condition]) {
         output += " <b>and</b> ";
-        output += `${conditions[item.condition].label
-          } is always ${formatOperator(item.operator)} ${formatValue(item)}`;
+        output += `${
+          conditions[item.condition].label
+        } is always ${formatOperator(item.operator)} ${formatValue(item)}`;
       }
     });
     if (filter.action.length === 0) {
@@ -333,6 +336,7 @@ export default function SettingsFilter(props) {
       const type = filters[key];
       for (let i in type) {
         const filter = type[i];
+        if (filter.action.length === 0) return false;
         for (let a in filter.action) {
           const action = filter.action[a];
           if (!action.path || !action.profile || !action.server || !action.type)
@@ -353,31 +357,44 @@ export default function SettingsFilter(props) {
       message: "Validating filters",
       type: "loading",
     });
-    const validation = await validateFilters();
-    console.log(validation);
-    if (!validation) {
+    try {
+      const validation = await validateFilters();
+      console.log(validation);
+      if (!validation) {
+        props.newNotification({
+          message: "Failed to validate filters",
+          type: "error",
+          id: n,
+        });
+      } else {
+        props.newNotification({
+          message: "Filters validated",
+          type: "success",
+          id: n,
+        });
+        await updateFilters(filters.movie_filters, filters.tv_filters);
+        props.newNotification({
+          message: "Filters saved",
+          type: "success",
+          id: n,
+        });
+      }
+    } catch (e) {
+      console.log(e);
       props.newNotification({
-        message: "Failed to validate filters",
+        message: "Failed to save filters",
         type: "error",
-        id: n,
-      });
-    } else {
-      props.newNotification({
-        message: "Filters validated",
-        type: "success",
         id: n,
       });
     }
     console.log("save");
   }
 
-  console.log(filters);
-
   return (
     <div className={styles.filter__wrap}>
       <p className={`${typo.smtitle} ${typo.bold}`}>Filters</p>
       <br />
-      <p className={`${typo.small}`}>
+      <p className={`${typo.body}`}>
         Don't want to send all your requests to the default Radarr / Sonarr
         instance? <br />
         Want to use custom rules based on the type of request your users make,
@@ -385,7 +402,7 @@ export default function SettingsFilter(props) {
         Then Filters are for you!
       </p>
       <br />
-      <p className={`${typo.small}`}>
+      <p className={`${typo.body}`}>
         Below you can create custom filters, which if matched will circumvent
         the default behaviour of Petio. Each filter contains conditions, grouped
         by "required" and "criteria". "Required" conditions must always be true
@@ -414,7 +431,41 @@ export default function SettingsFilter(props) {
               </p>
               {filters[key] && filters[key].length > 0
                 ? filters[key].map((item, i) => {
-                  if (item.collapse)
+                    if (item.collapse)
+                      return (
+                        <div
+                          className={styles.filter__grid__item}
+                          key={`filter__${key}__${i + 1}`}
+                        >
+                          <p className={`${typo.body} ${typo.medium}`}>
+                            {item.title || `Movie Filter #${i + 1}`}
+                          </p>
+                          <p
+                            className={`${typo.small} ${typo.uppercase} ${typo.medium} ${styles.filter__grid__item__collapse}`}
+                            onClick={() => toggleCollapse(key, i)}
+                          >
+                            Expand
+                          </p>
+                          <div className={styles.filter__grid__item__section}>
+                            <p
+                              className={`${typo.body} ${styles.filter__grid__item__section__overview}`}
+                              dangerouslySetInnerHTML={{
+                                __html: filterToText(key, i),
+                              }}
+                            ></p>
+                          </div>
+                        </div>
+                      );
+                    const actions = item.action;
+                    let required = [];
+                    let optional = [];
+                    item.rows.forEach((item, index) => {
+                      if (item.comparison === "and") {
+                        required.push({ ...item, index: index, rowIndex: i });
+                      } else {
+                        optional.push({ ...item, index: index, rowIndex: i });
+                      }
+                    });
                     return (
                       <div
                         className={styles.filter__grid__item}
@@ -427,158 +478,130 @@ export default function SettingsFilter(props) {
                           className={`${typo.small} ${typo.uppercase} ${typo.medium} ${styles.filter__grid__item__collapse}`}
                           onClick={() => toggleCollapse(key, i)}
                         >
-                          Expand
+                          Collapse
                         </p>
                         <div className={styles.filter__grid__item__section}>
-                          <p
-                            className={`${typo.body} ${styles.filter__grid__item__section__overview}`}
-                            dangerouslySetInnerHTML={{
-                              __html: filterToText(key, i),
-                            }}
-                          ></p>
+                          <p className={`${typo.body} ${typo.medium}`}>
+                            Criteria
+                          </p>
+                          {optional && optional.length > 0
+                            ? optional.map((option, o) => {
+                                return (
+                                  <FilterRow
+                                    option={option}
+                                    type={key}
+                                    itemId={`filter__${key}__${
+                                      i + 1
+                                    }__optional__row__${o}`}
+                                    handleChange={handleChangeRow}
+                                    removeRow={removeRow}
+                                    key={`filter__${key}__${
+                                      i + 1
+                                    }__optional__row__${o}`}
+                                  />
+                                );
+                              })
+                            : null}
+                          <div
+                            className={styles.filter__grid__item__section__add}
+                          >
+                            <button
+                              className={`${buttons.secondary}`}
+                              onClick={() => addCondition(key, i, true)}
+                            >
+                              Add Condition +
+                            </button>
+                          </div>
                         </div>
+                        <div className={styles.filter__grid__item__section}>
+                          <p className={`${typo.body} ${typo.medium}`}>
+                            Required
+                          </p>
+                          {required && required.length > 0
+                            ? required.map((option, o) => {
+                                return (
+                                  <FilterRow
+                                    option={option}
+                                    type={key}
+                                    itemId={`filter__${key}__${
+                                      i + 1
+                                    }__required__row__${o}`}
+                                    handleChange={handleChangeRow}
+                                    removeRow={removeRow}
+                                    key={`filter__${key}__${
+                                      i + 1
+                                    }__required__row__${o}`}
+                                  />
+                                );
+                              })
+                            : null}
+                          <div
+                            className={styles.filter__grid__item__section__add}
+                          >
+                            <button
+                              className={`${buttons.secondary}`}
+                              onClick={() => addCondition(key, i, false)}
+                            >
+                              Add Condition +
+                            </button>
+                          </div>
+                        </div>
+                        <div
+                          className={styles.filter__grid__item__section__action}
+                        >
+                          <p className={`${typo.body} ${typo.medium}`}>
+                            Actions
+                          </p>
+                          {actions && actions.length > 0
+                            ? actions.map((action, a) => {
+                                return (
+                                  <FilterAction
+                                    action={action}
+                                    index={i}
+                                    row={a}
+                                    type={key}
+                                    itemId={`filter__${key}__${
+                                      i + 1
+                                    }__action__row__${a}`}
+                                    handleChange={handleChangeAction}
+                                    removeAction={removeAction}
+                                    key={`filter__${key}__${
+                                      i + 1
+                                    }__action__row__${a}`}
+                                    servers={
+                                      key === "movie_filters"
+                                        ? radarrServers
+                                        : sonarrServers
+                                    }
+                                    settings={
+                                      key === "movie_filters"
+                                        ? radarrSettings
+                                        : sonarrSettings
+                                    }
+                                  />
+                                );
+                              })
+                            : null}
+                          <div
+                            className={styles.filter__grid__item__section__add}
+                          >
+                            <button
+                              className={`${buttons.secondary}`}
+                              onClick={() => addAction(key, i)}
+                            >
+                              Add Action +
+                            </button>
+                          </div>
+                        </div>
+                        <button
+                          className={`${styles.filter__grid__item__remove} ${buttons.primary__red}`}
+                          onClick={() => removeFilter(key, i)}
+                        >
+                          Remove
+                        </button>
                       </div>
                     );
-                  const actions = item.action;
-                  let required = [];
-                  let optional = [];
-                  item.rows.forEach((item, index) => {
-                    if (item.comparison === "and") {
-                      required.push({ ...item, index: index, rowIndex: i });
-                    } else {
-                      optional.push({ ...item, index: index, rowIndex: i });
-                    }
-                  });
-                  return (
-                    <div
-                      className={styles.filter__grid__item}
-                      key={`filter__${key}__${i + 1}`}
-                    >
-                      <p className={`${typo.body} ${typo.medium}`}>
-                        {item.title || `Movie Filter #${i + 1}`}
-                      </p>
-                      <p
-                        className={`${typo.small} ${typo.uppercase} ${typo.medium} ${styles.filter__grid__item__collapse}`}
-                        onClick={() => toggleCollapse(key, i)}
-                      >
-                        Collapse
-                      </p>
-                      <div className={styles.filter__grid__item__section}>
-                        <p className={`${typo.body} ${typo.medium}`}>
-                          Criteria
-                        </p>
-                        {optional && optional.length > 0
-                          ? optional.map((option, o) => {
-                            return (
-                              <FilterRow
-                                option={option}
-                                type={key}
-                                itemId={`filter__${key}__${i + 1
-                                  }__optional__row__${o}`}
-                                handleChange={handleChangeRow}
-                                removeRow={removeRow}
-                                key={`filter__${key}__${i + 1
-                                  }__optional__row__${o}`}
-                              />
-                            );
-                          })
-                          : null}
-                        <div
-                          className={styles.filter__grid__item__section__add}
-                        >
-                          <button
-                            className={`${buttons.secondary}`}
-                            onClick={() => addCondition(key, i, true)}
-                          >
-                            Add Condition +
-                          </button>
-                        </div>
-                      </div>
-                      <div className={styles.filter__grid__item__section}>
-                        <p className={`${typo.body} ${typo.medium}`}>
-                          Required
-                        </p>
-                        {required && required.length > 0
-                          ? required.map((option, o) => {
-                            return (
-                              <FilterRow
-                                option={option}
-                                type={key}
-                                itemId={`filter__${key}__${i + 1
-                                  }__required__row__${o}`}
-                                handleChange={handleChangeRow}
-                                removeRow={removeRow}
-                                key={`filter__${key}__${i + 1
-                                  }__required__row__${o}`}
-                              />
-                            );
-                          })
-                          : null}
-                        <div
-                          className={styles.filter__grid__item__section__add}
-                        >
-                          <button
-                            className={`${buttons.secondary}`}
-                            onClick={() => addCondition(key, i, false)}
-                          >
-                            Add Condition +
-                          </button>
-                        </div>
-                      </div>
-                      <div
-                        className={styles.filter__grid__item__section__action}
-                      >
-                        <p className={`${typo.body} ${typo.medium}`}>
-                          Actions
-                        </p>
-                        {actions && actions.length > 0
-                          ? actions.map((action, a) => {
-                            return (
-                              <FilterAction
-                                action={action}
-                                index={i}
-                                row={a}
-                                type={key}
-                                itemId={`filter__${key}__${i + 1
-                                  }__action__row__${a}`}
-                                handleChange={handleChangeAction}
-                                removeAction={removeAction}
-                                key={`filter__${key}__${i + 1
-                                  }__action__row__${a}`}
-                                servers={
-                                  key === "movie_filters"
-                                    ? radarrServers
-                                    : sonarrServers
-                                }
-                                settings={
-                                  key === "movie_filters"
-                                    ? radarrSettings
-                                    : sonarrSettings
-                                }
-                              />
-                            );
-                          })
-                          : null}
-                        <div
-                          className={styles.filter__grid__item__section__add}
-                        >
-                          <button
-                            className={`${buttons.secondary}`}
-                            onClick={() => addAction(key, i)}
-                          >
-                            Add Action +
-                          </button>
-                        </div>
-                      </div>
-                      <button
-                        className={`${styles.filter__grid__item__remove} ${buttons.primary__red}`}
-                        onClick={() => removeFilter(key, i)}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  );
-                })
+                  })
                 : null}
               <div className={styles.filter__grid__add}>
                 <button

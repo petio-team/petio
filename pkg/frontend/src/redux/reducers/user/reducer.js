@@ -18,6 +18,7 @@ export default function (
     plexServers: null,
     plexUser: null,
     config: null,
+    reviews: [],
   },
   action
 ) {
@@ -64,6 +65,11 @@ export default function (
       return {
         ...state,
         config: action.config,
+      };
+    case "user/all-reviews":
+      return {
+        ...state,
+        reviews: action.reviews,
       };
     default:
       return state;

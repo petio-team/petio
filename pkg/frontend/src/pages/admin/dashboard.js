@@ -62,7 +62,7 @@ function AdminDashboard({ requests, redux_movies, redux_tv }) {
 
   return (
     <div className={styles.dashboard}>
-      <div className={styles.dasboard__requests}>
+      <div className={styles.dashboard__requests}>
         {activeRequests.length > 0 ? (
           <Carousel
             key={`admin_requests`}
