@@ -289,6 +289,24 @@
       margin-right: #{$spacing * 2};
     }
 
+    &__up {
+      opacity: 1;
+      border-color: $green;
+
+      svg path {
+        fill: $green;
+      }
+    }
+
+    &__down {
+      opacity: 1;
+      border-color: $red;
+
+      svg path {
+        fill: $red;
+      }
+    }
+
     &__disabled {
       opacity: 0.2;
       pointer-events: none;

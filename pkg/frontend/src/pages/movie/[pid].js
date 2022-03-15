@@ -17,8 +17,6 @@ import styles from "../../styles/views/movie.module.scss";
 import typo from "../../styles/components/typography.module.scss";
 import buttons from "../../styles/components/button.module.scss";
 
-import { ReactComponent as ThumbUp } from "../../assets/svg/thumb-up.svg";
-import { ReactComponent as ThumbDown } from "../../assets/svg/thumb-down.svg";
 import { ReactComponent as IssueIcon } from "../../assets/svg/issue.svg";
 import { ReactComponent as TrailerIcon } from "../../assets/svg/trailer.svg";
 import { ReactComponent as WatchlistIcon } from "../../assets/svg/watchlist.svg";
@@ -26,11 +24,14 @@ import NotFound from "../404";
 import { matchGenre } from "../../helpers/genres";
 import { Loading } from "../../components/loading";
 import Trailer from "../../components/trailer";
+import { getReviews } from "../../services/user.service";
+import ReviewButtons from "../../components/reviewButtons";
 
 const mapStateToProps = (state) => {
   return {
     redux_movies: state.media.movies,
     redux_requests: state.user.requests,
+    redux_reviews: state.user.reviews,
   };
 };
 
@@ -40,7 +41,7 @@ function Movie({
   newNotification,
   redux_movies,
   redux_requests,
-  props,
+  redux_reviews,
 }) {
   const [mobile, setMobile] = useState(false);
   const [trailer, setTrailer] = useState(false);
@@ -61,6 +62,7 @@ function Movie({
     async function getMovieDetails() {
       try {
         media.getMovie(pid);
+        getReviews();
       } catch (e) {
         console.log(e);
       }
@@ -275,16 +277,13 @@ function Movie({
                         classStyle={styles.actions__request__main_btn}
                       />
                     </div>
-                    <button
-                      className={`${buttons.icon} ${styles.actions__btn}`}
-                    >
-                      <ThumbUp viewBox="0 0 24 24" />
-                    </button>
-                    <button
-                      className={`${buttons.icon} ${styles.actions__btn}`}
-                    >
-                      <ThumbDown viewBox="0 0 24 24" />
-                    </button>
+                    <ReviewButtons
+                      redux_reviews={redux_reviews}
+                      currentUser={currentUser}
+                      styles={styles}
+                      data={movieData}
+                      newNotification={newNotification}
+                    />
                     <button
                       className={`${buttons.icon} ${styles.actions__btn}`}
                     >
