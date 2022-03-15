@@ -12,17 +12,28 @@ router.post("/add", async (req, res) => {
   let userData = await User.findOne({ id: user });
 
   try {
-    const newReview = new Review({
+    let existingReview = await Review.findOne({
       tmdb_id: item.id,
-      score: review.score,
-      comment: review.comment,
       user: userData.id,
-      date: new Date(),
-      type: item.type,
-      title: item.title,
     });
+    let savedReview = false;
+    if (existingReview) {
+      existingReview.score = review.score;
+      savedReview = await existingReview.save();
+    } else {
+      const newReview = new Review({
+        tmdb_id: item.id,
+        score: review.score,
+        comment: review.comment,
+        user: userData.id,
+        date: new Date(),
+        type: item.type,
+        title: item.title,
+      });
 
-    const savedReview = await newReview.save();
+      savedReview = await newReview.save();
+    }
+
     res.json(savedReview);
   } catch (err) {
     res.status(500).json({ error: err });
