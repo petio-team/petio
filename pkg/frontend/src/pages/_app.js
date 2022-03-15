@@ -262,7 +262,7 @@ function Petio({ redux_pos }) {
           newestOnTop={false}
           closeOnClick
           rtl={false}
-          pauseOnFocusLoss
+          pauseOnFocusLoss={false}
           draggable={true}
           pauseOnHover
           transition={Slide}
