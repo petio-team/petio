@@ -108,6 +108,28 @@ export function getFilters() {
   return get(`/filter`);
 }
 
+// Notifications
+
+export function saveEmailConfig(config) {
+  return post(`/mail/create`, { email: config });
+}
+
+export function getEmailConfig() {
+  return get(`/mail/config`);
+}
+
+export function testEmail() {
+  return get(`/mail/test`);
+}
+
+export function testDiscord() {
+  return get(`/hooks/discord/test`);
+}
+
+export function testTelegram() {
+  return get(`/hooks/telegram/test`);
+}
+
 function updateStore(data = false) {
   if (!data) return false;
   return store.dispatch(data);

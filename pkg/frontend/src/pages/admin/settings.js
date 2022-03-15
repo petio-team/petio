@@ -6,6 +6,7 @@ import SettingsArr from "./settings-arr";
 import Meta from "../../components/meta";
 import typo from "../../styles/components/typography.module.scss";
 import SettingsFilter from "./settings-filter";
+import SettingsNotifications from "./settings-notifications";
 
 export default function Settings({ newNotification }) {
   const history = useHistory();
@@ -28,6 +29,9 @@ export default function Settings({ newNotification }) {
             </Route>
             <Route exact path="/admin/settings/filter">
               <SettingsFilter newNotification={newNotification} />
+            </Route>
+            <Route exact path="/admin/settings/notifications">
+              <SettingsNotifications newNotification={newNotification} />
             </Route>
             <Route path="*">
               <p className={`${typo.title} ${typo.bold}`}>Not found</p>
