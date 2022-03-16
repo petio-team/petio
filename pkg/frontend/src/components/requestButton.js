@@ -79,7 +79,14 @@ export default function RequestButton({
       };
     }
     try {
-      await addNewRequest(request, currentUser);
+      const res = await addNewRequest(request, currentUser);
+      if (res.error) {
+        newNotification({
+          type: "error",
+          message: `Request Failed: ${res.message}`,
+        });
+        throw res;
+      }
       newNotification({
         type: "success",
         message: `New Request added: ${data.title || data.name}`,
@@ -88,7 +95,7 @@ export default function RequestButton({
     } catch (err) {
       console.log(err);
       newNotification({
-        type: "success",
+        type: "error",
         message: `Request Failed: ${data.title || data.name}`,
         id: notify,
       });

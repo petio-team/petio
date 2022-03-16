@@ -76,7 +76,10 @@ export default function SettingsArr(props) {
   function handleChange(e) {
     const target = e.target;
     const name = target.name;
-    const value = target.value;
+    let value = target.value;
+    if (target.type === "checkbox") {
+      value = target.checked;
+    }
     if (!currentServer) {
       setNewServer({
         ...newServer,
@@ -102,7 +105,9 @@ export default function SettingsArr(props) {
           },
         });
       } else if (name === "language") {
-        const language = options.languages.filter((o) => o.language.id == value);
+        const language = options.languages.filter(
+          (o) => o.language.id == value
+        );
         setCurrentServer({
           ...currentServer,
           language: {
@@ -387,36 +392,37 @@ export default function SettingsArr(props) {
       <div className={styles.grid}>
         {servers && servers.length > 0
           ? servers.map((server, i) => {
-            return (
-              <div
-                className={`${styles.arr__item} ${server.enabled
-                  ? styles.arr__item__active
-                  : styles.arr__item__disabled
+              return (
+                <div
+                  className={`${styles.arr__item} ${
+                    server.enabled
+                      ? styles.arr__item__active
+                      : styles.arr__item__disabled
                   }`}
-                key={`${type}_server__${i}`}
-                onClick={() => selectServer(server.uuid)}
-              >
-                <div className={styles.arr__item__content}>
-                  <div className={styles.arr__item__icon}>
-                    <ServerIcon />
-                  </div>
-                  <div>
-                    <p
-                      className={`${typo.body} ${typo.uppercase} ${typo.medium}`}
-                    >
-                      {server.title} (
-                      {server.enabled ? "active" : "not active"})
-                    </p>
-                    <p
-                      className={`${typo.xsmall} ${typo.uppercase} ${typo.medium}`}
-                    >
-                      {server.uuid}
-                    </p>
+                  key={`${type}_server__${i}`}
+                  onClick={() => selectServer(server.uuid)}
+                >
+                  <div className={styles.arr__item__content}>
+                    <div className={styles.arr__item__icon}>
+                      <ServerIcon />
+                    </div>
+                    <div>
+                      <p
+                        className={`${typo.body} ${typo.uppercase} ${typo.medium}`}
+                      >
+                        {server.title} (
+                        {server.enabled ? "active" : "not active"})
+                      </p>
+                      <p
+                        className={`${typo.xsmall} ${typo.uppercase} ${typo.medium}`}
+                      >
+                        {server.uuid}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })
+              );
+            })
           : null}
         <div className={styles.arr__add} onClick={() => setOpenAdd(true)}>
           <div className={styles.arr__item__content}>
@@ -522,8 +528,9 @@ export default function SettingsArr(props) {
               <input
                 type="text"
                 className={inputs.text__light}
-                placeholder={`API Key from ${type === "radarr" ? "Radarr" : "Sonarr"
-                  }`}
+                placeholder={`API Key from ${
+                  type === "radarr" ? "Radarr" : "Sonarr"
+                }`}
                 name="key"
                 value={currentServer ? currentServer.key : newServer.key}
                 onChange={handleChange}
@@ -601,7 +608,10 @@ export default function SettingsArr(props) {
                         <option value="">Please select</option>
                         {options.languages.map((language) => {
                           return (
-                            <option key={language.language.id} value={language.language.id}>
+                            <option
+                              key={language.language.id}
+                              value={language.language.id}
+                            >
                               {language.language.name}
                             </option>
                           );
@@ -636,20 +646,22 @@ export default function SettingsArr(props) {
                   </button>
                   <br />
                   <button
-                    className={`${buttons.secondary} ${currentServer.path.id && currentServer.profile.id
-                      ? ""
-                      : buttons.disabled
-                      }`}
+                    className={`${buttons.secondary} ${
+                      currentServer.path.id && currentServer.profile.id
+                        ? ""
+                        : buttons.disabled
+                    }`}
                     onClick={() => testServer(currentServer.uuid)}
                   >
                     Test
                   </button>
                   <br />
                   <button
-                    className={`${buttons.primary} ${currentServer.path.id && currentServer.profile.id
-                      ? ""
-                      : buttons.disabled
-                      }`}
+                    className={`${buttons.primary} ${
+                      currentServer.path.id && currentServer.profile.id
+                        ? ""
+                        : buttons.disabled
+                    }`}
                     onClick={() => updateServer(currentServer.uuid)}
                   >
                     Save

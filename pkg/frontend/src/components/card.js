@@ -9,12 +9,15 @@ import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 
 import { ReactComponent as Tick } from "../assets/svg/check.svg";
+import { ReactComponent as Arrow } from "../assets/svg/chevron.svg";
+import { addNewRequest, getRequests } from "../services/user.service";
 
 const mapStateToProps = (state) => {
   return {
     redux_movies: state.media.movies,
     redux_tv: state.media.tv,
     redux_requests: state.user.requests,
+    currentUser: state.user.currentUser,
   };
 };
 
@@ -35,6 +38,8 @@ function Card({
   redux_tv,
   redux_requests,
   logo = false,
+  currentUser,
+  newNotification,
 }) {
   const [showTrailer, setShowTrailer] = useState(false);
   const [delayHandler, setDelayHandler] = useState(null);
@@ -45,6 +50,7 @@ function Card({
   const [onServer, setOnServer] = useState(false);
   const [animate, setAnimate] = useState(false);
   const [animate2, setAnimate2] = useState(false);
+  const [data, setData] = useState(false);
 
   const marqueeText = useRef(null);
   const marquee = useRef(null);
@@ -73,6 +79,7 @@ function Card({
         setTitle(redux ? redux.title : "");
         setPosterState(redux ? redux.poster_path : false);
         setOnServer(redux ? redux.on_server : false);
+        setData(redux ? redux : false);
         if (redux) {
           const video =
             redux.videos && redux.videos.results.length > 0
@@ -87,6 +94,7 @@ function Card({
         setTitle(redux ? redux.name : "");
         setPosterState(redux ? redux.poster_path : false);
         setOnServer(redux ? redux.on_server : false);
+        setData(redux ? redux : false);
         if (redux) {
           const video =
             redux.videos && redux.videos.results.length > 0
@@ -132,6 +140,79 @@ function Card({
       }
     }
   }, [marqueeText, marquee]);
+
+  async function request(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!data) return;
+    if (
+      redux_requests &&
+      redux_requests[data.id] &&
+      redux_requests[data.id].users
+    ) {
+      if (redux_requests[data.id].users.includes(currentUser.id)) {
+        if (newNotification)
+          newNotification({
+            type: "error",
+            message: `You've already requested ${data.title || data.name}`,
+          });
+        getRequests();
+        return;
+      }
+    }
+    let notify = false;
+    if (newNotification)
+      notify = newNotification({
+        type: "loading",
+        message: `Requesting ${data.title || data.name}`,
+      });
+    let request = {};
+    if (type === "movie")
+      request = {
+        id: data.id,
+        imdb_id: data.imdb_id,
+        tmdb_id: data.id,
+        tvdb_id: "n/a",
+        title: data.title,
+        thumb: data.poster_path,
+        type: type,
+      };
+    if (type === "tv") {
+      request = {
+        id: data.id,
+        tmdb_id: data.id,
+        tvdb_id: data.tvdb_id,
+        imdb_id: data.imdb_id,
+        title: data.name,
+        type: "tv",
+        thumb: data.poster_path,
+      };
+    }
+    try {
+      const res = await addNewRequest(request, currentUser);
+      if (res.error) {
+        newNotification({
+          type: "error",
+          message: `Request Failed: ${res.message}`,
+        });
+        throw res;
+      }
+      if (newNotification && notify)
+        newNotification({
+          type: "success",
+          message: `New Request added: ${data.title || data.name}`,
+          id: notify,
+        });
+    } catch (err) {
+      if (newNotification && notify)
+        newNotification({
+          type: "error",
+          message: `Request Failed: ${data.title || data.name}`,
+          id: notify,
+        });
+    }
+    getRequests();
+  }
 
   if (type === "company") {
     return (
@@ -274,6 +355,12 @@ function Card({
           <p className={type.body}>
             {titleState} {year ? `(${year})` : null}
           </p>
+          {!onServer && redux_requests && !redux_requests[id] ? (
+            <div className={styles.quickRequest} onClick={request}>
+              <p className={`${typo.body}`}>Request</p>
+              <Arrow />
+            </div>
+          ) : null}
         </div>
       </div>
       {type === "people" ? (

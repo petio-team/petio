@@ -3,7 +3,13 @@ import cards from "../styles/components/card.module.scss";
 
 import Card from "./card";
 
-export default function Grid({ data, title, type = "movie", id }) {
+export default function Grid({
+  data,
+  title,
+  type = "movie",
+  id,
+  newNotification,
+}) {
   const placeholderRow = [];
 
   for (let i = 0; i < 10; i++) {
@@ -59,6 +65,7 @@ export default function Grid({ data, title, type = "movie", id }) {
                     item={item}
                     load={item.load}
                     grid={true}
+                    newNotification={newNotification}
                   />
                 );
               })

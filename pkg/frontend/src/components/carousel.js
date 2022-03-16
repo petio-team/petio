@@ -17,7 +17,15 @@ const mapStateToProps = (state) => {
   };
 };
 
-function Carousel({ data, title, type = "movie", id, redux_pos, link }) {
+function Carousel({
+  data,
+  title,
+  type = "movie",
+  id,
+  redux_pos,
+  link,
+  newNotification,
+}) {
   const [waitForScroll, setWaitForScroll] = useState(true);
   const [end, setEnd] = useState(false);
   const [start, setStart] = useState(false);
@@ -216,6 +224,7 @@ function Carousel({ data, title, type = "movie", id, redux_pos, link }) {
                     name={item.name}
                     item={item}
                     load={item.load}
+                    newNotification={newNotification}
                   />
                 );
               })

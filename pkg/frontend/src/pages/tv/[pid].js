@@ -494,6 +494,7 @@ function Tv({
               type="tv"
               key={`${tvData.id}_collection_${tvData.belongs_to_collection.id}`}
               id={`${tvData.id}_collection_${tvData.belongs_to_collection.id}`}
+              newNotification={newNotification}
             />
           ) : null}
           <Carousel
@@ -502,6 +503,7 @@ function Tv({
             type="tv"
             key={`${tvData.id}_related`}
             id={`${tvData.id}_related`}
+            newNotification={newNotification}
           />
         </div>
       ) : null}

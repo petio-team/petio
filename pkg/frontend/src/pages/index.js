@@ -129,6 +129,7 @@ function Home({
           type="movie"
           key="trending_m"
           id="trending_m"
+          newNotification={newNotification}
         />
         <Carousel
           title="Trending TV"
@@ -136,6 +137,7 @@ function Home({
           type="tv"
           key="trending_t"
           id="trending_t"
+          newNotification={newNotification}
         />
         <Carousel
           title="Movie Studios"
@@ -161,6 +163,7 @@ function Home({
               title={row.title}
               data={row.results}
               type="movie"
+              newNotification={newNotification}
             />
           );
         })}
@@ -174,6 +177,7 @@ function Home({
               title={row.title}
               data={row.results}
               type="tv"
+              newNotification={newNotification}
             />
           );
         })}

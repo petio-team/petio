@@ -13,7 +13,7 @@ import Grid from "../../../components/grid";
 import { matchGenre } from "../../../helpers/genres";
 import NotFound from "../../404";
 
-export default function Genre() {
+export default function Genre({ newNotification }) {
   const [genreName, setGenreName] = useState("");
   const [movies, setMovies] = useState(false);
   // const [total, setTotal] = useState(1);
@@ -88,6 +88,7 @@ export default function Genre() {
             type="movie"
             key={`genre_${pid}_movies`}
             id={`genre_${pid}_movies`}
+            newNotification={newNotification}
           />
         </>
       )}

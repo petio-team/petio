@@ -255,6 +255,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  pointer-events: none;
 }
 
 .video {
@@ -286,7 +287,7 @@
   z-index: 3;
   opacity: 0;
   transition: opacity 0.3s ease;
-  pointer-events: none;
+  // pointer-events: none;
 
   p {
     color: $white;
@@ -389,6 +390,7 @@
     justify-content: flex-end;
     transition: transform 0.3s ease;
     padding: 5px;
+    pointer-events: none;
 
     @media (min-width: $md) {
       padding: $spacing;
@@ -463,4 +465,44 @@
 
   justify-content: center;
   max-width: 100% !important;
+}
+
+.quickRequest {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  z-index: 5;
+
+  p {
+    transition: color 0.3s ease;
+  }
+
+  svg {
+    width: 15px;
+    height: 15px;
+    margin-left: 5px;
+    transform: translateX(0);
+    transition: transform 0.3s ease;
+
+    g {
+      fill: $white;
+      transition: fill 0.3s ease;
+    }
+  }
+
+  &:hover {
+    p {
+      color: $orange;
+    }
+
+    svg {
+      transform: translateX(10px);
+      g {
+        fill: $orange;
+      }
+    }
+  }
 }

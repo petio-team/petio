@@ -15,7 +15,7 @@ import styles from "../../../styles/views/company.module.scss";
 import NotFound from "../../404";
 // import type from '../../../styles/components/typography.module.scss';
 
-export default function Network() {
+export default function Network({ newNotification }) {
   const [coData, setCoData] = useState(null);
   const [tv, setTv] = useState(false);
   // const [total, setTotal] = useState(1);
@@ -83,6 +83,7 @@ export default function Network() {
         type="tv"
         key={`network_${pid}_tv`}
         id={`network_${pid}_tv`}
+        newNotification={newNotification}
       />
     </div>
   );

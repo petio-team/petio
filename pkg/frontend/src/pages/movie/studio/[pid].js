@@ -14,7 +14,7 @@ import hero from "../../../styles/components/hero.module.scss";
 import styles from "../../../styles/views/company.module.scss";
 import NotFound from "../../404";
 
-export default function Studio() {
+export default function Studio({ newNotification }) {
   const [coData, setCoData] = useState(null);
   const [movies, setMovies] = useState(false);
   // const [total, setTotal] = useState(1);
@@ -82,6 +82,7 @@ export default function Studio() {
         type="movie"
         key={`company_${pid}_movies`}
         id={`company_${pid}_movies`}
+        newNotification={newNotification}
       />
     </div>
   );

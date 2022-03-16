@@ -470,6 +470,7 @@ function Movie({
             type="movie"
             key={`${movieData.id}_collection`}
             id={`${movieData.id}_collection`}
+            newNotification={newNotification}
           />
         ) : null}
         {movieData && movieData.recommendations ? (
@@ -479,6 +480,7 @@ function Movie({
             type="movie"
             key={`${movieData.id}_related`}
             id={`${movieData.id}_related`}
+            newNotification={newNotification}
           />
         ) : null}
       </div>
