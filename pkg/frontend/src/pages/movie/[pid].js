@@ -26,6 +26,7 @@ import { Loading } from "../../components/loading";
 import Trailer from "../../components/trailer";
 import { getReviews } from "../../services/user.service";
 import ReviewButtons from "../../components/reviewButtons";
+import languages from "../../helpers/languages";
 
 const mapStateToProps = (state) => {
   return {
@@ -168,6 +169,15 @@ function Movie({
     return out;
   }
 
+  function formatLang(code) {
+    const match = languages.filter((l) => l.code === code);
+    if (match && match[0]) {
+      return match[0].name;
+    } else {
+      return "Unknown";
+    }
+  }
+
   if (movieData === "error") {
     return <NotFound />;
   }
@@ -214,8 +224,8 @@ function Movie({
                         ? timeConvert(movieData.runtime)
                         : "Unknown"}
                       <span className={typo.vertical_spacer}></span>
-                      {movieData && movieData.original_language_format
-                        ? movieData.original_language_format
+                      {movieData && movieData.original_language
+                        ? formatLang(movieData.original_language)
                         : "Unknown Language"}
                       {movieData && movieData.age_rating ? (
                         <span className={typo.vertical_spacer}></span>

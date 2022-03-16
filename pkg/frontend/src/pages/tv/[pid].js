@@ -25,6 +25,7 @@ import { matchGenre } from "../../helpers/genres";
 import { Loading } from "../../components/loading";
 import Trailer from "../../components/trailer";
 import ReviewButtons from "../../components/reviewButtons";
+import languages from "../../helpers/languages";
 
 const mapStateToProps = (state) => {
   return {
@@ -172,6 +173,15 @@ function Tv({
     return out;
   }
 
+  function formatLang(code) {
+    const match = languages.filter((l) => l.code === code);
+    if (match && match[0]) {
+      return match[0].name;
+    } else {
+      return "Unknown";
+    }
+  }
+
   if (tvData === "error") {
     return <NotFound />;
   }
@@ -237,8 +247,8 @@ function Tv({
                         </>
                       ) : null}
                       <span className={typo.vertical_spacer}></span>
-                      {tvData && tvData.original_language_format
-                        ? tvData.original_language_format
+                      {tvData && tvData.original_language
+                        ? formatLang(tvData.original_language)
                         : "Unknown Language"}
                       {tvData && tvData.age_rating ? (
                         <span className={typo.vertical_spacer}></span>
