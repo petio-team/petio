@@ -1,13 +1,13 @@
 import styles from "../styles/components/trailer.module.scss";
 import ReactPlayer from "react-player/youtube";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/opacity.css";
 import { ReactComponent as PlayIcon } from "../assets/svg/play.svg";
 import { ReactComponent as PauseIcon } from "../assets/svg/pause.svg";
 import { ReactComponent as CloseIcon } from "../assets/svg/close.svg";
 
-export default function Trailer({ videoId, callback }) {
+export default function Trailer({ videoId, callback, newNotification }) {
   const [playing, setPlaying] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [seeking, setSeeking] = useState(false);
@@ -35,13 +35,22 @@ export default function Trailer({ videoId, callback }) {
       ...progress,
       played: parseFloat(e.target.value),
     });
-    // this.setState({ played: parseFloat(e.target.value) });
   }
 
   function handleSeekMouseUp(e) {
     setSeeking(false);
     player.current.seekTo(parseFloat(e.target.value));
   }
+
+  useEffect(() => {
+    if (!ReactPlayer.canPlay(`https://www.youtube.com/watch?v=${videoId}`)) {
+      newNotification({
+        message: "Unable to load video",
+        type: "error",
+      });
+    }
+    // eslint-disable-next-line
+  }, [videoId]);
 
   return (
     <div className={styles.wrap}>
@@ -66,6 +75,13 @@ export default function Trailer({ videoId, callback }) {
             onPlay={() => setIsPlaying(true)}
             onPause={() => setIsPlaying(false)}
             onProgress={handleProgress}
+            onError={(e) => {
+              console.log("error playing");
+              newNotification({
+                message: "Unable to play video",
+                type: "error",
+              });
+            }}
           />
         </div>
         <LazyLoadImage

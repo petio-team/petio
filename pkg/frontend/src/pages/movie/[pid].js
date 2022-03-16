@@ -182,6 +182,7 @@ function Movie({
           <Trailer
             videoId={movieData.videos.results[0].key || false}
             callback={() => setTrailer(false)}
+            newNotification={newNotification}
           />
         ) : null}
         <div className={hero.center}>
