@@ -2,6 +2,7 @@ import { post, get } from "../helpers";
 import store from "../redux/store.js";
 import { updateConfig } from "./config.service";
 import { login } from "./user.service";
+import { v4 as uuidv4 } from "uuid";
 
 const plexHeaders = {
   "Content-Type": "application/json",
@@ -22,7 +23,7 @@ function getClientId() {
   const name = "petioPlexClientId";
   let clientId = localStorage.getItem(name);
   if (!clientId) {
-    const uuid = "petio_" + crypto.randomUUID();
+    const uuid = "petio_" + uuidv4();
     localStorage.setItem(name, uuid);
     clientId = uuid;
   }
@@ -109,14 +110,18 @@ async function waitForPin(
 
 export async function plexAuth(plexWindow) {
   let pins = await getPins();
-  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=${getClientId()}&code=${pins.code}`;
+  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=${getClientId()}&code=${
+    pins.code
+  }`;
   let data = await waitForPin(plexWindow, pins.id, true, false);
   return data;
 }
 
 export async function plexAuthLogin(plexWindow) {
   let pins = await getPins();
-  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=${getClientId()}&code=${pins.code}`;
+  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=${getClientId()}&code=${
+    pins.code
+  }`;
   let data = await waitForPin(plexWindow, pins.id, false, true);
   return data;
 }
@@ -231,8 +236,9 @@ function getUser(token) {
 }
 
 function getServers(token, ssl = false) {
-  let url = `https://plex.tv/pms/resources?${ssl ? "includeHttps=1&" : ""
-    }X-Plex-Token=${token}`;
+  let url = `https://plex.tv/pms/resources?${
+    ssl ? "includeHttps=1&" : ""
+  }X-Plex-Token=${token}`;
   let method = "get";
   let headers = plexHeaders;
   return process(url, headers, method)
@@ -344,7 +350,9 @@ function process(url, headers, method, body = null) {
 
 export async function plexToken(plexWindow) {
   let pins = await getPins();
-  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=${getClientId()}&code=${pins.code}`;
+  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=${getClientId()}&code=${
+    pins.code
+  }`;
   let data = await waitForPin(plexWindow, pins.id, false, false, true);
   if (data.error) throw data.error;
   return data;
