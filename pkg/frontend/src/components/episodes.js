@@ -2,11 +2,12 @@ import { useState } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 
 import { ReactComponent as ArrowIcon } from "../assets/svg/arrow.svg";
+import { ReactComponent as Tick } from "../assets/svg/check.svg";
 
 import styles from "../styles/views/tv.module.scss";
 import typo from "../styles/components/typography.module.scss";
 
-export default function Episodes({ data, mobile }) {
+export default function Episodes({ data, mobile, globalRequests }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [currentSeasonData, setCurrentSeasonData] = useState(
     data.seasonData[
@@ -59,6 +60,8 @@ export default function Episodes({ data, mobile }) {
     );
   }
 
+  const requested = globalRequests && globalRequests[data.id] ? true : false;
+
   return (
     <div className={styles.episodes}>
       <div className="container">
@@ -107,24 +110,52 @@ export default function Episodes({ data, mobile }) {
             let airDate = episode.air_date
               ? Date.parse(episode.air_date)
               : false;
-            let onServer =
-              data.server_seasons &&
-              data.server_seasons[currentSeasonData.season_number] &&
-              data.server_seasons[currentSeasonData.season_number].episodes &&
-              data.server_seasons[currentSeasonData.season_number].episodes[
-                episode.episode_number
-              ]
-                ? true
-                : false;
+            let onServer = false;
+            if (data.on_server && data.on_server.versions)
+              data.on_server.versions.forEach((version) => {
+                if (
+                  !onServer &&
+                  version.seasons[currentSeasonData.season_number] &&
+                  version.seasons[currentSeasonData.season_number].episodes &&
+                  version.seasons[currentSeasonData.season_number].episodes[
+                    episode.episode_number
+                  ]
+                )
+                  onServer = true;
+              });
             return (
               <div
                 className={styles.episode}
                 key={`season_${data.id}_e${episode.episode_number}`}
               >
                 <div className={styles.episode__image}>
+                  <div className={styles.episode__image__status}>
+                    {onServer ? (
+                      <div
+                        className={`
+								${styles.episode__image__status__item} ${styles.episode__image__status__on_server}`}
+                      >
+                        <Tick />
+                      </div>
+                    ) : null}
+                    {requested ? (
+                      <div
+                        className={`
+								${styles.episode__image__status__item} ${styles.episode__image__status__requested}`}
+                      >
+                        <Tick />
+                      </div>
+                    ) : null}
+                  </div>
                   {episode.still_path ? (
                     <LazyLoadImage
                       src={`https://image.tmdb.org/t/p/w500${episode.still_path}`}
+                      alt={episode.name}
+                      // effect="opacity"
+                    />
+                  ) : data.backdrop_path ? (
+                    <LazyLoadImage
+                      src={`https://image.tmdb.org/t/p/w500${data.backdrop_path}`}
                       alt={episode.name}
                       // effect="opacity"
                     />
@@ -138,11 +169,18 @@ export default function Episodes({ data, mobile }) {
                     </div>
                   )}
                 </div>
-                <p
-                  className={`${typo.body} ${typo.uppercase} ${typo.medium} ${styles.episode__number}`}
-                >
-                  Episode {episode.episode_number}
-                </p>
+                <div className={styles.episode__top}>
+                  <p
+                    className={`${styles.episode__top__number} ${typo.small} ${typo.uppercase} ${typo.medium} ${styles.episode__number}`}
+                  >
+                    Episode {episode.episode_number}
+                  </p>
+                  <p
+                    className={`${styles.episode__airdate} ${typo.small} ${typo.medium} ${typo.uppercase}`}
+                  >
+                    {daysTillAir(airDate)}
+                  </p>
+                </div>
                 <p className={`${typo.body} ${styles.episode__name}`}>
                   {episode.name}
                 </p>
@@ -153,18 +191,6 @@ export default function Episodes({ data, mobile }) {
                       : episode.overview}
                   </p>
                 )}
-                <div className={`${styles.episode__info}`}>
-                  <p
-                    className={`${typo.small} ${typo.medium} ${typo.uppercase}`}
-                  >
-                    {daysTillAir(airDate)}
-                  </p>
-                  <p
-                    className={`${typo.small} ${typo.medium} ${typo.uppercase} ${styles.episode__info__onPlex}`}
-                  >
-                    {onServer ? "On Plex" : ""}
-                  </p>
-                </div>
               </div>
             );
           })}

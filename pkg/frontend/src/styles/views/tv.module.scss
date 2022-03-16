@@ -166,6 +166,75 @@
       height: 100%;
       background: $grey;
     }
+
+    &__status {
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: 2;
+      padding: 5px;
+      display: flex;
+      flex-direction: row-reverse;
+
+      &:after {
+        content: "";
+        position: absolute;
+        top: -25%;
+        right: -25%;
+        width: 150%;
+        height: 150%;
+        background: radial-gradient(
+          circle,
+          rgba(0, 0, 0, 1) 30%,
+          rgba(0, 0, 0, 0.2) 60%,
+          rgba(0, 0, 0, 0) 70%
+        );
+        opacity: 0.2;
+      }
+
+      @media (min-width: $lg) {
+        padding: 10px;
+      }
+
+      &__item {
+        height: 15px;
+        width: 15px;
+        border-radius: 50%;
+        z-index: 4;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      &__on_server {
+        background: $green;
+
+        svg {
+          width: 9px;
+          height: 9px;
+          fill: $greenLight;
+        }
+      }
+
+      &__requested {
+        background: $blue;
+
+        svg {
+          width: 9px;
+          height: 9px;
+          fill: darken($blue, 10);
+        }
+      }
+    }
+  }
+
+  &__top {
+    display: flex;
+    flex-wrap: wrap;
+
+    &__number {
+      margin-right: 20px;
+    }
   }
 }
 

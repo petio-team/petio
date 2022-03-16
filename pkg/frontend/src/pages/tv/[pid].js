@@ -187,6 +187,7 @@ function Tv({
           <Trailer
             videoId={tvData.videos.results[0].key || false}
             callback={() => setTrailer(false)}
+            newNotification={newNotification}
           />
         ) : null}
         <div className={hero.center}>
@@ -457,7 +458,11 @@ function Tv({
       {tvData ? (
         <div className={styles.content}>
           {tvData && tvData.seasonData ? (
-            <Episodes data={tvData} mobile={mobile} />
+            <Episodes
+              globalRequests={redux_requests}
+              data={tvData}
+              mobile={mobile}
+            />
           ) : null}
           {tvData.credits &&
           tvData.credits.cast &&
