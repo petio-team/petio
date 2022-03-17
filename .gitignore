@@ -7,6 +7,12 @@ logs/
 .eslintcache
 *.log
 .DS_Store
-releases/
 *.env
 node_modules/
+.yarn/*
+!.yarn/cache
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
