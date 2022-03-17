@@ -1,7 +1,16 @@
 import path from "path";
 import winston, { format } from "winston";
 import "winston-daily-rotate-file";
-const { combine, timestamp, printf, splat, colorize, label } = format;
+const {
+  combine,
+  timestamp,
+  printf,
+  splat,
+  colorize,
+  label,
+  errors,
+  prettyPrint,
+} = format;
 
 import { dataFolder } from "./env";
 import { conf } from "./config";
@@ -16,7 +25,9 @@ const customFormat = printf(({ level, label, message, timestamp }) => {
 const logger = winston.createLogger({
   level: conf.get("logger.level") || "debug",
   format: combine(
+    errors({ stack: true }),
     splat(),
+    prettyPrint(),
     label({
       label: "",
     }),
