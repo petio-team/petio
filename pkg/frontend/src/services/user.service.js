@@ -4,6 +4,14 @@ import store from "../redux/store.js";
 
 // user actions
 
+export function logout() {
+  cookies.remove("petio_jwt");
+  updateStore({
+    type: "user/logout",
+  });
+  if (typeof window !== undefined) window.location.reload();
+}
+
 export function getToken() {
   return cookies.get("petio_jwt");
 }

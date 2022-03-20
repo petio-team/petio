@@ -29,6 +29,12 @@ export default function (
         currentUser: action.user,
         isAdminLogin: action.admin,
       };
+    case "user/logout":
+      return {
+        ...state,
+        currentUser: false,
+        isAdminLogin: false,
+      };
     case "user/update-requests":
       return { ...state, requests: action.requests };
     case "user/my-requests":

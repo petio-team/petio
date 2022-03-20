@@ -43,6 +43,7 @@ import Error from "../components/error";
 import PwaInstall from "../components/pwaInstall";
 import PwaAndroid from "../components/pwaAndroid";
 import { getMobileOperatingSystem } from "../helpers/getOs";
+import MyAccount from "./myAccount";
 // import Modal from "../components/modal";
 
 const mapStateToProps = (state) => {
@@ -378,6 +379,13 @@ function Petio({ redux_pos }) {
           </Route>
           <Route exact path="/search">
             <Search
+              currentUser={currentUser}
+              config={globalConfig}
+              newNotification={newNotification}
+            />
+          </Route>
+          <Route exact path="/my-account">
+            <MyAccount
               currentUser={currentUser}
               config={globalConfig}
               newNotification={newNotification}
