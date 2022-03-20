@@ -9,6 +9,7 @@ import "react-lazy-load-image-component/src/effects/opacity.css";
 import { ReactComponent as PlayIcon } from "../../assets/svg/play.svg";
 import { ReactComponent as PauseIcon } from "../../assets/svg/pause.svg";
 import { ReactComponent as BufferIcon } from "../../assets/svg/buffer.svg";
+import { Link } from "react-router-dom";
 
 const mapStateToProps = (state) => {
   return {
@@ -139,7 +140,7 @@ function ActivitySession({
   const progressWidth = `${Math.ceil(progress)}%`;
 
   return (
-    <div className={styles.session}>
+    <Link to={`/${type}/${id}`} className={styles.session}>
       <div className={styles.session__card}>
         <div className={styles.session__card__status}>{status()}</div>
         <div className={styles.session__card__spacer}></div>
@@ -203,7 +204,7 @@ function ActivitySession({
       <div className={styles.session__card__user}>
         <p className={`${typo.small}`}>{session.User.title}</p>
       </div>
-    </div>
+    </Link>
   );
 }
 
