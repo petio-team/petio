@@ -25,7 +25,7 @@ tasks:
 
   build:pre:
     cmds:
-      - yarn {{if eq .CI "true"}}--production --immutable --immutable-cache --check-cache{{end}}
+      - yarn {{if eq .CI "true"}}--immutable --immutable-cache --check-cache{{end}}
 
   build:frontend:
     dir: pkg/frontend
