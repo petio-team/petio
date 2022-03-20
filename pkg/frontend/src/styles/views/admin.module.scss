@@ -227,7 +227,7 @@
 
     &__spacer {
       content: "";
-      padding-bottom: 100%;
+      padding-bottom: 60%;
     }
 
     &__img {
@@ -294,6 +294,7 @@
 
     &__content {
       padding: 5px 10px;
+      background: rgba($white, 0.025);
 
       &__title,
       &__episode {

@@ -105,6 +105,31 @@ function ActivitySession({
     }
   }
 
+  function formatRes(res) {
+    switch (res) {
+      case "1080":
+      case "1080p":
+      case "1080P":
+        return "HD 1080p";
+      case "720":
+      case "720p":
+      case "720P":
+        return "HD 720p";
+      case "sd":
+      case "480":
+      case "576":
+      case "480p":
+      case "576p":
+        return "SD";
+      case "2160":
+      case "4k":
+      case "4K":
+        return "UHD 4K";
+      default:
+        return res;
+    }
+  }
+
   function status() {
     let playbackState;
     switch (session.Player.state) {
@@ -197,8 +222,8 @@ function ActivitySession({
       </div>
       <div className={styles.session__card__detail}>
         <p className={`${typo.small}`}>
-          {formatDecision(playback)} - {selectedMedia.videoResolution} (
-          {bitrate})
+          {formatDecision(playback)} -{" "}
+          {formatRes(selectedMedia.videoResolution)} ({bitrate})
         </p>
       </div>
       <div className={styles.session__card__user}>
