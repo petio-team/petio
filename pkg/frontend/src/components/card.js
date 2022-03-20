@@ -355,7 +355,10 @@ function Card({
           <p className={type.body}>
             {titleState} {year ? `(${year})` : null}
           </p>
-          {!onServer && redux_requests && !redux_requests[id] ? (
+          {(type === "movie" || type === "tv") &&
+          !onServer &&
+          redux_requests &&
+          !redux_requests[id] ? (
             <div className={styles.quickRequest} onClick={request}>
               <p className={`${typo.body}`}>Request</p>
               <Arrow />
