@@ -1,6 +1,6 @@
 {
   "name": "petio-api",
-  "version": "0.5.4",
+  "version": "1.0.0",
   "description": "Petio API",
   "main": "main.js",
   "scripts": {

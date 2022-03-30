@@ -101,6 +101,19 @@ export async function getReviews() {
   }
 }
 
+export async function getUserQuota() {
+  try {
+    const data = await get("/user/quota");
+    return data;
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export async function watchHistory(user_id, type) {
+  return post("/history", { id: user_id, type });
+}
+
 function updateStore(data = false) {
   if (!data) return false;
   return store.dispatch(data);

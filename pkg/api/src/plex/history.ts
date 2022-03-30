@@ -77,22 +77,22 @@ async function parseHistory(data, type) {
   let histArr = new Array();
   for (let i = 0; i < history.length; i++) {
     let item = history[i];
-    if (type === item.type) {
+    if (type === item.type || type === "all") {
       let media_type = item.type;
       let media_id = item.ratingKey;
       let media_title = item.title;
 
-      if (type === "episode" && item.grandparentKey) {
+      if (media_type === "episode" && item.grandparentKey) {
         media_id = item.grandparentKey.replace("/library/metadata/", "");
         media_title = item.grandparentTitle;
-      } else if (type === "episode" && item.parentKey) {
+      } else if (media_type === "episode" && item.parentKey) {
         media_id = item.parentKey.replace("/library/metadata/", "");
       }
 
       let key = media_id;
 
       if (!histArr.includes(key)) {
-        if (type === "episode") {
+        if (media_type === "episode") {
           let plexData: any = await plexLookup(media_id, "show");
           media_id = plexData.tmdb_id;
         } else {
@@ -102,11 +102,14 @@ async function parseHistory(data, type) {
 
         histArr.push(key);
 
-        if (media_type === type && Object.keys(output).length < 19) {
+        if (
+          (media_type === type || type === "all") &&
+          Object.keys(output).length < 19
+        ) {
           output[i] =
-            type === "movie"
-              ? await movieLookup(media_id, true)
-              : await showLookup(media_id, true);
+            media_type === "movie"
+              ? await movieLookup(media_id, false)
+              : await showLookup(media_id, false);
         }
       }
     }
