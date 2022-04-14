@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const blueconfig = require('blueconfig');
 const blueconfig_format_with_validator = require('blueconfig-format-with-validator');
+const LISTOFERRORS = require('blueconfig/lib/error.js').LISTOFERRORS
 
 const { dataFolder } = require('./env');
 
