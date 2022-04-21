@@ -1,4 +1,4 @@
-FROM node:17.4.0-alpine
+FROM node:18.0.0-alpine
 ENV APP_DIR="/app" VIEWS_FOLDER="/app/views" DATA_FOLDER="/data"
 RUN apk add --no-cache ca-certificates shadow bash wget;
 RUN mkdir -p /app && chown node:node /app
