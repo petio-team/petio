@@ -248,10 +248,11 @@ export default function SettingsArr(props) {
       if (settings.profiles.error || settings.paths.error) {
         return;
       }
+      console.log(settings.languages);
       setOptions({
         profiles: settings.profiles.length > 0 ? settings.profiles : false,
         paths: settings.paths.length > 0 ? settings.paths : false,
-        languages: settings.languages[0].languages,
+        languages: settings.languages,
       });
     } catch (e) {
       console.log(e);
@@ -608,11 +609,8 @@ export default function SettingsArr(props) {
                         <option value="">Please select</option>
                         {options.languages.map((language) => {
                           return (
-                            <option
-                              key={language.language.id}
-                              value={language.language.id}
-                            >
-                              {language.language.name}
+                            <option key={language.id} value={language.id}>
+                              {language.name}
                             </option>
                           );
                         })}
