@@ -114,6 +114,19 @@ export async function watchHistory(user_id, type) {
   return post("/history", { id: user_id, type });
 }
 
+export async function allUsers() {
+  try {
+    const data = await get(`/user/all`);
+    updateStore({
+      type: "user/all-users",
+      users: data,
+    });
+    return data;
+  } catch (e) {
+    console.log(e);
+  }
+}
+
 function updateStore(data = false) {
   if (!data) return false;
   return store.dispatch(data);

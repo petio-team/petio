@@ -8,6 +8,9 @@ import { Link } from "react-router-dom";
 import NotFound from "../404";
 import Settings from "./settings";
 import Meta from "../../components/meta";
+import AdminRequests from "./admin-requests";
+import { useEffect } from "react";
+import { allUsers } from "../../services/user.service";
 
 const mapStateToProps = (state) => {
   return {
@@ -25,6 +28,10 @@ function Admin({
   function setLoadingScreen() {
     return;
   }
+
+  useEffect(() => {
+    allUsers();
+  }, []);
 
   if (redux_user.isAdminLogin)
     return (
@@ -56,9 +63,7 @@ function Admin({
               <AdminDashboard newNotification={newNotification} />
             </Route>
             <Route exact path="/admin/requests">
-              <div className="container">
-                <p>Requests</p>
-              </div>
+              <AdminRequests newNotification={newNotification} />
             </Route>
             <Route path="/admin/settings">
               <Settings newNotification={newNotification} />
