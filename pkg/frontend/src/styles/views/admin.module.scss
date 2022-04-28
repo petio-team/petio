@@ -343,23 +343,126 @@
 
 .requests {
   &__title {
-    margin-bottom: 30px;
+    margin-bottom: #{$spacing * 6};
   }
 
   &__table {
-    thead {
-      th {
-        background: $grey;
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    display: flex;
+    flex-wrap: wrap;
+
+    &__tr {
+      display: flex;
+      width: 100%;
+      margin-bottom: #{$spacing * 1};
+
+      &__header {
+        display: flex;
+        width: 100%;
+        margin-bottom: #{$spacing * 3};
+      }
+    }
+
+    // th,
+    // td {
+    //   display: flex;
+    // }
+
+    &__th {
+      background: $grey;
+
+      padding: 10px;
+      text-align: left;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      width: 10%;
+      overflow: hidden;
+
+      &:nth-child(1) {
+        width: 20%;
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+      }
+
+      &:nth-child(2) {
+        width: 20%;
+      }
+
+      &:last-child {
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+      }
+    }
+
+    &__td {
+      width: 10%;
+      overflow: hidden;
+      background: $grey;
+      padding: 20px 10px;
+
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+
+      &:nth-child(1) {
+        padding: 0;
+        width: 20%;
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+        display: block;
+      }
+
+      &:nth-child(2) {
+        width: 20%;
+      }
+
+      &:last-child {
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
       }
     }
   }
 
   &__item {
+    width: 100%;
+
     &__img {
-      width: 200px;
-      height: 100px;
+      width: 100%;
+      height: 100%;
       overflow: hidden;
       position: relative;
+      background: rgba($white, 0.1);
+
+      p {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 90%;
+        height: 100%;
+        z-index: 3;
+        display: flex;
+        align-items: flex-end;
+        padding: 10px;
+      }
+
+      &:after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba($black, 0.3);
+        z-index: 2;
+      }
+
+      &__wrap {
+        width: 100%;
+      }
 
       &__image {
         position: absolute;
@@ -380,17 +483,32 @@
         height: calc(100% - 30px);
         object-fit: contain;
         object-position: center;
-        z-index: 2;
+        z-index: 3;
       }
     }
 
     &__usr {
-      width: 50px;
-      height: 50px;
+      width: 40px;
+      height: 40px;
       border-radius: 100%;
       overflow: hidden;
       position: relative;
       margin: 0 10px 10px 0;
+      background: rgba($white, 0.2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      p {
+        font-size: 20px;
+        line-height: 1;
+        font-weight: 700;
+      }
+
+      &__wrap {
+        display: flex;
+        flex-wrap: wrap;
+      }
 
       &__image {
         position: absolute;
@@ -402,5 +520,184 @@
         object-position: center;
       }
     }
+
+    &__status {
+      &__item {
+        font-size: 12px;
+        line-height: 1;
+        font-weight: 700;
+        background: rgba($white, 0.3);
+        border-radius: 5px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 10px 10px 0;
+        padding: 5px;
+
+        &__good {
+          background: $green;
+          color: darken($green, 30);
+        }
+
+        &__bad {
+          background: $red;
+          color: darken($red, 30);
+        }
+
+        &__sonarr,
+        &__blue {
+          background: $blue;
+          color: darken($blue, 30);
+        }
+
+        &__radarr {
+          background: $black;
+          color: $orange;
+        }
+
+        &__orange {
+          background: $orange;
+          color: darken($orange, 30);
+        }
+
+        &__cinema {
+          background: $purple;
+          color: darken($purple, 30);
+        }
+      }
+    }
+
+    &__approved {
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      line-height: 1;
+      font-weight: 700;
+      border-radius: 100%;
+
+      &__yes {
+        background: $green;
+        color: darken($green, 30);
+      }
+
+      &__no {
+        background: $red;
+        color: darken($red, 30);
+      }
+    }
+
+    &__edit {
+      appearance: none;
+      border: none;
+      background: none;
+      color: $orange;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    &__child {
+      margin-top: #{$spacing * -0.5};
+      background: lighten($grey, 5);
+      margin-bottom: #{$spacing * 2};
+      border-radius: 5px;
+      padding: 10px 10px 0 10px;
+      display: flex;
+      flex-wrap: wrap;
+
+      &__server,
+      &__quality,
+      &__status,
+      &__eta {
+        padding-right: 50px;
+      }
+
+      &__info {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+
+        p {
+          // width: 50%;
+          padding: 0 50px 10px 0;
+        }
+      }
+
+      &__progress {
+        padding: 10px 0;
+        width: 100%;
+
+        &__bar {
+          width: 300px;
+          max-width: 100%;
+          height: 5px;
+          border-radius: 2.5px;
+          background: lighten($grey, 10);
+          position: relative;
+        }
+
+        &__state {
+          &__downloading,
+          &__Downloading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: $orange;
+            transition: width 0.3s ease, background 1s ease;
+            border-radius: 5px;
+            background: repeating-linear-gradient(
+              45deg,
+              $orange,
+              $orange 5px,
+              darken($orange, 12) 5px,
+              darken($orange, 12) 10px
+            );
+            background-size: 57px 100%;
+            animation: progress 1s linear infinite;
+          }
+
+          &__paused {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            transition: width 0.3s ease, background 1s ease;
+            border-radius: 5px;
+            background: $blue;
+            background: repeating-linear-gradient(
+              45deg,
+              $blue,
+              $blue 5px,
+              darken($blue, 12) 5px,
+              darken($blue, 12) 10px
+            );
+            background-size: 57px 100%;
+          }
+
+          &__complete,
+          &__downloaded {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            transition: width 0.3s ease, background 1s ease;
+            border-radius: 5px;
+            background: $green;
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes progress {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: 57px;
   }
 }

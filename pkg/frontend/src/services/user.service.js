@@ -36,9 +36,9 @@ export async function login(user, token = false) {
   }
 }
 
-export async function getRequests() {
+export async function getRequests(min = true) {
   try {
-    const data = await get("/request/min");
+    const data = await get(`/request/${min ? "min" : "all"}`);
     updateStore({ type: "user/update-requests", requests: data });
     return data;
   } catch (e) {

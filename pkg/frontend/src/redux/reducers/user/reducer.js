@@ -37,6 +37,16 @@ export default function (
         isAdminLogin: false,
       };
     case "user/update-requests":
+      const existing = state.requests;
+      if (existing)
+        Object.keys(action.requests).forEach((key) => {
+          if (existing[key]) {
+            action.requests[key] = {
+              ...existing[key],
+              ...action.requests[key],
+            };
+          }
+        });
       return { ...state, requests: action.requests };
     case "user/my-requests":
       return { ...state, myRequests: action.requests };

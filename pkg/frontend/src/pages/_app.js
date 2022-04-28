@@ -44,7 +44,6 @@ import PwaInstall from "../components/pwaInstall";
 import PwaAndroid from "../components/pwaAndroid";
 import { getMobileOperatingSystem } from "../helpers/getOs";
 import MyAccount from "./myAccount";
-// import Modal from "../components/modal";
 
 const mapStateToProps = (state) => {
   return {
