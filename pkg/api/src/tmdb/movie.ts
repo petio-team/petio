@@ -254,10 +254,19 @@ async function reviewsData(id) {
 function findEnLogo(logos) {
   let logoUrl = false;
   logos.forEach((logo) => {
-    if (logo.lang === "en" && !logoUrl) {
+    // For some reason fanart defaults to this obscure logo sometimes so lets exclude it
+    if (
+      logo.lang === "en" &&
+      !logoUrl &&
+      logo.url !==
+        "https://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png" &&
+      logo.url !==
+        "http://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png"
+    ) {
       logoUrl = logo.url;
     }
   });
+
   return logoUrl;
 }
 

@@ -330,7 +330,9 @@ function findEnLogo(logos) {
       logo.lang === "en" &&
       !logoUrl &&
       logo.url !==
-        "https://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png"
+        "https://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png" &&
+      logo.url !==
+        "http://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png"
     ) {
       logoUrl = logo.url;
     }
