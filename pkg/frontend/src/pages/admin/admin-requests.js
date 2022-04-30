@@ -7,7 +7,7 @@ import typo from "../../styles/components/typography.module.scss";
 import modal from "../../styles/components/modal.module.scss";
 import { Link } from "react-router-dom";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import { getRequests } from "../../services/user.service";
+import { deleteRequest, getRequests } from "../../services/user.service";
 
 const mapStateToProps = (state) => {
   return {
@@ -18,10 +18,17 @@ const mapStateToProps = (state) => {
   };
 };
 
-function AdminRequests({ requests, redux_movies, redux_tv, redux_users }) {
+function AdminRequests({
+  requests,
+  redux_movies,
+  redux_tv,
+  redux_users,
+  newNotification,
+}) {
   const [activeRequests, setActiveRequests] = useState([]);
   const [requestsLookup, setRequestsLookup] = useState(false);
   const [requestEdit, setRequestEdit] = useState(false);
+  const [requestsToRemove, setRequestsToRemove] = useState([]);
 
   useEffect(() => {
     getRequests(false);
@@ -74,6 +81,26 @@ function AdminRequests({ requests, redux_movies, redux_tv, redux_users }) {
     // eslint-disable-next-line
   }, [requests]);
 
+  async function removeReq(request, reason = false) {
+    if (!request) return;
+    try {
+      setRequestsToRemove([...requestsToRemove, request.id]);
+      await deleteRequest(request, reason);
+      getRequests();
+      setRequestEdit(false);
+      newNotification({
+        type: "success",
+        message: `Request: ${request.title} removed`,
+      });
+    } catch (e) {
+      newNotification({
+        type: "error",
+        message: `Failed to remove request: ${request.title}`,
+      });
+      console.log(e);
+    }
+  }
+
   return (
     <>
       <div className="container">
@@ -91,6 +118,8 @@ function AdminRequests({ requests, redux_movies, redux_tv, redux_users }) {
               redux_movies={redux_movies}
               redux_tv={redux_tv}
               setRequestEdit={setRequestEdit}
+              removeReq={removeReq}
+              requestsToRemove={requestsToRemove}
             />
           )}
         </div>
@@ -108,6 +137,8 @@ function ActiveRequestsTable({
   redux_movies,
   redux_tv,
   setRequestEdit,
+  removeReq,
+  requestsToRemove,
 }) {
   if (!requests) return null;
 
@@ -140,7 +171,11 @@ function ActiveRequestsTable({
   return (
     <div className={styles.requests__table}>
       <div className={styles.requests__table__tr__header}>
-        <div className={styles.requests__table__th}></div>
+        <div
+          className={`${styles.requests__table__th} ${typo.body} ${typo.bold}`}
+        >
+          Request
+        </div>
         <div
           className={`${styles.requests__table__th} ${typo.body} ${typo.bold}`}
         >
@@ -195,7 +230,11 @@ function ActiveRequestsTable({
         }
         return (
           <div
-            className={styles.requests__item}
+            className={`${styles.requests__item} ${
+              requestsToRemove && requestsToRemove.includes(request.id)
+                ? styles.requests__item__tbr
+                : ""
+            }`}
             key={`request_item_${request.type}_${request.id}`}
           >
             <div className={styles.requests__table__tr}>
@@ -318,6 +357,12 @@ function ActiveRequestsTable({
                 >
                   Edit
                 </button>
+                <button
+                  className={`${styles.requests__item__delete} ${typo.small} ${typo.uppercase} ${typo.medium}`}
+                  onClick={() => removeReq(request)}
+                >
+                  Delete
+                </button>
               </div>
             </div>
             <RequestChildren request={request} />
@@ -345,8 +390,6 @@ function RequestChildren({ request }) {
           return server.status.map((child, row) => {
             if (!child || ids.includes(child.downloadId)) return null;
             ids.push(child.downloadId);
-            console.log(child);
-            // return <p key={`child__${child.id}`}>{child.title}</p>;
             let prog = (child.sizeleft / child.size - 1) * -1 * 100;
             return (
               <div className={styles.requests__item__child}>

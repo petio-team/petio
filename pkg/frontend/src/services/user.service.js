@@ -127,6 +127,10 @@ export async function allUsers() {
   }
 }
 
+export function deleteRequest(request, reason) {
+  return post(`/request/remove`, { request, reason });
+}
+
 function updateStore(data = false) {
   if (!data) return false;
   return store.dispatch(data);
