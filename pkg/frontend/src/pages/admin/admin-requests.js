@@ -947,7 +947,7 @@ function RequestModal({
                     <p className={`${typo.body}`}>No Radarr Servers</p>
                   )}
                   {request.approved ? null : (
-                    <p style={{ margin: 0 }}>
+                    <p className={`${typo.small} ${typo.bold}`}>
                       Submitting will also immediately approve this request
                     </p>
                   )}
