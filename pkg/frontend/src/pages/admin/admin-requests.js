@@ -12,6 +12,7 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 import { deleteRequest, getRequests } from "../../services/user.service";
 import { ReactComponent as ArrowIcon } from "../../assets/svg/arrow.svg";
 import { ReactComponent as WarningIcon } from "../../assets/svg/warning.svg";
+import { ReactComponent as Spinner } from "../../assets/svg/spinner.svg";
 import {
   getRadarr,
   getRadarrOptions,
@@ -41,9 +42,15 @@ function AdminRequests({
   const [requestsToRemove, setRequestsToRemove] = useState([]);
   const [radarrServers, setRadarrServers] = useState([]);
   const [sonarrServers, setSonarrServers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingArr, setLoadingArr] = useState(true);
 
   useEffect(() => {
-    getRequests(false);
+    async function init() {
+      await getRequests(false);
+      setLoading(false);
+    }
+    init();
     const heartbeat = setInterval(() => getRequests(false), 60000);
     return () => {
       clearInterval(heartbeat);
@@ -72,6 +79,7 @@ function AdminRequests({
         }
         setRadarrServers(radarr);
         setSonarrServers(sonarr);
+        setLoadingArr(false);
 
         // processServers();
       } catch (err) {
@@ -192,6 +200,7 @@ function AdminRequests({
               setRequestEdit={setRequestEdit}
               removeReq={removeReq}
               requestsToRemove={requestsToRemove}
+              loading={loading || loadingArr}
             />
           )}
         </div>
@@ -216,6 +225,7 @@ function ActiveRequestsTable({
   setRequestEdit,
   removeReq,
   requestsToRemove,
+  loading,
 }) {
   const [sortValue, setSortValue] = useState({
     sortBy: "status",
@@ -449,6 +459,15 @@ function ActiveRequestsTable({
             }`}
             key={`request_item_${request.type}_${request.id}`}
           >
+            <div
+              className={
+                !loading || request.children
+                  ? `${styles.requests__item__loading__icon} ${styles.requests__item__loading__icon__hide}`
+                  : styles.requests__item__loading__icon
+              }
+            >
+              <Spinner />
+            </div>
             <div className={styles.requests__table__tr}>
               <div className={styles.requests__table__td}>
                 <Link
@@ -750,7 +769,7 @@ function RequestModal({
     }
     setRadarr(edit_radarr);
     setSonarr(edit_sonarr);
-  }, [request]);
+  }, [request, sonarrServers, radarrServers]);
 
   function statusChange(e) {
     const target = e.target;

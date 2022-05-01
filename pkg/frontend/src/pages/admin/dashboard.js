@@ -44,6 +44,7 @@ function AdminDashboard({ requests, redux_movies, redux_tv }) {
         });
       }
     });
+    data.reverse();
     setActiveRequests(data);
   }, [redux_movies, redux_tv, requests]);
 
