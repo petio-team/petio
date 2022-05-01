@@ -74,6 +74,10 @@ export async function addNewRequest(req, user) {
   return post("/request/add", { request: req, user });
 }
 
+export function updateRequest(request, servers) {
+  return post(`/request/update`, { request, servers });
+}
+
 export async function saveReview(item, id, review) {
   let itemMin = {
     title: item.title ? item.title : item.name,

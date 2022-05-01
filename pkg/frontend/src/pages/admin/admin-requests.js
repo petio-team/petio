@@ -9,7 +9,11 @@ import modal from "../../styles/components/modal.module.scss";
 import buttons from "../../styles/components/button.module.scss";
 import { Link } from "react-router-dom";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import { deleteRequest, getRequests } from "../../services/user.service";
+import {
+  deleteRequest,
+  getRequests,
+  updateRequest,
+} from "../../services/user.service";
 import { ReactComponent as ArrowIcon } from "../../assets/svg/arrow.svg";
 import { ReactComponent as WarningIcon } from "../../assets/svg/warning.svg";
 import { ReactComponent as Spinner } from "../../assets/svg/spinner.svg";
@@ -113,6 +117,7 @@ function AdminRequests({
   }, []);
 
   useEffect(() => {
+    console.log(requests);
     let data = [];
     if (!requests) return;
     Object.keys(requests).forEach((id) => {
@@ -181,6 +186,61 @@ function AdminRequests({
     }
   }
 
+  async function updateReq(request, sonarr, radarr) {
+    try {
+      let servers = {};
+      let type_server = {};
+      if (request.type === "tv") {
+        type_server = sonarr;
+      } else {
+        type_server = radarr;
+      }
+      if (Object.keys(type_server).length > 0) {
+        Object.keys(type_server).foreEach((r) => {
+          let server = type_server[r];
+          if (server.active) {
+            if (server.profile && server.path) {
+              servers[r] = server;
+            } else {
+              throw "Missing Path / Profile";
+            }
+          }
+        });
+      }
+
+      if (request.type === "tv" && servers && !request.tvdb_id) {
+        throw "No TVDb ID Cannot add to Sonarr";
+      }
+
+      if (request.type === "movie" && servers && !request.tmdb_id) {
+        throw "No TMDb ID Cannot add to Radarr";
+      }
+
+      let title = request.title;
+      let approved = request.approved;
+
+      try {
+        await updateRequest(request, servers);
+        setRequestEdit(false);
+        getRequests(false);
+        newNotification({
+          type: "success",
+          message: approved
+            ? `Request Updated: ${title}`
+            : `Request Approved: ${title}`,
+        });
+      } catch (e) {
+        console.log(e);
+        throw "Error updating request";
+      }
+    } catch (e) {
+      newNotification({
+        type: "error",
+        message: e,
+      });
+    }
+  }
+
   return (
     <>
       <div className="container">
@@ -211,6 +271,7 @@ function AdminRequests({
           setRequestEdit={setRequestEdit}
           radarrServers={radarrServers}
           sonarrServers={sonarrServers}
+          updateReq={updateReq}
         />
       ) : null}
     </>
@@ -690,9 +751,14 @@ function RequestModal({
   setRequestEdit,
   sonarrServers,
   radarrServers,
+  updateReq,
 }) {
   const [radarr, setRadarr] = useState({});
   const [sonarr, setSonarr] = useState({});
+  const [hasEdited, setHasEdited] = useState(false);
+  const [requestState, setRequestState] = useState(request);
+
+  console.log(requestState);
 
   useEffect(() => {
     let edit_radarr = {};
@@ -769,12 +835,14 @@ function RequestModal({
     }
     setRadarr(edit_radarr);
     setSonarr(edit_sonarr);
+    setRequestState(request);
   }, [request, sonarrServers, radarrServers]);
 
   function statusChange(e) {
     const target = e.target;
     let value = target.value;
-    request.manualStatus = value;
+    setRequestState({ ...requestState, manualStatus: value });
+    setHasEdited(true);
   }
 
   function changeServerSettings(e) {
@@ -801,6 +869,8 @@ function RequestModal({
           [name]: value,
         },
       });
+
+    setHasEdited(true);
   }
 
   return (
@@ -849,6 +919,7 @@ function RequestModal({
                       sonarrServers.map((server) => {
                         return (
                           <RenderRequestEdit
+                            key={`req_m_${request.id}_${server.uuid}`}
                             server={server}
                             request={request}
                             type="sonarr"
@@ -865,6 +936,7 @@ function RequestModal({
                     radarrServers.map((server) => {
                       return (
                         <RenderRequestEdit
+                          key={`req_m_${request.id}_${server.uuid}`}
                           server={server}
                           request={request}
                           type="radarr"
@@ -889,7 +961,7 @@ function RequestModal({
               </p>
               <select
                 name="manualStatus"
-                value={request.manualStatus}
+                value={requestState.manualStatus || ""}
                 onChange={statusChange}
                 className={input.select__light}
               >
@@ -903,7 +975,11 @@ function RequestModal({
               </p>
             </>
           ) : null}
-          <button className={`${buttons.primary} ${styles.requestEdit__btn}`}>
+          <button
+            className={`${buttons.primary} ${styles.requestEdit__btn}`}
+            onClick={() => updateReq(requestState, radarr, sonarr)}
+            disabled={hasEdited ? false : true}
+          >
             Update
           </button>
           <button
