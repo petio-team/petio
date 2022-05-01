@@ -357,11 +357,20 @@
       display: flex;
       width: 100%;
       margin-bottom: #{$spacing * 1};
+      flex-wrap: wrap;
+      border-radius: 5px;
+      overflow: hidden;
+
+      @media (min-width: $md) {
+        flex-wrap: nowrap;
+      }
 
       &__header {
         display: flex;
         width: 100%;
         margin-bottom: #{$spacing * 3};
+        border-radius: 5px;
+        overflow: hidden;
       }
     }
 
@@ -405,46 +414,59 @@
 
       &:nth-child(1) {
         width: 20%;
-        border-top-left-radius: 5px;
-        border-bottom-left-radius: 5px;
+        // border-top-left-radius: 5px;
+        // border-bottom-left-radius: 5px;
       }
 
       &:nth-child(2) {
         width: 20%;
       }
 
-      &:last-child {
-        border-top-right-radius: 5px;
-        border-bottom-right-radius: 5px;
-      }
+      // &:last-child {
+      //   border-top-right-radius: 5px;
+      //   border-bottom-right-radius: 5px;
+      // }
     }
 
     &__td {
-      width: 10%;
       overflow: hidden;
       background: $grey;
       padding: 20px 10px;
-
       min-height: 100px;
       display: flex;
       align-items: center;
       flex-wrap: wrap;
+      width: 33.33%;
+
+      @media (min-width: $md) {
+        width: 10%;
+      }
 
       &:nth-child(1) {
         padding: 0;
-        width: 20%;
-        border-top-left-radius: 5px;
-        border-bottom-left-radius: 5px;
+        width: 50%;
         display: block;
+
+        @media (min-width: $md) {
+          width: 20%;
+          border-top-left-radius: 5px;
+          border-bottom-left-radius: 5px;
+        }
       }
 
       &:nth-child(2) {
-        width: 20%;
+        width: 50%;
+
+        @media (min-width: $md) {
+          width: 20%;
+        }
       }
 
       &:last-child {
-        border-top-right-radius: 5px;
-        border-bottom-right-radius: 5px;
+        @media (min-width: $md) {
+          border-bottom-right-radius: 5px;
+          border-top-right-radius: 5px;
+        }
       }
     }
   }

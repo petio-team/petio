@@ -117,7 +117,6 @@ function AdminRequests({
   }, []);
 
   useEffect(() => {
-    console.log(requests);
     let data = [];
     if (!requests) return;
     Object.keys(requests).forEach((id) => {
@@ -186,7 +185,7 @@ function AdminRequests({
     }
   }
 
-  async function updateReq(request, sonarr, radarr) {
+  async function updateReq(request, radarr, sonarr) {
     try {
       let servers = {};
       let type_server = {};
@@ -196,7 +195,7 @@ function AdminRequests({
         type_server = radarr;
       }
       if (Object.keys(type_server).length > 0) {
-        Object.keys(type_server).foreEach((r) => {
+        Object.keys(type_server).forEach((r) => {
           let server = type_server[r];
           if (server.active) {
             if (server.profile && server.path) {
@@ -757,8 +756,6 @@ function RequestModal({
   const [sonarr, setSonarr] = useState({});
   const [hasEdited, setHasEdited] = useState(false);
   const [requestState, setRequestState] = useState(request);
-
-  console.log(requestState);
 
   useEffect(() => {
     let edit_radarr = {};
