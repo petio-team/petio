@@ -45,6 +45,7 @@ export async function showLookup(id, minified = false) {
         imdb_data,
         fanart,
         recommendations,
+        similar,
         seasonsLookup,
         reviews,
         onPlex,
@@ -52,6 +53,7 @@ export async function showLookup(id, minified = false) {
         !minified && external.imdb_id ? imdb(external.imdb_id) : false,
         minified ? false : fanartLookup(external.tvdb_id, "tv"),
         !minified ? getRecommendations(id) : false,
+        !minified ? getSimilar(id) : false,
         !minified ? getSeasons(show.seasons, id) : false,
         !minified ? getReviews(id) : false,
         onServer("show", external.imdb_id, external.tvdb_id, id),
@@ -98,7 +100,11 @@ export async function showLookup(id, minified = false) {
           });
           seasonData[season.season_number] = season;
         });
-        if (recommendations.results.length === 0) {
+
+        if (
+          recommendations.results.length === 0 &&
+          similar.results.length === 0
+        ) {
           let params: any = {};
           if (show.genres) {
             let genres = "";
@@ -114,6 +120,15 @@ export async function showLookup(id, minified = false) {
           Object.keys(recommendations.results).map((key) => {
             let recommendation = recommendations.results[key];
             if (recommendation.id !== parseInt(id))
+              recommendationsData.push(recommendation.id);
+          });
+        if (similar)
+          Object.keys(similar.results).map((key) => {
+            let recommendation = similar.results[key];
+            if (
+              recommendation.id !== parseInt(id) &&
+              !recommendationsData.includes(recommendation.id)
+            )
               recommendationsData.push(recommendation.id);
           });
         show.seasonData = seasonData;
@@ -211,6 +226,21 @@ export async function getRecommendations(id, page = 1) {
   return data;
 }
 
+export async function getSimilar(id, page = 1) {
+  let data = false;
+  try {
+    data = await memoryCache.wrap(`similar_${id}__${page}`, async function () {
+      return await similarData(id, page);
+    });
+  } catch (err) {
+    logger.warn(`Error getting similar data - ${id}`, {
+      label: "tmdb.show",
+    });
+    logger.error(err, { label: "tmdb.show" });
+  }
+  return data;
+}
+
 async function getReviews(id) {
   let data = false;
   try {
@@ -275,6 +305,18 @@ async function tmdbData(id) {
 }
 
 async function recommendationData(id, page = 1) {
+  const tmdb = "https://api.themoviedb.org/3/";
+  let url = `${tmdb}tv/${id}/recommendations?api_key=${tmdbApiKey}&page=${page}`;
+
+  try {
+    let res = await axios.get(url, { httpAgent: agent });
+    return res.data;
+  } catch (err) {
+    throw err;
+  }
+}
+
+async function similarData(id, page = 1) {
   const tmdb = "https://api.themoviedb.org/3/";
   let url = `${tmdb}tv/${id}/similar?api_key=${tmdbApiKey}&page=${page}`;
 

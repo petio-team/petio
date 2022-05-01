@@ -47,16 +47,23 @@ export async function movieLookup(id, minified = false) {
     }
     try {
       let collectionData: any = false;
-      let [onPlex, recommendations, imdb_data, collection, reviews]: any =
-        await Promise.all([
-          onServer("movie", movie.imdb_id, false, id),
-          getRecommendations(id),
-          !minified && movie.imdb_id ? lookup(movie.imdb_id) : false,
-          !minified && movie.belongs_to_collection
-            ? getCollection(movie.belongs_to_collection.id)
-            : false,
-          !minified ? getReviews(id) : false,
-        ]);
+      let [
+        onPlex,
+        recommendations,
+        similar,
+        imdb_data,
+        collection,
+        reviews,
+      ]: any = await Promise.all([
+        onServer("movie", movie.imdb_id, false, id),
+        getRecommendations(id),
+        getSimilar(id),
+        !minified && movie.imdb_id ? lookup(movie.imdb_id) : false,
+        !minified && movie.belongs_to_collection
+          ? getCollection(movie.belongs_to_collection.id)
+          : false,
+        !minified ? getReviews(id) : false,
+      ]);
 
       let recommendationsData: any = [];
       movie.on_server = onPlex.exists;
@@ -64,7 +71,10 @@ export async function movieLookup(id, minified = false) {
       movie.imdb_data = imdb_data;
       movie.reviews = reviews.results;
       if (!minified) {
-        if (recommendations.results.length === 0) {
+        if (
+          recommendations.results.length === 0 &&
+          similar.results.length === 0
+        ) {
           let params: any = {};
           if (movie.genres) {
             let genres = "";
@@ -77,13 +87,21 @@ export async function movieLookup(id, minified = false) {
           recommendations = await discoverMovie(1, params);
         }
       }
-      if (recommendations.results) {
+      if (recommendations)
         Object.keys(recommendations.results).map((key) => {
           let recommendation = recommendations.results[key];
           if (recommendation.id !== parseInt(id))
             recommendationsData.push(recommendation.id);
         });
-      }
+      if (similar)
+        Object.keys(similar.results).map((key) => {
+          let recommendation = similar.results[key];
+          if (
+            recommendation.id !== parseInt(id) &&
+            !recommendationsData.includes(recommendation.id)
+          )
+            recommendationsData.push(recommendation.id);
+        });
       if (!minified && movie.belongs_to_collection) {
         collectionData = [];
         collection.parts.map((part) => {
@@ -168,6 +186,21 @@ export async function getRecommendations(id, page = 1) {
   return data;
 }
 
+export async function getSimilar(id, page = 1) {
+  let data = false;
+  try {
+    data = await memoryCache.wrap(`similar_${id}_${page}`, async function () {
+      return await similarData(id, page);
+    });
+  } catch (err) {
+    logger.warn(`Error getting movie recommendations - ${id}`, {
+      label: "tmdb.movie",
+    });
+    logger.error(err, { label: "tmdb.movie" });
+  }
+  return data;
+}
+
 async function getReviews(id) {
   let data = false;
   try {
@@ -216,6 +249,17 @@ async function tmdbData(id) {
 }
 
 async function recommendationData(id, page = 1) {
+  const tmdb = "https://api.themoviedb.org/3/";
+  let url = `${tmdb}movie/${id}/recommendations?api_key=${tmdbApiKey}&page=${page}&append_to_response=videos`;
+  try {
+    let res = await axios.get(url, { httpAgent: agent });
+    return res.data;
+  } catch (err) {
+    throw err;
+  }
+}
+
+async function similarData(id, page = 1) {
   const tmdb = "https://api.themoviedb.org/3/";
   let url = `${tmdb}movie/${id}/similar?api_key=${tmdbApiKey}&page=${page}&append_to_response=videos`;
   try {
