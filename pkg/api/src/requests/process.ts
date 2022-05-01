@@ -293,7 +293,7 @@ export default class processRequest {
           let serverUuid = Object.keys(radarrIds)[0];
           let server = new Radarr(serverUuid);
           try {
-            server.remove(rId);
+            await server.remove(rId);
             logger.info(
               `REQ: ${this.request.title} removed from Radarr server - ${serverUuid}`,
               { label: "requests.process" }
@@ -312,7 +312,7 @@ export default class processRequest {
           let sId = sonarrIds[Object.keys(sonarrIds)[0]];
           let serverUuid = Object.keys(sonarrIds)[0];
           try {
-            new Sonarr().remove(serverUuid, sId);
+            await new Sonarr().remove(serverUuid, sId);
             logger.info(
               `REQ: ${this.request.title} removed from Sonarr server - ${serverUuid}`,
               { label: "requests.process" }

@@ -50,19 +50,28 @@ export default class Radarr {
     apiurl.search = prms.toString();
 
     try {
-      if (method === "post" && body) {
-        let res = await axios.post(apiurl.toString(), body);
-        if (typeof res.data !== "object") {
-          return Error("not a valid object");
-        }
-        return res.data;
-      } else {
-        let res = await axios.get(apiurl.toString());
-        if (typeof res.data !== "object") {
-          return Error("not a valid object");
-        }
-        return res.data;
+      let res;
+      switch (method) {
+        case "post":
+          res = await axios.post(apiurl.toString(), body);
+          break;
+        case "get":
+          res = await axios.get(apiurl.toString());
+          break;
+        case "delete":
+          res = await axios.delete(apiurl.toString(), body);
+          break;
+        case "put":
+          res = await axios.put(apiurl.toString(), body);
+          break;
+        default:
+          res = await axios.get(apiurl.toString());
       }
+
+      if (!res.data || typeof res.data !== "object") {
+        return Error("not a valid object");
+      }
+      return res.data;
     } catch (err) {
       throw err;
     }
