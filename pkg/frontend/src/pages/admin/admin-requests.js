@@ -103,11 +103,13 @@ function AdminRequests({
         return {
           profiles: settings.profiles,
           paths: settings.paths,
+          languages: settings.languages,
         };
       } catch {
         return {
           profiles: false,
           paths: false,
+          languages: false,
         };
       }
     }
@@ -198,10 +200,10 @@ function AdminRequests({
         Object.keys(type_server).forEach((r) => {
           let server = type_server[r];
           if (server.active) {
-            if (server.profile && server.path) {
+            if (server.profile && server.path && server.language) {
               servers[r] = server;
             } else {
-              throw "Missing Path / Profile";
+              throw "Missing Path / Profile / Language";
             }
           }
         });
@@ -1091,6 +1093,40 @@ function RenderRequestEdit({
                     value={path.path}
                   >
                     {path.path}
+                  </option>
+                );
+              })
+            ) : (
+              <option value=""></option>
+            )}
+          </select>
+
+          <p className={`${typo.body} ${styles.requestEdit__label}`}>
+            Language
+          </p>
+          <select
+            className={input.select__light}
+            data-type={type}
+            data-id={server.uuid}
+            name="language"
+            data-value={
+              edit[type][server.uuid] ? edit[type][server.uuid].language : false
+            }
+            value={
+              edit[type][server.uuid] ? edit[type][server.uuid].language : false
+            }
+            onChange={changeServerSettings}
+            disabled={!editable}
+          >
+            <option value="">Please choose</option>
+            {server.options.languages ? (
+              server.options.languages.map((lang) => {
+                return (
+                  <option
+                    key={`${type}_profile_${server.uuid}_${lang.id}`}
+                    value={lang.id}
+                  >
+                    {lang.name}
                   </option>
                 );
               })

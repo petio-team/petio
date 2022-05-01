@@ -105,14 +105,12 @@ export default function SettingsArr(props) {
           },
         });
       } else if (name === "language") {
-        const language = options.languages.filter(
-          (o) => o.language.id == value
-        );
+        const language = options.languages.filter((o) => o.id == value);
         setCurrentServer({
           ...currentServer,
           language: {
             id: value,
-            name: language[0].language.name,
+            name: language[0].name,
           },
         });
       } else {
@@ -601,7 +599,8 @@ export default function SettingsArr(props) {
                   <select
                     className={inputs.select__light}
                     name="language"
-                    value={currentServer.language.id || ""}
+                    data-value={currentServer.language.id}
+                    value={currentServer.language.id}
                     onChange={handleChange}
                   >
                     {options.languages && options.languages.length ? (
