@@ -276,7 +276,7 @@ async function tmdbData(id) {
 
 async function recommendationData(id, page = 1) {
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}tv/${id}/recommendations?api_key=${tmdbApiKey}&page=${page}`;
+  let url = `${tmdb}tv/${id}/similar?api_key=${tmdbApiKey}&page=${page}`;
 
   try {
     let res = await axios.get(url, { httpAgent: agent });
