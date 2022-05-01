@@ -31,6 +31,8 @@ function AdminDashboard({ requests, redux_movies, redux_tv }) {
           logo: redux_movies[id].logo || false,
           id: id,
           requestType: "movie",
+          year: redux_movies[id].release_date || "",
+          popularity: redux_movies[id].popularity || 0,
         });
       }
 
@@ -41,10 +43,22 @@ function AdminDashboard({ requests, redux_movies, redux_tv }) {
           logo: redux_tv[id].logo || false,
           id: id,
           requestType: "tv",
+          year: redux_tv[id].first_air_date || "",
+          popularity: redux_tv[id].popularity || 0,
         });
       }
     });
-    data.reverse();
+    console.log(data);
+    function sortRequests(a, b) {
+      if (a.popularity > b.popularity) {
+        return -1;
+      }
+      if (a.popularity < b.popularity) {
+        return 1;
+      }
+      return 0;
+    }
+    data.sort(sortRequests);
     setActiveRequests(data);
   }, [redux_movies, redux_tv, requests]);
 
