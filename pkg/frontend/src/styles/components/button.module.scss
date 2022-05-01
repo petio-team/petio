@@ -37,6 +37,12 @@ $btnWidth: 1.5px;
     padding: 0 20px;
     font-size: 20px;
   }
+
+  &[disabled] {
+    opacity: 0.2;
+    cursor: no-drop;
+    pointer-events: none;
+  }
 }
 
 // Orange
@@ -114,7 +120,7 @@ $btnWidth: 1.5px;
 }
 
 .disabled {
-  opacity: 0.5;
+  opacity: 0.2;
   cursor: no-drop;
   pointer-events: none;
 }
