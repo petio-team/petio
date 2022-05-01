@@ -70,7 +70,7 @@ router.post("/test_mongo", async (req, res) => {
       }
     }
     logger.log("verbose", "Attempting mongo connection");
-    await mongoose.createConnection(mongo + "/petio");
+    await mongoose.connect(mongo + "/petio");
     mongoose.connection.close();
     res.status(200).json({
       status: "connected",
