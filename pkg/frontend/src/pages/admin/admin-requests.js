@@ -4,10 +4,20 @@ import { useEffect, useState } from "react";
 import media from "../../services/media.service";
 import styles from "../../styles/views/admin.module.scss";
 import typo from "../../styles/components/typography.module.scss";
+import input from "../../styles/components/input.module.scss";
 import modal from "../../styles/components/modal.module.scss";
+import buttons from "../../styles/components/button.module.scss";
 import { Link } from "react-router-dom";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { deleteRequest, getRequests } from "../../services/user.service";
+import { ReactComponent as ArrowIcon } from "../../assets/svg/arrow.svg";
+import { ReactComponent as WarningIcon } from "../../assets/svg/warning.svg";
+import {
+  getRadarr,
+  getRadarrOptions,
+  getSonarr,
+  getSonarrOptions,
+} from "../../services/config.service";
 
 const mapStateToProps = (state) => {
   return {
@@ -29,6 +39,8 @@ function AdminRequests({
   const [requestsLookup, setRequestsLookup] = useState(false);
   const [requestEdit, setRequestEdit] = useState(false);
   const [requestsToRemove, setRequestsToRemove] = useState([]);
+  const [radarrServers, setRadarrServers] = useState([]);
+  const [sonarrServers, setSonarrServers] = useState([]);
 
   useEffect(() => {
     getRequests(false);
@@ -36,6 +48,60 @@ function AdminRequests({
     return () => {
       clearInterval(heartbeat);
     };
+  }, []);
+
+  useEffect(() => {
+    async function getArrs() {
+      try {
+        const [radarr, sonarr] = await Promise.all([getRadarr(), getSonarr()]);
+        if (radarr) {
+          await Promise.all(
+            radarr.map(async (server) => {
+              let options = await getArrOptions(server.uuid, "radarr");
+              server.options = options;
+            })
+          );
+        }
+        if (sonarr) {
+          await Promise.all(
+            sonarr.map(async (server) => {
+              let options = await getArrOptions(server.uuid, "sonarr");
+              server.options = options;
+            })
+          );
+        }
+        setRadarrServers(radarr);
+        setSonarrServers(sonarr);
+
+        // processServers();
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    async function getArrOptions(uuid, type) {
+      try {
+        let settings =
+          type === "radarr"
+            ? await getRadarrOptions(uuid)
+            : await getSonarrOptions(uuid);
+        if (settings.profiles.error || settings.paths.error) {
+          return;
+        }
+        return {
+          profiles: settings.profiles,
+          paths: settings.paths,
+        };
+      } catch {
+        return {
+          profiles: false,
+          paths: false,
+        };
+      }
+    }
+
+    getArrs();
+    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
@@ -48,6 +114,9 @@ function AdminRequests({
           ...item,
           id: id,
           requestType: "movie",
+          year: redux_movies[id]
+            ? new Date(redux_movies[id].release_date).getFullYear()
+            : "unknown",
         });
       }
 
@@ -56,6 +125,9 @@ function AdminRequests({
           ...item,
           id: id,
           requestType: "tv",
+          year: redux_tv[id]
+            ? new Date(redux_tv[id].first_air_date).getFullYear()
+            : "unknown",
         });
       }
     });
@@ -125,7 +197,12 @@ function AdminRequests({
         </div>
       </div>
       {requestEdit ? (
-        <RequestModal request={requestEdit} setRequestEdit={setRequestEdit} />
+        <RequestModal
+          request={requestEdit}
+          setRequestEdit={setRequestEdit}
+          radarrServers={radarrServers}
+          sonarrServers={sonarrServers}
+        />
       ) : null}
     </>
   );
@@ -140,7 +217,85 @@ function ActiveRequestsTable({
   removeReq,
   requestsToRemove,
 }) {
+  const [sortValue, setSortValue] = useState({
+    sortBy: "status",
+    dir: "DESC",
+  });
+
   if (!requests) return null;
+
+  function sortBy(a, b) {
+    let sortVal = sortValue.sortBy;
+    let av = a[sortVal];
+    let bv = b[sortVal];
+    if (sortVal === "status") {
+      av = a.process_stage ? a.process_stage.message : 0;
+      bv = b.process_stage ? b.process_stage.message : 0;
+      if (
+        a.type === "movie" &&
+        a.children &&
+        a.process_stage.message === "In Cinemas"
+      ) {
+        av = "__0inCinema";
+      }
+      if (
+        b.type === "movie" &&
+        b.children &&
+        b.process_stage.message === "In Cinemas"
+      ) {
+        bv = "__0inCinema";
+      }
+      if (
+        a.type === "movie" &&
+        a.children &&
+        a.process_stage.status === "blue"
+      ) {
+        if (a.children[0].info.inCinemas) {
+          av = `__${a.children[0].info.inCinemas}`;
+        }
+      }
+      if (
+        b.type === "movie" &&
+        b.children &&
+        b.process_stage.status === "blue"
+      ) {
+        if (b.children[0].info.inCinemas) {
+          bv = `__${b.children[0].info.inCinemas}`;
+        }
+      }
+      if (a.type === "tv" && a.children && a.process_stage.status === "blue") {
+        if (a.children[0].info.firstAired) {
+          av = `__${a.children[0].info.firstAired}`;
+        }
+      }
+      if (b.type === "tv" && b.children && b.process_stage.status === "blue") {
+        if (b.children[0].info.firstAired) {
+          bv = `__${b.children[0].info.firstAired}`;
+        }
+      }
+    }
+    if (!av) av = "";
+    if (!bv) bv = "";
+    if (typeof av === "string") av = av.toLowerCase();
+    if (typeof bv === "string") bv = bv.toLowerCase();
+    if (av > bv) {
+      return sortValue.dir === "DESC" ? 1 : -1;
+    }
+    if (av < bv) {
+      return sortValue.dir === "DESC" ? -1 : 1;
+    }
+    return 0;
+  }
+
+  function sortCol(type) {
+    if (!type) return;
+    let sw = sortValue.sortBy === type ? true : false;
+    let dir = sw ? (sortValue.dir === "DESC" ? "ASC" : "DESC") : "DESC";
+    setSortValue({
+      dir: dir,
+      sortBy: type,
+    });
+  }
 
   function reqState(request) {
     if (!request.process_stage) return null;
@@ -168,6 +323,8 @@ function ActiveRequestsTable({
     return null;
   }
 
+  const requestsSorted = requests.sort(sortBy);
+
   return (
     <div className={styles.requests__table}>
       <div className={styles.requests__table__tr__header}>
@@ -177,34 +334,89 @@ function ActiveRequestsTable({
           Request
         </div>
         <div
-          className={`${styles.requests__table__th} ${typo.body} ${typo.bold}`}
+          className={`${styles.requests__table__th} ${styles.requests__table__th__sortable} ${typo.body} ${typo.bold}`}
+          onClick={() => sortCol("title")}
         >
           Title
+          <ArrowIcon
+            className={`${styles.requests__table__th__arrow}
+              ${
+                sortValue.sortBy !== "title"
+                  ? ""
+                  : sortValue.dir === "DESC"
+                  ? styles.requests__table__th__arrow__down
+                  : styles.requests__table__th__arrow__up
+              }`}
+          />
         </div>
         <div
-          className={`${styles.requests__table__th} ${typo.body} ${typo.bold}`}
+          className={`${styles.requests__table__th} ${styles.requests__table__th__sortable} ${typo.body} ${typo.bold}`}
+          onClick={() => sortCol("year")}
         >
           Year
+          <ArrowIcon
+            className={`${styles.requests__table__th__arrow}
+              ${
+                sortValue.sortBy !== "year"
+                  ? ""
+                  : sortValue.dir === "DESC"
+                  ? styles.requests__table__th__arrow__down
+                  : styles.requests__table__th__arrow__up
+              }`}
+          />
         </div>
         <div
-          className={`${styles.requests__table__th} ${typo.body} ${typo.bold}`}
+          className={`${styles.requests__table__th} ${styles.requests__table__th__sortable} ${typo.body} ${typo.bold}`}
+          onClick={() => sortCol("type")}
         >
           Type
+          <ArrowIcon
+            className={`${styles.requests__table__th__arrow}
+              ${
+                sortValue.sortBy !== "type"
+                  ? ""
+                  : sortValue.dir === "DESC"
+                  ? styles.requests__table__th__arrow__down
+                  : styles.requests__table__th__arrow__up
+              }`}
+          />
         </div>
         <div
-          className={`${styles.requests__table__th} ${typo.body} ${typo.bold}`}
+          className={`${styles.requests__table__th} ${styles.requests__table__th__sortable} ${typo.body} ${typo.bold}`}
+          onClick={() => sortCol("status")}
         >
           Status
+          <ArrowIcon
+            className={`${styles.requests__table__th__arrow}
+              ${
+                sortValue.sortBy !== "status"
+                  ? ""
+                  : sortValue.dir === "DESC"
+                  ? styles.requests__table__th__arrow__down
+                  : styles.requests__table__th__arrow__up
+              }`}
+          />
         </div>
         <div
-          className={`${styles.requests__table__th} ${typo.body} ${typo.bold}`}
+          className={`${styles.requests__table__th} ${styles.requests__table__th__sortable} ${typo.body} ${typo.bold}`}
         >
           User(s)
         </div>
         <div
-          className={`${styles.requests__table__th} ${typo.body} ${typo.bold}`}
+          className={`${styles.requests__table__th} ${styles.requests__table__th__sortable} ${typo.body} ${typo.bold}`}
+          onClick={() => sortCol("approved")}
         >
           Approved
+          <ArrowIcon
+            className={`${styles.requests__table__th__arrow}
+              ${
+                sortValue.sortBy !== "approved"
+                  ? ""
+                  : sortValue.dir === "DESC"
+                  ? styles.requests__table__th__arrow__down
+                  : styles.requests__table__th__arrow__up
+              }`}
+          />
         </div>
         <div
           className={`${styles.requests__table__th} ${typo.body} ${typo.bold}`}
@@ -213,7 +425,7 @@ function ActiveRequestsTable({
         </div>
       </div>
 
-      {requests.map((request) => {
+      {requestsSorted.map((request) => {
         let id = request.id;
         let poster = false;
         let releaseDate = false;
@@ -244,6 +456,12 @@ function ActiveRequestsTable({
                   className={styles.requests__item__img__wrap}
                 >
                   <div className={styles.requests__item__img}>
+                    {!request.tvdb_id ? (
+                      <WarningIcon
+                        className={styles.requests__item__img__warning}
+                        title="TVDb ID not set"
+                      />
+                    ) : null}
                     {logo ? (
                       <LazyLoadImage
                         className={styles.requests__item__img__logo}
@@ -385,7 +603,6 @@ function RequestChildren({ request }) {
     <div className={styles.requests__item__children}>
       {request.children.map((server) => {
         if (server.status.length > 0) {
-          console.log(server);
           let ids = [];
           return server.status.map((child, row) => {
             if (!child || ids.includes(child.downloadId)) return null;
@@ -449,7 +666,124 @@ function RequestChildren({ request }) {
   );
 }
 
-function RequestModal({ request, setRequestEdit }) {
+function RequestModal({
+  request,
+  setRequestEdit,
+  sonarrServers,
+  radarrServers,
+}) {
+  const [radarr, setRadarr] = useState({});
+  const [sonarr, setSonarr] = useState({});
+
+  useEffect(() => {
+    let edit_radarr = {};
+    let edit_sonarr = {};
+    if (!request) return;
+
+    if (request.type === "movie") {
+      if (request.radarrId.length > 0) {
+        request.radarrId.forEach((r, i) => {
+          let uuid = Object.keys(r)[0];
+          let child =
+            request.children && request.children[i]
+              ? request.children[i].info
+              : {};
+          let path = false;
+          if (child.path) {
+            if (child.path.lastIndexOf("/") > 0) {
+              path = child.path.substring(0, child.path.lastIndexOf("/"));
+            } else if (child.path.lastIndexOf("\\") > 0) {
+              path = child.path.substring(0, child.path.lastIndexOf("\\"));
+            }
+          }
+          edit_radarr[uuid] = {
+            active: true,
+            profile: child.qualityProfileId ? child.qualityProfileId : false,
+            path: path,
+          };
+        });
+      } else {
+        if (request.defaults) {
+          Object.keys(request.defaults).forEach((s) => {
+            let uuid = s;
+            let server = request.defaults[s];
+            edit_radarr[uuid] = {
+              active: true,
+              profile: server.profile,
+              path: server.path,
+            };
+          });
+        }
+      }
+    }
+    if (request.type === "tv") {
+      if (request.sonarrId.length > 0) {
+        request.sonarrId.forEach((r, i) => {
+          let uuid = Object.keys(r)[0];
+          let child =
+            request.children && request.children[i]
+              ? request.children[i].info
+              : {};
+          let path = false;
+          if (child.rootFolderPath) {
+            path = child.rootFolderPath.slice(0, -1);
+          }
+          edit_sonarr[uuid] = {
+            active: true,
+            profile: child.qualityProfileId ? child.qualityProfileId : false,
+            path: path,
+          };
+        });
+      } else {
+        if (request.defaults) {
+          Object.keys(request.defaults).forEach((s) => {
+            let uuid = s;
+            let server = request.defaults[s];
+            edit_sonarr[uuid] = {
+              active: true,
+              profile: server.profile,
+              path: server.path,
+            };
+          });
+        }
+      }
+    }
+    setRadarr(edit_radarr);
+    setSonarr(edit_sonarr);
+  }, [request]);
+
+  function statusChange(e) {
+    const target = e.target;
+    let value = target.value;
+    request.manualStatus = value;
+  }
+
+  function changeServerSettings(e) {
+    const target = e.target;
+    const name = target.name;
+    let value = target.type === "checkbox" ? target.checked : target.value;
+    let type = target.dataset.type;
+    let id = target.dataset.id;
+
+    if (type === "radarr")
+      setRadarr({
+        ...radarr,
+        [id]: {
+          ...radarr[id],
+          [name]: value,
+        },
+      });
+
+    if (type === "sonarr")
+      setSonarr({
+        ...sonarr,
+        [id]: {
+          ...sonarr[id],
+          [name]: value,
+        },
+      });
+  }
+
   return (
     <div className={modal.wrap}>
       <div className={modal.main}>
@@ -466,8 +800,233 @@ function RequestModal({ request, setRequestEdit }) {
             Edit Request: {request.title}
           </p>
         </div>
-        <div className={modal.content}>content</div>
+        <div className={modal.content}>
+          {request ? (
+            <>
+              {request.type === "tv" && !request.tvdb_id ? (
+                <p
+                  className={`${typo.body} ${typo.bold} ${styles.warningText}`}
+                >
+                  <WarningIcon /> No TVDb ID
+                </p>
+              ) : null}
+              <p
+                className={`${typo.body} ${typo.bold} ${styles.requestEdit__title}`}
+              >
+                {request.title}
+              </p>
+              {request.type === "tv" && !request.tvdb_id ? (
+                <div className={styles.requestEdit__wrap}>
+                  <p
+                    className={`${typo.body} ${typo.bold} ${styles.warningText}`}
+                  >
+                    <WarningIcon /> Can&apos;t send to DVR without TVDB ID
+                  </p>
+                </div>
+              ) : (
+                <div className={styles.requestEdit__wrap}>
+                  {request.type === "tv" ? (
+                    sonarrServers && sonarrServers.length > 0 ? (
+                      sonarrServers.map((server) => {
+                        return (
+                          <RenderRequestEdit
+                            server={server}
+                            request={request}
+                            type="sonarr"
+                            radarr={radarr}
+                            sonarr={sonarr}
+                            changeServerSettings={changeServerSettings}
+                          />
+                        );
+                      })
+                    ) : (
+                      <p className={`${typo.body}`}>No Sonarr Servers</p>
+                    )
+                  ) : radarrServers && radarrServers.length > 0 ? (
+                    radarrServers.map((server) => {
+                      return (
+                        <RenderRequestEdit
+                          server={server}
+                          request={request}
+                          type="radarr"
+                          radarr={radarr}
+                          sonarr={sonarr}
+                          changeServerSettings={changeServerSettings}
+                        />
+                      );
+                    })
+                  ) : (
+                    <p className={`${typo.body}`}>No Radarr Servers</p>
+                  )}
+                  {request.approved ? null : (
+                    <p style={{ margin: 0 }}>
+                      Submitting will also immediately approve this request
+                    </p>
+                  )}
+                </div>
+              )}
+              <p className={`${typo.body} ${styles.requestEdit__label}`}>
+                Manually Set Status
+              </p>
+              <select
+                name="manualStatus"
+                value={request.manualStatus}
+                onChange={statusChange}
+                className={input.select__light}
+              >
+                <option value="">None</option>
+                <option value="3">Processing</option>
+                <option value="4">Finalising</option>
+                <option value="5">Complete</option>
+              </select>
+              <p className={`${typo.small} ${styles.requestEdit__under}`}>
+                This will only be used for untracked requests
+              </p>
+            </>
+          ) : null}
+          <button className={`${buttons.primary} ${styles.requestEdit__btn}`}>
+            Update
+          </button>
+          <button
+            className={`${buttons.primary__red} ${styles.requestEdit__btn}`}
+            onClick={() => setRequestEdit(false)}
+          >
+            Cancel
+          </button>
+        </div>
       </div>
+    </div>
+  );
+}
+
+function RenderRequestEdit({
+  server,
+  type,
+  request,
+  changeServerSettings,
+  radarr,
+  sonarr,
+}) {
+  let editable = request[`${type}Id`].length === 0;
+  const edit = {
+    radarr: radarr,
+    sonarr: sonarr,
+  };
+
+  return (
+    <div
+      className="request-edit--server--wrap"
+      key={`${type}_server_${server.uuid}`}
+    >
+      <p className={`${typo.body} ${typo.bold} ${styles.requestEdit__server}`}>
+        Server: {server.title}
+      </p>
+      <div>
+        <div className={input.checkboxes__item}>
+          <input
+            data-type={type}
+            data-id={server.uuid}
+            type="checkbox"
+            checked={
+              edit[type][server.uuid] ? edit[type][server.uuid].active : false
+            }
+            name={"active"}
+            onChange={changeServerSettings}
+            disabled={!editable}
+          />
+          <p className={typo.body}>Use this server</p>
+        </div>
+      </div>
+
+      {server.options ? (
+        <>
+          <p className={`${typo.body} ${styles.requestEdit__label}`}>Profile</p>
+
+          <select
+            className={input.select__light}
+            data-type={type}
+            data-id={server.uuid}
+            name="profile"
+            value={
+              edit[type][server.uuid] ? edit[type][server.uuid].profile : false
+            }
+            onChange={changeServerSettings}
+            disabled={!editable}
+          >
+            <option value="">Please choose</option>
+            {server.options.profiles ? (
+              server.options.profiles.map((profile) => {
+                return (
+                  <option
+                    key={`${type}_profile_${server.uuid}_${profile.id}`}
+                    value={profile.id}
+                  >
+                    {profile.name}
+                  </option>
+                );
+              })
+            ) : (
+              <option value=""></option>
+            )}
+          </select>
+          <p className={`${typo.body} ${styles.requestEdit__label}`}>
+            Root Path
+          </p>
+          <select
+            className={input.select__light}
+            data-type={type}
+            data-id={server.uuid}
+            name="path"
+            value={
+              edit[type][server.uuid]?.path
+                ? edit[type][server.uuid]?.path
+                : false
+            }
+            data-value={
+              edit[type][server.uuid]?.path
+                ? edit[type][server.uuid]?.path
+                : false
+            }
+            onChange={changeServerSettings}
+            disabled={!editable}
+          >
+            <option value="">Please choose</option>
+            {server.options.paths ? (
+              server.options.paths.map((path) => {
+                return (
+                  <option
+                    key={`${type}_profile_${server.uuid}_${path.id}`}
+                    value={path.path}
+                  >
+                    {path.path}
+                  </option>
+                );
+              })
+            ) : (
+              <option value=""></option>
+            )}
+          </select>
+        </>
+      ) : (
+        <>
+          <p className={`${typo.body} ${styles.requestEdit__label}`}>Profile</p>
+          <select className={input.select__light} disabled={true}>
+            <option value="">Loading...</option>
+          </select>
+          <p className={`${typo.body} ${styles.requestEdit__label}`}>
+            Root Path
+          </p>
+          <select className={input.select__light} disabled={true}>
+            <option value="">Loading...</option>
+          </select>
+        </>
+      )}
+      {editable ? null : (
+        <p className={`${typo.small} ${styles.requestEdit__under}`}>
+          {`These settings cannot be edited once sent to `}
+          <span style={{ textTransform: "capitalize" }}>{type}</span>
+        </p>
+      )}
     </div>
   );
 }

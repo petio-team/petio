@@ -372,7 +372,6 @@
 
     &__th {
       background: $grey;
-
       padding: 10px;
       text-align: left;
       height: 50px;
@@ -380,6 +379,29 @@
       align-items: center;
       width: 10%;
       overflow: hidden;
+
+      &__sortable {
+        cursor: pointer;
+      }
+
+      &__arrow {
+        margin-left: 15px;
+        transform: rotate(0deg);
+        height: 12px;
+        width: 7px;
+        transition: transform 0.5s ease, opacity 0.5s ease;
+        opacity: 0.2;
+
+        &__down {
+          transform: rotate(90deg);
+          opacity: 1;
+        }
+
+        &__up {
+          transform: rotate(-90deg);
+          opacity: 1;
+        }
+      }
 
       &:nth-child(1) {
         width: 20%;
@@ -441,6 +463,20 @@
       overflow: hidden;
       position: relative;
       background: rgba($white, 0.1);
+
+      &__warning {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        width: 15px;
+        height: 15px;
+        z-index: 5;
+        cursor: help;
+
+        path {
+          fill: $red;
+        }
+      }
 
       p {
         position: absolute;
@@ -704,6 +740,51 @@
         }
       }
     }
+  }
+}
+
+.warningText {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing;
+
+  svg {
+    height: 15px;
+    width: 15px;
+    margin-right: 10px;
+
+    path {
+      fill: $red;
+    }
+  }
+}
+
+.requestEdit {
+  &__title {
+    margin-bottom: #{$spacing * 2};
+  }
+
+  &__wrap {
+    padding-bottom: $spacing;
+    margin-bottom: $spacing;
+    border-bottom: solid 1px $orange;
+  }
+
+  &__server {
+    margin-bottom: $spacing;
+  }
+
+  &__label {
+    margin-top: $spacing;
+    margin-bottom: $spacing;
+  }
+
+  &__under {
+    margin-bottom: $spacing;
+  }
+
+  &__btn {
+    margin-top: #{$spacing * 2};
   }
 }
 

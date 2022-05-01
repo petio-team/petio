@@ -24,6 +24,12 @@
     font-size: 20px;
     padding: 0 20px;
   }
+
+  &[disabled],
+  &.disabled {
+    opacity: 0.2;
+    cursor: no-drop;
+  }
 }
 
 .text {
@@ -161,6 +167,12 @@
 
       &:checked {
         background: $orange;
+      }
+
+      &[disabled],
+      &.disabled {
+        opacity: 0.5;
+        cursor: no-drop;
       }
     }
   }

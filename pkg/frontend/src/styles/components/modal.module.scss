@@ -57,6 +57,12 @@
 .title {
   padding: 10px 20px;
   border-bottom: solid 1px rgba($white, 0.2);
+
+  p {
+    max-width: 80%;
+    white-space: nowrap;
+    overflow: hidden;
+  }
 }
 
 .content {

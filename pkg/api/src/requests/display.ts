@@ -202,7 +202,7 @@ function reqState(req, children) {
               if (diff > 0) {
                 return {
                   status: "blue",
-                  message: `~${calcDate(diff)}`,
+                  message: `${calcDate(diff)}`,
                   step: 3,
                 };
               } else {
@@ -228,7 +228,7 @@ function reqState(req, children) {
               if (diff > 0) {
                 return {
                   status: "blue",
-                  message: `~${calcDate(diff)}`,
+                  message: `${calcDate(diff)}`,
                   step: 3,
                 };
               }
@@ -315,10 +315,11 @@ function calcDate(diff) {
   days = days - months * 31;
   months = months - years * 12;
 
-  var message = "";
-  message += years ? years + " yr " : "";
-  message += months ? months + " m " : "";
-  message += days ? days + " d " : "";
+  var message = "~";
+  message += years ? years + "y " : "";
+  message += months ? months + "m " : "";
+  message += days ? days + "d" : "";
+  if (years) message = "> 1y";
 
   return message;
 }
