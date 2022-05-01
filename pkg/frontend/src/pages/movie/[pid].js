@@ -48,6 +48,7 @@ function Movie({
   const [trailer, setTrailer] = useState(false);
   const { pid } = useParams();
   const movieData = redux_movies[pid];
+  const [collection, setCollection] = useState(false);
 
   useEffect(() => {
     function handleResize() {
@@ -58,6 +59,33 @@ function Movie({
 
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  useEffect(() => {
+    // sort collection
+    if (!movieData) return;
+    const collectionData = movieData.collection;
+    if (!collectionData) return;
+    const collectionRedux = [];
+    collectionData.forEach((id) => {
+      if (!redux_movies[id]) return;
+      if (!redux_movies[id].release_date)
+        redux_movies[id].release_date = "999999999";
+      collectionRedux.push(redux_movies[id]);
+    });
+
+    const collectionSorted = collectionRedux.sort(sortCollection);
+
+    function sortCollection(a, b) {
+      if (a.release_date < b.release_date) {
+        return -1;
+      }
+      if (a.release_date > b.release_date) {
+        return 1;
+      }
+      return 0;
+    }
+    setCollection(collectionSorted);
+  }, [redux_movies, movieData]);
 
   useEffect(() => {
     async function getMovieDetails() {
@@ -462,11 +490,11 @@ function Movie({
         ) : null}
         {movieData &&
         movieData.belongs_to_collection &&
-        movieData.collection &&
-        movieData.collection.length > 0 ? (
+        collection &&
+        collection.length > 0 ? (
           <Carousel
             title={movieData.belongs_to_collection.name}
-            data={movieData.collection}
+            data={collection}
             type="movie"
             key={`${movieData.id}_collection`}
             id={`${movieData.id}_collection`}
