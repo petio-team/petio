@@ -19,8 +19,9 @@ function Search({ searchQuery, searchResults, newNotification }) {
   const history = useHistory();
 
   useEffect(() => {
+    console.log("ran");
     // clearResults()
-    setLoading(true);
+    // setLoading(true);
     async function submitSearch() {
       try {
         await media.search(searchQuery);
@@ -40,6 +41,7 @@ function Search({ searchQuery, searchResults, newNotification }) {
     return () => clearTimeout(to);
     // eslint-disable-next-line
   }, [searchQuery]);
+  console.log(searchResults);
   return (
     <div className={styles.wrap}>
       <Meta title={`Search - ${searchQuery}`} />
@@ -51,6 +53,7 @@ function Search({ searchQuery, searchResults, newNotification }) {
       </div>
 
       {!loading &&
+      searchResults &&
       searchResults.movies.length === 0 &&
       searchResults.shows.length === 0 &&
       searchResults.people.length === 0 &&
@@ -60,7 +63,7 @@ function Search({ searchQuery, searchResults, newNotification }) {
         </div>
       ) : null}
 
-      {!loading && searchResults.movies.length > 0 ? (
+      {!loading && searchResults && searchResults.movies.length > 0 ? (
         <Carousel
           title="Results in Movies"
           data={searchResults.movies}
@@ -69,7 +72,7 @@ function Search({ searchQuery, searchResults, newNotification }) {
           id="search_m"
         />
       ) : null}
-      {!loading && searchResults.shows.length > 0 ? (
+      {!loading && searchResults && searchResults.shows.length > 0 ? (
         <Carousel
           title="Results in TV"
           data={searchResults.shows}
@@ -78,7 +81,7 @@ function Search({ searchQuery, searchResults, newNotification }) {
           id="search_tv"
         />
       ) : null}
-      {!loading && searchResults.people.length > 0 ? (
+      {!loading && searchResults && searchResults.people.length > 0 ? (
         <Carousel
           title="Results in people"
           data={searchResults.people}
@@ -87,7 +90,7 @@ function Search({ searchQuery, searchResults, newNotification }) {
           id="search_p"
         />
       ) : null}
-      {!loading && searchResults.companies.length > 0 ? (
+      {!loading && searchResults && searchResults.companies.length > 0 ? (
         <Carousel
           title="Results in studios"
           data={searchResults.companies}

@@ -239,6 +239,11 @@ async function getDiscovery(type = "movies") {
 }
 
 function searchUpdate(q) {
+  if (!q || q.length === 0)
+    updateStore({
+      type: "search/results",
+      data: false,
+    });
   updateStore({ type: "search/update", query: q });
   return;
 }

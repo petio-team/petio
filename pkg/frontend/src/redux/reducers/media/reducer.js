@@ -9,13 +9,7 @@ export default function (
       tv: [],
     },
     searchQuery: "",
-    searchResults: {
-      movies: [],
-      shows: [],
-      people: [],
-      companies: [],
-      networks: [],
-    },
+    searchResults: false,
     featured: false,
   },
   action
