@@ -19,7 +19,6 @@ function Search({ searchQuery, searchResults, newNotification }) {
   const history = useHistory();
 
   useEffect(() => {
-    console.log("ran");
     // clearResults()
     // setLoading(true);
     async function submitSearch() {
@@ -41,7 +40,6 @@ function Search({ searchQuery, searchResults, newNotification }) {
     return () => clearTimeout(to);
     // eslint-disable-next-line
   }, [searchQuery]);
-  console.log(searchResults);
   return (
     <div className={styles.wrap}>
       <Meta title={`Search - ${searchQuery}`} />
