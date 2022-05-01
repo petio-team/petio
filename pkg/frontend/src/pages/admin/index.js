@@ -11,6 +11,8 @@ import Meta from "../../components/meta";
 import AdminRequests from "./admin-requests";
 import { useEffect } from "react";
 import { allUsers } from "../../services/user.service";
+import AdminUsers from "./admin-users";
+import AdminIssues from "./admin-issues";
 
 const mapStateToProps = (state) => {
   return {
@@ -52,6 +54,16 @@ function Admin({
             </div>
             <div className={styles.menu__item}>
               <p className={`${typo.body} ${typo.uppercase} ${typo.medium}`}>
+                <Link to="/admin/users">Users</Link>
+              </p>
+            </div>
+            <div className={styles.menu__item}>
+              <p className={`${typo.body} ${typo.uppercase} ${typo.medium}`}>
+                <Link to="/admin/issues">Issues</Link>
+              </p>
+            </div>
+            <div className={styles.menu__item}>
+              <p className={`${typo.body} ${typo.uppercase} ${typo.medium}`}>
                 <Link to="/admin/settings">Settings</Link>
               </p>
             </div>
@@ -64,6 +76,12 @@ function Admin({
             </Route>
             <Route exact path="/admin/requests">
               <AdminRequests newNotification={newNotification} />
+            </Route>
+            <Route exact path="/admin/users">
+              <AdminUsers newNotification={newNotification} />
+            </Route>
+            <Route exact path="/admin/issues">
+              <AdminIssues newNotification={newNotification} />
             </Route>
             <Route path="/admin/settings">
               <Settings newNotification={newNotification} />
