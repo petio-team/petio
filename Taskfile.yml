@@ -1,6 +1,10 @@
 version: "3"
 dotenv: [".env"]
 tasks:
+  default:
+    cmds:
+      - task: dev
+
   # -
   # Run development related tasks
   # -
