@@ -11,8 +11,6 @@ import { conf } from "./app/config";
 import checkSetup from "./middleware/setup";
 import { frontendView, env } from "./app/env";
 import logger from "./app/logger";
-import { attachRouting, createConfig } from "express-zod-api";
-import { routing } from "./routes/v1/api";
 
 // setups the core of the router
 export const SetupRouter = (restartFunc) => {
@@ -77,15 +75,6 @@ export const SetupRouter = (restartFunc) => {
 
   // setup the different routes
   routes(router);
-
-  const config = createConfig({
-    app: router,
-    cors: true,
-    logger: logger,
-    startupLogo: false,
-  });
-  const { notFoundHandler } = attachRouting(config, routing);
-  router.use(notFoundHandler);
 
   try {
     // listen on the address and port specified in the settings

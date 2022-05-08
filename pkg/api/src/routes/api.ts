@@ -32,7 +32,6 @@ import { conf } from "../app/config";
 import setupReady from "../util/setupReady";
 
 const router = express.Router();
-
 router.get("/config", async (req, res) => {
   let ready = false;
   if (conf.get("admin.id") != -1) {
