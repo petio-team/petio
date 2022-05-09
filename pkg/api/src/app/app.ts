@@ -17,21 +17,19 @@ const restartApp = (): void => {
 export const start = async (): Promise<void> => {
   logger.info(`Petio v${pkg.version} [${conf.get("logger.level")}]`);
 
-  if (conf.get("admin.id") != -1) {
-    await mongoose.connect(conf.get("db.url"));
-  }
-
   server = SetupRouter(restartApp);
-
   logger.info(
     "Listening on http://" +
       conf.get("petio.host") +
       ":" +
       conf.get("petio.port")
   );
+
   if (conf.get("admin.id") == -1) {
     logger.warn(
       "Initial setup is required, please proceed to the webui to begin the setup"
     );
+  } else {
+    await mongoose.connect(conf.get("db.url"));
   }
 };

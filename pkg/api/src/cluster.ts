@@ -47,10 +47,15 @@ const removeWorker = (id) => {
       await app.start();
     } catch (e) {
       console.log(e.stack);
-      process.exit(0);
+      process.exit(1);
     }
   } else {
     logger.debug(`started worker: ${cluster?.worker?.id}`);
-    await task.start();
+    try {
+      await task.start();
+    } catch (e) {
+      console.log(e.stack);
+      process.exit(1);
+    }
   }
 })();

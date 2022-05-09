@@ -1,4 +1,5 @@
 import { Agenda } from "agenda";
+import mongoose from "mongoose";
 
 import logger from "./app/logger";
 import LibraryUpdate from "./plex/library";
@@ -103,6 +104,8 @@ agenda.define(TASK_NAME.TMDB_CACHE, async (job: any, done: any) => {
 
 // execute tasks
 export const start = async () => {
+  await mongoose.connect(conf.get("db.url"));
+
   await agenda.start();
   await agenda.every(
     conf.get("tasks.library.full"),
