@@ -25,24 +25,26 @@ const removeWorker = (id) => {
   workers.splice(workers.indexOf(id), 1);
 };
 
-(async function () {
-  if (cluster.isPrimary) {
-    const cores = os.cpus().length;
-    // Create a worker for each CPU
-    for (let i = 0; i < cores; i++) {
+export const runForks = () => {
+  const cores = os.cpus().length;
+  // Create a worker for each CPU
+  for (let i = 0; i < cores; i++) {
+    addWorker();
+  }
+
+  cluster.on("exit", (worker, code, signal) => {
+    if (workers.indexOf(worker.id) !== -1) {
+      logger.debug(
+        `worker ${worker.process.pid} exited (signal: ${signal}). Trying to respawn...`
+      );
+      removeWorker(worker.id);
       addWorker();
     }
+  });
+};
 
-    cluster.on("exit", (worker, code, signal) => {
-      if (workers.indexOf(worker.id) !== -1) {
-        logger.debug(
-          `worker ${worker.process.pid} exited (signal: ${signal}). Trying to respawn...`
-        );
-        removeWorker(worker.id);
-        addWorker();
-      }
-    });
-
+(async function () {
+  if (cluster.isPrimary) {
     try {
       await app.start();
     } catch (e) {

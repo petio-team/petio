@@ -4,6 +4,7 @@ import logger from "./logger";
 import { conf } from "./config";
 import { SetupRouter } from "../router";
 import pkg from "../../package.json";
+import { runForks } from "../cluster";
 
 let server: any = null;
 
@@ -31,5 +32,6 @@ export const start = async (): Promise<void> => {
     );
   } else {
     await mongoose.connect(conf.get("db.url"));
+    runForks();
   }
 };
