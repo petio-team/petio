@@ -103,9 +103,8 @@ agenda.define(TASK_NAME.TMDB_CACHE, async (job: any, done: any) => {
 });
 
 // execute tasks
-export const start = async () => {
+(async function () {
   await mongoose.connect(conf.get("db.url"));
-
   await agenda.start();
   await agenda.every(
     conf.get("tasks.library.full"),
@@ -118,4 +117,4 @@ export const start = async () => {
   await agenda.every(conf.get("tasks.quotas"), TASK_NAME.PARTIAL_LIBRARY_SCAN);
   await agenda.every("24 hours", [TASK_NAME.IMDB_CACHE, TASK_NAME.TMDB_CACHE]);
   await agenda.purge();
-};
+})();

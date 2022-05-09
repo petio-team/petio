@@ -31,7 +31,15 @@ export const start = async (): Promise<void> => {
       "Initial setup is required, please proceed to the webui to begin the setup"
     );
   } else {
-    await mongoose.connect(conf.get("db.url"));
+    await mongoose.connect(conf.get("db.url")).catch((err) => {
+      logger.error(err);
+      process.exit(1);
+    });
     runForks();
   }
 };
+
+process.on("uncaughtException", function (err) {
+  console.log(err);
+  console.log(err.stack);
+});

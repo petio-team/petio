@@ -3,17 +3,8 @@ import os from "os";
 import process from "node:process";
 
 import * as app from "./app/app";
-import * as task from "./tasks";
 import logger from "./app/logger";
 import { conf, loadConfig } from "./app/config";
-
-try {
-  loadConfig();
-  logger.transports[0].level = conf.get("logger.level");
-} catch (e) {
-  console.log(e.stack);
-  process.exit(0);
-}
 
 const workers: number[] = [];
 
@@ -44,20 +35,18 @@ export const runForks = () => {
 };
 
 (async function () {
-  if (cluster.isPrimary) {
-    try {
+  try {
+    loadConfig();
+    logger.transports[0].level = conf.get("logger.level");
+
+    if (cluster.isPrimary) {
       await app.start();
-    } catch (e) {
-      console.log(e.stack);
-      process.exit(1);
+    } else {
+      logger.debug(`started worker: ${cluster?.worker?.id}`);
+      import("./tasks");
     }
-  } else {
-    logger.debug(`started worker: ${cluster?.worker?.id}`);
-    try {
-      await task.start();
-    } catch (e) {
-      console.log(e.stack);
-      process.exit(1);
-    }
+  } catch (e) {
+    console.log(e.stack);
+    process.exit(1);
   }
 })();
