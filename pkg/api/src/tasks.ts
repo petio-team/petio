@@ -102,7 +102,7 @@ agenda.define(TASK_NAME.TMDB_CACHE, async (job: any, done: any) => {
 });
 
 // execute tasks
-(async function () {
+export const start = async () => {
   await agenda.start();
   await agenda.every(
     conf.get("tasks.library.full"),
@@ -115,4 +115,4 @@ agenda.define(TASK_NAME.TMDB_CACHE, async (job: any, done: any) => {
   await agenda.every(conf.get("tasks.quotas"), TASK_NAME.PARTIAL_LIBRARY_SCAN);
   await agenda.every("24 hours", [TASK_NAME.IMDB_CACHE, TASK_NAME.TMDB_CACHE]);
   await agenda.purge();
-})();
+};

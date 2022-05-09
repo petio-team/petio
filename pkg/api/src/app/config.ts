@@ -422,7 +422,6 @@ export const loadConfig = () => {
   if (fs.existsSync(CONFIG_FILE)) {
     try {
       conf.loadFile(CONFIG_FILE).validate();
-      WriteConfig();
     } catch (e) {
       if (e instanceof SyntaxError) {
         console.error("config is in an invalid format");
