@@ -21,11 +21,12 @@ export default async () => {
         error: false,
       };
     }
-  } catch {
+  } catch (e) {
+    logger.debug(e);
     logger.error("setup ready check failed to get ready");
     return {
       ready: false,
       error: "setup ready failed",
     };
   }
-}
+};
