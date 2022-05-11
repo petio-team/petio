@@ -553,7 +553,7 @@ const MergeLegacyEmailConfig = (c) => {
     conf.set("email.host", c.emailServer);
   }
   if (c.emailPort != undefined) {
-    conf.set("email.port", c.emailPort);
+    conf.set("email.port", parseInt(c.emailPort));
   }
   if (c.emailSecure != undefined) {
     conf.set("email.ssl", c.emailSecure);
