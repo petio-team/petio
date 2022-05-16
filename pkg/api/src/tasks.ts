@@ -114,7 +114,7 @@ agenda.define(TASK_NAME.TMDB_CACHE, async (job: any, done: any) => {
     conf.get("tasks.library.partial"),
     TASK_NAME.PARTIAL_LIBRARY_SCAN
   );
-  await agenda.every(conf.get("tasks.quotas"), TASK_NAME.PARTIAL_LIBRARY_SCAN);
+  await agenda.every(conf.get("tasks.quotas"), TASK_NAME.USER_QUOTA_RESET);
   await agenda.every("24 hours", [TASK_NAME.IMDB_CACHE, TASK_NAME.TMDB_CACHE]);
   await agenda.purge();
 })();
