@@ -7,6 +7,8 @@ import { movieLookup } from "../tmdb/movie";
 import { showLookup } from "../tmdb/show";
 import logger from "../app/logger";
 import { tmdbApiKey } from "../app/env";
+import { TMDBAPI } from "./tmdb";
+import { MediaType, TimeWindow } from "./trending/trending";
 
 const agent = new http.Agent({ family: 4 });
 const memoryCache = cacheManager.caching({
@@ -24,12 +26,12 @@ async function trending() {
     getShows(),
   ]);
 
-  await Promise.map(
-    movies.results,
+  const mapped_movies = await Promise.map(
+    movies,
     async (result: any, i) => {
       let movieData = await movieLookup(result.id, true);
       let videoResults = movieData.videos.results;
-      movies.results[i] = {
+      return {
         on_server: movieData.on_server,
         title: movieData.title,
         poster_path: movieData.poster_path,
@@ -51,12 +53,12 @@ async function trending() {
     { concurrency: 10 }
   );
 
-  await Promise.map(
-    tv.results,
+  const mapped_tv = await Promise.map(
+    tv,
     async (result: any, i) => {
       let showData = await showLookup(result.id, true);
       let videoResults = showData.videos.results;
-      tv.results[i] = {
+      return {
         on_server: showData.on_server,
         name: showData.name,
         poster_path: showData.poster_path,
@@ -77,8 +79,9 @@ async function trending() {
     },
     { concurrency: 10 }
   );
-  await Promise.map(person.results, async (result: any, i) => {
-    person.results[i] = {
+
+  const mapped_people = await Promise.map(person, async (result: any, i) => {
+    return {
       id: result.id,
       name: result.name,
       profile_path: result.profile_path,
@@ -86,9 +89,9 @@ async function trending() {
   });
 
   let data = {
-    people: person.results,
-    movies: movies.results,
-    tv: tv.results,
+    people: mapped_people,
+    movies: mapped_movies,
+    tv: mapped_tv,
     companies: [
       {
         id: 2,
@@ -207,7 +210,7 @@ export default trending;
 // Caching Layer
 
 async function getPerson() {
-  let data = false;
+  let data = {};
   try {
     data = await memoryCache.wrap("trending_person", function () {
       return personData();
@@ -222,7 +225,7 @@ async function getPerson() {
 }
 
 async function getMovies() {
-  let data = false;
+  let data = {};
   try {
     data = await memoryCache.wrap("trending_movies", async function () {
       return await moviesData();
@@ -237,7 +240,7 @@ async function getMovies() {
 }
 
 async function getShows() {
-  let data = false;
+  let data = {};
   try {
     data = await memoryCache.wrap("trending_shows", async function () {
       return await showsData();
@@ -257,11 +260,14 @@ async function personData() {
   logger.verbose("Person from source not cache", {
     label: "tmdb.trending",
   });
-  const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}trending/person/week?api_key=${tmdbApiKey}&append_to_response=images`;
   try {
-    let res = await axios.get(url, { httpAgent: agent });
-    return res.data;
+    const data = await TMDBAPI.get("/trending/:media_type/:time_window", {
+      params: {
+        media_type: MediaType.Person,
+        time_window: TimeWindow.Week,
+      },
+    });
+    return data.results;
   } catch (err) {
     throw err;
   }
@@ -271,11 +277,14 @@ async function moviesData() {
   logger.verbose("Movies from source not cache", {
     label: "tmdb.trending",
   });
-  const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}trending/movie/week?api_key=${tmdbApiKey}&append_to_response=images,videos`;
   try {
-    let res = await axios.get(url, { httpAgent: agent });
-    return res.data;
+    const data = await TMDBAPI.get("/trending/:media_type/:time_window", {
+      params: {
+        media_type: MediaType.Movie,
+        time_window: TimeWindow.Week,
+      },
+    });
+    return data.results;
   } catch (err) {
     throw err;
   }
@@ -285,11 +294,14 @@ async function showsData() {
   logger.verbose("Shows from source not cache", {
     label: "tmdb.trending",
   });
-  const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}trending/tv/week?api_key=${tmdbApiKey}&append_to_response=images,videos`;
   try {
-    let res = await axios.get(url, { httpAgent: agent });
-    return res.data;
+    const data = await TMDBAPI.get("/trending/:media_type/:time_window", {
+      params: {
+        media_type: MediaType.Tv,
+        time_window: TimeWindow.Week,
+      },
+    });
+    return data.results;
   } catch (err) {
     throw err;
   }
