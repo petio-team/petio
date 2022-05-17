@@ -1,7 +1,7 @@
-import { conf } from "../app/config";
+import { conf, hasConfig } from "../app/config";
 
 export default (req, res, next) => {
-  if (conf.get("general.setup") === false) {
+  if (hasConfig() === false) {
     const path = req.path;
     if (path.startsWith("/api")) {
       if (

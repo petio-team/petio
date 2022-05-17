@@ -5,7 +5,13 @@ import bcrypt from "bcryptjs";
 import logger from "../app/logger";
 import testConnection from "../plex/connection";
 import { WriteConfig, conf } from "../app/config";
-import { User, UserModel, UserRole, UserSchema } from "@root/models/user";
+import {
+  CreateOrUpdateUser,
+  User,
+  UserModel,
+  UserRole,
+  UserSchema,
+} from "@root/models/user";
 
 const router = express.Router();
 let db;
@@ -108,20 +114,21 @@ router.post("/set", async (req, res) => {
   conf.set("plex.client", server.clientId);
 
   try {
-    const newUser = await UserSchema.parseAsync({
+    await CreateOrUpdateUser({
       title: user.display ?? user.username,
       username: user.username,
       password: bcrypt.hashSync(user.password, 10),
       email: user.email,
       thumbnail: user.thumb,
-      altId: user.id,
+      altId: "1",
       lastIp: req.ip,
       role: UserRole.Admin,
-      isOwner: true,
+      owner: true,
+      custom: false,
+      disabled: false,
+      quotaCount: 0,
     });
-    await new UserModel(newUser).save();
 
-    conf.set("general.setup", true);
     WriteConfig();
     logger.info("restarting to apply new configurations");
     await WaitBeforeRestart(res);

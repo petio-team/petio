@@ -28,13 +28,14 @@ import notificationsRoute from "./notifications";
 import batchRoute from "./batch";
 import setupRoute from "./setup";
 import { authRequired } from "../middleware/auth";
-import { conf } from "../app/config";
+import { conf, hasConfig } from "../app/config";
 import setupReady from "../util/setupReady";
 
 const router = express.Router();
 router.get("/config", async (req, res) => {
+  const configStatus = hasConfig();
   let ready = false;
-  if (conf.get("general.setup") !== false) {
+  if (configStatus !== false) {
     try {
       let setupCheck = await setupReady();
       if (setupCheck.ready) {
@@ -54,7 +55,7 @@ router.get("/config", async (req, res) => {
     }
   }
   res.json({
-    config: conf.get("general.setup") === false ? false : true,
+    config: configStatus === false ? false : true,
     login_type: conf.get("auth.type"),
     ready: ready,
   });

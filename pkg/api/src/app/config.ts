@@ -47,11 +47,6 @@ export const conf = blueconfig({
       format: Boolean,
       default: false,
     },
-    setup: {
-      doc: "Enabled when setup is complete",
-      format: Boolean,
-      default: false,
-    },
   },
   petio: {
     host: {
@@ -423,8 +418,12 @@ export const conf = blueconfig({
   },
 });
 
+export const hasConfig = (): boolean => {
+  return fs.existsSync(CONFIG_FILE);
+};
+
 export const loadConfig = () => {
-  if (fs.existsSync(CONFIG_FILE)) {
+  if (hasConfig()) {
     try {
       conf.loadFile(CONFIG_FILE).validate();
     } catch (e) {
@@ -434,6 +433,10 @@ export const loadConfig = () => {
       }
       throw e;
     }
+    return;
+  }
+
+  if (!hasLegacyConfig()) {
     return;
   }
 
@@ -458,6 +461,30 @@ export const WriteConfig = async () => {
       throw err;
     }
   });
+};
+
+const hasLegacyConfig = (): boolean => {
+  const configFile = path.join(dataFolder, "config.json");
+  if (fs.existsSync(configFile)) {
+    return true;
+  }
+
+  const emailFile = path.join(dataFolder, "email.json");
+  if (fs.existsSync(emailFile)) {
+    return true;
+  }
+
+  const radarrFile = path.join(dataFolder, "radarr.json");
+  if (fs.existsSync(radarrFile)) {
+    return true;
+  }
+
+  const sonarrFile = path.join(dataFolder, "sonarr.json");
+  if (fs.existsSync(sonarrFile)) {
+    return true;
+  }
+
+  return false;
 };
 
 const GetLegacyConfig = () => {

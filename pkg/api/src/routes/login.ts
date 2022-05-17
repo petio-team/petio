@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import axios from "axios";
 import xmlParser from "xml-js";
 
-import { conf } from "../app/config";
+import { conf, hasConfig } from "../app/config";
 import { UserModel, UserRole } from "../models/user";
 import logger from "../app/logger";
 import { authenticate } from "../middleware/auth";
@@ -21,7 +21,7 @@ router.post("/", async (req: any, res) => {
     user: { username, password },
   } = req.body || { user: {} };
 
-  if (conf.get("general.setup") === false) {
+  if (hasConfig() === false) {
     res.status(500).send("This Petio API is not setup");
     return;
   }

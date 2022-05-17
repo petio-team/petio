@@ -4,7 +4,6 @@ import process from "node:process";
 
 import * as app from "./app/app";
 import logger from "./app/logger";
-import { conf, loadConfig } from "./app/config";
 
 const workers: number[] = [];
 
@@ -36,9 +35,6 @@ export const runForks = () => {
 
 (async function () {
   try {
-    loadConfig();
-    logger.transports[0].level = conf.get("logger.level");
-
     if (cluster.isPrimary) {
       await app.start();
     } else {

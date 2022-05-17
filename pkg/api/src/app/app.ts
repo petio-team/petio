@@ -1,11 +1,10 @@
 import mongoose from "mongoose";
 
 import logger from "./logger";
-import { conf } from "./config";
+import { conf, hasConfig, loadConfig } from "./config";
 import { SetupRouter } from "../router";
 import pkg from "../../package.json";
 import { runForks } from "../cluster";
-import { UserModel } from "@root/models/user";
 
 let server: any = null;
 
@@ -27,11 +26,12 @@ export const start = async (): Promise<void> => {
       conf.get("petio.port")
   );
 
-  if (conf.get("general.setup") == false) {
+  if (!hasConfig()) {
     logger.warn(
       "Initial setup is required, please proceed to the webui to begin the setup"
     );
   } else {
+    loadConfig();
     await mongoose.connect(conf.get("db.url")).catch((err) => {
       logger.error(err);
       process.exit(1);
