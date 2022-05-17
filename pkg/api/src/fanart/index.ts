@@ -1,8 +1,7 @@
-import request from "xhr-request";
 import cacheManager from "cache-manager";
 
 import logger from "../app/logger";
-import { fanartApiKey } from "../app/env";
+import { FanartAPI } from "./api";
 
 const memoryCache = cacheManager.caching({
   store: "memory",
@@ -13,30 +12,19 @@ const memoryCache = cacheManager.caching({
 export default async (id, type) => {
   let data: any = false;
   try {
-    data = await memoryCache.wrap(id, function () {
-      return fanartData(id, type);
+    data = await memoryCache.wrap(id, async function () {
+      return await FanartAPI.get("/:type/:id", {
+        params: {
+          id,
+          type,
+        },
+      });
     });
   } catch (err) {
+    logger.error(`failed to get fanart for ${id} (${type})`, {
+      label: "fanart.index",
+    });
     logger.error(err, { label: "fanart.index" });
   }
   return data;
 };
-
-async function fanartData(id, type) {
-  let url = `https://webservice.fanart.tv/v3/${type}/${id}?api_key=${fanartApiKey}`;
-  return new Promise((resolve, reject) => {
-    request(
-      url,
-      {
-        method: "GET",
-        json: true,
-      },
-      function (err, data) {
-        if (err) {
-          reject();
-        }
-        resolve(data);
-      }
-    );
-  });
-}
