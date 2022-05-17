@@ -34,7 +34,7 @@ import setupReady from "../util/setupReady";
 const router = express.Router();
 router.get("/config", async (req, res) => {
   let ready = false;
-  if (conf.get("admin.id") != -1) {
+  if (conf.get("general.setup") !== false) {
     try {
       let setupCheck = await setupReady();
       if (setupCheck.ready) {
@@ -54,7 +54,7 @@ router.get("/config", async (req, res) => {
     }
   }
   res.json({
-    config: conf.get("admin.id") == -1 ? false : true,
+    config: conf.get("general.setup") === false ? false : true,
     login_type: conf.get("auth.type"),
     ready: ready,
   });

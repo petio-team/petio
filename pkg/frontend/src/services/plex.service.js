@@ -110,18 +110,16 @@ async function waitForPin(
 
 export async function plexAuth(plexWindow) {
   let pins = await getPins();
-  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=${getClientId()}&code=${
-    pins.code
-  }`;
+  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=${getClientId()}&code=${pins.code
+    }`;
   let data = await waitForPin(plexWindow, pins.id, true, false);
   return data;
 }
 
 export async function plexAuthLogin(plexWindow) {
   let pins = await getPins();
-  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=${getClientId()}&code=${
-    pins.code
-  }`;
+  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=${getClientId()}&code=${pins.code
+    }`;
   let data = await waitForPin(plexWindow, pins.id, false, true);
   return data;
 }
@@ -151,7 +149,7 @@ async function getUserFromToken(token) {
   setup.user.email = userData.getAttribute("email");
   setup.user.id = userData.getAttribute("id");
   setup.user.username = userData.getAttribute("title");
-  setup.user.thumb = userData.getAttribute("thumb");
+  setup.user.thumbnail = userData.getAttribute("thumb");
   for (let server of serverList) {
     let i = 0;
     if (
@@ -236,9 +234,8 @@ function getUser(token) {
 }
 
 function getServers(token, ssl = false) {
-  let url = `https://plex.tv/pms/resources?${
-    ssl ? "includeHttps=1&" : ""
-  }X-Plex-Token=${token}`;
+  let url = `https://plex.tv/pms/resources?${ssl ? "includeHttps=1&" : ""
+    }X-Plex-Token=${token}`;
   let method = "get";
   let headers = plexHeaders;
   return process(url, headers, method)
@@ -350,9 +347,8 @@ function process(url, headers, method, body = null) {
 
 export async function plexToken(plexWindow) {
   let pins = await getPins();
-  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=${getClientId()}&code=${
-    pins.code
-  }`;
+  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=${getClientId()}&code=${pins.code
+    }`;
   let data = await waitForPin(plexWindow, pins.id, false, false, true);
   if (data.error) throw data.error;
   return data;

@@ -1,6 +1,6 @@
 import Movie from "../models/movie";
 import Show from "../models/show";
-import User from "../models/user";
+import { UserModel } from "../models/user";
 import logger from "../app/logger";
 
 export default async () => {
@@ -8,7 +8,7 @@ export default async () => {
     let [movie, show, user] = await Promise.all([
       Movie.findOne(),
       Show.findOne(),
-      User.findOne(),
+      UserModel.findOne(),
     ]);
     if (movie && show && user) {
       return {

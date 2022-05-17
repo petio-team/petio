@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 
 import logger from "../app/logger";
 import { conf } from "../app/config";
-import User from "../models/user";
+import { UserModel } from "../models/user";
 
 export async function authenticate(req) {
   const { authorization: header } = req.headers;
@@ -20,7 +20,10 @@ export async function authenticate(req) {
   req.jwtUser = jwt.verify(petioJwt, conf.get("plex.token"));
 
   try {
-    let userData = await User.findOne({ id: req.jwtUser.id });
+    let userData = await UserModel.findOne({ id: req.jwtUser.id });
+    if (!userData) {
+      throw new Error("no user found");
+    }
     return userData.toObject();
   } catch {
     throw `AUTH: User ${req.jwtUser.id} not found in DB - route ${req.path}`;

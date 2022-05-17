@@ -5,6 +5,7 @@ import { conf } from "./config";
 import { SetupRouter } from "../router";
 import pkg from "../../package.json";
 import { runForks } from "../cluster";
+import { UserModel } from "@root/models/user";
 
 let server: any = null;
 
@@ -26,7 +27,7 @@ export const start = async (): Promise<void> => {
       conf.get("petio.port")
   );
 
-  if (conf.get("admin.id") == -1) {
+  if (conf.get("general.setup") == false) {
     logger.warn(
       "Initial setup is required, please proceed to the webui to begin the setup"
     );

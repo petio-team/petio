@@ -7,7 +7,13 @@ import Library from "../models/library";
 import Movie from "../models/movie";
 import Music from "../models/artist";
 import Show from "../models/show";
-import User from "../models/user";
+import {
+  CreateOrUpdateUser,
+  GetUserByEmail,
+  User,
+  UserModel,
+  UserRole,
+} from "../models/user";
 import Request from "../models/request";
 import Profile from "../models/profile";
 import Mailer from "../mail/mailer";
@@ -131,7 +137,6 @@ export default class LibraryUpdate {
   async scan() {
     this.timestamp = new Date().toString();
     logger.verbose(`CRON: Running Full`, { label: "plex.library" });
-    await this.createAdmin();
     await this.updateFriends();
     let libraries = false;
     try {
@@ -150,60 +155,6 @@ export default class LibraryUpdate {
       await this.deleteOld();
     } else {
       logger.warn("CRON: Couldn't update libraries", { label: "plex.library" });
-    }
-  }
-
-  async createAdmin() {
-    let adminFound = await User.findOne({
-      id: conf.get("admin.id"),
-    });
-    if (!adminFound) {
-      logger.verbose("CRON: Creating admin user", { label: "plex.library" });
-      try {
-        let adminData = new User({
-          id: conf.get("admin.id"),
-          email: conf.get("admin.email"),
-          thumb: conf.get("admin.thumbnail"),
-          title: conf.get("admin.display"),
-          nameLower: conf.get("admin.display").toLowerCase(),
-          username: conf.get("admin.username"),
-          password:
-            conf.get("admin.password").substring(0, 3) === "$2a"
-              ? conf.get("admin.password")
-              : bcrypt.hashSync(conf.get("admin.password"), 10),
-          altId: 1,
-          role: "admin",
-        });
-        await adminData.save();
-      } catch (err) {
-        logger.error(`CRON: Error creating admin user`, {
-          label: "plex.library",
-        });
-        logger.error(err, { label: "plex.library" });
-      }
-    } else {
-      try {
-        logger.verbose(`CRON: Admin Updating ${conf.get("admin.display")}`, {
-          label: "plex.library",
-        });
-        adminFound.email = conf.get("admin.email");
-        adminFound.thumb = conf.get("admin.thumbnail");
-        adminFound.title = conf.get("admin.display");
-        adminFound.nameLower = conf.get("admin.display").toLowerCase();
-        adminFound.username = conf.get("admin.username");
-        if (conf.get("admin.password").substring(0, 3) !== "$2a")
-          adminFound.password = bcrypt.hashSync(conf.get("admin.password"), 10);
-        await adminFound.save();
-        logger.verbose(`CRON: Admin Updated ${conf.get("admin.display")}`, {
-          label: "plex.library",
-        });
-      } catch (err) {
-        // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'obj'.
-        logger.error(`CRON: Admin Update Failed ${obj.title}`, {
-          label: "plex.library",
-        });
-        logger.error(err);
-      }
     }
   }
 
@@ -851,46 +802,35 @@ export default class LibraryUpdate {
       throw "Unable to get friends";
     }
   }
-
   async saveFriend(obj) {
     // Maybe delete all and rebuild each time?
-    let friendDb: any = false;
     try {
-      friendDb = await User.findOne({ id: obj.id });
-    } catch {
-      friendDb = false;
-    }
+      const defaultProfile = await Profile.findOne({ isDefault: true });
 
-    if (!friendDb) {
-      try {
-        let defaultProfile = await Profile.findOne({ isDefault: true });
-        let newFriend = new User({
-          id: obj.id,
-          title: obj.title,
-          username: obj.username ? obj.username : obj.title,
-          nameLower: obj.username
-            ? obj.username.toLowerCase()
-            : obj.title.toLowerCase(),
-          email: obj.email.toLowerCase(),
-          recommendationsPlaylistId: obj.recommendationsPlaylistId,
-          thumb: obj.thumb,
-          Server: obj.Server,
-          quotaCount: 0,
-        });
-        if (defaultProfile) {
-          newFriend.profile = defaultProfile._id;
-        }
-        friendDb = await newFriend.save();
-      } catch (err) {
-        logger.error(`CRON: Error`);
-        logger.error(err);
-      }
-      if (friendDb) {
-        logger.verbose(`CRON: User Created ${obj.title}`);
-      } else {
-        logger.warn(`CRON: User Failed to Create ${obj.title}`);
-      }
+      const newUser = await CreateOrUpdateUser({
+        title: obj.title ?? obj.username ?? "User",
+        username: obj.username ? obj.username : obj.title,
+        email: obj.email.toLowerCase() ?? "",
+        thumbnail: obj.thumb ?? "",
+        profileId: defaultProfile ? defaultProfile._id : undefined,
+        role: UserRole.User,
+        owner: false,
+        custom: false,
+        disabled: false,
+        quotaCount: 0,
+      });
+      logger.verbose("added new friend " + newUser.email, {
+        label: "plex.library",
+      });
+    } catch (e) {
+      logger.error("failed to save friend", {
+        label: "plex.library",
+      });
+      logger.error(e, {
+        label: "plex.library",
+      });
     }
+    return;
   }
 
   async mailAdded(plexData, ref_id) {
@@ -906,7 +846,7 @@ export default class LibraryUpdate {
   }
 
   async sendMail(user, i, request) {
-    let userData = await User.findOne({ id: user });
+    let userData = await UserModel.findOne({ id: user });
     if (!userData) {
       logger.error("CRON: Err: No user data", { label: "plex.library" });
       return;
@@ -1033,7 +973,7 @@ export default class LibraryUpdate {
         let titles: any = [];
         await Promise.all(
           request.users.map(async (user) => {
-            let userData = await User.findOne({ id: user });
+            let userData = await UserModel.findOne({ id: user });
             if (!userData) return;
             emails.push(userData.email);
             titles.push(userData.title);

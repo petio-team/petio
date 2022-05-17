@@ -1,7 +1,7 @@
 import express from "express";
 
 import Review from "../models/review";
-import User from "../models/user";
+import { UserModel } from "../models/user";
 
 const router = express.Router();
 
@@ -9,9 +9,11 @@ router.post("/add", async (req, res) => {
   let item = req.body.item;
   let review = req.body.review;
   let user = req.body.user;
-  let userData = await User.findOne({ id: user });
-
   try {
+    let userData = await UserModel.findOne({ id: user });
+    if (!userData) {
+      throw new Error("failed to get user data");
+    }
     let existingReview = await Review.findOne({
       tmdb_id: item.id,
       user: userData.id,

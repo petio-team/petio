@@ -1,7 +1,7 @@
 import express from "express";
 
 import Request from "../models/request";
-import User from "../models/user";
+import { UserModel } from "../models/user";
 import Mailer from "../mail/mailer";
 import Sonarr from "../downloaders/sonarr";
 import Radarr from "../downloaders/radarr";
@@ -78,8 +78,10 @@ router.post("/remove", async (req, res) => {
   let titles: any = [];
   await Promise.all(
     request.users.map(async (user) => {
-      let userData = await User.findOne({ id: user });
-      if (!userData) return;
+      let userData = await UserModel.findOne({ id: user });
+      if (!userData) {
+        return;
+      }
       emails.push(userData.email);
       titles.push(userData.title);
     })
@@ -155,8 +157,8 @@ router.post("/update", async (req, res) => {
       let emails: any = [];
       let titles: any = [];
       await Promise.all(
-        request.users.map(async (user) => {
-          let userData = await User.findOne({ id: user });
+        request.users.map(async (id) => {
+          let userData = await UserModel.findOne({ id });
           if (!userData) return;
           emails.push(userData.email);
           titles.push(userData.title);

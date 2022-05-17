@@ -5,7 +5,7 @@ import multer from "multer";
 import fs from "fs";
 import path from "path";
 
-import User from "../models/user";
+import { UserModel, UserRole } from "../models/user";
 import Profile from "../models/profile";
 import logger from "../app/logger";
 import { adminRequired, authRequired } from "../middleware/auth";
@@ -19,7 +19,7 @@ const UPLOAD_DIR = path.join(dataFolder, "./uploads");
 router.get("/thumb/:id", async (req, res) => {
   let userData: any = false;
   try {
-    userData = await User.findOne({ id: req.params.id });
+    userData = await UserModel.findOne({ id: req.params.id });
   } catch (err) {
     res.json({ error: err });
     return;
@@ -64,13 +64,18 @@ router.get("/quota", authRequired, async (req: any, res) => {
     res.sendStatus(404);
     return;
   }
-  const user = await User.findOne({ id: req.jwtUser.id });
+  const user = await UserModel.findOne({ id: req.jwtUser.id });
+  if (!user) {
+    return;
+  }
 
   if (!user) {
     res.sendStatus(404);
     return;
   }
-  const profile = user.profile ? await Profile.findById(user.profile) : false;
+  const profile = user.profileId
+    ? await Profile.findById(user.profileId)
+    : false;
   let total = 0;
   let current = user.quotaCount ? user.quotaCount : 0;
   if (profile) {
@@ -87,7 +92,7 @@ router.use(authRequired);
 router.get("/all", adminRequired, async (req, res) => {
   let userData: any;
   try {
-    userData = await User.find();
+    userData = await UserModel.find();
   } catch (err) {
     res.json({ error: err });
     return;
@@ -110,7 +115,7 @@ router.get("/all", adminRequired, async (req, res) => {
 router.get("/:id", adminRequired, async (req, res) => {
   let userData: any;
   try {
-    userData = await User.findOne({ id: req.params.id });
+    userData = await UserModel.findOne({ id: req.params.id });
   } catch (err) {
     res.json({ error: err });
     return;
@@ -130,7 +135,7 @@ router.post("/create_custom", adminRequired, async (req, res) => {
       error: "No user details",
     });
   }
-  let dbUser = await User.findOne({
+  let dbUser = await UserModel.findOne({
     $or: [
       { username: user.username },
       { email: user.email },
@@ -144,16 +149,16 @@ router.post("/create_custom", adminRequired, async (req, res) => {
     return;
   } else {
     try {
-      let newUser = new User({
+      let newUser = new UserModel({
         id: user.id,
         title: user.username,
         username: user.username,
+        password: bcrypt.hashSync(user.password, 12),
         email: user.email,
         recommendationsPlaylistId: false,
-        thumb: false,
-        password: bcrypt.hashSync(user.password, 10),
+        thumbnail: "",
         altId: user.linked,
-        custom: true,
+        isOwner: false,
       });
       await newUser.save();
       res.status(200).json(newUser);
@@ -192,7 +197,7 @@ router.post("/edit", adminRequired, async (req, res) => {
       userObj.password = null;
     }
 
-    if (user.role === "admin" && !user.password) {
+    if (user.role === UserRole.Admin && !user.password) {
       userObj.password =
         conf.get("admin.password").substring(0, 3) === "$2a"
           ? conf.get("admin.password")
@@ -204,7 +209,7 @@ router.post("/edit", adminRequired, async (req, res) => {
       WriteConfig();
     }
 
-    await User.findOneAndUpdate(
+    await UserModel.findOneAndUpdate(
       { _id: user.id },
       {
         $set: userObj,
@@ -238,7 +243,7 @@ router.post("/bulk_edit", adminRequired, async (req, res) => {
   try {
     await Promise.all(
       users.map(async (user) => {
-        await User.updateMany(
+        await UserModel.updateMany(
           {
             _id: user,
           },
@@ -278,7 +283,7 @@ router.post("/delete_user", adminRequired, async (req, res) => {
   }
 
   try {
-    await User.findByIdAndDelete(user._id);
+    await UserModel.findByIdAndDelete(user._id);
     res.json({
       message: "User deleted",
     });
@@ -338,7 +343,7 @@ router.post("/thumb/:id", adminRequired, async (req: any, res) => {
     return;
   }
   try {
-    await User.findOneAndUpdate(
+    await UserModel.findOneAndUpdate(
       { id: req.params.id },
       {
         $set: {

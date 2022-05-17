@@ -1,7 +1,7 @@
 import express from "express";
 
 import Profile from "../models/profile";
-import User from "../models/user";
+import { UserModel } from "../models/user";
 import logger from "../app/logger";
 import { adminRequired } from "../middleware/auth";
 
@@ -108,9 +108,9 @@ router.post("/delete_profile", async (req, res) => {
   }
 
   try {
-    await User.updateMany(
+    await UserModel.updateMany(
       {
-        profile: profile.id,
+        profileId: profile.id,
       },
       {
         $unset: {

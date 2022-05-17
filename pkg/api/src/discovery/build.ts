@@ -1,7 +1,7 @@
 import Promise from "bluebird";
 import request from "xhr-request";
 
-import User from "../models/user";
+import { GetAllUsers, User } from "../models/user";
 import Discovery from "../models/discovery";
 import logger from "../app/logger";
 import Movie from "../models/movie";
@@ -12,31 +12,35 @@ export default async () => {
   logger.verbose("DISC: Started building discovery profiles", {
     label: "discovery.build",
   });
-  let users = await User.find();
-  if (!users || users.length === 0) {
-    logger.verbose("DISC: No Users", { label: "discovery.build" });
-    return;
-  }
-  let userIds = [];
-  Object.keys(users).map((i) => {
-    if (users[i].altId) {
-      // @ts-expect-error ts-migrate(2345) FIXME: Argument of type 'any' is not assignable to parame... Remove this comment to see the full error message
-      userIds.push(users[i].altId);
-    } else if (!users[i].custom) {
-      // @ts-expect-error ts-migrate(2345) FIXME: Argument of type 'any' is not assignable to parame... Remove this comment to see the full error message
-      userIds.push(users[i].id);
+
+  try {
+    const users = await GetAllUsers();
+    if (users.length === 0) {
+      logger.verbose("DISC: No Users", { label: "discovery.build" });
+      return;
     }
-  });
-  await Promise.map(
-    userIds,
-    async (i) => {
-      await userBuild(i);
-    },
-    { concurrency: 10 }
-  );
-  logger.verbose("DISC: Finished building discovery profiles", {
-    label: "discovery.build",
-  });
+    const userIds = users.map((user: User) => {
+      if (user.altId) {
+        return user.altId;
+      } else if (!user.custom) {
+        return user.id;
+      }
+    });
+
+    await Promise.map(
+      userIds,
+      async (i) => {
+        await userBuild(i);
+      },
+      { concurrency: 10 }
+    );
+    logger.verbose("DISC: Finished building discovery profiles", {
+      label: "discovery.build",
+    });
+  } catch (e) {
+    logger.error(e);
+  }
+  return;
 };
 
 function userBuild(id) {
@@ -297,7 +301,9 @@ function cert(cert, type) {
       return false;
 
     default:
-      logger.verbose(`DISC: Unmapped Cert Rating - ${cert}`, { label: "discovery.build" });
+      logger.verbose(`DISC: Unmapped Cert Rating - ${cert}`, {
+        label: "discovery.build",
+      });
       return false;
   }
 }

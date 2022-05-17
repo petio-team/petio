@@ -5,8 +5,10 @@ import bcrypt from "bcryptjs";
 import logger from "../app/logger";
 import testConnection from "../plex/connection";
 import { WriteConfig, conf } from "../app/config";
+import { User, UserModel, UserRole, UserSchema } from "@root/models/user";
 
 const router = express.Router();
+let db;
 
 router.post("/test_server", async (req, res) => {
   let server = req.body.server;
@@ -70,14 +72,14 @@ router.post("/test_mongo", async (req, res) => {
       }
     }
     logger.log("verbose", "Attempting mongo connection");
-    const db = await mongoose.connect(mongo + "/petio");
-    db.connection.close();
+    db = await mongoose.connect(mongo + "/petio");
 
     res.status(200).json({
       status: "connected",
     });
     logger.log("verbose", "Mongo test connection success");
   } catch (err) {
+    db.connection.close();
     res.status(401).json({
       status: "failed",
       error: err,
@@ -104,14 +106,22 @@ router.post("/set", async (req, res) => {
   conf.set("plex.port", server.port);
   conf.set("plex.token", server.token);
   conf.set("plex.client", server.clientId);
-  conf.set("admin.username", user.username);
-  conf.set("admin.email", user.email);
-  conf.set("admin.password", bcrypt.hashSync(user.password, 10));
-  conf.set("admin.id", user.id);
-  conf.set("admin.thumbnail", user.thumb);
-  conf.set("admin.display", user.username);
 
   try {
+    const newUser = await UserSchema.parseAsync({
+      title: user.display ?? user.username,
+      username: user.username,
+      password: bcrypt.hashSync(user.password, 10),
+      email: user.email,
+      thumbnail: user.thumb,
+      altId: user.id,
+      lastIp: req.ip,
+      role: UserRole.Admin,
+      isOwner: true,
+    });
+    await new UserModel(newUser).save();
+
+    conf.set("general.setup", true);
     WriteConfig();
     logger.info("restarting to apply new configurations");
     await WaitBeforeRestart(res);
@@ -124,6 +134,7 @@ router.post("/set", async (req, res) => {
 });
 
 const WaitBeforeRestart = async (res) => {
+  db.connection.close();
   setTimeout(() => {
     res.app.settings["restart"]();
   }, 1000);

@@ -6,7 +6,7 @@ import axios from "axios";
 import xmlParser from "xml-js";
 
 import { conf } from "../app/config";
-import User from "../models/user";
+import { UserModel, UserRole } from "../models/user";
 import logger from "../app/logger";
 import { authenticate } from "../middleware/auth";
 import getDiscovery from "../discovery/display";
@@ -21,7 +21,7 @@ router.post("/", async (req: any, res) => {
     user: { username, password },
   } = req.body || { user: {} };
 
-  if (conf.get("admin.id") == -1) {
+  if (conf.get("general.setup") === false) {
     res.status(500).send("This Petio API is not setup");
     return;
   }
@@ -49,24 +49,34 @@ router.post("/", async (req: any, res) => {
 
   try {
     // Find user in db
-    let dbUser = await User.findOne({
-      $or: [
-        { username: username },
-        { email: username },
-        { title: username },
-        { nameLower: username.toLowerCase() },
-      ],
+    let dbUser = await UserModel.findOne({
+      $or: [{ username: username }, { email: username }],
     });
-    if (!dbUser) throw "User not found";
 
-    if (dbUser.disabled) throw "User is disabled";
+    if (!dbUser) {
+      res.status(401).json({
+        error: "User not found",
+      });
+      logger.warn(`LOGIN: User not found ${username} - ${request_ip}`);
+      return;
+    }
 
-    let isAdmin = dbUser.role === "admin" || dbUser.role === "moderator";
+    if (dbUser.disabled) {
+      res.status(401).json({
+        error: "User is disabled",
+      });
+      return;
+    }
+
+    let isAdmin = dbUser.role === UserRole.Admin;
 
     if (conf.get("auth.type") === 1 || password) {
       if (dbUser.password) {
         if (!bcrypt.compareSync(password, dbUser.password)) {
-          throw "Password is incorrect";
+          res.status(401).json({
+            error: "Password is incorrect",
+          });
+          return;
         }
       } else {
         // throws on invalid credentials
@@ -79,8 +89,7 @@ router.post("/", async (req: any, res) => {
     }
     saveRequestIp(dbUser, request_ip);
   } catch (err) {
-    logger.log("warn", `LOGIN: User not found ${username} - ${request_ip}`);
-    logger.warn(err);
+    logger.error(err);
     res
       .status(401)
       .json({ loggedIn: false, user: null, admin: false, token: null });
@@ -157,10 +166,18 @@ router.post("/plex_login", async (req, res) => {
   const token = req.body.token;
   try {
     let userId = await plexOauth(token);
-    let dbUser = await User.findOne({ id: userId });
-    if (!dbUser) throw "User not found";
-    if (dbUser.disabled) throw "User is disabled";
-    let isAdmin = dbUser.role === "admin" || dbUser.role === "moderator";
+    let dbUser = await UserModel.findOne({ id: userId });
+    if (!dbUser) {
+      res.status(401).json({ error: "User not found" });
+      return;
+    }
+
+    if (dbUser.disabled) {
+      res.status(401).json({ error: "User is disabled" });
+      return;
+    }
+
+    let isAdmin = dbUser.role === UserRole.Admin;
     success(dbUser.toObject(), isAdmin, res);
     saveRequestIp(dbUser, request_ip);
   } catch (err) {
@@ -187,7 +204,7 @@ async function plexOauth(token) {
 
 async function saveRequestIp(user, request_ip) {
   try {
-    await User.updateOne(
+    await UserModel.updateOne(
       { _id: user._id },
       {
         $set: {

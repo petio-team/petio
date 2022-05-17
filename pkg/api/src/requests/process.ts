@@ -1,6 +1,6 @@
 import Request from "../models/request";
 import Archive from "../models/archive";
-import User from "../models/user";
+import { UserModel, UserRole } from "../models/user";
 import Profile from "../models/profile";
 import Mailer from "../mail/mailer";
 import Sonarr from "../downloaders/sonarr";
@@ -33,11 +33,14 @@ export default class processRequest {
           out = await this.create();
         }
         if (quotaPass !== "admin") {
-          let updatedUser = await User.findOneAndUpdate(
+          let updatedUser = await UserModel.findOneAndUpdate(
             { id: this.user.id },
             { $inc: { quotaCount: 1 } },
             { new: true, useFindAndModify: false }
           );
+          if (!updatedUser) {
+            throw new Error("no user found");
+          }
           out.quota = updatedUser.quotaCount;
         }
         this.mailRequest();
@@ -64,8 +67,11 @@ export default class processRequest {
   }
 
   async existing() {
-    let userDetails = await User.findOne({ id: this.user.id });
-    let profile = userDetails.profile
+    let userDetails = await UserModel.findOne({ id: this.user.id });
+    if (!userDetails) {
+      return;
+    }
+    let profile = userDetails.profileId
       ? await Profile.findById(this.user.profile)
       : false;
     let autoApprove = profile ? profile.autoApprove : false;
@@ -105,8 +111,11 @@ export default class processRequest {
   }
 
   async create() {
-    let userDetails = await User.findOne({ id: this.user.id });
-    let profile = userDetails.profile
+    let userDetails = await UserModel.findOne({ id: this.user.id });
+    if (!userDetails) {
+      return;
+    }
+    let profile = userDetails.profileId
       ? await Profile.findById(this.user.profile)
       : false;
     let autoApprove = profile
@@ -115,7 +124,7 @@ export default class processRequest {
         : profile.autoApproveTv
       : false;
 
-    if (userDetails.role === "admin") {
+    if (userDetails.role === UserRole.Admin) {
       autoApprove = true;
     }
 
@@ -361,12 +370,14 @@ export default class processRequest {
   }
 
   async checkQuota() {
-    let userDetails = await User.findOne({ id: this.user.id });
-    if (!userDetails) return false;
-    if (userDetails.role === "admin") return "admin";
+    let userDetails = await UserModel.findOne({ id: this.user.id });
+    if (!userDetails) {
+      return false;
+    }
+    if (userDetails.role === UserRole.Admin) return "admin";
 
     let userQuota = userDetails.quotaCount ? userDetails.quotaCount : 0;
-    let profile = userDetails.profile
+    let profile = userDetails.profileId
       ? await Profile.findById(this.user.profile)
       : false;
     let quotaCap = profile ? profile.quota : 0;

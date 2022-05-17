@@ -47,6 +47,11 @@ export const conf = blueconfig({
       format: Boolean,
       default: false,
     },
+    setup: {
+      doc: "Enabled when setup is complete",
+      format: Boolean,
+      default: false,
+    },
   },
   petio: {
     host: {

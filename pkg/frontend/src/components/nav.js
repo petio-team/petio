@@ -87,9 +87,8 @@ export default function Nav(props) {
   return (
     <>
       <div
-        className={`${styles.nav} ${
-          showSearch ? styles.nav__search_open : ""
-        } ${darken ? styles.nav__darken : ""}`}
+        className={`${styles.nav} ${showSearch ? styles.nav__search_open : ""
+          } ${darken ? styles.nav__darken : ""}`}
       >
         <div className="container">
           <div className={styles.nav__inner}>
@@ -121,7 +120,7 @@ export default function Nav(props) {
                   My Account
                 </Link>
                 {props.currentUser.role === "admin" ||
-                props.currentUser.role === "moderator" ? (
+                  props.currentUser.role === "moderator" ? (
                   <Link to="/admin" className={`${typo.body} ${typo.bold}`}>
                     Admin
                   </Link>
@@ -130,9 +129,8 @@ export default function Nav(props) {
             </div>
             <div className={styles.nav__right}>
               <div
-                className={`${styles.collapse_search} ${
-                  showSearch ? "" : styles.collapse_search__collapsed
-                }`}
+                className={`${styles.collapse_search} ${showSearch ? "" : styles.collapse_search__collapsed
+                  }`}
               >
                 <form className={inp.wrap} onSubmit={submitSearch}>
                   <input
@@ -152,9 +150,9 @@ export default function Nav(props) {
                 <SearchIcon />
               </div>
               <Link to="/my-account" className={styles.nav__thumb}>
-                {props.currentUser.thumb ? (
+                {props.currentUser.thumbnail ? (
                   <img
-                    src={props.currentUser.thumb}
+                    src={props.currentUser.thumbnail}
                     alt={props.currentUser.title}
                   />
                 ) : null}
@@ -168,11 +166,10 @@ export default function Nav(props) {
           <Link
             to="/"
             onClick={() => resetScrollPos("/")}
-            className={`${typo.xsmall} ${styles.mobile_nav__item} ${
-              history.location.pathname === "/"
-                ? styles.mobile_nav__item__active
-                : ""
-            }`}
+            className={`${typo.xsmall} ${styles.mobile_nav__item} ${history.location.pathname === "/"
+              ? styles.mobile_nav__item__active
+              : ""
+              }`}
           >
             <span>
               <MovieIcon />
@@ -181,11 +178,10 @@ export default function Nav(props) {
           </Link>
           <Link
             to="/requests"
-            className={`${typo.xsmall} ${styles.mobile_nav__item} ${
-              history.location.pathname === "/requests"
-                ? styles.mobile_nav__item__active
-                : ""
-            }`}
+            className={`${typo.xsmall} ${styles.mobile_nav__item} ${history.location.pathname === "/requests"
+              ? styles.mobile_nav__item__active
+              : ""
+              }`}
           >
             <span className="stroke">
               <RequestIcon />
@@ -194,11 +190,10 @@ export default function Nav(props) {
           </Link>
           <Link
             to="/my-account"
-            className={`${typo.xsmall} ${styles.mobile_nav__item} ${
-              history.location.pathname === "/my-account"
-                ? styles.mobile_nav__item__active
-                : ""
-            }`}
+            className={`${typo.xsmall} ${styles.mobile_nav__item} ${history.location.pathname === "/my-account"
+              ? styles.mobile_nav__item__active
+              : ""
+              }`}
           >
             <span>
               <UserIcon />
@@ -206,14 +201,13 @@ export default function Nav(props) {
             My Account
           </Link>
           {props.currentUser.role === "admin" ||
-          props.currentUser.role === "moderator" ? (
+            props.currentUser.role === "moderator" ? (
             <Link
               to="/admin"
-              className={`${typo.xsmall} ${styles.mobile_nav__item} ${
-                history.location.pathname === "/admin"
-                  ? styles.mobile_nav__item__active
-                  : ""
-              }`}
+              className={`${typo.xsmall} ${styles.mobile_nav__item} ${history.location.pathname === "/admin"
+                ? styles.mobile_nav__item__active
+                : ""
+                }`}
             >
               <span>
                 <AdminIcon />
