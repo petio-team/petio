@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import fs from "fs";
 import helmet from "helmet";
 import morgan from "morgan";
+import compression from "compression";
 
 import apiRoutes from "./routes/api";
 import { conf } from "./app/config";
@@ -25,6 +26,7 @@ export const SetupRouter = (restartFunc) => {
       credentials: true,
     })
   );
+  router.use(compression());
   router.use(express.json());
   router.use(express.urlencoded({ extended: true }));
   router.use(cookieParser());
