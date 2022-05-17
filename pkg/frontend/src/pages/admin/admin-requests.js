@@ -373,10 +373,11 @@ function ActiveRequestsTable({
     if (!request.process_stage) return null;
     return (
       <span
-        className={`${styles.requests__item__status__item} ${styles[
-          `requests__item__status__item__${request.process_stage.status}`
-        ]
-          }`}
+        className={`${styles.requests__item__status__item} ${
+          styles[
+            `requests__item__status__item__${request.process_stage.status}`
+          ]
+        }`}
         title={request.process_stage.message || ""}
         data-status={request.process_stage.status}
         style={{ cursor: "help" }}
@@ -411,9 +412,10 @@ function ActiveRequestsTable({
           Title
           <ArrowIcon
             className={`${styles.requests__table__th__arrow}
-              ${sortValue.sortBy !== "title"
-                ? ""
-                : sortValue.dir === "DESC"
+              ${
+                sortValue.sortBy !== "title"
+                  ? ""
+                  : sortValue.dir === "DESC"
                   ? styles.requests__table__th__arrow__down
                   : styles.requests__table__th__arrow__up
               }`}
@@ -426,9 +428,10 @@ function ActiveRequestsTable({
           Year
           <ArrowIcon
             className={`${styles.requests__table__th__arrow}
-              ${sortValue.sortBy !== "year"
-                ? ""
-                : sortValue.dir === "DESC"
+              ${
+                sortValue.sortBy !== "year"
+                  ? ""
+                  : sortValue.dir === "DESC"
                   ? styles.requests__table__th__arrow__down
                   : styles.requests__table__th__arrow__up
               }`}
@@ -441,9 +444,10 @@ function ActiveRequestsTable({
           Type
           <ArrowIcon
             className={`${styles.requests__table__th__arrow}
-              ${sortValue.sortBy !== "type"
-                ? ""
-                : sortValue.dir === "DESC"
+              ${
+                sortValue.sortBy !== "type"
+                  ? ""
+                  : sortValue.dir === "DESC"
                   ? styles.requests__table__th__arrow__down
                   : styles.requests__table__th__arrow__up
               }`}
@@ -456,9 +460,10 @@ function ActiveRequestsTable({
           Status
           <ArrowIcon
             className={`${styles.requests__table__th__arrow}
-              ${sortValue.sortBy !== "status"
-                ? ""
-                : sortValue.dir === "DESC"
+              ${
+                sortValue.sortBy !== "status"
+                  ? ""
+                  : sortValue.dir === "DESC"
                   ? styles.requests__table__th__arrow__down
                   : styles.requests__table__th__arrow__up
               }`}
@@ -476,9 +481,10 @@ function ActiveRequestsTable({
           Approved
           <ArrowIcon
             className={`${styles.requests__table__th__arrow}
-              ${sortValue.sortBy !== "approved"
-                ? ""
-                : sortValue.dir === "DESC"
+              ${
+                sortValue.sortBy !== "approved"
+                  ? ""
+                  : sortValue.dir === "DESC"
                   ? styles.requests__table__th__arrow__down
                   : styles.requests__table__th__arrow__up
               }`}
@@ -508,10 +514,11 @@ function ActiveRequestsTable({
         }
         return (
           <div
-            className={`${styles.requests__item} ${requestsToRemove && requestsToRemove.includes(request.id)
-              ? styles.requests__item__tbr
-              : ""
-              }`}
+            className={`${styles.requests__item} ${
+              requestsToRemove && requestsToRemove.includes(request.id)
+                ? styles.requests__item__tbr
+                : ""
+            }`}
             key={`request_item_${request.type}_${request.id}`}
           >
             <div
@@ -631,11 +638,13 @@ function ActiveRequestsTable({
               </div>
               <div className={styles.requests__table__td}>
                 <div
-                  className={`${styles.requests__item__approved} ${styles[
-                    `requests__item__approved__${request.approved ? "yes" : "no"
-                    }`
-                  ]
-                    }`}
+                  className={`${styles.requests__item__approved} ${
+                    styles[
+                      `requests__item__approved__${
+                        request.approved ? "yes" : "no"
+                      }`
+                    ]
+                  }`}
                 >
                   {request.approved ? "Y" : "N"}
                 </div>
@@ -711,8 +720,8 @@ function RequestChildren({ request }) {
                       className={
                         child.status
                           ? styles[
-                          `requests__item__child__progress__state__${child.status}`
-                          ]
+                              `requests__item__child__progress__state__${child.status}`
+                            ]
                           : styles.requests__item__child__progress__state
                       }
                       style={{ width: `${prog}%` }}

@@ -9,8 +9,6 @@ on:
       - ./Dockerfile
       - ./.dockerignore
       - ./**/package.json
-    paths_ignore:
-      - /*
     branches:
       - "*"
       - "!master"

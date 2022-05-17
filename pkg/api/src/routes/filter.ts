@@ -1,10 +1,10 @@
 import express from "express";
 
 import logger from "../app/logger";
-import { adminRequired  } from "../middleware/auth";
+import { adminRequired } from "../middleware/auth";
 import Filter from "../models/filter";
 
-const router =  express.Router();
+const router = express.Router();
 router.use(adminRequired);
 
 router.post("/update", async (req, res) => {

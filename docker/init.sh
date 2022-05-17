@@ -1,8 +1,8 @@
 #!/bin/bash
-if [[ ! "${PUID}" -eq 0 ]] && [[ ! "${PGID}" -eq 0 ]]; then
-    usermod -o -u "${PUID}" node
-    groupmod -o -g "${PGID}" node
-    usermod -d "/data" node
+if [[ ! ${PUID} -eq 0 ]] && [[ ! ${PGID} -eq 0 ]]; then
+	usermod -o -u "${PUID}" node
+	groupmod -o -g "${PGID}" node
+	usermod -d "/data" node
 fi
 
 chmod "=rwx" "/data"

@@ -2,7 +2,7 @@ import express from "express";
 
 import getSessions from "../plex/sessions";
 import logger from "../app/logger";
-import { adminRequired  } from "../middleware/auth";
+import { adminRequired } from "../middleware/auth";
 
 const router = express.Router();
 router.use(adminRequired);

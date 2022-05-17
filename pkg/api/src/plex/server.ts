@@ -122,4 +122,4 @@ export default async (type, imdb, tvdb, tmdb) => {
       return { exists: false, resolutions: [] };
     }
   }
-}
+};

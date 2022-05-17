@@ -195,8 +195,8 @@ export default function FilterAction(props) {
             data-type={props.type}
           >
             {props.action.server &&
-              props.settings &&
-              props.settings[props.action.server] ? (
+            props.settings &&
+            props.settings[props.action.server] ? (
               <>
                 <option value="">Please Select</option>
                 <option value="standard">Standard</option>

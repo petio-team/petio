@@ -8,4 +8,4 @@ export default async (prot, ip, port, token) => {
   } catch (e) {
     // Do nothing
   }
-}
+};

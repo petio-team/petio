@@ -1,7 +1,7 @@
 import express from "express";
 import fs from "fs";
 import path from "path";
-import { adminRequired  } from "../middleware/auth";
+import { adminRequired } from "../middleware/auth";
 import { dataFolder } from "../app/env";
 
 const router = express.Router();

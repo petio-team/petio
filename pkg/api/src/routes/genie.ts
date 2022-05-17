@@ -3,7 +3,7 @@ import request from "xhr-request";
 
 import Movie from "../models/movie";
 import { movieLookup } from "../tmdb/movie";
-import MakePlexURL from '../plex/util';
+import MakePlexURL from "../plex/util";
 import logger from "../app/logger";
 
 const router = express.Router();
@@ -93,15 +93,12 @@ async function buildData(id) {
 
 function getHistory(id) {
   return new Promise((resolve, reject) => {
-    const url = MakePlexURL(
-      "/status/sessions/history/all",
-      {
-        "sort": "viewedAt:desc",
-        "accountID": id,
-        "viewedAt>=": "0",
-        "limit": 200,
-      }
-    ).toString();
+    const url = MakePlexURL("/status/sessions/history/all", {
+      sort: "viewedAt:desc",
+      accountID: id,
+      "viewedAt>=": "0",
+      limit: 200,
+    }).toString();
 
     request(
       url,

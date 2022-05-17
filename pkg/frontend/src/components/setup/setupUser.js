@@ -1,17 +1,17 @@
-import typo from '../../styles/components/typography.module.scss';
-import button from '../../styles/components/button.module.scss';
-import inp from '../../styles/components/input.module.scss';
-import { useState } from 'react';
+import typo from "../../styles/components/typography.module.scss";
+import button from "../../styles/components/button.module.scss";
+import inp from "../../styles/components/input.module.scss";
+import { useState } from "react";
 
 export default function SetupUser(props) {
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState("");
 
   function saveUser() {
     if (password.length < 8) {
       props.newNotification({
-        type: 'error',
+        type: "error",
         message:
-          'Your password is too short, please enter a password with 8 characters or more.',
+          "Your password is too short, please enter a password with 8 characters or more.",
       });
       return;
     } else {
@@ -31,9 +31,8 @@ export default function SetupUser(props) {
   return (
     <div className="step-2">
       <p className={`${typo.body} mb-2`}>
-        This is your Petio admin user details, we will use your Plex
-        Username / Email, but a custom password just for Petio can be
-        used.
+        This is your Petio admin user details, we will use your Plex Username /
+        Email, but a custom password just for Petio can be used.
       </p>
       <p className={`${typo.body} mb-1`}>Petio Admin Username</p>
       <input
@@ -61,8 +60,9 @@ export default function SetupUser(props) {
         className={`${inp.text} mb-2`}
       ></input>
       <button
-        className={`${button.primary} ${button.auto} ${password.length > 7 ? '' : button.disabled
-          }`}
+        className={`${button.primary} ${button.auto} ${
+          password.length > 7 ? "" : button.disabled
+        }`}
         onClick={saveUser}
       >
         Next

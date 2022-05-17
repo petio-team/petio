@@ -1,93 +1,93 @@
-@import '../global/variables.module.scss';
-@import '../components/typography.module.scss';
+@import "../global/variables.module.scss";
+@import "../components/typography.module.scss";
 
 .wrap {
-	margin-top: 120px;
+  margin-top: 120px;
 
-	@media (min-width: $lg) {
-		margin-top: 170px;
-	}
+  @media (min-width: $lg) {
+    margin-top: 170px;
+  }
 }
 
 .info {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: space-between;
-	flex-direction: column-reverse;
-	margin-bottom: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  flex-direction: column-reverse;
+  margin-bottom: 30px;
 
-	@media (min-width: $lg) {
-		flex-direction: row;
-		margin-bottom: 0;
-	}
+  @media (min-width: $lg) {
+    flex-direction: row;
+    margin-bottom: 0;
+  }
 
-	&__overview {
-		width: 100%;
+  &__overview {
+    width: 100%;
 
-		@media (min-width: $lg) {
-			width: auto;
-			padding-right: 50px;
-			padding-top: 70px;
-		}
-	}
+    @media (min-width: $lg) {
+      width: auto;
+      padding-right: 50px;
+      padding-top: 70px;
+    }
+  }
 
-	&__profile {
-		display: flex;
-		justify-content: center;
-		margin-bottom: 30px;
+  &__profile {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
 
-		@media (min-width: $lg) {
-			margin-bottom: 0;
-			padding-left: 50px;
-			justify-content: flex-end;
-		}
+    @media (min-width: $lg) {
+      margin-bottom: 0;
+      padding-left: 50px;
+      justify-content: flex-end;
+    }
 
-		&__img {
-			width: 30vw;
-			height: 45vw;
-			background: $grey;
-			position: relative;
-			border-radius: 2px;
-			overflow: hidden;
+    &__img {
+      width: 30vw;
+      height: 45vw;
+      background: $grey;
+      position: relative;
+      border-radius: 2px;
+      overflow: hidden;
 
-			@media (min-width: $lg) {
-				width: 380px;
-				height: 570px;
-			}
+      @media (min-width: $lg) {
+        width: 380px;
+        height: 570px;
+      }
 
-			img {
-				position: absolute;
-				top: 0;
-				left: 0;
-				width: 100%;
-				height: 100%;
-				object-fit: cover;
-				object-position: center;
-			}
-		}
-	}
+      img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+      }
+    }
+  }
 
-	&__title {
-		width: 550px;
-		max-width: 100%;
-	}
+  &__title {
+    width: 550px;
+    max-width: 100%;
+  }
 
-	&__biography {
-		width: 550px;
-		max-width: 100%;
+  &__biography {
+    width: 550px;
+    max-width: 100%;
 
-		&__showmore {
-			margin-top: 10px;
-			color: $orange;
-			cursor: pointer;
-		}
-	}
+    &__showmore {
+      margin-top: 10px;
+      color: $orange;
+      cursor: pointer;
+    }
+  }
 
-	&__knownfor {
-		margin: 10px 0 20px;
+  &__knownfor {
+    margin: 10px 0 20px;
 
-		@media (min-width: $lg) {
-			margin: 28px 0 35px;
-		}
-	}
+    @media (min-width: $lg) {
+      margin: 28px 0 35px;
+    }
+  }
 }

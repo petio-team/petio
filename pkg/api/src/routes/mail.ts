@@ -2,7 +2,7 @@ import express from "express";
 
 import Mailer from "../mail/mailer";
 import logger from "../app/logger";
-import { adminRequired  } from "../middleware/auth";
+import { adminRequired } from "../middleware/auth";
 import { conf, WriteConfig } from "../app/config";
 
 const router = express.Router();
@@ -16,13 +16,13 @@ router.post("/create", async (req, res) => {
     return;
   }
 
-  conf.set('email.enabled', email.enabled);
-  conf.set('email.username', email.user);
-  conf.set('email.password', email.pass);
-  conf.set('email.host', email.server);
-  conf.set('email.port', email.port);
-  conf.set('email.ssl', email.secure);
-  conf.set('email.from', email.from);
+  conf.set("email.enabled", email.enabled);
+  conf.set("email.username", email.user);
+  conf.set("email.password", email.pass);
+  conf.set("email.host", email.server);
+  conf.set("email.port", email.port);
+  conf.set("email.ssl", email.secure);
+  conf.set("email.from", email.from);
 
   try {
     WriteConfig();
@@ -33,19 +33,19 @@ router.post("/create", async (req, res) => {
   }
 
   logger.log("verbose", "MAILER: Config updated");
-  res.json({ config: conf.get('email') });
+  res.json({ config: conf.get("email") });
 });
 
 router.get("/config", async (req, res) => {
   res.json({
     config: {
-      emailEnabled: conf.get('email.enabled'),
-      emailUser: conf.get('email.username'),
-      emailPass: conf.get('email.password'),
-      emailServer: conf.get('email.host'),
-      emailPort: conf.get('email.port'),
-      emailSecure: conf.get('email.ssl'),
-      emailFrom: conf.get('email.from'),
+      emailEnabled: conf.get("email.enabled"),
+      emailUser: conf.get("email.username"),
+      emailPass: conf.get("email.password"),
+      emailServer: conf.get("email.host"),
+      emailPort: conf.get("email.port"),
+      emailSecure: conf.get("email.ssl"),
+      emailFrom: conf.get("email.from"),
     },
   });
 });

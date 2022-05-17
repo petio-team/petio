@@ -1,17 +1,17 @@
-@import '../global/variables.module.scss';
+@import "../global/variables.module.scss";
 
 .wrap {
-	margin: 0 -10px;
-	position: relative;
-	z-index: 3;
+  margin: 0 -10px;
+  position: relative;
+  z-index: 3;
 
-	@media (min-width: $md) {
-		margin: 0 -20px;
-	}
+  @media (min-width: $md) {
+    margin: 0 -20px;
+  }
 }
 
 .inner {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
 }

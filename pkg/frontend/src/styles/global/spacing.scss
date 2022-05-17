@@ -1,38 +1,38 @@
 $base: $spacing;
 
 .m {
-	&b {
-		&-1 {
-			margin-bottom: #{$base * 1};
-		}
-		&-2 {
-			margin-bottom: #{$base * 2};
-		}
-		&-3 {
-			margin-bottom: #{$base * 3};
-		}
-		&-4 {
-			margin-bottom: #{$base * 4};
-		}
-		&-5 {
-			margin-bottom: #{$base * 5};
-		}
-	}
-	&t {
-		&-1 {
-			margin-top: #{$base * 1};
-		}
-		&-2 {
-			margin-top: #{$base * 2};
-		}
-		&-3 {
-			margin-top: #{$base * 3};
-		}
-		&-4 {
-			margin-top: #{$base * 4};
-		}
-		&-5 {
-			margin-top: #{$base * 5};
-		}
-	}
+  &b {
+    &-1 {
+      margin-bottom: #{$base * 1};
+    }
+    &-2 {
+      margin-bottom: #{$base * 2};
+    }
+    &-3 {
+      margin-bottom: #{$base * 3};
+    }
+    &-4 {
+      margin-bottom: #{$base * 4};
+    }
+    &-5 {
+      margin-bottom: #{$base * 5};
+    }
+  }
+  &t {
+    &-1 {
+      margin-top: #{$base * 1};
+    }
+    &-2 {
+      margin-top: #{$base * 2};
+    }
+    &-3 {
+      margin-top: #{$base * 3};
+    }
+    &-4 {
+      margin-top: #{$base * 4};
+    }
+    &-5 {
+      margin-top: #{$base * 5};
+    }
+  }
 }
