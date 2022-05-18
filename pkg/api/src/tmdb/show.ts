@@ -8,6 +8,7 @@ import onServer from "../plex/server";
 import { lookup as imdb } from "../meta/imdb";
 import getLanguage from "./languages";
 import { tmdbApiKey } from "../app/env";
+import { TMDBAPI } from "./tmdb";
 
 const agent = new http.Agent({ family: 4 });
 const memoryCache = cacheManager.caching({
@@ -180,6 +181,82 @@ export async function showLookup(id, minified = false) {
 export default showLookup;
 
 // Caching Layer
+
+// Get show details via the tmdbid
+export const getShowDetails = async (id: number) => {
+  try {
+    const [details, plex] = await Promise.all([
+      TMDBAPI.get("/tv/:id", {
+        params: {
+          id,
+        },
+        queries: {
+          append_to_response: "videos",
+        },
+      }),
+      onServer("show", undefined, undefined, id),
+    ]);
+
+    return {
+      on_server: plex ? true : false,
+      name: details.name,
+      poster_path: details.poster_path,
+      first_air_date: details.first_air_date,
+      id: details.id,
+      backdrop_path: details.backdrop_path,
+      videos: details.videos ? {
+        results: [
+          ...details.videos.results.filter(
+            (obj) => obj.type == "Teaser" && obj.site == "YouTube"
+          ),
+          ...details.videos.results.filter(
+            (obj) => obj.type == "Trailer" && obj.site == "YouTube"
+          ),
+        ],
+      } : [],
+    };
+  } catch (e) {
+    logger.error(e);
+  }
+};
+
+// Get movie details via the tmdbid
+export const getMovieDetails = async (id: number) => {
+  try {
+    const [details, plex] = await Promise.all([
+      TMDBAPI.get("/movie/:id", {
+        params: {
+          id,
+        },
+        queries: {
+          append_to_response: "videos",
+        },
+      }),
+      onServer("movie", undefined, undefined, id),
+    ]);
+
+    return {
+      on_server: plex ? true : false,
+      name: details.title,
+      poster_path: details.poster_path,
+      release_date: details.release_date,
+      id: details.id,
+      backdrop_path: details.backdrop_path,
+      videos: details.videos ? {
+        results: [
+          ...details.videos.results.filter(
+            (obj) => obj.type == "Teaser" && obj.site == "YouTube"
+          ),
+          ...details.videos.results.filter(
+            (obj) => obj.type == "Trailer" && obj.site == "YouTube"
+          ),
+        ],
+      } : [],
+    };
+  } catch (e) {
+    logger.error(e);
+  }
+};
 
 async function getShowData(id) {
   let data = false;
