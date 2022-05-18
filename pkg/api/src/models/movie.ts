@@ -29,8 +29,8 @@ const MovieSchema = new mongoose.Schema({
   Role: Array,
   idSource: String,
   externalId: String,
-  imdb_id: String,
-  tmdb_id: String,
+  imdb_id: { type: String, index: true },
+  tmdb_id: { type: String, index: true },
   petioTimestamp: Date,
 });
 

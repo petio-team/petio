@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const DiscoverySchema = new mongoose.Schema({
-  id: String,
+  id: { type: String, index: true },
   movie: {
     genres: Object,
     people: {
