@@ -9,6 +9,7 @@ router.get("/movies", async (req: any, res) => {
   let userId = req.jwtUser.altId ? req.jwtUser.altId : req.jwtUser.id;
   if (!userId) {
     res.sendStatus(404);
+    return;
   }
   try {
     logger.verbose(`ROUTE: Movie Discovery Profile returned for ${userId}`);
@@ -25,6 +26,7 @@ router.get("/shows", async (req: any, res) => {
   let userId = req.jwtUser.altId ? req.jwtUser.altId : req.jwtUser.id;
   if (!userId) {
     res.sendStatus(404);
+    return;
   }
   try {
     logger.verbose(`ROUTE: TV Discovery Profile returned for ${userId}`);
