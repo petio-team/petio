@@ -30,22 +30,26 @@ router.post("/", async (req: any, res) => {
     conf.set("auth.type", 1);
   }
 
-  logger.log("verbose", `LOGIN: New login attempted`);
-  logger.log("verbose", `LOGIN: Request IP: ${request_ip}`);
+  logger.verbose(`LOGIN: New login attempted`, { label: "routes.login" });
+  logger.verbose(`LOGIN: Request IP: ${request_ip}`, { label: "routes.login" });
 
   // check for existing jwt (skip if performing admin auth)
   if (!password)
     try {
       const user = await authenticate(req);
       success(user, req.jwtUser.admin, res);
-      logger.log("verbose", `LOGIN: Request User: ${user.username}`);
+      logger.verbose(`LOGIN: Request User: ${user.username}`, {
+        label: "routes.login",
+      });
       return;
     } catch (e) {
       // if existing jwt failed, continue onto normal login flow
-      logger.log("verbose", `LOGIN: No JWT: ${req.body.user.username}`);
+      logger.verbose(`LOGIN: No JWT: ${req.body.user.username}`, {
+        label: "routes.login",
+      });
     }
 
-  logger.log("verbose", `LOGIN: Request User: ${username}`);
+  logger.verbose(`LOGIN: Request User: ${username}`, { label: "routes.login" });
 
   try {
     // Find user in db
@@ -57,7 +61,9 @@ router.post("/", async (req: any, res) => {
       res.status(401).json({
         error: "User not found",
       });
-      logger.warn(`LOGIN: User not found ${username} - ${request_ip}`);
+      logger.warn(`LOGIN: User not found ${username} - ${request_ip}`, {
+        label: "routes.login",
+      });
       return;
     }
 
@@ -89,7 +95,7 @@ router.post("/", async (req: any, res) => {
     }
     saveRequestIp(dbUser, request_ip);
   } catch (err) {
-    logger.error(err);
+    logger.error(err, { label: "routes.login" });
     res
       .status(401)
       .json({ loggedIn: false, user: null, admin: false, token: null });
@@ -123,7 +129,9 @@ function success(user, isAdmin = false, res) {
 }
 
 function plexAuth(username, password) {
-  logger.info(`LOGIN: Using Plex Auth for ${username}`);
+  logger.info(`LOGIN: Using Plex Auth for ${username}`, {
+    label: "routes.login",
+  });
   return new Promise((resolve, reject) => {
     request(
       "https://plex.tv/users/sign_in.json",
@@ -143,17 +151,25 @@ function plexAuth(username, password) {
       },
       function (err, data) {
         if (err) {
-          logger.warn(`LOGIN: Plex auth failed for ${username}`);
+          logger.warn(`LOGIN: Plex auth failed for ${username}`, {
+            label: "routes.login",
+          });
           reject();
         }
         if (!data) {
-          logger.warn(`LOGIN: Plex auth error ${username}`);
+          logger.warn(`LOGIN: Plex auth error ${username}`, {
+            label: "routes.login",
+          });
           reject("LOGIN: Failed Plex Auth");
         } else if (data.error) {
-          logger.warn(`LOGIN: Plex auth error ${username}`);
+          logger.warn(`LOGIN: Plex auth error ${username}`, {
+            label: "routes.login",
+          });
           reject("LOGIN: Failed Plex Auth");
         } else {
-          logger.info(`LOGIN: Plex auth passed ${username}`);
+          logger.info(`LOGIN: Plex auth passed ${username}`, {
+            label: "routes.login",
+          });
           resolve(data);
         }
       }
@@ -181,7 +197,7 @@ router.post("/plex_login", async (req, res) => {
     success(dbUser.toObject(), isAdmin, res);
     saveRequestIp(dbUser, request_ip);
   } catch (err) {
-    logger.error(err);
+    logger.error(err, { label: "routes.login" });
     res
       .status(401)
       .json({ loggedIn: false, user: null, admin: false, token: null });
@@ -197,7 +213,7 @@ async function plexOauth(token) {
     let user = data.elements[0].attributes;
     return user.id;
   } catch (err) {
-    logger.error(err);
+    logger.error(err, { label: "routes.login" });
     throw "Plex authentication failed";
   }
 }
@@ -214,8 +230,8 @@ async function saveRequestIp(user, request_ip) {
       }
     );
   } catch (err) {
-    logger.log("error", "LOGIN: Update IP failed");
-    logger.log({ level: "error", message: err });
+    logger.error("LOGIN: Update IP failed", { label: "routes.login" });
+    logger.error(err, { label: "routes.login" });
   }
 }
 

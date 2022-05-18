@@ -204,16 +204,18 @@ export const getShowDetails = async (id: number) => {
       first_air_date: details.first_air_date,
       id: details.id,
       backdrop_path: details.backdrop_path,
-      videos: details.videos ? {
-        results: [
-          ...details.videos.results.filter(
-            (obj) => obj.type == "Teaser" && obj.site == "YouTube"
-          ),
-          ...details.videos.results.filter(
-            (obj) => obj.type == "Trailer" && obj.site == "YouTube"
-          ),
-        ],
-      } : [],
+      videos: details.videos
+        ? {
+            results: [
+              ...details.videos.results.filter(
+                (obj) => obj.type == "Teaser" && obj.site == "YouTube"
+              ),
+              ...details.videos.results.filter(
+                (obj) => obj.type == "Trailer" && obj.site == "YouTube"
+              ),
+            ],
+          }
+        : [],
     };
   } catch (e) {
     logger.error(e);
@@ -242,16 +244,18 @@ export const getMovieDetails = async (id: number) => {
       release_date: details.release_date,
       id: details.id,
       backdrop_path: details.backdrop_path,
-      videos: details.videos ? {
-        results: [
-          ...details.videos.results.filter(
-            (obj) => obj.type == "Teaser" && obj.site == "YouTube"
-          ),
-          ...details.videos.results.filter(
-            (obj) => obj.type == "Trailer" && obj.site == "YouTube"
-          ),
-        ],
-      } : [],
+      videos: details.videos
+        ? {
+            results: [
+              ...details.videos.results.filter(
+                (obj) => obj.type == "Teaser" && obj.site == "YouTube"
+              ),
+              ...details.videos.results.filter(
+                (obj) => obj.type == "Trailer" && obj.site == "YouTube"
+              ),
+            ],
+          }
+        : [],
     };
   } catch (e) {
     logger.error(e);
