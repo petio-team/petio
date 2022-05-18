@@ -4,6 +4,7 @@ import process from "node:process";
 
 import * as app from "./app/app";
 import logger from "./app/logger";
+import { loadConfig } from "./app/config";
 
 const workers: number[] = [];
 
@@ -35,6 +36,8 @@ export const runForks = () => {
 
 (async function () {
   try {
+    loadConfig();
+
     if (cluster.isPrimary) {
       await app.start();
     } else {

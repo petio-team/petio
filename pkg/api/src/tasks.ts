@@ -19,8 +19,6 @@ const TASK_NAME = {
 
 // execute tasks
 (async function () {
-  loadConfig();
-
   const agenda = new Agenda({
     db: { address: conf.get("db.url"), collection: "jobs" },
   });

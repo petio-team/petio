@@ -16,8 +16,6 @@ const restartApp = (): void => {
 };
 
 export const start = async (): Promise<void> => {
-  loadConfig();
-
   logger.info(`Petio v${pkg.version} [${conf.get("logger.level")}]`);
 
   server = SetupRouter(restartApp);
