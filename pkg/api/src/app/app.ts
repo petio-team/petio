@@ -16,6 +16,8 @@ const restartApp = (): void => {
 };
 
 export const start = async (): Promise<void> => {
+  loadConfig();
+
   logger.info(`Petio v${pkg.version} [${conf.get("logger.level")}]`);
 
   server = SetupRouter(restartApp);
@@ -31,7 +33,6 @@ export const start = async (): Promise<void> => {
       "Initial setup is required, please proceed to the webui to begin the setup"
     );
   } else {
-    loadConfig();
     await mongoose.connect(conf.get("db.url")).catch((err) => {
       logger.error(err);
       process.exit(1);
