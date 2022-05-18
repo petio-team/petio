@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import blueconfig from "blueconfig";
+import { LISTOFERRORS } from "blueconfig/lib/error";
 import blueconfig_format_with_validator from "blueconfig-format-with-validator";
 
 import { dataFolder } from "./env";
@@ -33,7 +34,6 @@ blueconfig.addFormat({
     });
 
     if (errors.length !== 0) {
-      // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'LISTOFERRORS'.
       throw new LISTOFERRORS(errors);
     }
   },
