@@ -115,17 +115,6 @@ function success(user, isAdmin = false, res) {
       token,
       admin: isAdmin,
     });
-  getTop(1);
-  getTop(2);
-  let userId = user.altId ? user.altId : user.id;
-  try {
-    getHistory(userId, "movie");
-    getHistory(userId, "show");
-    getDiscovery(userId, "movie");
-    getDiscovery(userId, "show");
-  } catch (err) {
-    // No need to log
-  }
 }
 
 function plexAuth(username, password) {
