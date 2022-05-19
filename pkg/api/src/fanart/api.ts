@@ -8,7 +8,117 @@ export enum FanartTypes {
   Shows = "tv",
 }
 
-export const FanartMovieSchema = z.object({
+export const TvFanartSchema = z.object({
+  name: z.string(),
+  thetvdb_id: z.string().optional(),
+  hdtvlogo: z
+    .array(
+      z.object({
+        id: z.string(),
+        url: z.string(),
+        lang: z.string(),
+        likes: z.string(),
+      })
+    )
+    .optional(),
+  tvposter: z
+    .array(
+      z.object({
+        id: z.string(),
+        url: z.string(),
+        lang: z.string(),
+        likes: z.string(),
+      })
+    )
+    .optional(),
+  characterart: z
+    .array(
+      z.object({
+        id: z.string(),
+        url: z.string(),
+        lang: z.string(),
+        likes: z.string(),
+      })
+    )
+    .optional(),
+  seasonposter: z
+    .array(
+      z.object({
+        id: z.string(),
+        url: z.string(),
+        lang: z.string(),
+        likes: z.string(),
+        season: z.string(),
+      })
+    )
+    .optional(),
+  hdclearart: z
+    .array(
+      z.object({
+        id: z.string(),
+        url: z.string(),
+        lang: z.string(),
+        likes: z.string(),
+      })
+    )
+    .optional(),
+  tvbanner: z
+    .array(
+      z.object({
+        id: z.string(),
+        url: z.string(),
+        lang: z.string(),
+        likes: z.string(),
+      })
+    )
+    .optional(),
+  showbackground: z
+    .array(
+      z.object({
+        id: z.string(),
+        url: z.string(),
+        lang: z.string(),
+        likes: z.string(),
+        season: z.string(),
+      })
+    )
+    .optional(),
+  tvthumb: z
+    .array(
+      z.object({
+        id: z.string(),
+        url: z.string(),
+        lang: z.string(),
+        likes: z.string(),
+      })
+    )
+    .optional(),
+  seasonbanner: z
+    .array(
+      z.object({
+        id: z.string(),
+        url: z.string(),
+        lang: z.string(),
+        likes: z.string(),
+        season: z.string(),
+      })
+    )
+    .optional(),
+  seasonthumb: z
+    .array(
+      z.object({
+        id: z.string(),
+        url: z.string(),
+        lang: z.string(),
+        likes: z.string(),
+        season: z.string(),
+      })
+    )
+    .optional(),
+});
+export type TvFanart = z.infer<typeof TvFanartSchema>;
+
+export const MovieFanartSchema = z.object({
   name: z.string(),
   tmdb_id: z.string().optional(),
   imdb_id: z.string().optional(),
@@ -85,30 +195,16 @@ export const FanartMovieSchema = z.object({
     )
     .optional(),
 });
-export type FanartMovie = z.infer<typeof FanartMovieSchema>;
+export type MovieFanart = z.infer<typeof MovieFanartSchema>;
 
-export const FanartShowSchema = z.object({
-  name: z.string(),
-  thetvdb_id: z.string(),
-  tvthumb: z
-    .array(
-      z.object({
-        id: z.string(),
-        url: z.string(),
-        lang: z.string(),
-        likes: z.string(),
-      })
-    )
-    .optional(),
-});
-export type FanartShow = z.infer<typeof FanartShowSchema>;
+export const Fanart = TvFanartSchema.merge(MovieFanartSchema);
 
 export const FanartAPI = new Zodios("https://webservice.fanart.tv/v3", [
   {
     method: "get",
     path: "/:type/:id",
     parameters: [],
-    response: z.union([FanartMovieSchema, FanartShowSchema]),
+    response: Fanart,
   },
 ] as const);
 
