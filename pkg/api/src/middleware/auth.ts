@@ -20,7 +20,7 @@ export async function authenticate(req) {
   req.jwtUser = jwt.verify(petioJwt, conf.get("plex.token"));
 
   try {
-    let userData = await UserModel.findOne({ id: req.jwtUser.id });
+    let userData = await UserModel.findOne({ email: req.jwtUser.email });
     if (!userData) {
       throw new Error("no user found");
     }
