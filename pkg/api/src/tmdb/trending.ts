@@ -3,7 +3,13 @@ import bluebird from "bluebird";
 
 import logger from "../app/logger";
 import { TMDBAPI } from "./tmdb";
-import { MediaType, TimeWindow, TrendingPeople } from "./trending/trending";
+import {
+  MediaType,
+  TimeWindow,
+  TrendingMovie,
+  TrendingPeople,
+  TrendingTv,
+} from "./trending/trending";
 import { getMovieDetails, getShowDetails } from "./show";
 
 const memoryCache = cacheManager.caching({
@@ -221,7 +227,7 @@ async function personData(): Promise<TrendingPeople[]> {
   }
 }
 
-async function moviesData() {
+async function moviesData(): Promise<TrendingMovie[]> {
   logger.verbose("Movies from source not cache", {
     label: "tmdb.trending",
   });
@@ -232,13 +238,13 @@ async function moviesData() {
         time_window: TimeWindow.Week,
       },
     });
-    return data.results;
+    return data.results as TrendingMovie[];
   } catch (err) {
     throw err;
   }
 }
 
-async function showsData() {
+async function showsData(): Promise<TrendingTv[]> {
   logger.verbose("Shows from source not cache", {
     label: "tmdb.trending",
   });
@@ -249,7 +255,7 @@ async function showsData() {
         time_window: TimeWindow.Week,
       },
     });
-    return data.results;
+    return data.results as TrendingTv[];
   } catch (err) {
     throw err;
   }

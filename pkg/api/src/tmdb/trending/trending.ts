@@ -81,7 +81,7 @@ export const TrendingPeopleSchema = z.object({
 });
 export type TrendingPeople = z.infer<typeof TrendingPeopleSchema>;
 
-const TrendingSchema = z.object({
+export const TrendingSchema = z.object({
   page: z.number(),
   results: z.array(
     z.union([TrendingPeopleSchema, TrendingMovieSchema, TrendingTvSchema])
