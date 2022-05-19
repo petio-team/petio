@@ -14,9 +14,9 @@ export const UserSchema = z.object({
   password: z.string().optional(),
   email: z.string().email().nonempty(),
   thumbnail: z.string().nonempty(),
-  // altId is now used to tell if an account is custom or not, if the id is set
-  // then the id is that of a plex id
+  // altId is now used to tell if an account is custom or not
   altId: z.string().nonempty().optional(),
+  plexId: z.string().nonempty().optional(),
   role: z.nativeEnum(UserRole).default(UserRole.User),
   profileId: z.string().optional(),
   // owner replaced the old custom field, and inverts it's usage
@@ -48,6 +48,9 @@ const UserModelSchema = new Schema<User>(
       type: String,
     },
     altId: {
+      type: String,
+    },
+    plexId: {
       type: String,
     },
     lastIp: {

@@ -182,7 +182,7 @@ router.post("/plex_login", async (req, res) => {
   const token = req.body.token;
   try {
     let userId = await plexOauth(token);
-    let dbUser = await UserModel.findOne({ id: userId });
+    let dbUser = await UserModel.findOne({ plexId: userId });
     if (!dbUser) {
       res.status(401).json({ error: "User not found" });
       return;

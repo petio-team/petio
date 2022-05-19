@@ -121,6 +121,7 @@ router.post("/set", async (req, res) => {
       email: user.email,
       thumbnail: user.thumb,
       altId: "1",
+      plexId: user.id,
       lastIp: req.ip,
       role: UserRole.Admin,
       owner: true,

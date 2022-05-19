@@ -812,6 +812,7 @@ export default class LibraryUpdate {
         username: obj.username ? obj.username : obj.title,
         email: obj.email.toLowerCase() ?? "",
         thumbnail: obj.thumb ?? "",
+        plexId: obj.id,
         profileId: defaultProfile ? defaultProfile._id : undefined,
         role: UserRole.User,
         owner: false,
