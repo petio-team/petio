@@ -1,30 +1,29 @@
 import Promise from "bluebird";
 import xmlParser from "xml-js";
-import bcrypt from "bcryptjs";
 import axios from "axios";
 
-import Library from "../models/library";
-import Movie from "../models/movie";
-import Music from "../models/artist";
-import Show from "../models/show";
+import logger from "@/loaders/logger";
+import Library from "@/models/library";
+import Movie from "@/models/movie";
+import Music from "@/models/artist";
+import Show from "@/models/show";
 import {
   CreateOrUpdateUser,
   GetUserByEmail,
   User,
   UserModel,
   UserRole,
-} from "../models/user";
-import Request from "../models/request";
-import Profile from "../models/profile";
-import Mailer from "../mail/mailer";
-import processRequest from "../requests/process";
-import logger from "../app/logger";
-import Discord from "../notifications/discord";
-import Telegram from "../notifications/telegram";
-import { showLookup } from "../tmdb/show";
-import MusicMeta from "../meta/musicBrainz";
-import { conf } from "../app/config";
-import { tmdbApiKey } from "../app/env";
+} from "@/models/user";
+import Request from "@/models/request";
+import Profile from "@/models/profile";
+import Mailer from "@/mail/mailer";
+import processRequest from "@/requests/process";
+import Discord from "@/notifications/discord";
+import Telegram from "@/notifications/telegram";
+import { showLookup } from "@/tmdb/show";
+import MusicMeta from "@/meta/musicBrainz";
+import { conf } from "@/app/config";
+import { tmdbApiKey } from "@/app/env";
 
 export default class LibraryUpdate {
   full: any;

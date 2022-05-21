@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "esnext",
+    "typeRoots": ["./node_modules/@types", "./src/types"],
     "module": "commonjs",
     "allowJs": true,
     "checkJs": false,
@@ -8,25 +9,24 @@
     "rootDir": ".",
     "strict": false,
     "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */,
     "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */,
     "declaration": true /* Generates corresponding '.d.ts' file. */,
     "strictNullChecks": true,
     "resolveJsonModule": true,
+    "pretty": true,
+    "noEmit": false,
+    "moduleResolution": "node",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "preserveConstEnums": true,
     "sourceMap": true,
-    "baseUrl": "src",
+    "baseUrl": ".",
     "paths": {
-      "@root/*": ["*"],
-      "@app/*": ["app/*"],
-      "@models/*": ["models/*"],
-      "@routes/*": ["routes/*"],
-      "@services/*": ["services/*"],
-      "@db/*": ["db/*"]
+      "@/*": ["./src/*"]
     }
   },
-  "exclude": ["node_modules/**", "dist"],
-  "include": ["*", "./package.json"]
+  "exclude": ["node_modules", "dist", "tests"],
+  "include": ["./src/**/*", "./package.json"]
 }

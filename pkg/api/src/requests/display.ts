@@ -1,11 +1,11 @@
 import Promise from "bluebird";
 
-import { movieLookup } from "../tmdb/movie";
-import { showLookup } from "../tmdb/show";
-import Request from "../models/request";
-import Sonarr from "../downloaders/sonarr";
-import Radarr from "../downloaders/radarr";
-import logger from "../app/logger";
+import logger from "@/loaders/logger";
+import { movieLookup } from "@/tmdb/movie";
+import { showLookup } from "@/tmdb/show";
+import Request from "@/models/request";
+import Sonarr from "@/downloaders/sonarr";
+import Radarr from "@/downloaders/radarr";
 
 export const getRequests = async (user = false, all = false) => {
   const requests = await Request.find();

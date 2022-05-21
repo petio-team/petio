@@ -1,16 +1,16 @@
-import Request from "../models/request";
-import Archive from "../models/archive";
-import { UserModel, UserRole } from "../models/user";
-import Profile from "../models/profile";
-import Mailer from "../mail/mailer";
-import Sonarr from "../downloaders/sonarr";
-import Radarr from "../downloaders/radarr";
-import logger from "../app/logger";
+import logger from "@/loaders/logger";
+import Request from "@/models/request";
+import Archive from "@/models/archive";
+import { UserModel, UserRole } from "@/models/user";
+import Profile from "@/models/profile";
+import Mailer from "@/mail/mailer";
+import Sonarr from "@/downloaders/sonarr";
+import Radarr from "@/downloaders/radarr";
+import Discord from "@/notifications/discord";
+import Telegram from "@/notifications/telegram";
+import { showLookup } from "@/tmdb/show";
+import { conf } from "@/app/config";
 import filter from "./filter";
-import Discord from "../notifications/discord";
-import Telegram from "../notifications/telegram";
-import { showLookup } from "../tmdb/show";
-import { conf } from "../app/config";
 
 export default class processRequest {
   request: any;

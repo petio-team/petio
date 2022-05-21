@@ -4,7 +4,7 @@ import cacheManager from "cache-manager";
 import plexLookup from "./lookup";
 import { movieLookup } from "../tmdb/movie";
 import { showLookup } from "../tmdb/show";
-import logger from "../app/logger";
+import logger from "@/loaders/logger";
 import MakePlexURL from "./util";
 
 const memoryCache = cacheManager.caching({

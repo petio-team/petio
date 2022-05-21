@@ -1,12 +1,12 @@
 import Promise from "bluebird";
 import request from "xhr-request";
 
-import { GetAllUsers, User } from "../models/user";
-import Discovery from "../models/discovery";
-import logger from "../app/logger";
-import Movie from "../models/movie";
-import Show from "../models/show";
-import MakePlexURL from "../plex/util";
+import logger from "@/loaders/logger";
+import { GetAllUsers, User } from "@/models/user";
+import Discovery from "@/models/discovery";
+import Movie from "@/models/movie";
+import Show from "@/models/show";
+import MakePlexURL from "@/plex/util";
 
 export default async () => {
   logger.verbose("DISC: Started building discovery profiles", {

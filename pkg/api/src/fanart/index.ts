@@ -1,6 +1,6 @@
 import cacheManager from "cache-manager";
 
-import logger from "../app/logger";
+import logger from "@/loaders/logger";
 import { FanartAPI } from "./api";
 
 const memoryCache = cacheManager.caching({

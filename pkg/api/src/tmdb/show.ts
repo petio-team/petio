@@ -2,7 +2,7 @@ import http from "http";
 import axios from "axios";
 import cacheManager from "cache-manager";
 
-import logger from "../app/logger";
+import logger from "@/loaders/logger";
 import fanartLookup from "../fanart";
 import onServer from "../plex/server";
 import { lookup as imdb } from "../meta/imdb";

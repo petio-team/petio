@@ -2,21 +2,21 @@ import request from "xhr-request";
 import Promise from "bluebird";
 import cacheManager from "cache-manager";
 
-import Discovery from "../models/discovery";
-import logger from "../app/logger";
-import { conf } from "../app/config";
+import Discovery from "@/models/discovery";
+import logger from "@/loaders/logger";
+import { conf } from "@/app/config";
 import {
   movieLookup,
   getRecommendations as getMovieRecommendations,
-} from "../tmdb/movie";
+} from "@/tmdb/movie";
 import {
   showLookup,
   getRecommendations as getShowRecommendations,
-} from "../tmdb/show";
-import getHistory from "../plex/history";
-import onServer from "../plex/server";
-import getTop from "../plex/top";
-import { tmdbApiKey } from "../app/env";
+} from "@/tmdb/show";
+import getHistory from "@/plex/history";
+import onServer from "@/plex/server";
+import getTop from "@/plex/top";
+import { tmdbApiKey } from "@/app/env";
 
 const memoryCache = cacheManager.caching({
   store: "memory",

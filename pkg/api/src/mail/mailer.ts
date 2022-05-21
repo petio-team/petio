@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 
-import logger from "../app/logger";
-import { conf } from "../app/config";
+import logger from "@/loaders/logger";
+import { conf } from "@/app/config";
 
 export default class Mailer {
   transport: any;

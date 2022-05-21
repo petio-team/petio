@@ -1,9 +1,9 @@
-const User = require("../models/user");
-const logger = require("../app/logger");
+import logger from "@/loaders/logger";
+import { UserModel } from "@/models/user";
 
 export default class QuotaSystem {
   async reset() {
     logger.verbose("QUOTA: Reseting Quotas", { label: "requests.quotas" });
-    await User.updateMany({}, { $set: { quotaCount: 0 } });
+    UserModel.updateMany({}, { $set: { quotaCount: 0 } });
   }
 }

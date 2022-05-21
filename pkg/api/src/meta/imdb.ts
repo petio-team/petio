@@ -4,7 +4,7 @@ import zlib from "zlib";
 import fs from "fs";
 import path from "path";
 
-import logger from "../app/logger";
+import logger from "@/loaders/logger";
 import Imdb from "../models/imdb";
 import { dataFolder } from "../app/env";
 

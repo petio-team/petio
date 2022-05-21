@@ -1,8 +1,8 @@
 import axios from "axios";
 
-import Request from "../models/request";
-import logger from "../app/logger";
-import { conf } from "../app/config";
+import logger from "@/loaders/logger";
+import Request from "@/models/request";
+import { conf } from "@/app/config";
 
 export default class Sonarr {
   config: any;

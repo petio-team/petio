@@ -1,7 +1,7 @@
 import Movie from "../models/movie";
 import Show from "../models/show";
 import { UserModel } from "../models/user";
-import logger from "../app/logger";
+import logger from "@/loaders/logger";
 
 export default async () => {
   try {
@@ -22,8 +22,8 @@ export default async () => {
       };
     }
   } catch (e) {
-    logger.debug(e);
     logger.error("setup ready check failed to get ready");
+    logger.error(e);
     return {
       ready: false,
       error: "setup ready failed",

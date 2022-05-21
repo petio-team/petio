@@ -1,8 +1,8 @@
 import api from "musicbrainz-api";
-
-import pkg from "../../package.json";
 import sanitize from "sanitize-filename";
-import logger from "../app/logger";
+
+import pkg from "@/../package.json";
+import logger from "@/loaders/logger";
 
 export default class MusicMeta {
   api: any;

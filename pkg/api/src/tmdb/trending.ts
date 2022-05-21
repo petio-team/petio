@@ -1,7 +1,7 @@
 import cacheManager from "cache-manager";
 import bluebird from "bluebird";
 
-import logger from "../app/logger";
+import logger from "@/loaders/logger";
 import { TMDBAPI } from "./tmdb";
 import {
   MediaType,

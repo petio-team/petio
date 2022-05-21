@@ -11,7 +11,7 @@ tasks:
   dev:
     dir: pkg/api
     cmds:
-      - node-dev ./main.ts
+      - yarn run start
 
   dev:compose:
     cmds:

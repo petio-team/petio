@@ -20,7 +20,7 @@ export const TvDetailsSchema = z.object({
     name: z.string(),
     overview: z.string(),
     production_code: z.string(),
-    runtime: z.number(),
+    runtime: z.number().or(z.null()),
     season_number: z.number(),
     still_path: z.string(),
     vote_average: z.number(),

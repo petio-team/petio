@@ -1,8 +1,8 @@
 import http from "http";
 import axios from "axios";
 
-import logger from "../app/logger";
-import { tmdbApiKey } from "../app/env";
+import logger from "@/loaders/logger";
+import { tmdbApiKey } from "@/app/env";
 
 const agent = new http.Agent({ family: 4 });
 

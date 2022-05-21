@@ -1,7 +1,7 @@
-import logger from "../app/logger";
-import Filter from "../models/filter";
-import { movieLookup } from "../tmdb/movie";
-import { showLookup } from "../tmdb/show";
+import logger from "@/loaders/logger";
+import Filter from "@/models/filter";
+import { movieLookup } from "@/tmdb/movie";
+import { showLookup } from "@/tmdb/show";
 
 export default async (item) => {
   if (!item.tmdb_id) return false;

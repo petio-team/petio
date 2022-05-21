@@ -1,9 +1,9 @@
 import axios from "axios";
 import { URL, URLSearchParams } from "url";
 
-import Request from "../models/request";
-import logger from "../app/logger";
-import { conf } from "../app/config";
+import logger from "@/loaders/logger";
+import Request from "@/models/request";
+import { conf } from "@/app/config";
 
 export default class Radarr {
   config: any;
