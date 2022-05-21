@@ -9,10 +9,8 @@ export const listen = ({ expressApp }: { expressApp: Application }) => {
   let http = expressApp.listen(conf.get("petio.port"), conf.get("petio.host"));
   expressApp.set("restart", async () => {
     if (http != null) {
-      console.log("closing http server");
       http.close();
     }
-    console.log("running forks");
     setupWorkerProcesses();
   });
 
