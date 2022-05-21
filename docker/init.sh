@@ -8,4 +8,4 @@ fi
 chmod "=rwx" "/data"
 chown node:node "/data"
 
-su node -c "/usr/local/bin/node ./api/main.js --host 0.0.0.0 --port 7777"
+su node -c "/usr/local/bin/node ./api/src/app.js --host 0.0.0.0 --port 7777"
