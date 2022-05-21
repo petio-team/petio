@@ -83,5 +83,8 @@
       "node16-win-arm64"
     ],
     "outputPath": "../../releases"
+  },
+  "_moduleAliases": {
+    "@": "src"
   }
 }

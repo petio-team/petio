@@ -1,3 +1,4 @@
+import "module-alias/register";
 import("dotenv/config");
 import("cache-manager/lib/stores/memory");
 import express from "express";
