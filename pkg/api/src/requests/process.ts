@@ -9,7 +9,7 @@ import Radarr from "@/downloaders/radarr";
 import Discord from "@/notifications/discord";
 import Telegram from "@/notifications/telegram";
 import { showLookup } from "@/tmdb/show";
-import { conf } from "@/app/config";
+import { config } from "@/config/index";
 import filter from "./filter";
 
 export default class processRequest {
@@ -198,7 +198,7 @@ export default class processRequest {
       }
     } else {
       if (this.request.type === "movie") {
-        for (let s in conf.get("radarr")) {
+        for (let s in config.get("radarr")) {
           const obj: any = s;
           if (profile.radarr && profile.radarr[obj.uuid]) {
             pending[obj.uuid] = {
@@ -209,7 +209,7 @@ export default class processRequest {
           }
         }
       } else {
-        for (let s in conf.get("sonarr")) {
+        for (let s in config.get("sonarr")) {
           const obj: any = s;
           if (profile.sonarr && profile.sonarr[obj.uuid]) {
             pending[obj.uuid] = {

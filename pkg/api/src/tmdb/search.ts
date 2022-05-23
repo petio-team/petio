@@ -7,7 +7,7 @@ import logger from "@/loaders/logger";
 import onServer from "@/plex/server";
 import { movieLookup } from "@/tmdb/movie";
 import { showLookup } from "@/tmdb/show";
-import { tmdbApiKey } from "@/app/env";
+import { tmdbApiKey } from "@/config/env";
 
 const agent = new http.Agent({ family: 4 });
 

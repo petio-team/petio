@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 
 import { adminRequired } from "@/api/middleware/auth";
-import { dataFolder } from "@/app/env";
+import { dataFolder } from "@/config/env";
 
 let liveLogfile = path.join(dataFolder, "./logs/live1.log");
 let liveLogfile2 = path.join(dataFolder, "./logs/live.log");

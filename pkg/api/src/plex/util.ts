@@ -1,10 +1,10 @@
 import { URL, URLSearchParams } from "url";
-import { conf } from "../app/config";
+import { config } from "@/config/schema";
 
 const MakePlexURL = (url, params = {}) => {
   const baseurl = new URL(
     url,
-    `${conf.get("plex.protocol")}://${conf.get("plex.host")}:${conf.get(
+    `${config.get("plex.protocol")}://${config.get("plex.host")}:${config.get(
       "plex.port"
     )}`
   );
@@ -16,7 +16,7 @@ const MakePlexURL = (url, params = {}) => {
     }
   }
 
-  prms.set("X-Plex-Token", conf.get("plex.token"));
+  prms.set("X-Plex-Token", config.get("plex.token"));
   baseurl.search = prms.toString();
 
   return baseurl;

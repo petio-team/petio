@@ -1,7 +1,7 @@
-import { conf, hasConfig } from "../../app/config";
+import { HasConfig } from "@/config/index";
 
-export default (req, res, next) => {
-  if (hasConfig() === false) {
+export default async (req, res, next) => {
+  if ((await HasConfig()) === false) {
     const path = req.path;
     if (path.startsWith("/api")) {
       if (

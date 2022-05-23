@@ -7,7 +7,7 @@ import onServer from "../plex/server";
 import { lookup } from "../meta/imdb";
 import getLanguage from "./languages";
 import logger from "@/loaders/logger";
-import { tmdbApiKey } from "../app/env";
+import { tmdbApiKey } from "@/config/env";
 
 const agent = new http.Agent({ family: 4 });
 const memoryCache = cacheManager.caching({

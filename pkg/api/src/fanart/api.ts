@@ -1,5 +1,5 @@
 import { Zodios } from "zodios";
-import { fanartApiKey } from "../app/env";
+import { fanartApiKey } from "../config/env";
 import { pluginApiKey } from "./key";
 import * as z from "zod";
 

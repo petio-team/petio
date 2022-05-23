@@ -3,7 +3,8 @@ import { Router } from "express";
 import Mailer from "@/mail/mailer";
 import logger from "@/loaders/logger";
 import { adminRequired } from "@/api/middleware/auth";
-import { conf, WriteConfig } from "@/app/config";
+import { WriteConfig } from "@/config/config";
+import { config } from "@/config/schema";
 
 const route = Router();
 
@@ -19,13 +20,13 @@ export default (app: Router) => {
       return;
     }
 
-    conf.set("email.enabled", email.enabled);
-    conf.set("email.username", email.user);
-    conf.set("email.password", email.pass);
-    conf.set("email.host", email.server);
-    conf.set("email.port", email.port);
-    conf.set("email.ssl", email.secure);
-    conf.set("email.from", email.from);
+    config.set("email.enabled", email.enabled);
+    config.set("email.username", email.user);
+    config.set("email.password", email.pass);
+    config.set("email.host", email.server);
+    config.set("email.port", email.port);
+    config.set("email.ssl", email.secure);
+    config.set("email.from", email.from);
 
     try {
       await WriteConfig();
@@ -36,19 +37,19 @@ export default (app: Router) => {
     }
 
     logger.log("verbose", "MAILER: Config updated");
-    res.json({ config: conf.get("email") });
+    res.json({ config: config.get("email") });
   });
 
   route.get("/config", async (_req, res) => {
     res.json({
       config: {
-        emailEnabled: conf.get("email.enabled"),
-        emailUser: conf.get("email.username"),
-        emailPass: conf.get("email.password"),
-        emailServer: conf.get("email.host"),
-        emailPort: conf.get("email.port"),
-        emailSecure: conf.get("email.ssl"),
-        emailFrom: conf.get("email.from"),
+        emailEnabled: config.get("email.enabled"),
+        emailUser: config.get("email.username"),
+        emailPass: config.get("email.password"),
+        emailServer: config.get("email.host"),
+        emailPort: config.get("email.port"),
+        emailSecure: config.get("email.ssl"),
+        emailFrom: config.get("email.from"),
       },
     });
   });

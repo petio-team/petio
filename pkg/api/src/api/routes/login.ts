@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import axios from "axios";
 import xmlParser from "xml-js";
 
-import { conf, hasConfig } from "@/app/config";
+import { HasConfig, config } from "@/config/index";
 import { UserModel, UserRole } from "@/models/user";
 import logger from "@/loaders/logger";
 import { authenticate } from "@/api/middleware/auth";
@@ -21,13 +21,14 @@ export default (app: Router) => {
       user: { username, password },
     } = req.body || { user: {} };
 
-    if (hasConfig() === false) {
+    const exists = await HasConfig();
+    if (exists === false) {
       res.status(500).send("This Petio API is not setup");
       return;
     }
 
-    if (!conf.get("auth.type")) {
-      conf.set("auth.type", 1);
+    if (!config.get("auth.type")) {
+      config.set("auth.type", 1);
     }
 
     logger.verbose(`LOGIN: New login attempted`, { label: "routes.login" });
@@ -80,7 +81,7 @@ export default (app: Router) => {
 
       let isAdmin = dbUser.role === UserRole.Admin;
 
-      if (conf.get("auth.type") === 1 || password) {
+      if (config.get("auth.type") === 1 || password) {
         if (dbUser.password) {
           if (!bcrypt.compareSync(password, dbUser.password)) {
             res.status(401).json({
@@ -136,7 +137,7 @@ export default (app: Router) => {
 
 function success(user, isAdmin = false, res) {
   user.password = null;
-  const token = jwt.sign({ ...user, admin: isAdmin }, conf.get("plex.token"));
+  const token = jwt.sign({ ...user, admin: isAdmin }, config.get("plex.token"));
   res
     .cookie("petio_jwt", token, {
       maxAge: 2419200000,
@@ -164,7 +165,7 @@ function plexAuth(username, password) {
           "X-Plex-Platform-Version": "1.0",
           "X-Plex-Device-Name": "Petio API",
           "X-Plex-Version": "1.0",
-          "X-Plex-Client-Identifier": conf.get("plex.client"),
+          "X-Plex-Client-Identifier": config.get("plex.client"),
           Authorization:
             "Basic " +
             Buffer.from(`${username}:${password}`).toString("base64"),

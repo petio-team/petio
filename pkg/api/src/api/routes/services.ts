@@ -3,7 +3,7 @@ import { Router } from "express";
 import logger from "@/loaders/logger";
 import Sonarr from "@/downloaders/sonarr";
 import Radarr from "@/downloaders/radarr";
-import { conf, WriteConfig } from "@/app/config";
+import { config, WriteConfig } from "@/config/index";
 import { authRequired, adminRequired } from "@/api/middleware/auth";
 
 const route = Router();
@@ -72,8 +72,8 @@ export default (app: Router) => {
   });
 
   route.get("/sonarr/config", adminRequired, async (req, res) => {
-    let config = new Sonarr().getConfig();
-    res.json(config);
+    let conf = new Sonarr().getConfig();
+    res.json(conf);
   });
 
   route.post("/sonarr/config", adminRequired, async (req, res) => {
@@ -104,7 +104,7 @@ export default (app: Router) => {
       return;
     }
 
-    let sonarrs = conf.get("sonarr");
+    let sonarrs = config.get("sonarr");
     const match = sonarrs.filter((el) => el.uuid == uuid);
     if (match.length == 0) {
       res.status(400).json({
@@ -117,7 +117,7 @@ export default (app: Router) => {
     }
 
     sonarrs = sonarrs.filter((el) => el.uuid != uuid);
-    conf.set("sonarr", sonarrs);
+    config.set("sonarr", sonarrs);
 
     try {
       await WriteConfig();
@@ -217,8 +217,8 @@ export default (app: Router) => {
   });
 
   route.get("/radarr/config", adminRequired, async (req, res) => {
-    let config = new Radarr().getConfig();
-    res.json(config);
+    let conf = new Radarr().getConfig();
+    res.json(conf);
   });
 
   route.get("/radarr/test", adminRequired, async (req, res) => {
@@ -256,7 +256,7 @@ export default (app: Router) => {
       return;
     }
 
-    let radarrs = conf.get("radarr");
+    let radarrs = config.get("radarr");
     const match = radarrs.filter((el) => el.uuid == uuid);
     if (match.length == 0) {
       res.status(400).json({
@@ -269,7 +269,7 @@ export default (app: Router) => {
     }
 
     radarrs = radarrs.filter((el) => el.uuid != uuid);
-    conf.set("radarr", radarrs);
+    config.set("radarr", radarrs);
 
     try {
       await WriteConfig();
@@ -358,5 +358,5 @@ const ConvertToConfig = (entry, obj) => {
     data.push(item);
   }
 
-  conf.set(entry, data);
+  config.set(entry, data);
 };

@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
 import logger from "@/loaders/logger";
-import { conf } from "../../app/config";
+import { config } from "@/config/schema";
 import { UserModel } from "../../models/user";
 
 export async function authenticate(req) {
@@ -17,7 +17,7 @@ export async function authenticate(req) {
   } else {
     throw `AUTH: No auth token provided - route ${req.path}`;
   }
-  req.jwtUser = jwt.verify(petioJwt, conf.get("plex.token"));
+  req.jwtUser = jwt.verify(petioJwt, config.get("plex.token"));
 
   try {
     let userData = await UserModel.findOne({ email: req.jwtUser.email });

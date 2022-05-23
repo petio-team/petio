@@ -1,12 +1,15 @@
 import { Application } from "express";
 
-import { conf } from "@/app/config";
+import { config } from "@/config/schema";
 import logger from "@/loaders/logger";
 import { setupWorkerProcesses } from "@/app";
 
 export const listen = ({ expressApp }: { expressApp: Application }) => {
   // run server
-  let http = expressApp.listen(conf.get("petio.port"), conf.get("petio.host"));
+  let http = expressApp.listen(
+    config.get("petio.port"),
+    config.get("petio.host")
+  );
   expressApp.set("restart", async () => {
     if (http != null) {
       http.close();

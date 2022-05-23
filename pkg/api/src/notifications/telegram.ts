@@ -1,16 +1,16 @@
 import axios from "axios";
 
 import logger from "@/loaders/logger";
-import { conf } from "@/app/config";
+import { config } from "@/config/schema";
 
 export default class Telegram {
   botToken: any;
   chatId: any;
   sendSilently: any;
   constructor() {
-    this.botToken = conf.get("notifications.telegram.token") || null;
-    this.chatId = conf.get("notifications.telegram.id") || null;
-    this.sendSilently = conf.get("notifications.telegram.silent") || false;
+    this.botToken = config.get("notifications.telegram.token") || null;
+    this.chatId = config.get("notifications.telegram.id") || null;
+    this.sendSilently = config.get("notifications.telegram.silent") || false;
   }
 
   check() {

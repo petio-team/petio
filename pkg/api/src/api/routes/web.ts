@@ -2,8 +2,8 @@ import express, { Router } from "express";
 import path from "path";
 import fs from "fs";
 
-import { frontendView } from "@/app/env";
-import { conf } from "@/app/config";
+import { frontendView } from "@/config/env";
+import { config } from "@/config/index";
 
 const route = Router();
 
@@ -19,8 +19,8 @@ export default (app: Router) => {
   }
   route.use(express.static(frontendPath));
 
-  if (conf.get("petio.subpath") !== "/") {
-    app.use(`${conf.get("petio.subpath")}`, route);
+  if (config.get("petio.subpath") !== "/") {
+    app.use(`${config.get("petio.subpath")}`, route);
   } else {
     app.use(`/`, route);
   }

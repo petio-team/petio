@@ -1,6 +1,6 @@
 FROM node:17.4.0-alpine
 ENV APP_DIR="/app" VIEWS_FOLDER="/app/views" DATA_FOLDER="/data"
-RUN apk add --no-cache ca-certificates shadow bash wget;
+RUN apk add --no-cache ca-certificates shadow bash wget && rm -rf /var/cache/apk/*;
 RUN mkdir -p /app && chown node:node /app
 COPY --chown=node:node --chmod=0755 ./pkg/frontend/build /app/views/frontend
 COPY --chown=node:node --chmod=0755 ./pkg/api/dist /app/api

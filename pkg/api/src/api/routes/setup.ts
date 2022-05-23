@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 
 import logger from "@/loaders/logger";
 import testConnection from "@/plex/connection";
-import { WriteConfig, conf } from "@/app/config";
+import { config, WriteConfig } from "@/config/index";
 import { CreateOrUpdateUser, UserRole } from "@/models/user";
 
 const route = Router();
@@ -103,12 +103,12 @@ export default (app: Router) => {
       return;
     }
 
-    conf.set("db.url", dbUrl + "/petio");
-    conf.set("plex.protocol", server.protocol);
-    conf.set("plex.host", server.host);
-    conf.set("plex.port", server.port);
-    conf.set("plex.token", server.token);
-    conf.set("plex.client", server.clientId);
+    config.set("db.url", dbUrl + "/petio");
+    config.set("plex.protocol", server.protocol);
+    config.set("plex.host", server.host);
+    config.set("plex.port", server.port);
+    config.set("plex.token", server.token);
+    config.set("plex.client", server.clientId);
 
     try {
       await CreateOrUpdateUser({

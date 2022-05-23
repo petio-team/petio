@@ -6,7 +6,7 @@ import path from "path";
 
 import logger from "@/loaders/logger";
 import Imdb from "../models/imdb";
-import { dataFolder } from "../app/env";
+import { dataFolder } from "../config/env";
 
 export async function lookup(imdb_id) {
   if (!imdb_id) {

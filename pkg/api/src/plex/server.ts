@@ -1,9 +1,9 @@
 import Movie from "../models/movie";
 import Show from "../models/show";
-import { conf } from "../app/config";
+import { config } from "@/config/schema";
 
 export default async (type, imdb, tvdb, tmdb) => {
-  let clientId = conf.get("plex.client");
+  let clientId = config.get("plex.client");
   if (type === "movie") {
     let foundItemsImdb: any = false;
     let foundItemsTvdb: any = false;

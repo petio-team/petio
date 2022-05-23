@@ -3,7 +3,8 @@ import axios from "axios";
 
 import logger from "@/loaders/logger";
 import plexLookup from "@/plex/lookup";
-import { conf, WriteConfig } from "@/app/config";
+import { config } from "@/config/schema";
+import { WriteConfig } from "@/config/config";
 import MakePlexURL from "@/plex/util";
 import { authRequired } from "@/api/middleware/auth";
 
@@ -28,13 +29,13 @@ export default (app: Router) => {
     const url = MakePlexURL("/").toString();
     try {
       await axios.get(
-        `https://plex.tv/pms/resources?X-Plex-Token=${conf.get("plex.token")}`
+        `https://plex.tv/pms/resources?X-Plex-Token=${config.get("plex.token")}`
       );
       let connection = await axios.get(url);
       let data = connection.data.MediaContainer;
       if (
-        data.myPlexUsername === conf.get("admin.username") ||
-        data.myPlexUsername === conf.get("admin.email")
+        data.myPlexUsername === config.get("admin.username") ||
+        data.myPlexUsername === config.get("admin.email")
       ) {
         await updateCredentials({ plexClientID: data.machineIdentifier });
         res.json({
@@ -64,7 +65,7 @@ async function updateCredentials(obj) {
     throw "plex client id does not exist in object";
   }
 
-  conf.set("plex.client", obj.plexClientID);
+  config.set("plex.client", obj.plexClientID);
   try {
     await WriteConfig();
   } catch (err) {

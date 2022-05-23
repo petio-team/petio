@@ -32,6 +32,9 @@ jobs:
           cache: "yarn"
           cache-dependency-path: "**/yarn.lock"
 
+      - name: Install Node-Prune
+        run: curl -sf https://gobinaries.com/tj/node-prune | sh
+
       - name: Install task
         uses: arduino/setup-task@v1
 

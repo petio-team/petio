@@ -1,5 +1,5 @@
 import path from "path";
-import winston, { format } from "winston";
+import * as winston from "winston";
 import "winston-daily-rotate-file";
 const {
   combine,
@@ -10,10 +10,10 @@ const {
   label,
   errors,
   prettyPrint,
-} = format;
+} = winston.format;
 
-import { dataFolder } from "@/app/env";
-import { conf } from "@/app/config";
+import { dataFolder } from "@/config/env";
+import { config } from "@/config/schema";
 
 const logsFolder = path.join(dataFolder, "./logs");
 
@@ -23,7 +23,7 @@ const customFormat = printf(({ level, formatLabel, message, timestamp }) => {
 });
 
 const logger = winston.createLogger({
-  level: conf.get("logger.level") || "debug",
+  level: config.get("logger.level") || "debug",
   format: combine(
     errors({ stack: true }),
     splat(),

@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 
 import logger from "@/loaders/logger";
-import { conf } from "@/app/config";
+import { config } from "@/config/index";
 
 export default class Mailer {
   transport: any;
@@ -15,7 +15,7 @@ export default class Mailer {
   async _check() {
     try {
       let verify = await this.transport.verify();
-      if (!conf.get("email.from")) throw "No From Email set";
+      if (!config.get("email.from")) throw "No From Email set";
       return verify;
     } catch (err) {
       return err;
@@ -24,11 +24,11 @@ export default class Mailer {
 
   // Build mail transport
   _transport() {
-    const emailUser = conf.get("email.username");
-    const emailPass = conf.get("email.password");
-    const smtpServer = conf.get("email.host");
-    const smtpPort = conf.get("email.port");
-    const secure = conf.get("email.ssl");
+    const emailUser = config.get("email.username");
+    const emailPass = config.get("email.password");
+    const smtpServer = config.get("email.host");
+    const smtpPort = config.get("email.port");
+    const secure = config.get("email.ssl");
 
     const transporter = nodemailer.createTransport({
       host: smtpServer,
@@ -62,7 +62,7 @@ export default class Mailer {
         "If you're seeing this email then your Petio email settings are correct!",
         false,
         // @ts-expect-error ts-migrate(2322) FIXME: Type 'any' is not assignable to type 'never'.
-        [conf.get("admin.email")]
+        [config.get("admin.email")]
       );
       logger.verbose("MAILER: Verified", { label: "mail.mailer" });
       if (verify === true) {
@@ -85,7 +85,7 @@ export default class Mailer {
 
   // Build email and send to transport
   mail(subject, title, text, img, to = [], name = []) {
-    if (!conf.get("email.enabled")) {
+    if (!config.get("email.enabled")) {
       logger.verbose("MAILER: Email disabled, skipping sending emails", {
         label: "mail.mailer",
       });
@@ -106,15 +106,15 @@ export default class Mailer {
         i++;
         setTimeout(async () => {
           logger.verbose(
-            `MAILER: Sending email from: ${conf.get(
+            `MAILER: Sending email from: ${config.get(
               "email.from"
             )} to ${send} with the subject ${subject}`
           );
           try {
             this.transport.sendMail({
-              from: `"Petio" <${conf.get("email.from")}>`,
+              from: `"Petio" <${config.get("email.from")}>`,
               to: `${username} <${send}>`,
-              bcc: conf.get("admin.email"),
+              bcc: config.get("admin.email"),
               subject: subject,
               html: this.mailHtml(title, text, img, username),
               text: text,

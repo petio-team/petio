@@ -7,13 +7,7 @@ import Library from "@/models/library";
 import Movie from "@/models/movie";
 import Music from "@/models/artist";
 import Show from "@/models/show";
-import {
-  CreateOrUpdateUser,
-  GetUserByEmail,
-  User,
-  UserModel,
-  UserRole,
-} from "@/models/user";
+import { CreateOrUpdateUser, UserModel, UserRole } from "@/models/user";
 import Request from "@/models/request";
 import Profile from "@/models/profile";
 import Mailer from "@/mail/mailer";
@@ -22,8 +16,8 @@ import Discord from "@/notifications/discord";
 import Telegram from "@/notifications/telegram";
 import { showLookup } from "@/tmdb/show";
 import MusicMeta from "@/meta/musicBrainz";
-import { conf } from "@/app/config";
-import { tmdbApiKey } from "@/app/env";
+import { config } from "@/config/index";
+import { tmdbApiKey } from "@/config/env";
 
 export default class LibraryUpdate {
   full: any;
@@ -158,9 +152,9 @@ export default class LibraryUpdate {
   }
 
   async getLibraries() {
-    let url = `${conf.get("plex.protocol")}://${conf.get(
+    let url = `${config.get("plex.protocol")}://${config.get(
       "plex.host"
-    )}:${conf.get("plex.port")}/library/sections/?X-Plex-Token=${conf.get(
+    )}:${config.get("plex.port")}/library/sections/?X-Plex-Token=${config.get(
       "plex.token"
     )}`;
     try {
@@ -174,11 +168,11 @@ export default class LibraryUpdate {
   }
 
   async getRecent() {
-    let url = `${conf.get("plex.protocol")}://${conf.get(
+    let url = `${config.get("plex.protocol")}://${config.get(
       "plex.host"
-    )}:${conf.get("plex.port")}/library/recentlyAdded/?X-Plex-Token=${conf.get(
-      "plex.token"
-    )}`;
+    )}:${config.get(
+      "plex.port"
+    )}/library/recentlyAdded/?X-Plex-Token=${config.get("plex.token")}`;
     try {
       let res = await axios.get(url);
       logger.verbose("CRON: Recently Added received", {
@@ -326,11 +320,11 @@ export default class LibraryUpdate {
   }
 
   async getLibrary(id) {
-    let url = `${conf.get("plex.protocol")}://${conf.get(
+    let url = `${config.get("plex.protocol")}://${config.get(
       "plex.host"
-    )}:${conf.get(
+    )}:${config.get(
       "plex.port"
-    )}/library/sections/${id}/all?X-Plex-Token=${conf.get("plex.token")}`;
+    )}/library/sections/${id}/all?X-Plex-Token=${config.get("plex.token")}`;
     try {
       let res = await axios.get(url);
       return res.data.MediaContainer;
@@ -340,11 +334,11 @@ export default class LibraryUpdate {
   }
 
   async getMeta(id) {
-    let url = `${conf.get("plex.protocol")}://${conf.get(
+    let url = `${config.get("plex.protocol")}://${config.get(
       "plex.host"
-    )}:${conf.get(
+    )}:${config.get(
       "plex.port"
-    )}/library/metadata/${id}?includeChildren=1&X-Plex-Token=${conf.get(
+    )}/library/metadata/${id}?includeChildren=1&X-Plex-Token=${config.get(
       "plex.token"
     )}`;
     try {
@@ -356,11 +350,13 @@ export default class LibraryUpdate {
   }
 
   async getSeason(id) {
-    let url = `${conf.get("plex.protocol")}://${conf.get(
+    let url = `${config.get("plex.protocol")}://${config.get(
       "plex.host"
-    )}:${conf.get(
+    )}:${config.get(
       "plex.port"
-    )}/library/metadata/${id}/children?X-Plex-Token=${conf.get("plex.token")}`;
+    )}/library/metadata/${id}/children?X-Plex-Token=${config.get(
+      "plex.token"
+    )}`;
     try {
       let res = await axios.get(url);
       return res.data.MediaContainer.Metadata;
@@ -786,7 +782,7 @@ export default class LibraryUpdate {
   }
 
   async getFriends() {
-    let url = `https://plex.tv/pms/friends/all?X-Plex-Token=${conf.get(
+    let url = `https://plex.tv/pms/friends/all?X-Plex-Token=${config.get(
       "plex.token"
     )}`;
     try {

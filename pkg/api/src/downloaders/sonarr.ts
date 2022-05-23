@@ -2,20 +2,20 @@ import axios from "axios";
 
 import logger from "@/loaders/logger";
 import Request from "@/models/request";
-import { conf } from "@/app/config";
+import { config } from "@/config/index";
 
 export default class Sonarr {
   config: any;
   fullConfig: any;
   constructor() {
-    this.fullConfig = conf.get("sonarr");
+    this.fullConfig = config.get("sonarr");
     this.config = false;
   }
 
-  findUuid(uuid, config) {
-    for (var i = 0; i < config.length; i++) {
-      if (config[i].uuid === uuid) {
-        return config[i];
+  findUuid(uuid, conf) {
+    for (var i = 0; i < conf.length; i++) {
+      if (conf[i].uuid === uuid) {
+        return conf[i];
       }
     }
   }

@@ -3,7 +3,7 @@ import { URL, URLSearchParams } from "url";
 
 import logger from "@/loaders/logger";
 import Request from "@/models/request";
-import { conf } from "@/app/config";
+import { config } from "@/config/index";
 
 export default class Radarr {
   config: any;
@@ -15,7 +15,7 @@ export default class Radarr {
     profileOvr = false,
     pathOvr = false
   ) {
-    this.fullConfig = conf.get("radarr");
+    this.fullConfig = config.get("radarr");
     this.config = false;
     this.forced = forced;
 

@@ -6,7 +6,7 @@ import LoggerInstance from "./logger";
 import QuotaSystem from "@/requests/quotas";
 import { storeCache } from "@/meta/imdb";
 import trending from "@/tmdb/trending";
-import { conf } from "@/app/config";
+import { config } from "@/config/index";
 
 const TASK_NAME = {
   FULL_LIBRARY_SCAN: "full library scan",
@@ -102,12 +102,12 @@ export default ({ agenda }: { agenda: Agenda }) => {
   });
 
   agenda.start();
-  agenda.every(conf.get("tasks.library.full"), TASK_NAME.FULL_LIBRARY_SCAN);
+  agenda.every(config.get("tasks.library.full"), TASK_NAME.FULL_LIBRARY_SCAN);
   agenda.every(
-    conf.get("tasks.library.partial"),
+    config.get("tasks.library.partial"),
     TASK_NAME.PARTIAL_LIBRARY_SCAN
   );
-  agenda.every(conf.get("tasks.quotas"), TASK_NAME.USER_QUOTA_RESET);
+  agenda.every(config.get("tasks.quotas"), TASK_NAME.USER_QUOTA_RESET);
   agenda.every("24 hours", [TASK_NAME.IMDB_CACHE, TASK_NAME.TMDB_CACHE]);
   agenda.purge();
 };

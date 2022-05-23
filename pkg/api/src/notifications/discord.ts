@@ -1,12 +1,12 @@
 import axios from "axios";
 
 import logger from "@/loaders/logger";
-import { conf } from "@/app/config";
+import { config } from "@/config/schema";
 
 export default class Discord {
   webhook: any;
   constructor() {
-    this.webhook = conf.get("notifications.discord.url") || false;
+    this.webhook = config.get("notifications.discord.url") || false;
   }
 
   check() {

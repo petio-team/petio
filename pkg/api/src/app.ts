@@ -1,11 +1,11 @@
 import "module-alias/register";
 import("dotenv/config");
 import("cache-manager/lib/stores/memory");
-import express from "express";
+import * as express from "express";
 import cluster, { Worker } from "cluster";
 import os from "os";
 
-import { hasConfig } from "@/app/config";
+import { HasConfig } from "@/config/config";
 import { listen } from "./util/http";
 import startupMessage from "./util/startupMessage";
 
@@ -25,7 +25,7 @@ export const setupWorkerProcesses = async () => {
 };
 
 async function setupApp(output: boolean) {
-  const app = express();
+  const app = express.default();
 
   // load all the loaders
   (await import("./loaders")).default({ expressApp: app });
@@ -39,14 +39,19 @@ async function setupApp(output: boolean) {
 }
 
 const setupServer = async () => {
-  if (cluster.isPrimary) {
-    if (hasConfig()) {
-      setupWorkerProcesses();
+  try {
+    if (cluster.isPrimary) {
+      const exists = await HasConfig();
+      if (exists) {
+        setupWorkerProcesses();
+      } else {
+        setupApp(true);
+      }
     } else {
-      setupApp(true);
+      setupApp(process.env.output === "true");
     }
-  } else {
-    setupApp(process.env.output === "true");
+  } catch (error) {
+    console.log(error);
   }
 };
 

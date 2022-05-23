@@ -1,6 +1,6 @@
 import { Zodios } from "zodios";
 
-import { tmdbApiKey } from "../app/env";
+import { tmdbApiKey } from "../config/env";
 import { DiscoverAPI } from "./discover/discover";
 import { pluginApiKey } from "./key";
 import { MovieAPI } from "./movie/movies";

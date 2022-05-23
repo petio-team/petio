@@ -1,6 +1,5 @@
 *
 !docker/
-!/pkg/admin/build/
 !/pkg/frontend/build/
 !/pkg/api/dist/
 !/node_modules

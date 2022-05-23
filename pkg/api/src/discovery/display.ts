@@ -4,7 +4,7 @@ import cacheManager from "cache-manager";
 
 import Discovery from "@/models/discovery";
 import logger from "@/loaders/logger";
-import { conf } from "@/app/config";
+import { config } from "@/config/schema";
 import {
   movieLookup,
   getRecommendations as getMovieRecommendations,
@@ -16,7 +16,7 @@ import {
 import getHistory from "@/plex/history";
 import onServer from "@/plex/server";
 import getTop from "@/plex/top";
-import { tmdbApiKey } from "@/app/env";
+import { tmdbApiKey } from "@/config/env";
 
 const memoryCache = cacheManager.caching({
   store: "memory",
@@ -33,7 +33,7 @@ export default async (id, type = "movie") => {
       comingSoon(type),
       getTop(type === "movie" ? 1 : 2),
     ]);
-    const plr = conf.get("general.popular");
+    const plr = config.get("general.popular");
     if (plr || plr === null || plr === undefined) {
       for (let p in popularData) {
         popular.push(popularData[p]);

@@ -8,8 +8,8 @@ import path from "path";
 import logger from "@/loaders/logger";
 import { UserModel, UserRole } from "@/models/user";
 import Profile from "@/models/profile";
-import { conf, WriteConfig } from "@/app/config";
-import { dataFolder } from "@/app/env";
+import { config, WriteConfig } from "@/config/index";
+import { dataFolder } from "@/config/env";
 import { authRequired } from "@/api/middleware/auth";
 
 const UPLOAD_DIR = path.join(dataFolder, "./uploads");
@@ -200,13 +200,13 @@ export default (app: Router) => {
 
       if (user.role === UserRole.Admin && !user.password) {
         userObj.password =
-          conf.get("admin.password").substring(0, 3) === "$2a"
-            ? conf.get("admin.password")
-            : bcrypt.hashSync(conf.get("admin.password"), 10);
+          config.get("admin.password").substring(0, 3) === "$2a"
+            ? config.get("admin.password")
+            : bcrypt.hashSync(config.get("admin.password"), 10);
       }
 
       if (user.role === "admin" && user.email) {
-        conf.set("admin.email", user.email);
+        config.set("admin.email", user.email);
         WriteConfig();
       }
 

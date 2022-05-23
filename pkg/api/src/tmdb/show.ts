@@ -7,7 +7,7 @@ import fanartLookup from "../fanart";
 import onServer from "../plex/server";
 import { lookup as imdb } from "../meta/imdb";
 import getLanguage from "./languages";
-import { tmdbApiKey } from "../app/env";
+import { tmdbApiKey } from "../config/env";
 import { TMDBAPI } from "./tmdb";
 
 const agent = new http.Agent({ family: 4 });
