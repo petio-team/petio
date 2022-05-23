@@ -2,25 +2,22 @@ import "module-alias/register";
 import("dotenv/config");
 import("cache-manager/lib/stores/memory");
 import * as express from "express";
-import cluster, { Worker } from "cluster";
+import cluster from "cluster";
 import os from "os";
 
 import { HasConfig } from "@/config/config";
 import { listen } from "./util/http";
 import startupMessage from "./util/startupMessage";
 
-let workers: Worker[] = [];
-
 export const setupWorkerProcesses = async () => {
   let numCores = os.cpus().length;
 
   for (let i = 0; i < numCores; i++) {
-    workers.push(cluster.fork({ output: i == 0 }));
+    cluster.fork({ output: i == 0 });
   }
 
   cluster.on("exit", function (_worker, _code, _signal) {
     cluster.fork();
-    workers.push(cluster.fork());
   });
 };
 
