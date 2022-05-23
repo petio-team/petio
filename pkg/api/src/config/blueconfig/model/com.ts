@@ -1,7 +1,7 @@
 import fs from "fs";
 
 import { cloneDeep } from "lodash";
-import objectpath from "../lib/object-path";
+import { stringify, parse } from "../lib/object-path";
 
 import SchemaNode from "./schemanode";
 
@@ -167,9 +167,9 @@ ConfigObjectModel.prototype.getProperties = function () {
 ConfigObjectModel.prototype.toString = function () {
   const clone = cloneDeep(this._instance.root);
   this._sensitive.forEach(function (fullpath) {
-    const path = objectpath.parse(unroot(fullpath));
+    const path = parse(unroot(fullpath));
     const childKey = path.pop();
-    const parentKey = objectpath.stringify(path);
+    const parentKey = stringify(path);
     const parent = walk(clone, parentKey);
     parent[childKey] = "[Sensitive]";
   });
@@ -272,7 +272,7 @@ ConfigObjectModel.prototype.getOrigin = function (path) {
 function pathToSchemaPath(path) {
   const schemaPath = Array<any>();
 
-  path = objectpath.parse(path);
+  path = parse(path);
   path.forEach((property) => schemaPath.push(property, "_cvtProperties"));
   schemaPath.splice(-1);
 
@@ -520,9 +520,9 @@ ConfigObjectModel.prototype.set = function (
   }
 
   // walk to the value
-  const path = objectpath.parse(name);
+  const path = parse(name);
   const childKey = path.pop();
-  const parentKey = objectpath.stringify(path);
+  const parentKey = stringify(path);
   const parent = walk(this._instance.root, parentKey, true);
 
   // respect priority
@@ -559,7 +559,7 @@ ConfigObjectModel.prototype.set = function (
  * Get the selected property for COM.set(...)
  */
 function traverseSchema(schema, path) {
-  const ar = objectpath.parse(path);
+  const ar = parse(path);
   let o = schema;
   while (ar.length > 0) {
     const k = ar.shift();

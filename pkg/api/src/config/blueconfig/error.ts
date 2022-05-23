@@ -1,4 +1,4 @@
-import objectpath from "./lib/object-path";
+import { stringify } from "./lib/object-path";
 
 import * as utils from "./performer/utils/utils";
 const unroot = utils.unroot;
@@ -210,14 +210,14 @@ class PATH_INVALID extends BLUECONFIG_ERROR {
    * @param {*}        value            Return the value (should be an object)
    */
   constructor(fullname, path, name, value) {
-    const fullpath = unroot(objectpath.stringify([...path, name]));
+    const fullpath = unroot(stringify([...path, name]));
 
     const why = (() => {
       const type = typeof value;
       if (type !== "object") {
-        return `"${unroot(objectpath.stringify(path))}" is a ${type}`;
+        return `"${unroot(stringify(path))}" is a ${type}`;
       } else if (value === null) {
-        return `"${unroot(objectpath.stringify(path))}" is null`;
+        return `"${unroot(stringify(path))}" is null`;
       } else {
         return `"${fullpath}" is not defined`;
       }

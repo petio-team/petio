@@ -1,4 +1,4 @@
-import objectpath from "../../lib/object-path";
+import { stringify } from "../../lib/object-path";
 
 import * as utils from "./utils";
 const unroot = utils.unroot;
@@ -34,7 +34,7 @@ export default function validator(strictValidation) {
           if (strictValidation) {
             const err = new VALUE_INVALID(
               "configuration param '" +
-                unroot(objectpath.stringify(fullpath)) +
+                unroot(stringify(fullpath)) +
                 "' not declared in the schema"
             );
             errors.undeclared.push(err);
@@ -62,7 +62,7 @@ export default function validator(strictValidation) {
           }
         } else {
           // If node[name] doesn't exist and schema[name] exists:
-          const fullname = unroot(objectpath.stringify(fullpath));
+          const fullname = unroot(stringify(fullpath));
           const notfound = new PATH_INVALID(fullname, path, name, node);
           const error = new VALUE_INVALID(
             `config parameter "${fullname}" missing from config, did you override its parent? Because ${notfound.why}.`
