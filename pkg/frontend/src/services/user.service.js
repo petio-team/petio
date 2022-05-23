@@ -9,7 +9,7 @@ export function logout() {
   updateStore({
     type: "user/logout",
   });
-  if (typeof window !== undefined) window.location.reload();
+  if (typeof window !== "undefined") window.location.reload();
 }
 
 export function getToken() {
