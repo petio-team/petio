@@ -1,61 +1,94 @@
-import { Router } from "express";
+import Router from '@koa/router';
+import { StatusCodes } from 'http-status-codes';
+import { Context } from 'koa';
+import { z } from 'zod';
 
-import Mailer from "@/mail/mailer";
-import logger from "@/loaders/logger";
-import { adminRequired } from "@/api/middleware/auth";
-import { WriteConfig } from "@/config/config";
-import { config } from "@/config/schema";
+import { WriteConfig } from '@/config/config';
+import { config } from '@/config/schema';
+import logger from '@/loaders/logger';
+import Mailer from '@/mail/mailer';
 
-const route = Router();
+import { validateRequest } from '../middleware/validation';
+
+const route = new Router({ prefix: '/mail' });
 
 export default (app: Router) => {
-  app.use("/mail", route);
-  route.use(adminRequired);
-  route.post("/create", async (req, res) => {
-    let email = req.body.email;
+  route.post(
+    '/create',
+    validateRequest({
+      body: z.object({
+        email: z.object({
+          host: z.string().min(1),
+          port: z.number(),
+          username: z.string().min(1),
+          password: z.string().min(1),
+          from: z.string().min(1),
+          ssl: z.boolean(),
+          enabled: z.boolean(),
+        }),
+      }),
+    }),
+    createMail,
+  );
+  route.get('/config', getMailConfig);
+  route.get('/test', testConnection);
 
-    if (!email) {
-      res.status(400).send("Missing Fields");
-      logger.log("error", "MAILER: Update email config failed");
-      return;
-    }
+  app.use(route.routes());
+};
 
-    config.set("email.enabled", email.enabled);
-    config.set("email.username", email.user);
-    config.set("email.password", email.pass);
-    config.set("email.host", email.server);
-    config.set("email.port", email.port);
-    config.set("email.ssl", email.secure);
-    config.set("email.from", email.from);
+const createMail = async (ctx: Context) => {
+  const { email } = ctx.request.body;
 
-    try {
-      await WriteConfig();
-    } catch (e) {
-      logger.error(e);
-      res.status(500).send("failed to write config to filesystem");
-      return;
-    }
+  if (!email) {
+    logger.log('error', 'MAILER: Update email config failed');
 
-    logger.log("verbose", "MAILER: Config updated");
-    res.json({ config: config.get("email") });
-  });
+    ctx.status = StatusCodes.BAD_REQUEST;
+    ctx.body = 'missing fields';
+    return;
+  }
 
-  route.get("/config", async (_req, res) => {
-    res.json({
-      config: {
-        emailEnabled: config.get("email.enabled"),
-        emailUser: config.get("email.username"),
-        emailPass: config.get("email.password"),
-        emailServer: config.get("email.host"),
-        emailPort: config.get("email.port"),
-        emailSecure: config.get("email.ssl"),
-        emailFrom: config.get("email.from"),
-      },
-    });
-  });
+  config.set('email.enabled', email.enabled);
+  config.set('email.username', email.user);
+  config.set('email.password', email.pass);
+  config.set('email.host', email.server);
+  config.set('email.port', email.port);
+  config.set('email.ssl', email.secure);
+  config.set('email.from', email.from);
 
-  route.get("/test", async (_req, res) => {
-    let test = await new Mailer().test();
-    res.json({ result: test.result, error: test.error });
-  });
+  try {
+    await WriteConfig();
+  } catch (e) {
+    logger.error(e);
+
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = 'failed to write config to filesystem';
+    return;
+  }
+
+  logger.log('verbose', 'MAILER: Config updated');
+
+  ctx.status = StatusCodes.OK;
+  ctx.body = { config: config.get('email') };
+};
+
+const getMailConfig = async (ctx: Context) => {
+  ctx.status = StatusCodes.OK;
+  ctx.body = {
+    config: {
+      emailEnabled: config.get('email.enabled'),
+      emailUser: config.get('email.username'),
+      emailPass: config.get('email.password'),
+      emailServer: config.get('email.host'),
+      emailPort: config.get('email.port'),
+      emailSecure: config.get('email.ssl'),
+      emailFrom: config.get('email.from'),
+    },
+  };
+};
+
+const testConnection = async (ctx: Context) => {
+  let test = await new Mailer().test();
+
+  ctx.status = StatusCodes.OK;
+  ctx.body = { result: test.result, error: test.error };
 };

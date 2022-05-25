@@ -1,6 +1,8 @@
-import axios from "axios";
+import axios from 'axios';
 
-import MakePlexURL from "./util";
+import logger from '@/loaders/logger';
+
+import MakePlexURL from './util';
 
 function timeDifference(previous) {
   let now = new Date();
@@ -12,7 +14,7 @@ function timeDifference(previous) {
   var elapsed = current - previous;
 
   if (elapsed < msPerMinute) {
-    return Math.round(elapsed) + "s";
+    return Math.round(elapsed) + 's';
   } else if (elapsed < msPerHour) {
     let minutes = Math.floor(elapsed / msPerMinute);
     let seconds = elapsed - minutes * 60;
@@ -24,7 +26,7 @@ function timeDifference(previous) {
 }
 
 export default async () => {
-  const url = MakePlexURL("/statistics/bandwidth", {
+  const url = MakePlexURL('/statistics/bandwidth', {
     timespan: 6,
   }).toString();
 
@@ -33,10 +35,10 @@ export default async () => {
     let data: any = {};
     let bWidth: any = [];
     res.data.MediaContainer.StatisticsBandwidth.forEach((el) => {
-      let type = el["lan"] ? "Local" : "Remote";
-      let timestamp = el["at"];
+      let type = el['lan'] ? 'Local' : 'Remote';
+      let timestamp = el['at'];
       if (data[timestamp]) {
-        data[timestamp][type] += el["bytes"] * 8;
+        data[timestamp][type] += el['bytes'] * 8;
       } else {
         let time = timeDifference(timestamp);
         if (!time) return;
@@ -44,7 +46,7 @@ export default async () => {
         data[timestamp].name = time;
         data[timestamp].Local = 0;
         data[timestamp].Remote = 0;
-        data[timestamp][type] = el["bytes"] * 8;
+        data[timestamp][type] = el['bytes'] * 8;
       }
     });
     Object.keys(data)
@@ -56,7 +58,7 @@ export default async () => {
     bWidth.reverse();
     return bWidth;
   } catch (e) {
-    console.log(e.stack, { label: "plex.bandwidth" });
+    logger.error(e.stack, { label: 'plex.bandwidth' });
     // Do nothing
   }
 };

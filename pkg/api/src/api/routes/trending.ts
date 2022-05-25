@@ -1,16 +1,18 @@
-import { Router } from "express";
+import Router from '@koa/router';
+import { StatusCodes } from 'http-status-codes';
+import { Context } from 'koa';
 
-import trending from "@/tmdb/trending";
-import { authRequired } from "@/api/middleware/auth";
+import trending from '@/tmdb/trending';
 
-const route = Router();
+const route = new Router({ prefix: '/trending' });
 
 export default (app: Router) => {
-  app.use("/trending", route);
-  route.use(authRequired);
+  route.get('/', getTrending);
 
-  route.get("/", async (_req, res) => {
-    let data = await trending();
-    res.json(data);
-  });
+  app.use(route.routes());
+};
+
+const getTrending = async (ctx: Context) => {
+  ctx.status = StatusCodes.OK;
+  ctx.body = await trending();
 };

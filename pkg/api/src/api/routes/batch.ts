@@ -1,35 +1,61 @@
-import { authRequired } from "@/api/middleware/auth";
-import { Router } from "express";
-import { movieLookup } from "../../tmdb/movie";
-import { showLookup } from "../../tmdb/show";
+import Router from '@koa/router';
+import { Context } from 'koa';
+import { z } from 'zod';
 
-const route = Router();
+import { movieLookup } from '@/tmdb/movie';
+import { showLookup } from '@/tmdb/show';
+
+import { validateRequest } from '../middleware/validation';
+
+const route = new Router({ prefix: '/batch' });
 
 export default (app: Router) => {
-  app.use("/batch", route);
-  route.use(authRequired);
+  route.post(
+    '/movie',
+    validateRequest({
+      body: z.object({
+        ids: z.array(z.number()),
+        min: z.boolean().optional(),
+      }),
+    }),
+    handleMovie,
+  );
+  route.post(
+    '/tv',
+    validateRequest({
+      body: z.object({
+        ids: z.array(z.number()),
+        min: z.boolean().optional(),
+      }),
+    }),
+    handleTv,
+  );
 
-  route.post("/movie", async (req, res) => {
-    const ids = req.body.ids;
-    const min = req.body.min === undefined ? true : req.body.min;
-    let output = await Promise.all(
-      ids.map(async (id) => {
-        if (!id) return;
-        return movieLookup(id, min);
-      })
-    );
-    res.json(output);
-  });
+  app.use(route.routes());
+};
 
-  route.post("/tv", async (req, res) => {
-    const ids = req.body.ids;
-    const min = req.body.min === undefined ? true : req.body.min;
-    let output = await Promise.all(
-      ids.map(async (id) => {
-        if (!id) return;
-        return showLookup(id, min);
-      })
-    );
-    res.json(output);
-  });
+const handleTv = async (ctx: Context) => {
+  const ids = ctx.request.body.ids;
+  const min = ctx.request.body.min === undefined ? true : ctx.request.body.min;
+  let output = await Promise.all(
+    ids.map(async (id) => {
+      if (!id) return;
+      return showLookup(id, min);
+    }),
+  );
+
+  ctx.body = output;
+};
+
+const handleMovie = async (ctx: Context) => {
+  const ids = ctx.request.body.ids;
+  const min = ctx.request.body.min === undefined ? true : ctx.request.body.min;
+  let output = await Promise.all(
+    ids.map(async (id) => {
+      if (!id) return;
+      return movieLookup(id, min);
+    }),
+  );
+
+  ctx.body = output;
 };

@@ -1,13 +1,14 @@
-import "module-alias/register";
-import("dotenv/config");
-import("cache-manager/lib/stores/memory");
-import * as express from "express";
-import cluster from "cluster";
-import os from "os";
+import cluster from 'cluster';
+import Koa from 'koa';
+import 'module-alias/register';
+import os from 'os';
 
-import { HasConfig } from "@/config/config";
-import { listen } from "./util/http";
-import startupMessage from "./util/startupMessage";
+import { HasConfig } from '@/config/config';
+import { listen } from '@/util/http';
+import startupMessage from '@/util/startupMessage';
+
+import('dotenv/config');
+import('cache-manager/lib/stores/memory');
 
 export const setupWorkerProcesses = async () => {
   let numCores = os.cpus().length;
@@ -16,19 +17,19 @@ export const setupWorkerProcesses = async () => {
     cluster.fork({ output: i == 0 });
   }
 
-  cluster.on("exit", function (_worker, _code, _signal) {
+  cluster.on('exit', function (_worker, _code, _signal) {
     cluster.fork();
   });
 };
 
 async function setupApp(output: boolean) {
-  const app = express.default();
+  const app = new Koa();
 
   // load all the loaders
-  (await import("./loaders")).default({ expressApp: app });
+  (await import('./loaders')).default({ httpApp: app });
 
   // run server
-  listen({ expressApp: app });
+  listen({ httpApp: app });
 
   if (output) {
     startupMessage();
@@ -45,10 +46,10 @@ const setupServer = async () => {
         setupApp(true);
       }
     } else {
-      setupApp(process.env.output === "true");
+      setupApp(process.env.output === 'true');
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 

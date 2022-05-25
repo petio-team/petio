@@ -1,52 +1,49 @@
-import jwt from "jsonwebtoken";
+import * as HttpStatus from 'http-status-codes';
+import jwt from 'jsonwebtoken';
+import { Context, Next } from 'koa';
 
-import logger from "@/loaders/logger";
-import { config } from "@/config/schema";
-import { UserModel } from "../../models/user";
+import { config } from '@/config/schema';
+import logger from '@/loaders/logger';
+import { User, UserModel } from '@/models/user';
 
-export async function authenticate(req) {
-  const { authorization: header } = req.headers;
+export async function authenticate(ctx: Context) {
+  const { authorization: header } = ctx.request.headers;
+  const cookie = ctx.cookies.get('petio_jwt');
+
   let petioJwt;
-  if (req.body.authToken) {
-    petioJwt = req.body.authToken;
-  } else if (req.cookies && req.cookies.petio_jwt) {
-    petioJwt = req.cookies.petio_jwt;
+  if (ctx.request.body.authToken) {
+    petioJwt = ctx.request.body.authToken;
+  } else if (cookie) {
+    petioJwt = cookie;
   } else if (header && /^Bearer (.*)$/.test(header)) {
     const match: any = /^Bearer (.*)$/.exec(header);
     petioJwt = match[1];
   } else {
-    throw `AUTH: No auth token provided - route ${req.path}`;
+    throw new Error(`AUTH: No auth token provided - route ${ctx.path}`);
   }
-  req.jwtUser = jwt.verify(petioJwt, config.get("plex.token"));
 
+  let userData;
   try {
-    let userData = await UserModel.findOne({ email: req.jwtUser.email });
-    if (!userData) {
-      throw new Error("no user found");
+    const jwtData = jwt.verify(petioJwt, config.get('plex.token'));
+    let resp = await UserModel.findOne({ email: jwtData.email });
+    if (!resp) {
+      throw new Error('no user found');
     }
-    return userData.toObject();
-  } catch {
-    throw `AUTH: User ${req.jwtUser.id} not found in DB - route ${req.path}`;
+    userData = resp.toJSON();
+  } catch (error) {
+    logger.error(error);
+    throw new Error(`AUTH: User not found in DB - route ${ctx.path}`);
   }
+
+  return userData;
 }
 
-export const authRequired = async (req, res, next) => {
-  try {
-    await authenticate(req);
-  } catch (e) {
-    logger.verbose(`AUTH: user is not logged in`, { label: "middleware.auth" });
-    logger.debug(e, { label: "middleware.auth" });
-    res.sendStatus(401);
-    return;
-  }
-  next();
-};
-
-export const adminRequired = (req, res, next) => {
-  if (req.jwtUser && req.jwtUser.admin) {
-    next();
+export const adminRequired = async (ctx: Context, next: Next) => {
+  const user = ctx.state.user;
+  if (user && user.admin) {
+    await next();
   } else {
-    res.sendStatus(403);
-    logger.warn(`AUTH: User not admin`, { label: "middleware.auth" });
+    ctx.status = HttpStatus.StatusCodes.FORBIDDEN;
+    logger.warn(`AUTH: User not admin`, { label: 'middleware.auth' });
   }
 };

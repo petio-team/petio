@@ -1,72 +1,84 @@
-import { authRequired } from "@/api/middleware/auth";
-import { Router } from "express";
+import Router from '@koa/router';
+import { StatusCodes } from 'http-status-codes';
+import { Context } from 'koa';
 
-import Review from "@/models/review";
-import { UserModel } from "@/models/user";
+import { authRequired } from '@/api/middleware/auth';
+import Review from '@/models/review';
+import { UserModel } from '@/models/user';
 
-const route = Router();
+const route = new Router({ prefix: '/review' });
 
 export default (app: Router) => {
-  app.use("/review", route);
-  route.use(authRequired);
+  route.get('/all', listReviews);
+  route.get('/all/:id', getReviewById);
+  route.post('/add', addReview);
 
-  route.post("/add", async (req, res) => {
-    let item = req.body.item;
-    let review = req.body.review;
-    let user = req.body.user;
-    try {
-      let userData = await UserModel.findOne({ id: user });
-      if (!userData) {
-        throw new Error("failed to get user data");
-      }
-      let existingReview = await Review.findOne({
+  app.use(route.routes());
+};
+
+const listReviews = async (ctx: Context) => {
+  try {
+    ctx.status = StatusCodes.OK;
+    ctx.body = await Review.find();
+  } catch (err) {
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = { error: err };
+  }
+};
+
+const getReviewById = async (ctx: Context) => {
+  let id = ctx.params.id;
+  if (!id) {
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = { error: 'id required' };
+    return;
+  }
+  try {
+    ctx.status = StatusCodes.OK;
+    ctx.body = await Review.find({ tmdb_id: id });
+  } catch (err) {
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = {};
+  }
+};
+
+const addReview = async (ctx: Context) => {
+  const body = ctx.body as any;
+
+  let item = body.item;
+  let review = body.review;
+  let user = body.user;
+  try {
+    let userData = await UserModel.findOne({ id: user });
+    if (!userData) {
+      throw new Error('failed to get user data');
+    }
+    let existingReview = await Review.findOne({
+      tmdb_id: item.id,
+      user: userData.id,
+    });
+    let savedReview = false;
+    if (existingReview) {
+      existingReview.score = review.score;
+      savedReview = await existingReview.save();
+    } else {
+      const newReview = new Review({
         tmdb_id: item.id,
+        score: review.score,
+        comment: review.comment,
         user: userData.id,
+        date: new Date(),
+        type: item.type,
+        title: item.title,
       });
-      let savedReview = false;
-      if (existingReview) {
-        existingReview.score = review.score;
-        savedReview = await existingReview.save();
-      } else {
-        const newReview = new Review({
-          tmdb_id: item.id,
-          score: review.score,
-          comment: review.comment,
-          user: userData.id,
-          date: new Date(),
-          type: item.type,
-          title: item.title,
-        });
 
-        savedReview = await newReview.save();
-      }
+      savedReview = await newReview.save();
+    }
 
-      res.json(savedReview);
-    } catch (err) {
-      res.status(500).json({ error: err });
-    }
-  });
-
-  route.get("/all", async (_req, res) => {
-    try {
-      const reviews = await Review.find();
-      res.json(reviews);
-    } catch (err) {
-      res.status(500).json({ error: err });
-    }
-  });
-
-  route.get("/all/:id", async (req, res) => {
-    let id = req.params.id;
-    if (!id) {
-      res.status(500).json({ error: "ID required" });
-      return;
-    }
-    try {
-      const reviews = await Review.find({ tmdb_id: id });
-      res.json(reviews);
-    } catch (err) {
-      res.status(500).json({});
-    }
-  });
+    ctx.status = StatusCodes.OK;
+    ctx.body = savedReview;
+  } catch (err) {
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = { error: err };
+  }
 };

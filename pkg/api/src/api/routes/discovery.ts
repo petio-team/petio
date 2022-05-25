@@ -1,46 +1,55 @@
-import { Router } from "express";
+import Router from '@koa/router';
+import { StatusCodes } from 'http-status-codes';
+import { Context } from 'koa';
 
-import logger from "@/loaders/logger";
-import getDiscovery from "@/discovery/display";
-import { authRequired } from "@/api/middleware/auth";
+import getDiscovery from '@/discovery/display';
+import logger from '@/loaders/logger';
 
-const route = Router();
+const route = new Router({ prefix: '/discovery' });
 
 export default (app: Router) => {
-  app.use("/discovery", route);
-  route.use(authRequired);
+  route.get('/movies', getMovies);
+  route.get('/shows', getShows);
 
-  route.get("/movies", async (req: any, res) => {
-    let userId = req.jwtUser.altId ? req.jwtUser.altId : req.jwtUser.id;
-    if (!userId) {
-      res.sendStatus(404);
-      return;
-    }
-    try {
-      logger.verbose(`ROUTE: Movie Discovery Profile returned for ${userId}`);
-      let data: any = await getDiscovery(userId, "movie");
-      if (data.error) throw data.error;
-      res.json(data);
-    } catch (err) {
-      logger.error(err);
-      res.sendStatus(500);
-    }
-  });
+  app.use(route.routes());
+};
 
-  route.get("/shows", async (req: any, res) => {
-    let userId = req.jwtUser.altId ? req.jwtUser.altId : req.jwtUser.id;
-    if (!userId) {
-      res.sendStatus(404);
-      return;
-    }
-    try {
-      logger.verbose(`ROUTE: TV Discovery Profile returned for ${userId}`);
-      let data: any = await getDiscovery(userId, "show");
-      if (data.error) throw data.error;
-      res.json(data);
-    } catch (err) {
-      logger.error(err);
-      res.sendStatus(500);
-    }
-  });
+const getMovies = async (ctx: Context) => {
+  const userId = ctx.state.user.altId
+    ? ctx.state.user.altId
+    : ctx.state.user.id;
+  if (!userId) {
+    ctx.state = StatusCodes.NOT_FOUND;
+    return;
+  }
+  try {
+    logger.verbose(`ROUTE: Movie Discovery Profile returned for ${userId}`);
+    let data: any = await getDiscovery(userId, 'movie');
+    if (data.error) throw data.error;
+    ctx.body = data;
+  } catch (err) {
+    logger.error(err);
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+  }
+};
+
+const getShows = async (ctx: Context) => {
+  const userId = ctx.state.user.altId
+    ? ctx.state.user.altId
+    : ctx.state.user.id;
+  if (!userId) {
+    ctx.state = StatusCodes.NOT_FOUND;
+    return;
+  }
+  try {
+    logger.verbose(`ROUTE: TV Discovery Profile returned for ${userId}`);
+    let data: any = await getDiscovery(userId, 'show');
+    if (data.error) throw data.error;
+
+    ctx.status = StatusCodes.OK;
+    ctx.body = data;
+  } catch (err) {
+    logger.error(err);
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+  }
 };

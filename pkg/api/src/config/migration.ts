@@ -6,6 +6,7 @@ import { dataFolder } from "@/config/env";
 import logger from "@/loaders/logger";
 import { config } from "@/config/schema";
 import { WriteConfig } from "@/config/index";
+import { fileExists } from "./config";
 
 const MainConfigSchema = z.object({
   DB_URL: z.string().url().min(1),
@@ -95,8 +96,9 @@ const findParseAndMergeConfigs = async (): Promise<boolean> => {
   let isModified = false;
 
   for (const config of configFiles) {
-    const file = path.join(dataFolder, config.file, ".json");
-    const exists = await fs.stat(file);
+
+    const file = path.join(dataFolder, config.file + ".json");
+    const exists = await fileExists(file);
     if (exists) {
       const content = await fs.readFile(file);
       const parsed = await config.schema.safeParseAsync(content);

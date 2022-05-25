@@ -8,6 +8,7 @@
     "pkg/frontend"
   ],
   "devDependencies": {
+    "@babel/parser": "^7.18.0",
     "@commitlint/cli": "^16.2.3",
     "@commitlint/config-conventional": "^16.2.1",
     "@semantic-release/changelog": "^6.0.1",
@@ -16,8 +17,14 @@
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^8.0.2",
     "@semantic-release/release-notes-generator": "^10.0.3",
+    "@trivago/prettier-plugin-sort-imports": "^3.2.0",
     "commitlint": "^17.0.0",
-    "husky": "^7.0.4"
+    "husky": "^7.0.4",
+    "prettier": "^2.6.2"
   },
-  "packageManager": "yarn@3.2.0"
+  "packageManager": "yarn@3.2.0",
+  "dependencies": {
+    "koa-body": "^5.0.0",
+    "koa-jwt": "^4.0.3"
+  }
 }

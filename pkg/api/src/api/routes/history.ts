@@ -1,49 +1,57 @@
-import { Router } from "express";
+import Router from '@koa/router';
+import { StatusCodes } from 'http-status-codes';
+import { Context } from 'koa';
 
-import getHistory from "@/plex/history";
-import getBandwidth from "@/plex/bandwidth";
-import getServerInfo from "@/plex/serverInfo";
-import logger from "@/loaders/logger";
-import { authRequired } from "@/api/middleware/auth";
+import { authRequired } from '@/api/middleware/auth';
+import logger from '@/loaders/logger';
+import getBandwidth from '@/plex/bandwidth';
+import getHistory from '@/plex/history';
+import getServerInfo from '@/plex/serverInfo';
 
-const route = Router();
+const route = new Router({ prefix: '/history' });
 
 export default (app: Router) => {
-  app.use("/history", route);
-  route.use(authRequired);
+  route.post('/', listHistory);
+  route.get('/server', getServerData);
+  route.get('/bandwidth', collectBandwidth);
 
-  route.post("/", async (req, res) => {
-    let id = req.body.id;
-    if (id === "admin") id = 1;
-    try {
-      let data = await getHistory(id, req.body.type);
-      res.json(data);
-    } catch (err) {
-      logger.log("warn", "ROUTE: Error getting history");
-      logger.log({ level: "error", message: err });
-      res.status(500).send();
-    }
-  });
+  app.use(route.routes());
+};
 
-  route.get("/bandwidth", async (_req, res) => {
-    try {
-      let data = await getBandwidth();
-      res.json(data);
-    } catch (err) {
-      logger.log("warn", "ROUTE: Error getting bandwidth");
-      logger.log({ level: "error", message: err });
-      res.status(500).send();
-    }
-  });
+const listHistory = async (ctx: Context) => {
+  let id = ctx.request.body.id;
+  if (id === 'admin') id = 1;
+  try {
+    let data = await getHistory(id, ctx.request.body.type);
+    ctx.status = StatusCodes.OK;
+    ctx.body = data;
+  } catch (err) {
+    logger.log('warn', 'ROUTE: Error getting history');
+    logger.log({ level: 'error', message: err });
 
-  route.get("/server", async (_req, res) => {
-    try {
-      let data = await getServerInfo();
-      res.json(data.MediaContainer);
-    } catch (err) {
-      logger.log("warn", "ROUTE: Error getting server info");
-      logger.log({ level: "error", message: err });
-      res.status(500).send();
-    }
-  });
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+  }
+};
+
+const getServerData = async (ctx: Context) => {
+  try {
+    let data = await getServerInfo();
+    ctx.body = data.MediaContainer;
+  } catch (err) {
+    logger.log('warn', 'ROUTE: Error getting server info');
+    logger.log({ level: 'error', message: err });
+
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+  }
+};
+
+const collectBandwidth = async (ctx: Context) => {
+  try {
+    ctx.body = await getBandwidth();
+  } catch (err) {
+    logger.log('warn', 'ROUTE: Error getting bandwidth');
+    logger.log({ level: 'error', message: err });
+
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+  }
 };

@@ -1,301 +1,480 @@
-import { Router } from "express";
+import Router from '@koa/router';
+import { StatusCodes } from 'http-status-codes';
+import { Context } from 'koa';
+import { z } from 'zod';
 
-import logger from "@/loaders/logger";
-import Sonarr from "@/downloaders/sonarr";
-import Radarr from "@/downloaders/radarr";
-import { config, WriteConfig } from "@/config/index";
-import { authRequired, adminRequired } from "@/api/middleware/auth";
+import { adminRequired } from '@/api/middleware/auth';
+import { WriteConfig, config } from '@/config/index';
+import Radarr from '@/downloaders/radarr';
+import Sonarr from '@/downloaders/sonarr';
+import logger from '@/loaders/logger';
 
-const route = Router();
+import { validateRequest } from '../middleware/validation';
+
+const route = new Router({ prefix: '/services' });
 
 export default (app: Router) => {
-  app.use("/services", route);
-  route.use(authRequired);
+  route.get(
+    '/sonarr/paths/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    getSonarrPathsById,
+  );
+  route.get(
+    '/sonarr/profiles/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    getSonarrProfilesById,
+  );
+  route.get(
+    '/sonarr/languages/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    getSonarrLanguagesById,
+  );
+  route.get(
+    '/sonarr/tags/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    getSonarrTagsById,
+  );
+  route.get(
+    '/sonarr/test/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    testSonarrConnectionById,
+  );
+  route.get('/sonarr/config', adminRequired, getSonarrConfig);
+  route.get('/calendar', getCalendarData);
+  route.post('/sonarr/config', adminRequired, updateSonarrConfig);
+  route.delete(
+    '/sonarr/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    deleteSonarrById,
+  );
+  route.get(
+    '/radarr/paths/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    getRadarrPathsById,
+  );
+  route.get(
+    '/radarr/profiles/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    getRadarrProfilesById,
+  );
+  route.get(
+    '/radarr/languages/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    getRadarrLangugaesById,
+  );
+  route.get(
+    '/radarr/tags/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    getRadarrTagsById,
+  );
+  route.get(
+    '/radarr/test/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    testRadarrConnectionById,
+  );
+  route.get('/radarr/config', adminRequired, getRadarrConfig);
+  route.get('/radarr/test', adminRequired, testRadarrConnection);
+  route.post('/radarr/config', adminRequired, updateRadarrConfig);
+  route.delete(
+    '/radarr/:uuid',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    deleteRadarrById,
+  );
 
-  route.get("/sonarr/paths/:id", adminRequired, async (req, res) => {
-    if (!req.params.id) {
-      res.status(404).send();
-    }
-    try {
-      let data = await new Sonarr().getPaths(req.params.id);
+  app.use(route.routes());
+};
 
-      data.forEach((el) => {
-        delete el.unmappedFolders;
-      });
-      res.json(data);
-    } catch {
-      res.json([]);
-    }
-  });
+const getSonarrPathsById = async (ctx: Context) => {
+  if (!ctx.params.id) {
+    ctx.status = StatusCodes.NOT_FOUND;
+    ctx.body = {};
+  }
+  try {
+    let data = await new Sonarr().getPaths(ctx.params.id);
 
-  route.get("/sonarr/profiles/:id", adminRequired, async (req, res) => {
-    if (!req.params.id) {
-      res.status(404).send();
-    }
-    try {
-      let data = await new Sonarr().getProfiles(req.params.id);
-      res.json(data);
-    } catch {
-      res.json([]);
-    }
-  });
-
-  route.get("/sonarr/languages/:id", adminRequired, async (req, res) => {
-    if (!req.params.id) {
-      res.status(404).send();
-    }
-    try {
-      let data = await new Sonarr().getLanguageProfiles(req.params.id);
-      res.json(data);
-    } catch {
-      res.json([]);
-    }
-  });
-
-  route.get("/sonarr/tags/:id", adminRequired, async (req, res) => {
-    if (!req.params.id) {
-      res.status(404).send();
-    }
-    try {
-      let data = await new Sonarr().getTags(req.params.id);
-      res.json(data);
-    } catch {
-      res.json([]);
-    }
-  });
-
-  route.get("/sonarr/test/:id", adminRequired, async (req, res) => {
-    let data = {
-      connection: await new Sonarr().test(req.params.id),
-    };
-    res.json(data);
-  });
-
-  route.get("/sonarr/config", adminRequired, async (req, res) => {
-    let conf = new Sonarr().getConfig();
-    res.json(conf);
-  });
-
-  route.post("/sonarr/config", adminRequired, async (req, res) => {
-    let data = req.body.data;
-    ConvertToConfig("sonarr", JSON.parse(data));
-
-    try {
-      WriteConfig();
-      res.json(data);
-      return;
-    } catch (err) {
-      logger.log("error", `ROUTE: Error saving sonarr config`);
-      logger.log({ level: "error", message: err });
-      res.status(500).json({ error: err });
-      return;
-    }
-  });
-
-  route.delete("/sonarr/:uuid", adminRequired, async (req, res) => {
-    let uuid = req.params.uuid;
-    if (uuid == undefined) {
-      res.status(400).json({
-        status: "error",
-        error: "missing the required `uuid` field",
-        message: null,
-        data: {},
-      });
-      return;
-    }
-
-    let sonarrs = config.get("sonarr");
-    const match = sonarrs.filter((el) => el.uuid == uuid);
-    if (match.length == 0) {
-      res.status(400).json({
-        status: "error",
-        error: "no matching instance exists with the uuid: " + uuid,
-        message: null,
-        data: {},
-      });
-      return;
-    }
-
-    sonarrs = sonarrs.filter((el) => el.uuid != uuid);
-    config.set("sonarr", sonarrs);
-
-    try {
-      await WriteConfig();
-    } catch (e) {
-      logger.error(e);
-      res.status(500).json({
-        status: "error",
-        error: "failed to write to config file",
-        message: null,
-        data: {},
-      });
-      return;
-    }
-
-    res.status(200).json({
-      status: "success",
-      error: null,
-      message: "instance successfully removed",
-      data: sonarrs,
+    data.forEach((el) => {
+      delete el.unmappedFolders;
     });
+
+    ctx.status = StatusCodes.OK;
+    ctx.body = data;
+  } catch {
+    ctx.status = StatusCodes.OK;
+    ctx.body = {};
+  }
+};
+
+const getSonarrProfilesById = async (ctx: Context) => {
+  if (!ctx.params.id) {
+    ctx.status = StatusCodes.NOT_FOUND;
+    ctx.body = {};
+  }
+  try {
+    ctx.status = StatusCodes.OK;
+    ctx.body = await new Sonarr().getProfiles(ctx.params.id);
+  } catch {
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = {};
+  }
+};
+
+const getSonarrLanguagesById = async (ctx: Context) => {
+  if (!ctx.params.id) {
+    ctx.status = StatusCodes.NOT_FOUND;
+    ctx.body = {};
+  }
+  try {
+    ctx.status = StatusCodes.OK;
+    ctx.body = await new Sonarr().getLanguageProfiles(ctx.params.id);
+  } catch {
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = {};
+  }
+};
+
+const getSonarrTagsById = async (ctx: Context) => {
+  if (!ctx.params.id) {
+    ctx.status = StatusCodes.NOT_FOUND;
+    ctx.body = {};
+  }
+  try {
+    ctx.status = StatusCodes.OK;
+    ctx.body = await new Sonarr().getTags(ctx.params.id);
+  } catch {
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = {};
+  }
+};
+
+const testSonarrConnectionById = async (ctx: Context) => {
+  let data = {
+    connection: await new Sonarr().test(ctx.params.id),
+  };
+
+  ctx.status = StatusCodes.OK;
+  ctx.body = data;
+};
+
+const getSonarrConfig = async (ctx: Context) => {
+  ctx.status = StatusCodes.OK;
+  ctx.body = new Sonarr().getConfig();
+};
+
+const updateSonarrConfig = async (ctx: Context) => {
+  const body = ctx.body as any;
+
+  let data = body.data;
+  ConvertToConfig('sonarr', JSON.parse(data));
+
+  try {
+    await WriteConfig();
+
+    ctx.status = StatusCodes.OK;
+    ctx.body = data;
     return;
-  });
+  } catch (err) {
+    logger.log('error', `ROUTE: Error saving sonarr config`);
+    logger.log({ level: 'error', message: err });
 
-  route.get("/calendar", async (req, res) => {
-    try {
-      let sonarr = await new Sonarr().calendar();
-      let radarr = await new Radarr().calendar();
-      let full = [...sonarr, ...radarr];
-      res.json(full);
-    } catch (err) {
-      console.trace(err);
-      res.json([]);
-    }
-  });
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = { error: err };
+    return;
+  }
+};
 
-  // Radarr
-
-  route.get("/radarr/paths/:id", adminRequired, async (req, res) => {
-    if (!req.params.id) {
-      res.status(404).send();
-    }
-    try {
-      let data = await new Radarr(req.params.id).getPaths();
-
-      data.forEach((el) => {
-        delete el.unmappedFolders;
-      });
-      res.json(data);
-    } catch (err) {
-      logger.log("warn", `ROUTE: Enable to get Radarr paths`);
-      logger.log({ level: "error", message: err });
-      res.json([]);
-    }
-  });
-
-  route.get("/radarr/profiles/:id", adminRequired, async (req, res) => {
-    if (!req.params.id) {
-      res.status(404).send();
-    }
-    try {
-      let data = await new Radarr(req.params.id).getProfiles();
-      res.json(data);
-    } catch {
-      res.json([]);
-    }
-  });
-
-  route.get("/radarr/languages/:id", adminRequired, async (req, res) => {
-    if (!req.params.id) {
-      res.status(404).send();
-    }
-    try {
-      let data = await new Radarr(req.params.id).getLanguageProfiles();
-      res.json(data);
-    } catch {
-      res.json([]);
-    }
-  });
-
-  route.get("/radarr/tags/:id", adminRequired, async (req, res) => {
-    if (!req.params.id) {
-      res.status(404).send();
-    }
-    try {
-      let data = await new Radarr(req.params.id).getTags();
-      res.json(data);
-    } catch {
-      res.json([]);
-    }
-  });
-
-  route.get("/radarr/test/:id", adminRequired, async (req, res) => {
-    let data = {
-      connection: await new Radarr(req.params.id).test(),
+const deleteSonarrById = async (ctx: Context) => {
+  let uuid = ctx.params.id;
+  if (uuid == undefined) {
+    ctx.status = StatusCodes.NOT_FOUND;
+    ctx.body = {
+      status: 'error',
+      error: 'missing the required `uuid` field',
+      message: null,
+      data: {},
     };
-    res.json(data);
-  });
+    return;
+  }
 
-  route.get("/radarr/config", adminRequired, async (req, res) => {
-    let conf = new Radarr().getConfig();
-    res.json(conf);
-  });
+  let sonarrs = config.get('sonarr');
+  const match = sonarrs.filter((el) => el.uuid == uuid);
 
-  route.get("/radarr/test", adminRequired, async (req, res) => {
-    let data = {
-      connection: await new Radarr().test(),
+  if (match.length == 0) {
+    ctx.status = StatusCodes.BAD_REQUEST;
+    ctx.body = {
+      status: 'error',
+      error: 'no matching instance exists with the uuid: ' + uuid,
+      message: null,
+      data: {},
     };
-    res.json(data);
-  });
+    return;
+  }
 
-  route.post("/radarr/config", adminRequired, async (req, res) => {
-    let data = req.body.data;
-    ConvertToConfig("radarr", JSON.parse(data));
+  sonarrs = sonarrs.filter((el) => el.uuid != uuid);
+  config.set('sonarr', sonarrs);
 
-    try {
-      WriteConfig();
-      res.json(data);
-      return;
-    } catch (err) {
-      logger.log("error", `ROUTE: Error saving radarr config`);
-      logger.log({ level: "error", message: err });
-      res.status(500).json({ error: err });
-      return;
-    }
-  });
+  try {
+    await WriteConfig();
+  } catch (e) {
+    logger.error(e);
 
-  route.delete("/radarr/:uuid", adminRequired, async (req, res) => {
-    let uuid = req.params.uuid;
-    if (uuid == undefined) {
-      res.status(400).json({
-        status: "error",
-        error: "missing the required `uuid` field",
-        message: null,
-        data: {},
-      });
-      return;
-    }
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = {
+      status: 'error',
+      error: 'failed to write to config file',
+      message: null,
+      data: {},
+    };
+    return;
+  }
 
-    let radarrs = config.get("radarr");
-    const match = radarrs.filter((el) => el.uuid == uuid);
-    if (match.length == 0) {
-      res.status(400).json({
-        status: "error",
-        error: "no matching instance exists with the uuid: " + uuid,
-        message: null,
-        data: {},
-      });
-      return;
-    }
+  ctx.status = StatusCodes.OK;
+  ctx.body = {
+    status: 'success',
+    error: null,
+    message: 'instance successfully removed',
+    data: sonarrs,
+  };
+};
 
-    radarrs = radarrs.filter((el) => el.uuid != uuid);
-    config.set("radarr", radarrs);
+const getCalendarData = async (ctx: Context) => {
+  try {
+    let sonarr = await new Sonarr().calendar();
+    let radarr = await new Radarr().calendar();
+    let full = [...sonarr, ...radarr];
 
-    try {
-      await WriteConfig();
-    } catch (e) {
-      logger.error(e);
-      res.status(500).json({
-        status: "error",
-        error: "failed to write to config file",
-        message: null,
-        data: {},
-      });
-      return;
-    }
+    ctx.status = StatusCodes.OK;
+    ctx.body = full;
+  } catch (err) {
+    logger.error(err);
 
-    res.status(200).json({
-      status: "success",
-      error: null,
-      message: "instance successfully removed",
-      data: radarrs,
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = {};
+  }
+};
+
+const getRadarrPathsById = async (ctx: Context) => {
+  if (!ctx.params.id) {
+    ctx.status = StatusCodes.NOT_FOUND;
+    ctx.body = {};
+  }
+  try {
+    let data = await new Radarr(ctx.params.id).getPaths();
+
+    data.forEach((el) => {
+      delete el.unmappedFolders;
     });
+
+    ctx.status = StatusCodes.OK;
+    ctx.body = data;
+  } catch (err) {
+    logger.log('warn', `ROUTE: Enable to get Radarr paths`);
+    logger.log({ level: 'error', message: err });
+
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = {};
+  }
+};
+
+const getRadarrProfilesById = async (ctx: Context) => {
+  if (!ctx.params.id) {
+    ctx.status = StatusCodes.NOT_FOUND;
+    ctx.body = {};
+  }
+  try {
+    ctx.status = StatusCodes.OK;
+    ctx.body = await new Radarr(ctx.params.id).getProfiles();
+  } catch {
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = {};
+  }
+};
+
+const getRadarrLangugaesById = async (ctx: Context) => {
+  if (!ctx.params.id) {
+    ctx.status = StatusCodes.NOT_FOUND;
+    ctx.body = {};
+  }
+  try {
+    ctx.status = StatusCodes.OK;
+    ctx.body = await new Radarr(ctx.params.id).getLanguageProfiles();
+  } catch {
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = {};
+  }
+};
+
+const getRadarrTagsById = async (ctx: Context) => {
+  if (!ctx.params.id) {
+    ctx.status = StatusCodes.NOT_FOUND;
+    ctx.body = {};
+  }
+  try {
+    ctx.status = StatusCodes.OK;
+    ctx.body = await new Radarr(ctx.params.id).getTags();
+  } catch {
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = {};
+  }
+};
+
+const testRadarrConnectionById = async (ctx: Context) => {
+  ctx.status = StatusCodes.OK;
+  ctx.body = {
+    connection: await new Radarr(ctx.params.id).test(),
+  };
+};
+
+const getRadarrConfig = async (ctx: Context) => {
+  ctx.status = StatusCodes.OK;
+  ctx.body = new Radarr().getConfig();
+};
+
+const testRadarrConnection = async (ctx: Context) => {
+  ctx.status = StatusCodes.OK;
+  ctx.body = {
+    connection: await new Radarr().test(),
+  };
+};
+
+const updateRadarrConfig = async (ctx: Context) => {
+  const body = ctx.body as any;
+
+  let data = body.data;
+  ConvertToConfig('radarr', JSON.parse(data));
+
+  try {
+    WriteConfig();
+
+    ctx.status = StatusCodes.OK;
+    ctx.body = data;
     return;
-  });
+  } catch (err) {
+    logger.log('error', `ROUTE: Error saving radarr config`);
+    logger.log({ level: 'error', message: err });
+
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = { error: err };
+    return;
+  }
+};
+
+const deleteRadarrById = async (ctx: Context) => {
+  let uuid = ctx.params.uuid;
+  if (uuid == undefined) {
+    ctx.status = StatusCodes.BAD_REQUEST;
+    ctx.body = {
+      status: 'error',
+      error: 'missing the required `uuid` field',
+      message: null,
+      data: {},
+    };
+    return;
+  }
+
+  let radarrs = config.get('radarr');
+  const match = radarrs.filter((el) => el.uuid == uuid);
+  if (match.length == 0) {
+    ctx.status = StatusCodes.BAD_REQUEST;
+    ctx.body = {
+      status: 'error',
+      error: 'no matching instance exists with the uuid: ' + uuid,
+      message: null,
+      data: {},
+    };
+    return;
+  }
+
+  radarrs = radarrs.filter((el) => el.uuid != uuid);
+  config.set('radarr', radarrs);
+
+  try {
+    await WriteConfig();
+  } catch (e) {
+    logger.error(e);
+
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = {
+      status: 'error',
+      error: 'failed to write to config file',
+      message: null,
+      data: {},
+    };
+    return;
+  }
+
+  ctx.status = StatusCodes.OK;
+  ctx.body = {
+    status: 'success',
+    error: null,
+    message: 'instance successfully removed',
+    data: radarrs,
+  };
+
+  return;
 };
 
 const ConvertToConfig = (entry, obj) => {
-  if (obj == null || typeof obj !== "object") {
+  if (obj == null || typeof obj !== 'object') {
     return;
   }
 
@@ -314,8 +493,8 @@ const ConvertToConfig = (entry, obj) => {
     item.port = parseInt(val.port);
     item.key = val.key;
     item.subpath = String(val.subpath);
-    if (val.subpath === "") {
-      item.subpath = "/";
+    if (val.subpath === '') {
+      item.subpath = '/';
     }
 
     item.path = {};
@@ -327,7 +506,7 @@ const ConvertToConfig = (entry, obj) => {
     if (val.path.location !== null) {
       item.path.location = String(val.path.location);
     } else {
-      item.path.location = "";
+      item.path.location = '';
     }
 
     item.profile = {};
@@ -339,7 +518,7 @@ const ConvertToConfig = (entry, obj) => {
     if (val.profile.name !== undefined) {
       item.profile.name = String(val.profile.name);
     } else {
-      item.profile.name = "";
+      item.profile.name = '';
     }
 
     item.language = {};
@@ -351,7 +530,7 @@ const ConvertToConfig = (entry, obj) => {
     if (val.language.name !== null) {
       item.language.name = String(val.language.name);
     } else {
-      item.language.name = "";
+      item.language.name = '';
     }
 
     item.uuid = val.uuid;

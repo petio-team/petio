@@ -21,19 +21,15 @@ export function clearToken() {
 }
 
 export async function login(user, token = false) {
-  if (!user && !token) throw "User not supplied";
-  try {
-    const login = await post("/login", { user, authToken: false });
-    if (!login.loggedIn) throw "Invalid login credentials";
-    updateStore({
-      type: "user/set-current-user",
-      user: login.user,
-      admin: login.admin,
-    });
-    return login;
-  } catch (e) {
-    throw e;
-  }
+  if (!user && !token) throw new Error("User not supplied");
+  const login = await post("/login", { user, authToken: false });
+  if (!login.loggedIn) throw new Error("Invalid login credentials");
+  updateStore({
+    type: "user/set-current-user",
+    user: login.user,
+    admin: login.admin,
+  });
+  return login;
 }
 
 export async function getRequests(min = true) {
@@ -135,7 +131,7 @@ export function deleteRequest(request, reason) {
   return post(`/request/remove`, { request, reason });
 }
 
-function updateStore(data = false) {
-  if (!data) return false;
+function updateStore(data = {}) {
+  if (Object.keys(data).length === 0) return false;
   return store.dispatch(data);
 }

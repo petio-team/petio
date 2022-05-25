@@ -1,36 +1,41 @@
-import { Router } from "express";
-import fs from "fs";
-import path from "path";
+import Router from '@koa/router';
+import fs from 'fs';
+import { StatusCodes } from 'http-status-codes';
+import { Context } from 'koa';
+import path from 'path';
 
-import { adminRequired } from "@/api/middleware/auth";
-import { dataFolder } from "@/config/env";
+import { adminRequired } from '@/api/middleware/auth';
+import { dataFolder } from '@/config/env';
 
-let liveLogfile = path.join(dataFolder, "./logs/live1.log");
-let liveLogfile2 = path.join(dataFolder, "./logs/live.log");
+let liveLogfile = path.join(dataFolder, './logs/live1.log');
+let liveLogfile2 = path.join(dataFolder, './logs/live.log');
 
-const route = Router();
+const route = new Router({ prefix: 'logs/' });
 
 export default (app: Router) => {
-  app.use("/log", route);
-  route.use(adminRequired);
+  route.get('/stream', streamLog);
 
-  route.get("/stream", adminRequired, async (_req, res) => {
-    let dataNew, dataOld;
-    try {
-      let logsNew = fs.readFileSync(liveLogfile, "utf8");
-      dataNew = JSON.parse(`[${logsNew.replace(/,\s*$/, "")}]`);
-    } catch {
-      dataNew = [];
-    }
+  app.use(route.routes());
+};
 
-    try {
-      let logsOld = fs.readFileSync(liveLogfile2, "utf8");
-      dataOld = JSON.parse(`[${logsOld.replace(/,\s*$/, "")}]`);
-    } catch {
-      dataOld = [];
-    }
+const streamLog = async (ctx: Context) => {
+  let dataNew, dataOld;
+  try {
+    let logsNew = fs.readFileSync(liveLogfile, 'utf8');
+    dataNew = JSON.parse(`[${logsNew.replace(/,\s*$/, '')}]`);
+  } catch {
+    dataNew = [];
+  }
 
-    let data = [...dataNew, ...dataOld];
-    res.json(data);
-  });
+  try {
+    let logsOld = fs.readFileSync(liveLogfile2, 'utf8');
+    dataOld = JSON.parse(`[${logsOld.replace(/,\s*$/, '')}]`);
+  } catch {
+    dataOld = [];
+  }
+
+  let data = [...dataNew, ...dataOld];
+
+  ctx.status = StatusCodes.OK;
+  ctx.body = data;
 };

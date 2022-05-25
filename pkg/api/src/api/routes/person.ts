@@ -1,26 +1,28 @@
-import { Router } from "express";
-import ExpressCache from "express-cache-middleware";
-import cacheManager from "cache-manager";
+import Router from '@koa/router';
+import { StatusCodes } from 'http-status-codes';
+import { Context } from 'koa';
 
-import personLookup from "@/tmdb/person";
-import { authRequired } from "@/api/middleware/auth";
+import { authRequired } from '@/api/middleware/auth';
+import personLookup from '@/tmdb/person';
 
-const cacheMiddleware = new ExpressCache(
-  cacheManager.caching({
-    store: "memory",
-    max: 100,
-    ttl: 86400, // Cache for 1 day
-  })
-);
-const route = Router();
-cacheMiddleware.attach(route);
+// const cacheMiddleware = new ExpressCache(
+//   cacheManager.caching({
+//     store: "memory",
+//     max: 100,
+//     ttl: 86400, // Cache for 1 day
+//   })
+// );
+const route = new Router({ prefix: '/person' });
 
 export default (app: Router) => {
-  app.use("/person", route);
-  route.use(authRequired);
+  route.get('/lookup/:id', lookupById);
 
-  route.get("/lookup/:id", async (req, res) => {
-    let data = await personLookup(req.params.id);
-    res.json(data);
-  });
+  app.use(route.routes());
+};
+
+const lookupById = async (ctx: Context) => {
+  let data = await personLookup(ctx.params.id);
+
+  ctx.status = StatusCodes.OK;
+  ctx.body = data;
 };

@@ -1,10 +1,10 @@
-import { Schema, model, Types } from "mongoose";
-import { ObjectId } from "bson";
-import * as z from "zod";
+import { ObjectId } from 'bson';
+import { Schema, model } from 'mongoose';
+import * as z from 'zod';
 
 export enum UserRole {
-  User = "user",
-  Admin = "admin",
+  User = 'user',
+  Admin = 'admin',
 }
 
 export const UserSchema = z.object({
@@ -61,7 +61,7 @@ const UserModelSchema = new Schema<User>(
     },
     profileId: {
       type: Schema.Types.ObjectId,
-      ref: "Profile",
+      ref: 'Profile',
     },
     owner: {
       type: Boolean,
@@ -81,19 +81,17 @@ const UserModelSchema = new Schema<User>(
   },
   {
     timestamps: true,
-  }
-);
-
-// Transforms the data removing the __v while setting id to _id and then
-// removing _id
-UserModelSchema.set("toJSON", {
-  transform: (_, obj) => {
-    delete obj._id;
-    delete obj.__v;
-    delete obj.password;
+    toJSON: {
+      transform: function (_doc, ret, _options) {
+        ret.id = ret._id;
+        delete ret.password;
+        delete ret._id;
+        delete ret.__v;
+        return ret;
+      },
+    },
   },
-  virtuals: true,
-});
+);
 
 // TODO: this should be it's own service with a repository ideally
 // Gets all users
@@ -105,7 +103,7 @@ export const GetAllUsers = async (): Promise<User[]> => {
 
   const parsed = await UserSchema.array().safeParseAsync(results);
   if (!parsed.success) {
-    throw new Error("failed to parse users data");
+    throw new Error('failed to parse users data');
   }
 
   return parsed.data;
@@ -118,12 +116,12 @@ export const GetUserByEmail = async (email: string): Promise<User> => {
     email: email,
   });
   if (!data) {
-    throw new Error("failed to get user by email");
+    throw new Error('failed to get user by email');
   }
 
   const parsed = await UserSchema.safeParseAsync(data.toObject());
   if (!parsed.success) {
-    throw new Error("failed to parse and validate data");
+    throw new Error('failed to parse and validate data');
   }
 
   return parsed.data;
@@ -134,7 +132,7 @@ export const GetUserByEmail = async (email: string): Promise<User> => {
 export const CreateOrUpdateUser = async (user: User): Promise<User> => {
   let schema = await UserSchema.safeParseAsync(user);
   if (!schema.success) {
-    throw new Error("failed to parse user data");
+    throw new Error('failed to parse user data');
   }
 
   const data = await UserModel.updateOne(
@@ -144,10 +142,10 @@ export const CreateOrUpdateUser = async (user: User): Promise<User> => {
     schema.data,
     {
       upsert: true,
-    }
+    },
   );
   if (!data.acknowledged) {
-    throw new Error("failed to create or update user");
+    throw new Error('failed to create or update user');
   }
 
   schema.data.id = data.upsertedId;
@@ -155,4 +153,4 @@ export const CreateOrUpdateUser = async (user: User): Promise<User> => {
   return schema.data;
 };
 
-export const UserModel = model<User>("users", UserModelSchema);
+export const UserModel = model<User>('users', UserModelSchema);

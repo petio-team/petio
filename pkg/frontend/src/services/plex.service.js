@@ -110,18 +110,16 @@ async function waitForPin(
 
 export async function plexAuth(plexWindow) {
   let pins = await getPins();
-  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=${getClientId()}&code=${
-    pins.code
-  }`;
+  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=${getClientId()}&code=${pins.code
+    }`;
   let data = await waitForPin(plexWindow, pins.id, true, false);
   return data;
 }
 
 export async function plexAuthLogin(plexWindow) {
   let pins = await getPins();
-  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=${getClientId()}&code=${
-    pins.code
-  }`;
+  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=${getClientId()}&code=${pins.code
+    }`;
   let data = await waitForPin(plexWindow, pins.id, false, true);
   return data;
 }
@@ -236,9 +234,8 @@ function getUser(token) {
 }
 
 function getServers(token, ssl = false) {
-  let url = `https://plex.tv/pms/resources?${
-    ssl ? "includeHttps=1&" : ""
-  }X-Plex-Token=${token}`;
+  let url = `https://plex.tv/pms/resources?${ssl ? "includeHttps=1&" : ""
+    }X-Plex-Token=${token}`;
   let method = "get";
   let headers = plexHeaders;
   return process(url, headers, method)
@@ -266,8 +263,8 @@ function testServer(server) {
   return post(`/setup/test_server`, { server });
 }
 
-function updateStore(data = false) {
-  if (!data) return false;
+function updateStore(data = {}) {
+  if (Object.keys(data).length === 0) return false;
   return store.dispatch(data);
 }
 
@@ -350,9 +347,8 @@ function process(url, headers, method, body = null) {
 
 export async function plexToken(plexWindow) {
   let pins = await getPins();
-  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=${getClientId()}&code=${
-    pins.code
-  }`;
+  plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=${getClientId()}&code=${pins.code
+    }`;
   let data = await waitForPin(plexWindow, pins.id, false, false, true);
   if (data.error) throw data.error;
   return data;

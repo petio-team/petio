@@ -1,99 +1,138 @@
-import { Router } from "express";
+import Router from '@koa/router';
+import { StatusCodes } from 'http-status-codes';
+import { Context } from 'koa';
+import * as z from 'zod';
 
-import logger from "@/loaders/logger";
-import { adminRequired } from "../middleware/auth";
-import { HasConfig, WriteConfig } from "@/config/config";
-import { config } from "@/config/schema";
-import setupReady from "@/util/setupReady";
+import { HasConfig, WriteConfig } from '@/config/config';
+import { config } from '@/config/schema';
+import logger from '@/loaders/logger';
+import setupReady from '@/util/setupReady';
 
-const route = Router();
+import { validateRequest } from '../middleware/validation';
+
+const route = new Router({ prefix: '/config' });
 
 export default (app: Router) => {
-  app.use("/config", route);
+  route.get('/', getConfig);
+  route.post(
+    '/update',
+    validateRequest({
+      body: z.object({
+        plexToken: z.string().optional(),
+        base_path: z.string().optional(),
+        login_type: z.boolean().optional(),
+        plexPopular: z.boolean().optional(),
+        telegram_chat_id: z.string().optional(),
+        telegram_bot_token: z.string().optional(),
+        telegram_send_silent: z.boolean().optional(),
+        discord_webhook: z.string().optional(),
+      }),
+    }),
+    updateConfig,
+  );
+  route.get('/current', getCurrentConfig);
 
-  route.get("/", async (_req, res) => {
-    const configStatus = await HasConfig();
-    let ready = false;
-    if (configStatus !== false) {
-      try {
-        let setupCheck = await setupReady();
-        if (setupCheck.ready) {
-          ready = true;
-        }
-        if (setupCheck.error) {
-          res.status(500).json({
-            error: "An error has occured",
-          });
-          return;
-        }
-      } catch {
-        res.status(500).json({
-          error: "An error has occured",
-        });
+  app.use(route.routes());
+};
+
+const getConfig = async (ctx: Context) => {
+  const configStatus = await HasConfig();
+  let ready = false;
+  if (configStatus !== false) {
+    try {
+      let setupCheck = await setupReady();
+      if (setupCheck.ready) {
+        ready = true;
+      }
+      if (setupCheck.error) {
+        ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+        ctx.body = {
+          error: 'An error has occured',
+        };
         return;
       }
-    }
-    res.json({
-      config: configStatus,
-      login_type: config.get("auth.type"),
-      ready: ready,
-    });
-  });
-
-  route.post("/update", adminRequired, async (req, res) => {
-    let body = req.body;
-
-    if (body.plexToken != undefined) {
-      config.set("plex.token", body.plexToken);
-    }
-    if (body.base_path != undefined) {
-      config.set("petio.subpath", body.base_path);
-    }
-    if (body.login_type != undefined) {
-      config.set("auth.type", body.login_type);
-    }
-    if (body.plexPopular != undefined) {
-      config.set("general.popular", body.plexPopular);
-    }
-    if (body.telegram_bot_token != undefined) {
-      config.set("notifications.telegram.token", body.telegram_bot_token);
-    }
-    if (body.telegram_chat_id != undefined) {
-      config.set("notifications.telegram.id", body.telegram_chat_id);
-    }
-    if (body.telegram_send_silently != undefined) {
-      config.set("notifications.telegram.silent", body.telegram_send_silently);
-    }
-    if (body.discord_webhook != undefined) {
-      config.set("notifications.discord.url", body.discord_webhook);
-    }
-
-    try {
-      await WriteConfig();
-    } catch (err) {
-      logger.error(err);
-      res.status(500).send("Config Not Found");
-    }
-
-    res.status(200).send("config updated");
-  });
-
-  route.get("/current", adminRequired, async (_req, res) => {
-    try {
-      const json = {
-        base_path: config.get("petio.subpath"),
-        login_type: config.get("auth.type"),
-        plexPopular: config.get("general.popular"),
-        discord_webhook: config.get("notifications.discord.url"),
-        telegram_bot_token: config.get("notifications.telegram.token"),
-        telegram_chat_id: config.get("notifications.telegram.id"),
-        telegram_send_silently: config.get("notifications.telegram.silent"),
+    } catch {
+      ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+      ctx.body = {
+        error: 'An error has occured',
       };
-      res.json(json);
-    } catch (err) {
-      logger.log("error", "ROUTE: Config error");
-      logger.log({ level: "error", message: err });
-      res.status(500).send("Config Not Found");
+      return;
     }
-  });
+  }
+  ctx.body = {
+    config: configStatus,
+    login_type: config.get('auth.type'),
+    ready: ready,
+  };
+};
+
+const updateConfig = async (ctx: Context) => {
+  const {
+    plexToken,
+    base_path,
+    login_type,
+    plexPopular,
+    telegram_bot_token,
+    telegram_chat_id,
+    telegram_send_silently,
+    discord_webhook,
+  } = ctx.request.body;
+
+  if (plexToken) {
+    config.set('plex.token', plexToken);
+  }
+  if (base_path) {
+    config.set('petio.subpath', base_path);
+  }
+  if (login_type) {
+    config.set('auth.type', login_type);
+  }
+  if (plexPopular) {
+    config.set('general.popular', plexPopular);
+  }
+  if (telegram_bot_token) {
+    config.set('notifications.telegram.token', telegram_bot_token);
+  }
+  if (telegram_chat_id) {
+    config.set('notifications.telegram.id', telegram_chat_id);
+  }
+  if (telegram_send_silently) {
+    config.set('notifications.telegram.silent', telegram_send_silently);
+  }
+  if (discord_webhook) {
+    config.set('notifications.discord.url', discord_webhook);
+  }
+
+  try {
+    await WriteConfig();
+  } catch (err) {
+    logger.error(err);
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = 'Config Not Found';
+    return;
+  }
+
+  ctx.status = StatusCodes.OK;
+  ctx.body = 'config updated';
+};
+
+const getCurrentConfig = async (ctx: Context) => {
+  try {
+    ctx.status = StatusCodes.OK;
+    ctx.body = {
+      base_path: config.get('petio.subpath'),
+      login_type: config.get('auth.type'),
+      plexPopular: config.get('general.popular'),
+      discord_webhook: config.get('notifications.discord.url'),
+      telegram_bot_token: config.get('notifications.telegram.token'),
+      telegram_chat_id: config.get('notifications.telegram.id'),
+      telegram_send_silently: config.get('notifications.telegram.silent'),
+    };
+  } catch (err) {
+    logger.log('error', 'ROUTE: Config error');
+    logger.log({ level: 'error', message: err });
+
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = 'config not found';
+  }
 };

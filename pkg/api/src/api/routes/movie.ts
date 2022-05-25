@@ -1,32 +1,42 @@
-import { Router } from "express";
-import { movieLookup, discoverMovie, company } from "@/tmdb/movie";
-import { authRequired } from "@/api/middleware/auth";
+import Router from '@koa/router';
+import { StatusCodes } from 'http-status-codes';
+import { Context } from 'koa';
 
-const route = Router();
+import { authRequired } from '@/api/middleware/auth';
+import { company, discoverMovie, movieLookup } from '@/tmdb/movie';
+
+const route = new Router({ prefix: '/movie' });
 
 export default (app: Router) => {
-  app.use("/movie", route);
-  route.use(authRequired);
+  route.get('/lookup/:id', lookupById);
+  route.get('/lookup/:id/minified', lookupByIdMinified);
+  route.post('/discover', getMovieDiscovery);
+  route.get('/company/:id', getCompanyById);
 
-  route.get("/lookup/:id", async (req, res) => {
-    let data = await movieLookup(req.params.id);
-    res.json(data);
-  });
+  app.use(route.routes());
+};
 
-  route.get("/lookup/:id/minified", async (req, res) => {
-    let data = await movieLookup(req.params.id, true);
-    res.json(data);
-  });
+const lookupById = async (ctx: Context) => {
+  ctx.status = StatusCodes.OK;
+  ctx.body = await movieLookup(ctx.params.id);
+};
 
-  route.post("/discover", async (req, res) => {
-    let page = req.body.page ? req.body.page : 1;
-    let params = req.body.params;
-    let data = await discoverMovie(page, params);
-    res.json(data);
-  });
+const lookupByIdMinified = async (ctx: Context) => {
+  ctx.status = StatusCodes.OK;
+  ctx.body = await movieLookup(ctx.params.id, true);
+};
 
-  route.get("/company/:id", async (req, res) => {
-    let data = await company(req.params.id);
-    res.json(data);
-  });
+const getMovieDiscovery = async (ctx: Context) => {
+  const body = ctx.body as any;
+
+  let page = body.page ? body.page : 1;
+  let params = body.params;
+
+  ctx.status = StatusCodes.OK;
+  ctx.body = await discoverMovie(page, params);
+};
+
+const getCompanyById = async (ctx: Context) => {
+  ctx.status = StatusCodes.OK;
+  ctx.body = await company(ctx.params.id);
 };

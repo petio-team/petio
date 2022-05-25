@@ -1,14 +1,14 @@
-import fs from "fs/promises";
-import path from "path";
+import fs from 'fs/promises';
+import path from 'path';
 
-import { dataFolder } from "@/config/env";
-import { config } from "@/config/schema";
-import logger from "@/loaders/logger";
+import { dataFolder } from '@/config/env';
+import { config } from '@/config/schema';
+import logger from '@/loaders/logger';
 
 /**
  * The name of the config file to use
  */
-const PETIO_CONFIG_FILE = "petio.json";
+const PETIO_CONFIG_FILE = 'petio.json';
 
 /**
  * Gets the path of the config file
@@ -23,11 +23,14 @@ export const getConfigPath = (): string => {
  * @param path the path to the file to load
  * @returns void
  */
-const loadAndValidateConfig = async (path: string): Promise<void> => {
-  const stat = await fileExists(path);
+const loadAndValidateConfig = async (file: string): Promise<boolean> => {
+  const stat = await fileExists(file);
   if (stat) {
-    config.loadFile(path).validate();
+    config.loadFile(file).validate();
+    return true;
   }
+
+  return false;
 };
 
 /**
@@ -36,8 +39,7 @@ const loadAndValidateConfig = async (path: string): Promise<void> => {
  */
 export const LoadConfig = async (): Promise<boolean> => {
   try {
-    await loadAndValidateConfig(getConfigPath());
-    return true;
+    return loadAndValidateConfig(getConfigPath());
   } catch (error) {
     logger.error(error);
     return false;
@@ -67,9 +69,9 @@ export const WriteConfig = async (): Promise<boolean> => {
   }
 };
 
-const fileExists = async (path: string): Promise<boolean> => {
+export const fileExists = async (file: string): Promise<boolean> => {
   try {
-    const stats = await fs.stat(path);
+    const stats = await fs.stat(file);
     return stats.isFile();
   } catch (_error) {
     return false;

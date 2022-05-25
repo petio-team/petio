@@ -1,33 +1,35 @@
-import { Router } from "express";
-import ExpressCache from "express-cache-middleware";
-import cacheManager from "cache-manager";
+import Router from '@koa/router';
+import { StatusCodes } from 'http-status-codes';
+import { Context } from 'koa';
 
-import getTop from "@/plex/top";
-import { authRequired } from "@/api/middleware/auth";
+import { authRequired } from '@/api/middleware/auth';
+import getTop from '@/plex/top';
 
 // Cache for 1 day
-const cacheMiddleware = new ExpressCache(
-  cacheManager.caching({
-    store: "memory",
-    max: 100,
-    ttl: 86400,
-  })
-);
+// const cacheMiddleware = new ExpressCache(
+//   cacheManager.caching({
+//     store: "memory",
+//     max: 100,
+//     ttl: 86400,
+//   })
+// );
 
-const route = Router();
-cacheMiddleware.attach(route);
+const route = new Router({ prefix: '/top' });
+// cacheMiddleware.attach(route);
 
 export default (app: Router) => {
-  app.use("/top", route);
-  route.use(authRequired);
+  route.get('/movies', getMovies);
+  route.get('/shows', getShows);
 
-  route.get("/movies", async (req, res) => {
-    let data = await getTop(1);
-    res.json(data);
-  });
+  app.use(route.routes());
+};
 
-  route.get("/shows", async (req, res) => {
-    let data = await getTop(2);
-    res.json(data);
-  });
+const getMovies = async (ctx: Context) => {
+  ctx.status = StatusCodes.OK;
+  ctx.body = await getTop(1);
+};
+
+const getShows = async (ctx: Context) => {
+  ctx.status = StatusCodes.OK;
+  ctx.body = await getTop(2);
 };

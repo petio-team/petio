@@ -1,12 +1,12 @@
-import { Application } from "express";
+import Koa from 'koa';
 
-import agendaFactory from "./agenda";
-import appRouter from "./express";
-import mongoose from "./mongoose";
-import jobs from "./jobs";
-import config from "./config";
+import agendaFactory from './agenda';
+import config from './config';
+import jobs from './jobs';
+import appRouter from './koa';
+import mongoose from './mongoose';
 
-export default async ({ expressApp }: { expressApp: Application }) => {
+export default async ({ httpApp }: { httpApp: Koa }) => {
   // load the config if the file exists, else use defaults
   const exists = await config();
 
@@ -22,5 +22,5 @@ export default async ({ expressApp }: { expressApp: Application }) => {
   }
 
   // load express routing
-  appRouter({ app: expressApp });
+  appRouter({ app: httpApp });
 };

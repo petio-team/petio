@@ -1,22 +1,30 @@
-import { Router } from "express";
+import Router from '@koa/router';
+import { StatusCodes } from 'http-status-codes';
+import { Context } from 'koa';
 
-import logger from "@/loaders/logger";
-import getSessions from "@/plex/sessions";
-import { adminRequired } from "@/api/middleware/auth";
+import { adminRequired } from '@/api/middleware/auth';
+import logger from '@/loaders/logger';
+import getSessions from '@/plex/sessions';
 
-const route = Router();
+const route = new Router({ prefix: '/sessions' });
 
 export default (app: Router) => {
-  app.use("/sessions", route);
-  route.use(adminRequired);
-  route.get("/", async (_, res) => {
-    try {
-      let data = await getSessions();
-      res.json(data.MediaContainer);
-    } catch (err) {
-      logger.log("warn", "ROUTE: Unable to get sessions");
-      logger.log({ level: "error", message: err });
-      res.status(500).send();
-    }
-  });
+  route.get('/', getSessionsData);
+
+  app.use(route.routes());
+};
+
+const getSessionsData = async (ctx: Context) => {
+  try {
+    let data = await getSessions();
+
+    ctx.status = StatusCodes.OK;
+    ctx.body = data.MediaContainer;
+  } catch (err) {
+    logger.log('warn', 'ROUTE: Unable to get sessions');
+    logger.log({ level: 'error', message: err });
+
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = {};
+  }
 };

@@ -1,33 +1,42 @@
-import { Router } from "express";
+import Router from '@koa/router';
+import { StatusCodes } from 'http-status-codes';
+import { Context } from 'koa';
 
-import { showLookup, discoverSeries, network } from "@/tmdb/show";
-import { authRequired } from "@/api/middleware/auth";
+import { authRequired } from '@/api/middleware/auth';
+import { discoverSeries, network, showLookup } from '@/tmdb/show';
 
-const route = Router();
+const route = new Router({ prefix: '/show' });
 
 export default (app: Router) => {
-  app.use("/show", route);
-  route.use(authRequired);
+  route.get('/lookup/:id', lookupById);
+  route.get('/lookup/:id/minified', lookupByIdMinified);
+  route.post('/discover', discoverSeriesData);
+  route.get('/network/:id', getNetworkById);
 
-  route.get("/lookup/:id", async (req, res) => {
-    let data = await showLookup(req.params.id, false);
-    res.json(data);
-  });
+  app.use(route.routes());
+};
 
-  route.get("/lookup/:id/minified", async (req, res) => {
-    let data = await showLookup(req.params.id, true);
-    res.json(data);
-  });
+const lookupById = async (ctx: Context) => {
+  ctx.status = StatusCodes.OK;
+  ctx.body = await showLookup(ctx.params.id, false);
+};
 
-  route.post("/discover", async (req, res) => {
-    let page = req.body.page ? req.body.page : 1;
-    let params = req.body.params;
-    let data = await discoverSeries(page, params);
-    res.json(data);
-  });
+const lookupByIdMinified = async (ctx: Context) => {
+  ctx.status = StatusCodes.OK;
+  ctx.body = await showLookup(ctx.params.id, true);
+};
 
-  route.get("/network/:id", async (req, res) => {
-    let data = await network(req.params.id);
-    res.json(data);
-  });
+const discoverSeriesData = async (ctx: Context) => {
+  const body = ctx.body as any;
+
+  let page = body.page ? body.page : 1;
+  let params = body.params;
+
+  ctx.status = StatusCodes.OK;
+  ctx.body = await discoverSeries(page, params);
+};
+
+const getNetworkById = async (ctx: Context) => {
+  ctx.status = StatusCodes.OK;
+  ctx.body = await network(ctx.params.id);
 };

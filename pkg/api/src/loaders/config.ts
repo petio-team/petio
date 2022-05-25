@@ -1,5 +1,5 @@
-import { LoadConfig } from "@/config/index";
-import { migrateConfigs } from "@/config/migration";
+import { LoadConfig } from '@/config/index';
+import { migrateConfigs } from '@/config/migration';
 
 export default async (): Promise<boolean> => {
   let exists = await LoadConfig();
