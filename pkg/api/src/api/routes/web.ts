@@ -7,10 +7,10 @@ import path from 'path';
 import { frontendView } from '@/config/env';
 
 export default async (app: Koa) => {
-  let frontendPath = path.resolve(frontendView);
-  if (!pathExists(path.join(frontendPath, 'index.html'))) {
+  let frontendPath = frontendView;
+  if (!(await pathExists(path.join(frontendPath, 'index.html')))) {
     const frontendBuildPath = path.join(frontendPath, './build');
-    if (!pathExists(path.join(frontendBuildPath, './index.html'))) {
+    if (!(await pathExists(path.join(frontendBuildPath, './index.html')))) {
       throw new Error('unable to find views files for frontend');
     } else {
       frontendPath = frontendBuildPath;
@@ -20,10 +20,10 @@ export default async (app: Koa) => {
   app.use(mount('/', serve(frontendPath)));
 };
 
-const pathExists = async (path: string): Promise<boolean> => {
+const pathExists = async (file: string): Promise<boolean> => {
   try {
-    const file = await fs.stat(path);
-    return file.isFile();
+    const stat = await fs.stat(file);
+    return stat.isFile();
   } catch (error) {
     return false;
   }
