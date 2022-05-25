@@ -9,6 +9,7 @@ import batch from './routes/batch';
 import config from './routes/config';
 import discovery from './routes/discovery';
 import filter from './routes/filter';
+import health from './routes/health';
 import history from './routes/history';
 import issue from './routes/issue';
 import log from './routes/log';
@@ -63,6 +64,7 @@ export default (): Koa => {
   );
 
   // api v1 routes
+  health(v1);
   batch(v1);
   config(v1);
   discovery(v1);

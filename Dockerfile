@@ -10,7 +10,7 @@ RUN chmod +x /init.sh
 WORKDIR /app
 EXPOSE 7777
 VOLUME ["/data"]
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD ["wget", "--spider", "http://localhost:7777/health"]
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD ["wget", "--spider", "http://localhost:7777/api/health"]
 ENTRYPOINT ["/init.sh"]
 LABEL org.opencontainers.image.vendor="petio-team"
 LABEL org.opencontainers.image.url="https://github.com/petio-team/petio"
