@@ -221,9 +221,7 @@ const getSonarrConfig = async (ctx: Context) => {
 };
 
 const updateSonarrConfig = async (ctx: Context) => {
-  const body = ctx.body as any;
-
-  let data = body.data;
+  let data = ctx.request.body.data;
   ConvertToConfig('sonarr', JSON.parse(data));
 
   try {
@@ -397,9 +395,7 @@ const testRadarrConnection = async (ctx: Context) => {
 };
 
 const updateRadarrConfig = async (ctx: Context) => {
-  const body = ctx.body as any;
-
-  let data = body.data;
+  let data = ctx.request.body.data;
   ConvertToConfig('radarr', JSON.parse(data));
 
   try {
@@ -515,7 +511,7 @@ const ConvertToConfig = (entry, obj) => {
     } else {
       item.profile.id = 0;
     }
-    if (val.profile.name !== undefined) {
+    if (val.profile.name !== null) {
       item.profile.name = String(val.profile.name);
     } else {
       item.profile.name = '';
