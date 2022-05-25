@@ -3,7 +3,6 @@ import axios from 'axios';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import { authRequired } from '@/api/middleware/auth';
 import { WriteConfig } from '@/config/config';
 import { config } from '@/config/schema';
 import logger from '@/loaders/logger';

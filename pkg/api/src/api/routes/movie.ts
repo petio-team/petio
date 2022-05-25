@@ -2,7 +2,6 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import { authRequired } from '@/api/middleware/auth';
 import { company, discoverMovie, movieLookup } from '@/tmdb/movie';
 
 const route = new Router({ prefix: '/movie' });

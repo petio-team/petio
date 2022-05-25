@@ -2,7 +2,6 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import { authRequired } from '@/api/middleware/auth';
 import getTop from '@/plex/top';
 
 // Cache for 1 day

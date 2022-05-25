@@ -2,7 +2,6 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import { authRequired } from '@/api/middleware/auth';
 import logger from '@/loaders/logger';
 import getBandwidth from '@/plex/bandwidth';
 import getHistory from '@/plex/history';

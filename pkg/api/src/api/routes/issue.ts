@@ -2,7 +2,6 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import { authRequired } from '@/api/middleware/auth';
 import logger from '@/loaders/logger';
 import Mailer from '@/mail/mailer';
 import Issue from '@/models/issue';
