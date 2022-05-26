@@ -52,6 +52,7 @@ export default (): Koa => {
       debug: true,
     }).unless({
       path: [
+        '/api/health',
         '/api/config',
         '/api/login',
         '/api/login/plex_login',
