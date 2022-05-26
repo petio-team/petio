@@ -61,6 +61,7 @@ export default ({ app }: { app: Koa }) => {
           '*.plex.tv',
           '*.fanart.tv',
           '*.tmdb.org',
+          'secure.gravatar.com',
         ],
         connectSrc: ["'self'", 'plex.tv'],
       },
