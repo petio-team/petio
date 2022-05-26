@@ -160,7 +160,7 @@ const getSonarrPathsById = async (ctx: Context) => {
     ctx.body = data;
   } catch {
     ctx.status = StatusCodes.OK;
-    ctx.body = {};
+    ctx.body = [];
   }
 };
 
@@ -173,8 +173,8 @@ const getSonarrProfilesById = async (ctx: Context) => {
     ctx.status = StatusCodes.OK;
     ctx.body = await new Sonarr().getProfiles(ctx.params.id);
   } catch {
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = {};
+    ctx.status = StatusCodes.OK;
+    ctx.body = [];
   }
 };
 
@@ -187,8 +187,8 @@ const getSonarrLanguagesById = async (ctx: Context) => {
     ctx.status = StatusCodes.OK;
     ctx.body = await new Sonarr().getLanguageProfiles(ctx.params.id);
   } catch {
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = {};
+    ctx.status = StatusCodes.OK;
+    ctx.body = [];
   }
 };
 
@@ -201,8 +201,8 @@ const getSonarrTagsById = async (ctx: Context) => {
     ctx.status = StatusCodes.OK;
     ctx.body = await new Sonarr().getTags(ctx.params.id);
   } catch {
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = {};
+    ctx.status = StatusCodes.OK;
+    ctx.body = [];
   }
 };
 
@@ -243,7 +243,7 @@ const updateSonarrConfig = async (ctx: Context) => {
 const deleteSonarrById = async (ctx: Context) => {
   let uuid = ctx.params.id;
   if (uuid == undefined) {
-    ctx.status = StatusCodes.NOT_FOUND;
+    ctx.status = StatusCodes.BAD_REQUEST;
     ctx.body = {
       status: 'error',
       error: 'missing the required `uuid` field',
@@ -305,8 +305,8 @@ const getCalendarData = async (ctx: Context) => {
   } catch (err) {
     logger.error(err);
 
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = {};
+    ctx.status = StatusCodes.OK;
+    ctx.body = [];
   }
 };
 
@@ -328,8 +328,8 @@ const getRadarrPathsById = async (ctx: Context) => {
     logger.log('warn', `ROUTE: Enable to get Radarr paths`);
     logger.log({ level: 'error', message: err });
 
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = {};
+    ctx.status = StatusCodes.OK;
+    ctx.body = [];
   }
 };
 
@@ -342,8 +342,8 @@ const getRadarrProfilesById = async (ctx: Context) => {
     ctx.status = StatusCodes.OK;
     ctx.body = await new Radarr(ctx.params.id).getProfiles();
   } catch {
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = {};
+    ctx.status = StatusCodes.OK;
+    ctx.body = [];
   }
 };
 
@@ -356,8 +356,8 @@ const getRadarrLangugaesById = async (ctx: Context) => {
     ctx.status = StatusCodes.OK;
     ctx.body = await new Radarr(ctx.params.id).getLanguageProfiles();
   } catch {
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = {};
+    ctx.status = StatusCodes.OK;
+    ctx.body = [];
   }
 };
 
@@ -370,8 +370,8 @@ const getRadarrTagsById = async (ctx: Context) => {
     ctx.status = StatusCodes.OK;
     ctx.body = await new Radarr(ctx.params.id).getTags();
   } catch {
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = {};
+    ctx.status = StatusCodes.OK;
+    ctx.body = [];
   }
 };
 
@@ -399,7 +399,7 @@ const updateRadarrConfig = async (ctx: Context) => {
   ConvertToConfig('radarr', JSON.parse(data));
 
   try {
-    WriteConfig();
+    await WriteConfig();
 
     ctx.status = StatusCodes.OK;
     ctx.body = data;
