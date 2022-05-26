@@ -18,12 +18,12 @@ export default (app: Router) => {
     validateRequest({
       body: z.object({
         email: z.object({
-          host: z.string().min(1),
+          server: z.string().min(1),
           port: z.number(),
-          username: z.string().min(1),
-          password: z.string().min(1),
+          user: z.string().min(1),
+          pass: z.string().min(1),
           from: z.string().min(1),
-          ssl: z.boolean(),
+          secure: z.boolean(),
           enabled: z.boolean(),
         }),
       }),
