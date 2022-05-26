@@ -21,7 +21,7 @@ export default (app: Router) => {
         plexToken: z.string().optional(),
         base_path: z.string().optional(),
         login_type: z.boolean().optional(),
-        plexPopular: z.boolean().optional(),
+        plexPopular: z.string().optional(),
         telegram_chat_id: z.string().optional(),
         telegram_bot_token: z.string().optional(),
         telegram_send_silent: z.boolean().optional(),
@@ -88,7 +88,7 @@ const updateConfig = async (ctx: Context) => {
     config.set('auth.type', login_type);
   }
   if (plexPopular) {
-    config.set('general.popular', plexPopular);
+    config.set('general.popular', plexPopular === 'true' ? true : false);
   }
   if (telegram_bot_token) {
     config.set('notifications.telegram.token', telegram_bot_token);
