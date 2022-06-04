@@ -2,6 +2,10 @@
 
 .table {
   margin-bottom: #{$spacing * 4};
+
+  &2 {
+    margin-top: #{$spacing * 2};
+  }
 }
 
 .title {

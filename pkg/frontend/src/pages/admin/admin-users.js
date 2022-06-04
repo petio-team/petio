@@ -54,7 +54,7 @@ function AdminUsers({ redux_users }) {
         <p className={`${typo.title} ${typo.bold}`}>Users</p>
       </div>
       <div className={styles.subtitle}>
-        <p className={`${typo.subtitle} ${typo.bold}`}>Profiles</p>
+        <p className={`${typo.smtitle} ${typo.bold}`}>Profiles</p>
         <p className={`${typo.body} ${typo.capped}`}>
           User profiles determine what should happen when a user makes a
           request. If using Sonarr / Radarr you can pick which servers the
@@ -63,10 +63,10 @@ function AdminUsers({ redux_users }) {
         </p>
       </div>
       <UserProfiles profiles={profiles} sonarr={sonarr} radarr={radarr} />
-      <div className={styles.subtitle}>
-        <p className={`${typo.subtitle} ${typo.bold}`}>Users</p>
+      <div className={styles.smtitle}>
+        <p className={`${typo.smtitle} ${typo.bold}`}>Users</p>
       </div>
-      <table className={`${tableStyle.rounded}`}>
+      <table className={`${tableStyle.rounded} ${styles.table2}`}>
         <thead>
           <tr>
             <th>
