@@ -1,13 +1,47 @@
-import styles from "../styles/views/myAccount.module.scss";
-import typo from "../styles/components/typography.module.scss";
-import { LazyLoadImage } from "react-lazy-load-image-component";
-import "react-lazy-load-image-component/src/effects/opacity.css";
-import { ReactComponent as ThumbUp } from "../assets/svg/thumb-up.svg";
-import { ReactComponent as ThumbDown } from "../assets/svg/thumb-down.svg";
-import buttons from "../styles/components/button.module.scss";
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/opacity.css';
+import { Link } from 'react-router-dom';
 
-export default function ReviewQueue({ history }) {
-  const reviewed = false;
+import { ReactComponent as ThumbDown } from '../assets/svg/thumb-down.svg';
+import { ReactComponent as ThumbUp } from '../assets/svg/thumb-up.svg';
+import { getReviews, saveReview } from '../services/user.service';
+import buttons from '../styles/components/button.module.scss';
+import typo from '../styles/components/typography.module.scss';
+import styles from '../styles/views/myAccount.module.scss';
+
+export default function ReviewQueue({
+  history,
+  redux_reviews,
+  currentUser,
+  newNotification,
+}) {
+  function isReviewed(data) {
+    if (!data.id) return false;
+    if (redux_reviews && redux_reviews.length > 0 && currentUser) {
+      const review = redux_reviews.filter((r) => {
+        return (
+          parseInt(r.tmdb_id) === parseInt(data.id) && r.user === currentUser.id
+        );
+      });
+      if (review && review[0] && review[0].score) return review[0].score;
+      return false;
+    }
+  }
+
+  async function review(type, data) {
+    if (!type) return;
+    try {
+      await saveReview(data, currentUser.id, type === 'good' ? 10 : 1);
+      await getReviews();
+    } catch (e) {
+      console.log(e);
+      newNotification({
+        message: 'Failed to save review',
+        type: 'error',
+      });
+    }
+  }
+
   return (
     <div className={styles.reviewQueue}>
       {!history ? (
@@ -19,12 +53,16 @@ export default function ReviewQueue({ history }) {
       ) : Object.keys(history).length > 0 ? (
         Object.keys(history).map((i) => {
           const item = history[i];
+          const reviewed = isReviewed(item);
+          const type = item.episode_run_time ? 'tv' : 'movie';
+          console.log(reviewed);
           if (!item.id) return null;
           return (
             <div
               key={`reviewq__${item.id}`}
               className={styles.reviewQueue__item}
             >
+              <Link to={`${item ? `/${type}/${item.id}` : '#'}`}></Link>
               <div className={styles.reviewQueue__item__inner}>
                 <div className={styles.reviewQueue__item__image}>
                   {item.backdrop_path ? (
@@ -65,22 +103,22 @@ export default function ReviewQueue({ history }) {
                       ? ` (${new Date(item.first_air_date).getFullYear()})`
                       : item.release_date
                       ? ` ${new Date(item.release_date).getFullYear()})`
-                      : ""}
+                      : ''}
                   </p>
                   <div className={styles.reviewQueue__item__btns}>
                     <button
                       className={`${buttons.icon} ${styles.actions__btn} ${
-                        reviewed === 10 ? styles.actions__btn__up : ""
+                        reviewed === 10 ? styles.actions__btn__up : ''
                       }`}
-                      // onClick={() => review("good")}
+                      onClick={() => review('good', item)}
                     >
                       <ThumbUp viewBox="0 0 24 24" />
                     </button>
                     <button
                       className={`${buttons.icon} ${styles.actions__btn} ${
-                        reviewed === 1 ? styles.actions__btn__down : ""
+                        reviewed === 1 ? styles.actions__btn__down : ''
                       }`}
-                      // onClick={() => review("bad")}
+                      onClick={() => review('bad', item)}
                     >
                       <ThumbDown viewBox="0 0 24 24" />
                     </button>
