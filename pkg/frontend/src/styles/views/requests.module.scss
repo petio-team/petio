@@ -1,7 +1,11 @@
-@import "../global/variables.module.scss";
+@import '../global/variables.module.scss';
 
 .wrap {
-  padding-top: 100px;
+  padding-top: 40px;
+
+  @media (min-width: $lg) {
+    margin-top: 100px;
+  }
 }
 
 .grid {
@@ -68,7 +72,7 @@
     }
 
     &:after {
-      content: "";
+      content: '';
       position: absolute;
       top: 0;
       left: 0;

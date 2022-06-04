@@ -1,7 +1,7 @@
-@import "../global/variables.module.scss";
+@import '../global/variables.module.scss';
 
 .wrap {
-  margin-top: 100px;
+  margin-top: 40px;
 
   @media (min-width: $lg) {
     margin-top: 120px;
@@ -118,14 +118,14 @@
         }
 
         path {
-          &[name="Remote"] {
+          &[name='Remote'] {
             stroke: $orange;
 
             circle {
               fill: darken($orange, 10);
             }
           }
-          &[name="Local"] {
+          &[name='Local'] {
             stroke: $blue;
           }
         }
@@ -154,16 +154,16 @@
       }
 
       path {
-        &[name="Plex"] {
+        &[name='Plex'] {
           fill: $orange;
           stroke: none;
         }
-        &[name="System"] {
+        &[name='System'] {
           fill: $blue;
           stroke: none;
         }
 
-        &[name="Free"] {
+        &[name='Free'] {
           fill: rgba($white, 0.1);
           stroke: none;
         }
@@ -214,7 +214,7 @@
     overflow: hidden;
 
     &:after {
-      content: "";
+      content: '';
       background: rgba($black, 0.2);
       position: absolute;
       top: -5px;
@@ -226,7 +226,7 @@
     }
 
     &__spacer {
-      content: "";
+      content: '';
       padding-bottom: 60%;
     }
 
@@ -540,7 +540,7 @@
       }
 
       &:after {
-        content: "";
+        content: '';
         position: absolute;
         top: 0;
         left: 0;
