@@ -13,6 +13,7 @@ import { Login } from '../components/login';
 import Notification from '../components/notification';
 import PwaAndroid from '../components/pwaAndroid';
 import PwaInstall from '../components/pwaInstall';
+import ErrorHandler from '../helpers/errorHandler';
 import { getMobileOperatingSystem } from '../helpers/getOs';
 import { checkConfig } from '../services/config.service';
 import { storePosition } from '../services/position.service';
@@ -271,141 +272,143 @@ function Petio({ redux_pos }) {
 
   return (
     <Layout isLoggedIn={isLoggedIn} currentUser={currentUser}>
-      {setupMode ? (
-        <Setup config={globalConfig} newNotification={newNotification} />
-      ) : null}
-      {!setupMode && loadingScreen ? <Loading /> : null}
-      {setupMode ? null : !isLoggedIn && globalConfig.config === true ? (
-        <>
-          {showInstall ? (
-            <PwaInstall callback={() => setShowInstall(false)} />
-          ) : null}
-          {showInstallAndroid && OS === 'Android' ? (
-            <PwaAndroid
-              callback={() => {
-                setShowInstallAndroid(false);
-                setAndroidInstallPrompt(false);
-              }}
-              prompt={androidInstallPrompt}
-            />
-          ) : null}
-          <Login
-            config={globalConfig}
-            setIsLoggedIn={setIsLoggedIn}
-            setCurrentUser={setCurrentUser}
-            setLoadingScreen={setLoadingScreen}
-            newNotification={newNotification}
-          />
-        </>
-      ) : (
-        <Switch>
-          <Route exact path="/">
-            <Home
-              currentUser={currentUser}
+      <ErrorHandler newNotification={newNotification}>
+        {setupMode ? (
+          <Setup config={globalConfig} newNotification={newNotification} />
+        ) : null}
+        {!setupMode && loadingScreen ? <Loading /> : null}
+        {setupMode ? null : !isLoggedIn && globalConfig.config === true ? (
+          <>
+            {showInstall ? (
+              <PwaInstall callback={() => setShowInstall(false)} />
+            ) : null}
+            {showInstallAndroid && OS === 'Android' ? (
+              <PwaAndroid
+                callback={() => {
+                  setShowInstallAndroid(false);
+                  setAndroidInstallPrompt(false);
+                }}
+                prompt={androidInstallPrompt}
+              />
+            ) : null}
+            <Login
               config={globalConfig}
-              newNotification={newNotification}
-            />
-          </Route>
-          <Route exact path="/requests">
-            <Requests
-              currentUser={currentUser}
-              config={globalConfig}
-              newNotification={newNotification}
-            />
-          </Route>
-          <Route path="/admin">
-            <Admin
               setIsLoggedIn={setIsLoggedIn}
-              currentUser={currentUser}
-              config={globalConfig}
               setCurrentUser={setCurrentUser}
+              setLoadingScreen={setLoadingScreen}
               newNotification={newNotification}
             />
-          </Route>
-          <Route exact path="/movie/:pid">
-            <Movie
-              currentUser={currentUser}
-              config={globalConfig}
-              newNotification={newNotification}
-              updateRequests={updateRequests}
-            />
-          </Route>
-          <Route exact path="/movie/genre/:pid">
-            <MovieGenre
-              currentUser={currentUser}
-              config={globalConfig}
-              newNotification={newNotification}
-            />
-          </Route>
-          <Route exact path="/movie/studio/:pid">
-            <Studio
-              currentUser={currentUser}
-              config={globalConfig}
-              newNotification={newNotification}
-            />
-          </Route>
-          <Route exact path="/people/:pid">
-            <People
-              currentUser={currentUser}
-              config={globalConfig}
-              newNotification={newNotification}
-            />
-          </Route>
-          <Route exact path="/tv/:pid">
-            <Show
-              currentUser={currentUser}
-              config={globalConfig}
-              newNotification={newNotification}
-              updateRequests={updateRequests}
-            />
-          </Route>
-          <Route exact path="/tv/genre/:pid">
-            <ShowGenre
-              currentUser={currentUser}
-              config={globalConfig}
-              newNotification={newNotification}
-            />
-          </Route>
-          <Route exact path="/tv/network/:pid">
-            <Network
-              currentUser={currentUser}
-              config={globalConfig}
-              newNotification={newNotification}
-            />
-          </Route>
-          <Route exact path="/search">
-            <Search
-              currentUser={currentUser}
-              config={globalConfig}
-              newNotification={newNotification}
-            />
-          </Route>
-          <Route exact path="/my-account">
-            <MyAccount
-              currentUser={currentUser}
-              config={globalConfig}
-              newNotification={newNotification}
-            />
-          </Route>
-          <Route path="*">
-            <NotFound />
-          </Route>
-        </Switch>
-      )}
-      <ToastContainer
-        className={notifications.wrap}
-        position="bottom-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        transition={Slide}
-        theme={'petio'}
-      />
+          </>
+        ) : (
+          <Switch>
+            <Route exact path="/">
+              <Home
+                currentUser={currentUser}
+                config={globalConfig}
+                newNotification={newNotification}
+              />
+            </Route>
+            <Route exact path="/requests">
+              <Requests
+                currentUser={currentUser}
+                config={globalConfig}
+                newNotification={newNotification}
+              />
+            </Route>
+            <Route path="/admin">
+              <Admin
+                setIsLoggedIn={setIsLoggedIn}
+                currentUser={currentUser}
+                config={globalConfig}
+                setCurrentUser={setCurrentUser}
+                newNotification={newNotification}
+              />
+            </Route>
+            <Route exact path="/movie/:pid">
+              <Movie
+                currentUser={currentUser}
+                config={globalConfig}
+                newNotification={newNotification}
+                updateRequests={updateRequests}
+              />
+            </Route>
+            <Route exact path="/movie/genre/:pid">
+              <MovieGenre
+                currentUser={currentUser}
+                config={globalConfig}
+                newNotification={newNotification}
+              />
+            </Route>
+            <Route exact path="/movie/studio/:pid">
+              <Studio
+                currentUser={currentUser}
+                config={globalConfig}
+                newNotification={newNotification}
+              />
+            </Route>
+            <Route exact path="/people/:pid">
+              <People
+                currentUser={currentUser}
+                config={globalConfig}
+                newNotification={newNotification}
+              />
+            </Route>
+            <Route exact path="/tv/:pid">
+              <Show
+                currentUser={currentUser}
+                config={globalConfig}
+                newNotification={newNotification}
+                updateRequests={updateRequests}
+              />
+            </Route>
+            <Route exact path="/tv/genre/:pid">
+              <ShowGenre
+                currentUser={currentUser}
+                config={globalConfig}
+                newNotification={newNotification}
+              />
+            </Route>
+            <Route exact path="/tv/network/:pid">
+              <Network
+                currentUser={currentUser}
+                config={globalConfig}
+                newNotification={newNotification}
+              />
+            </Route>
+            <Route exact path="/search">
+              <Search
+                currentUser={currentUser}
+                config={globalConfig}
+                newNotification={newNotification}
+              />
+            </Route>
+            <Route exact path="/my-account">
+              <MyAccount
+                currentUser={currentUser}
+                config={globalConfig}
+                newNotification={newNotification}
+              />
+            </Route>
+            <Route path="*">
+              <NotFound />
+            </Route>
+          </Switch>
+        )}
+        <ToastContainer
+          className={notifications.wrap}
+          position="bottom-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          transition={Slide}
+          theme={'petio'}
+        />
+      </ErrorHandler>
     </Layout>
   );
 }
