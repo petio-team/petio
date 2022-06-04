@@ -1,4 +1,4 @@
-@import "../global/variables.module.scss";
+@import '../global/variables.module.scss';
 
 .xltitle {
   font-size: 40px;
@@ -182,4 +182,9 @@ code {
 .link {
   color: $orange;
   text-decoration: underline;
+}
+
+.capped {
+  width: 500px;
+  max-width: 100%;
 }
