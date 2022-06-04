@@ -1,5 +1,5 @@
-import { asApi } from "zodios";
-import * as z from "zod";
+import { asApi } from '@zodios/core';
+import * as z from 'zod';
 
 export const TvDetailsSchema = z.object({
   adult: z.boolean(),
@@ -12,20 +12,21 @@ export const TvDetailsSchema = z.object({
   id: z.number(),
   in_production: z.boolean(),
   languages: z.array(z.string()),
-  last_air_date: z.string(),
-  last_episode_to_air: z.object({
-    air_date: z.string(),
-    episode_number: z.number(),
-    id: z.number(),
-    name: z.string(),
-    overview: z.string(),
-    production_code: z.string(),
-    runtime: z.number().or(z.null()),
-    season_number: z.number(),
-    still_path: z.string(),
-    vote_average: z.number(),
-    vote_count: z.number(),
-  }),
+  last_air_date: z.string().or(z.null()),
+  last_episode_to_air: z
+    .object({
+      air_date: z.string(),
+      episode_number: z.number(),
+      id: z.number(),
+      name: z.string(),
+      overview: z.string(),
+      production_code: z.string(),
+      runtime: z.number().or(z.null()),
+      season_number: z.number(),
+      still_path: z.string(),
+      vote_average: z.number(),
+      vote_count: z.number(),
+    }).or(z.null()),
   name: z.string(),
   next_episode_to_air: z.union([
     z.object({
@@ -49,7 +50,7 @@ export const TvDetailsSchema = z.object({
       id: z.number(),
       logo_path: z.string(),
       origin_country: z.string(),
-    })
+    }),
   ),
   number_of_episodes: z.number(),
   number_of_seasons: z.number(),
@@ -66,11 +67,11 @@ export const TvDetailsSchema = z.object({
         logo_path: z.string().or(z.null()),
         name: z.string(),
         origin_country: z.string(),
-      })
+      }),
     )
     .optional(),
   production_countries: z.array(
-    z.object({ iso_3166_1: z.string(), name: z.string() })
+    z.object({ iso_3166_1: z.string(), name: z.string() }),
   ),
   seasons: z.array(
     z.object({
@@ -81,14 +82,14 @@ export const TvDetailsSchema = z.object({
       overview: z.string(),
       poster_path: z.string().or(z.null()),
       season_number: z.number(),
-    })
+    }),
   ),
   spoken_languages: z.array(
     z.object({
       english_name: z.string(),
       iso_639_1: z.string(),
       name: z.string(),
-    })
+    }),
   ),
   status: z.string(),
   tagline: z.string(),
@@ -109,7 +110,7 @@ export const TvDetailsSchema = z.object({
           official: z.boolean(),
           published_at: z.string(),
           id: z.string(),
-        })
+        }),
       ),
     })
     .optional(),
@@ -132,7 +133,7 @@ export const TvDetailsSchema = z.object({
                   credit_id: z.string(),
                   character: z.string(),
                   episode_count: z.number(),
-                })
+                }),
               ),
               total_episode_count: z.number(),
               order: z.number(),
@@ -151,12 +152,12 @@ export const TvDetailsSchema = z.object({
                   credit_id: z.string(),
                   character: z.string(),
                   episode_count: z.number(),
-                })
+                }),
               ),
               total_episode_count: z.number(),
               order: z.number(),
             }),
-          ])
+          ]),
         )
         .optional(),
       crew: z.array(
@@ -175,7 +176,7 @@ export const TvDetailsSchema = z.object({
                 credit_id: z.string(),
                 job: z.string(),
                 episode_count: z.number(),
-              })
+              }),
             ),
             department: z.string(),
             total_episode_count: z.number(),
@@ -194,12 +195,12 @@ export const TvDetailsSchema = z.object({
                 credit_id: z.string(),
                 job: z.string(),
                 episode_count: z.number(),
-              })
+              }),
             ),
             department: z.string(),
             total_episode_count: z.number(),
           }),
-        ])
+        ]),
       ),
     })
     .optional(),
@@ -211,7 +212,7 @@ export const TvDetailsSchema = z.object({
   content_ratings: z
     .object({
       results: z.array(
-        z.object({ iso_3166_1: z.string(), rating: z.string() })
+        z.object({ iso_3166_1: z.string(), rating: z.string() }),
       ),
     })
     .optional(),
@@ -230,7 +231,7 @@ export const TvDetailsSchema = z.object({
           character: z.string(),
           credit_id: z.string(),
           order: z.number(),
-        })
+        }),
       ),
       crew: z.array(
         z.union([
@@ -260,7 +261,7 @@ export const TvDetailsSchema = z.object({
             department: z.string(),
             job: z.string(),
           }),
-        ])
+        ]),
       ),
     })
     .optional(),
@@ -269,12 +270,12 @@ export type TvDetails = z.infer<typeof TvDetailsSchema>;
 
 export const TvDetailsAPI = asApi([
   {
-    method: "get",
-    path: "/tv/:id",
+    method: 'get',
+    path: '/tv/:id',
     parameters: [
       {
-        name: "append_to_response",
-        type: "Query",
+        name: 'append_to_response',
+        type: 'Query',
         schema: z.string().optional(),
       },
     ],

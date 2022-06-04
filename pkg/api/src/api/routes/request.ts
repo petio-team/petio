@@ -79,7 +79,7 @@ const getRequestMinified = async (ctx: Context) => {
 };
 
 const addRequest = async (ctx: Context) => {
-  const body = ctx.body as any;
+  const body = ctx.request.body as any;
 
   let user = body.user;
   let request = body.request;
@@ -90,7 +90,7 @@ const addRequest = async (ctx: Context) => {
 };
 
 const removeRequest = async (ctx: Context) => {
-  const body = ctx.body as any;
+  const body = ctx.request.body as any;
 
   let request = body.request;
   let reason = body.reason;
@@ -136,7 +136,7 @@ const removeRequest = async (ctx: Context) => {
 };
 
 const updateRequest = async (ctx: Context) => {
-  const body = ctx.body as any;
+  const body = ctx.request.body as any;
 
   let request = body.request;
   let servers = body.servers;

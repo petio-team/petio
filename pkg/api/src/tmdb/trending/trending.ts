@@ -1,16 +1,16 @@
-import { asApi } from "zodios";
-import * as z from "zod";
+import { asApi } from '@zodios/core';
+import * as z from 'zod';
 
 export enum MediaType {
-  All = "all",
-  Movie = "movie",
-  Tv = "tv",
-  Person = "person",
+  All = 'all',
+  Movie = 'movie',
+  Tv = 'tv',
+  Person = 'person',
 }
 
 export enum TimeWindow {
-  Day = "day",
-  Week = "week",
+  Day = 'day',
+  Week = 'week',
 }
 
 export const TrendingMovieSchema = z.object({
@@ -71,7 +71,7 @@ export const TrendingPeopleSchema = z.object({
       adult: z.boolean().optional(),
       backdrop_path: z.string(),
       media_type: z.string(),
-    })
+    }),
   ),
   adult: z.boolean(),
   known_for_department: z.string(),
@@ -84,7 +84,7 @@ export type TrendingPeople = z.infer<typeof TrendingPeopleSchema>;
 export const TrendingSchema = z.object({
   page: z.number(),
   results: z.array(
-    z.union([TrendingPeopleSchema, TrendingMovieSchema, TrendingTvSchema])
+    z.union([TrendingPeopleSchema, TrendingMovieSchema, TrendingTvSchema]),
   ),
   total_pages: z.number(),
   total_results: z.number(),
@@ -93,8 +93,8 @@ export type Trending = z.infer<typeof TrendingSchema>;
 
 export const TrendingAPI = asApi([
   {
-    method: "get",
-    path: "/trending/:media_type/:time_window",
+    method: 'get',
+    path: '/trending/:media_type/:time_window',
     parameters: [],
     response: TrendingSchema,
   },

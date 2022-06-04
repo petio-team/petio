@@ -1,33 +1,17 @@
-import axios from "axios";
-import { URL, URLSearchParams } from "url";
+import axios from 'axios';
+import { URL, URLSearchParams } from 'url';
 
-import logger from "@/loaders/logger";
-import Request from "@/models/request";
-import { config } from "@/config/index";
+import logger from '@/loaders/logger';
+import { IDownloader } from '@/models/downloaders';
+import Request from '@/models/request';
+
+import RadarrAPI from '../arr/radarr';
 
 export default class Radarr {
-  config: any;
-  forced: any;
-  fullConfig: any;
-  constructor(
-    id: any = false,
-    forced = false,
-    profileOvr = false,
-    pathOvr = false
-  ) {
-    this.fullConfig = config.get("radarr");
-    this.config = false;
-    this.forced = forced;
+  instances: IDownloader[];
 
-    if (id !== false) {
-      this.config = this.fullConfig.filter((i) => i.uuid == id)[0];
-      if (profileOvr) {
-        this.config.profile.id = profileOvr;
-      }
-      if (pathOvr) {
-        this.config.path.location = pathOvr;
-      }
-    }
+  constructor(instances: IDownloader[]) {
+    this.instances = instances;
   }
 
   async process(method, endpoint, params = {}, body = {}) {
@@ -35,8 +19,8 @@ export default class Radarr {
       return;
     }
     const baseurl = `${this.config.protocol}://${this.config.host}${
-      this.config.port ? ":" + this.config.port : ""
-    }${this.config.subpath == "/" ? "" : this.config.subpath}/api/v3/`;
+      this.config.port ? ':' + this.config.port : ''
+    }${this.config.subpath == '/' ? '' : this.config.subpath}/api/v3/`;
     const apiurl = new URL(endpoint, baseurl);
     const prms = new URLSearchParams();
 
@@ -46,69 +30,53 @@ export default class Radarr {
       }
     }
 
-    prms.set("apikey", this.config.key);
+    prms.set('apikey', this.config.key);
     apiurl.search = prms.toString();
 
-    try {
-      let res;
-      switch (method) {
-        case "post":
-          res = await axios.post(apiurl.toString(), body);
-          break;
-        case "get":
-          res = await axios.get(apiurl.toString());
-          break;
-        case "delete":
-          res = await axios.delete(apiurl.toString(), body);
-          break;
-        case "put":
-          res = await axios.put(apiurl.toString(), body);
-          break;
-        default:
-          res = await axios.get(apiurl.toString());
-      }
-
-      if (!res.data || typeof res.data !== "object") {
-        return Error("not a valid object");
-      }
-      return res.data;
-    } catch (err) {
-      throw err;
+    let res;
+    switch (method) {
+      case 'post':
+        res = await axios.post(apiurl.toString(), body);
+        break;
+      case 'get':
+        res = await axios.get(apiurl.toString());
+        break;
+      case 'delete':
+        res = await axios.delete(apiurl.toString(), body);
+        break;
+      case 'put':
+        res = await axios.put(apiurl.toString(), body);
+        break;
+      default:
+        res = await axios.get(apiurl.toString());
     }
+
+    if (!res.data || typeof res.data !== 'object') {
+      return Error('not a valid object');
+    }
+    return res.data;
   }
 
-  getConfig() {
-    return this.fullConfig;
-  }
-
-  async get(endpoint, params = {}) {
-    return this.process("get", endpoint, params);
-  }
-
-  async delete(endpoint, params = {}) {
-    return this.process("delete", endpoint, params);
-  }
-
-  async post(endpoint, params = {}, body = {}) {
-    return this.process("post", endpoint, params, body);
+  getInstances(): IDownloader[] {
+    return this.instances;
   }
 
   async connect(test = false) {
-    if (!this.config || this.config.title == "Server Removed") {
+    if (!this.config || this.config.title == 'Server Removed') {
       return false;
     }
     if (!this.config.enabled && !test) {
-      logger.verbose("SERVICE - RADARR: Radarr not enabled", {
-        label: "downloaders.radarr",
+      logger.verbose('SERVICE - RADARR: Radarr not enabled', {
+        label: 'downloaders.radarr',
       });
       return false;
     }
     try {
-      let check = await this.get("system/status");
+      let check = await this.get('system/status');
       if (check.error) {
         logger.warn(
           `SERVICE - RADARR: [${this.config.title}] ERR Connection failed`,
-          { label: "downloaders.radarr" }
+          { label: 'downloaders.radarr' },
         );
         return false;
       }
@@ -117,44 +85,22 @@ export default class Radarr {
       } else {
         logger.warn(
           `SERVICE - RADARR: [${this.config.title}] ERR Connection failed`,
-          { label: "downloaders.radarr" }
+          { label: 'downloaders.radarr' },
         );
         return false;
       }
     } catch (err) {
       logger.warn(
         `SERVICE - RADARR: [${this.config.title}] ERR Connection failed`,
-        { label: "downloaders.radarr" }
+        { label: 'downloaders.radarr' },
       );
       return false;
     }
   }
 
-  async getPaths() {
-    return await this.get("rootfolder");
-  }
-
-  async getProfiles() {
-    return await this.get("qualityProfile");
-  }
-
-  async getLanguageProfiles() {
-    return await this.get("language");
-  }
-
-  async getTags() {
-    return await this.get("tag");
-  }
-
-  lookup(id) {
-    return this.get("movie/lookup", {
-      term: `tmdb:${id}`,
-    });
-  }
-
   async refresh() {
-    return await this.post("command", false, {
-      name: "RefreshMonitoredDownloads",
+    return this.post('command', false, {
+      name: 'RefreshMonitoredDownloads',
     });
   }
 
@@ -178,14 +124,15 @@ export default class Radarr {
     try {
       return this.delete(`movie/${id}`);
     } catch {
-      logger.warn("RADARR: Unable to remove job, likely already removed", {
-        label: "downloaders.radarr",
+      logger.warn('RADARR: Unable to remove job, likely already removed', {
+        label: 'downloaders.radarr',
       });
     }
   }
 
   async queue() {
     let queue = {};
+
     for (let i = 0; i < this.fullConfig.length; i++) {
       this.config = this.fullConfig[i];
       const active = await this.connect();
@@ -198,7 +145,7 @@ export default class Radarr {
       let pageSize = queue[this.config.uuid].pageSize;
       let pages = Math.ceil(totalRecords / pageSize);
       for (let p = 2; p <= pages; p++) {
-        let queuePage = await this.get("queue", {
+        let queuePage = await this.get('queue', {
           page: p,
         });
         queue[this.config.uuid].records = [
@@ -206,7 +153,7 @@ export default class Radarr {
           ...queuePage.records,
         ];
       }
-      queue[this.config.uuid]["serverName"] = this.config.title;
+      queue[this.config.uuid]['serverName'] = this.config.title;
     }
     return queue;
   }
@@ -217,7 +164,7 @@ export default class Radarr {
 
   async add(movieData, path = false, profile = false, tag: any = false) {
     movieData.qualityProfileId = parseInt(
-      profile ? profile : this.config.profile.id
+      profile ? profile : this.config.profile.id,
     );
     movieData.rootFolderPath = `${path ? path : this.config.path.location}`;
     movieData.addOptions = {
@@ -227,7 +174,7 @@ export default class Radarr {
     if (tag) movieData.tags = [parseInt(tag)];
 
     try {
-      let add = await this.post("movie", false, movieData);
+      let add = await this.post('movie', false, movieData);
 
       if (Array.isArray(add)) {
         if (add[1].errorMessage) throw add[1].errorMessage;
@@ -236,9 +183,9 @@ export default class Radarr {
     } catch (err) {
       logger.warn(
         `SERVICE - RADARR: [${this.config.title}] Unable to add movie`,
-        { label: "downloaders.radarr" }
+        { label: 'downloaders.radarr' },
       );
-      logger.log(err, { label: "downloaders.radarr" });
+      logger.log(err, { label: 'downloaders.radarr' });
       throw err;
     }
   }
@@ -253,14 +200,14 @@ export default class Radarr {
           if (radarrData[0].id) {
             logger.verbose(
               `SERVICE - RADARR: [${this.config.title}] Job skipped already found for ${job.title}`,
-              { label: "downloaders.radarr" }
+              { label: 'downloaders.radarr' },
             );
             radarrId = radarrData[0].id;
           } else {
             radarrId = await this.add(radarrData[0]);
             logger.verbose(
               `SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`,
-              { label: "downloaders.radarr" }
+              { label: 'downloaders.radarr' },
             );
           }
           await Request.findOneAndUpdate(
@@ -268,14 +215,14 @@ export default class Radarr {
               requestId: job.requestId,
             },
             { $push: { radarrId: { [this.config.uuid]: radarrId } } },
-            { useFindAndModify: false }
+            { useFindAndModify: false },
           );
         } catch (err) {
           logger.error(
             `SERVICE - RADARR: [${this.config.title}] Unable to add movie ${job.title}`,
-            { label: "downloaders.radarr" }
+            { label: 'downloaders.radarr' },
           );
-          logger.error(err, { label: "downloaders.radarr" });
+          logger.error(err, { label: 'downloaders.radarr' });
         }
       } else {
         // Loop for all servers default
@@ -283,7 +230,7 @@ export default class Radarr {
           if (!server.enabled) {
             logger.verbose(
               `SERVICE - RADARR: [${server.title}] Server not active`,
-              { label: "downloaders.radarr" }
+              { label: 'downloaders.radarr' },
             );
             return;
           }
@@ -295,14 +242,14 @@ export default class Radarr {
             if (radarrData[0].id) {
               logger.verbose(
                 `SERVICE - RADARR: [${this.config.title}] Job skipped already found for ${job.title}`,
-                { label: "downloaders.radarr" }
+                { label: 'downloaders.radarr' },
               );
               radarrId = radarrData[0].id;
             } else {
               radarrId = await this.add(radarrData[0]);
               logger.verbose(
                 `SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`,
-                { label: "downloaders.radarr" }
+                { label: 'downloaders.radarr' },
               );
             }
 
@@ -311,14 +258,14 @@ export default class Radarr {
                 requestId: job.requestId,
               },
               { $push: { radarrId: { [this.config.uuid]: radarrId } } },
-              { useFindAndModify: false }
+              { useFindAndModify: false },
             );
           } catch (err) {
             logger.error(
               `SERVICE - RADARR: [${this.config.title}] Unable to add movie ${job.title}`,
-              { label: "downloaders.radarr" }
+              { label: 'downloaders.radarr' },
             );
-            logger.log(err, { label: "downloaders.radarr" });
+            logger.log(err, { label: 'downloaders.radarr' });
           }
         }
       }
@@ -333,7 +280,7 @@ export default class Radarr {
         if (radarrData[0] && radarrData[0].id) {
           logger.verbose(
             `SERVICE - RADARR: [${this.config.title}] Job skipped already found for ${job.title}`,
-            { label: "downloaders.radarr" }
+            { label: 'downloaders.radarr' },
           );
           radarrId = radarrData[0].id;
         } else {
@@ -341,11 +288,11 @@ export default class Radarr {
             radarrData[0],
             manual.path,
             manual.profile,
-            manual.tag
+            manual.tag,
           );
           logger.verbose(
             `SERVICE - RADARR: [${this.config.title}] Radarr job added for ${job.title}`,
-            { label: "downloaders.radarr" }
+            { label: 'downloaders.radarr' },
           );
         }
         await Request.findOneAndUpdate(
@@ -353,44 +300,44 @@ export default class Radarr {
             requestId: job.id,
           },
           { $push: { radarrId: { [this.config.uuid]: radarrId } } },
-          { useFindAndModify: false }
+          { useFindAndModify: false },
         );
       } catch (err) {
         logger.error(
           `SERVICE - RADARR: [${this.config.title}] Unable to add movie ${job.title}`,
-          { label: "downloaders.radarr" }
+          { label: 'downloaders.radarr' },
         );
-        logger.log(err, { label: "downloaders.radarr" });
+        logger.log(err, { label: 'downloaders.radarr' });
       }
     }
   }
 
   async processRequest(id) {
     logger.verbose(`SERVICE - RADARR: Processing request`, {
-      label: "downloaders.radarr",
+      label: 'downloaders.radarr',
     });
     if (!this.fullConfig || this.fullConfig.length === 0) {
       logger.verbose(`SERVICE - RADARR: No active servers`, {
-        label: "downloaders.radarr",
+        label: 'downloaders.radarr',
       });
       return;
     }
 
     const req = await Request.findOne({ requestId: id });
-    if (req.type === "movie") {
+    if (req.type === 'movie') {
       if (!req.tmdb_id) {
         logger.verbose(`SERVICE - RADARR: TMDB ID not found for ${req.title}`, {
-          label: "downloaders.radarr",
+          label: 'downloaders.radarr',
         });
       } else if (req.radarrId.length === 0) {
         if (!req.approved) {
           logger.verbose(
             `SERVICE - RADARR: Request requires approval - ${req.title}`,
-            { label: "downloaders.radarr" }
+            { label: 'downloaders.radarr' },
           );
         } else {
-          logger.verbose("SERVICE - RADARR: Request passed to queue", {
-            label: "downloaders.radarr",
+          logger.verbose('SERVICE - RADARR: Request passed to queue', {
+            label: 'downloaders.radarr',
           });
           this.processJobs([req]);
         }
@@ -401,36 +348,29 @@ export default class Radarr {
   async calendar() {
     let mainCalendar: any = [];
     let now = new Date();
-    for (let server of this.fullConfig) {
+    for (let server of this.instances) {
       if (server.enabled) {
-        this.config = server;
+        const url = new URL(server.url);
+        const api = new RadarrAPI(url, server.token);
 
         try {
-          let serverCal = await this.get("/calendar", {
-            unmonitored: true,
-            start: new Date(
-              now.getFullYear(),
-              now.getMonth() - 1,
-              1
-            ).toISOString(),
-            end: new Date(
-              now.getFullYear(),
-              now.getMonth() + 2,
-              1
-            ).toISOString(),
-          });
+          const calendar = await api.Calendar(
+            true,
+            new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString(),
+            new Date(now.getFullYear(), now.getMonth() + 2, 1).toISOString(),
+          );
 
-          mainCalendar = [...mainCalendar, ...serverCal];
+          mainCalendar = [...mainCalendar, ...calendar];
         } catch (err) {
-          logger.error("RADARR: Calendar error", {
-            label: "downloaders.radarr",
+          logger.error('RADARR: Calendar error', {
+            label: 'downloaders.radarr',
           });
-          logger.error(err, { label: "downloaders.radarr" });
+          logger.error(err, { label: 'downloaders.radarr' });
         }
       }
     }
-    logger.verbose("RADARR: Calendar returned", {
-      label: "downloaders.radarr",
+    logger.verbose('RADARR: Calendar returned', {
+      label: 'downloaders.radarr',
     });
 
     return mainCalendar;

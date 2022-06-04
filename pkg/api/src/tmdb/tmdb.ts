@@ -1,13 +1,13 @@
-import { Zodios } from "zodios";
+import { Zodios } from '@zodios/core';
 
-import { tmdbApiKey } from "../config/env";
-import { DiscoverAPI } from "./discover/discover";
-import { pluginApiKey } from "./key";
-import { MovieAPI } from "./movie/movies";
-import { TrendingAPI } from "./trending/trending";
-import { TVAPI } from "./tv/tv";
+import { tmdbApiKey } from '../config/env';
+import { DiscoverAPI } from './discover/discover';
+import { pluginApiKey } from './key';
+import { MovieAPI } from './movie/movies';
+import { TrendingAPI } from './trending/trending';
+import { TVAPI } from './tv/tv';
 
-export const TMDBAPI = new Zodios("https://api.themoviedb.org/3", [
+export const TMDBAPI = new Zodios('https://api.themoviedb.org/3', [
   ...DiscoverAPI,
   ...MovieAPI,
   ...TVAPI,
@@ -17,5 +17,5 @@ export const TMDBAPI = new Zodios("https://api.themoviedb.org/3", [
 TMDBAPI.use(
   pluginApiKey({
     getApiKey: async () => tmdbApiKey,
-  })
+  }),
 );

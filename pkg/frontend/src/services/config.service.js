@@ -45,7 +45,7 @@ export function getRadarr() {
 export function saveRadarrConfig(config) {
   if (!config) throw "No config provided";
 
-  return post(`/services/radarr/config`, { data: JSON.stringify(config) });
+  return post(`/services/radarr/config`, config);
 }
 
 export async function testRadarr(id) {
@@ -76,7 +76,7 @@ export function getSonarr() {
 export function saveSonarrConfig(config) {
   if (!config) throw "No config provided";
 
-  return post(`/services/sonarr/config`, { data: JSON.stringify(config) });
+  return post(`/services/sonarr/config`, config);
 }
 
 export async function testSonarr(id) {

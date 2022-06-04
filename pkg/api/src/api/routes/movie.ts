@@ -26,7 +26,7 @@ const lookupByIdMinified = async (ctx: Context) => {
 };
 
 const getMovieDiscovery = async (ctx: Context) => {
-  const body = ctx.body as any;
+  const body = ctx.request.body as any;
 
   let page = body.page ? body.page : 1;
   let params = body.params;

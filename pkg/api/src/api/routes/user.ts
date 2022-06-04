@@ -92,7 +92,7 @@ const getUserById = async (ctx: Context) => {
 };
 
 const createCustomUser = async (ctx: Context) => {
-  const body = ctx.body as any;
+  const body = ctx.request.body as any;
 
   let user = body.user;
   if (!user) {
@@ -142,7 +142,7 @@ const createCustomUser = async (ctx: Context) => {
 };
 
 const editUser = async (ctx: Context) => {
-  const body = ctx.body as any;
+  const body = ctx.request.body as any;
   let user = body.user;
 
   if (!user) {
@@ -203,7 +203,7 @@ const editUser = async (ctx: Context) => {
 };
 
 const editMultipleUsers = async (ctx: Context) => {
-  const body = ctx.body as any;
+  const body = ctx.request.body as any;
   let users = body.users;
   let enabled = body.enabled;
   let profile = body.profile;
@@ -246,7 +246,7 @@ const editMultipleUsers = async (ctx: Context) => {
 };
 
 const deleteUser = async (ctx: Context) => {
-  const body = ctx.body as any;
+  const body = ctx.request.body as any;
 
   let user = body.user;
   if (!user) {

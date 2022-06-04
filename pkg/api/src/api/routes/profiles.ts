@@ -37,7 +37,7 @@ const listProfiles = async (ctx: Context) => {
 };
 
 const saveProfile = async (ctx: Context) => {
-  const body = ctx.body as any;
+  const body = ctx.request.body as any;
   let profile = body.profile;
   if (!profile) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
@@ -54,7 +54,7 @@ const saveProfile = async (ctx: Context) => {
           },
         },
         { new: true, useFindAndModify: false },
-      );
+      ).exec();
     } catch {
       ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
       ctx.body = {
@@ -80,7 +80,7 @@ const saveProfile = async (ctx: Context) => {
           },
         },
         { new: true, useFindAndModify: false },
-      );
+      ).exec();
       ctx.status = StatusCodes.OK;
       ctx.body = {
         message: 'profile updated',
@@ -119,7 +119,7 @@ const saveProfile = async (ctx: Context) => {
 };
 
 const deleteProfile = async (ctx: Context) => {
-  const body = ctx.body as any;
+  const body = ctx.request.body as any;
 
   let profile = body.profile;
   if (!profile || !profile.id) {

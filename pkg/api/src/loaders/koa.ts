@@ -51,7 +51,7 @@ export default ({ app }: { app: Koa }) => {
     helmet.contentSecurityPolicy({
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", 'www.youtube.com'],
         styleSrc: ["'self'", "'unsafe-inline'"],
         fontSrc: ["'self'"],
         imgSrc: [
@@ -59,8 +59,8 @@ export default ({ app }: { app: Koa }) => {
           'data:',
           'plex.tv',
           '*.plex.tv',
-          '*.fanart.tv',
           '*.tmdb.org',
+          'assets.fanart.tv',
           'secure.gravatar.com',
         ],
         connectSrc: ["'self'", 'plex.tv'],

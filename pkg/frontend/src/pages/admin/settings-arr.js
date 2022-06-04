@@ -14,32 +14,31 @@ import {
   saveSonarrConfig,
   testSonarr,
 } from "../../services/config.service";
-import { v4 as uuidv4 } from "uuid";
 
 export default function SettingsArr(props) {
   const [servers, setServers] = useState([]);
   const [openAdd, setOpenAdd] = useState(false);
   const serverDefaults = {
-    enabled: false,
-    key: "",
+    id: null,
+    name: "",
     host: "",
     port: "",
     protocol: "http",
-    title: "",
+    token: "",
     subpath: "",
-    uuid: false,
     path: {
-      id: null,
-      location: null,
+      id: 0,
+      location: "",
     },
     profile: {
-      id: null,
-      name: null,
+      id: 0,
+      name: "",
     },
     language: {
-      id: null,
-      name: null,
+      id: 0,
+      name: "",
     },
+    enabled: false,
   };
   const [newServer, setNewServer] = useState(serverDefaults);
   const [currentServer, setCurrentServer] = useState(false);
@@ -91,7 +90,7 @@ export default function SettingsArr(props) {
         setCurrentServer({
           ...currentServer,
           profile: {
-            id: value,
+            id: parseInt(value),
             name: profile[0].name,
           },
         });
@@ -100,7 +99,7 @@ export default function SettingsArr(props) {
         setCurrentServer({
           ...currentServer,
           path: {
-            id: value,
+            id: parseInt(value),
             location: path[0].path,
           },
         });
@@ -109,7 +108,7 @@ export default function SettingsArr(props) {
         setCurrentServer({
           ...currentServer,
           language: {
-            id: value,
+            id: parseInt(value),
             name: language[0].name,
           },
         });
@@ -125,11 +124,10 @@ export default function SettingsArr(props) {
   async function addServer() {
     if (updating) return;
     setUpdating(true);
-    const uuid = uuidv4();
     let failed = false;
     if (
-      !newServer.title ||
-      !newServer.key ||
+      !newServer.name ||
+      !newServer.token ||
       !newServer.host ||
       !newServer.port ||
       !newServer.protocol ||
@@ -151,14 +149,13 @@ export default function SettingsArr(props) {
 
       data.push({
         ...newServer,
-        uuid: uuid,
       });
       if (type === "radarr") {
         await saveRadarrConfig(data);
       } else {
         await saveSonarrConfig(data);
       }
-      const test = await testServer(uuid);
+      const test = await testServer(newServer.id);
       if (!test) failed = true;
     } catch (e) {
       failed = true;
@@ -190,9 +187,8 @@ export default function SettingsArr(props) {
 
       setCurrentServer({
         ...newServer,
-        uuid: uuid,
       });
-      getSettings(uuid);
+      getSettings(newServer.id);
 
       setUpdating(false);
       props.newNotification({
@@ -203,14 +199,14 @@ export default function SettingsArr(props) {
     }
   }
 
-  async function testServer(uuid) {
+  async function testServer(id) {
     const n = props.newNotification({
       message: "Testing server",
       type: "loading",
     });
     try {
       const test =
-        type === "radarr" ? await testRadarr(uuid) : await testSonarr(uuid);
+        type === "radarr" ? await testRadarr(id) : await testSonarr(id);
       if (!test.connection) throw "Test Failed";
       props.newNotification({
         message: "Server test passed",
@@ -229,20 +225,20 @@ export default function SettingsArr(props) {
     }
   }
 
-  function selectServer(uuid) {
-    const server = servers.filter((s) => s.uuid === uuid);
+  function selectServer(id) {
+    const server = servers.filter((s) => s.id === id);
     if (server.length > 0) {
       setCurrentServer(server[0]);
-      getSettings(uuid);
+      getSettings(id);
     }
   }
 
-  async function getSettings(uuid) {
+  async function getSettings(id) {
     try {
       let settings =
         type === "radarr"
-          ? await getRadarrOptions(uuid)
-          : await getSonarrOptions(uuid);
+          ? await getRadarrOptions(id)
+          : await getSonarrOptions(id);
       if (settings.profiles.error || settings.paths.error) {
         return;
       }
@@ -274,7 +270,7 @@ export default function SettingsArr(props) {
     });
   }
 
-  async function deleteServer(uuid) {
+  async function deleteServer(id) {
     if (updating) return;
     setUpdating(true);
     const n = props.newNotification({
@@ -284,7 +280,7 @@ export default function SettingsArr(props) {
     closeModal();
     try {
       let data = servers.filter(function (s) {
-        return s.uuid !== uuid;
+        return s.id !== id;
       });
       if (type === "radarr") {
         await saveRadarrConfig(data);
@@ -310,7 +306,7 @@ export default function SettingsArr(props) {
     }
   }
 
-  async function updateServer(uuid) {
+  async function updateServer(id) {
     if (updating) return;
     setUpdating(true);
     const n = props.newNotification({
@@ -320,7 +316,7 @@ export default function SettingsArr(props) {
     try {
       let data = [...servers];
       data.forEach((s, i) => {
-        if (s.uuid === uuid) {
+        if (s.id === id) {
           data[i] = currentServer;
         }
       });
@@ -391,37 +387,36 @@ export default function SettingsArr(props) {
       <div className={styles.grid}>
         {servers && servers.length > 0
           ? servers.map((server, i) => {
-              return (
-                <div
-                  className={`${styles.arr__item} ${
-                    server.enabled
-                      ? styles.arr__item__active
-                      : styles.arr__item__disabled
+            return (
+              <div
+                className={`${styles.arr__item} ${server.enabled
+                  ? styles.arr__item__active
+                  : styles.arr__item__disabled
                   }`}
-                  key={`${type}_server__${i}`}
-                  onClick={() => selectServer(server.uuid)}
-                >
-                  <div className={styles.arr__item__content}>
-                    <div className={styles.arr__item__icon}>
-                      <ServerIcon />
-                    </div>
-                    <div>
-                      <p
-                        className={`${typo.body} ${typo.uppercase} ${typo.medium}`}
-                      >
-                        {server.title} (
-                        {server.enabled ? "active" : "not active"})
-                      </p>
-                      <p
-                        className={`${typo.xsmall} ${typo.uppercase} ${typo.medium}`}
-                      >
-                        {server.uuid}
-                      </p>
-                    </div>
+                key={`${type}_server__${i}`}
+                onClick={() => selectServer(server.id)}
+              >
+                <div className={styles.arr__item__content}>
+                  <div className={styles.arr__item__icon}>
+                    <ServerIcon />
+                  </div>
+                  <div>
+                    <p
+                      className={`${typo.body} ${typo.uppercase} ${typo.medium}`}
+                    >
+                      {server.name} (
+                      {server.enabled ? "active" : "not active"})
+                    </p>
+                    <p
+                      className={`${typo.xsmall} ${typo.uppercase} ${typo.medium}`}
+                    >
+                      {server.id}
+                    </p>
                   </div>
                 </div>
-              );
-            })
+              </div>
+            );
+          })
           : null}
         <div className={styles.arr__add} onClick={() => setOpenAdd(true)}>
           <div className={styles.arr__item__content}>
@@ -463,8 +458,8 @@ export default function SettingsArr(props) {
                 type="text"
                 className={inputs.text__light}
                 placeholder="Title"
-                name="title"
-                value={currentServer ? currentServer.title : newServer.title}
+                name="name"
+                value={currentServer ? currentServer.name : newServer.name}
                 onChange={handleChange}
               />
               <br />
@@ -527,11 +522,10 @@ export default function SettingsArr(props) {
               <input
                 type="text"
                 className={inputs.text__light}
-                placeholder={`API Key from ${
-                  type === "radarr" ? "Radarr" : "Sonarr"
-                }`}
-                name="key"
-                value={currentServer ? currentServer.key : newServer.key}
+                placeholder={`API Key from ${type === "radarr" ? "Radarr" : "Sonarr"
+                  }`}
+                name="token"
+                value={currentServer ? currentServer.token : newServer.token}
                 onChange={handleChange}
               />
               <br />
@@ -637,29 +631,27 @@ export default function SettingsArr(props) {
                 <>
                   <button
                     className={buttons.primary__red}
-                    onClick={() => deleteServer(currentServer.uuid)}
+                    onClick={() => deleteServer(currentServer.id)}
                   >
                     Delete
                   </button>
                   <br />
                   <button
-                    className={`${buttons.secondary} ${
-                      currentServer.path.id && currentServer.profile.id
-                        ? ""
-                        : buttons.disabled
-                    }`}
-                    onClick={() => testServer(currentServer.uuid)}
+                    className={`${buttons.secondary} ${currentServer.path.id && currentServer.profile.id
+                      ? ""
+                      : buttons.disabled
+                      }`}
+                    onClick={() => testServer(currentServer.id)}
                   >
                     Test
                   </button>
                   <br />
                   <button
-                    className={`${buttons.primary} ${
-                      currentServer.path.id && currentServer.profile.id
-                        ? ""
-                        : buttons.disabled
-                    }`}
-                    onClick={() => updateServer(currentServer.uuid)}
+                    className={`${buttons.primary} ${currentServer.path.id && currentServer.profile.id
+                      ? ""
+                      : buttons.disabled
+                      }`}
+                    onClick={() => updateServer(currentServer.id)}
                   >
                     Save
                   </button>

@@ -1,5 +1,5 @@
-import * as z from "zod";
-import { asApi } from "zodios";
+import { asApi } from '@zodios/core';
+import * as z from 'zod';
 
 export const MovieDetailsSchema = z.object({
   adult: z.boolean(),
@@ -29,11 +29,11 @@ export const MovieDetailsSchema = z.object({
         logo_path: z.string().or(z.null()),
         name: z.string(),
         origin_country: z.string(),
-      })
+      }),
     )
     .optional(),
   production_countries: z.array(
-    z.object({ iso_3166_1: z.string(), name: z.string() })
+    z.object({ iso_3166_1: z.string(), name: z.string() }),
   ),
   release_date: z.string(),
   revenue: z.number(),
@@ -43,7 +43,7 @@ export const MovieDetailsSchema = z.object({
       english_name: z.string(),
       iso_639_1: z.string(),
       name: z.string(),
-    })
+    }),
   ),
   status: z.string(),
   tagline: z.string(),
@@ -64,7 +64,7 @@ export const MovieDetailsSchema = z.object({
         official: z.boolean(),
         published_at: z.string(),
         id: z.string(),
-      })
+      }),
     ),
   }),
 });
@@ -72,12 +72,12 @@ export type MovieDetails = z.infer<typeof MovieDetailsSchema>;
 
 export const MovieDetailsAPI = asApi([
   {
-    method: "get",
-    path: "/movie/:id",
+    method: 'get',
+    path: '/movie/:id',
     parameters: [
       {
-        name: "append_to_response",
-        type: "Query",
+        name: 'append_to_response',
+        type: 'Query',
         schema: z.string().optional(),
       },
     ],

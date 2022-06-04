@@ -1,11 +1,12 @@
-import { Zodios } from "zodios";
-import { fanartApiKey } from "../config/env";
-import { pluginApiKey } from "./key";
-import * as z from "zod";
+import { Zodios } from '@zodios/core';
+import * as z from 'zod';
+
+import { fanartApiKey } from '../config/env';
+import { pluginApiKey } from './key';
 
 export enum FanartTypes {
-  Movies = "movies",
-  Shows = "tv",
+  Movies = 'movies',
+  Shows = 'tv',
 }
 
 export const TvFanartSchema = z.object({
@@ -18,7 +19,7 @@ export const TvFanartSchema = z.object({
         url: z.string(),
         lang: z.string(),
         likes: z.string(),
-      })
+      }),
     )
     .optional(),
   tvposter: z
@@ -28,7 +29,7 @@ export const TvFanartSchema = z.object({
         url: z.string(),
         lang: z.string(),
         likes: z.string(),
-      })
+      }),
     )
     .optional(),
   characterart: z
@@ -38,7 +39,7 @@ export const TvFanartSchema = z.object({
         url: z.string(),
         lang: z.string(),
         likes: z.string(),
-      })
+      }),
     )
     .optional(),
   seasonposter: z
@@ -49,7 +50,7 @@ export const TvFanartSchema = z.object({
         lang: z.string(),
         likes: z.string(),
         season: z.string(),
-      })
+      }),
     )
     .optional(),
   hdclearart: z
@@ -59,7 +60,7 @@ export const TvFanartSchema = z.object({
         url: z.string(),
         lang: z.string(),
         likes: z.string(),
-      })
+      }),
     )
     .optional(),
   tvbanner: z
@@ -69,7 +70,7 @@ export const TvFanartSchema = z.object({
         url: z.string(),
         lang: z.string(),
         likes: z.string(),
-      })
+      }),
     )
     .optional(),
   showbackground: z
@@ -80,7 +81,7 @@ export const TvFanartSchema = z.object({
         lang: z.string(),
         likes: z.string(),
         season: z.string(),
-      })
+      }),
     )
     .optional(),
   tvthumb: z
@@ -90,7 +91,7 @@ export const TvFanartSchema = z.object({
         url: z.string(),
         lang: z.string(),
         likes: z.string(),
-      })
+      }),
     )
     .optional(),
   seasonbanner: z
@@ -101,7 +102,7 @@ export const TvFanartSchema = z.object({
         lang: z.string(),
         likes: z.string(),
         season: z.string(),
-      })
+      }),
     )
     .optional(),
   seasonthumb: z
@@ -112,7 +113,7 @@ export const TvFanartSchema = z.object({
         lang: z.string(),
         likes: z.string(),
         season: z.string(),
-      })
+      }),
     )
     .optional(),
 });
@@ -129,7 +130,7 @@ export const MovieFanartSchema = z.object({
         url: z.string(),
         lang: z.string(),
         likes: z.string(),
-      })
+      }),
     )
     .optional(),
   moviethumb: z
@@ -139,7 +140,7 @@ export const MovieFanartSchema = z.object({
         url: z.string(),
         lang: z.string(),
         likes: z.string(),
-      })
+      }),
     )
     .optional(),
   movieposter: z
@@ -149,7 +150,7 @@ export const MovieFanartSchema = z.object({
         url: z.string(),
         lang: z.string(),
         likes: z.string(),
-      })
+      }),
     )
     .optional(),
   moviebackground: z
@@ -159,7 +160,7 @@ export const MovieFanartSchema = z.object({
         url: z.string(),
         lang: z.string(),
         likes: z.string(),
-      })
+      }),
     )
     .optional(),
   moviebanner: z
@@ -169,7 +170,7 @@ export const MovieFanartSchema = z.object({
         url: z.string(),
         lang: z.string(),
         likes: z.string(),
-      })
+      }),
     )
     .optional(),
   moviedisc: z
@@ -181,7 +182,7 @@ export const MovieFanartSchema = z.object({
         likes: z.string(),
         disc: z.string(),
         disc_type: z.string(),
-      })
+      }),
     )
     .optional(),
   hdmovieclearart: z
@@ -191,25 +192,25 @@ export const MovieFanartSchema = z.object({
         url: z.string(),
         lang: z.string(),
         likes: z.string(),
-      })
+      }),
     )
     .optional(),
 });
 export type MovieFanart = z.infer<typeof MovieFanartSchema>;
 
-export const Fanart = TvFanartSchema.merge(MovieFanartSchema);
+export const FanartSchema = TvFanartSchema.merge(MovieFanartSchema);
 
-export const FanartAPI = new Zodios("https://webservice.fanart.tv/v3", [
+export const FanartAPI = new Zodios('https://webservice.fanart.tv/v3', [
   {
-    method: "get",
-    path: "/:type/:id",
+    method: 'get',
+    path: '/:type/:id',
     parameters: [],
-    response: Fanart,
+    response: FanartSchema,
   },
 ] as const);
 
 FanartAPI.use(
   pluginApiKey({
     getApiKey: async () => fanartApiKey,
-  })
+  }),
 );

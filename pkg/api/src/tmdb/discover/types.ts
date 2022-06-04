@@ -1,7 +1,7 @@
 export enum WatchMonetizationType {
-  "flatrate",
-  "free",
-  "ads",
-  "rent",
-  "buy",
+  'flatrate',
+  'free',
+  'ads',
+  'rent',
+  'buy',
 }

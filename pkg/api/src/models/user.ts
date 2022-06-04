@@ -9,14 +9,14 @@ export enum UserRole {
 
 export const UserSchema = z.object({
   id: z.instanceof(ObjectId).optional(),
-  title: z.string().nonempty(),
-  username: z.string().nonempty(),
+  title: z.string().min(1),
+  username: z.string().min(1),
   password: z.string().optional(),
-  email: z.string().email().nonempty(),
-  thumbnail: z.string().nonempty(),
+  email: z.string().email().min(1),
+  thumbnail: z.string().min(1),
   // altId is now used to tell if an account is custom or not
-  altId: z.string().nonempty().optional(),
-  plexId: z.string().nonempty().optional(),
+  altId: z.string().min(1).optional(),
+  plexId: z.string().min(1).optional(),
   role: z.nativeEnum(UserRole).default(UserRole.User),
   profileId: z.string().optional(),
   // owner replaced the old custom field, and inverts it's usage
@@ -93,6 +93,8 @@ const UserModelSchema = new Schema<User>(
   },
 );
 
+export const UserModel = model<User>('users', UserModelSchema);
+
 // TODO: this should be it's own service with a repository ideally
 // Gets all users
 export const GetAllUsers = async (): Promise<User[]> => {
@@ -152,5 +154,3 @@ export const CreateOrUpdateUser = async (user: User): Promise<User> => {
 
   return schema.data;
 };
-
-export const UserModel = model<User>('users', UserModelSchema);

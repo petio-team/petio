@@ -42,7 +42,7 @@ const getReviewById = async (ctx: Context) => {
 };
 
 const addReview = async (ctx: Context) => {
-  const body = ctx.body as any;
+  const body = ctx.request.body as any;
 
   let item = body.item;
   let review = body.review;

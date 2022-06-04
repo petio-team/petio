@@ -25,7 +25,7 @@ const listAllIssues = async (ctx: Context) => {
 };
 
 const deleteIssues = async (ctx: Context) => {
-  const body = ctx.body as any;
+  const body = ctx.request.body as any;
   const issue_id = body.id;
   const message = body.message;
 
@@ -53,7 +53,7 @@ const deleteIssues = async (ctx: Context) => {
 };
 
 const addIssue = async (ctx: Context) => {
-  const body = ctx.body as any;
+  const body = ctx.request.body as any;
 
   const newIssue = new Issue({
     mediaId: body.mediaId,
