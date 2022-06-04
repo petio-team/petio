@@ -20,11 +20,13 @@ async function getTrending() {
     };
     const r = Math.floor(Math.random() * (10 - 0 + 1) + 0);
     data.movies.forEach((movie, i) => {
+      if (!movie) return;
       if (r === i) featuredMovie(movie.id);
       movies[movie.id] = movie;
       trending.movies.push(movie.id);
     });
     data.tv.forEach((show) => {
+      if (!show) return;
       shows[show.id] = show;
       trending.tv.push(show.id);
     });
