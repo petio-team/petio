@@ -1,32 +1,30 @@
-import media from "../../services/media.service";
+import { useEffect, useState } from 'react';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/opacity.css';
+import { connect } from 'react-redux';
+import { Link, useParams } from 'react-router-dom';
 
-import { useState, useEffect } from "react";
-import { LazyLoadImage } from "react-lazy-load-image-component";
-import "react-lazy-load-image-component/src/effects/opacity.css";
-import { Link, useParams } from "react-router-dom";
-import { connect } from "react-redux";
-
-import Meta from "../../components/meta";
-import Hero from "../../components/hero";
-import Carousel from "../../components/carousel";
-import Critics from "../../components/critics";
-import RequestButton from "../../components/requestButton";
-
-import hero from "../../styles/components/hero.module.scss";
-import styles from "../../styles/views/movie.module.scss";
-import typo from "../../styles/components/typography.module.scss";
-import buttons from "../../styles/components/button.module.scss";
-
-import { ReactComponent as IssueIcon } from "../../assets/svg/issue.svg";
-import { ReactComponent as TrailerIcon } from "../../assets/svg/trailer.svg";
-import { ReactComponent as WatchlistIcon } from "../../assets/svg/watchlist.svg";
-import NotFound from "../404";
-import { matchGenre } from "../../helpers/genres";
-import { Loading } from "../../components/loading";
-import Trailer from "../../components/trailer";
-import { getReviews } from "../../services/user.service";
-import ReviewButtons from "../../components/reviewButtons";
-import languages from "../../helpers/languages";
+import NotFound from '../404';
+import { ReactComponent as IssueIcon } from '../../assets/svg/issue.svg';
+import { ReactComponent as TrailerIcon } from '../../assets/svg/trailer.svg';
+import { ReactComponent as WatchlistIcon } from '../../assets/svg/watchlist.svg';
+import Carousel from '../../components/carousel';
+import Critics from '../../components/critics';
+import Hero from '../../components/hero';
+import IssueModal from '../../components/issueModal';
+import { Loading } from '../../components/loading';
+import Meta from '../../components/meta';
+import RequestButton from '../../components/requestButton';
+import ReviewButtons from '../../components/reviewButtons';
+import Trailer from '../../components/trailer';
+import { matchGenre } from '../../helpers/genres';
+import languages from '../../helpers/languages';
+import media from '../../services/media.service';
+import { getReviews } from '../../services/user.service';
+import buttons from '../../styles/components/button.module.scss';
+import hero from '../../styles/components/hero.module.scss';
+import typo from '../../styles/components/typography.module.scss';
+import styles from '../../styles/views/movie.module.scss';
 
 const mapStateToProps = (state) => {
   return {
@@ -46,6 +44,7 @@ function Movie({
 }) {
   const [mobile, setMobile] = useState(false);
   const [trailer, setTrailer] = useState(false);
+  const [issuesOpen, setIssuesOpen] = useState(false);
   const { pid } = useParams();
   const movieData = redux_movies[pid];
   const [collection, setCollection] = useState(false);
@@ -54,10 +53,10 @@ function Movie({
     function handleResize() {
       setMobile(window.innerWidth < 992);
     }
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
     handleResize();
 
-    return () => window.removeEventListener("resize", handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   useEffect(() => {
@@ -69,7 +68,7 @@ function Movie({
     collectionData.forEach((id) => {
       if (!redux_movies[id]) return;
       if (!redux_movies[id].release_date)
-        redux_movies[id].release_date = "999999999";
+        redux_movies[id].release_date = '999999999';
       collectionRedux.push(redux_movies[id]);
     });
 
@@ -105,20 +104,20 @@ function Movie({
     var hours = num / 60;
     var rhours = Math.floor(hours);
     var minutes = (hours - rhours) * 60;
-    var rminutes = ("0" + Math.round(minutes)).slice(-2);
-    var hrs = rhours < 1 ? "" : rhours === 1 ? " h " : rhours > 1 ? " h " : "";
-    return `${rhours >= 1 ? rhours : ""}${hrs}${rminutes} mins`;
+    var rminutes = ('0' + Math.round(minutes)).slice(-2);
+    var hrs = rhours < 1 ? '' : rhours === 1 ? ' h ' : rhours > 1 ? ' h ' : '';
+    return `${rhours >= 1 ? rhours : ''}${hrs}${rminutes} mins`;
   }
 
   function filterCrew() {
     let out = [];
     if (movieData && movieData.credits && movieData.credits.crew) {
       const crew = movieData.credits.crew;
-      let directors = crew.filter((obj) => obj.job === "Director");
-      let authors = crew.filter((obj) => obj.job === "Novel");
-      let writers = crew.filter((obj) => obj.job === "Screenplay");
-      let eProducers = crew.filter((obj) => obj.job === "Executive Producer");
-      let producers = crew.filter((obj) => obj.job === "Producer");
+      let directors = crew.filter((obj) => obj.job === 'Director');
+      let authors = crew.filter((obj) => obj.job === 'Novel');
+      let writers = crew.filter((obj) => obj.job === 'Screenplay');
+      let eProducers = crew.filter((obj) => obj.job === 'Executive Producer');
+      let producers = crew.filter((obj) => obj.job === 'Producer');
       let unsorted = [
         ...directors,
         ...authors,
@@ -168,7 +167,7 @@ function Movie({
               credits.length > i && credits[i].roles.length > 0 ? (
                 credits[i].roles.map((role, r) => {
                   if (r > 0) {
-                    return ", " + role;
+                    return ', ' + role;
                   }
                   return role;
                 })
@@ -185,13 +184,13 @@ function Movie({
             ) : credits.length > i && credits[i].roles.length > 0 ? (
               credits[i].roles.map((role, r) => {
                 if (r > 0) {
-                  return ", " + role;
+                  return ', ' + role;
                 }
                 return role;
               })
             ) : null}
           </p>
-        </div>
+        </div>,
       );
     }
     return out;
@@ -202,18 +201,26 @@ function Movie({
     if (match && match[0]) {
       return match[0].name;
     } else {
-      return "Unknown";
+      return 'Unknown';
     }
   }
 
-  if (movieData === "error") {
+  if (movieData === 'error') {
     return <NotFound />;
   }
 
   const credits = filterCrew();
   return (
     <div className={styles.wrap} key={`movie_single_${pid}`}>
-      <Meta title={movieData ? movieData.title : ""} />
+      <Meta title={movieData ? movieData.title : ''} />
+      <IssueModal
+        data={movieData}
+        type="movie"
+        issuesOpen={issuesOpen}
+        setIssuesOpen={setIssuesOpen}
+        newNotification={newNotification}
+        currentUser={currentUser}
+      />
       {!movieData || !movieData.ready || !pid ? <Loading /> : null}
       <div className={hero.single}>
         {trailer ? (
@@ -236,7 +243,7 @@ function Movie({
                   />
                 ) : (
                   <p className={`${typo.title} ${typo.bold}`}>
-                    {movieData ? movieData.title : ""}
+                    {movieData ? movieData.title : ''}
                   </p>
                 )}
               </div>
@@ -246,21 +253,21 @@ function Movie({
                     <p className={`${typo.body} ${typo.bold}`}>
                       {movieData && movieData.release_date
                         ? new Date(movieData.release_date).getFullYear()
-                        : "Coming Soon"}
+                        : 'Coming Soon'}
                       <span className={typo.vertical_spacer}></span>
                       {movieData && movieData.runtime
                         ? timeConvert(movieData.runtime)
-                        : "Unknown"}
+                        : 'Unknown'}
                       <span className={typo.vertical_spacer}></span>
                       {movieData && movieData.original_language
                         ? formatLang(movieData.original_language)
-                        : "Unknown Language"}
+                        : 'Unknown Language'}
                       {movieData && movieData.age_rating ? (
                         <span className={typo.vertical_spacer}></span>
                       ) : null}
                       {movieData && movieData.age_rating
                         ? movieData.age_rating
-                        : ""}
+                        : ''}
                     </p>
                     {movieData ? <Critics data={movieData} /> : null}
                   </div>
@@ -272,7 +279,7 @@ function Movie({
                     className={`${typo.xsmall} ${typo.uppercase} ${styles.overview__genres}`}
                   >
                     {movieData.genres.map((genre) => {
-                      const match = matchGenre("movie", genre.id);
+                      const match = matchGenre('movie', genre.id);
                       if (!match) return null;
                       return (
                         <span key={`movie_genre_${genre.id}`}>
@@ -284,7 +291,7 @@ function Movie({
                     })}
                     {movieData.keywords.length > 0
                       ? movieData.keywords.map((genre) => {
-                          const match = matchGenre("movie", genre.id);
+                          const match = matchGenre('movie', genre.id);
                           if (!match) return null;
                           return (
                             <span key={`movie_genre_${genre.id}`}>
@@ -325,6 +332,9 @@ function Movie({
                     />
                     <button
                       className={`${buttons.icon} ${styles.actions__btn}`}
+                      onClick={() => {
+                        setIssuesOpen(true);
+                      }}
                     >
                       <IssueIcon viewBox="0 0 24 24" />
                     </button>
@@ -334,7 +344,7 @@ function Movie({
                         movieData.videos &&
                         movieData.videos.results &&
                         movieData.videos.results.length > 0
-                          ? ""
+                          ? ''
                           : styles.actions__btn__disabled
                       }`}
                       onClick={() => setTrailer(true)}
@@ -383,13 +393,13 @@ function Movie({
                       </p>
                       <p className={typo.body}>
                         {new Date(movieData.release_date).toLocaleDateString(
-                          "en-US",
+                          'en-US',
                           {
-                            weekday: "long",
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          }
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                          },
                         )}
                       </p>
                     </div>
@@ -404,8 +414,8 @@ function Movie({
                       </p>
                       <p className={typo.body}>
                         {movieData.spoken_languages.map((lang, i) => {
-                          let out = "";
-                          if (i !== 0) out += ", ";
+                          let out = '';
+                          if (i !== 0) out += ', ';
                           out += lang.name;
                           return out;
                         })}
@@ -456,8 +466,8 @@ function Movie({
                       </p>
                       <p className={typo.body}>
                         {movieData.production_companies.map((studio, i) => {
-                          let out = "";
-                          if (i !== 0) out += ", ";
+                          let out = '';
+                          if (i !== 0) out += ', ';
                           out += studio.name;
                           return (
                             <Link

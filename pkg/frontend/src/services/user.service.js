@@ -136,6 +136,10 @@ export function getProfiles() {
   return get(`/profiles/all`);
 }
 
+export async function addIssue(issue) {
+  return post('/issue/add', issue);
+}
+
 function updateStore(data = {}) {
   if (Object.keys(data).length === 0) return false;
   return store.dispatch(data);

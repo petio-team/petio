@@ -1,4 +1,4 @@
-@import "../global/variables.module.scss";
+@import '../global/variables.module.scss';
 
 .base {
   appearance: none;
@@ -45,6 +45,23 @@
     opacity: 0.5;
     cursor: no-drop;
     pointer-events: none;
+  }
+}
+
+.textarea {
+  @extend .text;
+
+  padding: 10px;
+  height: calc(35px * 3);
+  resize: none;
+
+  @media (min-width: $xxxl) {
+    padding: 20px;
+  }
+
+  &__light {
+    @extend .textarea;
+    background: lighten($grey, 10);
   }
 }
 
@@ -110,7 +127,7 @@
   cursor: pointer;
 
   &:before {
-    content: "";
+    content: '';
     width: 14px;
     height: 1px;
     background: $white;
@@ -121,7 +138,7 @@
   }
 
   &:after {
-    content: "";
+    content: '';
     width: 14px;
     height: 1px;
     background: $white;

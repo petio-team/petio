@@ -1,4 +1,4 @@
-@import "../global/variables.module.scss";
+@import '../global/variables.module.scss';
 
 .main {
   position: relative;
@@ -34,7 +34,7 @@
 }
 
 .wrap {
-  z-index: 100;
+  z-index: 1000;
   position: fixed;
   top: 0;
   left: 0;
@@ -69,4 +69,7 @@
   padding: 20px;
   overflow-y: auto;
   max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
