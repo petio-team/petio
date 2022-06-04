@@ -45,11 +45,35 @@ export default function ReviewQueue({
   return (
     <div className={styles.reviewQueue}>
       {!history ? (
-        <p
-          className={`${styles.reviewQueue__empty} ${typo.smtitle} ${typo.medium}`}
-        >
-          Loading
-        </p>
+        [...Array(6)].map((e, i) => {
+          return (
+            <div
+              key={`reviewq__placeholder__${i}`}
+              className={styles.reviewQueue__item}
+            >
+              <div className={styles.reviewQueue__item__inner}>
+                <div className={styles.reviewQueue__item__image}></div>
+                <div className={styles.reviewQueue__item__content}>
+                  <p className={`${typo.body} ${typo.medium}`}>&nbsp;</p>
+                  <div className={styles.reviewQueue__item__btns}>
+                    <button
+                      className={`${buttons.icon} ${styles.actions__btn}`}
+                      style={{ pointerEvents: 'none' }}
+                    >
+                      <ThumbUp viewBox="0 0 24 24" />
+                    </button>
+                    <button
+                      className={`${buttons.icon} ${styles.actions__btn}`}
+                      style={{ pointerEvents: 'none' }}
+                    >
+                      <ThumbDown viewBox="0 0 24 24" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })
       ) : Object.keys(history).length > 0 ? (
         Object.keys(history).map((i) => {
           const item = history[i];
