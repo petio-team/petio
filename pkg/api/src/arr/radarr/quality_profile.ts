@@ -8,16 +8,16 @@ export const QualityProfileSchema = z.object({
   cutoff: z.number(),
   items: z.array(
     z.object({
-      id: z.number(),
-      name: z.string(),
-      quality: z.object({
-        id: z.number(),
-        name: z.string(),
-        source: z.string(),
-        resolution: z.number(),
-        modifier: z.string(),
-      }),
-      items: z.array(z.null()),
+      quality: z
+        .object({
+          id: z.number(),
+          name: z.string(),
+          source: z.string(),
+          resolution: z.number(),
+          modifier: z.string(),
+        })
+        .optional(),
+      items: z.array(z.any()),
       allowed: z.boolean(),
     }),
   ),
@@ -25,7 +25,7 @@ export const QualityProfileSchema = z.object({
   cutoffFormatScore: z.number(),
   formatItems: z.array(
     z.object({
-      id: z.number(),
+      id: z.number().optional(),
       format: z.number(),
       name: z.string(),
       score: z.number(),
@@ -40,6 +40,6 @@ export const QualityProfileEndpoint = asApi([
     method: 'get',
     path: '/api/v3/qualityprofile',
     parameters: [],
-    response: QualityProfileSchema,
+    response: z.array(QualityProfileSchema),
   },
 ] as const);
