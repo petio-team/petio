@@ -186,7 +186,7 @@ export default (app: Router) => {
   route.get('/radarr/config', adminRequired, getRadarrConfig);
   route.post('/radarr/config', adminRequired, updateRadarrConfig);
   route.delete(
-    '/radarr/:uuid',
+    '/radarr/:id',
     validateRequest({
       params: z.object({
         id: z.string().uuid(),
