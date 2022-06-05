@@ -160,7 +160,14 @@ export const CreateOrUpdateDownloader = async (
           id: data.id,
         },
         {
-          name: data.name,
+          $and: [
+            {
+              name: data.name,
+            },
+            {
+              type: data.type,
+            },
+          ],
         },
       ],
     },
