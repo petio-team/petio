@@ -5,7 +5,7 @@ import { DownloaderType, GetDownloaderById } from '@/models/downloaders';
 
 import { Language } from './radarr/language';
 import { Movie } from './radarr/movie';
-import { QualityProfile } from './radarr/quality_profile';
+import { QualityProfiles } from './radarr/quality_profile';
 import { Queue } from './radarr/queue';
 import { RootFolder } from './radarr/root_folder';
 import { Tag } from './radarr/tag';
@@ -30,7 +30,7 @@ export default class RadarrAPI {
     return this.client.get('/api/v3/rootfolder');
   }
 
-  public async GetQualityProfiles(): Promise<QualityProfile> {
+  public async GetQualityProfiles(): Promise<QualityProfiles> {
     return this.client.get('/api/v3/qualityprofile');
   }
 

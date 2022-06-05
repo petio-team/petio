@@ -33,13 +33,16 @@ export const QualityProfileSchema = z.object({
   ),
   language: z.object({ id: z.number(), name: z.string() }),
 });
+export const QualityProfilesSchema = z.array(QualityProfileSchema);
+
 export type QualityProfile = z.infer<typeof QualityProfileSchema>;
+export type QualityProfiles = z.infer<typeof QualityProfilesSchema>;
 
 export const QualityProfileEndpoint = asApi([
   {
     method: 'get',
     path: '/api/v3/qualityprofile',
     parameters: [],
-    response: z.array(QualityProfileSchema),
+    response: QualityProfilesSchema,
   },
 ] as const);
