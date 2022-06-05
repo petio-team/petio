@@ -1,31 +1,30 @@
-import media from "../../services/media.service";
+import { useEffect, useState } from 'react';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/opacity.css';
+import { connect } from 'react-redux';
+import { Link, useParams } from 'react-router-dom';
 
-import { useState, useEffect } from "react";
-import { LazyLoadImage } from "react-lazy-load-image-component";
-import "react-lazy-load-image-component/src/effects/opacity.css";
-import { Link, useParams } from "react-router-dom";
-import { connect } from "react-redux";
-import Meta from "../../components/meta";
-import Hero from "../../components/hero";
-import Carousel from "../../components/carousel";
-import Critics from "../../components/critics";
-import Episodes from "../../components/episodes";
-import RequestButton from "../../components/requestButton";
-
-import hero from "../../styles/components/hero.module.scss";
-import styles from "../../styles/views/tv.module.scss";
-import typo from "../../styles/components/typography.module.scss";
-import buttons from "../../styles/components/button.module.scss";
-
-import { ReactComponent as IssueIcon } from "../../assets/svg/issue.svg";
-import { ReactComponent as TrailerIcon } from "../../assets/svg/trailer.svg";
-import { ReactComponent as WatchlistIcon } from "../../assets/svg/watchlist.svg";
-import NotFound from "../404";
-import { matchGenre } from "../../helpers/genres";
-import { Loading } from "../../components/loading";
-import Trailer from "../../components/trailer";
-import ReviewButtons from "../../components/reviewButtons";
-import languages from "../../helpers/languages";
+import NotFound from '../404';
+import { ReactComponent as IssueIcon } from '../../assets/svg/issue.svg';
+import { ReactComponent as TrailerIcon } from '../../assets/svg/trailer.svg';
+import { ReactComponent as WatchlistIcon } from '../../assets/svg/watchlist.svg';
+import Carousel from '../../components/carousel';
+import Critics from '../../components/critics';
+import Episodes from '../../components/episodes';
+import Hero from '../../components/hero';
+import IssueModal from '../../components/issueModal';
+import { Loading } from '../../components/loading';
+import Meta from '../../components/meta';
+import RequestButton from '../../components/requestButton';
+import ReviewButtons from '../../components/reviewButtons';
+import Trailer from '../../components/trailer';
+import { matchGenre } from '../../helpers/genres';
+import languages from '../../helpers/languages';
+import media from '../../services/media.service';
+import buttons from '../../styles/components/button.module.scss';
+import hero from '../../styles/components/hero.module.scss';
+import typo from '../../styles/components/typography.module.scss';
+import styles from '../../styles/views/tv.module.scss';
 
 const mapStateToProps = (state) => {
   return {
@@ -45,6 +44,7 @@ function Tv({
 }) {
   const [mobile, setMobile] = useState(false);
   const [trailer, setTrailer] = useState(false);
+  const [issuesOpen, setIssuesOpen] = useState(false);
   const { pid } = useParams();
   const tvData = redux_tv[pid];
 
@@ -52,10 +52,10 @@ function Tv({
     function handleResize() {
       setMobile(window.innerWidth < 992);
     }
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
     handleResize();
 
-    return () => window.removeEventListener("resize", handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   useEffect(() => {
@@ -76,9 +76,9 @@ function Tv({
     var hours = num / 60;
     var rhours = Math.floor(hours);
     var minutes = (hours - rhours) * 60;
-    var rminutes = ("0" + Math.round(minutes)).slice(-2);
-    var hrs = rhours < 1 ? "" : rhours === 1 ? " h " : rhours > 1 ? " h " : "";
-    return `${rhours >= 1 ? rhours : ""}${hrs}${rminutes} mins`;
+    var rminutes = ('0' + Math.round(minutes)).slice(-2);
+    var hrs = rhours < 1 ? '' : rhours === 1 ? ' h ' : rhours > 1 ? ' h ' : '';
+    return `${rhours >= 1 ? rhours : ''}${hrs}${rminutes} mins`;
   }
 
   function filterCrew() {
@@ -86,13 +86,13 @@ function Tv({
     if (tvData && tvData.credits && tvData.credits.crew) {
       const crew = tvData.credits.crew;
       let createdBy = tvData.created_by;
-      let directors = crew.filter((obj) => obj.job === "Director");
-      let authors = crew.filter((obj) => obj.job === "Novel");
-      let writers = crew.filter((obj) => obj.job === "Screenplay");
-      let eProducers = crew.filter((obj) => obj.job === "Executive Producer");
-      let producers = crew.filter((obj) => obj.job === "Producer");
+      let directors = crew.filter((obj) => obj.job === 'Director');
+      let authors = crew.filter((obj) => obj.job === 'Novel');
+      let writers = crew.filter((obj) => obj.job === 'Screenplay');
+      let eProducers = crew.filter((obj) => obj.job === 'Executive Producer');
+      let producers = crew.filter((obj) => obj.job === 'Producer');
       createdBy.forEach((creator) => {
-        creator.job = "Created By";
+        creator.job = 'Created By';
       });
       let unsorted = [
         ...createdBy,
@@ -144,7 +144,7 @@ function Tv({
               credits.length > i && credits[i].roles.length > 0 ? (
                 credits[i].roles.map((role, r) => {
                   if (r > 0) {
-                    return ", " + role;
+                    return ', ' + role;
                   }
                   return role;
                 })
@@ -161,13 +161,13 @@ function Tv({
             ) : credits.length > i && credits[i].roles.length > 0 ? (
               credits[i].roles.map((role, r) => {
                 if (r > 0) {
-                  return ", " + role;
+                  return ', ' + role;
                 }
                 return role;
               })
             ) : null}
           </p>
-        </div>
+        </div>,
       );
     }
     return out;
@@ -178,11 +178,11 @@ function Tv({
     if (match && match[0]) {
       return match[0].name;
     } else {
-      return "Unknown";
+      return 'Unknown';
     }
   }
 
-  if (tvData === "error") {
+  if (tvData === 'error') {
     return <NotFound />;
   }
 
@@ -190,7 +190,15 @@ function Tv({
 
   return (
     <div className={styles.wrap} key={`tv_single_${pid}`}>
-      <Meta title={tvData ? tvData.name : ""} />
+      <Meta title={tvData ? tvData.name : ''} />
+      <IssueModal
+        data={tvData}
+        type="tv"
+        issuesOpen={issuesOpen}
+        setIssuesOpen={setIssuesOpen}
+        newNotification={newNotification}
+        currentUser={currentUser}
+      />
       {!tvData || !tvData.ready ? <Loading /> : null}
       <div className={hero.single}>
         {trailer ? (
@@ -223,37 +231,37 @@ function Tv({
                     <p className={`${typo.body} ${typo.bold}`}>
                       {tvData && tvData.first_air_date
                         ? new Date(tvData.first_air_date).getFullYear() +
-                          " - " +
-                          (tvData.status !== "Ended"
-                            ? ""
+                          ' - ' +
+                          (tvData.status !== 'Ended'
+                            ? ''
                             : new Date(tvData.last_air_date).getFullYear())
-                        : "Coming Soon"}
+                        : 'Coming Soon'}
                       <span className={typo.vertical_spacer}></span>
                       {tvData &&
                       tvData.episode_run_time &&
                       tvData.episode_run_time.length > 0
                         ? timeConvert(tvData.episode_run_time[0])
-                        : "Unknown"}
+                        : 'Unknown'}
                       {!mobile ? (
                         <>
                           <span className={typo.vertical_spacer}></span>
                           {tvData &&
                             tvData.seasons &&
-                            tvData.seasons.length}{" "}
+                            tvData.seasons.length}{' '}
                           Season
                           {tvData && tvData.seasons && tvData.seasons.length > 1
-                            ? "s"
-                            : ""}{" "}
+                            ? 's'
+                            : ''}{' '}
                         </>
                       ) : null}
                       <span className={typo.vertical_spacer}></span>
                       {tvData && tvData.original_language
                         ? formatLang(tvData.original_language)
-                        : "Unknown Language"}
+                        : 'Unknown Language'}
                       {tvData && tvData.age_rating ? (
                         <span className={typo.vertical_spacer}></span>
                       ) : null}
-                      {tvData && tvData.age_rating ? tvData.age_rating : ""}
+                      {tvData && tvData.age_rating ? tvData.age_rating : ''}
                     </p>
 
                     {tvData ? <Critics data={tvData} /> : null}
@@ -264,7 +272,7 @@ function Tv({
                     className={`${typo.small} ${typo.uppercase} ${styles.overview__genres}`}
                   >
                     {tvData.genres.map((genre) => {
-                      const match = matchGenre("tv", genre.id);
+                      const match = matchGenre('tv', genre.id);
                       if (!match) return null;
                       return (
                         <span key={`tv_genre_${genre.id}`}>
@@ -274,7 +282,7 @@ function Tv({
                     })}
                     {tvData.keywords.length > 0
                       ? tvData.keywords.map((genre) => {
-                          const match = matchGenre("tv", genre.id);
+                          const match = matchGenre('tv', genre.id);
                           if (!match) return null;
                           return (
                             <span key={`tv_genre_${genre.id}`}>
@@ -292,9 +300,9 @@ function Tv({
                 >
                   {tvData && tvData.tagline
                     ? `${tvData.tagline}${
-                        !tvData.tagline.endsWith(".") ? "." : ""
+                        !tvData.tagline.endsWith('.') ? '.' : ''
                       }`
-                    : null}{" "}
+                    : null}{' '}
                   {tvData ? tvData.overview : null}
                 </p>
                 {tvData ? (
@@ -320,6 +328,9 @@ function Tv({
 
                     <button
                       className={`${buttons.icon} ${styles.actions__btn}`}
+                      onClick={() => {
+                        setIssuesOpen(true);
+                      }}
                     >
                       <IssueIcon viewBox="0 0 24 24" />
                     </button>
@@ -329,7 +340,7 @@ function Tv({
                         tvData.videos &&
                         tvData.videos.results &&
                         tvData.videos.results.length > 0
-                          ? ""
+                          ? ''
                           : styles.actions__btn__disabled
                       }`}
                       onClick={() => setTrailer(true)}
@@ -374,13 +385,13 @@ function Tv({
                     </p>
                     <p className={typo.body}>
                       {new Date(tvData.first_air_date).toLocaleDateString(
-                        "en-US",
+                        'en-US',
                         {
-                          weekday: "long",
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        }
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        },
                       )}
                     </p>
                   </div>
@@ -395,8 +406,8 @@ function Tv({
                     </p>
                     <p className={typo.body}>
                       {tvData.spoken_languages.map((lang, i) => {
-                        let out = "";
-                        if (i !== 0) out += ", ";
+                        let out = '';
+                        if (i !== 0) out += ', ';
                         out += lang.name;
                         return out;
                       })}
@@ -445,8 +456,8 @@ function Tv({
                     </p>
                     <p className={typo.body}>
                       {tvData.networks.map((studio, i) => {
-                        let out = "";
-                        if (i !== 0) out += ", ";
+                        let out = '';
+                        if (i !== 0) out += ', ';
                         out += studio.name;
                         return (
                           <Link

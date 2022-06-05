@@ -1,5 +1,5 @@
-import { get, post } from "../helpers";
-import store from "../redux/store.js";
+import { get, post } from '../helpers';
+import store from '../redux/store.js';
 
 async function getTrending() {
   if (
@@ -8,7 +8,7 @@ async function getTrending() {
   )
     return;
   try {
-    const data = await get("/trending");
+    const data = await get('/trending');
     let movies = {};
     let shows = {};
     let trending = {
@@ -20,11 +20,13 @@ async function getTrending() {
     };
     const r = Math.floor(Math.random() * (10 - 0 + 1) + 0);
     data.movies.forEach((movie, i) => {
+      if (!movie) return;
       if (r === i) featuredMovie(movie.id);
       movies[movie.id] = movie;
       trending.movies.push(movie.id);
     });
     data.tv.forEach((show) => {
+      if (!show) return;
       shows[show.id] = show;
       trending.tv.push(show.id);
     });
@@ -34,9 +36,9 @@ async function getTrending() {
     data.networks.forEach((company) => {
       trending.networks.push(company);
     });
-    updateStore({ type: "media/store-movies", movies: movies });
-    updateStore({ type: "media/store-shows", shows: shows });
-    updateStore({ type: "media/store-trending", trending: trending });
+    updateStore({ type: 'media/store-movies', movies: movies });
+    updateStore({ type: 'media/store-shows', shows: shows });
+    updateStore({ type: 'media/store-trending', trending: trending });
 
     return data;
   } catch (e) {
@@ -50,60 +52,60 @@ async function featuredMovie(id) {
   }
   try {
     const data = await getMovie(id);
-    updateStore({ type: "media/store-featured", data: data });
+    updateStore({ type: 'media/store-featured', data: data });
   } catch (e) {
     console.log(e);
   }
 }
 
 async function getMovie(id, minified = false, noextras = false) {
-  if (!id) throw "No ID";
+  if (!id) throw 'No ID';
   try {
-    const data = await get(`/movie/lookup/${id}${minified ? "/minified" : ""}`);
-    if (data.error) throw "error";
+    const data = await get(`/movie/lookup/${id}${minified ? '/minified' : ''}`);
+    if (data.error) throw 'error';
     updateStore({
-      type: "media/store-movies",
+      type: 'media/store-movies',
       movies: { [data.id]: { ...data, ready: true } },
     });
     if (minified || noextras) return;
-    if (data.recommendations) batchLookup(data.recommendations, "movie");
-    if (data.collection) batchLookup(data.collection, "movie");
+    if (data.recommendations) batchLookup(data.recommendations, 'movie');
+    if (data.collection) batchLookup(data.collection, 'movie');
     return data;
   } catch (e) {
     updateStore({
-      type: "media/store-shows",
-      shows: { [id]: "error" },
+      type: 'media/store-shows',
+      shows: { [id]: 'error' },
     });
     throw e;
   }
 }
 
 async function getTv(id, minified = false, noextras = false) {
-  if (!id) throw "No ID";
+  if (!id) throw 'No ID';
   try {
-    const data = await get(`/show/lookup/${id}${minified ? "/minified" : ""}`);
-    if (data.error) throw "error";
+    const data = await get(`/show/lookup/${id}${minified ? '/minified' : ''}`);
+    if (data.error) throw 'error';
     updateStore({
-      type: "media/store-shows",
+      type: 'media/store-shows',
       shows: { [data.id]: { ...data, ready: true } },
     });
     if (minified || noextras) return;
-    batchLookup(data.recommendations, "tv");
+    batchLookup(data.recommendations, 'tv');
     return data;
   } catch (e) {
     updateStore({
-      type: "media/store-shows",
-      shows: { [id]: "error" },
+      type: 'media/store-shows',
+      shows: { [id]: 'error' },
     });
     throw e;
   }
 }
 
 async function getPerson(id) {
-  if (!id) throw "No ID";
+  if (!id) throw 'No ID';
   try {
     const data = await get(`/person/lookup/${id}`);
-    if (data.error) throw "error";
+    if (data.error) throw 'error';
     let movies = {};
     let shows = {};
     let moviesBatch = [];
@@ -125,32 +127,32 @@ async function getPerson(id) {
       showsBatch.push(show.id);
     });
 
-    batchLookup(moviesBatch, "movie");
-    batchLookup(showsBatch, "tv");
+    batchLookup(moviesBatch, 'movie');
+    batchLookup(showsBatch, 'tv');
 
     updateStore({
-      type: "media/store-people",
+      type: 'media/store-people',
       people: { [data.info.id]: { ...data } },
     });
-    updateStore({ type: "media/store-movies", movies: movies });
-    updateStore({ type: "media/store-shows", shows: shows });
+    updateStore({ type: 'media/store-movies', movies: movies });
+    updateStore({ type: 'media/store-shows', shows: shows });
     return data;
   } catch (e) {
     updateStore({
-      type: "media/store-people",
-      people: { [id]: "error" },
+      type: 'media/store-people',
+      people: { [id]: 'error' },
     });
     throw e;
   }
 }
 
 function getCompany(id) {
-  if (!id) throw "No ID";
+  if (!id) throw 'No ID';
   return get(`/movie/company/${id}`);
 }
 
 function getNetwork(id) {
-  if (!id) throw "No ID";
+  if (!id) throw 'No ID';
   return get(`/show/network/${id}`);
 }
 
@@ -158,7 +160,7 @@ async function lookup(type, page, params = {}) {
   try {
     // return post(`/${type}/discover`, { page, params });
     const data = await post(`/${type}/discover`, { page, params });
-    if (type === "movie") {
+    if (type === 'movie') {
       let movies = {};
       data.results.forEach((movie) => {
         if (movie.id) {
@@ -166,9 +168,9 @@ async function lookup(type, page, params = {}) {
           movies[movie.id].ready = true;
         }
       });
-      updateStore({ type: "media/store-movies", movies: movies });
+      updateStore({ type: 'media/store-movies', movies: movies });
       return data;
-    } else if (type === "show") {
+    } else if (type === 'show') {
       let shows = {};
       data.results.forEach((show) => {
         if (show.id) {
@@ -176,19 +178,19 @@ async function lookup(type, page, params = {}) {
           shows[show.id].ready = true;
         }
       });
-      updateStore({ type: "media/store-shows", shows: shows });
+      updateStore({ type: 'media/store-shows', shows: shows });
       return data;
     }
   } catch (e) {
-    throw `Error getting ${type === "movies" ? "Movies" : "Shows"}`;
+    throw `Error getting ${type === 'movies' ? 'Movies' : 'Shows'}`;
   }
 }
 
-async function getDiscovery(type = "movies") {
+async function getDiscovery(type = 'movies') {
   if (store.getState().media.discovery[type].length > 0) return;
   try {
-    if (type === "movies") {
-      const data = await get("/discovery/movies");
+    if (type === 'movies') {
+      const data = await get('/discovery/movies');
       let movies = {};
       let discovery = [];
       data.forEach((row) => {
@@ -203,14 +205,14 @@ async function getDiscovery(type = "movies") {
           discovery.push(thisRow);
         }
       });
-      updateStore({ type: "media/store-movies", movies: movies });
+      updateStore({ type: 'media/store-movies', movies: movies });
       updateStore({
-        type: "media/store-discovery-movies",
+        type: 'media/store-discovery-movies',
         discovery: discovery,
       });
       return data;
-    } else if (type === "tv") {
-      const data = await get("/discovery/shows");
+    } else if (type === 'tv') {
+      const data = await get('/discovery/shows');
       let shows = {};
       let discovery = [];
       data.forEach((row) => {
@@ -225,9 +227,9 @@ async function getDiscovery(type = "movies") {
           discovery.push(thisRow);
         }
       });
-      updateStore({ type: "media/store-shows", shows: shows });
+      updateStore({ type: 'media/store-shows', shows: shows });
       updateStore({
-        type: "media/store-discovery-shows",
+        type: 'media/store-discovery-shows',
         discovery: discovery,
       });
       return data;
@@ -241,10 +243,10 @@ async function getDiscovery(type = "movies") {
 function searchUpdate(q) {
   if (!q || q.length === 0)
     updateStore({
-      type: "search/results",
+      type: 'search/results',
       data: false,
     });
-  updateStore({ type: "search/update", query: q });
+  updateStore({ type: 'search/update', query: q });
   return;
 }
 
@@ -258,48 +260,53 @@ export async function search(term) {
   try {
     let searchResults = await get(`/search/${encodeURIComponent(term)}`);
     if (!searchResults) {
-      throw "Failed to search";
+      throw 'Failed to search';
     }
 
     let movies = {};
     searchResults.movies.forEach((result) => {
       movies[result.id] = result;
     });
-    updateStore({ type: "media/store-movies", movies: movies });
+    updateStore({ type: 'media/store-movies', movies: movies });
 
     let shows = {};
     searchResults.shows.forEach((result) => {
       shows[result.id] = result;
     });
-    updateStore({ type: "media/store-shows", shows: shows });
+    updateStore({ type: 'media/store-shows', shows: shows });
 
-    updateStore({ type: "search/results", data: searchResults });
+    updateStore({ type: 'search/results', data: searchResults });
   } catch (e) {
     console.log(e);
-    throw "Error searching";
+    throw 'Error searching';
   }
 }
 
-async function batchLookup(ids, type = "movie", minified = true) {
+async function batchLookup(ids, type = 'movie', minified = true) {
   if (ids && Array.isArray(ids) && ids.length > 0) {
+    ids.forEach((id, i) => {
+      ids[i] = parseInt(id);
+    });
     try {
       const data = await post(`/batch/${type}`, {
         ids: ids,
         min: minified,
       });
       let items = {};
-      if (!data) throw "Batch lookup failed";
+      if (!data) throw 'Batch lookup failed';
       data.forEach((item) => {
-        items[item.id] = item;
-        if (items[item.id].collection === false) {
-          // For some reason batch lookup returns false for collections?
-          delete items[item.id].collection;
+        if (item) {
+          items[item.id] = item;
+          if (items[item.id].collection === false) {
+            // For some reason batch lookup returns false for collections?
+            delete items[item.id].collection;
+          }
         }
       });
-      if (type === "movie")
-        updateStore({ type: "media/store-movies", movies: items });
-      if (type === "tv")
-        updateStore({ type: "media/store-shows", shows: items });
+      if (type === 'movie')
+        updateStore({ type: 'media/store-movies', movies: items });
+      if (type === 'tv')
+        updateStore({ type: 'media/store-shows', shows: items });
     } catch (e) {
       console.log(e);
     }

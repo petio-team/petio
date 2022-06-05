@@ -1,14 +1,13 @@
-import styles from "../styles/views/requests.module.scss";
-import typo from "../styles/components/typography.module.scss";
+import { useEffect } from 'react';
+import { connect } from 'react-redux';
 
-import Meta from "../components/meta";
-import Request from "../components/request";
-import { connect } from "react-redux";
-import { useEffect } from "react";
-
-import media from "../services/media.service";
-import { myRequests, myRequestsArchive } from "../services/user.service";
-import { Loading } from "../components/loading";
+import { Loading } from '../components/loading';
+import Meta from '../components/meta';
+import Request from '../components/request';
+import media from '../services/media.service';
+import { myRequests, myRequestsArchive } from '../services/user.service';
+import typo from '../styles/components/typography.module.scss';
+import styles from '../styles/views/requests.module.scss';
 
 const mapStateToProps = (state) => {
   return {
@@ -28,13 +27,12 @@ function Requests({ requests, currentUser }) {
     if (!requests) return;
     let tv = [];
     let movie = [];
-    Object.keys(requests).forEach((id) => {
-      const request = requests[id];
-      if (request.type === "movie") movie.push(id);
-      if (request.type === "tv") tv.push(id);
+    requests.forEach((request) => {
+      if (request.type === 'movie') movie.push(request.tmdb_id);
+      if (request.type === 'tv') tv.push(request.tmdb_id);
     });
-    media.batchLookup(tv, "tv", false);
-    media.batchLookup(movie, "movie", false);
+    media.batchLookup(tv, 'tv', false);
+    media.batchLookup(movie, 'movie', false);
   }, [requests]);
 
   return (
@@ -49,11 +47,12 @@ function Requests({ requests, currentUser }) {
           Active Requests
         </p>
         <div className={styles.grid}>
-          {requests && Object.keys(requests).length > 0 && currentUser ? (
-            Object.keys(requests).map((id) => {
-              const request = requests[id];
+          {requests && requests.length > 0 && currentUser ? (
+            requests.map((request) => {
               if (request.users.includes(currentUser.id.toString()))
-                return <Request request={request} key={`request_${id}`} />;
+                return (
+                  <Request request={request} key={`request_${request._id}`} />
+                );
               return null;
             })
           ) : (

@@ -71,7 +71,7 @@ export default ({ app }: { app: Koa }) => {
   // Enable cors
   app.use(
     cors({
-      origin: env === 'development' ? 'http://localhost:3001' : 'origin',
+      origin: env === 'development' ? 'http://localhost:3000' : 'origin',
       credentials: true,
     }),
   );

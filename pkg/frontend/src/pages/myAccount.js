@@ -1,18 +1,20 @@
-import styles from "../styles/views/myAccount.module.scss";
-import typo from "../styles/components/typography.module.scss";
-import { connect } from "react-redux";
-import { getUserQuota, logout, watchHistory } from "../services/user.service";
-import Meta from "../components/meta";
-import { useEffect, useState } from "react";
-import ReviewQueue from "../components/reviewQueue";
+import { useEffect, useState } from 'react';
+import { connect } from 'react-redux';
+
+import Meta from '../components/meta';
+import ReviewQueue from '../components/reviewQueue';
+import { getUserQuota, logout, watchHistory } from '../services/user.service';
+import typo from '../styles/components/typography.module.scss';
+import styles from '../styles/views/myAccount.module.scss';
 
 const mapStateToProps = (state) => {
   return {
     redux_user: state.user,
+    redux_reviews: state.user.reviews,
   };
 };
 
-function MyAccount({ redux_user }) {
+function MyAccount({ redux_user, redux_reviews, newNotification }) {
   const [quota, setQuota] = useState(false);
   const [history, setHistory] = useState(false);
 
@@ -23,8 +25,8 @@ function MyAccount({ redux_user }) {
         setQuota(q);
       } catch (err) {
         setQuota({
-          current: "error",
-          total: "error",
+          current: 'error',
+          total: 'error',
         });
       }
     }
@@ -37,10 +39,10 @@ function MyAccount({ redux_user }) {
         const userId = redux_user.currentUser.altId
           ? redux_user.currentUser.altId
           : redux_user.currentUser.id;
-        let h = await watchHistory(userId, "all");
+        let h = await watchHistory(userId, 'all');
         setHistory(h);
       } catch (err) {
-        setHistory("error");
+        setHistory('error');
       }
     }
 
@@ -51,18 +53,16 @@ function MyAccount({ redux_user }) {
 
   function formatQuota() {
     if (!quota) {
-      return "Loading...";
+      return 'Loading...';
     }
-    if (quota.current === "error") {
-      return "Error";
+    if (quota.current === 'error') {
+      return 'Error';
     } else {
       let current = quota.current;
-      let total = quota.total > 0 ? quota.total : "∞";
+      let total = quota.total > 0 ? quota.total : '∞';
       return `${current} / ${total} - per week`;
     }
   }
-
-  console.log(history);
 
   return (
     <div className={styles.wrap}>
@@ -70,10 +70,10 @@ function MyAccount({ redux_user }) {
       <div className="container">
         <p className={`${typo.title} ${typo.bold}`}>My Account</p>
         <p className={`${typo.smtitle} ${typo.bold} ${styles.username}`}>
-          Welcome back{" "}
+          Welcome back{' '}
           {redux_user && redux_user.currentUser
             ? redux_user.currentUser.username || redux_user.currentUser.email
-            : ""}{" "}
+            : ''}{' '}
           <span className={`${typo.small} ${styles.signOut}`} onClick={logout}>
             (Sign out?)
           </span>
@@ -83,8 +83,8 @@ function MyAccount({ redux_user }) {
           Account Details
         </p>
         <p className={typo.body}>
-          <b>Role:</b>{" "}
-          <span style={{ textTransform: "capitalize" }}>
+          <b>Role:</b>{' '}
+          <span style={{ textTransform: 'capitalize' }}>
             {redux_user.currentUser.role}
           </span>
         </p>
@@ -101,7 +101,12 @@ function MyAccount({ redux_user }) {
         <p className={`${typo.smtitle} ${typo.bold} ${styles.block__title}`}>
           Your Review Queue
         </p>
-        <ReviewQueue history={history} />
+        <ReviewQueue
+          history={history}
+          redux_reviews={redux_reviews}
+          currentUser={redux_user.currentUser}
+          newNotification={newNotification}
+        />
       </div>
     </div>
   );

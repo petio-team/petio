@@ -1,49 +1,46 @@
-import "../styles/global/main.scss";
-import notifications from "../styles/components/notifications.module.scss";
-import "react-toastify/dist/ReactToastify.css";
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { connect } from 'react-redux';
+import { useHistory, useLocation, withRouter } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
+import { Slide, ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import smoothscroll from 'smoothscroll-polyfill';
 
-import smoothscroll from "smoothscroll-polyfill";
-import { useLocation, withRouter, useHistory } from "react-router-dom";
-
-import { useState, useEffect, useCallback, useLayoutEffect } from "react";
-import { ToastContainer, toast, Slide } from "react-toastify";
-import { Switch, Route } from "react-router-dom";
-
-import Layout from "../components/layout";
-import { Login } from "../components/login";
-import { Loading } from "../components/loading";
-import Notification from "../components/notification";
-import Setup from "./setup";
-
-import { checkConfig } from "../services/config.service";
+import Error from '../components/error';
+import Layout from '../components/layout';
+import { Loading } from '../components/loading';
+import { Login } from '../components/login';
+import Notification from '../components/notification';
+import PwaAndroid from '../components/pwaAndroid';
+import PwaInstall from '../components/pwaInstall';
+import ErrorHandler from '../helpers/errorHandler';
+import { getMobileOperatingSystem } from '../helpers/getOs';
+import { checkConfig } from '../services/config.service';
+import { storePosition } from '../services/position.service';
 import {
   clearToken,
+  getRequests,
+  getReviews,
   getToken,
   login,
-  getRequests,
-} from "../services/user.service";
-
-import { connect } from "react-redux";
-import { storePosition } from "../services/position.service";
-
+} from '../services/user.service';
+import notifications from '../styles/components/notifications.module.scss';
+import '../styles/global/main.scss';
+import NotFound from './404';
+import Admin from './admin/index';
 // Pages
-import Home from "./index";
-import Requests from "./requests";
-import Admin from "./admin/index";
-import Movie from "./movie/[pid]";
-import Show from "./tv/[pid]";
-import People from "./people/[pid]";
-import MovieGenre from "./movie/genre/[pid]";
-import ShowGenre from "./tv/genre/[pid]";
-import Studio from "./movie/studio/[pid]";
-import Network from "./tv/network/[pid]";
-import NotFound from "./404";
-import Search from "./search";
-import Error from "../components/error";
-import PwaInstall from "../components/pwaInstall";
-import PwaAndroid from "../components/pwaAndroid";
-import { getMobileOperatingSystem } from "../helpers/getOs";
-import MyAccount from "./myAccount";
+import Home from './index';
+import Movie from './movie/[pid]';
+import MovieGenre from './movie/genre/[pid]';
+import Studio from './movie/studio/[pid]';
+import MyAccount from './myAccount';
+import People from './people/[pid]';
+import Requests from './requests';
+import Search from './search';
+import Setup from './setup';
+import Show from './tv/[pid]';
+import ShowGenre from './tv/genre/[pid]';
+import Network from './tv/network/[pid]';
 
 const mapStateToProps = (state) => {
   return {
@@ -85,14 +82,14 @@ function Petio({ redux_pos }) {
     };
     // Detects if device is in standalone mode
     const isInStandaloneMode = () =>
-      "standalone" in window.navigator && window.navigator.standalone;
+      'standalone' in window.navigator && window.navigator.standalone;
 
     // Checks if should display install popup notification:
     if (isIos() && !isInStandaloneMode()) {
       setShowInstall(true);
     }
 
-    window.addEventListener("beforeinstallprompt", (e) => {
+    window.addEventListener('beforeinstallprompt', (e) => {
       // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
       // Stash the event so it can be triggered later.
@@ -107,9 +104,9 @@ function Petio({ redux_pos }) {
   function newNotification(
     data = {
       message: String,
-      type: "info",
+      type: 'info',
       id: false,
-    }
+    },
   ) {
     const msg = {
       timestamp: +new Date(),
@@ -127,16 +124,16 @@ function Petio({ redux_pos }) {
       return;
     }
     switch (data.type) {
-      case "error":
+      case 'error':
         toast.error(comp);
         break;
-      case "warn":
+      case 'warn':
         toast.warn(comp);
         break;
-      case "success":
+      case 'success':
         toast.success(comp);
         break;
-      case "loading":
+      case 'loading':
         return toast.loading(comp);
       default:
         toast.info(comp);
@@ -148,14 +145,14 @@ function Petio({ redux_pos }) {
     async function getConfig() {
       try {
         const config = await checkConfig();
-        if (typeof config !== "object")
-          throw "Config not parsed, returned a string";
+        if (typeof config !== 'object')
+          throw 'Config not parsed, returned a string';
         setGlobalConfig(config);
       } catch (e) {
         console.log(e);
         newNotification({
-          type: "error",
-          message: "Unable to communciate with Petio API",
+          type: 'error',
+          message: 'Unable to communciate with Petio API',
         });
         setGlobalConfig({
           error: e,
@@ -173,8 +170,8 @@ function Petio({ redux_pos }) {
     } catch (e) {
       console.log(e);
       newNotification({
-        message: "Failed to get requests",
-        type: "error",
+        message: 'Failed to get requests',
+        type: 'error',
       });
     }
   }, []);
@@ -188,12 +185,13 @@ function Petio({ redux_pos }) {
         setIsLoggedIn(true);
         setLoadingScreen(false);
         updateRequests();
+        getReviews();
       } catch {
         clearToken();
-        console.log("Invalid token, logged out");
+        console.log('Invalid token, logged out');
         newNotification({
-          message: "Sesssion has expired, please log in again",
-          type: "error",
+          message: 'Sesssion has expired, please log in again',
+          type: 'error',
         });
         setLoadingScreen(false);
       }
@@ -208,25 +206,25 @@ function Petio({ redux_pos }) {
   useLayoutEffect(() => {
     let bounce = false;
     function checkScroll() {
-      if (history.location.pathname.startsWith("/admin")) return;
+      if (history.location.pathname.startsWith('/admin')) return;
       clearTimeout(bounce);
       bounce = setTimeout(() => {
         storePosition(history.location.pathname, window.scrollY);
       }, 500);
     }
 
-    window.addEventListener("scroll", checkScroll);
-    window.addEventListener("touchend", () => {
-      if (history.location.pathname.startsWith("/admin")) return;
+    window.addEventListener('scroll', checkScroll);
+    window.addEventListener('touchend', () => {
+      if (history.location.pathname.startsWith('/admin')) return;
       storePosition(history.location.pathname, window.scrollY);
     });
-    window.addEventListener("mouseup", () => {
-      if (history.location.pathname.startsWith("/admin")) return;
+    window.addEventListener('mouseup', () => {
+      if (history.location.pathname.startsWith('/admin')) return;
       storePosition(history.location.pathname, window.scrollY);
     });
 
     return () => {
-      window.removeEventListener("scroll", checkScroll);
+      window.removeEventListener('scroll', checkScroll);
     };
   }, [history]);
 
@@ -266,7 +264,7 @@ function Petio({ redux_pos }) {
           draggable={true}
           pauseOnHover
           transition={Slide}
-          theme={"petio"}
+          theme={'petio'}
         />
       </Layout>
     );
@@ -274,141 +272,143 @@ function Petio({ redux_pos }) {
 
   return (
     <Layout isLoggedIn={isLoggedIn} currentUser={currentUser}>
-      {setupMode ? (
-        <Setup config={globalConfig} newNotification={newNotification} />
-      ) : null}
-      {!setupMode && loadingScreen ? <Loading /> : null}
-      {setupMode ? null : !isLoggedIn && globalConfig.config === true ? (
-        <>
-          {showInstall ? (
-            <PwaInstall callback={() => setShowInstall(false)} />
-          ) : null}
-          {showInstallAndroid && OS === "Android" ? (
-            <PwaAndroid
-              callback={() => {
-                setShowInstallAndroid(false);
-                setAndroidInstallPrompt(false);
-              }}
-              prompt={androidInstallPrompt}
-            />
-          ) : null}
-          <Login
-            config={globalConfig}
-            setIsLoggedIn={setIsLoggedIn}
-            setCurrentUser={setCurrentUser}
-            setLoadingScreen={setLoadingScreen}
-            newNotification={newNotification}
-          />
-        </>
-      ) : (
-        <Switch>
-          <Route exact path="/">
-            <Home
-              currentUser={currentUser}
+      <ErrorHandler newNotification={newNotification}>
+        {setupMode ? (
+          <Setup config={globalConfig} newNotification={newNotification} />
+        ) : null}
+        {!setupMode && loadingScreen ? <Loading /> : null}
+        {setupMode ? null : !isLoggedIn && globalConfig.config === true ? (
+          <>
+            {showInstall ? (
+              <PwaInstall callback={() => setShowInstall(false)} />
+            ) : null}
+            {showInstallAndroid && OS === 'Android' ? (
+              <PwaAndroid
+                callback={() => {
+                  setShowInstallAndroid(false);
+                  setAndroidInstallPrompt(false);
+                }}
+                prompt={androidInstallPrompt}
+              />
+            ) : null}
+            <Login
               config={globalConfig}
-              newNotification={newNotification}
-            />
-          </Route>
-          <Route exact path="/requests">
-            <Requests
-              currentUser={currentUser}
-              config={globalConfig}
-              newNotification={newNotification}
-            />
-          </Route>
-          <Route path="/admin">
-            <Admin
               setIsLoggedIn={setIsLoggedIn}
-              currentUser={currentUser}
-              config={globalConfig}
               setCurrentUser={setCurrentUser}
+              setLoadingScreen={setLoadingScreen}
               newNotification={newNotification}
             />
-          </Route>
-          <Route exact path="/movie/:pid">
-            <Movie
-              currentUser={currentUser}
-              config={globalConfig}
-              newNotification={newNotification}
-              updateRequests={updateRequests}
-            />
-          </Route>
-          <Route exact path="/movie/genre/:pid">
-            <MovieGenre
-              currentUser={currentUser}
-              config={globalConfig}
-              newNotification={newNotification}
-            />
-          </Route>
-          <Route exact path="/movie/studio/:pid">
-            <Studio
-              currentUser={currentUser}
-              config={globalConfig}
-              newNotification={newNotification}
-            />
-          </Route>
-          <Route exact path="/people/:pid">
-            <People
-              currentUser={currentUser}
-              config={globalConfig}
-              newNotification={newNotification}
-            />
-          </Route>
-          <Route exact path="/tv/:pid">
-            <Show
-              currentUser={currentUser}
-              config={globalConfig}
-              newNotification={newNotification}
-              updateRequests={updateRequests}
-            />
-          </Route>
-          <Route exact path="/tv/genre/:pid">
-            <ShowGenre
-              currentUser={currentUser}
-              config={globalConfig}
-              newNotification={newNotification}
-            />
-          </Route>
-          <Route exact path="/tv/network/:pid">
-            <Network
-              currentUser={currentUser}
-              config={globalConfig}
-              newNotification={newNotification}
-            />
-          </Route>
-          <Route exact path="/search">
-            <Search
-              currentUser={currentUser}
-              config={globalConfig}
-              newNotification={newNotification}
-            />
-          </Route>
-          <Route exact path="/my-account">
-            <MyAccount
-              currentUser={currentUser}
-              config={globalConfig}
-              newNotification={newNotification}
-            />
-          </Route>
-          <Route path="*">
-            <NotFound />
-          </Route>
-        </Switch>
-      )}
-      <ToastContainer
-        className={notifications.wrap}
-        position="bottom-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        transition={Slide}
-        theme={"petio"}
-      />
+          </>
+        ) : (
+          <Switch>
+            <Route exact path="/">
+              <Home
+                currentUser={currentUser}
+                config={globalConfig}
+                newNotification={newNotification}
+              />
+            </Route>
+            <Route exact path="/requests">
+              <Requests
+                currentUser={currentUser}
+                config={globalConfig}
+                newNotification={newNotification}
+              />
+            </Route>
+            <Route path="/admin">
+              <Admin
+                setIsLoggedIn={setIsLoggedIn}
+                currentUser={currentUser}
+                config={globalConfig}
+                setCurrentUser={setCurrentUser}
+                newNotification={newNotification}
+              />
+            </Route>
+            <Route exact path="/movie/:pid">
+              <Movie
+                currentUser={currentUser}
+                config={globalConfig}
+                newNotification={newNotification}
+                updateRequests={updateRequests}
+              />
+            </Route>
+            <Route exact path="/movie/genre/:pid">
+              <MovieGenre
+                currentUser={currentUser}
+                config={globalConfig}
+                newNotification={newNotification}
+              />
+            </Route>
+            <Route exact path="/movie/studio/:pid">
+              <Studio
+                currentUser={currentUser}
+                config={globalConfig}
+                newNotification={newNotification}
+              />
+            </Route>
+            <Route exact path="/people/:pid">
+              <People
+                currentUser={currentUser}
+                config={globalConfig}
+                newNotification={newNotification}
+              />
+            </Route>
+            <Route exact path="/tv/:pid">
+              <Show
+                currentUser={currentUser}
+                config={globalConfig}
+                newNotification={newNotification}
+                updateRequests={updateRequests}
+              />
+            </Route>
+            <Route exact path="/tv/genre/:pid">
+              <ShowGenre
+                currentUser={currentUser}
+                config={globalConfig}
+                newNotification={newNotification}
+              />
+            </Route>
+            <Route exact path="/tv/network/:pid">
+              <Network
+                currentUser={currentUser}
+                config={globalConfig}
+                newNotification={newNotification}
+              />
+            </Route>
+            <Route exact path="/search">
+              <Search
+                currentUser={currentUser}
+                config={globalConfig}
+                newNotification={newNotification}
+              />
+            </Route>
+            <Route exact path="/my-account">
+              <MyAccount
+                currentUser={currentUser}
+                config={globalConfig}
+                newNotification={newNotification}
+              />
+            </Route>
+            <Route path="*">
+              <NotFound />
+            </Route>
+          </Switch>
+        )}
+        <ToastContainer
+          className={notifications.wrap}
+          position="bottom-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          transition={Slide}
+          theme={'petio'}
+        />
+      </ErrorHandler>
     </Layout>
   );
 }

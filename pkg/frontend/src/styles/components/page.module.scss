@@ -5,4 +5,8 @@
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
+
+  @media (max-width: 768px) {
+    padding-top: 66px;
+  }
 }
