@@ -6,6 +6,7 @@ import { DownloaderType, GetDownloaderById } from '@/models/downloaders';
 import { Language } from './radarr/language';
 import { Movie } from './radarr/movie';
 import { QualityProfile } from './radarr/quality_profile';
+import { Queue } from './radarr/queue';
 import { RootFolder } from './radarr/root_folder';
 import { Tag } from './radarr/tag';
 
@@ -41,6 +42,14 @@ export default class RadarrAPI {
     return this.client.get('/api/v3/tag');
   }
 
+  public async GetQueue(page?: number): Promise<Queue> {
+    return this.client.get('/api/v3/queue', {
+      queries: {
+        page,
+      },
+    });
+  }
+
   public async GetMovie(id: number): Promise<Movie> {
     return this.client.get('/api/v3/movie/:id', {
       params: {
@@ -53,6 +62,18 @@ export default class RadarrAPI {
     return this.client.get('/api/v3/movie/lookup', {
       queries: {
         term: 'tmdb:' + id,
+      },
+    });
+  }
+
+  public async CreateMovie(data: Movie): Promise<Movie> {
+    return this.client.post('/api/v3/movie', data);
+  }
+
+  public async DeleteMovie(id: number): Promise<void> {
+    this.client.delete('/api/v3/movie/:id', undefined, {
+      params: {
+        id,
       },
     });
   }

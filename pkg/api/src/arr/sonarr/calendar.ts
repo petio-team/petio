@@ -28,7 +28,23 @@ export const CalendarEndpoint = asApi([
   {
     method: 'get',
     path: '/api/v3/calendar',
-    parameters: [],
+    parameters: [
+      {
+        name: 'start',
+        type: 'Query',
+        schema: z.date().optional(),
+      },
+      {
+        name: 'end',
+        type: 'Query',
+        schema: z.date().optional(),
+      },
+      {
+        name: 'unmonitored',
+        type: 'Query',
+        schema: z.boolean().optional(),
+      },
+    ],
     response: CalendarSchema,
   },
 ] as const);

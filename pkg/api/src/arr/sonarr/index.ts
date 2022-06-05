@@ -5,9 +5,9 @@ import URL from 'url';
 import { CalendarEndpoint } from './calendar';
 import { LanguageProfileEndpoint } from './language_profile';
 import { QualityProfileEndpoint } from './quality_profile';
+import { QueueEndpoint } from './queue';
 import { RootFolderEndpoint } from './root_folder';
-import { SeriesIdEndpoint } from './series_id';
-import { SeriesLookupEndpoint } from './series_lookup';
+import { SeriesEndpoint } from './series';
 import { SystemStatusEndpoint } from './status';
 import { TagEndpoint } from './tag';
 
@@ -17,9 +17,9 @@ export const SonarrAPIEndpoints = [
   ...CalendarEndpoint,
   ...QualityProfileEndpoint,
   ...RootFolderEndpoint,
-  ...SeriesLookupEndpoint,
-  ...SeriesIdEndpoint,
+  ...SeriesEndpoint,
   ...TagEndpoint,
+  ...QueueEndpoint,
 ] as const;
 
 export const SonarrAPIClient = (

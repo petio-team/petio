@@ -5,9 +5,9 @@ import { DownloaderType, GetDownloaderById } from '@/models/downloaders';
 
 import { LanguageProfile } from './sonarr/language_profile';
 import { QualityProfile } from './sonarr/quality_profile';
+import { Queue } from './sonarr/queue';
 import { RootFolder } from './sonarr/root_folder';
-import { SeriesId } from './sonarr/series_id';
-import { SeriesLookup } from './sonarr/series_lookup';
+import { Series, SeriesLookup } from './sonarr/series';
 import { Tag } from './sonarr/tag';
 
 export default class SonarrAPI {
@@ -42,7 +42,15 @@ export default class SonarrAPI {
     return this.client.get('/api/v3/tag');
   }
 
-  public async GetSeriesById(id: number): Promise<SeriesId> {
+  public async GetQueue(page?: number): Promise<Queue> {
+    return this.client.get('/api/v3/queue', {
+      queries: {
+        page,
+      },
+    });
+  }
+
+  public async GetSeriesById(id: number): Promise<Series> {
     return this.client.get('/api/v3/series/:id', { params: { id } });
   }
 
@@ -50,6 +58,29 @@ export default class SonarrAPI {
     return this.client.get('/api/v3/series/lookup', {
       queries: {
         term: 'tvdb:' + id,
+      },
+    });
+  }
+
+  public async UpdateSeriesById(id: number, data: Series) {
+    return this.client.put('/api/v3/series/:id', data, {
+      params: {
+        id,
+      },
+    });
+  }
+
+  public async CreateSeries(data: Series) {
+    return this.client.post('/api/v3/series', data);
+  }
+
+  public async DeleteSeries(id: number, deleteFiles?: boolean) {
+    return this.client.delete('/api/v3/series/:id', undefined, {
+      params: {
+        id,
+      },
+      queries: {
+        deleteFiles,
       },
     });
   }

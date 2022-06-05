@@ -1,85 +1,106 @@
-import Promise from "bluebird";
+import Bluebird from 'bluebird';
 
-import logger from "@/loaders/logger";
-import { movieLookup } from "@/tmdb/movie";
-import { showLookup } from "@/tmdb/show";
-import Request from "@/models/request";
-import Sonarr from "@/downloaders/sonarr";
-import Radarr from "@/downloaders/radarr";
+import Radarr from '@/downloaders/radarr';
+import Sonarr from '@/downloaders/sonarr';
+import logger from '@/loaders/logger';
+import { DownloaderType, GetAllDownloaders } from '@/models/downloaders';
+import Request from '@/models/request';
+import { movieLookup } from '@/tmdb/movie';
+import { showLookup } from '@/tmdb/show';
 
 export const getRequests = async (user = false, all = false) => {
-  const requests = await Request.find();
+  const requests = await Request.find().exec();
   let data = {};
-  let sonarr = new Sonarr();
-  let radarr = new Radarr();
   try {
-    let sonarrQ = await sonarr.queue();
-    let radarrQ = await radarr.queue();
+    const instances = await GetAllDownloaders();
+    const sonarrs = instances.filter((i) => i.type === DownloaderType.Sonarr);
+    const radarrs = instances.filter((i) => i.type === DownloaderType.Radarr);
+
+    const [sonarrQ, radarrQ] = await Bluebird.all([
+      Bluebird.map(sonarrs, async (i) => {
+        return new Sonarr(i).queue();
+      }),
+      Bluebird.map(radarrs, async (i) => {
+        return new Radarr(i).queue();
+      }),
+    ]);
 
     data = {};
 
-    await Promise.all(
-      requests.map(
+    await Bluebird.all(
+      Bluebird.map(
+        requests,
         async (request, i) => {
           let children: any = [];
           let media: any = [];
           if (request.users.includes(user) || all) {
-            if (request.type === "movie" && request.radarrId.length > 0) {
+            if (request.type === 'movie' && request.radarrId.length > 0) {
               for (let i = 0; i < Object.keys(request.radarrId).length; i++) {
                 let radarrIds = request.radarrId[i];
                 let rId = parseInt(radarrIds[Object.keys(radarrIds)[0]]);
                 let serverUuid = Object.keys(radarrIds)[0];
-                let server = new Radarr(serverUuid);
+
+                const instance = instances.find((i) => i.id === serverUuid);
+                if (!instance) {
+                  continue;
+                }
+
+                const server = new Radarr(instance);
                 children[i] = {};
                 children[i].id = rId;
                 try {
-                  children[i].info = await server.movie(rId);
-                  children[i].info.serverName = server.config.title;
+                  children[i].info = await server.getClient().GetMovie(rId);
+                  children[i].info.serverName = server.instance.name;
                 } catch {
-                  children[i].info = { message: "NotFound" };
+                  children[i].info = { message: 'NotFound' };
                 }
                 children[i].status = [];
                 if (radarrQ[serverUuid] && radarrQ[serverUuid].records) {
-                  for (let o = 0; o < radarrQ[serverUuid].records.length; o++) {
-                    if (radarrQ[serverUuid].records[o].movieId === rId) {
-                      children[i].status.push(radarrQ[serverUuid].records[o]);
+                  for (const element of radarrQ[serverUuid].records) {
+                    if (element.movieId === rId) {
+                      children[i].status.push(element);
                     }
                   }
                 }
               }
             }
 
-            if (request.type === "tv" && request.sonarrId.length > 0) {
+            if (request.type === 'tv' && request.sonarrId.length > 0) {
               for (let i = 0; i < Object.keys(request.sonarrId).length; i++) {
                 let sonarrIds = request.sonarrId[i];
                 let sId = parseInt(sonarrIds[Object.keys(sonarrIds)[0]]);
                 let serverUuid = Object.keys(sonarrIds)[0];
-                let server = new Sonarr().serverDetails({ id: serverUuid });
+
+                const instance = instances.find((i) => i.id === serverUuid);
+                if (!instance) {
+                  continue;
+                }
+
+                let server = new Sonarr(instance);
                 children[i] = {};
                 children[i].id = sId;
                 try {
-                  children[i].info = await new Sonarr().series(
-                    { id: serverUuid },
-                    sId
-                  );
-                  children[i].info.serverName = server.title;
+                  children[i].info = await server
+                    .getClient()
+                    .GetSeriesById(sId);
+                  children[i].info.serverName = server.instance.name;
                 } catch (e) {
-                  children[i].info = { message: "NotFound", error: e };
+                  children[i].info = { message: 'NotFound', error: e };
                 }
                 children[i].status = [];
                 if (sonarrQ[serverUuid] && sonarrQ[serverUuid].records) {
-                  for (let o = 0; o < sonarrQ[serverUuid].records.length; o++) {
-                    if (sonarrQ[serverUuid].records[o].seriesId === sId) {
-                      children[i].status.push(sonarrQ[serverUuid].records[o]);
+                  for (const element of sonarrQ[serverUuid].records) {
+                    if (element.seriesId === sId) {
+                      children[i].status.push(element);
                     }
                   }
                 }
               }
             }
 
-            if (request.type === "movie") {
+            if (request.type === 'movie') {
               media = await movieLookup(request.requestId, true);
-            } else if (request.type === "tv") {
+            } else if (request.type === 'tv') {
               media = await showLookup(request.requestId, true);
             }
 
@@ -102,20 +123,20 @@ export const getRequests = async (user = false, all = false) => {
               defaults: request.pendingDefault,
             };
 
-            if (request.type === "tv") {
+            if (request.type === 'tv') {
               data[request.requestId].seasons = request.seasons;
             }
           }
         },
-        { concurrency: 20 }
-      )
+        { concurrency: 20 },
+      ),
     );
   } catch (err) {
     logger.error(err.stack);
     logger.error(`ROUTE: Error getting requests display`, {
-      label: "requests.display",
+      label: 'requests.display',
     });
-    logger.error(err, { label: "requests.display" });
+    logger.error(err, { label: 'requests.display' });
     data = requests;
   }
   return data;
@@ -125,54 +146,53 @@ function reqState(req, children) {
   let diff;
   if (!req.approved) {
     return {
-      status: "pending",
-      message: "Pending",
+      status: 'pending',
+      message: 'Pending',
       step: 2,
     };
   }
   if (children) {
     if (children.length > 0) {
-      for (let r = 0; r < children.length; r++) {
-        if (children[r].status.length > 0) {
+      for (const element of children) {
+        if (element.status.length > 0) {
           return {
-            status: "orange",
-            message: "Downloading",
+            status: 'orange',
+            message: 'Downloading',
             step: 3,
           };
         }
 
-        if (children[r].info.downloaded || children[r].info.movieFile) {
+        if (element.info.downloaded || element.info.movieFile) {
           return {
-            status: "good",
-            message: "Downloaded",
+            status: 'good',
+            message: 'Downloaded',
             step: 4,
           };
         }
 
-        if (children[r].info.message === "NotFound") {
+        if (element.info.message === 'NotFound') {
           return {
-            status: "bad",
-            message: "Removed",
+            status: 'bad',
+            message: 'Removed',
             step: 2,
           };
         }
 
-        if (req.type === "tv" && children[r].info) {
+        if (req.type === 'tv' && element.info) {
           if (
-            children[r].info.episodeCount ===
-              children[r].info.episodeFileCount &&
-            children[r].info.episodeCount > 0
+            element.info.episodeCount === element.info.episodeFileCount &&
+            element.info.episodeCount > 0
           ) {
             return {
-              status: "good",
-              message: "Downloaded",
+              status: 'good',
+              message: 'Downloaded',
               step: 4,
             };
           }
 
-          if (children[r].info.seasons) {
+          if (element.info.seasons) {
             let missing = false;
-            for (let season of children[r].info.seasons) {
+            for (let season of element.info.seasons) {
               if (season.monitored) {
                 if (
                   season.statistics &&
@@ -182,34 +202,34 @@ function reqState(req, children) {
               }
             }
 
-            if (!missing && children[r].info.statistics.totalEpisodeCount > 0) {
+            if (!missing && element.info.statistics.totalEpisodeCount > 0) {
               return {
-                status: "good",
-                message: "Downloaded",
+                status: 'good',
+                message: 'Downloaded',
                 step: 4,
               };
             } else {
-              let airDate = children[r].info.firstAired;
+              let airDate = element.info.firstAired;
               if (!airDate)
                 return {
-                  status: "blue",
-                  message: "Awaiting Info",
+                  status: 'blue',
+                  message: 'Awaiting Info',
                   step: 3,
                 };
               diff = Math.ceil(
-                new Date(airDate).getTime() - new Date().getTime()
+                new Date(airDate).getTime() - new Date().getTime(),
               );
               if (diff > 0) {
                 return {
-                  status: "blue",
+                  status: 'blue',
                   message: `${calcDate(diff)}`,
                   step: 3,
                 };
               } else {
-                if (children[r].info.episodeFileCount > 0) {
+                if (element.info.episodeFileCount > 0) {
                   return {
-                    status: "blue",
-                    message: "Partially Downloaded",
+                    status: 'blue',
+                    message: 'Partially Downloaded',
                     step: 3,
                   };
                 }
@@ -218,40 +238,40 @@ function reqState(req, children) {
           }
         }
 
-        if (req.type === "movie" && children[r].info) {
-          if (children[r].info.inCinemas || children[r].info.digitalRelease) {
-            if (children[r].info.inCinemas) {
+        if (req.type === 'movie' && element.info) {
+          if (element.info.inCinemas || element.info.digitalRelease) {
+            if (element.info.inCinemas) {
               diff = Math.ceil(
-                new Date(children[r].info.inCinemas).getTime() -
-                  new Date().getTime()
+                new Date(element.info.inCinemas).getTime() -
+                  new Date().getTime(),
               );
               if (diff > 0) {
                 return {
-                  status: "blue",
+                  status: 'blue',
                   message: `${calcDate(diff)}`,
                   step: 3,
                 };
               }
             }
-            if (children[r].info.digitalRelease) {
-              let digitalDate = new Date(children[r].info.digitalRelease);
+            if (element.info.digitalRelease) {
+              let digitalDate = new Date(element.info.digitalRelease);
               if (new Date().getTime() - digitalDate.getTime() < 0) {
                 return {
-                  status: "cinema",
-                  message: "In Cinemas",
+                  status: 'cinema',
+                  message: 'In Cinemas',
                   step: 3,
                 };
               }
             } else {
-              if (children[r].info.inCinemas) {
+              if (element.info.inCinemas) {
                 diff = Math.ceil(
                   new Date().getTime() -
-                    new Date(children[r].info.inCinemas).getTime()
+                    new Date(element.info.inCinemas).getTime(),
                 );
                 if (cinemaWindow(diff)) {
                   return {
-                    status: "cinema",
-                    message: "In Cinemas",
+                    status: 'cinema',
+                    message: 'In Cinemas',
                     step: 3,
                   };
                 }
@@ -259,18 +279,18 @@ function reqState(req, children) {
             }
           }
 
-          if (children[r].info.status === "announced") {
+          if (element.info.status === 'announced') {
             return {
-              status: "blue",
-              message: "Awaiting Info",
+              status: 'blue',
+              message: 'Awaiting Info',
               step: 3,
             };
           }
         }
       }
       return {
-        status: "bad",
-        message: "Unavailable",
+        status: 'bad',
+        message: 'Unavailable',
         step: 3,
       };
     }
@@ -280,28 +300,28 @@ function reqState(req, children) {
     switch (req.manualStatus) {
       case 3:
         return {
-          status: "orange",
-          message: "Processing",
+          status: 'orange',
+          message: 'Processing',
           step: 3,
         };
       case 4:
         return {
-          status: "good",
-          message: "Finalising",
+          status: 'good',
+          message: 'Finalising',
           step: 4,
         };
       case 5:
         return {
-          status: "good",
-          message: "Complete",
+          status: 'good',
+          message: 'Complete',
           step: 5,
         };
     }
   }
 
   return {
-    status: "manual",
-    message: "No Status",
+    status: 'manual',
+    message: 'No Status',
     step: 3,
   };
 }
@@ -315,11 +335,11 @@ function calcDate(diff) {
   days = days - months * 31;
   months = months - years * 12;
 
-  var message = "~";
-  message += years ? years + "y " : "";
-  message += months ? months + "m " : "";
-  message += days ? days + "d" : "";
-  if (years) message = "> 1y";
+  var message = '~';
+  message += years ? years + 'y ' : '';
+  message += months ? months + 'm ' : '';
+  message += days ? days + 'd' : '';
+  if (years) message = '> 1y';
 
   return message;
 }

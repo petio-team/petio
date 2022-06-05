@@ -59,11 +59,13 @@ export const MovieSchema = z.object({
   genres: z.array(z.string()),
   tags: z.array(z.number()),
   added: z.string(),
-  addOptions: z.object({
-    ignoreEpisodesWithFiles: z.boolean(),
-    ignoreEpisodesWithoutFiles: z.boolean(),
-    searchForMovie: z.boolean(),
-  }),
+  addOptions: z
+    .object({
+      ignoreEpisodesWithFiles: z.boolean().optional(),
+      ignoreEpisodesWithoutFiles: z.boolean().optional(),
+      searchForMovie: z.boolean().optional(),
+    })
+    .optional(),
   ratings: z.object({
     imdb: z.object({
       votes: z.number(),
@@ -190,7 +192,10 @@ export const MovieSchema = z.object({
   }),
   popularity: z.number(),
 });
+export const MoviesSchema = z.array(MovieSchema);
+
 export type Movie = z.infer<typeof MovieSchema>;
+export type Movies = z.infer<typeof MovieSchema>;
 
 export const MovieEndpoint = asApi([
   {
@@ -203,7 +208,7 @@ export const MovieEndpoint = asApi([
         schema: z.number().positive().optional(),
       },
     ],
-    response: z.array(MovieSchema),
+    response: MoviesSchema,
   },
   {
     method: 'get',
@@ -222,5 +227,23 @@ export const MovieEndpoint = asApi([
       },
     ],
     response: MovieSchema,
+  },
+  {
+    method: 'post',
+    path: '/api/v3/movie',
+    parameters: [
+      {
+        name: 'body',
+        type: 'Body',
+        schema: MovieSchema,
+      },
+    ],
+    response: MovieSchema,
+  },
+  {
+    method: 'delete',
+    path: '/api/v3/movie/:id',
+    parameters: [],
+    response: z.object({}),
   },
 ] as const);

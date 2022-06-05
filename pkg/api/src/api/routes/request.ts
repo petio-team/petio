@@ -1,4 +1,5 @@
 import Router from '@koa/router';
+import Bluebird from 'bluebird';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
@@ -11,6 +12,8 @@ import { UserModel } from '@/models/user';
 import { getArchive } from '@/requests/archive';
 import { getRequests } from '@/requests/display';
 import processRequest from '@/requests/process';
+
+import { GetAllDownloaders, IDownloader } from '../../models/downloaders';
 
 const route = new Router({ prefix: '/request' });
 
@@ -43,7 +46,7 @@ const getUserRequests = async (ctx: Context) => {
 };
 
 const getRequestMinified = async (ctx: Context) => {
-  const requests = await Request.find();
+  const requests = await Request.find().exec();
   let data = {};
   try {
     data = {};
@@ -79,7 +82,7 @@ const getRequestMinified = async (ctx: Context) => {
 };
 
 const addRequest = async (ctx: Context) => {
-  const body = ctx.request.body as any;
+  const body = ctx.request.body;
 
   let user = body.user;
   let request = body.request;
@@ -90,7 +93,7 @@ const addRequest = async (ctx: Context) => {
 };
 
 const removeRequest = async (ctx: Context) => {
-  const body = ctx.request.body as any;
+  const body = ctx.request.body;
 
   let request = body.request;
   let reason = body.reason;
@@ -105,7 +108,7 @@ const removeRequest = async (ctx: Context) => {
 
   await Promise.all(
     request.users.map(async (user) => {
-      let userData = await UserModel.findOne({ id: user });
+      let userData = await UserModel.findOne({ id: user }).exec();
       if (!userData) {
         ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
         ctx.body = { error: 'failed to find requests by user' };
@@ -136,7 +139,7 @@ const removeRequest = async (ctx: Context) => {
 };
 
 const updateRequest = async (ctx: Context) => {
-  const body = ctx.request.body as any;
+  const body = ctx.request.body;
 
   let request = body.request;
   let servers = body.servers;
@@ -152,6 +155,8 @@ const updateRequest = async (ctx: Context) => {
   }
 
   try {
+    const instances = await GetAllDownloaders();
+
     await Request.findOneAndUpdate(
       { requestId: request.requestId },
       {
@@ -161,37 +166,39 @@ const updateRequest = async (ctx: Context) => {
         },
       },
       { new: true, useFindAndModify: false },
-    );
+    ).exec();
 
     if (servers && request.type === 'movie') {
-      await Promise.all(
-        Object.keys(servers).map(async (r) => {
-          let active = servers[r].active;
-          if (active) {
-            await new Radarr(
-              r,
-              false,
-              servers[r].profile,
-              servers[r].path,
-            ).processRequest(request.requestId);
+      const activeServers: IDownloader[] = servers.map((s) => {
+        if (s.active) {
+          const instance = instances.find((i) => i.id === s.id);
+          if (instance) {
+            return instance;
           }
-        }),
-      );
+        }
+      });
+
+      await Bluebird.map(activeServers, async (instance) => {
+        await new Radarr(instance).processRequest(request.requestId);
+      });
     }
 
     if (servers && request.type === 'tv') {
-      await Promise.all(
-        Object.keys(servers).map(async (s) => {
-          let active = servers[s].active;
-          request.id = request.requestId;
-          if (active) {
-            await new Sonarr().addShow({ id: s }, request, {
-              profile: servers[s].profile,
-              path: servers[s].path,
-            });
+      const activeServers: IDownloader[] = servers.map((s) => {
+        if (s.active) {
+          const instance = instances.find((i) => i.id === s.id);
+          if (instance) {
+            return instance;
           }
-        }),
-      );
+        }
+      });
+
+      await Bluebird.map(activeServers, async (instance) => {
+        await new Sonarr(instance).addShow(request, {
+          profile: instance.profile,
+          path: instance.path,
+        });
+      });
     }
 
     if (!approved) {
@@ -199,7 +206,7 @@ const updateRequest = async (ctx: Context) => {
       let titles: any = [];
       await Promise.all(
         request.users.map(async (id) => {
-          let userData = await UserModel.findOne({ id });
+          let userData = await UserModel.findOne({ id }).exec();
           if (!userData) return;
           emails.push(userData.email);
           titles.push(userData.title);
