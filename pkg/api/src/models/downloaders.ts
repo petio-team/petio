@@ -124,12 +124,12 @@ export const GetAllDownloaders = async (
 };
 
 export const GetDownloaderById = async (id: string): Promise<IDownloader> => {
-  const downloader = await DownloaderModel.findById({ id }).exec();
+  const downloader = await DownloaderModel.findOne({ id }).exec();
   if (!downloader) {
     throw new Error('no downloader exists with id: ' + id);
   }
 
-  return downloader;
+  return downloader.toObject();
 };
 
 export const CreateDownloader = async (
