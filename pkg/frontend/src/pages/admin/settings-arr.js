@@ -223,7 +223,6 @@ export default function SettingsArr(props) {
       });
       return true;
     } catch (e) {
-      console.log(e);
       props.newNotification({
         message: 'Server test failed',
         type: 'error',
@@ -349,8 +348,6 @@ export default function SettingsArr(props) {
       setUpdating(false);
     }
   }
-
-  console.log(options);
 
   return (
     <div className={styles.arr__wrap}>
