@@ -1,28 +1,29 @@
-import http from "http";
-import axios from "axios";
-import cacheManager from "cache-manager";
+import axios from 'axios';
+import cacheManager from 'cache-manager';
+import http from 'http';
 
-import logger from "@/loaders/logger";
-import fanartLookup from "../fanart";
-import onServer from "../plex/server";
-import { lookup as imdb } from "../meta/imdb";
-import getLanguage from "./languages";
-import { tmdbApiKey } from "../config/env";
-import { TMDBAPI } from "./tmdb";
+import logger from '@/loaders/logger';
+
+import { tmdbApiKey } from '../config/env';
+import fanartLookup from '../fanart';
+import { lookup as imdb } from '../meta/imdb';
+import onServer from '../plex/server';
+import getLanguage from './languages';
+import { TMDBAPI } from './tmdb';
 
 const agent = new http.Agent({ family: 4 });
 const memoryCache = cacheManager.caching({
-  store: "memory",
+  store: 'memory',
   max: 500,
   ttl: 86400 /*seconds*/,
 });
 
 export async function showLookup(id, minified = false) {
-  if (!id || id == "false") {
-    return "No ID";
+  if (!id || id == 'false') {
+    return 'No ID';
   }
   logger.debug(`TMDB Show Lookup ${id}`, {
-    label: "tmdb.show",
+    label: 'tmdb.show',
   });
   let external: any = await externalId(id);
   let show: any = false;
@@ -31,14 +32,14 @@ export async function showLookup(id, minified = false) {
     data = await getShowData(id);
     show = Object.assign({}, data);
   } catch {
-    return { error: "not found" };
+    return { error: 'not found' };
   }
   if (show.success === false) {
-    return { error: "not found" };
+    return { error: 'not found' };
   }
   if (show) {
     if (!show.id) {
-      return { error: "no id returned" };
+      return { error: 'no id returned' };
     }
 
     try {
@@ -52,12 +53,12 @@ export async function showLookup(id, minified = false) {
         onPlex,
       ]: any = await Promise.all([
         !minified && external.imdb_id ? imdb(external.imdb_id) : false,
-        minified ? false : fanartLookup(external.tvdb_id, "tv"),
+        minified ? false : fanartLookup(external.tvdb_id, 'tv'),
         !minified ? getRecommendations(id) : false,
         !minified ? getSimilar(id) : false,
         !minified ? getSeasons(show.seasons, id) : false,
         !minified ? getReviews(id) : false,
-        onServer("show", external.imdb_id, external.tvdb_id, id),
+        onServer('show', external.imdb_id, external.tvdb_id, id),
       ]);
 
       if (fanart) {
@@ -76,10 +77,10 @@ export async function showLookup(id, minified = false) {
       show.videos = {
         results: [
           ...show.videos.results.filter(
-            (obj) => obj.type == "Trailer" && obj.site == "YouTube"
+            (obj) => obj.type == 'Trailer' && obj.site == 'YouTube',
           ),
           ...show.videos.results.filter(
-            (obj) => obj.type == "Teaser" && obj.site == "YouTube"
+            (obj) => obj.type == 'Teaser' && obj.site == 'YouTube',
           ),
         ],
       };
@@ -108,7 +109,7 @@ export async function showLookup(id, minified = false) {
         ) {
           let params: any = {};
           if (show.genres) {
-            let genres = "";
+            let genres = '';
             for (let i = 0; i < show.genres.length; i++) {
               genres += `${show.genres[i].id},`;
             }
@@ -171,10 +172,10 @@ export async function showLookup(id, minified = false) {
       return show;
     } catch (err) {
       logger.warn(`Error processing show data - ${id}`, {
-        label: "tmdb.show",
+        label: 'tmdb.show',
       });
-      logger.error(err, { label: "tmdb.show" });
-      return { error: "not found" };
+      logger.error(err, { label: 'tmdb.show' });
+      return { error: 'not found' };
     }
   }
 }
@@ -186,19 +187,24 @@ export default showLookup;
 export const getShowDetails = async (id: number) => {
   try {
     const [details, plex] = await Promise.all([
-      TMDBAPI.get("/tv/:id", {
+      TMDBAPI.get('/tv/:id', {
         params: {
           id,
         },
         queries: {
-          append_to_response: "videos",
+          append_to_response: 'videos',
         },
       }),
-      onServer("show", undefined, undefined, id),
+      onServer('show', undefined, undefined, id),
     ]);
 
+    let exists = false;
+    if (plex && plex.exists) {
+      exists = true;
+    }
+
     return {
-      on_server: plex ? true : false,
+      on_server: exists,
       name: details.name,
       poster_path: details.poster_path,
       first_air_date: details.first_air_date,
@@ -208,10 +214,10 @@ export const getShowDetails = async (id: number) => {
         ? {
             results: [
               ...details.videos.results.filter(
-                (obj) => obj.type == "Teaser" && obj.site == "YouTube"
+                (obj) => obj.type == 'Teaser' && obj.site == 'YouTube',
               ),
               ...details.videos.results.filter(
-                (obj) => obj.type == "Trailer" && obj.site == "YouTube"
+                (obj) => obj.type == 'Trailer' && obj.site == 'YouTube',
               ),
             ],
           }
@@ -226,19 +232,24 @@ export const getShowDetails = async (id: number) => {
 export const getMovieDetails = async (id: number) => {
   try {
     const [details, plex] = await Promise.all([
-      TMDBAPI.get("/movie/:id", {
+      TMDBAPI.get('/movie/:id', {
         params: {
           id,
         },
         queries: {
-          append_to_response: "videos",
+          append_to_response: 'videos',
         },
       }),
-      onServer("movie", undefined, undefined, id),
+      onServer('movie', undefined, undefined, id),
     ]);
 
+    let exists = false;
+    if (plex && plex.exists) {
+      exists = true;
+    }
+
     return {
-      on_server: plex ? true : false,
+      on_server: exists,
       name: details.title,
       poster_path: details.poster_path,
       release_date: details.release_date,
@@ -248,10 +259,10 @@ export const getMovieDetails = async (id: number) => {
         ? {
             results: [
               ...details.videos.results.filter(
-                (obj) => obj.type == "Teaser" && obj.site == "YouTube"
+                (obj) => obj.type == 'Teaser' && obj.site == 'YouTube',
               ),
               ...details.videos.results.filter(
-                (obj) => obj.type == "Trailer" && obj.site == "YouTube"
+                (obj) => obj.type == 'Trailer' && obj.site == 'YouTube',
               ),
             ],
           }
@@ -270,9 +281,9 @@ async function getShowData(id) {
     });
   } catch (err) {
     logger.warn(`Error getting show data - ${id}`, {
-      label: "tmdb.show",
+      label: 'tmdb.show',
     });
-    logger.error(err, { label: "tmdb.show" });
+    logger.error(err, { label: 'tmdb.show' });
   }
   return data;
 }
@@ -285,9 +296,9 @@ async function externalId(id) {
     });
   } catch (err) {
     logger.verbose(`Error getting external ID - ${id}`, {
-      label: "tmdb.show",
+      label: 'tmdb.show',
     });
-    logger.debug(err, { label: "tmdb.show" });
+    logger.debug(err, { label: 'tmdb.show' });
   }
   return data;
 }
@@ -300,9 +311,9 @@ export async function getRecommendations(id, page = 1) {
     });
   } catch (err) {
     logger.warn(`Error getting recommendation data - ${id}`, {
-      label: "tmdb.show",
+      label: 'tmdb.show',
     });
-    logger.error(err, { label: "tmdb.show" });
+    logger.error(err, { label: 'tmdb.show' });
   }
   return data;
 }
@@ -315,9 +326,9 @@ export async function getSimilar(id, page = 1) {
     });
   } catch (err) {
     logger.warn(`Error getting similar data - ${id}`, {
-      label: "tmdb.show",
+      label: 'tmdb.show',
     });
-    logger.error(err, { label: "tmdb.show" });
+    logger.error(err, { label: 'tmdb.show' });
   }
   return data;
 }
@@ -330,9 +341,9 @@ async function getReviews(id) {
     });
   } catch (err) {
     logger.warn(`Error getting review data - ${id}`, {
-      label: "tmdb.show",
+      label: 'tmdb.show',
     });
-    logger.error(err, { label: "tmdb.show" });
+    logger.error(err, { label: 'tmdb.show' });
   }
   return data;
 }
@@ -345,9 +356,9 @@ async function getSeasons(seasons, id) {
     });
   } catch (err) {
     logger.warn(`Error getting season data - ${id}`, {
-      label: "tmdb.show",
+      label: 'tmdb.show',
     });
-    logger.error(err, { label: "tmdb.show" });
+    logger.error(err, { label: 'tmdb.show' });
   }
   return data;
 }
@@ -355,7 +366,7 @@ async function getSeasons(seasons, id) {
 // Lookup layer
 
 async function tmdbData(id) {
-  const tmdb = "https://api.themoviedb.org/3/";
+  const tmdb = 'https://api.themoviedb.org/3/';
   let url = `${tmdb}tv/${id}?api_key=${tmdbApiKey}&append_to_response=aggregate_credits,videos,keywords,content_ratings,credits`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
@@ -386,7 +397,7 @@ async function tmdbData(id) {
 }
 
 async function recommendationData(id, page = 1) {
-  const tmdb = "https://api.themoviedb.org/3/";
+  const tmdb = 'https://api.themoviedb.org/3/';
   let url = `${tmdb}tv/${id}/recommendations?api_key=${tmdbApiKey}&page=${page}`;
 
   try {
@@ -398,7 +409,7 @@ async function recommendationData(id, page = 1) {
 }
 
 async function similarData(id, page = 1) {
-  const tmdb = "https://api.themoviedb.org/3/";
+  const tmdb = 'https://api.themoviedb.org/3/';
   let url = `${tmdb}tv/${id}/similar?api_key=${tmdbApiKey}&page=${page}`;
 
   try {
@@ -422,7 +433,7 @@ async function seasonsAsync(seasonList, id) {
 }
 
 async function getSeason(id, season) {
-  const tmdb = "https://api.themoviedb.org/3/";
+  const tmdb = 'https://api.themoviedb.org/3/';
   let url = `${tmdb}tv/${id}/season/${season}?api_key=${tmdbApiKey}`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
@@ -433,7 +444,7 @@ async function getSeason(id, season) {
 }
 
 async function reviewsData(id) {
-  const tmdb = "https://api.themoviedb.org/3/";
+  const tmdb = 'https://api.themoviedb.org/3/';
   let url = `${tmdb}tv/${id}/reviews?api_key=${tmdbApiKey}`;
 
   try {
@@ -450,12 +461,12 @@ function findEnLogo(logos) {
   logos.forEach((logo) => {
     // For some reason fanart defaults to this obscure logo sometimes so lets exclude it
     if (
-      logo.lang === "en" &&
+      logo.lang === 'en' &&
       !logoUrl &&
       logo.url !==
-        "https://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png" &&
+        'https://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png' &&
       logo.url !==
-        "http://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png"
+        'http://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png'
     ) {
       logoUrl = logo.url;
     }
@@ -467,7 +478,7 @@ function findEnLogo(logos) {
 function findEnRating(data) {
   let rating = false;
   data.forEach((item) => {
-    if (item.iso_3166_1 === "US") {
+    if (item.iso_3166_1 === 'US') {
       rating = item.rating;
     }
   });
@@ -475,21 +486,21 @@ function findEnRating(data) {
 }
 
 async function idLookup(id) {
-  const tmdb = "https://api.themoviedb.org/3/";
+  const tmdb = 'https://api.themoviedb.org/3/';
   let url = `${tmdb}tv/${id}/external_ids?api_key=${tmdbApiKey}`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
   } catch (err) {
-    logger.error(`failed to look up show ${id}`, { label: "tmdb.show" });
-    logger.error(err, { label: "tmdb.show" });
+    logger.error(`failed to look up show ${id}`, { label: 'tmdb.show' });
+    logger.error(err, { label: 'tmdb.show' });
     throw err;
   }
 }
 
 export async function discoverSeries(page = 1, params = {}) {
-  const tmdb = "https://api.themoviedb.org/3/";
-  let par = "";
+  const tmdb = 'https://api.themoviedb.org/3/';
+  let par = '';
   Object.keys(params).map((i) => {
     par += `&${i}=${params[i]}`;
   });
@@ -499,9 +510,9 @@ export async function discoverSeries(page = 1, params = {}) {
     if (res.data && res.data.results.length > 0) {
       await Promise.all(
         res.data.results.map(async (show) => {
-          const check: any = await onServer("show", false, false, show.id);
+          const check: any = await onServer('show', false, false, show.id);
           show.on_server = check.exists;
-        })
+        }),
       );
     }
     return res.data;
@@ -511,7 +522,7 @@ export async function discoverSeries(page = 1, params = {}) {
 }
 
 export async function network(id) {
-  const tmdb = "https://api.themoviedb.org/3/";
+  const tmdb = 'https://api.themoviedb.org/3/';
   let url = `${tmdb}network/${id}?api_key=${tmdbApiKey}`;
   try {
     let res = await axios.get(url, { httpAgent: agent });

@@ -215,49 +215,37 @@ async function personData(): Promise<TrendingPeople[]> {
   logger.verbose('Person from source not cache', {
     label: 'tmdb.trending',
   });
-  try {
-    const data = await TMDBAPI.get('/trending/:media_type/:time_window', {
-      params: {
-        media_type: MediaType.Person,
-        time_window: TimeWindow.Week,
-      },
-    });
-    return data.results as TrendingPeople[];
-  } catch (err) {
-    throw err;
-  }
+  const data = await TMDBAPI.get('/trending/:media_type/:time_window', {
+    params: {
+      media_type: MediaType.Person,
+      time_window: TimeWindow.Week,
+    },
+  });
+  return data.results as TrendingPeople[];
 }
 
 async function moviesData(): Promise<TrendingMovie[]> {
   logger.verbose('Movies from source not cache', {
     label: 'tmdb.trending',
   });
-  try {
-    const data = await TMDBAPI.get('/trending/:media_type/:time_window', {
-      params: {
-        media_type: MediaType.Movie,
-        time_window: TimeWindow.Week,
-      },
-    });
-    return data.results as TrendingMovie[];
-  } catch (err) {
-    throw err;
-  }
+  const data = await TMDBAPI.get('/trending/:media_type/:time_window', {
+    params: {
+      media_type: MediaType.Movie,
+      time_window: TimeWindow.Week,
+    },
+  });
+  return data.results as TrendingMovie[];
 }
 
 async function showsData(): Promise<TrendingTv[]> {
   logger.verbose('Shows from source not cache', {
     label: 'tmdb.trending',
   });
-  try {
-    const data = await TMDBAPI.get('/trending/:media_type/:time_window', {
-      params: {
-        media_type: MediaType.Tv,
-        time_window: TimeWindow.Week,
-      },
-    });
-    return data.results as TrendingTv[];
-  } catch (err) {
-    throw err;
-  }
+  const data = await TMDBAPI.get('/trending/:media_type/:time_window', {
+    params: {
+      media_type: MediaType.Tv,
+      time_window: TimeWindow.Week,
+    },
+  });
+  return data.results as TrendingTv[];
 }
