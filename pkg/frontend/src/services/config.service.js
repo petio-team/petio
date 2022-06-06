@@ -1,8 +1,8 @@
-import { get, post } from "../helpers";
-import store from "../redux/store.js";
+import { del, get, post } from '../helpers';
+import store from '../redux/store.js';
 
 export function checkConfig() {
-  return get("/config");
+  return get('/config');
 }
 
 export async function saveConfig(config) {
@@ -10,7 +10,7 @@ export async function saveConfig(config) {
     await post(`/setup/set`, config);
   } catch (e) {
     console.log(e);
-    throw "Error saving your config";
+    throw 'Error saving your config';
   }
 }
 
@@ -20,7 +20,7 @@ export async function testMongo(mongo) {
     return result.status;
   } catch (err) {
     console.log(err);
-    return "failed";
+    return 'failed';
   }
 }
 
@@ -30,57 +30,72 @@ export async function updateConfig(config) {
 
 export async function getConfig() {
   const data = await get(`/config/current`);
-  if (!data) throw "No data";
+  if (!data) throw 'No data';
   updateStore({
-    type: "user/get-config",
+    type: 'user/get-config',
     config: data,
   });
   return data;
 }
 
 export function getRadarr() {
-  return get("/services/radarr/config");
+  return get('/services/radarr/config');
+}
+
+export function deleteRadarr(uuid = '') {
+  if (!uuid) return;
+  return del(`/services/radarr/${uuid}`);
 }
 
 export function saveRadarrConfig(config) {
-  if (!config) throw "No config provided";
+  if (!config) throw 'No config provided';
 
   return post(`/services/radarr/config`, config);
 }
 
 export async function testRadarr(id) {
-  if (!id) throw "No ID";
+  if (!id) throw 'No ID';
   return get(`/services/radarr/test/${id}`);
 }
 
 export async function getRadarrOptions(id) {
-  let [paths, profiles, tags, languages] = await Promise.all([
-    get(`/services/radarr/paths/${id}`),
-    get(`/services/radarr/profiles/${id}`),
-    get(`/services/radarr/tags/${id}`),
-    get(`/services/radarr/languages/${id}`),
-  ]);
+  try {
+    let [paths, profiles, tags, languages] = await Promise.all([
+      get(`/services/radarr/paths/${id}`),
+      get(`/services/radarr/profiles/${id}`),
+      get(`/services/radarr/tags/${id}`),
+      get(`/services/radarr/languages/${id}`),
+    ]);
 
-  return {
-    paths,
-    profiles,
-    tags,
-    languages,
-  };
+    return {
+      paths,
+      profiles,
+      tags,
+      languages,
+    };
+  } catch (e) {
+    console.log(e);
+    throw e;
+  }
 }
 
 export function getSonarr() {
-  return get("/services/sonarr/config");
+  return get('/services/sonarr/config');
+}
+
+export function deleteSonarr(uuid = '') {
+  if (!uuid) return;
+  return del(`/services/sonarr/${uuid}`);
 }
 
 export function saveSonarrConfig(config) {
-  if (!config) throw "No config provided";
+  if (!config) throw 'No config provided';
 
   return post(`/services/sonarr/config`, config);
 }
 
 export async function testSonarr(id) {
-  if (!id) throw "No ID";
+  if (!id) throw 'No ID';
   return get(`/services/sonarr/test/${id}`);
 }
 

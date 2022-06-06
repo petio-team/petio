@@ -1,32 +1,32 @@
-import cookies from "js-cookie";
+import cookies from 'js-cookie';
 
-const isDev = process.env.NODE_ENV === "development";
+const isDev = process.env.NODE_ENV === 'development';
 const origin = isDev
-  ? "http://localhost:7777"
-  : typeof window === "undefined"
-  ? ""
+  ? 'http://localhost:7777'
+  : typeof window === 'undefined'
+  ? ''
   : `${window.location.protocol}//${window.location.host}`;
-const basePath = window.location.pathname.replace(/\/$/, "");
+const basePath = window.location.pathname.replace(/\/$/, '');
 const API_URL = `${origin}${basePath}/api`;
 
 function getCookie(cname) {
-  var name = cname + "=";
-  var decodedCookie = decodeURIComponent(cookies.get("petio_jwt"));
-  var ca = decodedCookie.split(";");
+  var name = cname + '=';
+  var decodedCookie = decodeURIComponent(cookies.get('petio_jwt'));
+  var ca = decodedCookie.split(';');
   for (var i = 0; i < ca.length; i++) {
     var c = ca[i];
-    while (c.charAt(0) === " ") {
+    while (c.charAt(0) === ' ') {
       c = c.substring(1);
     }
     if (c.indexOf(name) === 0) {
       return c.substring(name.length, c.length);
     }
   }
-  return "";
+  return '';
 }
 
 function maybeGetAuthHeader() {
-  let petioJwt = getCookie("petio_jwt");
+  let petioJwt = getCookie('petio_jwt');
   if (petioJwt) {
     return { Authorization: `Bearer ${petioJwt}` };
   } else {
@@ -49,15 +49,16 @@ function parseResponse(response) {
       .catch(() => response.text());
   }
   console.log(new HttpError(response.status));
-  return response
-    .clone()
-    .json()
-    .catch(() => response.text());
+  throw response.text();
+  // return response
+  //   .clone()
+  //   .json()
+  //   .catch(() => response.text());
 }
 
 export function get(path, options = {}) {
   const mergedOptions = {
-    credentials: "include",
+    credentials: 'include',
     ...options,
     headers: {
       ...maybeGetAuthHeader(),
@@ -69,11 +70,11 @@ export function get(path, options = {}) {
 
 export function post(path, data, options = {}) {
   const mergedOptions = {
-    credentials: "include",
-    method: "POST",
+    credentials: 'include',
+    method: 'POST',
     ...options,
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       ...maybeGetAuthHeader(),
       ...options.headers,
     },
@@ -84,11 +85,11 @@ export function post(path, data, options = {}) {
 
 export function put(path, data, options = {}) {
   const mergedOptions = {
-    credentials: "include",
-    method: "PUT",
+    credentials: 'include',
+    method: 'PUT',
     ...options,
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       ...maybeGetAuthHeader(),
       ...options.headers,
     },
@@ -99,8 +100,8 @@ export function put(path, data, options = {}) {
 
 export function del(path, options = {}) {
   const mergedOptions = {
-    credentials: "include",
-    method: "DELETE",
+    credentials: 'include',
+    method: 'DELETE',
     ...options,
     headers: {
       ...maybeGetAuthHeader(),
