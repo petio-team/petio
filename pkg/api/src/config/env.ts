@@ -21,3 +21,8 @@ export const adminView = path.join(VIEW_FOLDER, './admin');
 export const tmdbApiKey = '1af5ad19a2d972a67cd27eb033979c4c';
 // trunk-ignore(gitleaks/generic-api-key)
 export const fanartApiKey = 'ee409f6fb0c5cd2352e7a454d3f580d4';
+export const corsDomains = process.env.CORS_DOMAINS || '';
+
+export const IsDevelopment = (): boolean => {
+  return env === 'development';
+};

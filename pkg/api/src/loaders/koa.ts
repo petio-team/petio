@@ -7,7 +7,7 @@ import morgan from 'koa-morgan';
 import mount from 'koa-mount';
 
 import routes from '@/api/index';
-import { env } from '@/config/env';
+import { IsDevelopment, corsDomains } from '@/config/env';
 import { config } from '@/config/index';
 import logger from '@/loaders/logger';
 
@@ -69,12 +69,27 @@ export default ({ app }: { app: Koa }) => {
   );
 
   // Enable cors
-  app.use(
-    cors({
-      origin: env === 'development' ? 'http://localhost:3000' : 'origin',
-      credentials: true,
-    }),
-  );
+  const whitelist = corsDomains.split(',').map((domain) => domain.trim());
+  if (IsDevelopment()) {
+    // add local react dev
+    whitelist.push('http://localhost:3000');
+  }
+
+  const corsOptions = {
+    origin: async (ctx: Koa.Context): Promise<string> => {
+      if (
+        ctx.request.header.origin &&
+        whitelist.indexOf(ctx.request.header.origin) !== -1
+      ) {
+        return ctx.request.header.origin;
+      } else {
+        return 'http://localhost:7777';
+      }
+    },
+    credentials: true,
+  };
+
+  app.use(cors(corsOptions));
 
   // Enable body parsing
   app.use(koaBody());
