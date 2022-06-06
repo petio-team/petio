@@ -7,8 +7,6 @@ import { z } from 'zod';
 import { adminRequired } from '@/api/middleware/auth';
 import { GetRadarrInstanceFromDb } from '@/arr/radarr';
 import { GetSonarrInstanceFromDb } from '@/arr/sonarr';
-import Radarr from '@/downloaders/radarr';
-import Sonarr from '@/downloaders/sonarr';
 import logger from '@/loaders/logger';
 import {
   CreateOrUpdateDownloader,
@@ -338,7 +336,7 @@ const getSonarrConfig = async (ctx: Context) => {
         },
         path: {
           id: instance.path.id,
-          location: instance.path.id,
+          location: instance.path.location,
         },
         language: {
           id: instance.language.id,
@@ -596,7 +594,7 @@ const getRadarrConfig = async (ctx: Context) => {
         },
         path: {
           id: instance.path.id,
-          location: instance.path.id,
+          location: instance.path.location,
         },
         language: {
           id: instance.language.id,
