@@ -1,22 +1,25 @@
 import { useEffect } from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 import { Loading } from '../components/loading';
 import Meta from '../components/meta';
 import Request from '../components/request';
 import media from '../services/media.service';
 import { myRequests, myRequestsArchive } from '../services/user.service';
+import tableStyle from '../styles/components/table.module.scss';
 import typo from '../styles/components/typography.module.scss';
 import styles from '../styles/views/requests.module.scss';
 
 const mapStateToProps = (state) => {
   return {
     requests: state.user.myRequests,
+    requestsArchive: state.user.myRequestsArchive,
     currentUser: state.user.currentUser,
   };
 };
 
-function Requests({ requests, currentUser }) {
+function Requests({ requests, requestsArchive, currentUser }) {
   useEffect(() => {
     if (!currentUser.id) return;
     myRequests();
@@ -47,13 +50,11 @@ function Requests({ requests, currentUser }) {
           Active Requests
         </p>
         <div className={styles.grid}>
-          {requests && requests.length > 0 && currentUser ? (
+          {requests && requests.length > 0 ? (
             requests.map((request) => {
-              if (request.users.includes(currentUser.id.toString()))
-                return (
-                  <Request request={request} key={`request_${request._id}`} />
-                );
-              return null;
+              return (
+                <Request request={request} key={`request_${request._id}`} />
+              );
             })
           ) : (
             <p
@@ -66,7 +67,64 @@ function Requests({ requests, currentUser }) {
         <p className={`${typo.bold} ${typo.uppercase} ${typo.body}`}>
           Archive Requests
         </p>
-        <div className={styles.archive}>archive</div>
+        <div className={styles.archive}>
+          <table className={`${tableStyle.rounded} ${styles.table2}`}>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Approved</th>
+                <th>Removed</th>
+                <th>Complete</th>
+                <th>Reason for Removal</th>
+                <th>Date Added</th>
+              </tr>
+            </thead>
+            {requestsArchive && requestsArchive.length > 0 ? (
+              requestsArchive.map((request) => {
+                return (
+                  <tr key={request._id}>
+                    <td>
+                      <Link to={`/${request.type}/${request.requestId}`}>
+                        {request.title}
+                      </Link>
+                    </td>
+                    <td style={{ textTransform: 'capitalize' }}>
+                      {request.type}
+                    </td>
+                    <td>{request.approved ? 'Yes' : 'No'}</td>
+                    <td>{request.removed ? 'Yes' : 'No'}</td>
+                    <td>{request.complete ? 'Yes' : 'No'}</td>
+                    <td>
+                      {request.removed_reason !== 'false'
+                        ? request.removed_reason
+                        : 'None'}
+                    </td>
+                    <td>
+                      {request.timeStamp
+                        ? `${new Date(
+                            request.timeStamp,
+                          ).getFullYear()}/${new Date(
+                            request.timeStamp,
+                          ).getMonth()}/${new Date(
+                            request.timeStamp,
+                          ).getDate()} ${new Date(
+                            request.timeStamp,
+                          ).getHours()}:${new Date(
+                            request.timeStamp,
+                          ).getMinutes()}`
+                        : 'N/A'}
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td>You don't have any archive requests</td>
+              </tr>
+            )}
+          </table>
+        </div>
       </div>
     </div>
   );
