@@ -43,7 +43,7 @@ const ArrInputSchema = z.array(
       }
       return parsed;
     }),
-    subpath: z.string().default('/'),
+    subpath: z.string().default('/').min(1),
     path: z.object({
       id: z.number(),
       location: z.string(),
