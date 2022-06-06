@@ -654,7 +654,7 @@ const updateRadarrConfig = async (ctx: Context) => {
     ctx.body = results;
     return;
   } catch (err) {
-    logger.log('error', `ROUTE: Error saving sonarr config`);
+    logger.log('error', `ROUTE: Error saving radarr config`);
     logger.log({ level: 'error', message: err });
 
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
