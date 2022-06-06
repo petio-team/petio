@@ -80,49 +80,51 @@ function Requests({ requests, requestsArchive, currentUser }) {
                 <th>Date Added</th>
               </tr>
             </thead>
-            {requestsArchive && requestsArchive.length > 0 ? (
-              requestsArchive.map((request) => {
-                return (
-                  <tr key={request._id}>
-                    <td>
-                      <Link to={`/${request.type}/${request.requestId}`}>
-                        {request.title}
-                      </Link>
-                    </td>
-                    <td style={{ textTransform: 'capitalize' }}>
-                      {request.type}
-                    </td>
-                    <td>{request.approved ? 'Yes' : 'No'}</td>
-                    <td>{request.removed ? 'Yes' : 'No'}</td>
-                    <td>{request.complete ? 'Yes' : 'No'}</td>
-                    <td>
-                      {request.removed_reason !== 'false'
-                        ? request.removed_reason
-                        : 'None'}
-                    </td>
-                    <td>
-                      {request.timeStamp
-                        ? `${new Date(
-                            request.timeStamp,
-                          ).getFullYear()}/${new Date(
-                            request.timeStamp,
-                          ).getMonth()}/${new Date(
-                            request.timeStamp,
-                          ).getDate()} ${new Date(
-                            request.timeStamp,
-                          ).getHours()}:${new Date(
-                            request.timeStamp,
-                          ).getMinutes()}`
-                        : 'N/A'}
-                    </td>
-                  </tr>
-                );
-              })
-            ) : (
-              <tr>
-                <td>You don't have any archive requests</td>
-              </tr>
-            )}
+            <tbody>
+              {requestsArchive && requestsArchive.length > 0 ? (
+                requestsArchive.map((request) => {
+                  return (
+                    <tr key={request._id}>
+                      <td>
+                        <Link to={`/${request.type}/${request.requestId}`}>
+                          {request.title}
+                        </Link>
+                      </td>
+                      <td style={{ textTransform: 'capitalize' }}>
+                        {request.type}
+                      </td>
+                      <td>{request.approved ? 'Yes' : 'No'}</td>
+                      <td>{request.removed ? 'Yes' : 'No'}</td>
+                      <td>{request.complete ? 'Yes' : 'No'}</td>
+                      <td>
+                        {request.removed_reason !== 'false'
+                          ? request.removed_reason
+                          : 'None'}
+                      </td>
+                      <td>
+                        {request.timeStamp
+                          ? `${new Date(
+                              request.timeStamp,
+                            ).getFullYear()}/${new Date(
+                              request.timeStamp,
+                            ).getMonth()}/${new Date(
+                              request.timeStamp,
+                            ).getDate()} ${new Date(
+                              request.timeStamp,
+                            ).getHours()}:${new Date(
+                              request.timeStamp,
+                            ).getMinutes()}`
+                          : 'N/A'}
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td>You don't have any archive requests</td>
+                </tr>
+              )}
+            </tbody>
           </table>
         </div>
       </div>
