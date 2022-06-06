@@ -22,7 +22,7 @@ export const TrendingMovieSchema = z.object({
   release_date: z.string(),
   title: z.string(),
   adult: z.boolean(),
-  backdrop_path: z.string(),
+  backdrop_path: z.string().or(z.null()),
   vote_count: z.number(),
   genre_ids: z.array(z.number()),
   vote_average: z.number(),
@@ -33,7 +33,7 @@ export const TrendingMovieSchema = z.object({
 export type TrendingMovie = z.infer<typeof TrendingMovieSchema>;
 
 export const TrendingTvSchema = z.object({
-  backdrop_path: z.string(),
+  backdrop_path: z.string().or(z.null()),
   first_air_date: z.string(),
   genre_ids: z.array(z.number()),
   id: z.number(),
@@ -69,7 +69,7 @@ export const TrendingPeopleSchema = z.object({
       overview: z.string(),
       id: z.number(),
       adult: z.boolean().optional(),
-      backdrop_path: z.string(),
+      backdrop_path: z.string().or(z.null()),
       media_type: z.string(),
     }),
   ),
