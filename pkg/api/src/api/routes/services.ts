@@ -359,6 +359,7 @@ const updateSonarrConfig = async (ctx: Context) => {
   let data = ctx.request.body as ArrInput;
 
   try {
+    const results: IDownloader[] = [];
     for (const instance of data) {
       if (instance.subpath.startsWith('/')) {
         instance.subpath = instance.subpath.substring(1);
@@ -374,7 +375,7 @@ const updateSonarrConfig = async (ctx: Context) => {
           instance.subpath,
       );
 
-      await CreateOrUpdateDownloader({
+      const newInstance = await CreateOrUpdateDownloader({
         name: instance.name,
         type: DownloaderType.Sonarr,
         url: url.toString(),
@@ -384,10 +385,12 @@ const updateSonarrConfig = async (ctx: Context) => {
         language: instance.language,
         enabled: instance.enabled,
       });
+
+      results.push(newInstance);
     }
 
     ctx.status = StatusCodes.OK;
-    ctx.body = data;
+    ctx.body = results;
     return;
   } catch (err) {
     logger.log('error', `ROUTE: Error saving sonarr config`);
