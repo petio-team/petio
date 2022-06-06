@@ -22,7 +22,7 @@ export const SystemStatusSchema = z.object({
   branch: z.string(),
   authentication: z.string(),
   databaseType: z.string(),
-  databaseVersion: z.string(),
+  databaseVersion: z.string().optional(),
   migrationVersion: z.number(),
   urlBase: z.string(),
   runtimeVersion: z.string(),
