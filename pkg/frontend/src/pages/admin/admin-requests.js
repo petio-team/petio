@@ -171,7 +171,7 @@ function AdminRequests({
   async function removeReq(request, reason = false) {
     if (!request) return;
     try {
-      setRequestsToRemove([...requestsToRemove, request.id]);
+      setRequestsToRemove([...requestsToRemove, request.requestId]);
       await deleteRequest(request, reason);
       getRequests();
       setRequestEdit(false);
@@ -190,7 +190,7 @@ function AdminRequests({
 
   async function updateReq(request, radarr, sonarr) {
     try {
-      let servers = {};
+      let servers = [];
       let type_server = {};
       if (request.type === 'tv') {
         type_server = sonarr;
@@ -202,7 +202,7 @@ function AdminRequests({
           let server = type_server[r];
           if (server.active) {
             if (server.profile && server.path && server.language) {
-              servers[r] = server;
+              servers.push(server);
             } else {
               throw 'Missing Path / Profile / Language';
             }
@@ -499,10 +499,11 @@ function ActiveRequestsTable({
       </div>
 
       {requestsSorted.map((request) => {
-        let id = request.id;
+        let id = request.requestId;
         let poster = false;
         let releaseDate = false;
         let logo = false;
+        console.log(request);
         if (request.type === 'movie' && redux_movies[id]) {
           poster = redux_movies[id].backdrop_path;
           releaseDate = redux_movies[id].release_date;
@@ -516,11 +517,11 @@ function ActiveRequestsTable({
         return (
           <div
             className={`${styles.requests__item} ${
-              requestsToRemove && requestsToRemove.includes(request.id)
+              requestsToRemove && requestsToRemove.includes(id)
                 ? styles.requests__item__tbr
                 : ''
             }`}
-            key={`request_item_${request.type}_${request.id}`}
+            key={`request_item_${request.type}_${id}`}
           >
             <div
               className={
@@ -534,7 +535,7 @@ function ActiveRequestsTable({
             <div className={styles.requests__table__tr}>
               <div className={styles.requests__table__td}>
                 <Link
-                  to={`/${request.requestType}/${request.id}`}
+                  to={`/${request.requestType}/${id}`}
                   className={styles.requests__item__img__wrap}
                 >
                   <div className={styles.requests__item__img}>
@@ -619,7 +620,7 @@ function ActiveRequestsTable({
 
                   return (
                     <div
-                      key={`request_item_${request.type}_${request.id}_${userId}_${i}`}
+                      key={`request_item_${request.type}_${id}_${userId}_${i}`}
                       className={styles.requests__item__usr}
                       style={{ cursor: 'help' }}
                       title={user.title || ''}
@@ -889,7 +890,7 @@ function RequestModal({
             Edit Request: {request.title}
           </p>
         </div>
-        <div className={modal.content}>
+        <div className={modal.content} style={{ display: 'block' }}>
           {request ? (
             <>
               {request.type === 'tv' && !request.tvdb_id ? (
@@ -919,7 +920,7 @@ function RequestModal({
                       sonarrServers.map((server) => {
                         return (
                           <RenderRequestEdit
-                            key={`req_m_${request.id}_${server.id}`}
+                            key={`req_m_${request.requestId}_${server.id}`}
                             server={server}
                             request={request}
                             type="sonarr"
@@ -936,7 +937,7 @@ function RequestModal({
                     radarrServers.map((server) => {
                       return (
                         <RenderRequestEdit
-                          key={`req_m_${request.id}_${server.id}`}
+                          key={`req_m_${request.requestId}_${server.id}`}
                           server={server}
                           request={request}
                           type="radarr"
@@ -1010,7 +1011,7 @@ function RenderRequestEdit({
 
   return (
     <div
-      className="request-edit--server--wrap"
+      className={styles.requestEdit__server__wrap}
       key={`${type}_server_${server.id}`}
     >
       <p className={`${typo.body} ${typo.bold} ${styles.requestEdit__server}`}>

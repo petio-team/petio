@@ -825,6 +825,10 @@
 
   &__server {
     margin-bottom: $spacing;
+
+    &__wrap {
+      margin-bottom: #{$spacing * 2};
+    }
   }
 
   &__label {
