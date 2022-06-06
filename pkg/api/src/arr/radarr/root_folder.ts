@@ -7,7 +7,9 @@ export const RootFolderSchema = z.array(
     path: z.string(),
     accessible: z.boolean(),
     freeSpace: z.number(),
-    unmappedFolders: z.array(z.object({ name: z.string(), path: z.string() })),
+    unmappedFolders: z
+      .array(z.object({ name: z.string(), path: z.string() }))
+      .optional(),
   }),
 );
 export type RootFolder = z.infer<typeof RootFolderSchema>;
