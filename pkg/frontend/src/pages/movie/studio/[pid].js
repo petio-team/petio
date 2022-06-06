@@ -1,49 +1,80 @@
-import media from "../../../services/media.service";
+import { useEffect, useState } from 'react';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/opacity.css';
+import { useParams } from 'react-router-dom';
 
-import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { LazyLoadImage } from "react-lazy-load-image-component";
-import "react-lazy-load-image-component/src/effects/opacity.css";
-
-import { Loading } from "../../../components/loading";
-import Meta from "../../../components/meta";
-import Hero from "../../../components/hero";
-import Grid from "../../../components/grid";
-
-import hero from "../../../styles/components/hero.module.scss";
-import styles from "../../../styles/views/company.module.scss";
-import NotFound from "../../404";
+import NotFound from '../../404';
+import Grid from '../../../components/grid';
+import Hero from '../../../components/hero';
+import { Loading } from '../../../components/loading';
+import Meta from '../../../components/meta';
+import media from '../../../services/media.service';
+import hero from '../../../styles/components/hero.module.scss';
+import styles from '../../../styles/views/company.module.scss';
 
 export default function Studio({ newNotification }) {
   const [coData, setCoData] = useState(null);
   const [movies, setMovies] = useState(false);
-  // const [total, setTotal] = useState(1);
+  const [total, setTotal] = useState(1);
   const [featuredMovie, setFeaturedMovie] = useState(false);
   const { pid } = useParams();
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [query, setQuery] = useState(null);
 
   useEffect(() => {
     async function getCoDetails() {
       try {
         const movieData = await media.getCompany(pid);
-        const moviesLookup = await media.lookup("movie", 1, {
+        const moviesLookup = await media.lookup('movie', 1, {
           with_companies: pid,
         });
         setCoData(movieData);
+        setQuery({
+          with_companies: pid,
+        });
         setMovies(moviesLookup.results);
-        // setTotal(moviesLookup.totalPages);
+        setTotal(moviesLookup.totalPages);
         setFeaturedMovie(moviesLookup.results[0]);
       } catch (e) {
         console.log(e);
-        setCoData("error");
+        setCoData('error');
       }
     }
 
     getCoDetails();
   }, [pid]);
 
+  useEffect(() => {
+    async function loadMore() {
+      if (loadingMore || !query || page === total) return;
+      setLoadingMore(true);
+      const moviesLookup = await media.lookup('movie', page + 1, query);
+      setMovies([...movies, ...moviesLookup.results]);
+      setPage(page + 1);
+      setLoadingMore(false);
+    }
+
+    function handleScroll() {
+      if (
+        window.innerHeight * 2 + window.scrollY >=
+        document.body.offsetHeight
+      ) {
+        // you're at the bottom of the page
+        loadMore();
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [loadingMore, query, page, total, movies]);
+
   if (!coData) return <Loading />;
 
-  if (coData === "error") return <NotFound />;
+  if (coData === 'error') return <NotFound />;
 
   return (
     <div className={styles.wrap} key={`company_single_${pid}`}>
