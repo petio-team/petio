@@ -92,7 +92,7 @@ function AdminUsers({ redux_users }) {
                   ? findProfile(user.profile)
                   : { name: 'default' };
                 return (
-                  <tr key={user._id}>
+                  <tr key={user.id}>
                     <td>
                       <div className={inputs.checkboxes__item}>
                         <input type="checkbox" style={{ margin: 0 }} />

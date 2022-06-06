@@ -1,28 +1,29 @@
-import Meta from "../../components/meta";
-import { connect } from "react-redux";
-import { useEffect, useState } from "react";
-import media from "../../services/media.service";
-import styles from "../../styles/views/admin.module.scss";
-import typo from "../../styles/components/typography.module.scss";
-import input from "../../styles/components/input.module.scss";
-import modal from "../../styles/components/modal.module.scss";
-import buttons from "../../styles/components/button.module.scss";
-import { Link } from "react-router-dom";
-import { LazyLoadImage } from "react-lazy-load-image-component";
-import {
-  deleteRequest,
-  getRequests,
-  updateRequest,
-} from "../../services/user.service";
-import { ReactComponent as ArrowIcon } from "../../assets/svg/arrow.svg";
-import { ReactComponent as WarningIcon } from "../../assets/svg/warning.svg";
-import { ReactComponent as Spinner } from "../../assets/svg/spinner.svg";
+import { useEffect, useState } from 'react';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
+
+import { ReactComponent as ArrowIcon } from '../../assets/svg/arrow.svg';
+import { ReactComponent as Spinner } from '../../assets/svg/spinner.svg';
+import { ReactComponent as WarningIcon } from '../../assets/svg/warning.svg';
+import Meta from '../../components/meta';
 import {
   getRadarr,
   getRadarrOptions,
   getSonarr,
   getSonarrOptions,
-} from "../../services/config.service";
+} from '../../services/config.service';
+import media from '../../services/media.service';
+import {
+  deleteRequest,
+  getRequests,
+  updateRequest,
+} from '../../services/user.service';
+import buttons from '../../styles/components/button.module.scss';
+import input from '../../styles/components/input.module.scss';
+import modal from '../../styles/components/modal.module.scss';
+import typo from '../../styles/components/typography.module.scss';
+import styles from '../../styles/views/admin.module.scss';
 
 const mapStateToProps = (state) => {
   return {
@@ -68,17 +69,17 @@ function AdminRequests({
         if (radarr) {
           await Promise.all(
             radarr.map(async (server) => {
-              let options = await getArrOptions(server.uuid, "radarr");
+              let options = await getArrOptions(server.id, 'radarr');
               server.options = options;
-            })
+            }),
           );
         }
         if (sonarr) {
           await Promise.all(
             sonarr.map(async (server) => {
-              let options = await getArrOptions(server.uuid, "sonarr");
+              let options = await getArrOptions(server.id, 'sonarr');
               server.options = options;
-            })
+            }),
           );
         }
         setRadarrServers(radarr);
@@ -91,12 +92,12 @@ function AdminRequests({
       }
     }
 
-    async function getArrOptions(uuid, type) {
+    async function getArrOptions(id, type) {
       try {
         let settings =
-          type === "radarr"
-            ? await getRadarrOptions(uuid)
-            : await getSonarrOptions(uuid);
+          type === 'radarr'
+            ? await getRadarrOptions(id)
+            : await getSonarrOptions(id);
         if (settings.profiles.error || settings.paths.error) {
           return;
         }
@@ -123,25 +124,25 @@ function AdminRequests({
     if (!requests) return;
     Object.keys(requests).forEach((id) => {
       let item = requests[id];
-      if (item.type === "movie") {
+      if (item.type === 'movie') {
         data.push({
           ...item,
           id: id,
-          requestType: "movie",
+          requestType: 'movie',
           year: redux_movies[id]
             ? new Date(redux_movies[id].release_date).getFullYear()
-            : "unknown",
+            : 'unknown',
         });
       }
 
-      if (item.type === "tv") {
+      if (item.type === 'tv') {
         data.push({
           ...item,
           id: id,
-          requestType: "tv",
+          requestType: 'tv',
           year: redux_tv[id]
             ? new Date(redux_tv[id].first_air_date).getFullYear()
-            : "unknown",
+            : 'unknown',
         });
       }
     });
@@ -150,8 +151,8 @@ function AdminRequests({
     let movie = [];
     Object.keys(requests).forEach((id) => {
       const request = requests[id];
-      if (request.type === "movie" && !redux_movies[id]) movie.push(id);
-      if (request.type === "tv" && !redux_tv[id]) tv.push(id);
+      if (request.type === 'movie' && !redux_movies[id]) movie.push(id);
+      if (request.type === 'tv' && !redux_tv[id]) tv.push(id);
     });
 
     if (!requestsLookup) lookups(tv, movie);
@@ -159,8 +160,8 @@ function AdminRequests({
     async function lookups(tv, movie) {
       setRequestsLookup(true);
       await Promise.all(
-        [media.batchLookup(tv, "tv", false)],
-        [media.batchLookup(movie, "movie", false)]
+        [media.batchLookup(tv, 'tv', false)],
+        [media.batchLookup(movie, 'movie', false)],
       );
       setRequestsLookup(false);
     }
@@ -175,12 +176,12 @@ function AdminRequests({
       getRequests();
       setRequestEdit(false);
       newNotification({
-        type: "success",
+        type: 'success',
         message: `Request: ${request.title} removed`,
       });
     } catch (e) {
       newNotification({
-        type: "error",
+        type: 'error',
         message: `Failed to remove request: ${request.title}`,
       });
       console.log(e);
@@ -191,7 +192,7 @@ function AdminRequests({
     try {
       let servers = {};
       let type_server = {};
-      if (request.type === "tv") {
+      if (request.type === 'tv') {
         type_server = sonarr;
       } else {
         type_server = radarr;
@@ -203,18 +204,18 @@ function AdminRequests({
             if (server.profile && server.path && server.language) {
               servers[r] = server;
             } else {
-              throw "Missing Path / Profile / Language";
+              throw 'Missing Path / Profile / Language';
             }
           }
         });
       }
 
-      if (request.type === "tv" && servers && !request.tvdb_id) {
-        throw "No TVDb ID Cannot add to Sonarr";
+      if (request.type === 'tv' && servers && !request.tvdb_id) {
+        throw 'No TVDb ID Cannot add to Sonarr';
       }
 
-      if (request.type === "movie" && servers && !request.tmdb_id) {
-        throw "No TMDb ID Cannot add to Radarr";
+      if (request.type === 'movie' && servers && !request.tmdb_id) {
+        throw 'No TMDb ID Cannot add to Radarr';
       }
 
       let title = request.title;
@@ -225,18 +226,18 @@ function AdminRequests({
         setRequestEdit(false);
         getRequests(false);
         newNotification({
-          type: "success",
+          type: 'success',
           message: approved
             ? `Request Updated: ${title}`
             : `Request Approved: ${title}`,
         });
       } catch (e) {
         console.log(e);
-        throw "Error updating request";
+        throw 'Error updating request';
       }
     } catch (e) {
       newNotification({
-        type: "error",
+        type: 'error',
         message: e,
       });
     }
@@ -290,8 +291,8 @@ function ActiveRequestsTable({
   loading,
 }) {
   const [sortValue, setSortValue] = useState({
-    sortBy: "status",
-    dir: "DESC",
+    sortBy: 'status',
+    dir: 'DESC',
   });
 
   if (!requests) return null;
@@ -300,61 +301,61 @@ function ActiveRequestsTable({
     let sortVal = sortValue.sortBy;
     let av = a[sortVal];
     let bv = b[sortVal];
-    if (sortVal === "status") {
+    if (sortVal === 'status') {
       av = a.process_stage ? a.process_stage.message : 0;
       bv = b.process_stage ? b.process_stage.message : 0;
       if (
-        a.type === "movie" &&
+        a.type === 'movie' &&
         a.children &&
-        a.process_stage.message === "In Cinemas"
+        a.process_stage.message === 'In Cinemas'
       ) {
-        av = "__0inCinema";
+        av = '__0inCinema';
       }
       if (
-        b.type === "movie" &&
+        b.type === 'movie' &&
         b.children &&
-        b.process_stage.message === "In Cinemas"
+        b.process_stage.message === 'In Cinemas'
       ) {
-        bv = "__0inCinema";
+        bv = '__0inCinema';
       }
       if (
-        a.type === "movie" &&
+        a.type === 'movie' &&
         a.children &&
-        a.process_stage.status === "blue"
+        a.process_stage.status === 'blue'
       ) {
         if (a.children[0].info.inCinemas) {
           av = `__${a.children[0].info.inCinemas}`;
         }
       }
       if (
-        b.type === "movie" &&
+        b.type === 'movie' &&
         b.children &&
-        b.process_stage.status === "blue"
+        b.process_stage.status === 'blue'
       ) {
         if (b.children[0].info.inCinemas) {
           bv = `__${b.children[0].info.inCinemas}`;
         }
       }
-      if (a.type === "tv" && a.children && a.process_stage.status === "blue") {
+      if (a.type === 'tv' && a.children && a.process_stage.status === 'blue') {
         if (a.children[0].info.firstAired) {
           av = `__${a.children[0].info.firstAired}`;
         }
       }
-      if (b.type === "tv" && b.children && b.process_stage.status === "blue") {
+      if (b.type === 'tv' && b.children && b.process_stage.status === 'blue') {
         if (b.children[0].info.firstAired) {
           bv = `__${b.children[0].info.firstAired}`;
         }
       }
     }
-    if (!av) av = "";
-    if (!bv) bv = "";
-    if (typeof av === "string") av = av.toLowerCase();
-    if (typeof bv === "string") bv = bv.toLowerCase();
+    if (!av) av = '';
+    if (!bv) bv = '';
+    if (typeof av === 'string') av = av.toLowerCase();
+    if (typeof bv === 'string') bv = bv.toLowerCase();
     if (av > bv) {
-      return sortValue.dir === "DESC" ? 1 : -1;
+      return sortValue.dir === 'DESC' ? 1 : -1;
     }
     if (av < bv) {
-      return sortValue.dir === "DESC" ? -1 : 1;
+      return sortValue.dir === 'DESC' ? -1 : 1;
     }
     return 0;
   }
@@ -362,7 +363,7 @@ function ActiveRequestsTable({
   function sortCol(type) {
     if (!type) return;
     let sw = sortValue.sortBy === type ? true : false;
-    let dir = sw ? (sortValue.dir === "DESC" ? "ASC" : "DESC") : "DESC";
+    let dir = sw ? (sortValue.dir === 'DESC' ? 'ASC' : 'DESC') : 'DESC';
     setSortValue({
       dir: dir,
       sortBy: type,
@@ -378,9 +379,9 @@ function ActiveRequestsTable({
             `requests__item__status__item__${request.process_stage.status}`
           ]
         }`}
-        title={request.process_stage.message || ""}
+        title={request.process_stage.message || ''}
         data-status={request.process_stage.status}
-        style={{ cursor: "help" }}
+        style={{ cursor: 'help' }}
       >
         {request.process_stage.message}
       </span>
@@ -407,15 +408,15 @@ function ActiveRequestsTable({
         </div>
         <div
           className={`${styles.requests__table__th} ${styles.requests__table__th__sortable} ${typo.body} ${typo.bold}`}
-          onClick={() => sortCol("title")}
+          onClick={() => sortCol('title')}
         >
           Title
           <ArrowIcon
             className={`${styles.requests__table__th__arrow}
               ${
-                sortValue.sortBy !== "title"
-                  ? ""
-                  : sortValue.dir === "DESC"
+                sortValue.sortBy !== 'title'
+                  ? ''
+                  : sortValue.dir === 'DESC'
                   ? styles.requests__table__th__arrow__down
                   : styles.requests__table__th__arrow__up
               }`}
@@ -423,15 +424,15 @@ function ActiveRequestsTable({
         </div>
         <div
           className={`${styles.requests__table__th} ${styles.requests__table__th__sortable} ${typo.body} ${typo.bold}`}
-          onClick={() => sortCol("year")}
+          onClick={() => sortCol('year')}
         >
           Year
           <ArrowIcon
             className={`${styles.requests__table__th__arrow}
               ${
-                sortValue.sortBy !== "year"
-                  ? ""
-                  : sortValue.dir === "DESC"
+                sortValue.sortBy !== 'year'
+                  ? ''
+                  : sortValue.dir === 'DESC'
                   ? styles.requests__table__th__arrow__down
                   : styles.requests__table__th__arrow__up
               }`}
@@ -439,15 +440,15 @@ function ActiveRequestsTable({
         </div>
         <div
           className={`${styles.requests__table__th} ${styles.requests__table__th__sortable} ${typo.body} ${typo.bold}`}
-          onClick={() => sortCol("type")}
+          onClick={() => sortCol('type')}
         >
           Type
           <ArrowIcon
             className={`${styles.requests__table__th__arrow}
               ${
-                sortValue.sortBy !== "type"
-                  ? ""
-                  : sortValue.dir === "DESC"
+                sortValue.sortBy !== 'type'
+                  ? ''
+                  : sortValue.dir === 'DESC'
                   ? styles.requests__table__th__arrow__down
                   : styles.requests__table__th__arrow__up
               }`}
@@ -455,15 +456,15 @@ function ActiveRequestsTable({
         </div>
         <div
           className={`${styles.requests__table__th} ${styles.requests__table__th__sortable} ${typo.body} ${typo.bold}`}
-          onClick={() => sortCol("status")}
+          onClick={() => sortCol('status')}
         >
           Status
           <ArrowIcon
             className={`${styles.requests__table__th__arrow}
               ${
-                sortValue.sortBy !== "status"
-                  ? ""
-                  : sortValue.dir === "DESC"
+                sortValue.sortBy !== 'status'
+                  ? ''
+                  : sortValue.dir === 'DESC'
                   ? styles.requests__table__th__arrow__down
                   : styles.requests__table__th__arrow__up
               }`}
@@ -476,15 +477,15 @@ function ActiveRequestsTable({
         </div>
         <div
           className={`${styles.requests__table__th} ${styles.requests__table__th__sortable} ${typo.body} ${typo.bold}`}
-          onClick={() => sortCol("approved")}
+          onClick={() => sortCol('approved')}
         >
           Approved
           <ArrowIcon
             className={`${styles.requests__table__th__arrow}
               ${
-                sortValue.sortBy !== "approved"
-                  ? ""
-                  : sortValue.dir === "DESC"
+                sortValue.sortBy !== 'approved'
+                  ? ''
+                  : sortValue.dir === 'DESC'
                   ? styles.requests__table__th__arrow__down
                   : styles.requests__table__th__arrow__up
               }`}
@@ -502,12 +503,12 @@ function ActiveRequestsTable({
         let poster = false;
         let releaseDate = false;
         let logo = false;
-        if (request.type === "movie" && redux_movies[id]) {
+        if (request.type === 'movie' && redux_movies[id]) {
           poster = redux_movies[id].backdrop_path;
           releaseDate = redux_movies[id].release_date;
           logo = redux_movies[id].logo;
         }
-        if (request.type === "tv" && redux_tv[id]) {
+        if (request.type === 'tv' && redux_tv[id]) {
           poster = redux_tv[id].backdrop_path;
           releaseDate = redux_tv[id].first_air_date;
           logo = redux_tv[id].logo;
@@ -517,7 +518,7 @@ function ActiveRequestsTable({
             className={`${styles.requests__item} ${
               requestsToRemove && requestsToRemove.includes(request.id)
                 ? styles.requests__item__tbr
-                : ""
+                : ''
             }`}
             key={`request_item_${request.type}_${request.id}`}
           >
@@ -551,14 +552,14 @@ function ActiveRequestsTable({
                       />
                     ) : (
                       <p className={`${typo.body} ${typo.bold}`}>
-                        {request.title || ""}
+                        {request.title || ''}
                       </p>
                     )}
                     {poster ? (
                       <LazyLoadImage
                         className={styles.requests__item__img__image}
                         src={`https://image.tmdb.org/t/p/w500${poster}`}
-                        alt={request.title || ""}
+                        alt={request.title || ''}
                       />
                     ) : null}
                   </div>
@@ -570,18 +571,18 @@ function ActiveRequestsTable({
               <div className={styles.requests__table__td}>
                 <p
                   className={`${typo.body} ${typo.medium}`}
-                  style={{ cursor: "help" }}
-                  title={releaseDate || ""}
+                  style={{ cursor: 'help' }}
+                  title={releaseDate || ''}
                 >
                   {releaseDate
                     ? new Date(releaseDate).getFullYear()
-                    : "Unknown"}
+                    : 'Unknown'}
                 </p>
               </div>
               <div className={styles.requests__table__td}>
                 <p
                   className={`${typo.body} ${typo.medium}`}
-                  style={{ textTransform: "capitalize" }}
+                  style={{ textTransform: 'capitalize' }}
                 >
                   {request.type}
                 </p>
@@ -594,7 +595,7 @@ function ActiveRequestsTable({
                   <span
                     className={`${styles.requests__item__status__item} ${styles.requests__item__status__item__sonarr}`}
                     title="Sonarr"
-                    style={{ cursor: "help" }}
+                    style={{ cursor: 'help' }}
                   >
                     Sonarr
                   </span>
@@ -603,7 +604,7 @@ function ActiveRequestsTable({
                   <span
                     className={`${styles.requests__item__status__item} ${styles.requests__item__status__item__radarr}`}
                     title="Radarr"
-                    style={{ cursor: "help" }}
+                    style={{ cursor: 'help' }}
                   >
                     Radarr
                   </span>
@@ -620,10 +621,10 @@ function ActiveRequestsTable({
                     <div
                       key={`request_item_${request.type}_${request.id}_${userId}_${i}`}
                       className={styles.requests__item__usr}
-                      style={{ cursor: "help" }}
-                      title={user.title || ""}
+                      style={{ cursor: 'help' }}
+                      title={user.title || ''}
                     >
-                      {user.thumbnail && user.thumbnail !== "false" ? (
+                      {user.thumbnail && user.thumbnail !== 'false' ? (
                         <LazyLoadImage
                           className={styles.requests__item__usr__image}
                           src={user.thumbnail}
@@ -641,12 +642,12 @@ function ActiveRequestsTable({
                   className={`${styles.requests__item__approved} ${
                     styles[
                       `requests__item__approved__${
-                        request.approved ? "yes" : "no"
+                        request.approved ? 'yes' : 'no'
                       }`
                     ]
                   }`}
                 >
-                  {request.approved ? "Y" : "N"}
+                  {request.approved ? 'Y' : 'N'}
                 </div>
               </div>
               <div className={styles.requests__table__td}>
@@ -704,14 +705,14 @@ function RequestChildren({ request }) {
                 <div className={styles.requests__item__child__status}>
                   <p
                     className={`${typo.small}`}
-                    style={{ textTransform: "capitalize" }}
+                    style={{ textTransform: 'capitalize' }}
                   >
                     <strong>Status:</strong> {child.status}
                   </p>
                 </div>
                 <div className={styles.requests__item__child__eta}>
                   <p className={`${typo.small}`}>
-                    <strong>ETA:</strong> {child.timeleft || "-"}
+                    <strong>ETA:</strong> {child.timeleft || '-'}
                   </p>
                 </div>
                 <div className={styles.requests__item__child__progress}>
@@ -764,23 +765,23 @@ function RequestModal({
     let edit_sonarr = {};
     if (!request) return;
 
-    if (request.type === "movie") {
+    if (request.type === 'movie') {
       if (request.radarrId.length > 0) {
         request.radarrId.forEach((r, i) => {
-          let uuid = Object.keys(r)[0];
+          let id = Object.keys(r)[0];
           let child =
             request.children && request.children[i]
               ? request.children[i].info
               : {};
           let path = false;
           if (child.path) {
-            if (child.path.lastIndexOf("/") > 0) {
-              path = child.path.substring(0, child.path.lastIndexOf("/"));
-            } else if (child.path.lastIndexOf("\\") > 0) {
-              path = child.path.substring(0, child.path.lastIndexOf("\\"));
+            if (child.path.lastIndexOf('/') > 0) {
+              path = child.path.substring(0, child.path.lastIndexOf('/'));
+            } else if (child.path.lastIndexOf('\\') > 0) {
+              path = child.path.substring(0, child.path.lastIndexOf('\\'));
             }
           }
-          edit_radarr[uuid] = {
+          edit_radarr[id] = {
             active: true,
             profile: child.qualityProfileId ? child.qualityProfileId : false,
             path: path,
@@ -789,9 +790,9 @@ function RequestModal({
       } else {
         if (request.defaults) {
           Object.keys(request.defaults).forEach((s) => {
-            let uuid = s;
+            let id = s;
             let server = request.defaults[s];
-            edit_radarr[uuid] = {
+            edit_radarr[id] = {
               active: true,
               profile: server.profile,
               path: server.path,
@@ -800,10 +801,10 @@ function RequestModal({
         }
       }
     }
-    if (request.type === "tv") {
+    if (request.type === 'tv') {
       if (request.sonarrId.length > 0) {
         request.sonarrId.forEach((r, i) => {
-          let uuid = Object.keys(r)[0];
+          let id = Object.keys(r)[0];
           let child =
             request.children && request.children[i]
               ? request.children[i].info
@@ -812,7 +813,7 @@ function RequestModal({
           if (child.rootFolderPath) {
             path = child.rootFolderPath.slice(0, -1);
           }
-          edit_sonarr[uuid] = {
+          edit_sonarr[id] = {
             active: true,
             profile: child.qualityProfileId ? child.qualityProfileId : false,
             path: path,
@@ -821,9 +822,9 @@ function RequestModal({
       } else {
         if (request.defaults) {
           Object.keys(request.defaults).forEach((s) => {
-            let uuid = s;
+            let id = s;
             let server = request.defaults[s];
-            edit_sonarr[uuid] = {
+            edit_sonarr[id] = {
               active: true,
               profile: server.profile,
               path: server.path,
@@ -847,11 +848,11 @@ function RequestModal({
   function changeServerSettings(e) {
     const target = e.target;
     const name = target.name;
-    let value = target.type === "checkbox" ? target.checked : target.value;
+    let value = target.type === 'checkbox' ? target.checked : target.value;
     let type = target.dataset.type;
     let id = target.dataset.id;
 
-    if (type === "radarr")
+    if (type === 'radarr')
       setRadarr({
         ...radarr,
         [id]: {
@@ -860,7 +861,7 @@ function RequestModal({
         },
       });
 
-    if (type === "sonarr")
+    if (type === 'sonarr')
       setSonarr({
         ...sonarr,
         [id]: {
@@ -891,7 +892,7 @@ function RequestModal({
         <div className={modal.content}>
           {request ? (
             <>
-              {request.type === "tv" && !request.tvdb_id ? (
+              {request.type === 'tv' && !request.tvdb_id ? (
                 <p
                   className={`${typo.body} ${typo.bold} ${styles.warningText}`}
                 >
@@ -903,7 +904,7 @@ function RequestModal({
               >
                 {request.title}
               </p>
-              {request.type === "tv" && !request.tvdb_id ? (
+              {request.type === 'tv' && !request.tvdb_id ? (
                 <div className={styles.requestEdit__wrap}>
                   <p
                     className={`${typo.body} ${typo.bold} ${styles.warningText}`}
@@ -913,12 +914,12 @@ function RequestModal({
                 </div>
               ) : (
                 <div className={styles.requestEdit__wrap}>
-                  {request.type === "tv" ? (
+                  {request.type === 'tv' ? (
                     sonarrServers && sonarrServers.length > 0 ? (
                       sonarrServers.map((server) => {
                         return (
                           <RenderRequestEdit
-                            key={`req_m_${request.id}_${server.uuid}`}
+                            key={`req_m_${request.id}_${server.id}`}
                             server={server}
                             request={request}
                             type="sonarr"
@@ -935,7 +936,7 @@ function RequestModal({
                     radarrServers.map((server) => {
                       return (
                         <RenderRequestEdit
-                          key={`req_m_${request.id}_${server.uuid}`}
+                          key={`req_m_${request.id}_${server.id}`}
                           server={server}
                           request={request}
                           type="radarr"
@@ -960,7 +961,7 @@ function RequestModal({
               </p>
               <select
                 name="manualStatus"
-                value={requestState.manualStatus || ""}
+                value={requestState.manualStatus || ''}
                 onChange={statusChange}
                 className={input.select__light}
               >
@@ -1010,7 +1011,7 @@ function RenderRequestEdit({
   return (
     <div
       className="request-edit--server--wrap"
-      key={`${type}_server_${server.uuid}`}
+      key={`${type}_server_${server.id}`}
     >
       <p className={`${typo.body} ${typo.bold} ${styles.requestEdit__server}`}>
         Server: {server.title}
@@ -1019,12 +1020,12 @@ function RenderRequestEdit({
         <div className={input.checkboxes__item}>
           <input
             data-type={type}
-            data-id={server.uuid}
+            data-id={server.id}
             type="checkbox"
             checked={
-              edit[type][server.uuid] ? edit[type][server.uuid].active : false
+              edit[type][server.id] ? edit[type][server.id].active : false
             }
-            name={"active"}
+            name={'active'}
             onChange={changeServerSettings}
             disabled={!editable}
           />
@@ -1039,10 +1040,10 @@ function RenderRequestEdit({
           <select
             className={input.select__light}
             data-type={type}
-            data-id={server.uuid}
+            data-id={server.id}
             name="profile"
             value={
-              edit[type][server.uuid] ? edit[type][server.uuid].profile : false
+              edit[type][server.id] ? edit[type][server.id].profile : false
             }
             onChange={changeServerSettings}
             disabled={!editable}
@@ -1052,7 +1053,7 @@ function RenderRequestEdit({
               server.options.profiles.map((profile) => {
                 return (
                   <option
-                    key={`${type}_profile_${server.uuid}_${profile.id}`}
+                    key={`${type}_profile_${server.id}_${profile.id}`}
                     value={profile.id}
                   >
                     {profile.name}
@@ -1069,17 +1070,13 @@ function RenderRequestEdit({
           <select
             className={input.select__light}
             data-type={type}
-            data-id={server.uuid}
+            data-id={server.id}
             name="path"
             value={
-              edit[type][server.uuid]?.path
-                ? edit[type][server.uuid]?.path
-                : false
+              edit[type][server.id]?.path ? edit[type][server.id]?.path : false
             }
             data-value={
-              edit[type][server.uuid]?.path
-                ? edit[type][server.uuid]?.path
-                : false
+              edit[type][server.id]?.path ? edit[type][server.id]?.path : false
             }
             onChange={changeServerSettings}
             disabled={!editable}
@@ -1089,7 +1086,7 @@ function RenderRequestEdit({
               server.options.paths.map((path) => {
                 return (
                   <option
-                    key={`${type}_profile_${server.uuid}_${path.id}`}
+                    key={`${type}_profile_${server.id}_${path.id}`}
                     value={path.path}
                   >
                     {path.path}
@@ -1107,13 +1104,13 @@ function RenderRequestEdit({
           <select
             className={input.select__light}
             data-type={type}
-            data-id={server.uuid}
+            data-id={server.id}
             name="language"
             data-value={
-              edit[type][server.uuid] ? edit[type][server.uuid].language : false
+              edit[type][server.id] ? edit[type][server.id].language : false
             }
             value={
-              edit[type][server.uuid] ? edit[type][server.uuid].language : false
+              edit[type][server.id] ? edit[type][server.id].language : false
             }
             onChange={changeServerSettings}
             disabled={!editable}
@@ -1123,7 +1120,7 @@ function RenderRequestEdit({
               server.options.languages.map((lang) => {
                 return (
                   <option
-                    key={`${type}_profile_${server.uuid}_${lang.id}`}
+                    key={`${type}_profile_${server.id}_${lang.id}`}
                     value={lang.id}
                   >
                     {lang.name}
@@ -1152,7 +1149,7 @@ function RenderRequestEdit({
       {editable ? null : (
         <p className={`${typo.small} ${styles.requestEdit__under}`}>
           {`These settings cannot be edited once sent to `}
-          <span style={{ textTransform: "capitalize" }}>{type}</span>
+          <span style={{ textTransform: 'capitalize' }}>{type}</span>
         </p>
       )}
     </div>
