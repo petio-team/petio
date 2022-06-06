@@ -128,6 +128,8 @@ export default function SettingsArr(props) {
     if (updating) return;
     setUpdating(true);
     let failed = false;
+    let serverData = null;
+
     if (
       !newServer.name ||
       !newServer.token ||
@@ -159,11 +161,15 @@ export default function SettingsArr(props) {
       } else {
         responseData = await saveSonarrConfig(data);
       }
-      const test = await testServer(responseData[0].id);
+      serverData = {
+        ...data[data.length - 1],
+        id: responseData[responseData.length - 1].id,
+      };
+      const test = await testServer(serverData.id);
       if (!test) {
         failed = true;
       } else {
-        setNewServer(responseData[0]);
+        setNewServer(serverData);
       }
     } catch (e) {
       failed = true;
@@ -194,9 +200,9 @@ export default function SettingsArr(props) {
       await getServers();
 
       setCurrentServer({
-        ...newServer,
+        ...serverData,
       });
-      getSettings(newServer.id);
+      getSettings(serverData.id);
 
       setUpdating(false);
       props.newNotification({
