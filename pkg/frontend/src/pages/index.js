@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 
 import Carousel from '../components/carousel';
 import Hero from '../components/hero';
-import { Loading } from '../components/loading';
+// import { Loading } from '../components/loading';
 import Meta from '../components/meta';
 import media from '../services/media.service';
 import hero from '../styles/components/hero.module.scss';
@@ -15,7 +15,6 @@ import typo from '../styles/components/typography.module.scss';
 const mapStateToProps = (state) => {
   return {
     redux_trending: state.media.trending,
-    redux_movies: state.media.movies,
     redux_discovery: state.media.discovery,
     redux_featured: state.media.featured,
   };
@@ -24,7 +23,6 @@ const mapStateToProps = (state) => {
 function Home({
   newNotification,
   redux_trending,
-  redux_movies,
   redux_discovery,
   redux_featured,
 }) {
