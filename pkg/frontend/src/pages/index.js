@@ -1,17 +1,16 @@
-import { useEffect } from "react";
-import { Link } from "react-router-dom";
-import media from "../services/media.service";
-import { connect } from "react-redux";
+import { useEffect } from 'react';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/opacity.css';
+import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 
-import Meta from "../components/meta";
-import Carousel from "../components/carousel";
-import Hero from "../components/hero";
-
-import hero from "../styles/components/hero.module.scss";
-import typo from "../styles/components/typography.module.scss";
-import { LazyLoadImage } from "react-lazy-load-image-component";
-import "react-lazy-load-image-component/src/effects/opacity.css";
-import { Loading } from "../components/loading";
+import Carousel from '../components/carousel';
+import Hero from '../components/hero';
+import { Loading } from '../components/loading';
+import Meta from '../components/meta';
+import media from '../services/media.service';
+import hero from '../styles/components/hero.module.scss';
+import typo from '../styles/components/typography.module.scss';
 
 const mapStateToProps = (state) => {
   return {
@@ -36,8 +35,8 @@ function Home({
       } catch (e) {
         console.log(e);
         newNotification({
-          type: "error",
-          message: "Error loading trending",
+          type: 'error',
+          message: 'Error loading trending',
         });
       }
     }
@@ -45,13 +44,13 @@ function Home({
     async function getPersonalised() {
       try {
         await Promise.all([
-          media.getDiscovery("movies"),
-          media.getDiscovery("tv"),
+          media.getDiscovery('movies'),
+          media.getDiscovery('tv'),
         ]);
       } catch (e) {
         console.log(e);
         newNotification({
-          type: "error",
+          type: 'error',
           message: "Couldn't load personalised recommendations",
         });
       }
@@ -70,24 +69,24 @@ function Home({
     redux_discovery.movies.length > 0
       ? redux_discovery.movies
       : [
-          { title: "", results: "placeholder" },
-          { title: "", results: "placeholder" },
-          { title: "", results: "placeholder" },
+          { title: '', results: 'placeholder' },
+          { title: '', results: 'placeholder' },
+          { title: '', results: 'placeholder' },
         ];
 
   const discoveryTv =
     redux_discovery.tv.length > 0
       ? redux_discovery.tv
       : [
-          { title: "", results: "placeholder" },
-          { title: "", results: "placeholder" },
-          { title: "", results: "placeholder" },
+          { title: '', results: 'placeholder' },
+          { title: '', results: 'placeholder' },
+          { title: '', results: 'placeholder' },
         ];
 
   return (
     <>
-      <Meta title={"Home"} />
-      {!redux_featured ? <Loading /> : null}
+      <Meta title={'Home'} />
+      {/* {!redux_featured ? <Loading /> : null} */}
       <div>
         <div className={hero.discovery}>
           <div className="container">
@@ -155,7 +154,7 @@ function Home({
         />
         {discoveryMovies.map((row, i) => {
           if (!row || !row.results || row.results.length === 0) return null;
-          if (row.results === "placeholder") row.results = false;
+          if (row.results === 'placeholder') row.results = false;
           return (
             <Carousel
               key={`personal_movies_${i}`}
@@ -169,7 +168,7 @@ function Home({
         })}
         {discoveryTv.map((row, i) => {
           if (!row || !row.results || row.results.length === 0) return null;
-          if (row.results === "placeholder") row.results = false;
+          if (row.results === 'placeholder') row.results = false;
           return (
             <Carousel
               key={`personal_tv_${i}`}
