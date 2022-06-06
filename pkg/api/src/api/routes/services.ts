@@ -13,6 +13,7 @@ import {
   DeleteDownloaderById,
   DownloaderType,
   GetAllDownloaders,
+  IDownloader,
 } from '@/models/downloaders';
 
 import RadarrAPI from '../../arr/radarr';
@@ -616,6 +617,7 @@ const updateRadarrConfig = async (ctx: Context) => {
   let data = ctx.request.body as ArrInput;
 
   try {
+    const results: IDownloader[] = [];
     for (const instance of data) {
       if (instance.subpath.startsWith('/')) {
         instance.subpath = instance.subpath.substring(1);
@@ -631,7 +633,7 @@ const updateRadarrConfig = async (ctx: Context) => {
           instance.subpath,
       );
 
-      await CreateOrUpdateDownloader({
+      const newInstance = await CreateOrUpdateDownloader({
         name: instance.name,
         type: DownloaderType.Radarr,
         url: url.toString(),
@@ -641,10 +643,12 @@ const updateRadarrConfig = async (ctx: Context) => {
         language: instance.language,
         enabled: instance.enabled,
       });
+
+      results.push(newInstance);
     }
 
     ctx.status = StatusCodes.OK;
-    ctx.body = data;
+    ctx.body = results;
     return;
   } catch (err) {
     logger.log('error', `ROUTE: Error saving sonarr config`);
