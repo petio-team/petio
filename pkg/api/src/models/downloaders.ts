@@ -202,6 +202,8 @@ export const CreateOrUpdateDownloader = async (
     throw new Error('failed to create downloader');
   }
 
+  downloader.id = data.id;
+
   return downloader;
 };
 
