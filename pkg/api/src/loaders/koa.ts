@@ -10,6 +10,7 @@ import routes from '@/api/index';
 import { IsDevelopment, corsDomains } from '@/config/env';
 import { config } from '@/config/index';
 import logger from '@/loaders/logger';
+import { removeSlashes } from '@/util/urls';
 
 export default ({ app }: { app: Koa }) => {
   // Add http logging using morgan
@@ -95,9 +96,8 @@ export default ({ app }: { app: Koa }) => {
   app.use(koaBody());
 
   // Load routes
-  const subpath =
-    config.get('petio.subpath') !== '/' ? config.get('petio.subpath') : '/';
-  app.use(mount(subpath, routes()));
+  const subpath = removeSlashes(config.get('petio.subpath'));
+  app.use(mount('/' + subpath, routes()));
 
   // Handle errors
   app.on('error', (err) => logger.error(err));

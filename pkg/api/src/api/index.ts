@@ -4,6 +4,7 @@ import jwt from 'koa-jwt';
 
 import setupMiddleware from '@/api/middleware/setup';
 import { config as conf } from '@/config/index';
+import { removeSlashes } from '@/util/urls';
 
 import batch from './routes/batch';
 import config from './routes/config';
@@ -41,6 +42,11 @@ export default (): Koa => {
   // web
   web(app);
 
+  let subpath = removeSlashes(conf.get('petio.subpath'));
+  if (subpath !== '') {
+    subpath = '/' + subpath;
+  }
+
   // v1 api router
   const v1 = new Router({
     prefix: '/api',
@@ -52,14 +58,14 @@ export default (): Koa => {
       debug: true,
     }).unless({
       path: [
-        '/api/health',
-        '/api/config',
-        '/api/login',
-        '/api/login/plex_login',
-        '/api/setup',
-        '/api/setup/test_server',
-        '/api/setup/test_mongo',
-        '/api/setup/set',
+        subpath + '/api/health',
+        subpath + '/api/config',
+        subpath + '/api/login',
+        subpath + '/api/login/plex_login',
+        subpath + '/api/setup',
+        subpath + '/api/setup/test_server',
+        subpath + '/api/setup/test_mongo',
+        subpath + '/api/setup/set',
       ],
     }),
   );
