@@ -4,10 +4,11 @@ import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
 import { WriteConfig } from '@/config/config';
-import { config } from '@/config/schema';
+import { config } from '@/config/index';
 import logger from '@/loaders/logger';
 import plexLookup from '@/plex/lookup';
 import MakePlexURL from '@/plex/util';
+import { UserModel } from "@/models/user";
 
 const route = new Router({ prefix: '/plex' });
 
@@ -33,14 +34,21 @@ const lookupByIdAndType = async (ctx: Context) => {
 const testPlexConnection = async (ctx: Context) => {
   const url = MakePlexURL('/').toString();
   try {
+    const admin = await UserModel.findOne({ owner: true }).exec();
+    if (!admin) {
+      ctx.status = StatusCodes.NOT_FOUND;
+      ctx.body = "no admin user could be found";
+      return;
+    }
+
     await axios.get(
       `https://plex.tv/pms/resources?X-Plex-Token=${config.get('plex.token')}`,
     );
     let connection = await axios.get(url);
     let data = connection.data.MediaContainer;
     if (
-      data.myPlexUsername === config.get('admin.username') ||
-      data.myPlexUsername === config.get('admin.email')
+      data.myPlexUsername === admin.username ||
+      data.myPlexUsername === admin.email
     ) {
       await updateCredentials({ plexClientID: data.machineIdentifier });
       ctx.status = StatusCodes.OK;
