@@ -2,6 +2,7 @@ import cors from '@koa/cors';
 import { StatusCodes } from 'http-status-codes';
 import Koa from 'koa';
 import koaBody from 'koa-body';
+import compress from 'koa-compress';
 import helmet from 'koa-helmet';
 import morgan from 'koa-morgan';
 import mount from 'koa-mount';
@@ -91,6 +92,11 @@ export default ({ app }: { app: Koa }) => {
   };
 
   app.use(cors(corsOptions));
+  app.use(
+    compress({
+      threshold: 2048,
+    }),
+  );
 
   // Enable body parsing
   app.use(koaBody());
