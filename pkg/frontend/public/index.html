@@ -174,5 +174,10 @@
 
         https://petio.tv
     -->
+    <script>
+      const url = window.location.pathname;
+      if (url.substr(-1) != '/')
+        window.location.href = `${window.location.origin}${window.location.pathname}/`;
+    </script>
   </body>
 </html>
