@@ -87,7 +87,7 @@ const updateConfig = async (ctx: Context) => {
     config.set('auth.type', login_type);
   }
   if (plexPopular) {
-    config.set('general.popular', plexPopular === 'true' ? true : false);
+    config.set('general.popular', plexPopular === 'on' ? true : false);
   }
   if (telegram_bot_token) {
     config.set('notifications.telegram.token', telegram_bot_token);

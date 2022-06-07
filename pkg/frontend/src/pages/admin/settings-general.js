@@ -89,7 +89,12 @@ function SettingsGeneral(props) {
   function handleChange(e) {
     const target = e.target;
     const inpName = target.name;
-    const inpVal = target.value;
+    let inpVal = target.value;
+
+    if (inpName === "login_type") {
+      inpVal = parseInt(inpVal);
+    }
+
     setConfig({
       ...config,
       [inpName]: inpVal,
