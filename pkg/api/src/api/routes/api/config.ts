@@ -3,12 +3,11 @@ import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 import * as z from 'zod';
 
+import { validateRequest } from '@/api/middleware/validation';
 import { HasConfig, WriteConfig } from '@/config/config';
 import { config } from '@/config/schema';
 import logger from '@/loaders/logger';
 import setupReady from '@/util/setupReady';
-
-import { validateRequest } from '../middleware/validation';
 
 const route = new Router({ prefix: '/config' });
 

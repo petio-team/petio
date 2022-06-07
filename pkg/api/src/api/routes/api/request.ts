@@ -13,7 +13,7 @@ import { getArchive } from '@/requests/archive';
 import { getRequests } from '@/requests/display';
 import processRequest from '@/requests/process';
 
-import { GetAllDownloaders, IDownloader } from '../../models/downloaders';
+import { GetAllDownloaders, IDownloader } from '@/models/downloaders';
 
 const route = new Router({ prefix: '/request' });
 
@@ -179,6 +179,7 @@ const updateRequest = async (ctx: Context) => {
       });
 
       await Bluebird.map(activeServers, async (instance) => {
+        console.log(JSON.stringify(instance, null, 4));
         await new Radarr(instance).processRequest(request.requestId);
       });
     }
@@ -194,6 +195,7 @@ const updateRequest = async (ctx: Context) => {
       });
 
       await Bluebird.map(activeServers, async (instance) => {
+        console.log(JSON.stringify(instance, null, 4));
         await new Sonarr(instance).addShow(request, {
           profile: instance.profile,
           path: instance.path,

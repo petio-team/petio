@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { movieLookup } from '@/tmdb/movie';
 import { showLookup } from '@/tmdb/show';
 
-import { validateRequest } from '../middleware/validation';
+import { validateRequest } from '@/api/middleware/validation';
 
 const route = new Router({ prefix: '/batch' });
 

@@ -2,8 +2,8 @@ import Koa from 'koa';
 
 import setupMiddleware from '@/api/middleware/setup';
 
-import api from './api';
-import web from './web';
+import api from './routes/api';
+import web from './routes/web';
 
 const app = new Koa();
 

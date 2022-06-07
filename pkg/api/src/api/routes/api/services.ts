@@ -5,8 +5,9 @@ import { Context } from 'koa';
 import { z } from 'zod';
 
 import { adminRequired } from '@/api/middleware/auth';
-import { GetRadarrInstanceFromDb } from '@/arr/radarr';
-import { GetSonarrInstanceFromDb } from '@/arr/sonarr';
+import { validateRequest } from '@/api/middleware/validation';
+import RadarrAPI, { GetRadarrInstanceFromDb } from '@/arr/radarr';
+import SonarrAPI, { GetSonarrInstanceFromDb } from '@/arr/sonarr';
 import logger from '@/loaders/logger';
 import {
   CreateOrUpdateDownloader,
@@ -15,10 +16,6 @@ import {
   GetAllDownloaders,
   IDownloader,
 } from '@/models/downloaders';
-
-import RadarrAPI from '../../arr/radarr';
-import SonarrAPI from '../../arr/sonarr';
-import { validateRequest } from '../middleware/validation';
 
 const route = new Router({ prefix: '/services' });
 

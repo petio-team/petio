@@ -8,7 +8,7 @@ import { config } from '@/config/schema';
 import logger from '@/loaders/logger';
 import Mailer from '@/mail/mailer';
 
-import { validateRequest } from '../middleware/validation';
+import { validateRequest } from '@/api/middleware/validation';
 
 const route = new Router({ prefix: '/mail' });
 

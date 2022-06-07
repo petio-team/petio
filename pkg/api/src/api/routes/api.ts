@@ -4,31 +4,31 @@ import jwt from 'koa-jwt';
 
 import { config as conf } from '@/config/index';
 
-import batch from './routes/batch';
-import config from './routes/config';
-import discovery from './routes/discovery';
-import filter from './routes/filter';
-import health from './routes/health';
-import history from './routes/history';
-import issue from './routes/issue';
-import log from './routes/log';
-import login from './routes/login';
-import mail from './routes/mail';
-import movie from './routes/movie';
-import notifications from './routes/notifications';
-import person from './routes/person';
-import plex from './routes/plex';
-import profiles from './routes/profiles';
-import request from './routes/request';
-import review from './routes/review';
-import search from './routes/search';
-import services from './routes/services';
-import sessions from './routes/sessions';
-import setup from './routes/setup';
-import show from './routes/show';
-import top from './routes/top';
-import trending from './routes/trending';
-import user from './routes/user';
+import batch from './api/batch';
+import config from './api/config';
+import discovery from './api/discovery';
+import filter from './api/filter';
+import health from './api/health';
+import history from './api/history';
+import issue from './api/issue';
+import log from './api/log';
+import login from './api/login';
+import mail from './api/mail';
+import movie from './api/movie';
+import notifications from './api/notifications';
+import person from './api/person';
+import plex from './api/plex';
+import profiles from './api/profiles';
+import request from './api/request';
+import review from './api/review';
+import search from './api/search';
+import services from './api/services';
+import sessions from './api/sessions';
+import setup from './api/setup';
+import show from './api/show';
+import top from './api/top';
+import trending from './api/trending';
+import user from './api/user';
 
 export default (app: Koa, subpath: string) => {
   // api router
