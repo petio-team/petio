@@ -96,8 +96,8 @@ export default ({ app }: { app: Koa }) => {
   app.use(koaBody());
 
   // Load routes
-  const subpath = removeSlashes(config.get('petio.subpath'));
-  app.use(mount('/' + subpath, routes()));
+  const subpath = '/' + removeSlashes(config.get('petio.subpath'));
+  app.use(mount(subpath, routes(subpath)));
 
   // Handle errors
   app.on('error', (err) => logger.error(err));
