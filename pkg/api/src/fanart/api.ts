@@ -16,7 +16,7 @@ export const TvFanartSchema = z.object({
     .array(
       z.object({
         id: z.string(),
-        url: z.string(),
+        url: z.string().transform((val) => val.replace('http://', 'https://')),
         lang: z.string(),
         likes: z.string(),
       }),
@@ -26,7 +26,7 @@ export const TvFanartSchema = z.object({
     .array(
       z.object({
         id: z.string(),
-        url: z.string(),
+        url: z.string().transform((val) => val.replace('http://', 'https://')),
         lang: z.string(),
         likes: z.string(),
       }),
@@ -36,7 +36,7 @@ export const TvFanartSchema = z.object({
     .array(
       z.object({
         id: z.string(),
-        url: z.string(),
+        url: z.string().transform((val) => val.replace('http://', 'https://')),
         lang: z.string(),
         likes: z.string(),
       }),
@@ -46,7 +46,7 @@ export const TvFanartSchema = z.object({
     .array(
       z.object({
         id: z.string(),
-        url: z.string(),
+        url: z.string().transform((val) => val.replace('http://', 'https://')),
         lang: z.string(),
         likes: z.string(),
         season: z.string(),
@@ -57,7 +57,7 @@ export const TvFanartSchema = z.object({
     .array(
       z.object({
         id: z.string(),
-        url: z.string(),
+        url: z.string().transform((val) => val.replace('http://', 'https://')),
         lang: z.string(),
         likes: z.string(),
       }),
@@ -67,7 +67,7 @@ export const TvFanartSchema = z.object({
     .array(
       z.object({
         id: z.string(),
-        url: z.string(),
+        url: z.string().transform((val) => val.replace('http://', 'https://')),
         lang: z.string(),
         likes: z.string(),
       }),
@@ -77,7 +77,7 @@ export const TvFanartSchema = z.object({
     .array(
       z.object({
         id: z.string(),
-        url: z.string(),
+        url: z.string().transform((val) => val.replace('http://', 'https://')),
         lang: z.string(),
         likes: z.string(),
         season: z.string(),
@@ -88,7 +88,7 @@ export const TvFanartSchema = z.object({
     .array(
       z.object({
         id: z.string(),
-        url: z.string(),
+        url: z.string().transform((val) => val.replace('http://', 'https://')),
         lang: z.string(),
         likes: z.string(),
       }),
@@ -98,7 +98,7 @@ export const TvFanartSchema = z.object({
     .array(
       z.object({
         id: z.string(),
-        url: z.string(),
+        url: z.string().transform((val) => val.replace('http://', 'https://')),
         lang: z.string(),
         likes: z.string(),
         season: z.string(),
@@ -109,7 +109,7 @@ export const TvFanartSchema = z.object({
     .array(
       z.object({
         id: z.string(),
-        url: z.string(),
+        url: z.string().transform((val) => val.replace('http://', 'https://')),
         lang: z.string(),
         likes: z.string(),
         season: z.string(),
@@ -127,7 +127,7 @@ export const MovieFanartSchema = z.object({
     .array(
       z.object({
         id: z.string(),
-        url: z.string(),
+        url: z.string().transform((val) => val.replace('http://', 'https://')),
         lang: z.string(),
         likes: z.string(),
       }),
@@ -137,7 +137,7 @@ export const MovieFanartSchema = z.object({
     .array(
       z.object({
         id: z.string(),
-        url: z.string(),
+        url: z.string().transform((val) => val.replace('http://', 'https://')),
         lang: z.string(),
         likes: z.string(),
       }),
@@ -147,7 +147,7 @@ export const MovieFanartSchema = z.object({
     .array(
       z.object({
         id: z.string(),
-        url: z.string(),
+        url: z.string().transform((val) => val.replace('http://', 'https://')),
         lang: z.string(),
         likes: z.string(),
       }),
@@ -157,7 +157,7 @@ export const MovieFanartSchema = z.object({
     .array(
       z.object({
         id: z.string(),
-        url: z.string(),
+        url: z.string().transform((val) => val.replace('http://', 'https://')),
         lang: z.string(),
         likes: z.string(),
       }),
@@ -167,7 +167,7 @@ export const MovieFanartSchema = z.object({
     .array(
       z.object({
         id: z.string(),
-        url: z.string(),
+        url: z.string().transform((val) => val.replace('http://', 'https://')),
         lang: z.string(),
         likes: z.string(),
       }),
@@ -177,7 +177,7 @@ export const MovieFanartSchema = z.object({
     .array(
       z.object({
         id: z.string(),
-        url: z.string(),
+        url: z.string().transform((val) => val.replace('http://', 'https://')),
         lang: z.string(),
         likes: z.string(),
         disc: z.string(),
@@ -189,7 +189,7 @@ export const MovieFanartSchema = z.object({
     .array(
       z.object({
         id: z.string(),
-        url: z.string(),
+        url: z.string().transform((val) => val.replace('http://', 'https://')),
         lang: z.string(),
         likes: z.string(),
       }),
