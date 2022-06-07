@@ -19,7 +19,7 @@ export default (app: Router) => {
       body: z.object({
         plexToken: z.string().optional(),
         base_path: z.string().optional(),
-        login_type: z.boolean().optional(),
+        login_type: z.number().optional(),
         plexPopular: z.string().optional(),
         telegram_chat_id: z.string().optional(),
         telegram_bot_token: z.string().optional(),
