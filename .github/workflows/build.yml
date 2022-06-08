@@ -35,7 +35,7 @@ jobs:
       - name: Install task
         uses: arduino/setup-task@v1
 
-      - name: Install node-prune
+      - name: Install node-prune binary
         run: curl -sf https://gobinaries.com/tj/node-prune | sh
 
       - name: Build frontend and api
