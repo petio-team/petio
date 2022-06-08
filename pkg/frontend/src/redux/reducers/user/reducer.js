@@ -21,22 +21,22 @@ export default function (
     reviews: [],
     users: [],
   },
-  action
+  action,
 ) {
   switch (action.type) {
-    case "user/set-current-user":
+    case 'user/set-current-user':
       return {
         ...state,
         currentUser: action.user,
         isAdminLogin: action.admin,
       };
-    case "user/logout":
+    case 'user/logout':
       return {
         ...state,
         currentUser: false,
         isAdminLogin: false,
       };
-    case "user/update-requests":
+    case 'user/update-requests':
       const existing = state.requests;
       if (existing)
         Object.keys(action.requests).forEach((key) => {
@@ -48,11 +48,11 @@ export default function (
           }
         });
       return { ...state, requests: action.requests };
-    case "user/my-requests":
+    case 'user/my-requests':
       return { ...state, myRequests: action.requests };
-    case "user/my-requests-archive":
+    case 'user/my-requests-archive':
       return { ...state, myRequestsArchive: action.requests };
-    case "user/plex-token":
+    case 'user/plex-token':
       return {
         ...state,
         plexUser: {
@@ -60,7 +60,7 @@ export default function (
           token: action.token,
         },
       };
-    case "user/plex-details":
+    case 'user/plex-details':
       return {
         ...state,
         plexServers: action.servers,
@@ -70,7 +70,7 @@ export default function (
         },
       };
 
-    case "user/plex-server":
+    case 'user/plex-server':
       return {
         ...state,
         plexServers: {
@@ -78,17 +78,17 @@ export default function (
           [action.key]: action.server,
         },
       };
-    case "user/get-config":
+    case 'user/get-config':
       return {
         ...state,
         config: action.config,
       };
-    case "user/all-reviews":
+    case 'user/all-reviews':
       return {
         ...state,
         reviews: action.reviews,
       };
-    case "user/all-users":
+    case 'user/all-users':
       return {
         ...state,
         users: action.users,

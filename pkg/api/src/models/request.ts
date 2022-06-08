@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const RequestSchema = new mongoose.Schema({
   requestId: String,
@@ -18,4 +18,4 @@ const RequestSchema = new mongoose.Schema({
   timeStamp: Date,
 });
 
-export default mongoose.model("Request", RequestSchema);
+export default mongoose.model('Request', RequestSchema);

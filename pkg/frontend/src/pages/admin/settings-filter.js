@@ -1,8 +1,12 @@
-import styles from "../../styles/views/adminSettings.module.scss";
-import typo from "../../styles/components/typography.module.scss";
-import buttons from "../../styles/components/button.module.scss";
+import { useEffect, useState } from 'react';
 
-import { useEffect, useState } from "react";
+import FilterAction from '../../components/filterAction';
+import FilterRow from '../../components/filterRow';
+import {
+  conditions, // ageRatings,
+  genres, // operators,
+} from '../../components/filterRow';
+import languages from '../../helpers/languages';
 import {
   getFilters,
   getRadarr,
@@ -10,24 +14,18 @@ import {
   getSonarr,
   getSonarrOptions,
   updateFilters,
-} from "../../services/config.service";
-import FilterRow from "../../components/filterRow";
-import FilterAction from "../../components/filterAction";
-import {
-  genres,
-  // operators,
-  conditions,
-  // ageRatings,
-} from "../../components/filterRow";
-import languages from "../../helpers/languages";
+} from '../../services/config.service';
+import buttons from '../../styles/components/button.module.scss';
+import typo from '../../styles/components/typography.module.scss';
+import styles from '../../styles/views/adminSettings.module.scss';
 
 export default function SettingsFilter(props) {
   const [filters, setFilters] = useState({
     movie_filters: false,
     tv_filters: false,
   });
-  const [radarrServers, setRadarrServers] = useState("loading");
-  const [sonarrServers, setSonarrServers] = useState("loading");
+  const [radarrServers, setRadarrServers] = useState('loading');
+  const [sonarrServers, setSonarrServers] = useState('loading');
   const [radarrSettings, setRadarrSettings] = useState({});
   const [sonarrSettings, setSonarrSettings] = useState({});
 
@@ -52,7 +50,7 @@ export default function SettingsFilter(props) {
       console.log(e);
       props.newNotification({
         message: "Couldn't load filters",
-        type: "error",
+        type: 'error',
       });
     }
   }
@@ -72,12 +70,12 @@ export default function SettingsFilter(props) {
       existingFilters[type][row].rows[item]
     ) {
       existingFilters[type][row].rows[item][key] = value;
-      if (key === "condition")
+      if (key === 'condition')
         existingFilters[type][row].rows[item].value = false;
       setFilters(existingFilters);
     } else {
       console.log(target);
-      console.log("Failed to update filter");
+      console.log('Failed to update filter');
     }
   }
 
@@ -99,7 +97,7 @@ export default function SettingsFilter(props) {
       setFilters(existingFilters);
     } else {
       console.log(target);
-      console.log("Failed to update filter");
+      console.log('Failed to update filter');
     }
   }
 
@@ -109,7 +107,7 @@ export default function SettingsFilter(props) {
       condition: false,
       operator: false,
       value: false,
-      comparison: optional ? "or" : "and",
+      comparison: optional ? 'or' : 'and',
     });
     setFilters(existingFilters);
   }
@@ -178,22 +176,22 @@ export default function SettingsFilter(props) {
       let settingsRadarr = {};
       let settingsSonarr = {};
       radarr.forEach((item) => {
-        getSettings(item.uuid, "radarr", settingsRadarr);
+        getSettings(item.uuid, 'radarr', settingsRadarr);
       });
       sonarr.forEach((item) => {
-        getSettings(item.uuid, "sonarr", settingsSonarr);
+        getSettings(item.uuid, 'sonarr', settingsSonarr);
       });
     } catch (err) {
       console.log(err);
-      setRadarrServers("error");
-      setSonarrServers("error");
+      setRadarrServers('error');
+      setSonarrServers('error');
     }
   }
 
-  async function getSettings(uuid, type = "radarr" || "sonarr", current) {
+  async function getSettings(uuid, type = 'radarr' || 'sonarr', current) {
     try {
       let settings =
-        type === "radarr"
+        type === 'radarr'
           ? await getRadarrOptions(uuid)
           : await getSonarrOptions(uuid);
 
@@ -212,7 +210,7 @@ export default function SettingsFilter(props) {
         tags: settings.tags && settings.tags.length > 0 ? settings.tags : false,
       };
 
-      if (type === "radarr") {
+      if (type === 'radarr') {
         setRadarrSettings(current);
       } else {
         setSonarrSettings({ ...sonarrSettings, ...current });
@@ -226,30 +224,30 @@ export default function SettingsFilter(props) {
 
   function filterToText(type, index) {
     function formatOperator(operator) {
-      if (!operator) return "not set";
+      if (!operator) return 'not set';
       switch (operator) {
-        case "equal":
-          return "equal to";
-        case "not":
-          return "not equal to";
-        case "greater":
-          return "greater than";
-        case "less":
-          return "less than";
+        case 'equal':
+          return 'equal to';
+        case 'not':
+          return 'not equal to';
+        case 'greater':
+          return 'greater than';
+        case 'less':
+          return 'less than';
         default:
           return operator;
       }
     }
 
     function formatValue(item) {
-      if (!item.value) return "not set";
+      if (!item.value) return 'not set';
       switch (item.condition) {
-        case "genre":
+        case 'genre':
           let genre = genres[type].filter(
-            (g) => g.id.toString() === item.value.toString()
+            (g) => g.id.toString() === item.value.toString(),
           );
           return genre[0].name;
-        case "language":
+        case 'language':
           let lang = languages.filter((l) => l.code === item.value);
           return lang[0].name;
         default:
@@ -258,9 +256,9 @@ export default function SettingsFilter(props) {
     }
 
     function formatProfile(id, uuid) {
-      if (!id) return "not set";
+      if (!id) return 'not set';
       let profiles = false;
-      if (type === "movie_filters") {
+      if (type === 'movie_filters') {
         profiles = radarrSettings[uuid].profiles;
       } else {
         profiles = sonarrSettings[uuid].profiles;
@@ -271,7 +269,7 @@ export default function SettingsFilter(props) {
 
     function formatServer(uuid) {
       let servers = false;
-      if (type === "movie_filters") {
+      if (type === 'movie_filters') {
         servers = radarrServers;
       } else {
         servers = sonarrServers;
@@ -285,49 +283,49 @@ export default function SettingsFilter(props) {
     let required = [];
     let optional = [];
     filter.rows.forEach((item, index) => {
-      if (item.comparison === "and") {
+      if (item.comparison === 'and') {
         required.push(item);
       } else {
         optional.push(item);
       }
     });
-    let output = "";
+    let output = '';
     optional.forEach((item, i) => {
       if (conditions[item.condition]) {
-        if (i === 0) output += "<b>If</b> ";
-        if (i > 0) output += " <b>or if</b> ";
+        if (i === 0) output += '<b>If</b> ';
+        if (i > 0) output += ' <b>or if</b> ';
         output += `${conditions[item.condition].label} is ${formatOperator(
-          item.operator
+          item.operator,
         )} ${formatValue(item)}`;
       }
     });
     required.forEach((item, i) => {
       if (conditions[item.condition]) {
-        output += " <b>and</b> ";
+        output += ' <b>and</b> ';
         output += `${
           conditions[item.condition].label
         } is always ${formatOperator(item.operator)} ${formatValue(item)}`;
       }
     });
     if (filter.action.length === 0) {
-      output += " <b>then</b> do nothing";
+      output += ' <b>then</b> do nothing';
     } else {
       filter.action.forEach((action, i) => {
         if (!action.server) {
-          output += " <b>then</b> do nothing";
+          output += ' <b>then</b> do nothing';
         } else {
-          if (i === 0) output += " <b>then</b> send to ";
-          if (i > 0) output += " <b>and</b> also send to ";
+          if (i === 0) output += ' <b>then</b> send to ';
+          if (i > 0) output += ' <b>and</b> also send to ';
           output += `${formatServer(
-            action.server
+            action.server,
           )} with the quality profile ${formatProfile(
             action.profile,
-            action.server
+            action.server,
           )} and use the root path <code>${action.path}</code>`;
         }
       });
     }
-    output += ".";
+    output += '.';
     return output;
   }
 
@@ -354,40 +352,40 @@ export default function SettingsFilter(props) {
 
   async function saveFilters() {
     const n = props.newNotification({
-      message: "Validating filters",
-      type: "loading",
+      message: 'Validating filters',
+      type: 'loading',
     });
     try {
       const validation = await validateFilters();
       console.log(validation);
       if (!validation) {
         props.newNotification({
-          message: "Failed to validate filters",
-          type: "error",
+          message: 'Failed to validate filters',
+          type: 'error',
           id: n,
         });
       } else {
         props.newNotification({
-          message: "Filters validated",
-          type: "success",
+          message: 'Filters validated',
+          type: 'success',
           id: n,
         });
         await updateFilters(filters.movie_filters, filters.tv_filters);
         props.newNotification({
-          message: "Filters saved",
-          type: "success",
+          message: 'Filters saved',
+          type: 'success',
           id: n,
         });
       }
     } catch (e) {
       console.log(e);
       props.newNotification({
-        message: "Failed to save filters",
-        type: "error",
+        message: 'Failed to save filters',
+        type: 'error',
         id: n,
       });
     }
-    console.log("save");
+    console.log('save');
   }
 
   return (
@@ -427,7 +425,7 @@ export default function SettingsFilter(props) {
               key={`filter__${key}`}
             >
               <p className={`${typo.smtitle} ${typo.bold}`}>
-                {key === "movie_filters" ? "Movie" : "TV"} Filters
+                {key === 'movie_filters' ? 'Movie' : 'TV'} Filters
               </p>
               {filters[key] && filters[key].length > 0
                 ? filters[key].map((item, i) => {
@@ -460,7 +458,7 @@ export default function SettingsFilter(props) {
                     let required = [];
                     let optional = [];
                     item.rows.forEach((item, index) => {
-                      if (item.comparison === "and") {
+                      if (item.comparison === 'and') {
                         required.push({ ...item, index: index, rowIndex: i });
                       } else {
                         optional.push({ ...item, index: index, rowIndex: i });
@@ -569,12 +567,12 @@ export default function SettingsFilter(props) {
                                       i + 1
                                     }__action__row__${a}`}
                                     servers={
-                                      key === "movie_filters"
+                                      key === 'movie_filters'
                                         ? radarrServers
                                         : sonarrServers
                                     }
                                     settings={
-                                      key === "movie_filters"
+                                      key === 'movie_filters'
                                         ? radarrSettings
                                         : sonarrSettings
                                     }

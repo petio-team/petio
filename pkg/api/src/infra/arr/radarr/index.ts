@@ -5,7 +5,7 @@ import { CalendarEndpoint } from './calendar';
 import { LanguageEndpoint } from './language';
 import { MovieEndpoint } from './movie';
 import { QualityProfileEndpoint } from './quality_profile';
-import { QueueEndpoint } from "./queue";
+import { QueueEndpoint } from './queue';
 import { RootFolderEndpoint } from './root_folder';
 import { SystemStatusEndpoint } from './status';
 import { TagEndpoint } from './tag';

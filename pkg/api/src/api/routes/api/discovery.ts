@@ -2,8 +2,8 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import getDiscovery from '@/services/discovery/display';
 import logger from '@/loaders/logger';
+import getDiscovery from '@/services/discovery/display';
 
 const route = new Router({ prefix: '/discovery' });
 

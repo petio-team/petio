@@ -1,8 +1,9 @@
-import axios from "axios";
-import MakePlexURL from "./util";
+import axios from 'axios';
+
+import MakePlexURL from './util';
 
 export default async () => {
-  const url = MakePlexURL("/statistics/resources", {
+  const url = MakePlexURL('/statistics/resources', {
     timespan: 6,
   }).toString();
 

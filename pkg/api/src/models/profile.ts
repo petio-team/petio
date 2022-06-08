@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const ProfileSchema = new mongoose.Schema(
   {
@@ -10,7 +10,7 @@ const ProfileSchema = new mongoose.Schema(
     quota: Number,
     isDefault: Boolean,
   },
-  { collection: "profiles" }
+  { collection: 'profiles' },
 );
 
-export default mongoose.model("Profile", ProfileSchema);
+export default mongoose.model('Profile', ProfileSchema);

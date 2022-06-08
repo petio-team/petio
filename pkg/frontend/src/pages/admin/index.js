@@ -1,18 +1,19 @@
-import { connect } from "react-redux";
-import { Login } from "../../components/login";
-import styles from "../../styles/views/admin.module.scss";
-import typo from "../../styles/components/typography.module.scss";
-import { Route, Switch } from "react-router";
-import AdminDashboard from "./dashboard";
-import { Link } from "react-router-dom";
-import NotFound from "../404";
-import Settings from "./settings";
-import Meta from "../../components/meta";
-import AdminRequests from "./admin-requests";
-import { useEffect } from "react";
-import { allUsers } from "../../services/user.service";
-import AdminUsers from "./admin-users";
-import AdminIssues from "./admin-issues";
+import { useEffect } from 'react';
+import { connect } from 'react-redux';
+import { Route, Switch } from 'react-router';
+import { Link } from 'react-router-dom';
+
+import NotFound from '../404';
+import { Login } from '../../components/login';
+import Meta from '../../components/meta';
+import { allUsers } from '../../services/user.service';
+import typo from '../../styles/components/typography.module.scss';
+import styles from '../../styles/views/admin.module.scss';
+import AdminIssues from './admin-issues';
+import AdminRequests from './admin-requests';
+import AdminUsers from './admin-users';
+import AdminDashboard from './dashboard';
+import Settings from './settings';
 
 const mapStateToProps = (state) => {
   return {

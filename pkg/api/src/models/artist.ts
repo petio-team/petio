@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const MusicSchema = new mongoose.Schema(
   {
@@ -17,9 +17,9 @@ const MusicSchema = new mongoose.Schema(
     Genre: Array,
     Country: Array,
   },
-  { collection: "music" }
+  { collection: 'music' },
 );
 
-export default mongoose.model("Music", MusicSchema);
+export default mongoose.model('Music', MusicSchema);
 
 // ratingKey

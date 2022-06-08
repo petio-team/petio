@@ -1,6 +1,10 @@
-import path from "path";
-import * as winston from "winston";
-import "winston-daily-rotate-file";
+import path from 'path';
+import * as winston from 'winston';
+import 'winston-daily-rotate-file';
+
+import { dataFolder } from '@/config/env';
+import { config } from '@/config/schema';
+
 const {
   combine,
   timestamp,
@@ -12,27 +16,24 @@ const {
   prettyPrint,
 } = winston.format;
 
-import { dataFolder } from "@/config/env";
-import { config } from "@/config/schema";
-
-const logsFolder = path.join(dataFolder, "./logs");
+const logsFolder = path.join(dataFolder, './logs');
 
 const customFormat = printf(({ level, formatLabel, message, timestamp }) => {
-  const lbl = formatLabel ? `[${formatLabel}] ` : "";
+  const lbl = formatLabel ? `[${formatLabel}] ` : '';
   return `${timestamp} ${lbl}${level}: ${message}`;
 });
 
 const logger = winston.createLogger({
-  level: config.get("logger.level") || "debug",
+  level: config.get('logger.level') || 'debug',
   format: combine(
     errors({ stack: true }),
     splat(),
     prettyPrint(),
     label({
-      label: "label",
+      label: 'label',
     }),
-    timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-    customFormat
+    timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    customFormat,
   ),
   transports: [
     new winston.transports.Console({
@@ -41,14 +42,14 @@ const logger = winston.createLogger({
     }),
     new winston.transports.DailyRotateFile({
       filename: path.join(logsFolder, `petio-%DATE%.log`),
-      maxSize: "20m",
-      maxFiles: "7d",
+      maxSize: '20m',
+      maxFiles: '7d',
       createSymlink: true,
-      symlinkName: "petio.log",
+      symlinkName: 'petio.log',
     }),
     new winston.transports.File({
-      filename: path.join(logsFolder, "live.log"),
-      level: "silly",
+      filename: path.join(logsFolder, 'live.log'),
+      level: 'silly',
       maxsize: 100000,
       maxFiles: 1,
       tailable: true,
@@ -61,7 +62,7 @@ const logger = winston.createLogger({
               log: info.message,
             },
           })},`;
-        })
+        }),
       ),
     }),
   ],

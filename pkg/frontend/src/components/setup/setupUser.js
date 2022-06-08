@@ -1,17 +1,18 @@
-import typo from "../../styles/components/typography.module.scss";
-import button from "../../styles/components/button.module.scss";
-import inp from "../../styles/components/input.module.scss";
-import { useState } from "react";
+import { useState } from 'react';
+
+import button from '../../styles/components/button.module.scss';
+import inp from '../../styles/components/input.module.scss';
+import typo from '../../styles/components/typography.module.scss';
 
 export default function SetupUser(props) {
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState('');
 
   function saveUser() {
     if (password.length < 8) {
       props.newNotification({
-        type: "error",
+        type: 'error',
         message:
-          "Your password is too short, please enter a password with 8 characters or more.",
+          'Your password is too short, please enter a password with 8 characters or more.',
       });
       return;
     } else {
@@ -61,7 +62,7 @@ export default function SetupUser(props) {
       ></input>
       <button
         className={`${button.primary} ${button.auto} ${
-          password.length > 7 ? "" : button.disabled
+          password.length > 7 ? '' : button.disabled
         }`}
         onClick={saveUser}
       >

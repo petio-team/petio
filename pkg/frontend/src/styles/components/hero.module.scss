@@ -1,5 +1,5 @@
-@import "../global/variables.module.scss";
-@import "../components/typography.module.scss";
+@import '../global/variables.module.scss';
+@import '../components/typography.module.scss';
 
 .discovery {
   position: relative;
@@ -19,7 +19,7 @@
     }
 
     &:before {
-      content: "";
+      content: '';
       background: rgba($grey, 0.2);
       top: 0;
       left: 0;
@@ -43,7 +43,7 @@
     }
 
     &:after {
-      content: "";
+      content: '';
       background: linear-gradient(
         0deg,
         rgba($black, 1) 0%,
@@ -167,7 +167,7 @@
 
     &__blur {
       &:after {
-        content: "";
+        content: '';
         background: rgb(68, 55, 66);
         background: linear-gradient(
           135deg,

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const VideoResultSchema = z.object({
   iso_639_1: z.string(),

@@ -1,11 +1,11 @@
-import styles from "../styles/views/requests.module.scss";
-import typo from "../styles/components/typography.module.scss";
-import { Link } from "react-router-dom";
-import { connect } from "react-redux";
-import { LazyLoadImage } from "react-lazy-load-image-component";
-import "react-lazy-load-image-component/src/effects/opacity.css";
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/opacity.css';
+import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 
-import { ReactComponent as CheckIcon } from "../assets/svg/check.svg";
+import { ReactComponent as CheckIcon } from '../assets/svg/check.svg';
+import typo from '../styles/components/typography.module.scss';
+import styles from '../styles/views/requests.module.scss';
 
 const mapStateToProps = (state) => {
   return {
@@ -18,7 +18,7 @@ function Request({ redux_movies, redux_tv, request }) {
   let requestData = false;
   if (request)
     requestData =
-      request.type === "movie"
+      request.type === 'movie'
         ? redux_movies[request.requestId]
         : redux_tv[request.requestId];
   const processStage =
@@ -27,7 +27,7 @@ function Request({ redux_movies, redux_tv, request }) {
     <div className={styles.item}>
       <div className={styles.item__wrap}>
         <Link
-          to={`${request ? `/${request.type}/${request.requestId}` : "#"}`}
+          to={`${request ? `/${request.type}/${request.requestId}` : '#'}`}
           className={styles.card}
         >
           <div className={styles.card__image}>
@@ -70,24 +70,24 @@ function Request({ redux_movies, redux_tv, request }) {
                 {requestData.title || requestData.name}
                 <span className={styles.item__content__year}>
                   (
-                  {request.type === "movie"
+                  {request.type === 'movie'
                     ? requestData.release_date
                       ? new Date(requestData.release_date).getFullYear()
-                      : "Coming Soon"
+                      : 'Coming Soon'
                     : requestData.first_air_date
                     ? new Date(requestData.first_air_date).getFullYear() +
-                      " - " +
-                      (requestData.status !== "Ended"
-                        ? ""
+                      ' - ' +
+                      (requestData.status !== 'Ended'
+                        ? ''
                         : new Date(requestData.last_air_date).getFullYear())
-                    : "Coming Soon"}
+                    : 'Coming Soon'}
                   )
                 </span>
               </p>
               <p className={typo.small}>
                 <b>Status:</b> {processStage.message}
               </p>
-              <p className={typo.small} style={{ textTransform: "capitalize" }}>
+              <p className={typo.small} style={{ textTransform: 'capitalize' }}>
                 <b>Type:</b> {request.type}
               </p>
               <div className={styles.steps}>
@@ -97,7 +97,7 @@ function Request({ redux_movies, redux_tv, request }) {
                       ? styles.steps__step__complete
                       : processStage.step === 1
                       ? styles.steps__step__active
-                      : ""
+                      : ''
                   }`}
                 >
                   <span className={styles.steps__step__icon}>
@@ -111,7 +111,7 @@ function Request({ redux_movies, redux_tv, request }) {
                       ? styles.steps__step__complete
                       : processStage.step === 2
                       ? styles.steps__step__active
-                      : ""
+                      : ''
                   }`}
                 >
                   <span className={styles.steps__step__icon}>
@@ -125,7 +125,7 @@ function Request({ redux_movies, redux_tv, request }) {
                       ? styles.steps__step__complete
                       : processStage.step === 3
                       ? styles.steps__step__active
-                      : ""
+                      : ''
                   }`}
                 >
                   <span className={styles.steps__step__icon}>
@@ -139,7 +139,7 @@ function Request({ redux_movies, redux_tv, request }) {
                       ? styles.steps__step__complete
                       : processStage.step === 4
                       ? styles.steps__step__active
-                      : ""
+                      : ''
                   }`}
                 >
                   <span className={styles.steps__step__icon}>

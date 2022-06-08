@@ -1,14 +1,14 @@
-import { createStore, applyMiddleware, combineReducers } from "redux";
-import thunkMiddleware from "redux-thunk";
+import { applyMiddleware, combineReducers, createStore } from 'redux';
+import thunkMiddleware from 'redux-thunk';
 
-import user from "./reducers/user/reducer";
-import media from "./reducers/media/reducer";
-import pos from "./reducers/pos/reducer";
-import system from "./reducers/system/reducer";
+import media from './reducers/media/reducer';
+import pos from './reducers/pos/reducer';
+import system from './reducers/system/reducer';
+import user from './reducers/user/reducer';
 
 const bindMiddleware = (middleware) => {
-  if (process.env.NODE_ENV !== "production") {
-    const { composeWithDevTools } = require("redux-devtools-extension");
+  if (process.env.NODE_ENV !== 'production') {
+    const { composeWithDevTools } = require('redux-devtools-extension');
     return composeWithDevTools(applyMiddleware(...middleware));
   }
   return applyMiddleware(...middleware);
@@ -26,7 +26,7 @@ const rootReducer = combineReducers({
 const store = createStore(
   rootReducer,
   initialState,
-  bindMiddleware([thunkMiddleware])
+  bindMiddleware([thunkMiddleware]),
 );
 
 export default store;

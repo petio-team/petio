@@ -1,16 +1,16 @@
-import api from "musicbrainz-api";
-import sanitize from "sanitize-filename";
+import api from 'musicbrainz-api';
+import sanitize from 'sanitize-filename';
 
-import pkg from "@/../package.json";
-import logger from "@/loaders/logger";
+import pkg from '@/../package.json';
+import logger from '@/loaders/logger';
 
 export default class MusicMeta {
   api: any;
   constructor() {
     this.api = new api.MusicBrainzApi({
-      appName: "petio-api",
+      appName: 'petio-api',
       appVersion: pkg.version,
-      appContactInfo: "contact@petio.tv",
+      appContactInfo: 'contact@petio.tv',
     });
   }
 
@@ -21,16 +21,16 @@ export default class MusicMeta {
 
   async match(name, genres) {
     logger.info(`MB: Attempting to match ${name}`, {
-      label: "meta.musicbrainz",
+      label: 'meta.musicbrainz',
     });
-    if (!genres) return { id: "no genres", title: false };
+    if (!genres) return { id: 'no genres', title: false };
     // return true;
     let term = sanitize(name);
     try {
       let res = await this.api.searchArtist(term);
       let artists = res.artists;
       if (artists.length === 0) {
-        logger.warn(`MB: No match for ${term}`, { label: "meta.musicbrainz" });
+        logger.warn(`MB: No match for ${term}`, { label: 'meta.musicbrainz' });
         return false;
       }
       let match = false;
@@ -63,16 +63,16 @@ export default class MusicMeta {
       }
 
       if (!match) {
-        return { id: "no match", title: false };
+        return { id: 'no match', title: false };
       }
       return match;
     } catch (e) {
-      logger.error(e, { label: "meta.musicbrainz" });
-      return { id: "error", title: false };
+      logger.error(e, { label: 'meta.musicbrainz' });
+      return { id: 'error', title: false };
     }
   }
 
   formatGenre(name) {
-    return name.toLowerCase().replace("-", " ").split("/");
+    return name.toLowerCase().replace('-', ' ').split('/');
   }
 }

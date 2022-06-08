@@ -1,15 +1,16 @@
-import { useEffect, useState } from "react";
-import { connect } from "react-redux";
-import { getPlexMedia } from "../../services/plex.service";
-import media from "../../services/media.service";
-import styles from "../../styles/views/admin.module.scss";
-import typo from "../../styles/components/typography.module.scss";
-import { LazyLoadImage } from "react-lazy-load-image-component";
-import "react-lazy-load-image-component/src/effects/opacity.css";
-import { ReactComponent as PlayIcon } from "../../assets/svg/play.svg";
-import { ReactComponent as PauseIcon } from "../../assets/svg/pause.svg";
-import { ReactComponent as BufferIcon } from "../../assets/svg/buffer.svg";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from 'react';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/opacity.css';
+import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
+
+import { ReactComponent as BufferIcon } from '../../assets/svg/buffer.svg';
+import { ReactComponent as PauseIcon } from '../../assets/svg/pause.svg';
+import { ReactComponent as PlayIcon } from '../../assets/svg/play.svg';
+import media from '../../services/media.service';
+import { getPlexMedia } from '../../services/plex.service';
+import typo from '../../styles/components/typography.module.scss';
+import styles from '../../styles/views/admin.module.scss';
 
 const mapStateToProps = (state) => {
   return {
@@ -58,13 +59,13 @@ function ActivitySession({
     async function getDetails() {
       try {
         if (!id) return;
-        if (type === "movie") {
+        if (type === 'movie') {
           if (reduxMovie) return;
 
           await media.getMovie(id, false, true);
           return;
         }
-        if (type === "tv") {
+        if (type === 'tv') {
           if (reduxShow) return;
           await media.getTv(id, false, true);
           return;
@@ -79,8 +80,8 @@ function ActivitySession({
 
   useEffect(() => {
     let redux = false;
-    if (type === "movie") redux = redux_movies;
-    if (type === "tv") redux = redux_tv;
+    if (type === 'movie') redux = redux_movies;
+    if (type === 'tv') redux = redux_tv;
 
     if (!redux || !id || !redux[id]) return null;
 
@@ -89,42 +90,42 @@ function ActivitySession({
 
   function pad(num, places = 2) {
     var zero = places - num.toString().length + 1;
-    return Array(+(zero > 0 && zero)).join("0") + num;
+    return Array(+(zero > 0 && zero)).join('0') + num;
   }
 
   function formatDecision(dec) {
     switch (dec) {
-      case "copy":
-        return "Direct Stream";
+      case 'copy':
+        return 'Direct Stream';
 
-      case "transcode":
-        return "Transcode";
+      case 'transcode':
+        return 'Transcode';
 
       default:
-        return "Direct Play";
+        return 'Direct Play';
     }
   }
 
   function formatRes(res) {
     switch (res) {
-      case "1080":
-      case "1080p":
-      case "1080P":
-        return "HD 1080p";
-      case "720":
-      case "720p":
-      case "720P":
-        return "HD 720p";
-      case "sd":
-      case "480":
-      case "576":
-      case "480p":
-      case "576p":
-        return "SD";
-      case "2160":
-      case "4k":
-      case "4K":
-        return "UHD 4K";
+      case '1080':
+      case '1080p':
+      case '1080P':
+        return 'HD 1080p';
+      case '720':
+      case '720p':
+      case '720P':
+        return 'HD 720p';
+      case 'sd':
+      case '480':
+      case '576':
+      case '480p':
+      case '576p':
+        return 'SD';
+      case '2160':
+      case '4k':
+      case '4K':
+        return 'UHD 4K';
       default:
         return res;
     }
@@ -133,22 +134,22 @@ function ActivitySession({
   function status() {
     let playbackState;
     switch (session.Player.state) {
-      case "playing":
-      case "streaming":
+      case 'playing':
+      case 'streaming':
         playbackState = (
           <>
             <PlayIcon /> <p className={typo.small}>Playing</p>
           </>
         );
         break;
-      case "paused":
+      case 'paused':
         playbackState = (
           <>
             <PauseIcon /> <p className={typo.small}>Paused</p>
           </>
         );
         break;
-      case "buffering":
+      case 'buffering':
         playbackState = (
           <>
             <BufferIcon /> <p className={typo.small}>Buffering</p>
@@ -202,15 +203,15 @@ function ActivitySession({
         <p
           className={`${typo.medium} ${typo.body} ${styles.session__card__content__title}`}
         >
-          {type === "movie" ? meta.title || " " : meta.name || " "}
-          {session.live ? " (Live)" : ""}
+          {type === 'movie' ? meta.title || ' ' : meta.name || ' '}
+          {session.live ? ' (Live)' : ''}
         </p>
-        {session.type === "episode" ? (
+        {session.type === 'episode' ? (
           <p
             className={`${typo.small} ${styles.session__card__content__episode}`}
           >
             S{pad(session.parentIndex)} - E{pad(session.index)}
-            {session.title ? ` - ${session.title}` : ""}
+            {session.title ? ` - ${session.title}` : ''}
           </p>
         ) : (
           <p
@@ -222,7 +223,7 @@ function ActivitySession({
       </div>
       <div className={styles.session__card__detail}>
         <p className={`${typo.small}`}>
-          {formatDecision(playback)} -{" "}
+          {formatDecision(playback)} -{' '}
           {formatRes(selectedMedia.videoResolution)} ({bitrate})
         </p>
       </div>

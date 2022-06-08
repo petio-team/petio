@@ -1,13 +1,13 @@
-import blueconfig from "../blueconfig";
-import { LISTOFERRORS } from "../blueconfig/error";
+import blueconfig from '../blueconfig';
+import { LISTOFERRORS } from '../blueconfig/error';
 
 export default {
-  name: "source-array",
+  name: 'source-array',
   validate: function (children, schema, fullname) {
     const errors = Array<any>();
 
     if (!Array.isArray(children)) {
-      throw new Error("must be an Array");
+      throw new Error('must be an Array');
     }
 
     children.forEach((_child, keyname) => {
@@ -15,9 +15,9 @@ export default {
         const conf = blueconfig(schema.children)
           .merge(children[keyname])
           .validate();
-        this.set(fullname + "." + keyname, conf.getProperties());
+        this.set(fullname + '.' + keyname, conf.getProperties());
       } catch (err) {
-        err.parent = fullname + "." + keyname;
+        err.parent = fullname + '.' + keyname;
         errors.push(err);
       }
     });

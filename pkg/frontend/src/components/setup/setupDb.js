@@ -1,64 +1,63 @@
-import typo from "../../styles/components/typography.module.scss";
-import button from "../../styles/components/button.module.scss";
-import styles from "../../styles/views/setup.module.scss";
-import inp from "../../styles/components/input.module.scss";
+import { useState } from 'react';
 
-import { ReactComponent as Server } from "../../assets/svg/server.svg";
-import { ReactComponent as Good } from "../../assets/svg/check.svg";
-import { ReactComponent as Bad } from "../../assets/svg/close.svg";
-import { ReactComponent as Spinner } from "../../assets/svg/spinner.svg";
-
-import { useState } from "react";
-import { testMongo } from "../../services/config.service";
+import { ReactComponent as Good } from '../../assets/svg/check.svg';
+import { ReactComponent as Bad } from '../../assets/svg/close.svg';
+import { ReactComponent as Server } from '../../assets/svg/server.svg';
+import { ReactComponent as Spinner } from '../../assets/svg/spinner.svg';
+import { testMongo } from '../../services/config.service';
+import button from '../../styles/components/button.module.scss';
+import inp from '../../styles/components/input.module.scss';
+import typo from '../../styles/components/typography.module.scss';
+import styles from '../../styles/views/setup.module.scss';
 
 export default function SetupDb(props) {
-  const [mongoType, setMongoType] = useState("mongodb://");
-  const [mongoInstall, setMongoInstall] = useState("docker");
-  const [db, setDb] = useState("mongo:27017");
-  const [mongoStatus, setMongoStatus] = useState("");
+  const [mongoType, setMongoType] = useState('mongodb://');
+  const [mongoInstall, setMongoInstall] = useState('docker');
+  const [db, setDb] = useState('mongo:27017');
+  const [mongoStatus, setMongoStatus] = useState('');
 
   function changeMongoType() {
     setMongoType(
-      mongoType === "mongodb+srv://" ? "mongodb://" : "mongodb+srv://"
+      mongoType === 'mongodb+srv://' ? 'mongodb://' : 'mongodb+srv://',
     );
-    setMongoStatus("");
+    setMongoStatus('');
   }
 
   function mongoPreset(type) {
     let preset;
     switch (type) {
-      case "docker":
-        preset = "mongo:27017";
+      case 'docker':
+        preset = 'mongo:27017';
         break;
-      case "unraid":
-        preset = "X.X.X.X:27017";
+      case 'unraid':
+        preset = 'X.X.X.X:27017';
         break;
       default:
-        preset = "localhost:27017";
+        preset = 'localhost:27017';
     }
     setMongoInstall(type);
     setDb(preset);
   }
 
   async function test() {
-    setMongoStatus("pending");
+    setMongoStatus('pending');
     const nId = props.newNotification({
-      type: "loading",
-      message: "Testing database connection",
+      type: 'loading',
+      message: 'Testing database connection',
     });
     let dbString = mongoType + db;
     let test = await testMongo(dbString);
-    if (test === "failed") {
+    if (test === 'failed') {
       props.newNotification({
-        type: "error",
-        message: "Database connection test failed",
+        type: 'error',
+        message: 'Database connection test failed',
         id: nId,
       });
-      props.setSetupDb("");
+      props.setSetupDb('');
     } else {
       props.newNotification({
-        type: "success",
-        message: "Database connection test passed",
+        type: 'success',
+        message: 'Database connection test passed',
         id: nId,
       });
       props.setSetupDb(dbString);
@@ -79,9 +78,9 @@ export default function SetupDb(props) {
       <div className={styles.db_tabs}>
         <div
           className={`${styles.db_tabs__item} ${
-            mongoInstall === "docker" ? styles.db_tabs__item__active : ""
+            mongoInstall === 'docker' ? styles.db_tabs__item__active : ''
           }`}
-          onClick={() => mongoPreset("docker")}
+          onClick={() => mongoPreset('docker')}
         >
           <p className={`${typo.small} ${typo.uppercase} ${typo.medium}`}>
             Docker
@@ -89,9 +88,9 @@ export default function SetupDb(props) {
         </div>
         <div
           className={`${styles.db_tabs__item} ${
-            mongoInstall === "unraid" ? styles.db_tabs__item__active : ""
+            mongoInstall === 'unraid' ? styles.db_tabs__item__active : ''
           }`}
-          onClick={() => mongoPreset("unraid")}
+          onClick={() => mongoPreset('unraid')}
         >
           <p className={`${typo.small} ${typo.uppercase} ${typo.medium}`}>
             Unraid
@@ -99,9 +98,9 @@ export default function SetupDb(props) {
         </div>
         <div
           className={`${styles.db_tabs__item} ${
-            mongoInstall === "other" ? styles.db_tabs__item__active : ""
+            mongoInstall === 'other' ? styles.db_tabs__item__active : ''
           }`}
-          onClick={() => mongoPreset("other")}
+          onClick={() => mongoPreset('other')}
         >
           <p className={`${typo.small} ${typo.uppercase} ${typo.medium}`}>
             Other
@@ -118,9 +117,9 @@ export default function SetupDb(props) {
           </div>
           <input
             style={
-              mongoStatus === "pending"
-                ? { pointerEvents: "none" }
-                : { pointerEvents: "all" }
+              mongoStatus === 'pending'
+                ? { pointerEvents: 'none' }
+                : { pointerEvents: 'all' }
             }
             type="text"
             name="db"
@@ -134,9 +133,9 @@ export default function SetupDb(props) {
             className={`${styles.db_content__status__item} ${
               styles.db_content__status__item__pending
             } ${
-              mongoStatus === "pending"
+              mongoStatus === 'pending'
                 ? styles.db_content__status__item__active
-                : ""
+                : ''
             }`}
           >
             <Spinner />
@@ -145,9 +144,9 @@ export default function SetupDb(props) {
             className={`${styles.db_content__status__item} ${
               styles.db_content__status__item__good
             } ${
-              mongoStatus === "connected"
+              mongoStatus === 'connected'
                 ? styles.db_content__status__item__active
-                : ""
+                : ''
             }`}
           >
             <Good />
@@ -156,9 +155,9 @@ export default function SetupDb(props) {
             className={`${styles.db_content__status__item} ${
               styles.db_content__status__item__bad
             } ${
-              mongoStatus === "failed"
+              mongoStatus === 'failed'
                 ? styles.db_content__status__item__active
-                : ""
+                : ''
             }`}
           >
             <Bad />
@@ -168,16 +167,16 @@ export default function SetupDb(props) {
       <div className={button.wrap}>
         <button
           className={`${button.secondary} ${button.auto} mt-2 ${
-            mongoStatus !== "pending" ? "" : button.disabled
+            mongoStatus !== 'pending' ? '' : button.disabled
           }`}
           onClick={test}
-          style={{ marginRight: "10px" }}
+          style={{ marginRight: '10px' }}
         >
           Test
         </button>
         <button
           className={`${button.primary} ${button.auto} mt-2 ${
-            mongoStatus === "connected" ? "" : button.disabled
+            mongoStatus === 'connected' ? '' : button.disabled
           }`}
           onClick={props.submit}
         >

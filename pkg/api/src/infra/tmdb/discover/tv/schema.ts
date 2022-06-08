@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const TVResultSchema = z.object({
   backdrop_path: z.union([z.string(), z.null()]),

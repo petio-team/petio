@@ -1,4 +1,4 @@
-@import "../global/variables.module.scss";
+@import '../global/variables.module.scss';
 
 .wrap {
   position: fixed;
@@ -27,8 +27,8 @@
   border-bottom: solid 1px #dcdcde;
 
   p {
-    font-family: "Droid Sans", sans-serif;
-    font: -apple-system-headline, "Droid Sans";
+    font-family: 'Droid Sans', sans-serif;
+    font: -apple-system-headline, 'Droid Sans';
   }
 }
 
@@ -36,13 +36,13 @@
   padding: 20px;
 
   ul {
-    font-family: "Droid Sans", sans-serif;
+    font-family: 'Droid Sans', sans-serif;
     font: -apple-system-footnote;
     padding-left: 15px;
   }
 
   p {
-    font-family: "Droid Sans", sans-serif;
+    font-family: 'Droid Sans', sans-serif;
     font: -apple-system-footnote;
     display: flex;
     align-items: center;
@@ -85,6 +85,6 @@
   font-size: 14px;
   letter-spacing: 1.25px;
   font-weight: 500;
-  font-family: "Droid Sans", sans-serif;
+  font-family: 'Droid Sans', sans-serif;
   border-radius: 4px;
 }

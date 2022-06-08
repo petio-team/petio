@@ -1,9 +1,9 @@
-import { stringify } from "../../lib/object-path";
+import { stringify } from '../../lib/object-path';
+import * as cvtError from './../../error';
+import * as utils from './utils';
 
-import * as utils from "./utils";
 const unroot = utils.unroot;
 
-import * as cvtError from "./../../error";
 const PATH_INVALID = cvtError.PATH_INVALID;
 const VALUE_INVALID = cvtError.VALUE_INVALID;
 
@@ -35,7 +35,7 @@ export default function validator(strictValidation) {
             const err = new VALUE_INVALID(
               "configuration param '" +
                 unroot(stringify(fullpath)) +
-                "' not declared in the schema"
+                "' not declared in the schema",
             );
             errors.undeclared.push(err);
           }
@@ -47,7 +47,7 @@ export default function validator(strictValidation) {
             if (
               attr.required ||
               !(
-                typeof attr.default === "undefined" &&
+                typeof attr.default === 'undefined' &&
                 node[name] === attr.default
               )
             ) {
@@ -65,7 +65,7 @@ export default function validator(strictValidation) {
           const fullname = unroot(stringify(fullpath));
           const notfound = new PATH_INVALID(fullname, path, name, node);
           const error = new VALUE_INVALID(
-            `config parameter "${fullname}" missing from config, did you override its parent? Because ${notfound.why}.`
+            `config parameter "${fullname}" missing from config, did you override its parent? Because ${notfound.why}.`,
           );
           errors.missing.push(error);
         }

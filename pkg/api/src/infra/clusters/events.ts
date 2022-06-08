@@ -1,4 +1,5 @@
 import { config } from '@/config/index';
+
 import { IData } from './ipc';
 
 // Handle events passed by workers

@@ -1,7 +1,8 @@
-import * as utils from "./../performer/utils/utils";
+import * as cvtError from './../error';
+import * as utils from './../performer/utils/utils';
+
 const unroot = utils.unroot;
 
-import * as cvtError from "./../error";
 const LISTOFERRORS = cvtError.LISTOFERRORS;
 const FORMAT_INVALID = cvtError.FORMAT_INVALID;
 
@@ -58,7 +59,7 @@ function SchemaNode(rawSchema) {
    *
    * @returns  {string}    value    Getter name which origin of the value
    */
-  Object.defineProperty(this.attributes, "_cvtGetOrigin", {
+  Object.defineProperty(this.attributes, '_cvtGetOrigin', {
     value: () => {
       return this.getOrigin();
     },
@@ -74,7 +75,7 @@ function SchemaNode(rawSchema) {
    *
    * @param    {*}             value       Value of the property to validate
    */
-  Object.defineProperty(this.attributes, "_cvtValidateFormat", {
+  Object.defineProperty(this.attributes, '_cvtValidateFormat', {
     value: (value) => {
       this.validate(value);
     },
@@ -94,7 +95,7 @@ function SchemaNode(rawSchema) {
    * @returns  {*}    value    Returns coerced value
    *
    */
-  Object.defineProperty(this.attributes, "_cvtCoerce", {
+  Object.defineProperty(this.attributes, '_cvtCoerce', {
     value: (value) => {
       return this.coerce(value);
     },
@@ -146,21 +147,21 @@ SchemaNode.prototype.validate = function (value) {
     this._private.validate(value, schema, fullpath);
   } catch (err) {
     if (err instanceof LISTOFERRORS) {
-      err.message = `${fullpath || "root"}: Custom format "${
+      err.message = `${fullpath || 'root'}: Custom format "${
         schema.format
       }" tried to validate something and failed:`;
 
       err.errors.forEach((error, i) => {
         err.message +=
           `\n    ${i + 1}) ${unroot(error.parent)}:` +
-          ("\n" + error.why).replace(/(\n)/g, "$1    ");
+          ('\n' + error.why).replace(/(\n)/g, '$1    ');
       });
 
       throw err;
     } else {
       // Origin of the value, is getter {name}.
       const name = this._private.origin;
-      const keyname = schema[this._private.origin] ? schema[name] : "";
+      const keyname = schema[this._private.origin] ? schema[name] : '';
       const getter = { name, keyname };
 
       throw new FORMAT_INVALID(fullpath, err.message, getter, value);

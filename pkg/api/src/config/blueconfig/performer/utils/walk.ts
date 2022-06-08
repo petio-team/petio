@@ -1,9 +1,9 @@
-import { parse, stringify } from "../../lib/object-path";
+import { parse, stringify } from '../../lib/object-path';
+import * as cvtError from './../../error';
+import * as utils from './utils';
 
-import * as utils from "./utils";
 const isObjNotNull = utils.isObjNotNull;
 
-import * as cvtError from "./../../error";
 const PATH_INVALID = cvtError.PATH_INVALID;
 
 export default function walk(obj, path, initializeMissing?): Object {
@@ -14,7 +14,7 @@ export default function walk(obj, path, initializeMissing?): Object {
     while (sibling.length) {
       const key = sibling.shift();
 
-      if (key !== "_cvtProperties") {
+      if (key !== '_cvtProperties') {
         historic.push(key);
       }
 
@@ -24,12 +24,12 @@ export default function walk(obj, path, initializeMissing?): Object {
       } else if (isObjNotNull(obj) && key in obj) {
         obj = obj[key];
       } else {
-        const noCvtProp = (path) => path !== "_cvtProperties";
+        const noCvtProp = (path) => path !== '_cvtProperties';
         throw new PATH_INVALID(
           stringify(path.filter(noCvtProp)),
           historic.slice(0, -1),
           historic[historic.length - 1],
-          obj
+          obj,
         );
       }
     }

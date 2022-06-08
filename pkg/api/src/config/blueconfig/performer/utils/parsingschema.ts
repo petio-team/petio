@@ -1,11 +1,9 @@
-import * as utils from "./utils";
+import * as cvtError from './../../error';
+import SchemaNode from './../../model/schemanode';
+import * as utils from './utils';
 
 const isObjNotNull = utils.isObjNotNull;
 const unroot = utils.unroot;
-
-import SchemaNode from "./../../model/schemanode";
-
-import * as cvtError from "./../../error";
 
 const SCHEMA_INVALID = cvtError.SCHEMA_INVALID;
 
@@ -26,12 +24,12 @@ export default function parsingSchema(
   name,
   rawSchema,
   schemaObjectModel,
-  fullpath
+  fullpath,
 ) {
-  if (name === "_cvtProperties") {
+  if (name === '_cvtProperties') {
     throw new SCHEMA_INVALID(
       unroot(fullpath),
-      "'_cvtProperties' is reserved word of blueconfig, it can be used like property name."
+      "'_cvtProperties' is reserved word of blueconfig, it can be used like property name.",
     );
   }
 
@@ -43,7 +41,7 @@ export default function parsingSchema(
     hasFormat && isObjNotNull(hasFormat) && !Array.isArray(hasFormat);
 
   const filterName = (name) => {
-    return name === this._defaultSubstitute ? "default" : name;
+    return name === this._defaultSubstitute ? 'default' : name;
   }; //                    ^^^^^^^^^^^^^^^^^^ = '$~default'
 
   name = filterName(name);
@@ -59,40 +57,40 @@ export default function parsingSchema(
     isObjNotNull(rawSchema) &&
     !isArray &&
     countChildren > 0 &&
-    !("default" in rawSchema) &&
+    !('default' in rawSchema) &&
     (!hasFormat || isConfigPropFormat)
   ) {
     schemaObjectModel[name] = {
       _cvtProperties: {},
     };
     Object.keys(rawSchema).forEach((key) => {
-      const path = fullpath + "." + key;
+      const path = fullpath + '.' + key;
       parsingSchema.call(
         this,
         key,
         rawSchema[key],
         schemaObjectModel[name]._cvtProperties,
-        path
+        path,
       );
     });
     return;
   } else if (
     this._strictParsing &&
     isObjNotNull(rawSchema) &&
-    !("default" in rawSchema)
+    !('default' in rawSchema)
   ) {
     // throw an error instead use magic parsing
-    throw new SCHEMA_INVALID(unroot(fullpath), "default property is missing");
+    throw new SCHEMA_INVALID(unroot(fullpath), 'default property is missing');
     // Magic parsing
   } else if (
-    typeof rawSchema !== "object" ||
+    typeof rawSchema !== 'object' ||
     rawSchema === null ||
     isArray ||
     countChildren === 0
   ) {
     // Parses a shorthand value to a config property
     rawSchema = { default: rawSchema };
-  } else if (!("default" in rawSchema) && !isConfigPropFormat) {
+  } else if (!('default' in rawSchema) && !isConfigPropFormat) {
     // Set `.default` to undefined when it doesn't exist
     rawSchema.default = (function () {})(); // === undefined
   }
@@ -112,11 +110,11 @@ export default function parsingSchema(
 
         const value = schema[keyname];
         if (this._getterAlreadyUsed[keyname].has(value)) {
-          if (typeof usedOnlyOnce === "function") {
+          if (typeof usedOnlyOnce === 'function') {
             return usedOnlyOnce(value, schema, fullpath, keyname);
           } else {
             const errorMessage = `uses a already used getter keyname for "${keyname}", current: \`${keyname}[${JSON.stringify(
-              value
+              value,
             )}]\``;
             throw new SCHEMA_INVALID(unroot(fullpath), errorMessage);
           }
@@ -139,22 +137,22 @@ export default function parsingSchema(
       // if the format property is a built-in JavaScript constructor,
       // assert that the value is of that type
       const Format =
-        typeof format === "string" ? BUILT_INS_BY_NAME[format] : format;
+        typeof format === 'string' ? BUILT_INS_BY_NAME[format] : format;
       const formatFormat = Object.prototype.toString.call(new Format());
       const myFormat = Format.name;
       schema.format = format = myFormat;
       return (value) => {
         if (formatFormat !== Object.prototype.toString.call(value)) {
-          throw new Error("must be of type " + myFormat);
+          throw new Error('must be of type ' + myFormat);
           //        ^^^^^-- will be catch in _cvtValidateFormat and convert to FORMAT_INVALID Error.
         }
       };
-    } else if (typeof format === "string") {
+    } else if (typeof format === 'string') {
       // store declared type
       if (!this.Ruler.types.has(format)) {
         throw new SCHEMA_INVALID(
           unroot(fullpath),
-          `uses an unknown format type (current: ${JSON.stringify(format)})`
+          `uses an unknown format type (current: ${JSON.stringify(format)})`,
         );
       }
       // use a predefined type
@@ -164,43 +162,43 @@ export default function parsingSchema(
       const contains = (whitelist, value) => {
         if (!whitelist.includes(value)) {
           throw new Error(
-            "must be one of the possible values: " + JSON.stringify(whitelist)
+            'must be one of the possible values: ' + JSON.stringify(whitelist),
           );
           //        ^^^^^-- will be catch in _cvtValidateFormat and convert to FORMAT_INVALID Error.
         }
       };
       return contains.bind(null, format);
-    } else if (typeof format === "function") {
+    } else if (typeof format === 'function') {
       return format;
     } else if (format) {
       // Wrong type for format
       const errorMessage =
-        "uses an invalid format, it must be a format name, a function, an array or a known format type";
-      const value = (format || "").toString() || "is a " + typeof format;
+        'uses an invalid format, it must be a format name, a function, an array or a known format type';
+      const value = (format || '').toString() || 'is a ' + typeof format;
       throw new SCHEMA_INVALID(
         unroot(fullpath),
-        `${errorMessage} (current: ${JSON.stringify(value)})`
+        `${errorMessage} (current: ${JSON.stringify(value)})`,
       );
-    } else if (!this._strictParsing && typeof schema.default !== "undefined") {
+    } else if (!this._strictParsing && typeof schema.default !== 'undefined') {
       // Magic format: default format is the type of the default value (if strictParsing is not enabled)
       const defaultFormat = Object.prototype.toString.call(schema.default);
-      const myFormat = defaultFormat.replace(/\[.* |]/g, "");
+      const myFormat = defaultFormat.replace(/\[.* |]/g, '');
       // Magic coerceing
       schema.format = format = myFormat;
       return (value) => {
         if (defaultFormat !== Object.prototype.toString.call(value)) {
-          throw new Error("must be of type " + myFormat);
+          throw new Error('must be of type ' + myFormat);
           //        ^^^^^-- will be catch in _cvtValidateFormat and convert to FORMAT_INVALID Error.
         }
       };
     } else {
       // .format are missing
-      const errorMessage = "format property is missing";
+      const errorMessage = 'format property is missing';
       throw new SCHEMA_INVALID(unroot(fullpath), errorMessage);
     }
   })();
 
-  if (typeof format === "string") {
+  if (typeof format === 'string') {
     schemaNode._private.coerce = this.Ruler.getCoerceMethod(format);
   }
 

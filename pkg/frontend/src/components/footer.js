@@ -1,16 +1,15 @@
-import styles from "../styles/components/footer.module.scss";
-import typo from "../styles/components/typography.module.scss";
+import { Link } from 'react-router-dom';
 
-import { ReactComponent as Logo } from "../assets/svg/logo.svg";
 // import { ReactComponent as Tmdb } from '../assets/svg/tmdb.svg';
-
-import pjson from "../../package.json";
-import { getGenres } from "../helpers/genres";
-import { Link } from "react-router-dom";
+import pjson from '../../package.json';
+import { ReactComponent as Logo } from '../assets/svg/logo.svg';
+import { getGenres } from '../helpers/genres';
+import styles from '../styles/components/footer.module.scss';
+import typo from '../styles/components/typography.module.scss';
 
 export default function Footer() {
-  const movieGenres = getGenres("movie");
-  const tvGenres = getGenres("tv");
+  const movieGenres = getGenres('movie');
+  const tvGenres = getGenres('tv');
   let movieGenresSorted = {};
   Object.keys(movieGenres).forEach((id) => {
     movieGenresSorted[movieGenres[id]] = id;

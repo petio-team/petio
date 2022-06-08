@@ -1,5 +1,5 @@
-import styles from "../styles/components/install.module.scss";
-import { ReactComponent as IosIcon } from "../assets/svg/iosShare.svg";
+import { ReactComponent as IosIcon } from '../assets/svg/iosShare.svg';
+import styles from '../styles/components/install.module.scss';
 
 export default function PwaInstall({ callback }) {
   return (
@@ -20,10 +20,10 @@ export default function PwaInstall({ callback }) {
           <ul>
             <li>
               <p>
-                Step 1: Tap the{" "}
+                Step 1: Tap the{' '}
                 <span>
                   <IosIcon viewBox="0 0 50 50" />
-                </span>{" "}
+                </span>{' '}
                 icon below
               </p>
             </li>

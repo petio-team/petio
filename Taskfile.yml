@@ -1,17 +1,22 @@
-version: "3"
-dotenv: [".env"]
+version: '3'
+dotenv: ['.env']
 tasks:
   default:
     cmds:
-      - task: dev
+      - task: dev:api
 
   # -
   # Run development related tasks
   # -
-  dev:
+  dev:api:
     dir: pkg/api
     cmds:
-      - yarn run start
+      - yarn start
+
+  dev:fe:
+    dir: pkg/frontend
+    cmds:
+      - yarn start
 
   dev:compose:
     cmds:
@@ -22,7 +27,7 @@ tasks:
   # Run build related tasks
   # -
   build:
-    deps: ["build:pre"]
+    deps: ['build:pre']
     cmds:
       - task: build:frontend
       - task: build:api
@@ -73,7 +78,7 @@ tasks:
 
   # Publish the hash of the image
   docker:hash:
-    deps: ["docker:build"]
+    deps: ['docker:build']
     cmds:
       - docker tag {{.DOCKER_IMAGE_REPO}}:local {{.DOCKER_IMAGE_REPO}}:{{.DOCKER_IMAGE_REPO_VERSION}}
       - docker push {{.DOCKER_IMAGE_REPO}}:{{.DOCKER_IMAGE_REPO_VERSION}}
@@ -83,28 +88,28 @@ tasks:
 
   # Publish the new-ui image
   docker:new-ui:
-    deps: ["docker:hash"]
+    deps: ['docker:hash']
     cmds:
       - docker tag {{.DOCKER_IMAGE_REPO}}:local {{.DOCKER_IMAGE_REPO}}:new-ui
       - docker push {{.DOCKER_IMAGE_REPO}}:new-ui
 
   # Publish the nightly image
   docker:nightly:
-    deps: ["docker:hash"]
+    deps: ['docker:hash']
     cmds:
       - docker tag {{.DOCKER_IMAGE_REPO}}:local {{.DOCKER_IMAGE_REPO}}:nightly
       - docker push {{.DOCKER_IMAGE_REPO}}:nightly
 
   # Publish the preview image
   docker:preview:
-    deps: ["docker:hash"]
+    deps: ['docker:hash']
     cmds:
       - docker tag {{.DOCKER_IMAGE_REPO}}:local {{.DOCKER_IMAGE_REPO}}:preview
       - docker push {{.DOCKER_IMAGE_REPO}}:preview
 
   # Publish the latest image
   docker:latest:
-    deps: ["docker:hash"]
+    deps: ['docker:hash']
     cmds:
       - docker tag {{.DOCKER_IMAGE_REPO}}:local {{.DOCKER_IMAGE_REPO}}:latest
       - docker push {{.DOCKER_IMAGE_REPO}}:latest

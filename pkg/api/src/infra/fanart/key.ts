@@ -1,5 +1,5 @@
-import { AxiosRequestConfig } from "axios";
-import { ZodiosInstance, ZodiosEnpointDescriptions } from "@zodios/core";
+import { ZodiosEnpointDescriptions, ZodiosInstance } from '@zodios/core';
+import { AxiosRequestConfig } from 'axios';
 
 export interface ApiKeyPluginConfig {
   getApiKey: () => Promise<string>;
@@ -16,7 +16,7 @@ function createRequestInterceptor(provider: ApiKeyPluginConfig) {
 }
 
 export function pluginApiKey<Api extends ZodiosEnpointDescriptions>(
-  provider: ApiKeyPluginConfig
+  provider: ApiKeyPluginConfig,
 ) {
   return (zodios: ZodiosInstance<Api>) => {
     zodios.axios.interceptors.request.use(createRequestInterceptor(provider));

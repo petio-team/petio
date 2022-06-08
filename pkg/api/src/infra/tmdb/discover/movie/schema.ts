@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const MovieResultSchema = z.object({
   adult: z.boolean(),

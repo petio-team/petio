@@ -2,10 +2,10 @@ export default function (
   state = {
     pages: {},
   },
-  action
+  action,
 ) {
   switch (action.type) {
-    case "pos/store":
+    case 'pos/store':
       let exists = state.pages[action.path];
       let carousels = {};
       let scroll = 0;
@@ -32,7 +32,7 @@ export default function (
         },
       };
 
-    case "pos/clear":
+    case 'pos/clear':
       return {
         ...state,
         pages: {},

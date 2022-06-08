@@ -1,12 +1,13 @@
-import * as z from "zod";
-import fs from "fs/promises";
-import path from "path";
+import fs from 'fs/promises';
+import path from 'path';
+import * as z from 'zod';
 
-import { dataFolder } from "@/config/env";
-import logger from "@/loaders/logger";
-import { config } from "@/config/schema";
-import { WriteConfig } from "@/config/index";
-import { fileExists } from "./config";
+import { dataFolder } from '@/config/env';
+import { WriteConfig } from '@/config/index';
+import { config } from '@/config/schema';
+import logger from '@/loaders/logger';
+
+import { fileExists } from './config';
 
 const MainConfigSchema = z.object({
   DB_URL: z.string().url().min(1),
@@ -64,19 +65,19 @@ interface ConfigParse {
 
 const configFiles: ConfigParse[] = [
   {
-    file: "main",
+    file: 'main',
     schema: MainConfigSchema,
   },
   {
-    file: "email",
+    file: 'email',
     schema: EmailConfigSchema,
   },
   {
-    file: "sonarr",
+    file: 'sonarr',
     schema: z.array(ArrConfigSchema),
   },
   {
-    file: "radarr",
+    file: 'radarr',
     schema: z.array(ArrConfigSchema),
   },
 ];
@@ -96,30 +97,29 @@ const findParseAndMergeConfigs = async (): Promise<boolean> => {
   let isModified = false;
 
   for (const config of configFiles) {
-
-    const file = path.join(dataFolder, config.file + ".json");
+    const file = path.join(dataFolder, config.file + '.json');
     const exists = await fileExists(file);
     if (exists) {
       const content = await fs.readFile(file);
       const parsed = await config.schema.safeParseAsync(content);
       if (!parsed.success) {
-        logger.error("failed to parse config '" + config.file + ".json");
+        logger.error("failed to parse config '" + config.file + '.json');
         continue;
       }
 
       const output = parsed.data.toString();
 
       switch (config.file) {
-        case "main":
+        case 'main':
           transformMainConfig(output);
           break;
-        case "email":
+        case 'email':
           transformEmailConfig(output);
           break;
-        case "radarr":
+        case 'radarr':
           transformRadarrConfig(output);
           break;
-        case "sonarr":
+        case 'sonarr':
           transformSonarrConfig(output);
       }
 
@@ -132,35 +132,35 @@ const findParseAndMergeConfigs = async (): Promise<boolean> => {
 
 const transformMainConfig = (data: any): void => {
   const output = data as MainConfig;
-  config.set("db.url", output.DB_URL);
-  config.set("notifications.discord.url", output.discord_webhook);
-  config.set("notifications.telegram.id", output.telegram_bot_id);
-  config.set("notifications.telegram.token", output.telegram_bot_token);
-  config.set("notifications.telegram.silent", output.telegram_send_silent);
-  config.set("general.popular", output.plexPopular);
-  config.set("petio.subpath", output.base_path);
-  config.set("plex.protocol", output.plexProtocol);
-  config.set("plex.host", output.plexIp);
-  config.set("plex.port", output.plexPort);
-  config.set("plex.token", output.plexToken);
-  config.set("plex.client", output.plexClientID);
-  config.set("admin.id", output.adminId);
-  config.set("admin.username", output.adminUsername);
-  config.set("admin.email", output.adminEmail);
-  config.set("admin.password", output.adminPass);
-  config.set("admin.thumbnail", output.adminThumb);
-  config.set("admin.display", output.adminDisplayName);
+  config.set('db.url', output.DB_URL);
+  config.set('notifications.discord.url', output.discord_webhook);
+  config.set('notifications.telegram.id', output.telegram_bot_id);
+  config.set('notifications.telegram.token', output.telegram_bot_token);
+  config.set('notifications.telegram.silent', output.telegram_send_silent);
+  config.set('general.popular', output.plexPopular);
+  config.set('petio.subpath', output.base_path);
+  config.set('plex.protocol', output.plexProtocol);
+  config.set('plex.host', output.plexIp);
+  config.set('plex.port', output.plexPort);
+  config.set('plex.token', output.plexToken);
+  config.set('plex.client', output.plexClientID);
+  config.set('admin.id', output.adminId);
+  config.set('admin.username', output.adminUsername);
+  config.set('admin.email', output.adminEmail);
+  config.set('admin.password', output.adminPass);
+  config.set('admin.thumbnail', output.adminThumb);
+  config.set('admin.display', output.adminDisplayName);
 };
 
 const transformEmailConfig = (data: any): void => {
   const output = data as EmailConfig;
-  config.set("email.host", output.emailServer);
-  config.set("email.port", output.emailPort);
-  config.set("email.username", output.emailUser);
-  config.set("email.password", output.emailPass);
-  config.set("email.from", output.emailFrom);
-  config.set("email.ssl", output.emailSecure);
-  config.set("email.enabled", output.emailEnabled);
+  config.set('email.host', output.emailServer);
+  config.set('email.port', output.emailPort);
+  config.set('email.username', output.emailUser);
+  config.set('email.password', output.emailPass);
+  config.set('email.from', output.emailFrom);
+  config.set('email.ssl', output.emailSecure);
+  config.set('email.enabled', output.emailEnabled);
 };
 
 const transformSonarrConfig = (data: any): void => {
@@ -186,13 +186,13 @@ const transformSonarrConfig = (data: any): void => {
       },
       language: {
         id: 0,
-        name: "English",
+        name: 'English',
       },
       enabled: instance.enabled,
     });
   }
 
-  config.set("sonarr", sonarrs);
+  config.set('sonarr', sonarrs);
 };
 
 const transformRadarrConfig = (data: any): void => {
@@ -218,11 +218,11 @@ const transformRadarrConfig = (data: any): void => {
       },
       language: {
         id: 0,
-        name: "English",
+        name: 'English',
       },
       enabled: instance.enabled,
     });
   }
 
-  config.set("radarr", radarrs);
+  config.set('radarr', radarrs);
 };

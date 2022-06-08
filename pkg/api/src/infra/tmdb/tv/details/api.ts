@@ -26,7 +26,8 @@ export const TvDetailsSchema = z.object({
       still_path: z.string(),
       vote_average: z.number(),
       vote_count: z.number(),
-    }).or(z.null()),
+    })
+    .or(z.null()),
   name: z.string(),
   next_episode_to_air: z.union([
     z.object({

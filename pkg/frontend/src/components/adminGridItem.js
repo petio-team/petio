@@ -1,5 +1,5 @@
-import styles from "../styles/views/adminSettings.module.scss";
-import typo from "../styles/components/typography.module.scss";
+import typo from '../styles/components/typography.module.scss';
+import styles from '../styles/views/adminSettings.module.scss';
 
 export default function AdminGridItem({ children, title }) {
   return (

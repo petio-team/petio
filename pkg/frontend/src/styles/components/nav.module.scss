@@ -1,4 +1,4 @@
-@import "../global/variables.module.scss";
+@import '../global/variables.module.scss';
 
 .nav {
   padding: 15px 0;
@@ -25,7 +25,7 @@
     }
 
     &:after {
-      content: "";
+      content: '';
       background: linear-gradient(
         0deg,
         rgba(17, 17, 17, 0) 0%,
