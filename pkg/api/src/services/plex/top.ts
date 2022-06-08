@@ -2,11 +2,10 @@ import axios from 'axios';
 import cacheManager from 'cache-manager';
 
 import logger from '@/loaders/logger';
-
-import { movieLookup } from '../tmdb/movie';
-import { showLookup } from '../tmdb/show';
-import plexLookup from './lookup';
-import MakePlexURL from './util';
+import plexLookup from '@/services/plex/lookup';
+import MakePlexURL from '@/services/plex/util';
+import { movieLookup } from '@/services/tmdb/movie';
+import { showLookup } from '@/services/tmdb/show';
 
 const memoryCache = cacheManager.caching({
   store: 'memory',

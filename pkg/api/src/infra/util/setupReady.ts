@@ -1,8 +1,7 @@
 import logger from '@/loaders/logger';
-
-import Movie from '../../models/movie';
-import Show from '../../models/show';
-import { UserModel } from '../../models/user';
+import Movie from '@/models/movie';
+import Show from '@/models/show';
+import { UserModel } from '@/models/user';
 
 export default async () => {
   try {

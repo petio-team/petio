@@ -3,8 +3,11 @@ import { URL } from 'url';
 import RadarrAPI from '@/infra/arr/radarr';
 import { Movie } from '@/infra/arr/radarr/movie';
 import logger from '@/loaders/logger';
-import { DownloaderType, IDownloader } from '@/models/downloaders';
-import { GetAllDownloaders } from '@/models/downloaders';
+import {
+  DownloaderType,
+  GetAllDownloaders,
+  IDownloader,
+} from '@/models/downloaders';
 import Request from '@/models/request';
 
 export default class Radarr {

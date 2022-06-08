@@ -8,8 +8,7 @@ import logger from '@/loaders/logger';
 import fanartLookup from '@/services/fanart';
 import { lookup as imdb } from '@/services/meta/imdb';
 import onServer from '@/services/plex/server';
-
-import getLanguage from './languages';
+import getLanguage from '@/services/tmdb/languages';
 
 const agent = new http.Agent({ family: 4 });
 const memoryCache = cacheManager.caching({

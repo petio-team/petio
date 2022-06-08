@@ -1,5 +1,5 @@
-import Movie from '../../models/movie';
-import Show from '../../models/show';
+import Movie from '@/models/movie';
+import Show from '@/models/show';
 
 export default async (id, type) => {
   let plexMatch = false;

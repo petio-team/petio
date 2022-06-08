@@ -1,8 +1,7 @@
 import axios from 'axios';
 
 import logger from '@/loaders/logger';
-
-import MakePlexURL from './util';
+import MakePlexURL from '@/services/plex/util';
 
 function timeDifference(previous) {
   let now = new Date();

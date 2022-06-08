@@ -9,9 +9,8 @@ import Sonarr from '@/services/downloaders/sonarr';
 import Mailer from '@/services/mail/mailer';
 import Discord from '@/services/notifications/discord';
 import Telegram from '@/services/notifications/telegram';
+import filter from '@/services/requests/filter';
 import { showLookup } from '@/services/tmdb/show';
-
-import filter from './filter';
 
 export default class processRequest {
   request: any;

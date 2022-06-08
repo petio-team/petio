@@ -1,10 +1,10 @@
 import Koa from 'koa';
 
-import agendaFactory from './agenda';
-import config from './config';
-import jobs from './jobs';
-import appRouter from './koa';
-import mongoose from './mongoose';
+import agendaFactory from '@/loaders/agenda';
+import config from '@/loaders/config';
+import jobs from '@/loaders/jobs';
+import appRouter from '@/loaders/koa';
+import mongoose from '@/loaders/mongoose';
 
 export default async ({ httpApp }: { httpApp: Koa }) => {
   // load the config if the file exists, else use defaults

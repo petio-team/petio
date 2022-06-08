@@ -1,14 +1,13 @@
 import { ZodiosInstance } from '@zodios/core';
 
 import { SonarrAPIClient, SonarrAPIEndpoints } from '@/infra/arr/sonarr/index';
+import { LanguageProfile } from '@/infra/arr/sonarr/language_profile';
+import { QualityProfile } from '@/infra/arr/sonarr/quality_profile';
+import { Queue } from '@/infra/arr/sonarr/queue';
+import { RootFolder } from '@/infra/arr/sonarr/root_folder';
+import { Series, SeriesLookup } from '@/infra/arr/sonarr/series';
+import { Tag } from '@/infra/arr/sonarr/tag';
 import { DownloaderType, GetDownloaderById } from '@/models/downloaders';
-
-import { LanguageProfile } from './sonarr/language_profile';
-import { QualityProfile } from './sonarr/quality_profile';
-import { Queue } from './sonarr/queue';
-import { RootFolder } from './sonarr/root_folder';
-import { Series, SeriesLookup } from './sonarr/series';
-import { Tag } from './sonarr/tag';
 
 export default class SonarrAPI {
   private client: ZodiosInstance<typeof SonarrAPIEndpoints>;

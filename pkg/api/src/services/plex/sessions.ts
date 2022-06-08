@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import MakePlexURL from './util';
+import MakePlexURL from '@/services/plex/util';
 
 export default async () => {
   const url = MakePlexURL('/status/sessions').toString();

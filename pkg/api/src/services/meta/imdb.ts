@@ -4,10 +4,9 @@ import lineReader from 'line-reader';
 import path from 'path';
 import zlib from 'zlib';
 
+import { dataFolder } from '@/config/env';
 import logger from '@/loaders/logger';
-
-import { dataFolder } from '../../config/env';
-import Imdb from '../../models/imdb';
+import Imdb from '@/models/imdb';
 
 export async function lookup(imdb_id) {
   if (!imdb_id) {

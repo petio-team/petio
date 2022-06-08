@@ -1,14 +1,13 @@
 import { ZodiosInstance } from '@zodios/core';
 
 import { RadarrAPIClient, RadarrAPIEndpoints } from '@/infra/arr/radarr/index';
+import { Language } from '@/infra/arr/radarr/language';
+import { Movie } from '@/infra/arr/radarr/movie';
+import { QualityProfiles } from '@/infra/arr/radarr/quality_profile';
+import { Queue } from '@/infra/arr/radarr/queue';
+import { RootFolder } from '@/infra/arr/radarr/root_folder';
+import { Tag } from '@/infra/arr/radarr/tag';
 import { DownloaderType, GetDownloaderById } from '@/models/downloaders';
-
-import { Language } from './radarr/language';
-import { Movie } from './radarr/movie';
-import { QualityProfiles } from './radarr/quality_profile';
-import { Queue } from './radarr/queue';
-import { RootFolder } from './radarr/root_folder';
-import { Tag } from './radarr/tag';
 
 export default class RadarrAPI {
   private client: ZodiosInstance<typeof RadarrAPIEndpoints>;
