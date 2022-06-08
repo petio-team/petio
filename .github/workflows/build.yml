@@ -37,8 +37,6 @@ jobs:
 
       - name: Build frontend and api
         run: task --parallel build
-        env:
-          YARN_ENABLE_SCRIPTS: 0
 
       - name: Authenticate with github's docker registry
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9

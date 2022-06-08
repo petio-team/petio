@@ -23,7 +23,7 @@
     "prettier": "^2.6.2"
   },
   "scripts": {
-    "postinstall": "husky install"
+    "prepare": "is-ci || husky install"
   },
   "packageManager": "yarn@3.2.1"
 }
