@@ -22,9 +22,5 @@
     "husky": "^7.0.4",
     "prettier": "^2.6.2"
   },
-  "packageManager": "yarn@3.2.0",
-  "dependencies": {
-    "koa-body": "^5.0.0",
-    "koa-jwt": "^4.0.3"
-  }
+  "packageManager": "yarn@3.2.0"
 }
