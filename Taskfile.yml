@@ -29,7 +29,7 @@ tasks:
   build:
     deps: ['build:pre']
     cmds:
-      - task: build:frontend
+      - task: build:fe
       - task: build:api
 
   build:pre:
