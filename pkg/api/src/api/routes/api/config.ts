@@ -6,8 +6,8 @@ import * as z from 'zod';
 import { validateRequest } from '@/api/middleware/validation';
 import { HasConfig, WriteConfig } from '@/config/config';
 import { config } from '@/config/schema';
-import setupReady from '@/infra/util/setupReady';
 import logger from '@/loaders/logger';
+import setupReady from '@/services/setup/setup';
 
 const route = new Router({ prefix: '/config' });
 
