@@ -12452,6 +12452,7 @@ __metadata:
     http-status-codes: ^2.2.0
     jsonwebtoken: ^8.5.1
     koa: ^2.13.4
+    koa-body: ^5.0.0
     koa-compress: ^5.1.0
     koa-helmet: ^6.1.0
     koa-jwt: ^4.0.3
@@ -12469,6 +12470,7 @@ __metadata:
     nodemailer: ^6.7.5
     nodemon: ^2.0.16
     sanitize-filename: ^1.6.3
+    ts-node: ^10.8.1
     tsconfig-paths: ^4.0.0
     typescript: ^4.7.2
     validator: ^13.7.0
@@ -12508,6 +12510,7 @@ __metadata:
     redux-thunk: ^2.4.1
     sass: 1.49.8
     smoothscroll-polyfill: ^0.4.4
+    ts-node: ^10.8.1
     uuid: ^8.3.2
     web-vitals: ^2.1.4
   languageName: unknown
@@ -12529,8 +12532,6 @@ __metadata:
     "@trivago/prettier-plugin-sort-imports": ^3.2.0
     commitlint: ^17.0.0
     husky: ^7.0.4
-    koa-body: ^5.0.0
-    koa-jwt: ^4.0.3
     prettier: ^2.6.2
   languageName: unknown
   linkType: soft
@@ -13595,7 +13596,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"qs@npm:6.10.3, qs@npm:^6.4.0":
+"qs@npm:6.10.3":
   version: 6.10.3
   resolution: "qs@npm:6.10.3"
   dependencies:
@@ -13608,6 +13609,15 @@ __metadata:
   version: 6.9.3
   resolution: "qs@npm:6.9.3"
   checksum: 89cd1b5e521c19a7e0a7a056ddc261c5c30889664608cf9ce6085f9f25606fc48568cf6a6249e641b4b5c04dac7889e3b82133142523abf397228eb4f488fc38
+  languageName: node
+  linkType: hard
+
+"qs@npm:^6.4.0":
+  version: 6.10.5
+  resolution: "qs@npm:6.10.5"
+  dependencies:
+    side-channel: ^1.0.4
+  checksum: b3873189a11bcf48445864b3ba66f7a76db0d9d874955d197779f561addfa604884f7b107971526ce1eca02c99bf7d1e47f28a3e7e6e29204d798fb279164226
   languageName: node
   linkType: hard
 
@@ -15918,6 +15928,44 @@ __metadata:
     ts-node-transpile-only: dist/bin-transpile.js
     ts-script: dist/bin-script-deprecated.js
   checksum: 1c22dc8dd80d0ba4dd4250b82cc032b63f6fbe8c87f8197cef43e7f9e2d43f5b333b445ed712e3006e24119257b4bff2c46605f7da61ab6f5e9514885d296f0c
+  languageName: node
+  linkType: hard
+
+"ts-node@npm:^10.8.1":
+  version: 10.8.1
+  resolution: "ts-node@npm:10.8.1"
+  dependencies:
+    "@cspotcode/source-map-support": ^0.8.0
+    "@tsconfig/node10": ^1.0.7
+    "@tsconfig/node12": ^1.0.7
+    "@tsconfig/node14": ^1.0.0
+    "@tsconfig/node16": ^1.0.2
+    acorn: ^8.4.1
+    acorn-walk: ^8.1.1
+    arg: ^4.1.0
+    create-require: ^1.1.0
+    diff: ^4.0.1
+    make-error: ^1.1.1
+    v8-compile-cache-lib: ^3.0.1
+    yn: 3.1.1
+  peerDependencies:
+    "@swc/core": ">=1.2.50"
+    "@swc/wasm": ">=1.2.50"
+    "@types/node": "*"
+    typescript: ">=2.7"
+  peerDependenciesMeta:
+    "@swc/core":
+      optional: true
+    "@swc/wasm":
+      optional: true
+  bin:
+    ts-node: dist/bin.js
+    ts-node-cwd: dist/bin-cwd.js
+    ts-node-esm: dist/bin-esm.js
+    ts-node-script: dist/bin-script.js
+    ts-node-transpile-only: dist/bin-transpile.js
+    ts-script: dist/bin-script-deprecated.js
+  checksum: 7d1aa7aa3ae1c0459c4922ed0dbfbade442cfe0c25aebaf620cdf1774f112c8d7a9b14934cb6719274917f35b2c503ba87bcaf5e16a0d39ba0f68ce3e7728363
   languageName: node
   linkType: hard
 

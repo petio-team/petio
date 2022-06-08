@@ -1,15 +1,14 @@
-import carousel from "../styles/components/carousel.module.scss";
-import typo from "../styles/components/typography.module.scss";
-import cards from "../styles/components/card.module.scss";
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { connect } from 'react-redux';
+import { Link, useHistory } from 'react-router-dom';
 
-import { connect } from "react-redux";
-import { Link, useHistory } from "react-router-dom";
+import { ReactComponent as Chevron } from '../assets/svg/chevron.svg';
+import { storePosition } from '../services/position.service';
+import cards from '../styles/components/card.module.scss';
+import carousel from '../styles/components/carousel.module.scss';
+import typo from '../styles/components/typography.module.scss';
 // import { useRouter } from 'next/router';
-
-import Card from "./card";
-import { useEffect, useRef, useLayoutEffect, useState } from "react";
-import { storePosition } from "../services/position.service";
-import { ReactComponent as Chevron } from "../assets/svg/chevron.svg";
+import Card from './card';
 
 const mapStateToProps = (state) => {
   return {
@@ -20,7 +19,7 @@ const mapStateToProps = (state) => {
 function Carousel({
   data,
   title,
-  type = "movie",
+  type = 'movie',
   id,
   redux_pos,
   link,
@@ -40,12 +39,12 @@ function Carousel({
       <div className={cards.wrap} key={`${rowId}_${i}`}>
         <div
           className={
-            type === "company" || type === "request"
+            type === 'company' || type === 'request'
               ? cards.placeholder__wide
               : cards.placeholder
           }
         ></div>
-      </div>
+      </div>,
     );
   }
 
@@ -80,10 +79,10 @@ function Carousel({
       }
     }
 
-    el.addEventListener("scroll", checkScroll);
+    el.addEventListener('scroll', checkScroll);
 
     return () => {
-      el.removeEventListener("scroll", checkScroll);
+      el.removeEventListener('scroll', checkScroll);
     };
   }, [history, track, id, data]);
 
@@ -114,7 +113,7 @@ function Carousel({
     track.current.scroll({
       top: 0,
       left: track.current.scrollLeft - track.current.offsetWidth * 0.8,
-      behavior: "smooth",
+      behavior: 'smooth',
     });
   }
 
@@ -123,7 +122,7 @@ function Carousel({
     track.current.scroll({
       top: 0,
       left: track.current.scrollLeft + track.current.offsetWidth * 0.8,
-      behavior: "smooth",
+      behavior: 'smooth',
     });
   }
 
@@ -131,7 +130,7 @@ function Carousel({
     <div className="container">
       <div
         className={`${carousel.wrap} ${
-          type === "request" ? carousel.wrap__nospacing : ""
+          type === 'request' ? carousel.wrap__nospacing : ''
         }`}
       >
         {link ? (
@@ -142,16 +141,16 @@ function Carousel({
                 <span className={typo.carousel_title__icon}></span>
               </Link>
             ) : (
-              "Loading..."
+              'Loading...'
             )}
           </p>
         ) : (
-          <p className={typo.carousel_title}>{title ? title : "Loading..."}</p>
+          <p className={typo.carousel_title}>{title ? title : 'Loading...'}</p>
         )}
         <div className={carousel.controls}>
           <div
             className={`${carousel.controls__prev} ${
-              start ? carousel.controls__disabled : ""
+              start ? carousel.controls__disabled : ''
             }`}
             onClick={scrollBack}
           >
@@ -159,7 +158,7 @@ function Carousel({
           </div>
           <div
             className={`${carousel.controls__next} ${
-              end ? carousel.controls__disabled : ""
+              end ? carousel.controls__disabled : ''
             }`}
             onClick={scrollForward}
           >
@@ -168,16 +167,16 @@ function Carousel({
         </div>
         <div
           className={`${carousel.track} ${
-            type === "request" ? carousel.track__nospacing : ""
+            type === 'request' ? carousel.track__nospacing : ''
           } carousel-store`}
           id={rowId}
           ref={track}
         >
           {data && data.length > 0
             ? data.map((item, i) => {
-                if (item === "watched") return null;
+                if (item === 'watched') return null;
 
-                if (type === "request") {
+                if (type === 'request') {
                   return (
                     <Card
                       key={`${rowId}__carousel__${item.id}__${i}`}
@@ -196,24 +195,24 @@ function Carousel({
                     ? item.videos.results[0].key
                     : false;
                 const date =
-                  type === "movie"
+                  type === 'movie'
                     ? item.release_date
-                    : type === "tv"
+                    : type === 'tv'
                     ? item.first_air_date
-                    : "";
+                    : '';
                 const poster =
-                  type === "movie" || type === "tv"
+                  type === 'movie' || type === 'tv'
                     ? item.poster_path
-                    : type === "people"
+                    : type === 'people'
                     ? item.profile_path
                     : item.logo_path;
-                if (typeof item === "string" || typeof item === "number")
+                if (typeof item === 'string' || typeof item === 'number')
                   item = { id: item, load: true };
 
                 return (
                   <Card
                     key={`${rowId}__carousel__${item.id}__${i}`}
-                    title={type === "movie" ? item.title : item.name}
+                    title={type === 'movie' ? item.title : item.name}
                     poster={poster}
                     video={video}
                     year={date ? new Date(date).getFullYear() : false}

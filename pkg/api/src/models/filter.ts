@@ -1,8 +1,8 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const FilterSchema = new mongoose.Schema({
   id: String,
   data: Array,
 });
 
-export default mongoose.model("Filter", FilterSchema);
+export default mongoose.model('Filter', FilterSchema);

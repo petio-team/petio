@@ -1,19 +1,20 @@
-import AdminGridItem from "../../components/adminGridItem";
-import styles from "../../styles/views/adminSettings.module.scss";
-import typo from "../../styles/components/typography.module.scss";
-import buttons from "../../styles/components/button.module.scss";
-import inputs from "../../styles/components/input.module.scss";
-import { useState, useEffect } from "react";
-import { connect } from "react-redux";
+import { useEffect, useState } from 'react';
+import { connect } from 'react-redux';
+
+import AdminGridItem from '../../components/adminGridItem';
 import {
   getConfig,
   getEmailConfig,
-  updateConfig,
-  testEmail,
-  testDiscord,
-  testTelegram,
   saveEmailConfig,
-} from "../../services/config.service";
+  testDiscord,
+  testEmail,
+  testTelegram,
+  updateConfig,
+} from '../../services/config.service';
+import buttons from '../../styles/components/button.module.scss';
+import inputs from '../../styles/components/input.module.scss';
+import typo from '../../styles/components/typography.module.scss';
+import styles from '../../styles/views/adminSettings.module.scss';
 
 const mapStateToProps = (state) => {
   return {
@@ -42,8 +43,8 @@ function SettingsNotifications(props) {
       } catch (err) {
         console.log(err);
         props.newNotification({
-          message: "Failed to load config",
-          type: "error",
+          message: 'Failed to load config',
+          type: 'error',
         });
       }
     }
@@ -57,7 +58,7 @@ function SettingsNotifications(props) {
     const name = target.name;
     let value = target.value;
 
-    if (target.type === "checkbox") {
+    if (target.type === 'checkbox') {
       value = target.checked;
     }
 
@@ -72,20 +73,20 @@ function SettingsNotifications(props) {
       let test = await testEmail();
       if (test.result) {
         props.newNotification({
-          message: "Email Test Passed!",
-          type: "success",
+          message: 'Email Test Passed!',
+          type: 'success',
         });
       } else {
         props.newNotification({
-          message: "Email Test Failed",
-          type: "error",
+          message: 'Email Test Failed',
+          type: 'error',
         });
       }
     } catch (err) {
       console.log(err);
       props.newNotification({
-        message: "Email Test Failed",
-        type: "error",
+        message: 'Email Test Failed',
+        type: 'error',
       });
     }
   }
@@ -96,20 +97,20 @@ function SettingsNotifications(props) {
       let test = await testDiscord();
       if (test.result) {
         props.newNotification({
-          message: "Discord Test Passed!",
-          type: "success",
+          message: 'Discord Test Passed!',
+          type: 'success',
         });
       } else {
         props.newNotification({
-          message: "Discord Test Failed",
-          type: "error",
+          message: 'Discord Test Failed',
+          type: 'error',
         });
       }
     } catch (err) {
       console.log(err);
       props.newNotification({
-        message: "Discord Test Failed",
-        type: "error",
+        message: 'Discord Test Failed',
+        type: 'error',
       });
     }
   }
@@ -120,20 +121,20 @@ function SettingsNotifications(props) {
       let test = await testTelegram();
       if (test.result) {
         props.newNotification({
-          message: "Telegram Test Passed!",
-          type: "success",
+          message: 'Telegram Test Passed!',
+          type: 'success',
         });
       } else {
         props.newNotification({
-          message: "Telegram Test Failed",
-          type: "error",
+          message: 'Telegram Test Failed',
+          type: 'error',
         });
       }
     } catch (err) {
       console.log(err);
       props.newNotification({
-        message: "Telegram Test Failed",
-        type: "error",
+        message: 'Telegram Test Failed',
+        type: 'error',
       });
     }
   }
@@ -146,14 +147,14 @@ function SettingsNotifications(props) {
         telegram_send_silently: config.telegram_send_silently,
       });
       props.newNotification({
-        message: "Telegram Chat Config Saved",
-        type: "success",
+        message: 'Telegram Chat Config Saved',
+        type: 'success',
       });
     } catch (err) {
       console.log(err);
       props.newNotification({
-        message: "Failed to Save Telegram Chat Config",
-        type: "error",
+        message: 'Failed to Save Telegram Chat Config',
+        type: 'error',
       });
     }
   }
@@ -164,14 +165,14 @@ function SettingsNotifications(props) {
         discord_webhook: config.discord_webhook,
       });
       props.newNotification({
-        message: "Discord Webhook Saved",
-        type: "success",
+        message: 'Discord Webhook Saved',
+        type: 'success',
       });
     } catch (err) {
       console.log(err);
       props.newNotification({
-        message: "Failed to Save Discord Webhook",
-        type: "error",
+        message: 'Failed to Save Discord Webhook',
+        type: 'error',
       });
     }
   }
@@ -189,14 +190,14 @@ function SettingsNotifications(props) {
       });
 
       props.newNotification({
-        message: "Email Settings Saved!",
-        type: "success",
+        message: 'Email Settings Saved!',
+        type: 'success',
       });
     } catch (err) {
       console.log(err);
       props.newNotification({
-        message: "Failed to Save Email Settings",
-        type: "error",
+        message: 'Failed to Save Email Settings',
+        type: 'error',
       });
     }
   }
@@ -275,7 +276,7 @@ function SettingsNotifications(props) {
               onChange={inputChange}
             />
             <p className={`${typo.body}`}>
-              Use Secure{" "}
+              Use Secure{' '}
               <span className={typo.bold}>(For port 587 or 25 use false)</span>
             </p>
           </div>
@@ -294,7 +295,7 @@ function SettingsNotifications(props) {
         </div>
         <br />
         <p className={`${typo.body}`}>
-          Using Gmail? You can either create a{" "}
+          Using Gmail? You can either create a{' '}
           <a
             target="_blank"
             rel="noreferrer"
@@ -302,7 +303,7 @@ function SettingsNotifications(props) {
             className={typo.link}
           >
             One Time App Password
-          </a>{" "}
+          </a>{' '}
           or you can choose to allow
           <a
             target="_blank"
@@ -310,21 +311,21 @@ function SettingsNotifications(props) {
             href="https://www.google.com/settings/security/lesssecureapps"
             className={typo.link}
           >
-            {" "}
+            {' '}
             Less Secure Apps
-          </a>{" "}
+          </a>{' '}
           to allow Petio to send emails on your behalf.
         </p>
         <br />
         <button
-          className={`${buttons.primary} ${!config ? buttons.disabled : ""}`}
+          className={`${buttons.primary} ${!config ? buttons.disabled : ''}`}
           onClick={emailSave}
         >
           Save
         </button>
         <br />
         <button
-          className={`${buttons.secondary} ${!config ? buttons.disabled : ""}`}
+          className={`${buttons.secondary} ${!config ? buttons.disabled : ''}`}
           onClick={emailTest}
         >
           Test
@@ -333,7 +334,7 @@ function SettingsNotifications(props) {
       <AdminGridItem title="Telegram">
         <p className={`${typo.body}`}>
           Please enter here your Telegram chat config. You can find
-          documentation about Telegram&apos;s bot on{" "}
+          documentation about Telegram&apos;s bot on{' '}
           <a
             href="https://core.telegram.org/bots"
             target="_blank"
@@ -396,14 +397,14 @@ function SettingsNotifications(props) {
         </div>
         <br />
         <button
-          className={`${buttons.primary} ${!config ? buttons.disabled : ""}`}
+          className={`${buttons.primary} ${!config ? buttons.disabled : ''}`}
           onClick={telegramSave}
         >
           Save
         </button>
         <br />
         <button
-          className={`${buttons.secondary} ${!config ? buttons.disabled : ""}`}
+          className={`${buttons.secondary} ${!config ? buttons.disabled : ''}`}
           onClick={telegramTest}
         >
           Test
@@ -422,14 +423,14 @@ function SettingsNotifications(props) {
         />
         <br />
         <button
-          className={`${buttons.primary} ${!config ? buttons.disabled : ""}`}
+          className={`${buttons.primary} ${!config ? buttons.disabled : ''}`}
           onClick={discordSave}
         >
           Save
         </button>
         <br />
         <button
-          className={`${buttons.secondary} ${!config ? buttons.disabled : ""}`}
+          className={`${buttons.secondary} ${!config ? buttons.disabled : ''}`}
           onClick={discordTest}
         >
           Test

@@ -3,17 +3,16 @@ import Bluebird from 'bluebird';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import Radarr from '@/downloaders/radarr';
-import Sonarr from '@/downloaders/sonarr';
 import logger from '@/loaders/logger';
-import Mailer from '@/mail/mailer';
+import { GetAllDownloaders, IDownloader } from '@/models/downloaders';
 import Request from '@/models/request';
 import { UserModel } from '@/models/user';
-import { getArchive } from '@/requests/archive';
-import { getRequests } from '@/requests/display';
-import processRequest from '@/requests/process';
-
-import { GetAllDownloaders, IDownloader } from '@/models/downloaders';
+import Radarr from '@/services/downloaders/radarr';
+import Sonarr from '@/services/downloaders/sonarr';
+import Mailer from '@/services/mail/mailer';
+import { getArchive } from '@/services/requests/archive';
+import { getRequests } from '@/services/requests/display';
+import processRequest from '@/services/requests/process';
 
 const route = new Router({ prefix: '/request' });
 

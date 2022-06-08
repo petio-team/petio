@@ -1,17 +1,15 @@
-import media from "../../services/media.service";
+import { useEffect, useState } from 'react';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/opacity.css';
+import { connect } from 'react-redux';
+import { useParams } from 'react-router-dom';
 
-import { useState, useEffect } from "react";
-import { LazyLoadImage } from "react-lazy-load-image-component";
-import "react-lazy-load-image-component/src/effects/opacity.css";
-import { useParams } from "react-router-dom";
-import { connect } from "react-redux";
-
-import styles from "../../styles/views/person.module.scss";
-import typo from "../../styles/components/typography.module.scss";
-
-import Meta from "../../components/meta";
-import Carousel from "../../components/carousel";
-import { Loading } from "../../components/loading";
+import Carousel from '../../components/carousel';
+import { Loading } from '../../components/loading';
+import Meta from '../../components/meta';
+import media from '../../services/media.service';
+import typo from '../../styles/components/typography.module.scss';
+import styles from '../../styles/views/person.module.scss';
 
 const mapStateToProps = (state) => {
   return {
@@ -77,36 +75,36 @@ function Person({ redux_people }) {
   function processCredit(item) {
     let credit = null;
 
-    if (personData.known_for_department !== "Acting") {
+    if (personData.known_for_department !== 'Acting') {
       // Not actor
-      credit = "";
+      credit = '';
       let o = 0;
 
       if (item.jobs)
         item.jobs.forEach((job) => {
-          if (o > 0) credit += " / ";
+          if (o > 0) credit += ' / ';
           credit += job;
           o++;
         });
       if (item.characters)
         item.characters.forEach((role) => {
-          if (o > 0) credit += " / ";
+          if (o > 0) credit += ' / ';
           credit += role;
           o++;
         });
     } else {
       // actor
-      credit = "";
+      credit = '';
       let o = 0;
       if (item.characters)
         item.characters.forEach((role) => {
-          if (o > 0) credit += " / ";
+          if (o > 0) credit += ' / ';
           credit += role;
           o++;
         });
       if (item.jobs)
         item.jobs.forEach((job) => {
-          if (o > 0) credit += " / ";
+          if (o > 0) credit += ' / ';
           credit += job;
           o++;
         });
@@ -150,21 +148,21 @@ function Person({ redux_people }) {
 
   return (
     <div className={styles.wrap}>
-      <Meta title={personData && personData.info ? personData.info.name : ""} />
+      <Meta title={personData && personData.info ? personData.info.name : ''} />
       {!personData ? <Loading /> : null}
       <div className="container">
         <div className={styles.info}>
           <div className={styles.info__overview}>
             <div className={styles.info__title}>
               <p className={`${typo.title} ${typo.bold}`}>
-                {personData && personData.info ? personData.info.name : ""}
+                {personData && personData.info ? personData.info.name : ''}
               </p>
             </div>
             <div className={styles.info__knownfor}>
               <p className={`${typo.body} ${typo.bold}`}>
                 {personData && personData.info
                   ? personData.info.known_for_department
-                  : ""}
+                  : ''}
               </p>
             </div>
             <div className={styles.info__biography}>
@@ -173,7 +171,7 @@ function Person({ redux_people }) {
                   ? personData.info.biography.length > 800 && !showMore
                     ? `${personData.info.biography.substring(0, 800)} ...`
                     : personData.info.biography
-                  : ""}
+                  : ''}
               </p>
               {personData &&
               personData.info &&
@@ -186,7 +184,7 @@ function Person({ redux_people }) {
                   <p
                     className={`${styles.body} ${styles.uppercase} ${styles.bold}`}
                   >
-                    {showMore ? "Show less" : "Show more"}
+                    {showMore ? 'Show less' : 'Show more'}
                   </p>
                 </div>
               ) : null}

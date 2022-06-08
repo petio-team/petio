@@ -1,7 +1,7 @@
-import { getReviews, saveReview } from "../services/user.service";
-import { ReactComponent as ThumbUp } from "../assets/svg/thumb-up.svg";
-import { ReactComponent as ThumbDown } from "../assets/svg/thumb-down.svg";
-import buttons from "../styles/components/button.module.scss";
+import { ReactComponent as ThumbDown } from '../assets/svg/thumb-down.svg';
+import { ReactComponent as ThumbUp } from '../assets/svg/thumb-up.svg';
+import { getReviews, saveReview } from '../services/user.service';
+import buttons from '../styles/components/button.module.scss';
 
 export default function ReviewButtons({
   styles,
@@ -13,13 +13,13 @@ export default function ReviewButtons({
   async function review(type) {
     if (!type) return;
     try {
-      await saveReview(data, currentUser.id, type === "good" ? 10 : 1);
+      await saveReview(data, currentUser.id, type === 'good' ? 10 : 1);
       await getReviews();
     } catch (e) {
       console.log(e);
       newNotification({
-        message: "Failed to save review",
-        type: "error",
+        message: 'Failed to save review',
+        type: 'error',
       });
     }
   }
@@ -40,17 +40,17 @@ export default function ReviewButtons({
     <>
       <button
         className={`${buttons.icon} ${styles.actions__btn} ${
-          reviewed === 10 ? styles.actions__btn__up : ""
+          reviewed === 10 ? styles.actions__btn__up : ''
         }`}
-        onClick={() => review("good")}
+        onClick={() => review('good')}
       >
         <ThumbUp viewBox="0 0 24 24" />
       </button>
       <button
         className={`${buttons.icon} ${styles.actions__btn} ${
-          reviewed === 1 ? styles.actions__btn__down : ""
+          reviewed === 1 ? styles.actions__btn__down : ''
         }`}
-        onClick={() => review("bad")}
+        onClick={() => review('bad')}
       >
         <ThumbDown viewBox="0 0 24 24" />
       </button>

@@ -1,9 +1,10 @@
-import { connect } from "react-redux";
-import styles from "../../styles/views/admin.module.scss";
-import { getSessions } from "../../services/plex.service";
-import { useEffect, useState } from "react";
-import ActivitySession from "./activitySession";
-import typo from "../../styles/components/typography.module.scss";
+import { useEffect, useState } from 'react';
+import { connect } from 'react-redux';
+
+import { getSessions } from '../../services/plex.service';
+import typo from '../../styles/components/typography.module.scss';
+import styles from '../../styles/views/admin.module.scss';
+import ActivitySession from './activitySession';
 
 const mapStateToProps = (state) => {
   return {
@@ -42,15 +43,15 @@ function Activity({ system }) {
   }, [liveUpdate]);
 
   function formatBytes(bytes, decimals = 2) {
-    if (bytes === 0) return "0 bps";
+    if (bytes === 0) return '0 bps';
 
     const k = 1024;
     const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ["bps", "Kbps", "Mbps", "Gbps", "TB", "PB", "EB", "ZB", "YB"];
+    const sizes = ['bps', 'Kbps', 'Mbps', 'Gbps', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
     const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   }
 
   return (
@@ -78,15 +79,15 @@ function Activity({ system }) {
 
           let playback = selectedMedia.Part
             ? selectedMedia.Part[0].decision
-            : "unknown";
+            : 'unknown';
           switch (session.type) {
-            case "episode":
+            case 'episode':
               media = session.grandparentRatingKey;
-              type = "tv";
+              type = 'tv';
               break;
-            case "movie":
+            case 'movie':
               media = session.ratingKey;
-              type = "movie";
+              type = 'movie';
               break;
             default:
               media = null;

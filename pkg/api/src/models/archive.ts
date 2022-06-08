@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const ArchiveSchema = new mongoose.Schema({
   requestId: String,
@@ -18,4 +18,4 @@ const ArchiveSchema = new mongoose.Schema({
   timeStamp: Date,
 });
 
-export default mongoose.model("Archive", ArchiveSchema);
+export default mongoose.model('Archive', ArchiveSchema);

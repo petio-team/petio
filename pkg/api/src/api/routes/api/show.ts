@@ -2,7 +2,7 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import { discoverSeries, network, showLookup } from '@/tmdb/show';
+import { discoverSeries, network, showLookup } from '@/services/tmdb/show';
 
 const route = new Router({ prefix: '/show' });
 

@@ -1,10 +1,10 @@
 // import Router from 'next/router';
-import { useState, useEffect } from "react";
-import styles from "../styles/components/error.module.scss";
-import typo from "../styles/components/typography.module.scss";
-// import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 
-import Meta from "../components/meta";
+// import { useRouter } from 'next/router';
+import Meta from '../components/meta';
+import styles from '../styles/components/error.module.scss';
+import typo from '../styles/components/typography.module.scss';
 
 export default function Error(props) {
   const [countdown, setCountdown] = useState(30);
@@ -22,7 +22,7 @@ export default function Error(props) {
 
   return (
     <>
-      <Meta title={"Error"} />
+      <Meta title={'Error'} />
       <div className={styles.wrap}>
         <div className="container">
           <p className={`${typo.xltitle} ${typo.bold}`}>Oops</p>

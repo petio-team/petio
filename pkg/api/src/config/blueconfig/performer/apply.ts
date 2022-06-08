@@ -1,6 +1,7 @@
-import { cloneDeep } from "lodash";
+import { cloneDeep } from 'lodash';
 
-import * as utils from "./utils/utils";
+import * as utils from './utils/utils';
+
 const isObjNotNull = utils.isObjNotNull;
 
 /**
@@ -73,10 +74,10 @@ Apply.prototype.getters = function applyGetters(schema, node) {
           this,
           value,
           mySchema.attributes,
-          stopPropagation
+          stopPropagation,
         );
 
-        if (typeof node[name] !== "undefined" || propagationAsked) {
+        if (typeof node[name] !== 'undefined' || propagationAsked) {
           // We use function because function are not saved/exported in schema
           mySchema._private.origin = getterName;
           break;
@@ -90,7 +91,7 @@ Apply.prototype.getters = function applyGetters(schema, node) {
  * Apply values from config merged
  */
 Apply.prototype.values = function applyValues(from, to, schema) {
-  const indexVal = this._getters.order.indexOf("value");
+  const indexVal = this._getters.order.indexOf('value');
   Object.keys(from).forEach((name) => {
     const mySchema =
       schema && schema._cvtProperties ? schema._cvtProperties[name] : null;
@@ -99,7 +100,7 @@ Apply.prototype.values = function applyValues(from, to, schema) {
       Array.isArray(from[name]) ||
       !isObjNotNull(from[name]) ||
       !schema ||
-      schema.format === "object"
+      schema.format === 'object'
     ) {
       const lastG = mySchema && mySchema.getOrigin && mySchema.getOrigin();
 
@@ -110,7 +111,7 @@ Apply.prototype.values = function applyValues(from, to, schema) {
       to[name] =
         mySchema && mySchema.coerce ? mySchema.coerce(from[name]) : from[name];
       if (lastG) {
-        mySchema._private.origin = "value";
+        mySchema._private.origin = 'value';
       }
     } else {
       if (!isObjNotNull(to[name])) to[name] = {};

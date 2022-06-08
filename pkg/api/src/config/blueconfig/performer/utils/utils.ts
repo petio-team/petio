@@ -1,11 +1,11 @@
 // With 'in': Prevent error: 'Cannot use 'in' operator to search for {key} in {value}'
 export function isObjNotNull(obj) {
-  return typeof obj === "object" && obj !== null;
+  return typeof obj === 'object' && obj !== null;
 }
 
 export function unroot(text) {
-  return (text || "").replace(
+  return (text || '').replace(
     /^(?:root(\.|\[)?|\.(.+))/g,
-    (_, b, c) => c || (b === "[" ? "[" : "")
+    (_, b, c) => c || (b === '[' ? '[' : ''),
   );
 }

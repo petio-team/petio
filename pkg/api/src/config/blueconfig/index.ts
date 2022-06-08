@@ -1,6 +1,6 @@
-import parseArgs from "yargs-parser";
+import parseArgs from 'yargs-parser';
 
-import Core from "./core";
+import Core from './core';
 
 /**
  * Static version of BlueConfigCore, with standard getters/formats:
@@ -49,29 +49,29 @@ Blueconfig.addParser = Core.prototype.addParser;
 
 /* >> default getters & standard formats */
 // Add getters
-Blueconfig.addGetter("default", (value, schema, stopPropagation) =>
-  schema._cvtCoerce(value)
+Blueconfig.addGetter('default', (value, schema, stopPropagation) =>
+  schema._cvtCoerce(value),
 );
-Blueconfig.sortGetters(["default", "value"]); // set default before value
-Blueconfig.addGetter("env", function (value, schema, stopPropagation) {
+Blueconfig.sortGetters(['default', 'value']); // set default before value
+Blueconfig.addGetter('env', function (value, schema, stopPropagation) {
   return schema._cvtCoerce(this.getEnv()[value]);
 });
 Blueconfig.addGetter(
-  "arg",
+  'arg',
   function (value, schema, stopPropagation) {
     const argv = parseArgs(this.getArgs(), {
       configuration: {
-        "dot-notation": false,
+        'dot-notation': false,
       },
     });
     return schema._cvtCoerce(argv[value]);
   },
-  true
+  true,
 );
 
 // Add formats
-Blueconfig.addFormats(require("./format/standard-formats"));
-Blueconfig.addFormats(require("./format/validator"));
+Blueconfig.addFormats(require('./format/standard-formats'));
+Blueconfig.addFormats(require('./format/validator'));
 /* << */
 
 export default Blueconfig;

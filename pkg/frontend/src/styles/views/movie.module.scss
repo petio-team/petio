@@ -1,4 +1,4 @@
-@import "../global/variables.module.scss";
+@import '../global/variables.module.scss';
 
 .overview {
   position: relative;
@@ -230,7 +230,7 @@
         border-left: solid 1.5px $orange;
 
         &:after {
-          content: "";
+          content: '';
           display: block;
           height: 10px;
           width: 10px;

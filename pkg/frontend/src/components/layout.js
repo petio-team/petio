@@ -1,7 +1,6 @@
-import Nav from "./nav";
-import Footer from "./footer";
-
-import styles from "../styles/components/page.module.scss";
+import styles from '../styles/components/page.module.scss';
+import Footer from './footer';
+import Nav from './nav';
 
 export default function Layout({ isLoggedIn, children, currentUser }) {
   return (

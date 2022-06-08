@@ -1,12 +1,11 @@
-import grid from "../styles/components/grid.module.scss";
-import cards from "../styles/components/card.module.scss";
-
-import Card from "./card";
+import cards from '../styles/components/card.module.scss';
+import grid from '../styles/components/grid.module.scss';
+import Card from './card';
 
 export default function Grid({
   data,
   title,
-  type = "movie",
+  type = 'movie',
   id,
   newNotification,
 }) {
@@ -17,12 +16,12 @@ export default function Grid({
       <div className={cards.grid__wrap} key={`${id}__grid__placeholder__${i}`}>
         <div
           className={
-            type === "company"
+            type === 'company'
               ? cards.placeholder__grid__wide
               : cards.placeholder__grid
           }
         ></div>
-      </div>
+      </div>,
     );
   }
 
@@ -32,29 +31,29 @@ export default function Grid({
         <div className={grid.inner}>
           {data && data.length > 0
             ? data.map((item, i) => {
-                if (item === "watched") return null;
+                if (item === 'watched') return null;
                 const video =
                   item.videos && item.videos.results.length > 0
                     ? item.videos.results[0].key
                     : false;
                 const date =
-                  type === "movie"
+                  type === 'movie'
                     ? item.release_date
-                    : type === "tv"
+                    : type === 'tv'
                     ? item.first_air_date
-                    : "";
+                    : '';
                 const poster =
-                  type === "movie" || type === "tv"
+                  type === 'movie' || type === 'tv'
                     ? item.poster_path
-                    : type === "people"
+                    : type === 'people'
                     ? item.profile_path
                     : item.logo_path;
-                if (typeof item === "string" || typeof item === "number")
+                if (typeof item === 'string' || typeof item === 'number')
                   item = { id: item, load: true };
                 return (
                   <Card
                     key={`${id}__grid__${item.id}__${i}`}
-                    title={type === "movie" ? item.title : item.name}
+                    title={type === 'movie' ? item.title : item.name}
                     poster={poster}
                     video={video}
                     year={date ? new Date(date).getFullYear() : false}

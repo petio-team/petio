@@ -1,6 +1,6 @@
-import inputs from "../styles/components/input.module.scss";
-import styles from "../styles/views/adminSettings.module.scss";
-import typo from "../styles/components/typography.module.scss";
+import inputs from '../styles/components/input.module.scss';
+import typo from '../styles/components/typography.module.scss';
+import styles from '../styles/views/adminSettings.module.scss';
 
 export default function FilterAction(props) {
   return (
@@ -25,7 +25,7 @@ export default function FilterAction(props) {
             data-key="server"
             data-type={props.type}
           >
-            {props.servers === "loading" ? (
+            {props.servers === 'loading' ? (
               <option value="">Loading</option>
             ) : props.servers && props.servers.length > 0 ? (
               <>
@@ -108,7 +108,7 @@ export default function FilterAction(props) {
                         {profile.name}
                       </option>
                     );
-                  }
+                  },
                 )}
               </>
             ) : (
@@ -144,7 +144,7 @@ export default function FilterAction(props) {
                         {lang.language.name}
                       </option>
                     );
-                  }
+                  },
                 )}
               </>
             ) : (

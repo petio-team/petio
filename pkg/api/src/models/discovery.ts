@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const DiscoverySchema = new mongoose.Schema({
   id: { type: String, index: true },
@@ -20,4 +20,4 @@ const DiscoverySchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.model("Discover", DiscoverySchema);
+export default mongoose.model('Discover', DiscoverySchema);

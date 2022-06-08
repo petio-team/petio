@@ -1,11 +1,12 @@
-import styles from "../styles/components/trailer.module.scss";
-import ReactPlayer from "react-player/youtube";
-import { useEffect, useRef, useState } from "react";
-import { LazyLoadImage } from "react-lazy-load-image-component";
-import "react-lazy-load-image-component/src/effects/opacity.css";
-import { ReactComponent as PlayIcon } from "../assets/svg/play.svg";
-import { ReactComponent as PauseIcon } from "../assets/svg/pause.svg";
-import { ReactComponent as CloseIcon } from "../assets/svg/close.svg";
+import { useEffect, useRef, useState } from 'react';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/opacity.css';
+import ReactPlayer from 'react-player/youtube';
+
+import { ReactComponent as CloseIcon } from '../assets/svg/close.svg';
+import { ReactComponent as PauseIcon } from '../assets/svg/pause.svg';
+import { ReactComponent as PlayIcon } from '../assets/svg/play.svg';
+import styles from '../styles/components/trailer.module.scss';
 
 export default function Trailer({ videoId, callback, newNotification }) {
   const [playing, setPlaying] = useState(false);
@@ -45,8 +46,8 @@ export default function Trailer({ videoId, callback, newNotification }) {
   useEffect(() => {
     if (!ReactPlayer.canPlay(`https://www.youtube.com/watch?v=${videoId}`)) {
       newNotification({
-        message: "Unable to load video",
-        type: "error",
+        message: 'Unable to load video',
+        type: 'error',
       });
     }
     // eslint-disable-next-line
@@ -60,7 +61,7 @@ export default function Trailer({ videoId, callback, newNotification }) {
         onMouseLeave={() => setShowControls(false)}
       >
         <div
-          className={`${styles.video} ${isPlaying ? styles.video__show : ""}`}
+          className={`${styles.video} ${isPlaying ? styles.video__show : ''}`}
         >
           <ReactPlayer
             ref={player}
@@ -76,16 +77,16 @@ export default function Trailer({ videoId, callback, newNotification }) {
             onPause={() => setIsPlaying(false)}
             onProgress={handleProgress}
             onError={(e) => {
-              console.log("error playing");
+              console.log('error playing');
               newNotification({
-                message: "Unable to play video",
-                type: "error",
+                message: 'Unable to play video',
+                type: 'error',
               });
             }}
           />
         </div>
         <LazyLoadImage
-          className={`${styles.poster} ${isPlaying ? styles.poster__hide : ""}`}
+          className={`${styles.poster} ${isPlaying ? styles.poster__hide : ''}`}
           src={`http://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
           alt="Video Poster"
           effect="opacity"
@@ -95,7 +96,7 @@ export default function Trailer({ videoId, callback, newNotification }) {
         </div>
         <div
           className={`${styles.controls} ${
-            showControls ? styles.controls__show : ""
+            showControls ? styles.controls__show : ''
           }`}
         >
           <button
@@ -107,11 +108,11 @@ export default function Trailer({ videoId, callback, newNotification }) {
           <div className={styles.controls__progress}>
             <div
               className={styles.controls__progress__buffer}
-              style={{ width: progress.loaded * 100 + "%" }}
+              style={{ width: progress.loaded * 100 + '%' }}
             ></div>
             <div
               className={styles.controls__progress__pos}
-              style={{ width: progress.played * 100 + "%" }}
+              style={{ width: progress.played * 100 + '%' }}
             ></div>
             <input
               className={styles.controls__progress__input}

@@ -1,23 +1,19 @@
-import fs from "fs";
+import fs from 'fs';
+import { cloneDeep } from 'lodash';
 
-import { cloneDeep } from "lodash";
-import { stringify, parse } from "../lib/object-path";
-
-import SchemaNode from "./schemanode";
-
-import Apply from "./../performer/apply";
-
-import parsingSchema from "./../performer/utils/parsingschema";
-import validator from "./../performer/utils/validator";
-import * as utils from "./../performer/utils/utils";
-import walk from "./../performer/utils/walk";
+import { parse, stringify } from '../lib/object-path';
+import * as cvtError from './../error';
+import Apply from './../performer/apply';
+import parsingSchema from './../performer/utils/parsingschema';
+import * as utils from './../performer/utils/utils';
+import validator from './../performer/utils/validator';
+import walk from './../performer/utils/walk';
+import SchemaNode from './schemanode';
 
 const unroot = utils.unroot;
 
-const ALLOWED_OPTION_STRICT = "strict";
-const ALLOWED_OPTION_WARN = "warn";
-
-import * as cvtError from "./../error";
+const ALLOWED_OPTION_STRICT = 'strict';
+const ALLOWED_OPTION_WARN = 'warn';
 
 const BLUECONFIG_ERROR = cvtError.BLUECONFIG_ERROR;
 // 2
@@ -78,10 +74,10 @@ function ConfigObjectModel(rawSchema, options, scope) {
   // to use default key for config properties.
   const optsDefSub = options ? options.defaultSubstitute : false;
   this._defaultSubstitute =
-    typeof optsDefSub !== "string" ? "$~default" : optsDefSub;
+    typeof optsDefSub !== 'string' ? '$~default' : optsDefSub;
 
   // If the definition is a string treat it as an external schema file
-  if (typeof rawSchema === "string") {
+  if (typeof rawSchema === 'string') {
     rawSchema = parseFile.call(this, rawSchema);
   }
 
@@ -109,7 +105,7 @@ function ConfigObjectModel(rawSchema, options, scope) {
       key,
       rawSchema[key],
       this._schema._cvtProperties,
-      key
+      key,
     );
   });
 
@@ -171,7 +167,7 @@ ConfigObjectModel.prototype.toString = function () {
     const childKey = path.pop();
     const parentKey = stringify(path);
     const parent = walk(clone, parentKey);
-    parent[childKey] = "[Sensitive]";
+    parent[childKey] = '[Sensitive]';
   });
   return JSON.stringify(clone, null, 2);
 };
@@ -192,7 +188,7 @@ ConfigObjectModel.prototype.getSchema = function (debug) {
 function convertSchema(schemaObjectModel) {
   if (
     !schemaObjectModel ||
-    typeof schemaObjectModel !== "object" ||
+    typeof schemaObjectModel !== 'object' ||
     Array.isArray(schemaObjectModel)
   ) {
     return schemaObjectModel;
@@ -208,7 +204,7 @@ function convertSchema(schemaObjectModel) {
 
     Object.keys(schemaObjectModel).forEach((name) => {
       let keyname = name;
-      if (name === "default" && !isSchemaNode) {
+      if (name === 'default' && !isSchemaNode) {
         keyname = this._defaultSubstitute;
       }
 
@@ -273,7 +269,7 @@ function pathToSchemaPath(path) {
   const schemaPath = Array<any>();
 
   path = parse(path);
-  path.forEach((property) => schemaPath.push(property, "_cvtProperties"));
+  path.forEach((property) => schemaPath.push(property, '_cvtProperties'));
   schemaPath.splice(-1);
 
   /* if (addPath) {
@@ -371,14 +367,14 @@ ConfigObjectModel.prototype.default = function (strPath) {
   } catch (err) {
     if (err instanceof PATH_INVALID) {
       throw new PATH_INVALID(
-        err.fullname + ".default",
+        err.fullname + '.default',
         err.path,
         err.name,
-        err.value
+        err.value,
       );
     } else {
       throw new INCORRECT_USAGE(
-        unroot(strPath) + ': Cannot read property "default"'
+        unroot(strPath) + ': Cannot read property "default"',
       );
     }
   }
@@ -395,7 +391,7 @@ ConfigObjectModel.prototype.default = function (strPath) {
  * @return   {this}
  */
 ConfigObjectModel.prototype.reset = function (name) {
-  this.set(name, this.default(name), "default", false);
+  this.set(name, this.default(name), 'default', false);
 
   return this;
 };
@@ -417,7 +413,7 @@ ConfigObjectModel.prototype.has = function (name) {
     try {
       const prop = walk(
         this._schemaRoot._cvtProperties,
-        pathToSchemaPath(name)
+        pathToSchemaPath(name),
       );
       return (prop as any).attributes.required;
     } catch (err) {
@@ -437,7 +433,7 @@ ConfigObjectModel.prototype.has = function (name) {
 
   try {
     // values that are set and required = false but undefined return false
-    return isRequired || typeof this.get(name) !== "undefined";
+    return isRequired || typeof this.get(name) !== 'undefined';
   } catch (err) {
     return false;
   }
@@ -495,21 +491,21 @@ ConfigObjectModel.prototype.set = function (
   name,
   value,
   priority,
-  respectPriority
+  respectPriority,
 ) {
-  name = name.replace(/^\.(.+)$/, "$1"); // fix fast `root` & `unroot` issue (devfriendly)
+  name = name.replace(/^\.(.+)$/, '$1'); // fix fast `root` & `unroot` issue (devfriendly)
 
   const mySchema = traverseSchema(this._schemaRoot, name);
 
   if (!priority) {
-    priority = "value";
-  } else if (typeof priority !== "string") {
-    priority = "force";
+    priority = 'value';
+  } else if (typeof priority !== 'string') {
+    priority = 'force';
   } else if (
     !this._getters.list[priority] &&
-    !["value", "force"].includes(priority)
+    !['value', 'force'].includes(priority)
   ) {
-    throw new INCORRECT_USAGE("unknown getter: " + priority);
+    throw new INCORRECT_USAGE('unknown getter: ' + priority);
   } else if (!mySchema) {
     // no schema and custom priority = impossible
     const errorMsg =
@@ -590,7 +586,7 @@ ConfigObjectModel.prototype.load = function (obj) {
       root: cloneDeep(obj),
     },
     this._instance,
-    this._schema
+    this._schema,
   );
 
   return this;
@@ -618,12 +614,12 @@ ConfigObjectModel.prototype.loadFile = function (paths) {
 };
 
 function parseFile(path) {
-  const segments = path.split(".");
-  const extension = segments.length > 1 ? segments.pop() : "";
+  const segments = path.split('.');
+  const extension = segments.length > 1 ? segments.pop() : '';
 
   // TODO: Get rid of the sync call
   // eslint-disable-next-line no-sync
-  return this.Parser.parse(extension, fs.readFileSync(path, "utf-8"));
+  return this.Parser.parse(extension, fs.readFileSync(path, 'utf-8'));
 }
 
 /**
@@ -665,9 +661,9 @@ function parseFile(path) {
  * @return   {this}
  */
 ConfigObjectModel.prototype.merge = function (sources, contentType) {
-  if (!Array.isArray(sources) || contentType === "data") sources = [sources];
+  if (!Array.isArray(sources) || contentType === 'data') sources = [sources];
   sources.forEach((config) => {
-    if (typeof config !== "string" || contentType === "data") {
+    if (typeof config !== 'string' || contentType === 'data') {
       this.load(config);
     } else {
       const json = parseFile.call(this, config);
@@ -712,9 +708,9 @@ ConfigObjectModel.prototype.validate = function (options) {
 
   options.allowed = options.allowed || ALLOWED_OPTION_WARN;
 
-  if (options.output && typeof options.output !== "function") {
+  if (options.output && typeof options.output !== 'function') {
     throw new CUSTOMISE_FAILED(
-      "options.output is optionnal and must be a function."
+      'options.output is optionnal and must be a function.',
     );
   }
 
@@ -723,8 +719,8 @@ ConfigObjectModel.prototype.validate = function (options) {
   const errors = validator.call(this, options.allowed);
 
   // Write 'Warning:' in bold and in yellow
-  const BOLD_YELLOW_TEXT = "\x1b[33;1m";
-  const RESET_TEXT = "\x1b[0m";
+  const BOLD_YELLOW_TEXT = '\x1b[33;1m';
+  const RESET_TEXT = '\x1b[0m';
 
   if (
     errors.invalid_type.length +
@@ -736,42 +732,42 @@ ConfigObjectModel.prototype.validate = function (options) {
     const fillErrorBuffer = function (errors) {
       const messages = Array<any>();
       errors.forEach(function (err) {
-        let err_buf = "  - ";
+        let err_buf = '  - ';
 
         /* if (err.type) {
           err_buf += '[' + err.type + '] '
         } */
         if (err.fullname) {
-          err_buf += unroot(err.fullname) + ": ";
+          err_buf += unroot(err.fullname) + ': ';
         }
         if (err.message) {
           err_buf += err.message;
         }
 
-        const hidden = !!sensitive.has("root." + err.fullname);
-        const value = hidden ? "[Sensitive]" : JSON.stringify(err.value);
+        const hidden = !!sensitive.has('root.' + err.fullname);
+        const value = hidden ? '[Sensitive]' : JSON.stringify(err.value);
         const getterValue = hidden
-          ? "[Sensitive]"
+          ? '[Sensitive]'
           : JSON.stringify(err.getter && err.getter.keyname);
 
         if (err.value) {
-          err_buf += ": value was " + value;
+          err_buf += ': value was ' + value;
 
           const getter = err.getter ? err.getter.name : false;
 
           if (getter) {
-            err_buf += ", getter was `" + getter;
-            err_buf += getter !== "value" ? "[" + getterValue + "]`" : "`";
+            err_buf += ', getter was `' + getter;
+            err_buf += getter !== 'value' ? '[' + getterValue + ']`' : '`';
           }
         }
 
         if (!(err instanceof BLUECONFIG_ERROR)) {
-          let warning = "[/!\\ this is probably blueconfig internal error]";
+          let warning = '[/!\\ this is probably blueconfig internal error]';
           console.error(err);
           if (process.stdout.isTTY) {
             warning = BOLD_YELLOW_TEXT + warning + RESET_TEXT;
           }
-          err_buf += " " + warning;
+          err_buf += ' ' + warning;
         }
 
         messages.push(err_buf);
@@ -779,18 +775,18 @@ ConfigObjectModel.prototype.validate = function (options) {
       return messages;
     };
 
-    const types_err_buf = fillErrorBuffer(errors.invalid_type).join("\n");
-    const params_err_buf = fillErrorBuffer(errors.undeclared).join("\n");
-    const missing_err_buf = fillErrorBuffer(errors.missing).join("\n");
+    const types_err_buf = fillErrorBuffer(errors.invalid_type).join('\n');
+    const params_err_buf = fillErrorBuffer(errors.undeclared).join('\n');
+    const missing_err_buf = fillErrorBuffer(errors.missing).join('\n');
 
     const output_err_bufs = [types_err_buf, missing_err_buf];
 
     if (options.allowed === ALLOWED_OPTION_WARN && params_err_buf.length) {
-      let warning = "Warning:";
+      let warning = 'Warning:';
       if (process.stdout.isTTY) {
         warning = BOLD_YELLOW_TEXT + warning + RESET_TEXT;
       }
-      output_function(warning + "\n" + params_err_buf);
+      output_function(warning + '\n' + params_err_buf);
     } else if (options.allowed === ALLOWED_OPTION_STRICT) {
       output_err_bufs.push(params_err_buf);
     }
@@ -799,7 +795,7 @@ ConfigObjectModel.prototype.validate = function (options) {
       .filter(function (str) {
         return str.length;
       })
-      .join("\n");
+      .join('\n');
 
     if (output.length) {
       throw new VALIDATE_FAILED(output);

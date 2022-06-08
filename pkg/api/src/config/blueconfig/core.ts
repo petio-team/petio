@@ -1,10 +1,9 @@
-import ConfigObjectModel from "./model/com";
+import * as cvtError from './error';
+import ConfigObjectModel from './model/com';
+import GetterInterface from './performer/getter';
+import ParserInterface from './performer/parser';
+import RulerInterface from './performer/ruler';
 
-import ParserInterface from "./performer/parser";
-import GetterInterface from "./performer/getter";
-import RulerInterface from "./performer/ruler";
-
-import * as cvtError from "./error";
 const CUSTOMISE_FAILED = cvtError.CUSTOMISE_FAILED;
 
 /**
@@ -93,7 +92,7 @@ BlueconfigCore.prototype.getGettersOrder = function () {
 BlueconfigCore.prototype.sortGetters = function (newOrder) {
   const sortFilter = this.Getter.sortGetters(
     this.Getter.storage.order,
-    newOrder
+    newOrder,
   );
 
   this.Getter.storage.order.sort(sortFilter);
@@ -124,9 +123,9 @@ BlueconfigCore.prototype.addGetter = function (
   name,
   getter,
   usedOnlyOnce,
-  rewrite
+  rewrite,
 ) {
-  if (typeof name === "object") {
+  if (typeof name === 'object') {
     getter = name.getter;
     usedOnlyOnce = name.usedOnlyOnce;
     rewrite = name.rewrite;
@@ -209,9 +208,9 @@ BlueconfigCore.prototype.addFormat = function (
   name,
   validate,
   coerce,
-  rewrite
+  rewrite,
 ) {
-  if (typeof name === "object") {
+  if (typeof name === 'object') {
     validate = name.validate;
     coerce = name.coerce;
     rewrite = name.rewrite;
@@ -264,7 +263,7 @@ BlueconfigCore.prototype.addFormats = function (formats) {
       formats[name].name,
       formats[name].validate,
       formats[name].coerce,
-      formats[name].rewrite
+      formats[name].rewrite,
     );
   });
 
@@ -298,11 +297,11 @@ BlueconfigCore.prototype.addParser = function (parsers) {
   if (!Array.isArray(parsers)) parsers = [parsers];
 
   parsers.forEach((parser) => {
-    if (!parser) throw new CUSTOMISE_FAILED("Invalid parser");
+    if (!parser) throw new CUSTOMISE_FAILED('Invalid parser');
     if (!parser.extension)
-      throw new CUSTOMISE_FAILED("Missing parser.extension");
+      throw new CUSTOMISE_FAILED('Missing parser.extension');
     if (!parser.parse)
-      throw new CUSTOMISE_FAILED("Missing parser.parse function");
+      throw new CUSTOMISE_FAILED('Missing parser.parse function');
 
     this.Parser.add(parser.extension, parser.parse);
   });

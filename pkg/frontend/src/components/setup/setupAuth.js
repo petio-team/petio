@@ -1,12 +1,11 @@
-import typo from "../../styles/components/typography.module.scss";
-import button from "../../styles/components/button.module.scss";
-
-import oAuthWindow from "../../components/oAuthWindow";
-import { plexAuth } from "../../services/plex.service";
+import oAuthWindow from '../../components/oAuthWindow';
+import { plexAuth } from '../../services/plex.service';
+import button from '../../styles/components/button.module.scss';
+import typo from '../../styles/components/typography.module.scss';
 
 export default function SetupAuth() {
   function loginOauth() {
-    let plexWindow = oAuthWindow("", "Login with Plex", 500, 500);
+    let plexWindow = oAuthWindow('', 'Login with Plex', 500, 500);
     plexAuth(plexWindow);
   }
 

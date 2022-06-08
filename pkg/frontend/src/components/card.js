@@ -1,16 +1,15 @@
-import styles from "../styles/components/card.module.scss";
-import typo from "../styles/components/typography.module.scss";
+import { useEffect, useRef, useState } from 'react';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/opacity.css';
+import ReactPlayer from 'react-player/youtube';
+import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 
-import ReactPlayer from "react-player/youtube";
-import { useState, useEffect, useRef } from "react";
-import { LazyLoadImage } from "react-lazy-load-image-component";
-import "react-lazy-load-image-component/src/effects/opacity.css";
-import { Link } from "react-router-dom";
-import { connect } from "react-redux";
-
-import { ReactComponent as Tick } from "../assets/svg/check.svg";
-import { ReactComponent as Arrow } from "../assets/svg/chevron.svg";
-import { addNewRequest, getRequests } from "../services/user.service";
+import { ReactComponent as Tick } from '../assets/svg/check.svg';
+import { ReactComponent as Arrow } from '../assets/svg/chevron.svg';
+import { addNewRequest, getRequests } from '../services/user.service';
+import styles from '../styles/components/card.module.scss';
+import typo from '../styles/components/typography.module.scss';
 
 const mapStateToProps = (state) => {
   return {
@@ -44,7 +43,7 @@ function Card({
   const [showTrailer, setShowTrailer] = useState(false);
   const [delayHandler, setDelayHandler] = useState(null);
   const [posterState, setPosterState] = useState(false);
-  const [titleState, setTitle] = useState("");
+  const [titleState, setTitle] = useState('');
   const [videoState, setVideo] = useState(false);
   const mountedRef = useRef(true);
   const [onServer, setOnServer] = useState(false);
@@ -62,7 +61,7 @@ function Card({
       setTimeout(() => {
         if (!mountedRef.current) return null;
         setShowTrailer(true);
-      }, 1000)
+      }, 1000),
     );
   };
 
@@ -74,9 +73,9 @@ function Card({
   useEffect(() => {
     let redux = false;
     switch (type) {
-      case "movie":
+      case 'movie':
         redux = redux_movies[id];
-        setTitle(redux ? redux.title : "");
+        setTitle(redux ? redux.title : '');
         setPosterState(redux ? redux.poster_path : false);
         setOnServer(redux ? redux.on_server : false);
         setData(redux ? redux : false);
@@ -88,10 +87,10 @@ function Card({
           if (video) setVideo(video);
         }
         break;
-      case "tv":
-      case "show":
+      case 'tv':
+      case 'show':
         redux = redux_tv[id];
-        setTitle(redux ? redux.name : "");
+        setTitle(redux ? redux.name : '');
         setPosterState(redux ? redux.poster_path : false);
         setOnServer(redux ? redux.on_server : false);
         setData(redux ? redux : false);
@@ -103,7 +102,7 @@ function Card({
           if (video) setVideo(video);
         }
         break;
-      case "people":
+      case 'people':
         setTitle(title);
         setPosterState(poster ? poster : false);
         break;
@@ -153,7 +152,7 @@ function Card({
       if (redux_requests[data.id].users.includes(currentUser.id)) {
         if (newNotification)
           newNotification({
-            type: "error",
+            type: 'error',
             message: `You've already requested ${data.title || data.name}`,
           });
         getRequests();
@@ -163,28 +162,28 @@ function Card({
     let notify = false;
     if (newNotification)
       notify = newNotification({
-        type: "loading",
+        type: 'loading',
         message: `Requesting ${data.title || data.name}`,
       });
     let request = {};
-    if (type === "movie")
+    if (type === 'movie')
       request = {
         id: data.id,
         imdb_id: data.imdb_id,
         tmdb_id: data.id,
-        tvdb_id: "n/a",
+        tvdb_id: 'n/a',
         title: data.title,
         thumb: data.poster_path,
         type: type,
       };
-    if (type === "tv") {
+    if (type === 'tv') {
       request = {
         id: data.id,
         tmdb_id: data.id,
         tvdb_id: data.tvdb_id,
         imdb_id: data.imdb_id,
         title: data.name,
-        type: "tv",
+        type: 'tv',
         thumb: data.poster_path,
       };
     }
@@ -192,21 +191,21 @@ function Card({
       const res = await addNewRequest(request, currentUser);
       if (res.error) {
         newNotification({
-          type: "error",
+          type: 'error',
           message: `Request Failed: ${res.message}`,
         });
         throw res;
       }
       if (newNotification && notify)
         newNotification({
-          type: "success",
+          type: 'success',
           message: `New Request added: ${data.title || data.name}`,
           id: notify,
         });
     } catch (err) {
       if (newNotification && notify)
         newNotification({
-          type: "error",
+          type: 'error',
           message: `Request Failed: ${data.title || data.name}`,
           id: notify,
         });
@@ -214,7 +213,7 @@ function Card({
     getRequests();
   }
 
-  if (type === "company") {
+  if (type === 'company') {
     return (
       <Link to={`/movie/studio/${id}`} className={styles.wrap}>
         <div className={styles.wide}>
@@ -241,7 +240,7 @@ function Card({
     );
   }
 
-  if (type === "network") {
+  if (type === 'network') {
     return (
       <Link to={`/tv/network/${id}`} className={styles.wrap}>
         <div className={styles.wide}>
@@ -268,7 +267,7 @@ function Card({
     );
   }
 
-  if (type === "request") {
+  if (type === 'request') {
     return (
       <Link to={`/${requestType}/${id}`} className={styles.wrap}>
         <div className={styles.request}>
@@ -304,7 +303,7 @@ function Card({
     >
       <div
         className={`${grid ? styles.grid : styles.default} ${
-          type === "people" ? styles.cast : ""
+          type === 'people' ? styles.cast : ''
         }`}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -355,7 +354,7 @@ function Card({
           <p className={type.body}>
             {titleState} {year ? `(${year})` : null}
           </p>
-          {(type === "movie" || type === "tv") &&
+          {(type === 'movie' || type === 'tv') &&
           !onServer &&
           redux_requests &&
           !redux_requests[id] ? (
@@ -366,12 +365,12 @@ function Card({
           ) : null}
         </div>
       </div>
-      {type === "people" ? (
+      {type === 'people' ? (
         <>
           <div
             ref={marquee2}
             className={`${styles.marquee} ${
-              animate2 ? styles.marquee__anim : ""
+              animate2 ? styles.marquee__anim : ''
             }`}
           >
             <p
@@ -384,7 +383,7 @@ function Card({
           <div
             ref={marquee}
             className={`${styles.marquee} ${
-              animate ? styles.marquee__anim : ""
+              animate ? styles.marquee__anim : ''
             }`}
           >
             <p ref={marqueeText} className={`${typo.body} ${typo.uppercase}`}>
@@ -396,7 +395,7 @@ function Card({
       {credit ? (
         <div
           ref={marquee}
-          className={`${styles.marquee} ${animate ? styles.marquee__anim : ""}`}
+          className={`${styles.marquee} ${animate ? styles.marquee__anim : ''}`}
         >
           <p ref={marqueeText} className={`${typo.body} ${typo.uppercase}`}>
             {credit}

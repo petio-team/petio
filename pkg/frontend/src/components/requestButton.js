@@ -1,15 +1,16 @@
-import { useEffect, useState } from "react";
-import { addNewRequest } from "../services/user.service";
-import buttons from "../styles/components/button.module.scss";
-import styles from "../styles/views/movie.module.scss";
-import typo from "../styles/components/typography.module.scss";
-import { getMobileOperatingSystem } from "../helpers/getOs";
+import { useEffect, useState } from 'react';
+
+import { getMobileOperatingSystem } from '../helpers/getOs';
+import { addNewRequest } from '../services/user.service';
+import buttons from '../styles/components/button.module.scss';
+import typo from '../styles/components/typography.module.scss';
+import styles from '../styles/views/movie.module.scss';
 
 export default function RequestButton({
   data,
   globalRequests,
   currentUser,
-  type = "movie",
+  type = 'movie',
   updateRequests,
   newNotification,
 }) {
@@ -39,7 +40,7 @@ export default function RequestButton({
     ) {
       if (globalRequests[data.id].users.includes(currentUser.id)) {
         newNotification({
-          type: "error",
+          type: 'error',
           message: `You've already requested ${data.title || data.name}`,
         });
         return;
@@ -47,21 +48,21 @@ export default function RequestButton({
     }
     setPending(true);
     const notify = newNotification({
-      type: "loading",
+      type: 'loading',
       message: `Requesting ${data.title || data.name}`,
     });
     let request = {};
-    if (type === "movie")
+    if (type === 'movie')
       request = {
         id: data.id,
         imdb_id: data.imdb_id,
         tmdb_id: data.id,
-        tvdb_id: "n/a",
+        tvdb_id: 'n/a',
         title: data.title,
         thumb: data.poster_path,
         type: type,
       };
-    if (type === "tv") {
+    if (type === 'tv') {
       let seasons = {};
       if (data.seasons.length > 0)
         data.seasons.forEach((season) => {
@@ -73,7 +74,7 @@ export default function RequestButton({
         tvdb_id: data.tvdb_id,
         imdb_id: data.imdb_id,
         title: data.name,
-        type: "tv",
+        type: 'tv',
         thumb: data.poster_path,
         seasons: seasons,
       };
@@ -82,20 +83,20 @@ export default function RequestButton({
       const res = await addNewRequest(request, currentUser);
       if (res.error) {
         newNotification({
-          type: "error",
+          type: 'error',
           message: `Request Failed: ${res.message}`,
         });
         throw res;
       }
       newNotification({
-        type: "success",
+        type: 'success',
         message: `New Request added: ${data.title || data.name}`,
         id: notify,
       });
     } catch (err) {
       console.log(err);
       newNotification({
-        type: "error",
+        type: 'error',
         message: `Request Failed: ${data.title || data.name}`,
         id: notify,
       });
@@ -111,17 +112,17 @@ export default function RequestButton({
       if (new Date().valueOf() - now > 100) return;
       window.open(
         `https://app.plex.tv/desktop#!/server/${serverKey}/details?key=%2Flibrary%2Fmetadata%2F${ratingKey}`,
-        "_blank"
+        '_blank',
       );
     }, 25);
 
-    if (OS === "iOS")
+    if (OS === 'iOS')
       window.location = `plex://${
-        type === "movie" ? "play" : "preplay"
+        type === 'movie' ? 'play' : 'preplay'
       }/?metadataKey=%2Flibrary%2Fmetadata%2F${ratingKey}&metadataType=1&server=${serverKey}`;
-    if (OS === "Android")
+    if (OS === 'Android')
       window.open(
-        `plex://server://${serverKey}/com.plexapp.plugins.library/library/metadata/${ratingKey}`
+        `plex://server://${serverKey}/com.plexapp.plugins.library/library/metadata/${ratingKey}`,
       );
   }
 
@@ -140,7 +141,7 @@ export default function RequestButton({
           <>
             <button
               className={`${buttons.secondary} ${styles.actions__request__main_btn}`}
-              style={{ pointerEvents: "none" }}
+              style={{ pointerEvents: 'none' }}
             >
               On Plex
             </button>
@@ -156,7 +157,7 @@ export default function RequestButton({
                 } ${
                   versionsOpen
                     ? styles.actions__request__dropdown__button__open
-                    : ""
+                    : ''
                 }`}
                 onClick={() => setVersionsOpen(!versionsOpen)}
               >
@@ -167,7 +168,7 @@ export default function RequestButton({
                 className={`${styles.actions__request__dropdown__options} ${
                   versionsOpen
                     ? styles.actions__request__dropdown__options__open
-                    : ""
+                    : ''
                 }`}
               >
                 {onServer.versions.map((version) => {
@@ -182,9 +183,9 @@ export default function RequestButton({
                       <p
                         className={`${typo.body} ${typo.medium}`}
                       >{`Watch now in ${
-                        version.resolution === "720" ||
-                        version.resolution === "1080"
-                          ? version.resolution + "p"
+                        version.resolution === '720' ||
+                        version.resolution === '1080'
+                          ? version.resolution + 'p'
                           : version.resolution.toUpperCase()
                       }`}</p>
                     </div>

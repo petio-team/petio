@@ -1,5 +1,6 @@
-import { connect } from "react-redux";
-import styles from "../../styles/views/admin.module.scss";
+import { connect } from 'react-redux';
+
+import styles from '../../styles/views/admin.module.scss';
 
 const mapStateToProps = (state) => {
   return {

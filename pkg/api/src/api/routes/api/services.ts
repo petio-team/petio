@@ -6,8 +6,8 @@ import { z } from 'zod';
 
 import { adminRequired } from '@/api/middleware/auth';
 import { validateRequest } from '@/api/middleware/validation';
-import RadarrAPI, { GetRadarrInstanceFromDb } from '@/arr/radarr';
-import SonarrAPI, { GetSonarrInstanceFromDb } from '@/arr/sonarr';
+import RadarrAPI, { GetRadarrInstanceFromDb } from '@/infra/arr/radarr';
+import SonarrAPI, { GetSonarrInstanceFromDb } from '@/infra/arr/sonarr';
 import logger from '@/loaders/logger';
 import {
   CreateOrUpdateDownloader,

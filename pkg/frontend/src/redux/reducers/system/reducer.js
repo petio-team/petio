@@ -4,22 +4,22 @@ export default function (
     bandwidth: [],
     sessions: [],
   },
-  action
+  action,
 ) {
   switch (action.type) {
-    case "system/server":
+    case 'system/server':
       return {
         ...state,
         server: action.server,
       };
 
-    case "system/bandwidth":
+    case 'system/bandwidth':
       return {
         ...state,
         bandwidth: action.bandwidth,
       };
 
-    case "system/sessions":
+    case 'system/sessions':
       return {
         ...state,
         sessions: action.sessions,

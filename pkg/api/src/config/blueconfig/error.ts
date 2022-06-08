@@ -1,6 +1,6 @@
-import { stringify } from "./lib/object-path";
+import { stringify } from './lib/object-path';
+import * as utils from './performer/utils/utils';
 
-import * as utils from "./performer/utils/utils";
 const unroot = utils.unroot;
 
 /**
@@ -71,7 +71,7 @@ class LISTOFERRORS extends BLUECONFIG_ERROR {
    * @param {BLUECONFIG_ERROR[]}   errors   List of errors
    */
   constructor(errors) {
-    super("List of several errors.");
+    super('List of several errors.');
 
     /**
      * List of errors
@@ -124,8 +124,8 @@ class SCHEMA_INVALID extends BLUECONFIG_ERROR {
      */
     this.fullname = fullname;
 
-    this.type = "SCHEMA_INVALID";
-    this.doc = "The schema is not valid, edit your schema to continue.";
+    this.type = 'SCHEMA_INVALID';
+    this.doc = 'The schema is not valid, edit your schema to continue.';
 
     return this;
   }
@@ -154,9 +154,9 @@ class CUSTOMISE_FAILED extends BLUECONFIG_ERROR {
   constructor(message) {
     super(message);
 
-    this.type = "CUSTOMISE_FAILED";
+    this.type = 'CUSTOMISE_FAILED';
     this.doc =
-      "You try to add a getter/format/parser but you failed, fix your javascript code to continue.";
+      'You try to add a getter/format/parser but you failed, fix your javascript code to continue.';
 
     return this;
   }
@@ -179,9 +179,9 @@ class INCORRECT_USAGE extends BLUECONFIG_ERROR {
   constructor(message) {
     super(message);
 
-    this.type = "INCORRECT_USAGE";
+    this.type = 'INCORRECT_USAGE';
     this.doc =
-      "Wrong usage of blueconfig function, maybe wrong parameter, fix your javascript code to continue.";
+      'Wrong usage of blueconfig function, maybe wrong parameter, fix your javascript code to continue.';
 
     return this;
   }
@@ -214,7 +214,7 @@ class PATH_INVALID extends BLUECONFIG_ERROR {
 
     const why = (() => {
       const type = typeof value;
-      if (type !== "object") {
+      if (type !== 'object') {
         return `"${unroot(stringify(path))}" is a ${type}`;
       } else if (value === null) {
         return `"${unroot(stringify(path))}" is null`;
@@ -265,9 +265,9 @@ class PATH_INVALID extends BLUECONFIG_ERROR {
      */
     this.why = why;
 
-    this.type = "PATH_INVALID";
+    this.type = 'PATH_INVALID';
     this.doc =
-      "To fix this error you should try to use an existing property path (take a look on the schema), edit your javascript file to continue.";
+      'To fix this error you should try to use an existing property path (take a look on the schema), edit your javascript file to continue.';
 
     return this;
   }
@@ -295,9 +295,9 @@ class VALUE_INVALID extends BLUECONFIG_ERROR {
   constructor(message) {
     super(message);
 
-    this.type = "VALUE_INVALID";
+    this.type = 'VALUE_INVALID';
     this.doc =
-      "You should try to change your config to respect the schema to continue.";
+      'You should try to change your config to respect the schema to continue.';
 
     return this;
   }
@@ -319,7 +319,7 @@ class VALIDATE_FAILED extends BLUECONFIG_ERROR {
    * @param {String}    explains    List of explained error why validate failed
    */
   constructor(explains) {
-    super("Validate failed because wrong value(s):\n" + explains);
+    super('Validate failed because wrong value(s):\n' + explains);
 
     /**
      * List of explained error why validate failed (defined with the first argument of the constructor)
@@ -328,9 +328,9 @@ class VALIDATE_FAILED extends BLUECONFIG_ERROR {
      */
     this.why = explains;
 
-    this.type = "VALIDATE_FAILED";
+    this.type = 'VALIDATE_FAILED';
     this.doc =
-      "You should try to change your config to respect the schema to continue.";
+      'You should try to change your config to respect the schema to continue.';
 
     return this;
   }
@@ -394,9 +394,9 @@ class FORMAT_INVALID extends BLUECONFIG_ERROR {
      */
     this.value = value;
 
-    this.type = "FORMAT_INVALID";
+    this.type = 'FORMAT_INVALID';
     this.doc =
-      "You should try to change the property value to respect the schema to continue.";
+      'You should try to change the property value to respect the schema to continue.';
 
     return this;
   }

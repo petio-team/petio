@@ -2,7 +2,7 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import personLookup from '@/tmdb/person';
+import personLookup from '@/services/tmdb/person';
 
 // const cacheMiddleware = new ExpressCache(
 //   cacheManager.caching({

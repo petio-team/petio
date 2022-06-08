@@ -1,11 +1,12 @@
-import { connect } from "react-redux";
-import styles from "../styles/views/search.module.scss";
-import typo from "../styles/components/typography.module.scss";
-import Meta from "../components/meta";
-import Carousel from "../components/carousel";
-import { useEffect, useState } from "react";
-import media from "../services/media.service";
-import { useHistory } from "react-router-dom";
+import { useEffect, useState } from 'react';
+import { connect } from 'react-redux';
+import { useHistory } from 'react-router-dom';
+
+import Carousel from '../components/carousel';
+import Meta from '../components/meta';
+import media from '../services/media.service';
+import typo from '../styles/components/typography.module.scss';
+import styles from '../styles/views/search.module.scss';
 
 const mapStateToProps = (state) => {
   return {
@@ -26,12 +27,12 @@ function Search({ searchQuery, searchResults, newNotification }) {
         await media.search(searchQuery);
         setLoading(false);
       } catch (e) {
-        newNotification({ type: "error", message: e });
+        newNotification({ type: 'error', message: e });
         setLoading(false);
       }
     }
     if (searchQuery.length === 0) {
-      history.push("/");
+      history.push('/');
       return;
     }
     const to = setTimeout(() => {

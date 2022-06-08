@@ -1,34 +1,34 @@
-import typo from "../../styles/components/typography.module.scss";
-import button from "../../styles/components/button.module.scss";
-import styles from "../../styles/views/setup.module.scss";
-import { useState } from "react";
+import { useState } from 'react';
 
-import { ReactComponent as Windows } from "../../assets/svg/windows.svg";
-import { ReactComponent as OSX } from "../../assets/svg/mac.svg";
-import { ReactComponent as Linux } from "../../assets/svg/linux.svg";
-import { ReactComponent as Docker } from "../../assets/svg/docker.svg";
-import { ReactComponent as Server } from "../../assets/svg/server.svg";
-import { ReactComponent as Good } from "../../assets/svg/check.svg";
-import { ReactComponent as Bad } from "../../assets/svg/close.svg";
-import { ReactComponent as LockIcon } from "../../assets/svg/lock.svg";
-import { ReactComponent as UnlockIcon } from "../../assets/svg/unlock.svg";
-import { ReactComponent as Spinner } from "../../assets/svg/spinner.svg";
+import { ReactComponent as Good } from '../../assets/svg/check.svg';
+import { ReactComponent as Bad } from '../../assets/svg/close.svg';
+import { ReactComponent as Docker } from '../../assets/svg/docker.svg';
+import { ReactComponent as Linux } from '../../assets/svg/linux.svg';
+import { ReactComponent as LockIcon } from '../../assets/svg/lock.svg';
+import { ReactComponent as OSX } from '../../assets/svg/mac.svg';
+import { ReactComponent as Server } from '../../assets/svg/server.svg';
+import { ReactComponent as Spinner } from '../../assets/svg/spinner.svg';
+import { ReactComponent as UnlockIcon } from '../../assets/svg/unlock.svg';
+import { ReactComponent as Windows } from '../../assets/svg/windows.svg';
+import button from '../../styles/components/button.module.scss';
+import typo from '../../styles/components/typography.module.scss';
+import styles from '../../styles/views/setup.module.scss';
 
 export default function SetupServer(props) {
   const [picked, setPicked] = useState(false);
 
   function serverIcon(platform) {
     switch (platform) {
-      case "Linux":
+      case 'Linux':
         return <Linux />;
 
-      case "Windows":
+      case 'Windows':
         return <Windows />;
 
-      case "MacOSX":
+      case 'MacOSX':
         return <OSX />;
 
-      case "docker":
+      case 'docker':
         return <Docker />;
 
       default:
@@ -39,8 +39,8 @@ export default function SetupServer(props) {
   function saveServer() {
     if (!picked)
       props.newNotification({
-        type: "error",
-        message: "No server selected please pick a server from the list",
+        type: 'error',
+        message: 'No server selected please pick a server from the list',
       });
     if (picked) props.setSetupServer(picked);
   }
@@ -65,11 +65,11 @@ export default function SetupServer(props) {
               <div
                 key={key}
                 className={`${styles.server_option} ${
-                  picked === key ? styles.server_option__selected : ""
+                  picked === key ? styles.server_option__selected : ''
                 } ${
-                  server.status !== "connected"
+                  server.status !== 'connected'
                     ? styles.server_option__disabled
-                    : ""
+                    : ''
                 } mb-1`}
                 data-id={key}
                 onClick={(e) => setPicked(e.target.dataset.id)}
@@ -84,12 +84,12 @@ export default function SetupServer(props) {
                     {server.name}
                     <span
                       className={`${styles.server_option__lock} ${
-                        server.protocol === "https"
+                        server.protocol === 'https'
                           ? styles.server_option__lock__secure
                           : styles.server_option__lock__insecure
                       }`}
                     >
-                      {server.protocol === "https" ? (
+                      {server.protocol === 'https' ? (
                         <LockIcon />
                       ) : (
                         <UnlockIcon />
@@ -98,16 +98,16 @@ export default function SetupServer(props) {
                   </p>
                   <p className={typo.small}>{`${server.protocol}://${
                     server.host
-                  }${server.port ? ":" : ""}${server.port}`}</p>
+                  }${server.port ? ':' : ''}${server.port}`}</p>
                 </div>
                 <div className={styles.server_option__status}>
                   <div
                     className={`${styles.server_option__status__item} ${
                       styles.server_option__status__item__pending
                     } ${
-                      server.status === "pending"
+                      server.status === 'pending'
                         ? styles.server_option__status__active
-                        : ""
+                        : ''
                     }`}
                   >
                     <Spinner />
@@ -116,9 +116,9 @@ export default function SetupServer(props) {
                     className={`${styles.server_option__status__item} ${
                       styles.server_option__status__item__good
                     } ${
-                      server.status === "connected"
+                      server.status === 'connected'
                         ? styles.server_option__status__active
-                        : ""
+                        : ''
                     }`}
                   >
                     <span>
@@ -129,9 +129,9 @@ export default function SetupServer(props) {
                     className={`${styles.server_option__status__item} ${
                       styles.server_option__status__item__bad
                     } ${
-                      server.status === "failed"
+                      server.status === 'failed'
                         ? styles.server_option__status__active
-                        : ""
+                        : ''
                     }`}
                   >
                     <span>
@@ -145,7 +145,7 @@ export default function SetupServer(props) {
         )}
         <button
           className={`${button.primary} ${button.auto} mt-2 ${
-            picked ? "" : button.disabled
+            picked ? '' : button.disabled
           }`}
           onClick={saveServer}
         >

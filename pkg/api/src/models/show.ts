@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const TvSchema = new mongoose.Schema(
   {
@@ -34,7 +34,7 @@ const TvSchema = new mongoose.Schema(
     petioTimestamp: Date,
     seasonData: Object,
   },
-  { collection: "shows" }
+  { collection: 'shows' },
 );
 
-export default mongoose.model("Show", TvSchema);
+export default mongoose.model('Show', TvSchema);

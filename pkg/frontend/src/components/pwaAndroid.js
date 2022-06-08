@@ -1,4 +1,4 @@
-import styles from "../styles/components/install.module.scss";
+import styles from '../styles/components/install.module.scss';
 
 export default function PwaAndroid({ callback, prompt }) {
   async function handleClick() {
@@ -10,7 +10,7 @@ export default function PwaAndroid({ callback, prompt }) {
     prompt.prompt();
     // Log the result
     const result = await prompt.userChoice;
-    console.log("👍", "userChoice", result);
+    console.log('👍', 'userChoice', result);
     // Reset the deferred prompt variable, since
     // prompt() can only be called once.
     callback();

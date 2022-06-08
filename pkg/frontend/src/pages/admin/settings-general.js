@@ -1,13 +1,14 @@
-import AdminGridItem from "../../components/adminGridItem";
-import styles from "../../styles/views/adminSettings.module.scss";
-import typo from "../../styles/components/typography.module.scss";
-import buttons from "../../styles/components/button.module.scss";
-import inputs from "../../styles/components/input.module.scss";
-import oAuthWindow from "../../components/oAuthWindow";
-import { plexToken, testPlex } from "../../services/plex.service";
-import { connect } from "react-redux";
-import { getConfig, updateConfig } from "../../services/config.service";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from 'react';
+import { connect } from 'react-redux';
+
+import AdminGridItem from '../../components/adminGridItem';
+import oAuthWindow from '../../components/oAuthWindow';
+import { getConfig, updateConfig } from '../../services/config.service';
+import { plexToken, testPlex } from '../../services/plex.service';
+import buttons from '../../styles/components/button.module.scss';
+import inputs from '../../styles/components/input.module.scss';
+import typo from '../../styles/components/typography.module.scss';
+import styles from '../../styles/views/adminSettings.module.scss';
 
 const mapStateToProps = (state) => {
   return {
@@ -26,8 +27,8 @@ function SettingsGeneral(props) {
       } catch (err) {
         console.log(err);
         props.newNotification({
-          message: "Failed to load config",
-          type: "error",
+          message: 'Failed to load config',
+          type: 'error',
         });
       }
     }
@@ -38,49 +39,49 @@ function SettingsGeneral(props) {
 
   async function reAuthPlex() {
     try {
-      let plexWindow = oAuthWindow("", "Login with Plex", 500, 500);
+      let plexWindow = oAuthWindow('', 'Login with Plex', 500, 500);
       let res = await plexToken(plexWindow);
       if (res.error) {
         throw res.error;
       }
       props.newNotification({
-        message: "Authentication Success: Token Renewed",
-        type: "success",
+        message: 'Authentication Success: Token Renewed',
+        type: 'success',
       });
     } catch (err) {
       console.log(err);
       props.newNotification({
-        message: "Authentication Failed",
-        type: "error",
+        message: 'Authentication Failed',
+        type: 'error',
       });
     }
   }
 
   async function testPlexConnection() {
     const n = props.newNotification({
-      message: "Testing Plex Connection",
-      type: "loading",
+      message: 'Testing Plex Connection',
+      type: 'loading',
     });
     try {
       let plexConnect = await testPlex();
       if (plexConnect.error) {
         props.newNotification({
-          message: "Plex Test Failed",
-          type: "error",
+          message: 'Plex Test Failed',
+          type: 'error',
           id: n,
         });
       } else {
         props.newNotification({
-          message: "Plex Test Passed!",
-          type: "success",
+          message: 'Plex Test Passed!',
+          type: 'success',
           id: n,
         });
       }
     } catch (err) {
       console.log(err);
       props.newNotification({
-        message: "Plex Test Failed",
-        type: "error",
+        message: 'Plex Test Failed',
+        type: 'error',
         id: n,
       });
     }
@@ -94,7 +95,7 @@ function SettingsGeneral(props) {
       inpVal = target.checked;
     }
 
-    if (inpName === "login_type") {
+    if (inpName === 'login_type') {
       inpVal = parseInt(inpVal);
     }
 
@@ -107,21 +108,21 @@ function SettingsGeneral(props) {
   async function save(key) {
     if (!key) return;
     const n = props.newNotification({
-      message: "Saving Settings",
-      type: "loading",
+      message: 'Saving Settings',
+      type: 'loading',
     });
     try {
       await updateConfig({ [key]: config[key] });
       props.newNotification({
-        message: "Settings Saved",
-        type: "success",
+        message: 'Settings Saved',
+        type: 'success',
         id: n,
       });
     } catch (e) {
       console.log(e);
       props.newNotification({
-        message: "Error: Failed to Save Settings",
-        type: "error",
+        message: 'Error: Failed to Save Settings',
+        type: 'error',
         id: n,
       });
     }
@@ -141,14 +142,14 @@ function SettingsGeneral(props) {
         </p>
         <br />
         <button
-          className={`${buttons.primary} ${!config ? buttons.disabled : ""}`}
+          className={`${buttons.primary} ${!config ? buttons.disabled : ''}`}
           onClick={reAuthPlex}
         >
           Login with Plex
         </button>
         <br />
         <button
-          className={`${buttons.primary} ${!config ? buttons.disabled : ""}`}
+          className={`${buttons.primary} ${!config ? buttons.disabled : ''}`}
           onClick={testPlexConnection}
         >
           Test
@@ -181,8 +182,8 @@ function SettingsGeneral(props) {
         )}
         <br />
         <button
-          className={`${buttons.primary} ${!config ? buttons.disabled : ""}`}
-          onClick={() => save("base_path")}
+          className={`${buttons.primary} ${!config ? buttons.disabled : ''}`}
+          onClick={() => save('base_path')}
         >
           Save
         </button>
@@ -192,7 +193,7 @@ function SettingsGeneral(props) {
           Logging into the admin panel in Petio will always require a
           Username/Email &amp; Password, however the standard user panel can be
           customised for <span className={typo.bold}>Fast Login</span> (where a
-          user only needs to provide their Username / Email) or{" "}
+          user only needs to provide their Username / Email) or{' '}
           <span className={typo.bold}>Standard Login</span> (a user is required
           to enter a username and password)
         </p>
@@ -212,8 +213,8 @@ function SettingsGeneral(props) {
 
         <br />
         <button
-          className={`${buttons.primary} ${!config ? buttons.disabled : ""}`}
-          onClick={() => save("login_type")}
+          className={`${buttons.primary} ${!config ? buttons.disabled : ''}`}
+          onClick={() => save('login_type')}
         >
           Save
         </button>
@@ -228,15 +229,15 @@ function SettingsGeneral(props) {
               onChange={handleChange}
             />
             <p className={`${typo.body}`}>
-              Popular on Plex{" "}
+              Popular on Plex{' '}
               <span className={typo.bold}>(Requires Plex Pass)</span>
             </p>
           </div>
         </div>
         <br />
         <button
-          className={`${buttons.primary} ${!config ? buttons.disabled : ""}`}
-          onClick={() => save("plexPopular")}
+          className={`${buttons.primary} ${!config ? buttons.disabled : ''}`}
+          onClick={() => save('plexPopular')}
         >
           Save
         </button>

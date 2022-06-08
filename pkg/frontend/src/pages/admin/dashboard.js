@@ -1,12 +1,13 @@
-import { connect } from "react-redux";
-import styles from "../../styles/views/admin.module.scss";
-import typo from "../../styles/components/typography.module.scss";
-import Carousel from "../../components/carousel";
-import Metrics from "./dashboard-metrics";
-import Activity from "./dashboard-activity";
-import Issues from "./dashboard-issues";
-import { useEffect, useState } from "react";
-import media from "../../services/media.service";
+import { useEffect, useState } from 'react';
+import { connect } from 'react-redux';
+
+import Carousel from '../../components/carousel';
+import media from '../../services/media.service';
+import typo from '../../styles/components/typography.module.scss';
+import styles from '../../styles/views/admin.module.scss';
+import Activity from './dashboard-activity';
+import Issues from './dashboard-issues';
+import Metrics from './dashboard-metrics';
 
 const mapStateToProps = (state) => {
   return {
@@ -24,26 +25,26 @@ function AdminDashboard({ requests, redux_movies, redux_tv }) {
     if (!requests) return;
     Object.keys(requests).forEach((id) => {
       let item = requests[id];
-      if (item.type === "movie" && redux_movies[id]) {
+      if (item.type === 'movie' && redux_movies[id]) {
         data.push({
           title: redux_movies[id].title || false,
           poster: redux_movies[id].backdrop_path || false,
           logo: redux_movies[id].logo || false,
           id: id,
-          requestType: "movie",
-          year: redux_movies[id].release_date || "",
+          requestType: 'movie',
+          year: redux_movies[id].release_date || '',
           popularity: redux_movies[id].popularity || 0,
         });
       }
 
-      if (item.type === "tv" && redux_tv[id]) {
+      if (item.type === 'tv' && redux_tv[id]) {
         data.push({
           title: redux_tv[id].name || false,
           poster: redux_tv[id].backdrop_path || false,
           logo: redux_tv[id].logo || false,
           id: id,
-          requestType: "tv",
-          year: redux_tv[id].first_air_date || "",
+          requestType: 'tv',
+          year: redux_tv[id].first_air_date || '',
           popularity: redux_tv[id].popularity || 0,
         });
       }
@@ -68,11 +69,11 @@ function AdminDashboard({ requests, redux_movies, redux_tv }) {
     let movie = [];
     Object.keys(requests).forEach((id) => {
       const request = requests[id];
-      if (request.type === "movie") movie.push(id);
-      if (request.type === "tv") tv.push(id);
+      if (request.type === 'movie') movie.push(id);
+      if (request.type === 'tv') tv.push(id);
     });
-    media.batchLookup(tv, "tv", false);
-    media.batchLookup(movie, "movie", false);
+    media.batchLookup(tv, 'tv', false);
+    media.batchLookup(movie, 'movie', false);
   }, [requests]);
 
   return (
@@ -82,7 +83,7 @@ function AdminDashboard({ requests, redux_movies, redux_tv }) {
           <Carousel
             key={`admin_requests`}
             id={`admin_requests`}
-            title={"Active Requests"}
+            title={'Active Requests'}
             data={activeRequests}
             type="request"
             link="/admin/requests"

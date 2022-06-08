@@ -7,7 +7,7 @@ import mongoose from 'mongoose';
 import { WriteConfig, config } from '@/config/index';
 import logger from '@/loaders/logger';
 import { CreateOrUpdateUser, UserRole } from '@/models/user';
-import testConnection from '@/plex/connection';
+import testConnection from '@/services/plex/connection';
 
 const route = new Router({ prefix: '/setup' });
 

@@ -8,17 +8,17 @@ export default function (
       movies: [],
       tv: [],
     },
-    searchQuery: "",
+    searchQuery: '',
     searchResults: false,
     featured: false,
   },
-  action
+  action,
 ) {
   switch (action.type) {
-    case "media/store-movies":
+    case 'media/store-movies':
       Object.keys(action.movies).forEach((id) => {
         if (
-          action.movies[id].hasOwnProperty("imdb_data") &&
+          action.movies[id].hasOwnProperty('imdb_data') &&
           !action.movies[id].imdb_data
         )
           delete action.movies[id].imdb_data;
@@ -33,10 +33,10 @@ export default function (
         ...state,
         movies: { ...state.movies, ...action.movies },
       };
-    case "media/store-shows":
+    case 'media/store-shows':
       Object.keys(action.shows).forEach((id) => {
         if (
-          action.shows[id].hasOwnProperty("imdb_data") &&
+          action.shows[id].hasOwnProperty('imdb_data') &&
           !action.shows[id].imdb_data
         )
           delete action.shows[id].imdb_data;
@@ -51,17 +51,17 @@ export default function (
         ...state,
         tv: { ...state.tv, ...action.shows },
       };
-    case "media/store-people":
+    case 'media/store-people':
       return {
         ...state,
         people: { ...state.people, ...action.people },
       };
-    case "media/store-trending":
+    case 'media/store-trending':
       return {
         ...state,
         trending: action.trending,
       };
-    case "media/store-discovery-movies":
+    case 'media/store-discovery-movies':
       return {
         ...state,
         discovery: {
@@ -69,7 +69,7 @@ export default function (
           movies: action.discovery,
         },
       };
-    case "media/store-discovery-shows":
+    case 'media/store-discovery-shows':
       return {
         ...state,
         discovery: {
@@ -77,17 +77,17 @@ export default function (
           tv: action.discovery,
         },
       };
-    case "media/store-featured":
+    case 'media/store-featured':
       return {
         ...state,
         featured: action.data,
       };
-    case "search/update":
+    case 'search/update':
       return {
         ...state,
         searchQuery: action.query,
       };
-    case "search/results":
+    case 'search/results':
       return {
         ...state,
         searchResults: action.data,

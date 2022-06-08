@@ -1,27 +1,25 @@
-import media from "../services/media.service";
-import { useEffect, useState, useRef } from "react";
-import { useHistory } from "react-router-dom";
-// import { useRouter } from 'next/router';
+import { useEffect, useRef, useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
-import styles from "../styles/components/nav.module.scss";
-import typo from "../styles/components/typography.module.scss";
-import inp from "../styles/components/input.module.scss";
-
-import { Link } from "react-router-dom";
+import { ReactComponent as AdminIcon } from '../assets/svg/admin.svg';
+import { ReactComponent as BackIcon } from '../assets/svg/back.svg';
 // import Image from 'next/image';
 // import Router from 'next/router';
-
-import { ReactComponent as Logo } from "../assets/svg/logo.svg";
-import { ReactComponent as SearchIcon } from "../assets/svg/search.svg";
-import { ReactComponent as MovieIcon } from "../assets/svg/movie.svg";
-import { ReactComponent as RequestIcon } from "../assets/svg/request.svg";
-import { ReactComponent as UserIcon } from "../assets/svg/user.svg";
-import { ReactComponent as AdminIcon } from "../assets/svg/admin.svg";
-import { ReactComponent as BackIcon } from "../assets/svg/back.svg";
-import { resetScrollPosition } from "../services/position.service";
+import { ReactComponent as Logo } from '../assets/svg/logo.svg';
+import { ReactComponent as MovieIcon } from '../assets/svg/movie.svg';
+import { ReactComponent as RequestIcon } from '../assets/svg/request.svg';
+import { ReactComponent as SearchIcon } from '../assets/svg/search.svg';
+import { ReactComponent as UserIcon } from '../assets/svg/user.svg';
+import media from '../services/media.service';
+import { resetScrollPosition } from '../services/position.service';
+import inp from '../styles/components/input.module.scss';
+// import { useRouter } from 'next/router';
+import styles from '../styles/components/nav.module.scss';
+import typo from '../styles/components/typography.module.scss';
 
 export default function Nav(props) {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [mobile, setMobile] = useState(false);
   const [darken, setDarken] = useState(false);
@@ -40,13 +38,13 @@ export default function Nav(props) {
         setDarken(false);
       }
     }
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
     handleResize();
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll);
 
     return () => {
-      window.removeEventListener("resize", handleResize);
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
@@ -58,8 +56,8 @@ export default function Nav(props) {
   }
 
   function clearSearch() {
-    media.searchUpdate("");
-    setSearchQuery("");
+    media.searchUpdate('');
+    setSearchQuery('');
   }
 
   function submitSearch(e) {
@@ -68,8 +66,8 @@ export default function Nav(props) {
   }
 
   function changePath(val) {
-    if (history.location.pathname !== "/search" && val.length > 0)
-      history.push("/search");
+    if (history.location.pathname !== '/search' && val.length > 0)
+      history.push('/search');
   }
 
   function toggleSearch() {
@@ -88,12 +86,12 @@ export default function Nav(props) {
     <>
       <div
         className={`${styles.nav} ${
-          showSearch ? styles.nav__search_open : ""
-        } ${darken ? styles.nav__darken : ""}`}
+          showSearch ? styles.nav__search_open : ''
+        } ${darken ? styles.nav__darken : ''}`}
       >
         <div className="container">
           <div className={styles.nav__inner}>
-            {history.location.pathname !== "/" ? (
+            {history.location.pathname !== '/' ? (
               <div onClick={() => history.goBack()} className={styles.back_btn}>
                 <span>
                   <BackIcon />
@@ -102,14 +100,14 @@ export default function Nav(props) {
             ) : null}
             <div className={styles.nav__left}>
               <div className={styles.nav__logo}>
-                <Link to="/" onClick={() => resetScrollPos("/")}>
+                <Link to="/" onClick={() => resetScrollPos('/')}>
                   <Logo viewBox="0 0 98 24" />
                 </Link>
               </div>
               <div className={styles.nav__menu}>
                 <Link
                   to="/"
-                  onClick={() => resetScrollPos("/")}
+                  onClick={() => resetScrollPos('/')}
                   className={`${typo.body} ${typo.bold}`}
                 >
                   Movies &amp; TV
@@ -120,8 +118,8 @@ export default function Nav(props) {
                 <Link to="/my-account" className={`${typo.body} ${typo.bold}`}>
                   My Account
                 </Link>
-                {props.currentUser.role === "admin" ||
-                props.currentUser.role === "moderator" ? (
+                {props.currentUser.role === 'admin' ||
+                props.currentUser.role === 'moderator' ? (
                   <Link to="/admin" className={`${typo.body} ${typo.bold}`}>
                     Admin
                   </Link>
@@ -131,7 +129,7 @@ export default function Nav(props) {
             <div className={styles.nav__right}>
               <div
                 className={`${styles.collapse_search} ${
-                  showSearch ? "" : styles.collapse_search__collapsed
+                  showSearch ? '' : styles.collapse_search__collapsed
                 }`}
               >
                 <form className={inp.wrap} onSubmit={submitSearch}>
@@ -167,11 +165,11 @@ export default function Nav(props) {
         <div className={styles.mobile_nav}>
           <Link
             to="/"
-            onClick={() => resetScrollPos("/")}
+            onClick={() => resetScrollPos('/')}
             className={`${typo.xsmall} ${styles.mobile_nav__item} ${
-              history.location.pathname === "/"
+              history.location.pathname === '/'
                 ? styles.mobile_nav__item__active
-                : ""
+                : ''
             }`}
           >
             <span>
@@ -182,9 +180,9 @@ export default function Nav(props) {
           <Link
             to="/requests"
             className={`${typo.xsmall} ${styles.mobile_nav__item} ${
-              history.location.pathname === "/requests"
+              history.location.pathname === '/requests'
                 ? styles.mobile_nav__item__active
-                : ""
+                : ''
             }`}
           >
             <span className="stroke">
@@ -195,9 +193,9 @@ export default function Nav(props) {
           <Link
             to="/my-account"
             className={`${typo.xsmall} ${styles.mobile_nav__item} ${
-              history.location.pathname === "/my-account"
+              history.location.pathname === '/my-account'
                 ? styles.mobile_nav__item__active
-                : ""
+                : ''
             }`}
           >
             <span>
@@ -205,14 +203,14 @@ export default function Nav(props) {
             </span>
             My Account
           </Link>
-          {props.currentUser.role === "admin" ||
-          props.currentUser.role === "moderator" ? (
+          {props.currentUser.role === 'admin' ||
+          props.currentUser.role === 'moderator' ? (
             <Link
               to="/admin"
               className={`${typo.xsmall} ${styles.mobile_nav__item} ${
-                history.location.pathname === "/admin"
+                history.location.pathname === '/admin'
                   ? styles.mobile_nav__item__active
-                  : ""
+                  : ''
               }`}
             >
               <span>

@@ -2,8 +2,8 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import Discord from '@/notifications/discord';
-import Telegram from '@/notifications/telegram';
+import Discord from '@/services/notifications/discord';
+import Telegram from '@/services/notifications/telegram';
 
 const route = new Router({ prefix: '/hooks' });
 

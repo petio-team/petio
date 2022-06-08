@@ -1,15 +1,15 @@
 // import Router from 'next/router';
-import { useState, useEffect } from "react";
-import styles from "../styles/views/setup.module.scss";
-import typo from "../styles/components/typography.module.scss";
-import { connect } from "react-redux";
+import { useEffect, useState } from 'react';
+import { connect } from 'react-redux';
 
-import Meta from "../components/meta";
-import SetupAuth from "../components/setup/setupAuth";
-import SetupUser from "../components/setup/setupUser";
-import SetupServer from "../components/setup/setupServer";
-import SetupDb from "../components/setup/setupDb";
-import { saveConfig } from "../services/config.service";
+import Meta from '../components/meta';
+import SetupAuth from '../components/setup/setupAuth';
+import SetupDb from '../components/setup/setupDb';
+import SetupServer from '../components/setup/setupServer';
+import SetupUser from '../components/setup/setupUser';
+import { saveConfig } from '../services/config.service';
+import typo from '../styles/components/typography.module.scss';
+import styles from '../styles/views/setup.module.scss';
 
 const mapStateToProps = (state) => {
   return {
@@ -37,8 +37,8 @@ function Setup({ config, redux_user, newNotification }) {
       db: setupDb,
     };
     const nId = newNotification({
-      type: "loading",
-      message: "Saving your config",
+      type: 'loading',
+      message: 'Saving your config',
     });
     try {
       saveConfig(config);
@@ -46,7 +46,7 @@ function Setup({ config, redux_user, newNotification }) {
         window.location.reload();
       }, 4000); // for now just wait until api has time to build
     } catch (e) {
-      newNotification({ type: "error", message: e, id: nId });
+      newNotification({ type: 'error', message: e, id: nId });
     }
   }
 
@@ -59,13 +59,13 @@ function Setup({ config, redux_user, newNotification }) {
             ? styles.step__complete
             : step === i
             ? styles.step__active
-            : ""
+            : ''
         }`}
         key={`setup_step_${i}`}
       >
         <p className={typo.body}>{i + 1}</p>
       </div>,
-      <span key={`setup_divide_${i}`}></span>
+      <span key={`setup_divide_${i}`}></span>,
     );
   }
   let content = null;
@@ -106,7 +106,7 @@ function Setup({ config, redux_user, newNotification }) {
 
   return (
     <div className={styles.wrap}>
-      <Meta title={"Setup"} />
+      <Meta title={'Setup'} />
       <div className={styles.steps}>{steps}</div>
       <div className={styles.content}>
         <p className={`${typo.title} ${typo.bold} mb-2`}>Setup</p>

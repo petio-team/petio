@@ -3,12 +3,11 @@ import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 import { z } from 'zod';
 
+import { validateRequest } from '@/api/middleware/validation';
 import { WriteConfig } from '@/config/config';
 import { config } from '@/config/schema';
 import logger from '@/loaders/logger';
-import Mailer from '@/mail/mailer';
-
-import { validateRequest } from '@/api/middleware/validation';
+import Mailer from '@/services/mail/mailer';
 
 const route = new Router({ prefix: '/mail' });
 

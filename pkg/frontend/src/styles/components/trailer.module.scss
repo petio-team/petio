@@ -1,4 +1,4 @@
-@import "../global/variables.module.scss";
+@import '../global/variables.module.scss';
 
 .wrap {
   position: fixed;
@@ -30,7 +30,7 @@
 
   &:after {
     display: block;
-    content: "";
+    content: '';
     padding-bottom: 56%;
   }
 }

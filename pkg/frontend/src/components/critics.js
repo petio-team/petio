@@ -1,7 +1,6 @@
-import { ReactComponent as ImdbIcon } from "../assets/svg/imdb.svg";
-
-import styles from "../styles/components/critics.module.scss";
-import typo from "../styles/components/typography.module.scss";
+import { ReactComponent as ImdbIcon } from '../assets/svg/imdb.svg';
+import styles from '../styles/components/critics.module.scss';
+import typo from '../styles/components/typography.module.scss';
 
 export default function Critics({ data }) {
   return (

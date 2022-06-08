@@ -1,12 +1,13 @@
-import { Route, Switch, useHistory } from "react-router";
-import AdminSettingsSidebar from "../../components/adminSettingsSidebar";
-import SettingsGeneral from "./settings-general";
-import styles from "../../styles/views/adminSettings.module.scss";
-import SettingsArr from "./settings-arr";
-import Meta from "../../components/meta";
-import typo from "../../styles/components/typography.module.scss";
-import SettingsFilter from "./settings-filter";
-import SettingsNotifications from "./settings-notifications";
+import { Route, Switch, useHistory } from 'react-router';
+
+import AdminSettingsSidebar from '../../components/adminSettingsSidebar';
+import Meta from '../../components/meta';
+import typo from '../../styles/components/typography.module.scss';
+import styles from '../../styles/views/adminSettings.module.scss';
+import SettingsArr from './settings-arr';
+import SettingsFilter from './settings-filter';
+import SettingsGeneral from './settings-general';
+import SettingsNotifications from './settings-notifications';
 
 export default function Settings({ newNotification }) {
   const history = useHistory();

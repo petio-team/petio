@@ -2,10 +2,9 @@ import Router from '@koa/router';
 import { Context } from 'koa';
 import { z } from 'zod';
 
-import { movieLookup } from '@/tmdb/movie';
-import { showLookup } from '@/tmdb/show';
-
 import { validateRequest } from '@/api/middleware/validation';
+import { movieLookup } from '@/services/tmdb/movie';
+import { showLookup } from '@/services/tmdb/show';
 
 const route = new Router({ prefix: '/batch' });
 

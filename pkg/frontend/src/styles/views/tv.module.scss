@@ -1,6 +1,6 @@
-@import "../global/variables.module.scss";
-@import "./movie.module.scss";
-@import "../components/typography.module.scss";
+@import '../global/variables.module.scss';
+@import './movie.module.scss';
+@import '../components/typography.module.scss';
 
 .episodes {
   margin: 20px 0;
@@ -59,7 +59,7 @@
     }
 
     &:before {
-      content: "";
+      content: '';
       width: 10px;
       height: 10px;
       position: absolute;
@@ -177,7 +177,7 @@
       flex-direction: row-reverse;
 
       &:after {
-        content: "";
+        content: '';
         position: absolute;
         top: -25%;
         right: -25%;

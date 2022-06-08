@@ -1,16 +1,17 @@
-import { connect } from "react-redux";
-import styles from "../../styles/views/admin.module.scss";
-import typo from "../../styles/components/typography.module.scss";
+import { useEffect, useState } from 'react';
+import { connect } from 'react-redux';
 import {
-  PieChart,
-  Pie,
-  ResponsiveContainer,
-  LineChart,
   Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
   Tooltip,
-} from "recharts";
-import { useEffect, useState } from "react";
-import { getBandwidth, getServerDetails } from "../../services/plex.service";
+} from 'recharts';
+
+import { getBandwidth, getServerDetails } from '../../services/plex.service';
+import typo from '../../styles/components/typography.module.scss';
+import styles from '../../styles/views/admin.module.scss';
 
 const mapStateToProps = (state) => {
   return {
@@ -70,11 +71,11 @@ function Metrics({ system }) {
   if (system.server) {
     cpuData = [
       {
-        name: "Plex",
+        name: 'Plex',
         value: system.server.processCpuUtilization || 0,
       },
       {
-        name: "System",
+        name: 'System',
         value:
           system.server.processCpuUtilization &&
           system.server.processCpuUtilization
@@ -83,7 +84,7 @@ function Metrics({ system }) {
             : 0,
       },
       {
-        name: "Free",
+        name: 'Free',
         value:
           system.server.processCpuUtilization &&
           system.server.processCpuUtilization
@@ -95,11 +96,11 @@ function Metrics({ system }) {
     ];
     ramData = [
       {
-        name: "Plex",
+        name: 'Plex',
         value: system.server.processMemoryUtilization || 0,
       },
       {
-        name: "System",
+        name: 'System',
         value:
           system.server.processMemoryUtilization &&
           system.server.processMemoryUtilization
@@ -108,7 +109,7 @@ function Metrics({ system }) {
             : 0,
       },
       {
-        name: "Free",
+        name: 'Free',
         value:
           system.server.processMemoryUtilization &&
           system.server.processMemoryUtilization
@@ -125,15 +126,15 @@ function Metrics({ system }) {
   }
 
   function formatBytes(bytes, decimals = 2) {
-    if (bytes === 0) return "0 bps";
+    if (bytes === 0) return '0 bps';
 
     const k = 1024;
     const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ["bps", "Kbps", "Mbps", "Gbps", "TB", "PB", "EB", "ZB", "YB"];
+    const sizes = ['bps', 'Kbps', 'Mbps', 'Gbps', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
     const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   }
 
   const CustomTooltip = ({ active, payload }) => {
@@ -167,13 +168,13 @@ function Metrics({ system }) {
           <p
             className={`${styles.dashboard__metrics__graph__line__title} ${typo.body} ${typo.bold}`}
           >
-            Bandwidth{" "}
+            Bandwidth{' '}
             <span className={typo.small}>
               {system.bandwidth && system.bandwidth[system.bandwidth.length - 1]
                 ? `(${formatBytes(
                     system.bandwidth[system.bandwidth.length - 1].Remote +
                       system.bandwidth[system.bandwidth.length - 1].Local,
-                    0
+                    0,
                   )})`
                 : null}
             </span>

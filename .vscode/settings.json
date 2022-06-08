@@ -4,5 +4,6 @@
       "file:///workspaces/petio-new-ui/.github/workflows/build.yml",
       "file:///workspaces/petio-new-ui/.github/workflows/release.yml"
     ]
-  }
+  },
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

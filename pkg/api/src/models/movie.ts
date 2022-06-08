@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const MovieSchema = new mongoose.Schema({
   title: String,
@@ -34,4 +34,4 @@ const MovieSchema = new mongoose.Schema({
   petioTimestamp: Date,
 });
 
-export default mongoose.model("Movie", MovieSchema);
+export default mongoose.model('Movie', MovieSchema);

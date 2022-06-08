@@ -1,4 +1,4 @@
-@import "../global/variables.module.scss";
+@import '../global/variables.module.scss';
 
 .wrap {
   margin-right: 20px;
@@ -208,7 +208,7 @@
   padding: 10px;
 
   &:after {
-    content: "";
+    content: '';
     position: absolute;
     top: 0;
     left: 0;
@@ -397,7 +397,7 @@
     }
 
     &:after {
-      content: "";
+      content: '';
       position: absolute;
       top: 0;
       right: 0;

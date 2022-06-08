@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const IssueSchema = new mongoose.Schema({
   mediaId: String,
@@ -11,4 +11,4 @@ const IssueSchema = new mongoose.Schema({
   comment: String,
 });
 
-export default mongoose.model("Issue", IssueSchema);
+export default mongoose.model('Issue', IssueSchema);

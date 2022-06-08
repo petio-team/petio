@@ -6,9 +6,9 @@ import { Context } from 'koa';
 import { WriteConfig } from '@/config/config';
 import { config } from '@/config/index';
 import logger from '@/loaders/logger';
-import plexLookup from '@/plex/lookup';
-import MakePlexURL from '@/plex/util';
-import { UserModel } from "@/models/user";
+import { UserModel } from '@/models/user';
+import plexLookup from '@/services/plex/lookup';
+import MakePlexURL from '@/services/plex/util';
 
 const route = new Router({ prefix: '/plex' });
 
@@ -37,7 +37,7 @@ const testPlexConnection = async (ctx: Context) => {
     const admin = await UserModel.findOne({ owner: true }).exec();
     if (!admin) {
       ctx.status = StatusCodes.NOT_FOUND;
-      ctx.body = "no admin user could be found";
+      ctx.body = 'no admin user could be found';
       return;
     }
 

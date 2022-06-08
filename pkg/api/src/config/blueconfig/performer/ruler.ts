@@ -1,4 +1,5 @@
-import * as cvtError from "./../error";
+import * as cvtError from './../error';
+
 const CUSTOMISE_FAILED = cvtError.CUSTOMISE_FAILED;
 
 /**
@@ -9,7 +10,7 @@ const CUSTOMISE_FAILED = cvtError.CUSTOMISE_FAILED;
  */
 function Ruler() {
   this.types = new Map();
-  this.types.set("*", () => {});
+  this.types.set('*', () => {});
   this.coerces = new Map();
 }
 
@@ -19,27 +20,27 @@ export default Ruler;
  * Adds a new custom format.
  */
 Ruler.prototype.add = function (name, validate, coerce, rewrite) {
-  if (typeof name !== "string") {
+  if (typeof name !== 'string') {
     throw new CUSTOMISE_FAILED(
-      'Schema name must be a string (current: "' + typeof name + '").'
+      'Schema name must be a string (current: "' + typeof name + '").',
     );
   }
-  if (typeof validate !== "function") {
+  if (typeof validate !== 'function') {
     throw new CUSTOMISE_FAILED(
-      'Validation function for "' + name + '" must be a function.'
+      'Validation function for "' + name + '" must be a function.',
     );
   }
-  if (coerce && typeof coerce !== "function") {
+  if (coerce && typeof coerce !== 'function') {
     throw new CUSTOMISE_FAILED(
-      'Coerce function for "' + name + '" must be a function.'
+      'Coerce function for "' + name + '" must be a function.',
     );
   }
 
   if (this.types.has(name) && !rewrite) {
     const advice =
-      " Set the 4th argument (rewrite) of `addFormat` at true to skip this error.";
+      ' Set the 4th argument (rewrite) of `addFormat` at true to skip this error.';
     throw new CUSTOMISE_FAILED(
-      'Format name "' + name + '" is already registered.' + advice
+      'Format name "' + name + '" is already registered.' + advice,
     );
   }
 
@@ -53,21 +54,21 @@ Ruler.prototype.add = function (name, validate, coerce, rewrite) {
  * @Returns {Function} Coerce method
  */
 Ruler.prototype.getCoerceMethod = function (format) {
-  const isStr = (value) => typeof value === "string";
+  const isStr = (value) => typeof value === 'string';
 
   if (this.coerces.has(format)) {
     return this.coerces.get(format);
   }
   switch (format) {
-    case "Number":
+    case 'Number':
       return (v) => (isStr(v) ? parseFloat(v) : v);
-    case "Boolean":
-      return (v) => (isStr(v) ? String(v).toLowerCase() !== "false" : v);
-    case "Array":
-      return (v) => (isStr(v) ? v.split(",") : v);
-    case "Object":
+    case 'Boolean':
+      return (v) => (isStr(v) ? String(v).toLowerCase() !== 'false' : v);
+    case 'Array':
+      return (v) => (isStr(v) ? v.split(',') : v);
+    case 'Object':
       return (v) => (isStr(v) ? JSON.parse(v) : v);
-    case "RegExp":
+    case 'RegExp':
       return (v) => (isStr(v) ? new RegExp(v) : v);
     default:
     // for eslint "Expected a default case"

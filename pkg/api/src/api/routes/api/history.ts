@@ -3,9 +3,9 @@ import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
 import logger from '@/loaders/logger';
-import getBandwidth from '@/plex/bandwidth';
-import getHistory from '@/plex/history';
-import getServerInfo from '@/plex/serverInfo';
+import getBandwidth from '@/services/plex/bandwidth';
+import getHistory from '@/services/plex/history';
+import getServerInfo from '@/services/plex/serverInfo';
 
 const route = new Router({ prefix: '/history' });
 

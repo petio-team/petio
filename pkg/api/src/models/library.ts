@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const LibrarySchema = new mongoose.Schema(
   {
@@ -23,9 +23,9 @@ const LibrarySchema = new mongoose.Schema(
     contentChangedAt: Number,
     hidden: String,
   },
-  { collection: "libraries" }
+  { collection: 'libraries' },
 );
 
-export default mongoose.model("Library", LibrarySchema);
+export default mongoose.model('Library', LibrarySchema);
 
 // uuid
