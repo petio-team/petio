@@ -35,6 +35,9 @@ jobs:
       - name: Install task
         uses: arduino/setup-task@v1
 
+      - name: Install node-prune
+        run: curl -sf https://gobinaries.com/tj/node-prune | sh
+
       - name: Build frontend and api
         run: task --parallel build
 
