@@ -19,11 +19,11 @@
     "@semantic-release/release-notes-generator": "^10.0.3",
     "@trivago/prettier-plugin-sort-imports": "^3.2.0",
     "commitlint": "^17.0.0",
-    "husky": "^7.0.4",
+    "husky": "^8.0.1",
     "prettier": "^2.6.2"
   },
   "scripts": {
-    "postinstall": "node-prune"
+    "postinstall": "node-prune && husky install"
   },
-  "packageManager": "yarn@3.2.0"
+  "packageManager": "yarn@3.2.1"
 }
