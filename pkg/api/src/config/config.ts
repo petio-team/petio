@@ -1,9 +1,9 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import ipc from '@/clusters/ipc';
 import { dataFolder } from '@/config/env';
 import { config } from '@/config/schema';
+import ipc from '@/infra/clusters/ipc';
 import logger from '@/loaders/logger';
 
 /**

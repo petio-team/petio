@@ -2,7 +2,7 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import { company, discoverMovie, movieLookup } from '@/tmdb/movie';
+import { company, discoverMovie, movieLookup } from '@/services/tmdb/movie';
 
 const route = new Router({ prefix: '/movie' });
 

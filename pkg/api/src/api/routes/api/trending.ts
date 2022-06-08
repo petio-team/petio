@@ -2,7 +2,7 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import trending from '@/tmdb/trending';
+import trending from '@/services/tmdb/trending';
 
 const route = new Router({ prefix: '/trending' });
 

@@ -47,5 +47,8 @@
     "development": [
       "since 2010"
     ]
+  },
+  "devDependencies": {
+    "ts-node": "^10.8.1"
   }
 }

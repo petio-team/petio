@@ -4,7 +4,7 @@ import { Context } from 'koa';
 
 import { adminRequired } from '@/api/middleware/auth';
 import logger from '@/loaders/logger';
-import getSessions from '@/plex/sessions';
+import getSessions from '@/services/plex/sessions';
 
 const route = new Router({ prefix: '/sessions' });
 

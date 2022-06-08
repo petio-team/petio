@@ -2,7 +2,7 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import getDiscovery from '@/discovery/display';
+import getDiscovery from '@/services/discovery/display';
 import logger from '@/loaders/logger';
 
 const route = new Router({ prefix: '/discovery' });

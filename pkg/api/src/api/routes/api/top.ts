@@ -2,7 +2,7 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import getTop from '@/plex/top';
+import getTop from '@/services/plex/top';
 
 // Cache for 1 day
 // const cacheMiddleware = new ExpressCache(

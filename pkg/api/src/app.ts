@@ -3,11 +3,11 @@ import Koa from 'koa';
 import 'module-alias/register';
 import os from 'os';
 
-import { masterHandler, workerHandler } from '@/clusters/events';
-import ipc from '@/clusters/ipc';
 import { HasConfig } from '@/config/index';
-import { listen } from '@/util/http';
-import startupMessage from '@/util/startupMessage';
+import { masterHandler, workerHandler } from '@/infra/clusters/events';
+import ipc from '@/infra/clusters/ipc';
+import { listen } from '@/infra/util/http';
+import startupMessage from '@/infra/util/startupMessage';
 
 import('dotenv/config');
 import('cache-manager/lib/stores/memory');

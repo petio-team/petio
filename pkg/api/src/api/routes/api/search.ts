@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
 import logger from '@/loaders/logger';
-import search from '@/tmdb/search';
+import search from '@/services/tmdb/search';
 
 const route = new Router({ prefix: '/search' });
 

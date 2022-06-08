@@ -3,11 +3,11 @@ import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
 import logger from '@/loaders/logger';
-import Mailer from '@/mail/mailer';
 import Issue from '@/models/issue';
 import { UserModel } from '@/models/user';
-import { movieLookup } from '@/tmdb/movie';
-import { showLookup } from '@/tmdb/show';
+import Mailer from '@/services/mail/mailer';
+import { movieLookup } from '@/services/tmdb/movie';
+import { showLookup } from '@/services/tmdb/show';
 
 const route = new Router({ prefix: '/issue' });
 

@@ -1,19 +1,20 @@
-import { Agenda } from "agenda";
+import { Agenda } from 'agenda';
 
-import LibraryUpdate from "@/plex/library";
-import buildDiscovery from "@/discovery/build";
-import LoggerInstance from "./logger";
-import QuotaSystem from "@/requests/quotas";
-import { storeCache } from "@/meta/imdb";
-import trending from "@/tmdb/trending";
-import { config } from "@/config/index";
+import { config } from '@/config/index';
+import buildDiscovery from '@/services/discovery/build';
+import { storeCache } from '@/services/meta/imdb';
+import LibraryUpdate from '@/services/plex/library';
+import QuotaSystem from '@/services/requests/quotas';
+import trending from '@/services/tmdb/trending';
+
+import LoggerInstance from './logger';
 
 const TASK_NAME = {
-  FULL_LIBRARY_SCAN: "full library scan",
-  PARTIAL_LIBRARY_SCAN: "partial library scan",
-  USER_QUOTA_RESET: "reset user quota",
-  IMDB_CACHE: "update imdb cache",
-  TMDB_CACHE: "update tmdb cache",
+  FULL_LIBRARY_SCAN: 'full library scan',
+  PARTIAL_LIBRARY_SCAN: 'partial library scan',
+  USER_QUOTA_RESET: 'reset user quota',
+  IMDB_CACHE: 'update imdb cache',
+  TMDB_CACHE: 'update tmdb cache',
 } as const;
 
 export default ({ agenda }: { agenda: Agenda }) => {
@@ -26,7 +27,7 @@ export default ({ agenda }: { agenda: Agenda }) => {
         "an error occured while attempting to run task '" +
           TASK_NAME.FULL_LIBRARY_SCAN +
           "'",
-        { label: "task" }
+        { label: 'task' },
       );
       LoggerInstance.debug(err);
     } finally {
@@ -44,13 +45,13 @@ export default ({ agenda }: { agenda: Agenda }) => {
           "an error occured while attempting to run task '" +
             TASK_NAME.PARTIAL_LIBRARY_SCAN +
             "'",
-          { label: "task" }
+          { label: 'task' },
         );
         LoggerInstance.debug(err);
       } finally {
         done();
       }
-    }
+    },
   );
 
   agenda.define(TASK_NAME.USER_QUOTA_RESET, async (_job: any, done: any) => {
@@ -61,7 +62,7 @@ export default ({ agenda }: { agenda: Agenda }) => {
         "an error occured while attempting to run task '" +
           TASK_NAME.USER_QUOTA_RESET +
           "'",
-        { label: "task" }
+        { label: 'task' },
       );
       LoggerInstance.debug(err);
     } finally {
@@ -77,7 +78,7 @@ export default ({ agenda }: { agenda: Agenda }) => {
         "an error occured while attempting to run task '" +
           TASK_NAME.IMDB_CACHE +
           "'",
-        { label: "task" }
+        { label: 'task' },
       );
       LoggerInstance.debug(err);
     } finally {
@@ -93,7 +94,7 @@ export default ({ agenda }: { agenda: Agenda }) => {
         "an error occured while attempting to run task '" +
           TASK_NAME.TMDB_CACHE +
           "'",
-        { label: "task" }
+        { label: 'task' },
       );
       LoggerInstance.debug(err);
     } finally {
@@ -102,12 +103,12 @@ export default ({ agenda }: { agenda: Agenda }) => {
   });
 
   agenda.start();
-  agenda.every(config.get("tasks.library.full"), TASK_NAME.FULL_LIBRARY_SCAN);
+  agenda.every(config.get('tasks.library.full'), TASK_NAME.FULL_LIBRARY_SCAN);
   agenda.every(
-    config.get("tasks.library.partial"),
-    TASK_NAME.PARTIAL_LIBRARY_SCAN
+    config.get('tasks.library.partial'),
+    TASK_NAME.PARTIAL_LIBRARY_SCAN,
   );
-  agenda.every(config.get("tasks.quotas"), TASK_NAME.USER_QUOTA_RESET);
-  agenda.every("24 hours", [TASK_NAME.IMDB_CACHE, TASK_NAME.TMDB_CACHE]);
+  agenda.every(config.get('tasks.quotas'), TASK_NAME.USER_QUOTA_RESET);
+  agenda.every('24 hours', [TASK_NAME.IMDB_CACHE, TASK_NAME.TMDB_CACHE]);
   agenda.purge();
 };
