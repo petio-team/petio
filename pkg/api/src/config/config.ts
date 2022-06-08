@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 
+import ipc from '@/clusters/ipc';
 import { dataFolder } from '@/config/env';
 import { config } from '@/config/schema';
 import logger from '@/loaders/logger';
@@ -60,8 +61,13 @@ export const HasConfig = async (): Promise<boolean> => {
  */
 export const WriteConfig = async (): Promise<boolean> => {
   try {
-    const data = JSON.stringify(config.getProperties(), null, 4);
+    const properties = config.getProperties();
+    const data = JSON.stringify(properties, null, 4);
     await fs.writeFile(getConfigPath(), data);
+
+    // update other clusters with new config changes
+    ipc.messageSiblings({ action: 'update_config', data: properties });
+
     return true;
   } catch (error) {
     logger.error(error);

@@ -3,7 +3,9 @@ import Koa from 'koa';
 import 'module-alias/register';
 import os from 'os';
 
-import { HasConfig } from '@/config/config';
+import { masterHandler, workerHandler } from '@/clusters/events';
+import ipc from '@/clusters/ipc';
+import { HasConfig } from '@/config/index';
 import { listen } from '@/util/http';
 import startupMessage from '@/util/startupMessage';
 
@@ -14,7 +16,8 @@ export const setupWorkerProcesses = async () => {
   let numCores = os.cpus().length;
 
   for (let i = 0; i < numCores; i++) {
-    cluster.fork({ output: i == 0 });
+    const worker = cluster.fork({ output: i == 0 });
+    ipc.register(worker, masterHandler);
   }
 
   cluster.on('exit', function (_worker, _code, _signal) {
@@ -46,10 +49,12 @@ const setupServer = async () => {
         setupApp(true);
       }
     } else {
+      ipc.register(process, workerHandler);
       setupApp(process.env.output === 'true');
     }
   } catch (error) {
     console.error(error);
+    process.exit(1);
   }
 };
 
