@@ -90,6 +90,9 @@ function SettingsGeneral(props) {
     const target = e.target;
     const inpName = target.name;
     let inpVal = target.value;
+    if (target.type === 'checkbox') {
+      inpVal = target.checked;
+    }
 
     if (inpName === "login_type") {
       inpVal = parseInt(inpVal);
