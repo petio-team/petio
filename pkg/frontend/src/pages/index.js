@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/opacity.css';
 import { connect } from 'react-redux';
@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 
 import Carousel from '../components/carousel';
 import Hero from '../components/hero';
-// import { Loading } from '../components/loading';
+import { Loading } from '../components/loading';
 import Meta from '../components/meta';
 import media from '../services/media.service';
 import hero from '../styles/components/hero.module.scss';
@@ -26,10 +26,13 @@ function Home({
   redux_discovery,
   redux_featured,
 }) {
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     async function getTrending() {
       try {
-        media.getTrending();
+        await media.getTrending();
+        setLoading(false);
       } catch (e) {
         console.log(e);
         newNotification({
@@ -84,6 +87,7 @@ function Home({
   return (
     <>
       <Meta title={'Home'} />
+      {loading ? <Loading /> : null}
       {/* {!redux_featured ? <Loading /> : null} */}
       <div>
         <div className={hero.discovery}>
