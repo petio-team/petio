@@ -5,7 +5,7 @@
     "typeRoots": ["../../node_modules/@types", "./src/types"],
     "allowJs": true,
     "checkJs": false,
-    "outDir": "dist",
+    "outDir": "build",
     "noEmitOnError": true,
     "rootDir": ".",
     "strict": false,

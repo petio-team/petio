@@ -1,5 +1,10 @@
+# Ignore everything
 *
+
+# Allow files and directories
 !docker/
 !/pkg/frontend/build/
 !/pkg/api/dist/
+!/pkg/api/package.json
 !/node_modules
+!.node-version

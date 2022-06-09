@@ -5,8 +5,8 @@ interface Process extends NodeJS.Process {
 }
 const proc: Process = process;
 
-const ROOT_DIR = proc.pkg ? path.dirname(process.execPath) : proc.cwd();
-const APP_DIR: string = proc.pkg
+export const ROOT_DIR = proc.pkg ? path.dirname(process.execPath) : proc.cwd();
+export const APP_DIR: string = proc.pkg
   ? path.join(__dirname, '../../../../../')
   : proc.env.APP_DIR ?? path.join(__dirname, '../../../../');
 
@@ -16,7 +16,7 @@ export const rootDir = ROOT_DIR;
 export const env = process.env.NODE_ENV ?? 'development';
 export const dataFolder =
   process.env.DATA_FOLDER ?? path.join(ROOT_DIR, './data');
-export const frontendView = path.join(VIEW_FOLDER, './frontend');
+export const frontendView = VIEW_FOLDER;
 export const adminView = path.join(VIEW_FOLDER, './admin');
 export const tmdbApiKey = '1af5ad19a2d972a67cd27eb033979c4c';
 // trunk-ignore(gitleaks/generic-api-key)

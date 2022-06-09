@@ -44,7 +44,7 @@ tasks:
   build:api:
     dir: pkg/api
     cmds:
-      - yarn workspace petio-api run build
+      - yarn workspace petio-api run build:prod
 
   # -
   # Generate

@@ -9,7 +9,7 @@ import { frontendView } from '@/config/env';
 export default async (app: Koa) => {
   let frontendPath = frontendView;
   if (!(await pathExists(path.join(frontendPath, 'index.html')))) {
-    const frontendBuildPath = path.join(frontendPath, './build');
+    const frontendBuildPath = path.join(frontendPath, './frontend/build');
     if (!(await pathExists(path.join(frontendBuildPath, './index.html')))) {
       throw new Error('unable to find views files for frontend');
     } else {

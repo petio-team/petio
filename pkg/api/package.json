@@ -6,7 +6,8 @@
   "scripts": {
     "start": "nodemon",
     "inspect": "nodemon --inspect src/app.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "build:prod": "yarn dlx @vercel/ncc build ./src/app.ts -o dist -m"
   },
   "author": "",
   "license": "MIT",
