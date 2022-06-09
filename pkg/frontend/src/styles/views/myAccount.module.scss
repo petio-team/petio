@@ -23,12 +23,51 @@
   margin: 50px 0;
 
   &__title {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
+
+    @media (min-width: $lg) {
+      margin-bottom: 20px;
+    }
   }
 }
 
+.accountItems {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.accountItem {
+  width: 100%;
+  margin-top: 20px;
+
+  &:nth-child(1) {
+    margin-top: 0;
+  }
+
+  @media (min-width: $lg) {
+    width: 33%;
+    margin-top: 0;
+  }
+}
+
+.prefBtn {
+  appearance: none;
+  border: none;
+  background: none;
+  color: $orange;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  margin-top: 10px;
+  font-weight: 700;
+}
+
 .divide {
-  margin: 50px 0;
+  margin: 20px 0;
+
+  @media (min-width: $lg) {
+    margin: 50px 0;
+  }
 }
 
 .reviewQueue {

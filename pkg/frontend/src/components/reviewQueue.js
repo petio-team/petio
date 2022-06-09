@@ -126,7 +126,14 @@ export default function ReviewQueue({
                   )}
                 </div>
                 <div className={styles.reviewQueue__item__content}>
-                  <p className={`${typo.body} ${typo.medium}`}>
+                  <p
+                    className={`${typo.body} ${typo.medium}`}
+                    style={{
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
                     {item.title || item.name}
                     {item.first_air_date
                       ? ` (${new Date(item.first_air_date).getFullYear()})`

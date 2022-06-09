@@ -79,24 +79,60 @@ function MyAccount({ redux_user, redux_reviews, newNotification }) {
           </span>
         </p>
         <hr className={styles.divide} />
-        <p className={`${typo.smtitle} ${typo.bold} ${styles.block__title}`}>
-          Account Details
-        </p>
-        <p className={typo.body}>
-          <b>Role:</b>{' '}
-          <span style={{ textTransform: 'capitalize' }}>
-            {redux_user.currentUser.role}
-          </span>
-        </p>
-        <p className={typo.body}>
-          <b>Email:</b> {redux_user.currentUser.email}
-        </p>
-        <p className={typo.body}>
-          <b>Username:</b> {redux_user.currentUser.username}
-        </p>
-        <p className={typo.body}>
-          <b>Quota:</b> {formatQuota()}
-        </p>
+        <div className={styles.accountItems}>
+          <div className={styles.accountItem}>
+            <p
+              className={`${typo.smtitle} ${typo.bold} ${styles.block__title}`}
+            >
+              Account Details
+            </p>
+            <p className={typo.body}>
+              <b>Role:</b>{' '}
+              <span style={{ textTransform: 'capitalize' }}>
+                {redux_user.currentUser.role}
+              </span>
+            </p>
+            <p className={typo.body}>
+              <b>Email:</b> {redux_user.currentUser.email}
+            </p>
+            <p className={typo.body}>
+              <b>Username:</b> {redux_user.currentUser.username}
+            </p>
+            <p className={typo.body}>
+              <b>Quota:</b> {formatQuota()}
+            </p>
+          </div>
+          <div className={styles.accountItem}>
+            <p
+              className={`${typo.smtitle} ${typo.bold} ${styles.block__title}`}
+            >
+              Your Issues
+            </p>
+            <p className={typo.body}>No active issues</p>
+          </div>
+          <div className={styles.accountItem}>
+            <p
+              className={`${typo.smtitle} ${typo.bold} ${styles.block__title}`}
+            >
+              Your Preferences
+            </p>
+            <p className={typo.body}>
+              <b>Email Notifications:</b> Yes
+            </p>
+            <p className={typo.body}>
+              <b>Discord Notifications:</b> Yes
+            </p>
+            <p className={typo.body}>
+              <b>Child Account:</b> No
+            </p>
+            <p className={typo.body}>
+              <b>Default Language:</b> English
+            </p>
+            <button className={`${typo.small} ${styles.prefBtn}`}>
+              Edit Preferences
+            </button>
+          </div>
+        </div>
         <hr className={styles.divide} />
         <p className={`${typo.smtitle} ${typo.bold} ${styles.block__title}`}>
           Your Review Queue
