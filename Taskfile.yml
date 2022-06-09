@@ -34,7 +34,7 @@ tasks:
 
   build:pre:
     cmds:
-      - yarn workspaces focus --all --production
+      - yarn workspaces focus --all
 
   build:fe:
     dir: pkg/frontend

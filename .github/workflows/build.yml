@@ -33,7 +33,7 @@ jobs:
           cache-dependency-path: '**/yarn.lock'
 
       - name: Install typescript
-        run: yarn add --dev typescript
+        run: yarn add typescript
 
       - name: Install task
         uses: arduino/setup-task@v1
