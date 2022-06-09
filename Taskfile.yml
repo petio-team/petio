@@ -35,7 +35,6 @@ tasks:
   build:pre:
     cmds:
       - yarn workspaces focus --all --production
-      - node-prune
 
   build:fe:
     dir: pkg/frontend
