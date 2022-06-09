@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 
 import { Loading } from '../components/loading';
 import Meta from '../components/meta';
-import request from '../components/request';
 import Request from '../components/request';
 import media from '../services/media.service';
 import { myRequests, myRequestsArchive } from '../services/user.service';
@@ -28,10 +27,10 @@ function Requests({ requests, requestsArchive, currentUser }) {
   }, [currentUser]);
 
   useEffect(() => {
-    if (!requests || Object.keys(requests).length === 0 ) return;
+    if (!requests || Object.keys(requests).length === 0) return;
     let tv = [];
     let movie = [];
-    console.log(requests)
+    console.log(requests);
     Object.keys(requests).forEach((key) => {
       const request = requests[key];
       if (request.type === 'movie') movie.push(request.tmdb_id);
