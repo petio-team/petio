@@ -35,14 +35,8 @@ jobs:
       - name: Install task
         uses: arduino/setup-task@v1
 
-      - name: Install node-prune binary
-        run: curl -sf https://gobinaries.com/tj/node-prune | sh
-
       - name: Build frontend and api
         run: task --parallel build
-
-      - name: Clean up node_modules folder
-        run: node-prune
 
       - name: Authenticate with github's docker registry
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
