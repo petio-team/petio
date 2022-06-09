@@ -2,6 +2,7 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/opacity.css';
 import { Link } from 'react-router-dom';
 
+import { ReactComponent as Spinner } from '../assets/svg/spinner.svg';
 import { ReactComponent as ThumbDown } from '../assets/svg/thumb-down.svg';
 import { ReactComponent as ThumbUp } from '../assets/svg/thumb-up.svg';
 import { getReviews, saveReview } from '../services/user.service';
@@ -52,7 +53,11 @@ export default function ReviewQueue({
               className={styles.reviewQueue__item}
             >
               <div className={styles.reviewQueue__item__inner}>
-                <div className={styles.reviewQueue__item__image}></div>
+                <div className={styles.reviewQueue__item__image}>
+                  <div className={styles.reviewQueue__loader}>
+                    <Spinner />
+                  </div>
+                </div>
                 <div className={styles.reviewQueue__item__content}>
                   <p className={`${typo.body} ${typo.medium}`}>&nbsp;</p>
                   <div className={styles.reviewQueue__item__btns}>
