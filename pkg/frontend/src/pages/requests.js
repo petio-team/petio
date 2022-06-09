@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 
 import { Loading } from '../components/loading';
 import Meta from '../components/meta';
+import request from '../components/request';
 import Request from '../components/request';
 import media from '../services/media.service';
 import { myRequests, myRequestsArchive } from '../services/user.service';
@@ -27,10 +28,12 @@ function Requests({ requests, requestsArchive, currentUser }) {
   }, [currentUser]);
 
   useEffect(() => {
-    if (!requests) return;
+    if (!requests || Object.keys(requests).length === 0 ) return;
     let tv = [];
     let movie = [];
-    requests.forEach((request) => {
+    console.log(requests)
+    Object.keys(requests).forEach((key) => {
+      const request = requests[key];
       if (request.type === 'movie') movie.push(request.tmdb_id);
       if (request.type === 'tv') tv.push(request.tmdb_id);
     });
@@ -50,8 +53,9 @@ function Requests({ requests, requestsArchive, currentUser }) {
           Active Requests
         </p>
         <div className={styles.grid}>
-          {requests && requests.length > 0 ? (
-            requests.map((request) => {
+          {requests && Object.keys(requests).length > 0 ? (
+            Object.keys(requests).map((key) => {
+              const request = requests[key];
               return (
                 <Request request={request} key={`request_${request._id}`} />
               );
