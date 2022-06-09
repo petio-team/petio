@@ -56,6 +56,7 @@ export default ({ app }: { app: Koa }) => {
         scriptSrc: ["'self'", "'unsafe-inline'", 'https://www.youtube.com'],
         styleSrc: ["'self'", "'unsafe-inline'"],
         fontSrc: ["'self'"],
+        frameSrc: ["'self'", 'unsafe-inline', 'https://www.youtube.com'],
         imgSrc: [
           "'self'",
           'data:',
