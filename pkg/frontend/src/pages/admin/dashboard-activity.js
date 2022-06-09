@@ -67,16 +67,6 @@ function Activity({ system }) {
             }
           }
 
-          if (!selectedMedia.Part) {
-            return null;
-          }
-
-          if (!selectedMedia.Part[0].Stream) {
-            return null;
-          }
-
-          const bitrate = formatBytes(session.Session.bandwidth * 1000, 0);
-
           let playback = selectedMedia.Part
             ? selectedMedia.Part[0].decision
             : 'unknown';
@@ -89,10 +79,49 @@ function Activity({ system }) {
               media = session.ratingKey;
               type = 'movie';
               break;
+            case 'track':
+              type = 'music';
+              break;
             default:
               media = null;
               if (!media) return null;
           }
+
+          if (type === 'music') {
+            return (
+              <div
+                key={`activity_sesion_${session.ratingKey}__${i}`}
+                className={styles.dashboard__activity__item}
+              >
+                <ActivitySession
+                  ratingKey={session.ratingKey}
+                  type={type}
+                  session={session}
+                  progress={
+                    session.Media &&
+                    session.Media.length > 0 &&
+                    session.viewOffset &&
+                    session.viewOffset
+                      ? (session.viewOffset / session.Media[0].duration) * 100
+                      : 0
+                  }
+                  selectedMedia={selectedMedia}
+                  playback={playback}
+                  bitrate={false}
+                />
+              </div>
+            );
+          }
+
+          if (!selectedMedia.Part) {
+            return null;
+          }
+
+          if (!selectedMedia.Part[0].Stream) {
+            return null;
+          }
+
+          const bitrate = formatBytes(session.Session.bandwidth * 1000, 0);
 
           return (
             <div

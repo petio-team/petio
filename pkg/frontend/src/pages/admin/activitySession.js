@@ -165,6 +165,47 @@ function ActivitySession({
 
   const progressWidth = `${Math.ceil(progress)}%`;
 
+  if (type === 'music') {
+    return (
+      <div className={styles.session}>
+        <div className={styles.session__card}>
+          <div className={styles.session__card__status}>{status()}</div>
+          <div className={styles.session__card__spacer}></div>
+          <p
+            className={`${styles.session__card__logo__text} ${typo.smtitle} ${typo.medium} ${styles.no_logo}`}
+          >
+            Audio
+          </p>
+          <div className={styles.session__card__progress__wrap}>
+            <div
+              className={styles.session__card__progress}
+              style={{ width: progressWidth }}
+            ></div>
+          </div>
+        </div>
+        <div className={styles.session__card__content}>
+          <p
+            className={`${typo.medium} ${typo.body} ${styles.session__card__content__title}`}
+          >
+            {session.title}
+          </p>
+
+          <p
+            className={`${typo.small} ${styles.session__card__content__episode}`}
+          >
+            {session.grandparentTitle}
+          </p>
+        </div>
+        <div className={styles.session__card__detail}>
+          <p className={`${typo.small}`}>{formatDecision(playback)}</p>
+        </div>
+        <div className={styles.session__card__user}>
+          <p className={`${typo.small}`}>{session.User.title}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Link to={`/${type}/${id}`} className={styles.session}>
       <div className={styles.session__card}>

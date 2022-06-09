@@ -49,7 +49,7 @@ function AdminDashboard({ requests, redux_movies, redux_tv }) {
         });
       }
     });
-    console.log(data);
+
     function sortRequests(a, b) {
       if (a.popularity > b.popularity) {
         return -1;
