@@ -4,6 +4,7 @@ import path from 'path';
 import { dataFolder } from '@/config/env';
 import { config } from '@/config/schema';
 import ipc from '@/infra/clusters/ipc';
+import { fileExists } from '@/infra/util/file';
 import logger from '@/loaders/logger';
 
 /**
@@ -71,15 +72,6 @@ export const WriteConfig = async (): Promise<boolean> => {
     return true;
   } catch (error) {
     logger.error(error);
-    return false;
-  }
-};
-
-export const fileExists = async (file: string): Promise<boolean> => {
-  try {
-    const stats = await fs.stat(file);
-    return stats.isFile();
-  } catch (_error) {
     return false;
   }
 };
