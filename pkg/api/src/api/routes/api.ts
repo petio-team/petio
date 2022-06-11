@@ -29,12 +29,9 @@ import trending from '@/api/routes/api/trending';
 import user from '@/api/routes/api/user';
 import { config as conf } from '@/config/index';
 
-export default (app: Koa, subpath: string) => {
-  // api router
-  const api = new Router({
-    prefix: '/api',
-  });
+const api = new Router({ prefix: '/api' });
 
+export default (app: Koa, subpath: string) => {
   if (subpath === '/') {
     subpath = '';
   }

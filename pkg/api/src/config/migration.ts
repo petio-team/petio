@@ -5,8 +5,8 @@ import * as z from 'zod';
 import { dataFolder } from '@/config/env';
 import { WriteConfig } from '@/config/index';
 import { config } from '@/config/schema';
-import { fileExists } from '@/infra/util/file';
 import logger from '@/loaders/logger';
+import { fileExists } from '@/utils/file';
 
 const MainConfigSchema = z.object({
   DB_URL: z.string().url().min(1),

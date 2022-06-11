@@ -4,8 +4,8 @@ import path from 'path';
 import { dataFolder } from '@/config/env';
 import { config } from '@/config/schema';
 import ipc from '@/infra/clusters/ipc';
-import { fileExists } from '@/infra/util/file';
 import logger from '@/loaders/logger';
+import { fileExists } from '@/utils/file';
 
 /**
  * The name of the config file to use

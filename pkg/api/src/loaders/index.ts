@@ -6,7 +6,12 @@ import jobs from '@/loaders/jobs';
 import appRouter from '@/loaders/koa';
 import mongoose from '@/loaders/mongoose';
 
+import di from './di';
+
 export default async ({ httpApp }: { httpApp: Koa }) => {
+  // inject everything into di
+  di();
+
   // load the config if the file exists, else use defaults
   const exists = await config();
 

@@ -2,6 +2,8 @@ import { StatusCodes } from 'http-status-codes';
 import { Context, Next } from 'koa';
 import { ZodError } from 'zod';
 
+import { StatusBadRequest } from '../web/request';
+
 type ErrorListItem = {
   type: 'Query' | 'Params' | 'Body';
   errors: ZodError<any>;
@@ -11,20 +13,12 @@ export function sendErrors(
   errors: { type: any; errors: any }[],
   ctx: Context,
 ): void {
-  ctx.status = StatusCodes.BAD_REQUEST;
-  ctx.body = errors.map((error: { type: any; errors: any }) => ({
+  const err = errors.map((error: { type: any; errors: any }) => ({
     type: error.type,
     errors: error.errors,
   }));
+  StatusBadRequest(ctx, 'failed to validate request', err);
 }
-
-export const sendError: (error: ErrorListItem, ctx: Context) => void = (
-  error,
-  ctx,
-) => {
-  ctx.status = StatusCodes.BAD_REQUEST;
-  ctx.body = { type: error.type, errors: error.errors };
-};
 
 export function validateRequest({
   params,
@@ -44,7 +38,7 @@ export function validateRequest({
       }
     }
     if (query) {
-      const parsed = await query.safeParseAsync(ctx.request.query);
+      const parsed = await query.safeParseAsync(ctx.query);
       if (!parsed.success) {
         errors.push({ type: 'Query', errors: parsed.error });
       }

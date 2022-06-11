@@ -10,8 +10,8 @@ import mount from 'koa-mount';
 import routes from '@/api/index';
 import { IsDevelopment, corsDomains } from '@/config/env';
 import { config } from '@/config/index';
-import { removeSlashes } from '@/infra/util/urls';
 import logger from '@/loaders/logger';
+import { removeSlashes } from '@/utils/urls';
 
 export default ({ app }: { app: Koa }) => {
   // Add http logging using morgan

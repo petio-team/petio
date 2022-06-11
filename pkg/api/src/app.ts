@@ -2,12 +2,13 @@ import cluster from 'cluster';
 import Koa from 'koa';
 import 'module-alias/register';
 import os from 'os';
+import 'reflect-metadata';
 
 import { HasConfig } from '@/config/index';
 import { masterHandler, workerHandler } from '@/infra/clusters/events';
 import ipc from '@/infra/clusters/ipc';
-import { listen } from '@/infra/util/http';
-import startupMessage from '@/infra/util/startupMessage';
+import { listen } from '@/utils/http';
+import startupMessage from '@/utils/startupMessage';
 
 import('dotenv/config');
 import('cache-manager/lib/stores/memory');
