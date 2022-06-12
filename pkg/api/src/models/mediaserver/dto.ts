@@ -10,7 +10,7 @@ export interface IMediaServer {
   name: string;
   url: URL;
   token: string;
-  enabled: true;
+  enabled: boolean;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
