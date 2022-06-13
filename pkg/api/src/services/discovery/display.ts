@@ -265,7 +265,7 @@ export default async (id, type = 'movie') => {
           }
         }
       },
-      { concurrency: 10 },
+      { concurrency: config.get("general.concurrency") },
     );
     let data = [...peopleData, ...directorData, ...recentData, ...genresData];
     data = shuffle(data);
@@ -676,7 +676,7 @@ async function comingSoon(type) {
                 videos: result.videos,
               };
       },
-      { concurrency: 10 },
+      { concurrency: config.get("general.concurrency") },
     );
     return data;
   } catch (e) {

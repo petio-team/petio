@@ -4,6 +4,7 @@ import http from 'http';
 import sanitize from 'sanitize-filename';
 
 import { tmdbApiKey } from '@/config/env';
+import { config } from '@/config/index';
 import logger from '@/loaders/logger';
 import onServer from '@/services/plex/server';
 import { movieLookup } from '@/services/tmdb/movie';
@@ -28,7 +29,7 @@ async function search(term) {
       let res: any = await onServer('movie', false, false, result.id);
       movies.results[i].on_server = res.exists;
     },
-    { concurrency: 10 },
+    { concurrency: config.get('general.concurrency') },
   );
 
   await Promise.map(
@@ -38,7 +39,7 @@ async function search(term) {
       let res: any = await onServer('show', false, false, result.id);
       shows.results[i].on_server = res.exists;
     },
-    { concurrency: 10 },
+    { concurrency: config.get('general.concurrency') },
   );
 
   return {

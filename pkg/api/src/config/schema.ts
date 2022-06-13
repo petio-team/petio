@@ -12,6 +12,11 @@ export const config = blueconfig({
       format: Boolean,
       default: false,
     },
+    concurrency: {
+      doc: 'The concurrency limit amount for concurrent operations',
+      format: Number,
+      default: 10,
+    },
   },
   petio: {
     host: {

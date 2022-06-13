@@ -119,7 +119,7 @@ export default class LibraryUpdate {
           });
         }
       },
-      { concurrency: 10 },
+      { concurrency: config.get("general.concurrency") },
     );
     this.execMail();
     logger.verbose('Partial Scan Complete', { label: 'plex.library' });
@@ -302,7 +302,7 @@ export default class LibraryUpdate {
               });
             }
           },
-          { concurrency: 10 },
+          { concurrency: config.get("general.concurrency") },
         );
         for (let i in music) {
           let artist = music[i];
@@ -636,7 +636,7 @@ export default class LibraryUpdate {
           }
           return thisSeason;
         },
-        { concurrency: 2 },
+        { concurrency: config.get("general.concurrency") },
       );
     } catch (e) {
       logger.warn(`CRON: Unable to fetch meta for ${title}`, {

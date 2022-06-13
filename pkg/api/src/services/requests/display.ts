@@ -1,5 +1,6 @@
 import Bluebird from 'bluebird';
 
+import { config } from '@/config/index';
 import logger from '@/loaders/logger';
 import { DownloaderType, GetAllDownloaders } from '@/models/downloaders';
 import Request from '@/models/request';
@@ -128,7 +129,7 @@ export const getRequests = async (user = false, all = false) => {
             }
           }
         },
-        { concurrency: 20 },
+        { concurrency: config.get('general.concurrency') },
       ),
     );
   } catch (err) {

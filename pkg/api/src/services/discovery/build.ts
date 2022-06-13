@@ -1,6 +1,7 @@
 import Promise from 'bluebird';
 import request from 'xhr-request';
 
+import { config } from '@/config/index';
 import logger from '@/loaders/logger';
 import Discovery from '@/models/discovery';
 import Movie from '@/models/movie';
@@ -32,7 +33,7 @@ export default async () => {
       async (i) => {
         await userBuild(i);
       },
-      { concurrency: 10 },
+      { concurrency: config.get('general.concurrency') },
     );
     logger.verbose('DISC: Finished building discovery profiles', {
       label: 'discovery.build',
