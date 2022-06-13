@@ -1,30 +1,16 @@
 import cluster from 'cluster';
 import Koa from 'koa';
 import 'module-alias/register';
-import os from 'os';
 import 'reflect-metadata';
 
 import { HasConfig } from '@/config/index';
-import { masterHandler, workerHandler } from '@/infra/clusters/events';
+import { setupWorkerProcesses, workerHandler } from '@/infra/clusters/clusters';
 import ipc from '@/infra/clusters/ipc';
 import { listen } from '@/utils/http';
 import startupMessage from '@/utils/startupMessage';
 
 import('dotenv/config');
 import('cache-manager/lib/stores/memory');
-
-export const setupWorkerProcesses = async () => {
-  let numCores = os.cpus().length;
-
-  for (let i = 0; i < numCores; i++) {
-    const worker = cluster.fork({ output: i == 0 });
-    ipc.register(worker, masterHandler);
-  }
-
-  cluster.on('exit', function (_worker, _code, _signal) {
-    cluster.fork();
-  });
-};
 
 async function setupApp(output: boolean) {
   const app = new Koa();
