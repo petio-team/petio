@@ -23,7 +23,7 @@ const customFormat = printf(({ level, formatLabel, message, timestamp }) => {
   return `${timestamp} ${lbl}${level}: ${message}`;
 });
 
-const logger = winston.createLogger({
+const Logger = winston.createLogger({
   level: config.get('logger.level') || 'debug',
   format: combine(
     errors({ stack: true }),
@@ -68,4 +68,4 @@ const logger = winston.createLogger({
   ],
 });
 
-export default logger;
+export default Logger;

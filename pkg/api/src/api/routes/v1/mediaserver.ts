@@ -79,12 +79,11 @@ export default (app: Router) => {
 };
 
 const listMediaServers = async (ctx: Context) => {
-  const deleted =
-    ctx.request.query.deleted === undefined ? { deletedAt: null } : {};
+  const deleted = ctx.request.query.deleted === undefined ? true : false;
 
   try {
     const repo = container.resolve<IMediaServerRepository>('MediaServer');
-    const instances = await repo.getAll({ ...deleted });
+    const instances = await repo.getAll(deleted);
 
     StatusOk(ctx, instances);
   } catch (error) {
@@ -93,12 +92,11 @@ const listMediaServers = async (ctx: Context) => {
 };
 
 const getMediaServerById = async (ctx: Context) => {
-  const deleted =
-    ctx.request.query.deleted === undefined ? { deletedAt: null } : {};
+  const deleted = ctx.request.query.deleted === undefined ? true : false;
 
   try {
     const repo = container.resolve<IMediaServerRepository>('MediaServer');
-    const instance = await repo.getAll({ ...deleted });
+    const instance = await repo.getAll(deleted);
 
     StatusOk(ctx, instance);
   } catch (error) {
@@ -119,7 +117,7 @@ const createMediaServer = async (ctx: Context) => {
       return;
     }
 
-    const exists = await repo.getAll({});
+    const exists = await repo.getAll();
     if (exists.length) {
       StatusBadRequest(ctx, 'media server already exists');
       return;
