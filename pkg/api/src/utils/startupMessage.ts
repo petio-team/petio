@@ -1,3 +1,5 @@
+import cluster from 'cluster';
+
 import pkg from '@/../package.json';
 import { HasConfig } from '@/config/config';
 import { config } from '@/config/schema';

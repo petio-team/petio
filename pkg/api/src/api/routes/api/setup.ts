@@ -4,6 +4,8 @@ import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 import mongoose from 'mongoose';
 
+import { validateRequest } from '@/api/middleware/validation';
+import { SetupTestInput, SetupTestInputSchema } from '@/api/schemas/setup';
 import { WriteConfig, config } from '@/config/index';
 import logger from '@/loaders/logger';
 import { CreateOrUpdateUser, UserRole } from '@/models/user';
@@ -12,7 +14,13 @@ import testConnection from '@/services/plex/connection';
 const route = new Router({ prefix: '/setup' });
 
 export default (app: Router) => {
-  route.post('/test_server', testServer);
+  route.post(
+    '/test_server',
+    validateRequest({
+      body: SetupTestInputSchema,
+    }),
+    testServer,
+  );
   route.post('/test_mongo', testMongo);
   route.post('/set', finishSetup);
 
@@ -20,7 +28,7 @@ export default (app: Router) => {
 };
 
 const testServer = async (ctx: Context) => {
-  const body = ctx.request.body as any;
+  const body = ctx.request.body as SetupTestInput;
 
   let server = body.server;
   if (!server) {
@@ -67,7 +75,7 @@ const testServer = async (ctx: Context) => {
 };
 
 const testMongo = async (ctx: Context) => {
-  const body = ctx.request.body as any;
+  const body = ctx.request.body;
 
   let mongo = body.mongo;
   logger.log('verbose', `testing mongo connection: ${mongo}`);
@@ -120,7 +128,7 @@ const testMongo = async (ctx: Context) => {
 const finishSetup = async (ctx: Context) => {
   logger.log('verbose', 'Attempting to create config file');
 
-  const body = ctx.request.body as any;
+  const body = ctx.request.body;
 
   let user = body.user;
   let server = body.server;
@@ -157,9 +165,12 @@ const finishSetup = async (ctx: Context) => {
       quotaCount: 0,
     });
 
-    WriteConfig();
+    await WriteConfig(false);
     logger.info('restarting to apply new configurations');
-    await WaitBeforeRestart(ctx);
+    await ctx.reload();
+
+    ctx.status = StatusCodes.OK;
+    ctx.body = {};
   } catch (err) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = 'error creating config';
@@ -167,10 +178,4 @@ const finishSetup = async (ctx: Context) => {
     logger.log('error', 'Config creation error');
     logger.log({ level: 'error', message: err });
   }
-};
-
-const WaitBeforeRestart = async (ctx: Context) => {
-  setTimeout(async () => {
-    await ctx.reload();
-  }, 1000);
 };

@@ -1,7 +1,7 @@
 import koa from 'koa';
 
-import { setupWorkerProcesses } from '@/app';
 import { config } from '@/config/schema';
+import { setupWorkerProcesses } from '@/services/cluster/setup';
 
 export const listen = ({ httpApp }: { httpApp: koa }) => {
   // run server

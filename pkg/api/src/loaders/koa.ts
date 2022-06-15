@@ -11,9 +11,12 @@ import routes from '@/api/index';
 import { IsDevelopment, corsDomains } from '@/config/env';
 import { config } from '@/config/index';
 import logger from '@/loaders/logger';
+import { listen } from '@/utils/http';
 import { removeSlashes } from '@/utils/urls';
 
-export default ({ app }: { app: Koa }) => {
+export default () => {
+  const app = new Koa();
+
   // Add http logging using morgan
   app.use(
     morgan((tokens: any, req: any, res: any) => {
@@ -108,4 +111,7 @@ export default ({ app }: { app: Koa }) => {
 
   // Handle errors
   app.on('error', (err) => logger.error(err));
+
+  // run server
+  listen({ httpApp: app });
 };

@@ -1,4 +1,4 @@
-import { HasConfig, LoadConfig, WriteConfig } from './config';
+import { HasConfig, LoadConfig, WriteConfig, toObject } from './config';
 import { config } from './schema';
 
-export { LoadConfig, WriteConfig, HasConfig, config };
+export { LoadConfig, WriteConfig, HasConfig, toObject, config };
