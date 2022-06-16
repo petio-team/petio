@@ -29,22 +29,24 @@ export const TvDetailsSchema = z.object({
     })
     .or(z.null()),
   name: z.string(),
-  next_episode_to_air: z.union([
-    z.object({
-      air_date: z.string(),
-      episode_number: z.number(),
-      id: z.number(),
-      name: z.string(),
-      overview: z.string(),
-      production_code: z.string(),
-      runtime: z.number().or(z.null()),
-      season_number: z.number(),
-      still_path: z.string().or(z.null()),
-      vote_average: z.number(),
-      vote_count: z.number(),
-    }),
-    z.null(),
-  ]),
+  next_episode_to_air: z
+    .union([
+      z.object({
+        air_date: z.string(),
+        episode_number: z.number(),
+        id: z.number(),
+        name: z.string(),
+        overview: z.string(),
+        production_code: z.string(),
+        runtime: z.number().or(z.null()).optional(),
+        season_number: z.number(),
+        still_path: z.string().or(z.null()),
+        vote_average: z.number(),
+        vote_count: z.number(),
+      }),
+      z.null(),
+    ])
+    .optional(),
   networks: z.array(
     z.object({
       name: z.string(),
