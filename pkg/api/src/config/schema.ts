@@ -1,7 +1,12 @@
 import { randomUUID } from 'crypto';
 
+import { generateKeys } from '@/utils/security';
+
 import blueconfig from './blueconfig';
 import sourceArray from './formats/source-array';
+
+// MAX SECURTIY KEYS
+const MAX_SECURITY_KEYS = 10;
 
 blueconfig.addFormat(sourceArray);
 
@@ -45,6 +50,11 @@ export const config = blueconfig({
       format: Array,
       default: [],
       env: 'PETIO_TRUSTED_PROXIES',
+    },
+    keys: {
+      doc: 'A list of keys used to encrypt data',
+      format: Array,
+      default: generateKeys(MAX_SECURITY_KEYS),
     },
   },
   logger: {
