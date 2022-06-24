@@ -8,9 +8,6 @@ import mediaserver from './v1/mediaserver';
 const route = new Router({ prefix: '/api/v1' });
 
 export default (app: Koa) => {
-  // session middleware
-  app.use(session(app));
-
   // endpoints
   mediaserver(route);
 

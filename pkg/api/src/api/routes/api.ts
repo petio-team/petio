@@ -2,6 +2,7 @@ import Router from '@koa/router';
 import Koa from 'koa';
 import jwt from 'koa-jwt';
 
+import setupMiddleware from '@/api/middleware/setup';
 import batch from '@/api/routes/api/batch';
 import config from '@/api/routes/api/config';
 import discovery from '@/api/routes/api/discovery';
@@ -35,6 +36,9 @@ export default (app: Koa, subpath: string) => {
   if (subpath === '/') {
     subpath = '';
   }
+
+  // make sure setup is complete before allowing access to non setup routes
+  app.use(setupMiddleware);
 
   api.use(
     jwt({

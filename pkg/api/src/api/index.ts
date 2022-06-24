@@ -5,7 +5,6 @@ import mount from 'koa-mount';
 
 import { cors } from '@/api/middleware/cors';
 import { errorHandler } from '@/api/middleware/error_handling';
-import setupMiddleware from '@/api/middleware/setup';
 import api from '@/api/routes/api';
 import web from '@/api/routes/web';
 import { config } from '@/config/index';
@@ -14,6 +13,7 @@ import { listen } from '@/utils/http';
 import { removeSlashes } from '@/utils/urls';
 
 import { logging } from './middleware/logging';
+import session from './middleware/session';
 import v1 from './routes/v1';
 
 export default () => {
@@ -49,6 +49,9 @@ export default () => {
   // get correctly formatted subpath
   const subpath = '/' + removeSlashes(config.get('petio.subpath'));
 
+  // session middleware
+  app.use(session(app));
+
   // Mount endpoints
   app.use(mount(subpath, routes(subpath)));
 
@@ -58,9 +61,6 @@ export default () => {
 
 const routes = (subpath: string): Koa => {
   const app = new Koa();
-
-  // make sure setup is complete before allowing access to non setup routes
-  app.use(setupMiddleware);
 
   // web/frontend/react
   web(app);

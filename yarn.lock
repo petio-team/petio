@@ -11574,6 +11574,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"koa-session-mongoose@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "koa-session-mongoose@npm:3.0.1"
+  peerDependencies:
+    mongoose: ">=5.0.0"
+  checksum: c690c901e36a0eacb470e2ced74aa378c918d6b9a5f54959ca566444ee52a90cd4d9d7ff27b7e8970778141b932150dd642e398995fae74aa4d94073e6f10fcb
+  languageName: node
+  linkType: hard
+
 "koa-session@npm:^6.2.0":
   version: 6.2.0
   resolution: "koa-session@npm:6.2.0"
@@ -13419,6 +13428,7 @@ __metadata:
     koa-mount: ^4.0.0
     koa-send: ^5.0.1
     koa-session: ^6.2.0
+    koa-session-mongoose: ^3.0.1
     koa-static: ^5.0.0
     line-reader: ^0.4.0
     lodash: ^4.17.21

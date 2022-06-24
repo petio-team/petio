@@ -1,12 +1,16 @@
 import koa from 'koa';
 import session from 'koa-session';
+import MongooseStore from 'koa-session-mongoose';
 
 import logger from '@/loaders/logger';
 
 const SESSION_CONFIG: Partial<session.opts> = {
-  key: 'petio',
+  key: 'petio_sess',
   maxAge: 2630000, // one month
   secure: false,
+  store: new MongooseStore({
+    expires: 2630000,
+  }),
 };
 
 export default (app: koa) => {
