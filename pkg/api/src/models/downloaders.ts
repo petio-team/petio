@@ -4,6 +4,7 @@ import { Document, Schema, model } from 'mongoose';
 export enum DownloaderType {
   Sonarr = 'sonarr',
   Radarr = 'radarr',
+  Lidarr = 'lidarr',
 }
 
 export interface IDownloader {
