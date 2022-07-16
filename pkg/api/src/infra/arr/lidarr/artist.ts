@@ -104,18 +104,6 @@ export const ArtistEndPoint = asApi([
     ],
     response: ArtistsSchema,
   },
-  // {
-  //   method: 'post',
-  //   path: '/api/v1/artist',
-  //   parameters: [
-  //     {
-  //       name: 'mbId',
-  //       type: 'Query',
-  //       schema: z.string().optional(),
-  //     },
-  //   ],
-  //   response: ArtistsSchema,
-  // },
   {
     method: 'get',
     path: '/api/v1/artist/lookup',
