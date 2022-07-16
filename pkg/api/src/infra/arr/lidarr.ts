@@ -118,7 +118,7 @@ export default class LidarrAPI {
   }
 }
 
-export const GetRadarrInstanceFromDb = async (
+export const GetLidarrInstanceFromDb = async (
   id: string,
 ): Promise<LidarrAPI | undefined> => {
   try {
