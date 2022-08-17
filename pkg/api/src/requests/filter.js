@@ -125,8 +125,8 @@ function getValue(condition, media) {
       break;
     case "network":
       values = [];
-      if (media.networks && Array.isArray(media.networks.results))
-        media.networks.results.map((nw) => {
+      if (media.networks && Array.isArray(media.networks))
+        media.networks.map((nw) => {
           values.push(nw.name);
         });
       break;
@@ -134,9 +134,9 @@ function getValue(condition, media) {
       values = [];
       if (
         media.production_companies &&
-        Array.isArray(media.production_companies.results)
+        Array.isArray(media.production_companies)
       )
-        media.production_companies.results.map((cp) => {
+        media.production_companies.map((cp) => {
           values.push(cp.name);
         });
       break;
