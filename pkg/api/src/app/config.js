@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const blueconfig = require('blueconfig');
 const blueconfig_format_with_validator = require('blueconfig-format-with-validator');
-const LISTOFERRORS = require('blueconfig/lib/error.js').LISTOFERRORS
+const LISTOFERRORS = require('blueconfig/lib/error.js').LISTOFERRORS;
 
 const { dataFolder } = require('./env');
 
@@ -380,6 +380,18 @@ const conf = blueconfig({
           format: String,
           default: 'Default',
         }
+      },
+      availability: {
+        id: {
+          doc: 'The id of the minimum availability option',
+          format: Number,
+          default: 0,
+        },
+        name: {
+          doc: 'The name of the minimum availability option',
+          format: String,
+          default: 'Announced',
+        },
       },
       uuid: {
         doc: 'The internal identifer for this instance',
