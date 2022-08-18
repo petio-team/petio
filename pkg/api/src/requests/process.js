@@ -173,8 +173,8 @@ class processRequest {
         "info",
         "REQ: Pending Request Matched on custom filter, setting default"
       );
-      for (let f = 0; f < filterMatch.length; f++) {
-        let filter = filterMatch[f];
+      for (const element of filterMatch) {
+        let filter = element;
         pending[filter.server] = {
           path: filter.path,
           profile: filter.profile,
@@ -204,7 +204,6 @@ class processRequest {
         }
       }
     }
-    console.log(pending);
     if (Object.keys(pending).length > 0) {
       await Request.updateOne(
         { requestId: this.request.id },
@@ -227,18 +226,18 @@ class processRequest {
       );
       logger.log("verbose", "REQ: Sending to DVR");
       if (this.request.type === "movie") {
-        for (let i = 0; i < filterMatch.length; i++) {
-          new Radarr(filterMatch[i].server).manualAdd(
+        for (const element of filterMatch) {
+          new Radarr(element.server).manualAdd(
             this.request,
-            filterMatch[i]
+            element
           );
         }
       } else {
-        for (let i = 0; i < filterMatch.length; i++) {
+        for (const element of filterMatch) {
           new Sonarr().addShow(
-            { id: filterMatch[i].server },
+            { id: element.server },
             this.request,
-            filterMatch[i]
+            element
           );
         }
       }
@@ -353,11 +352,7 @@ class processRequest {
       : false;
     let quotaCap = profile ? profile.quota : 0;
 
-    if (quotaCap > 0 && userQuota >= quotaCap) {
-      return false;
-    }
-
-    return true;
+    return !(quotaCap > 0 && userQuota >= quotaCap);
   }
 
   async archive(complete = Boolean, removed = Boolean, reason = false) {
@@ -385,7 +380,7 @@ class processRequest {
         requestId: this.request.requestId,
       },
       { useFindAndModify: false },
-      function (err, data) {
+      function (err, _data) {
         if (err) {
           logger.log("error", `REQ: Archive Error`);
           logger.log({ level: "error", message: err });

@@ -41,22 +41,18 @@ class Radarr {
     prms.set('apikey', this.config.key);
     apiurl.search = prms;
 
-    try {
-      if (method === "post" && body) {
-        let res = await axios.post(apiurl.toString(), body);
-        if (typeof res.data !== 'object') {
-          reject("not a valid object");
-        }
-        return res.data;
-      } else {
-        let res = await axios.get(apiurl.toString());
-        if (typeof res.data !== 'object') {
-          reject("not a valid object");
-        }
-        return res.data;
+    if (method === "post" && body) {
+      let res = await axios.post(apiurl.toString(), body);
+      if (typeof res.data !== 'object') {
+        reject("not a valid object");
       }
-    } catch (err) {
-      throw err;
+      return res.data;
+    } else {
+      let res = await axios.get(apiurl.toString());
+      if (typeof res.data !== 'object') {
+        reject("not a valid object");
+      }
+      return res.data;
     }
   }
 
@@ -112,19 +108,19 @@ class Radarr {
   }
 
   async getPaths() {
-    return await this.get("rootfolder");
+    return this.get("rootfolder");
   }
 
   async getProfiles() {
-    return await this.get("qualityProfile");
+    return this.get("qualityProfile");
   }
 
   async getLanguageProfiles() {
-    return await this.get("language");
+    return this.get("language");
   }
 
   async getTags() {
-    return await this.get("tag");
+    return this.get("tag");
   }
 
   lookup(id) {
@@ -134,7 +130,7 @@ class Radarr {
   }
 
   async refresh() {
-    return await this.post("command", false, {
+    return this.post("command", false, {
       name: "RefreshMonitoredDownloads",
     });
   }
@@ -165,13 +161,13 @@ class Radarr {
 
   async queue() {
     let queue = {};
-    for (let i = 0; i < this.fullConfig.length; i++) {
-      this.config = this.fullConfig[i];
+    for (const element of this.fullConfig) {
+      this.config = element;
       const active = await this.connect();
       if (!active) {
         return false;
       }
-      // await this.refresh();
+
       queue[this.config.uuid] = await this.get(`queue`);
       let totalRecords = queue[this.config.uuid].totalRecords;
       let pageSize = queue[this.config.uuid].pageSize;
@@ -191,10 +187,10 @@ class Radarr {
   }
 
   async test() {
-    return await this.connect(true);
+    return this.connect(true);
   }
 
-  async add(movieData, path = false, profile = false, tag = false) {
+  async add(movieData, path = false, profile = false, minimumAvailability = "Announced", tag = false) {
     movieData.qualityProfileId = parseInt(
       profile ? profile : this.config.profile.id
     );
@@ -202,6 +198,7 @@ class Radarr {
     movieData.addOptions = {
       searchForMovie: true,
     };
+    movieData.minimumAvailability = minimumAvailability;
     movieData.monitored = true;
     if (tag) movieData.tags = [parseInt(tag)];
 
@@ -320,6 +317,7 @@ class Radarr {
             radarrData[0],
             manual.path,
             manual.profile,
+            manual.availability,
             manual.tag
           );
           logger.log(
