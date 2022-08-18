@@ -1,7 +1,7 @@
 import React from "react";
 import Api from "../../data/Api";
 import FilterItem from "../../components/FilterItem";
-// import Api from "../../data/Api";
+import { radarrMinimumAvailability } from "../../data/Api/api";
 
 class Filter extends React.Component {
   constructor(props) {
@@ -48,6 +48,7 @@ class Filter extends React.Component {
           path: false,
           profile: false,
           language: false,
+          availability: false,
           tag: false,
           type: false,
         },
@@ -99,6 +100,7 @@ class Filter extends React.Component {
       path: false,
       profile: false,
       language: false,
+      availability: false,
       server: false,
       tag: false,
       type: false,
@@ -184,6 +186,7 @@ class Filter extends React.Component {
           paths: settings.paths.length > 0 ? settings.paths : false,
           languages: settings.languages.length > 0 ? settings.languages : false,
           tags: settings.tags.length > 0 ? settings.tags : false,
+          availabilities: radarrMinimumAvailability(),
         };
       }
       if (type === "radarr") {

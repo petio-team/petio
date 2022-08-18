@@ -350,9 +350,23 @@ const ConvertToConfig = (entry, obj) => {
       item.language.name = "";
     }
 
+    if (i.availability) {
+      item.availability = {};
+      if (i.availability.id != undefined) {
+        item.availability.id = Number(i.availability.id);
+      } else {
+        item.availability.id = 0;
+      }
+      if (i.availability.name != undefined) {
+        item.availability.name = String(i.availability.name);
+      } else {
+        item.availability.name = "Announced";
+      }
+    }
+
     item.uuid = i.uuid;
     data.push(item);
-  };
+  }
 
   conf.set(entry, data);
 };

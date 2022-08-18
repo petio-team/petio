@@ -115,6 +115,23 @@ export async function radarrTags(id) {
   return get(`/services/radarr/tags/${id}`);
 }
 
+export function radarrMinimumAvailability() {
+  return [
+    {
+      id: 0,
+      name: "Announced",
+    },
+    {
+      id: 1,
+      name: "In Cinemas",
+    },
+    {
+      id: 2,
+      name: "Released",
+    }
+  ];
+}
+
 export async function testRadarr(id) {
   return get(`/services/radarr/test/${id}`);
 }

@@ -8,6 +8,7 @@ import { ReactComponent as ServerIcon } from "../../assets/svg/server.svg";
 
 import { ReactComponent as Spinner } from "../../assets/svg/spinner.svg";
 import Modal from "../../components/Modal";
+import { radarrMinimumAvailability } from "../../data/Api/api";
 
 class Radarr extends React.Component {
   constructor(props) {
@@ -25,16 +26,20 @@ class Radarr extends React.Component {
       host: "localhost",
       port: 7878,
       profile: {
-        id: null,
-        name: null,
+        id: 0,
+        name: "",
       },
       path: {
-        id: null,
-        location: null,
+        id: 0,
+        location: "",
       },
       language: {
-        id: null,
-        name: null,
+        id: 0,
+        name: "",
+      },
+      availability: {
+        id: 0,
+        name: "",
       },
       subpath: "/",
       key: "",
@@ -82,6 +87,10 @@ class Radarr extends React.Component {
       language: {
         id: this.state.language.id,
         name: this.state.language.name,
+      },
+      availability: {
+        id: this.state.availability.id,
+        name: this.state.availability.name,
       },
       uuid: this.state.uuid,
     };
@@ -261,6 +270,10 @@ class Radarr extends React.Component {
           id: this.state.servers[id].language.id,
           name: this.state.servers[id].language.name,
         },
+        availability: {
+          id: this.state.servers[id].availability.id,
+          name: this.state.servers[id].availability.name,
+        },
         uuid: this.state.servers[id].uuid,
         needsTest: false,
       });
@@ -287,17 +300,21 @@ class Radarr extends React.Component {
       key: "",
       profiles: false,
       paths: false,
-      path: {
-        id: null,
-        location: null,
-      },
       profile: {
-        id: null,
-        name: null,
+        id: 0,
+        name: "",
+      },
+      path: {
+        id: 0,
+        location: "",
       },
       language: {
-        id: null,
-        name: null,
+        id: 0,
+        name: "",
+      },
+      availability: {
+        id: 0,
+        name: "",
       },
       wizardOpen: false,
       editWizardOpen: false,
@@ -326,17 +343,21 @@ class Radarr extends React.Component {
       key: "",
       profiles: false,
       paths: false,
-      path: {
-        id: null,
-        location: null,
-      },
       profile: {
-        id: null,
-        name: null,
+        id: 0,
+        name: "",
+      },
+      path: {
+        id: 0,
+        location: "",
       },
       language: {
-        id: null,
-        name: null,
+        id: 0,
+        name: "",
+      },
+      availability: {
+        id: 0,
+        name: "",
       },
       wizardOpen: false,
       editWizardOpen: false,
@@ -356,6 +377,7 @@ class Radarr extends React.Component {
           profiles: settings.profiles.length > 0 ? settings.profiles : false,
           paths: settings.paths.length > 0 ? settings.paths : false,
           languages: settings.languages.length > 0 ? settings.languages : false,
+          availabilities: radarrMinimumAvailability(),
         });
     } catch {
       return;
@@ -539,13 +561,44 @@ class Radarr extends React.Component {
                     );
                   })}
                 </>
-              ) : (
-                <option value="">
-                  {this.state.newServer || this.state.needsTest
-                    ? "Please test connection"
-                    : "Loading..."}
-                </option>
-              )}
+              ) :
+                (
+                  <option value="">
+                    {this.state.newServer || this.state.needsTest
+                      ? "Please test connection"
+                      : "Loading..."}
+                  </option>
+                )}
+            </select>
+          </div>
+          <label>Availability</label>
+          <div
+            className={`styled-input--select ${this.state.availabilities ? "" : "disabled"
+              }`}
+          >
+            <select
+              name="availability"
+              value={this.state.availability.id}
+              onChange={this.inputChange}
+            >
+              {this.state.availabilities && !this.state.needsTest ? (
+                <>
+                  {this.state.availabilities.map((item) => {
+                    return (
+                      <option key={`pp__${item.id}`} value={item.id}>
+                        {item.name}
+                      </option>
+                    );
+                  })}
+                </>
+              ) :
+                (
+                  <option value="">
+                    {this.state.newServer || this.state.needsTest
+                      ? "Please test connection"
+                      : "Loading..."}
+                  </option>
+                )}
             </select>
           </div>
           {!this.state.newServer &&
@@ -563,7 +616,6 @@ class Radarr extends React.Component {
             </div>
           ) : null}
         </Modal>
-
         <section>
           <p className="main-title mb--2">Radarr</p>
           <p className="description">
@@ -593,6 +645,9 @@ class Radarr extends React.Component {
                     </p>
                     <p>
                       Language: {server.language.name ?? "Not set"}
+                    </p>
+                    <p>
+                      Minimum Availability: {server.availability.name ?? "Not set"}
                     </p>
                     <p className="small">
                       ID: {server.uuid ? server.uuid : "Error"}
