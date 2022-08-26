@@ -4,14 +4,15 @@ import * as z from 'zod';
 export const MovieDetailsSchema = z.object({
   adult: z.boolean(),
   backdrop_path: z.string(),
-  belongs_to_collection: z
-    .object({
+  belongs_to_collection: z.union([
+    z.object({
       id: z.number(),
       name: z.string(),
       poster_path: z.union([z.string(), z.null()]),
       backdrop_path: z.string().or(z.null()),
-    })
-    .or(z.null()),
+    }),
+    z.null(),
+  ]),
   budget: z.number(),
   genres: z.array(z.object({ id: z.number(), name: z.string() })),
   homepage: z.string(),
