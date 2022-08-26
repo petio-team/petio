@@ -8,7 +8,7 @@ export const MovieDetailsSchema = z.object({
     .object({
       id: z.number(),
       name: z.string(),
-      poster_path: z.string(),
+      poster_path: z.union([z.string(), z.null()]),
       backdrop_path: z.string().or(z.null()),
     })
     .or(z.null()),
