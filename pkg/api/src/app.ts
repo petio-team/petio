@@ -4,6 +4,7 @@ import 'reflect-metadata';
 import('dotenv/config');
 import('cache-manager/lib/stores/memory');
 
+// Loads the app
 (async () => {
   (await import('./loaders')).default().catch((error) => {
     console.log('something unexpected went wrong');
