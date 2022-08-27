@@ -3804,7 +3804,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/koa@npm:*, @types/koa@npm:^2.13.4":
+"@types/koa@npm:*, @types/koa@npm:^2.13.5":
   version: 2.13.5
   resolution: "@types/koa@npm:2.13.5"
   dependencies:
@@ -4918,7 +4918,7 @@ __metadata:
     "@types/cache-manager": ^3.4.3
     "@types/jest": ^28.1.1
     "@types/jsonwebtoken": ^8.5.8
-    "@types/koa": ^2.13.4
+    "@types/koa": ^2.13.5
     "@types/koa-compress": ^4.0.3
     "@types/koa-mount": ^4.0.1
     "@types/koa-session": ^5.10.6

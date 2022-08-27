@@ -16,7 +16,7 @@ export const rootDir = ROOT_DIR;
 export const env = process.env.NODE_ENV ?? 'development';
 export const dataFolder =
   process.env.DATA_FOLDER ?? path.join(ROOT_DIR, './data');
-export const frontendView = VIEW_FOLDER;
+export const frontendView = path.join(VIEW_FOLDER, './frontend');
 export const adminView = path.join(VIEW_FOLDER, './admin');
 export const tmdbApiKey = '1af5ad19a2d972a67cd27eb033979c4c';
 // trunk-ignore(gitleaks/generic-api-key)
