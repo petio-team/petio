@@ -1,0 +1,10 @@
+{
+  "yaml.schemas": {
+    "https://json.schemastore.org/github-workflow.json": [
+      "file:///workspaces/petio-new-ui/.github/workflows/build.yml",
+      "file:///workspaces/petio-new-ui/.github/workflows/release.yml"
+    ]
+  },
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "ionic.previewInEditor": true
+}

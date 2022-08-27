@@ -1,0 +1,29 @@
+{
+  "name": "petio",
+  "private": true,
+  "author": "Petio Team",
+  "license": "MIT",
+  "workspaces": [
+    "pkg/api",
+    "pkg/frontend",
+    "pkg/admin"
+  ],
+  "devDependencies": {
+    "@commitlint/cli": "^16.2.3",
+    "@commitlint/config-conventional": "^16.2.1",
+    "@semantic-release/changelog": "^6.0.1",
+    "@semantic-release/commit-analyzer": "^9.0.2",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^8.0.2",
+    "@semantic-release/release-notes-generator": "^10.0.3",
+    "@trivago/prettier-plugin-sort-imports": "^3.2.0",
+    "commitlint": "^17.0.0",
+    "husky": "^8.0.1",
+    "prettier": "^2.6.2"
+  },
+  "scripts": {
+    "prepare": "is-ci || husky install"
+  },
+  "packageManager": "yarn@3.2.1"
+}
