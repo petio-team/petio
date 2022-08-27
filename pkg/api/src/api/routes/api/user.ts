@@ -1,7 +1,8 @@
 import multer from '@koa/multer';
 import Router from '@koa/router';
+import axios from 'axios';
 import bcrypt from 'bcryptjs';
-import http from 'follow-redirects';
+import fs from 'fs';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 import send from 'koa-send';
@@ -319,34 +320,33 @@ const getThumbnailById = async (ctx: Context) => {
     return;
   }
 
-  if (userData) {
-    if (userData.custom_thumb) {
-      send(ctx, `${UPLOAD_DIR}/${userData.custom_thumb}`);
-      return;
-    }
-    let url = userData.thumb;
+  if (!userData) {
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = 'user data missing';
+    return;
+  }
 
-    var options = {
-      host: 'plex.tv',
-      path: url.replace('https://plex.tv', ''),
-      method: 'GET',
-      headers: {
-        'content-type': 'image/png',
-      },
-    };
+  if (userData.custom_thumb) {
+    send(ctx, `${UPLOAD_DIR}/${userData.custom_thumb}`);
+    return;
+  }
+  let url = userData.thumbnail;
 
-    var request = http
-      .get(options, function (response) {
-        ctx.response.header['Content-Type'] = response.headers['content-type'];
-      })
-      .on('error', function (e) {
-        logger.log(
-          'warn',
-          'ROUTE: Unable to get user thumb - Got error: ' + e.message,
-          e,
-        );
-      });
-    request.end();
+  try {
+    const resp = await axios.get(url, {
+      responseType: 'stream',
+    });
+    ctx.response.set('Content-Type', 'image/png');
+    ctx.status = StatusCodes.OK;
+    ctx.body = resp.data;
+  } catch (e) {
+    logger.log(
+      'warn',
+      'ROUTE: Unable to get user thumb - Got error: ' + e.message,
+      e,
+    );
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = 'Unable to get user thumb';
   }
 };
 
