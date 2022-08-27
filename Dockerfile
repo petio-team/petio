@@ -23,7 +23,8 @@ RUN groupadd -g 1000 petio && \
 RUN mkdir -p /app && chown petio:petio /app
 
 # Copy all the build files from both frontend and backend
-COPY --chown=petio:petio --chmod=0755 ./pkg/frontend/build /app/views/
+COPY --chown=petio:petio --chmod=0755 ./pkg/frontend/build /app/views/frontend
+COPY --chown=petio:petio --chmod=0755 ./pkg/admin/build /app/views/admin
 COPY --chown=petio:petio --chmod=0755 ./pkg/api/dist/index.js /app/index.js
 COPY --chown=petio:petio --chmod=0755 ./pkg/api/package.json /app/package.json
 COPY ./docker /

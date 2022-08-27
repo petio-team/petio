@@ -35,6 +35,7 @@ tasks:
     deps: ['build:pre']
     cmds:
       - task: build:fe
+      - task: build:adm
       - task: build:api
 
   build:pre:
@@ -44,12 +45,17 @@ tasks:
   build:fe:
     dir: pkg/frontend
     cmds:
-      - yarn workspace petio-ui run build
+      - yarn workspace frontend run build
+
+  build:adm:
+    dir: pkg/api
+    cmds:
+      - yarn workspace admin run build:prod
 
   build:api:
     dir: pkg/api
     cmds:
-      - yarn workspace petio-api run build:prod
+      - yarn workspace admin run build
 
   # -
   # Generate
