@@ -48,9 +48,9 @@ tasks:
       - yarn workspace frontend run build
 
   build:adm:
-    dir: pkg/api
+    dir: pkg/admin
     cmds:
-      - yarn workspace admin run build:prod
+      - yarn workspace admin run build
 
   build:api:
     dir: pkg/api
