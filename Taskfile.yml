@@ -55,7 +55,7 @@ tasks:
   build:api:
     dir: pkg/api
     cmds:
-      - yarn workspace admin run build
+      - yarn workspace api run build:prod
 
   # -
   # Generate
