@@ -83,6 +83,10 @@ export default class processRequest {
     let requestDb = await Request.findOne({
       requestId: this.request.id,
     }).exec();
+    if (!requestDb) {
+      return;
+    }
+
     if (!requestDb.users.includes(this.user.id)) {
       requestDb.users.push(this.user.id);
       requestDb.markModified('users');
@@ -426,6 +430,9 @@ export default class processRequest {
       ? await Profile.findById(this.user.profile).exec()
       : false;
     let quotaCap = profile ? profile.quota : 0;
+    if (!quotaCap) {
+      return false;
+    }
 
     if (quotaCap > 0 && userQuota >= quotaCap) {
       return false;

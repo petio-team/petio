@@ -31,7 +31,7 @@ export const getRequests = async (user = false, all = false) => {
     await Bluebird.all(
       Bluebird.map(
         requests,
-        async (request, i) => {
+        async (request: any, _i) => {
           let children: any = [];
           let media: any = [];
           if (request.users.includes(user) || all) {

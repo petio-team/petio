@@ -4749,7 +4749,7 @@ __metadata:
     line-reader: ^0.4.0
     lodash: ^4.17.21
     module-alias: ^2.2.2
-    mongodb: 4.5.0
+    mongodb: 4.8.1
     mongoose: ^6.3.4
     multer: ^1.4.4
     musicbrainz-api: ^0.8.0
@@ -5723,7 +5723,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bson@npm:^4.6.2, bson@npm:^4.6.5, bson@npm:^4.7.0":
+"bson@npm:^4.6.5, bson@npm:^4.7.0":
   version: 4.7.0
   resolution: "bson@npm:4.7.0"
   dependencies:
@@ -13512,22 +13512,6 @@ __metadata:
     "@types/whatwg-url": ^8.2.1
     whatwg-url: ^11.0.0
   checksum: 1b7a97ccff75176319801ab3552ac472c8657a026268416be52ff3821db66ce869a70f8ac629dc2b18d94b997e8408d485bf1142c3afbecd02d713521b14e9ba
-  languageName: node
-  linkType: hard
-
-"mongodb@npm:4.5.0":
-  version: 4.5.0
-  resolution: "mongodb@npm:4.5.0"
-  dependencies:
-    bson: ^4.6.2
-    denque: ^2.0.1
-    mongodb-connection-string-url: ^2.5.2
-    saslprep: ^1.0.3
-    socks: ^2.6.2
-  dependenciesMeta:
-    saslprep:
-      optional: true
-  checksum: 423974a663c90e6673226a9ad691e8b445ecd43fc4e9e424343644b20c35188bd3d6692dcc2798022cc6b5c6f4391b54747c7543134b46f93cb3da428e5f9246
   languageName: node
   linkType: hard
 

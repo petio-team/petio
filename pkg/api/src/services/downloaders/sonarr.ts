@@ -145,8 +145,16 @@ export default class Sonarr {
       let dbRequest = await Request.findOne({
         requestId: request.id,
       }).exec();
+      if (!dbRequest) {
+        logger.verbose(
+          `SERVICE - SONARR: [${this.instance.name}] No request found with id ${request.id}`,
+          { label: 'downloaders.sonarr' },
+        );
+        return;
+      }
+
       let exists = false;
-      for (let o; o < dbRequest.sonarrId.lenght; o++) {
+      for (let o; o < dbRequest.sonarrId.length; o++) {
         if (dbRequest.sonarrId[o][this.instance.id]) {
           exists = true;
           dbRequest.sonarrId[o][this.instance.id] = sonarrId;

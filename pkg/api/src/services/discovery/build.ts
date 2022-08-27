@@ -180,7 +180,7 @@ async function build(id) {
     } else if (listItem.type === 'episode') {
       if (listItem.grandparentKey) {
         let key = listItem.grandparentKey.replace('/library/metadata/', '');
-        let dbItem = await Show.findOne({ ratingKey: key });
+        let dbItem: any = await Show.findOne({ ratingKey: key });
         if (dbItem) {
           if (dbItem.tmdb_id) series.history[dbItem.tmdb_id] = dbItem.tmdb_id;
           if (dbItem.Genre) {

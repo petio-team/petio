@@ -31,6 +31,12 @@ const deleteIssues = async (ctx: Context) => {
 
   try {
     let issue = await Issue.findById(issue_id);
+    if (!issue) {
+      ctx.status = StatusCodes.NOT_FOUND;
+      ctx.body = { error: 'error no issue found' };
+      return;
+    }
+
     mailIssueResolve(
       issue.user,
       issue.mediaId,

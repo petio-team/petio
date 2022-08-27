@@ -56,7 +56,7 @@ const addReview = async (ctx: Context) => {
       tmdb_id: item.id,
       user: userData.id,
     });
-    let savedReview = false;
+    let savedReview = {};
     if (existingReview) {
       existingReview.score = review.score;
       savedReview = await existingReview.save();

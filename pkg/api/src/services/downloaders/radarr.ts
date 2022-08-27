@@ -217,6 +217,13 @@ export default class Radarr {
       label: 'downloaders.radarr',
     });
     const req = await Request.findOne({ requestId: id }).exec();
+    if (!req) {
+      logger.verbose(`SERVICE - RADARR: no request found`, {
+        label: 'downloaders.radarr',
+      });
+      return;
+    }
+
     if (req.type === 'movie') {
       if (!req.tmdb_id) {
         logger.verbose(`SERVICE - RADARR: TMDB ID not found for ${req.title}`, {

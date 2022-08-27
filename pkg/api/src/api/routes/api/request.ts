@@ -45,13 +45,21 @@ const getUserRequests = async (ctx: Context) => {
 };
 
 const getRequestMinified = async (ctx: Context) => {
-  const requests = await Request.find().exec();
   let data = {};
   try {
-    data = {};
+    const requests = await Request.find().exec();
+    if (!requests) {
+      ctx.status = StatusCodes.NOT_FOUND;
+      ctx.body = {};
+      return;
+    }
 
     await Promise.all(
-      requests.map(async (request, i) => {
+      requests.map(async (request, _i) => {
+        if (!request.requestId) {
+          return;
+        }
+
         data[request.requestId] = {
           title: request.title,
           requestId: request.requestId,

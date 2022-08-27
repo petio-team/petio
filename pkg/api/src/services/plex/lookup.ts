@@ -2,7 +2,7 @@ import Movie from '@/models/movie';
 import Show from '@/models/show';
 
 export default async (id, type) => {
-  let plexMatch = false;
+  let plexMatch: any = {};
   if (type === 'movie') {
     plexMatch = await Movie.findOne({
       ratingKey: id,

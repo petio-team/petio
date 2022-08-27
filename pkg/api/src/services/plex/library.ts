@@ -119,7 +119,7 @@ export default class LibraryUpdate {
           });
         }
       },
-      { concurrency: config.get("general.concurrency") },
+      { concurrency: config.get('general.concurrency') },
     );
     this.execMail();
     logger.verbose('Partial Scan Complete', { label: 'plex.library' });
@@ -302,7 +302,7 @@ export default class LibraryUpdate {
               });
             }
           },
-          { concurrency: config.get("general.concurrency") },
+          { concurrency: config.get('general.concurrency') },
         );
         for (let i in music) {
           let artist = music[i];
@@ -636,7 +636,7 @@ export default class LibraryUpdate {
           }
           return thisSeason;
         },
-        { concurrency: config.get("general.concurrency") },
+        { concurrency: config.get('general.concurrency') },
       );
     } catch (e) {
       logger.warn(`CRON: Unable to fetch meta for ${title}`, {
@@ -800,7 +800,13 @@ export default class LibraryUpdate {
   async saveFriend(obj) {
     // Maybe delete all and rebuild each time?
     try {
-      const defaultProfile = await Profile.findOne({ isDefault: true });
+      const defaultProfile: any = await Profile.findOne({ isDefault: true });
+      if (!defaultProfile) {
+        logger.error('CRON: Default profile returned empty object', {
+          label: 'plex.library',
+        });
+        return;
+      }
 
       const newUser = await CreateOrUpdateUser({
         title: obj.title ?? obj.username ?? 'User',
