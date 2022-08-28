@@ -56,14 +56,14 @@ jobs:
         name: Build docker image with tag
         run: task docker:hash
 
-      - if: "github.ref != 'refs/heads/preview'"
+      - if: "github.ref == 'refs/heads/preview'"
         name: Build docker image for preview
         run: task docker:preview
 
-      - if: "github.ref != 'refs/heads/dev'"
+      - if: "github.ref == 'refs/heads/dev'"
         name: Build docker image for dev
         run: task docker:nightly
 
-      - if: "github.ref != 'refs/heads/new-ui'"
+      - if: "github.ref == 'refs/heads/new-ui'"
         name: Build docker image for new-ui
         run: task docker:new-ui
