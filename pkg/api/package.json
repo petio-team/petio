@@ -15,7 +15,7 @@
     "@koa/cors": "^3.3.0",
     "@koa/multer": "^3.0.0",
     "@koa/router": "^10.1.1",
-    "@zodios/core": "^6.2.1",
+    "@zodios/core": "^9.0.0",
     "@zodios/plugins": "^1.0.1",
     "agenda": "^4.3.0",
     "axios": "^0.27.2",
