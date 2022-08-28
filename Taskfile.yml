@@ -1,20 +1,27 @@
 version: '3'
 dotenv: ['.env']
 tasks:
-  # -
-  # Run CI related tasks
-  # -
-  ci:
+  default:
     cmds:
-      - npm ci
+      - task: dev:api
 
   # -
   # Run development related tasks
   # -
-  dev:
+  dev:api:
     dir: pkg/api
     cmds:
-      - node ./main.js --port 8000
+      - yarn workspace api run start
+
+  dev:fe:
+    dir: pkg/frontend
+    cmds:
+      - yarn start
+
+  dev:adm:
+    dir: pkg/admin
+    cmds:
+      - yarn start
 
   dev:compose:
     cmds:
@@ -25,29 +32,37 @@ tasks:
   # Run build related tasks
   # -
   build:
-    deps: [
-      'build:frontend',
-      'build:admin',
-      'build:api'
-    ]
+    deps: ['build:pre']
+    cmds:
+      - task: build:fe
+      - task: build:adm
+      - task: build:api
 
-  build:frontend:
+  build:pre:
+    cmds:
+      - yarn workspaces focus --all
+
+  build:fe:
     dir: pkg/frontend
     cmds:
-      - npm install
-      - npm run build
+      - yarn workspace frontend run build
 
-  build:admin:
+  build:adm:
     dir: pkg/admin
     cmds:
-      - npm install --legacy-peer-deps
-      - npm run build
+      - yarn workspace admin run build
 
   build:api:
     dir: pkg/api
     cmds:
-      - npm install --legacy-peer-deps
-      - npm run build
+      - yarn workspace api run build:prod
+
+  # -
+  # Generate
+  # -
+  generate:
+    cmds:
+      - yarn dlx prisma generate
 
   # -
   # Package
@@ -82,6 +97,13 @@ tasks:
       DOCKER_IMAGE_REPO_VERSION:
         sh: git log -1 --format=%H
 
+  # Publish the new-ui image
+  docker:new-ui:
+    deps: ['docker:hash']
+    cmds:
+      - docker tag {{.DOCKER_IMAGE_REPO}}:local {{.DOCKER_IMAGE_REPO}}:new-ui
+      - docker push {{.DOCKER_IMAGE_REPO}}:new-ui
+
   # Publish the nightly image
   docker:nightly:
     deps: ['docker:hash']
@@ -109,7 +131,7 @@ tasks:
   release:
     dir: pkg/api
     cmds:
-      - npx semantic-release --extends ../../semantic-release.json --dry-run --no-ci
+      - yarn dlx semantic-release --extends ../../semantic-release.json --dry-run --no-ci
 
   release:prepare:
     cmds:
@@ -119,7 +141,7 @@ tasks:
   release:ci:
     dir: pkg/api
     cmds:
-      - npx semantic-release --extends ../../semantic-release.json
+      - yarn dlx semantic-release --extends ../../semantic-release.json
 
 # Global Vars
 vars:

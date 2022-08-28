@@ -6,12 +6,15 @@ on:
       - .github/**/*
       - docker/**/*
       - pkg/**/*
-    paths_ignore:
-      - /*
+      - ./Dockerfile
+      - ./.dockerignore
+      - ./**/package.json
     branches:
-      - "*"
-      - "!master"
+      - '*'
+      - '!master'
   pull_request:
+  pull_request_target:
+    types: [opened]
 
 jobs:
   build:
@@ -25,19 +28,18 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v2
         with:
-          node-version: '16.x'
-          cache: 'npm'
-          cache-dependency-path: |
-            pkg/api/package-lock.json
-            pkg/frontend/package-lock.json
-            pkg/admin/package-lock.json
-      - run: npm install -g pkg typescript
+          node-version-file: '.node-version'
+          cache: 'yarn'
+          cache-dependency-path: '**/yarn.lock'
+
+      - name: Install typescript
+        run: yarn add typescript
 
       - name: Install task
         uses: arduino/setup-task@v1
 
       - name: Build frontend and api
-        run: task build
+        run: task --parallel build
 
       - name: Authenticate with github's docker registry
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
@@ -47,17 +49,21 @@ jobs:
           password: ${{ secrets.GHCR_TOKEN }}
 
       - if: |
-          !contains(github.ref, 'preview') ||
-          !contains(github.ref, 'dev') ||
-          !contains(github.ref, 'master')
+          github.ref != 'refs/heads/preview' ||
+          github.ref != 'refs/heads/dev' ||
+          github.ref != 'refs/heads/new-ui' ||
+          github.ref != 'refs/heads/master'
         name: Build docker image with tag
         run: task docker:hash
 
-      - if: "contains(github.ref, 'preview')"
+      - if: "github.ref == 'refs/heads/preview'"
         name: Build docker image for preview
         run: task docker:preview
 
-      - if: "contains(github.ref, 'dev')"
+      - if: "github.ref == 'refs/heads/dev'"
         name: Build docker image for dev
         run: task docker:nightly
 
+      - if: "github.ref == 'refs/heads/new-ui'"
+        name: Build docker image for new-ui
+        run: task docker:new-ui

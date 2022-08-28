@@ -1,0 +1,37 @@
+import mongoose from 'mongoose';
+
+const MovieSchema = new mongoose.Schema({
+  title: String,
+  ratingKey: Number,
+  key: String,
+  guid: String,
+  studio: String,
+  type: String,
+  titleSort: String,
+  contentRating: String,
+  summary: String,
+  rating: Number,
+  year: Number,
+  tagline: String,
+  thumb: String,
+  art: String,
+  duration: Number,
+  originallyAvailableAt: String,
+  addedAt: Number,
+  updatedAt: Number,
+  primaryExtraKey: String,
+  ratingImage: String,
+  Media: Array,
+  Genre: Array,
+  Director: Array,
+  Writer: Array,
+  Country: Array,
+  Role: Array,
+  idSource: String,
+  externalId: String,
+  imdb_id: { type: String, index: true },
+  tmdb_id: { type: String, index: true },
+  petioTimestamp: Date,
+});
+
+export default mongoose.model('Movie', MovieSchema);

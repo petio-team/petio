@@ -35,4 +35,3 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - run: task release
-
