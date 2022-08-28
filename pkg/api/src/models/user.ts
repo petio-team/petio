@@ -129,6 +129,24 @@ export const GetUserByEmail = async (email: string): Promise<User> => {
   return parsed.data;
 };
 
+// Get a user by using an email address
+export const GetUserByPlexID = async (id: string): Promise<User> => {
+  const data = await UserModel.findOne({
+    plexId: id,
+  }).exec();
+  if (!data) {
+    throw new Error('failed to get user by plex id');
+  }
+
+  const parsed = await UserSchema.safeParseAsync(data.toObject());
+  if (!parsed.success) {
+    throw new Error('failed to parse and validate data');
+  }
+
+  delete parsed.data.password;
+  return parsed.data;
+};
+
 // TODO: this should be it's own service with a repository ideally
 // Create a new user or update if one already exists
 export const CreateOrUpdateUser = async (user: User): Promise<User> => {

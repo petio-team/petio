@@ -10,7 +10,7 @@ import xmlParser from 'xml-js';
 import { authenticate } from '@/api/middleware/auth';
 import { config } from '@/config/index';
 import logger from '@/loaders/logger';
-import { UserModel, UserRole } from '@/models/user';
+import { GetUserByPlexID, UserModel, UserRole } from '@/models/user';
 
 const route = new Router({ prefix: '/login' });
 
@@ -71,7 +71,7 @@ const attemptAuth = async (ctx: Context) => {
     // Find user in db
     let dbUser = await UserModel.findOne({
       $or: [{ username: username }, { email: username }],
-    });
+    }).exec();
 
     if (!dbUser) {
       ctx.status = StatusCodes.UNAUTHORIZED;
@@ -125,7 +125,8 @@ const attemptPlexAuth = async (ctx: Context) => {
   const token = ctx.request.body.token;
   try {
     let userId = await plexOauth(token);
-    let dbUser = await UserModel.findOne({ plexId: userId });
+    let dbUser = await GetUserByPlexID(userId);
+
     if (!dbUser) {
       ctx.status = StatusCodes.UNAUTHORIZED;
       ctx.body = { error: 'user not found' };
@@ -139,7 +140,7 @@ const attemptPlexAuth = async (ctx: Context) => {
     }
 
     let isAdmin = dbUser.role === UserRole.Admin;
-    success(ctx, dbUser.toJSON(), isAdmin);
+    success(ctx, dbUser, isAdmin);
     saveRequestIp(dbUser, request_ip);
   } catch (err) {
     logger.error(err, { label: 'routes.login' });
@@ -225,7 +226,6 @@ async function plexOauth(token) {
     return user.id;
   } catch (err) {
     logger.error(err, { label: 'routes.login' });
-    throw 'Plex authentication failed';
   }
 }
 
@@ -239,7 +239,7 @@ async function saveRequestIp(user, request_ip) {
           lastLogin: new Date(),
         },
       },
-    );
+    ).exec();
   } catch (err) {
     logger.error('LOGIN: Update IP failed', { label: 'routes.login' });
     logger.error(err, { label: 'routes.login' });

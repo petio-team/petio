@@ -794,19 +794,12 @@ export default class LibraryUpdate {
     } catch (e) {
       logger.error('CRON: Unable to get friends', { label: 'plex.library' });
       logger.error(e, { label: 'plex.library' });
-      throw 'Unable to get friends';
     }
   }
   async saveFriend(obj) {
     // Maybe delete all and rebuild each time?
     try {
-      const defaultProfile: any = await Profile.findOne({ isDefault: true });
-      if (!defaultProfile) {
-        logger.error('CRON: Default profile returned empty object', {
-          label: 'plex.library',
-        });
-        return;
-      }
+      const defaultProfile: any = await Profile.findOne({ isDefault: true }).exec();
 
       const newUser = await CreateOrUpdateUser({
         title: obj.title ?? obj.username ?? 'User',
@@ -832,7 +825,6 @@ export default class LibraryUpdate {
         label: 'plex.library',
       });
     }
-    return;
   }
 
   async mailAdded(plexData, ref_id) {
