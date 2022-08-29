@@ -24,6 +24,10 @@ export interface IDownloader {
     id: number;
     name: string;
   };
+  media_type: {
+    id: number;
+    name: string;
+  };
   enabled: boolean;
 }
 
@@ -80,6 +84,15 @@ export const DownloaderModelSchema = new Schema<IDownloader>(
       name: {
         type: String,
         required: true,
+      },
+    },
+    media_type: {
+      id: {
+        type: Number,
+        required: true,
+      },
+      name: {
+        type: String,
       },
     },
     enabled: {
@@ -189,6 +202,10 @@ export const CreateOrUpdateDownloader = async (
         language: {
           id: data.language.id,
           name: data.language.name,
+        },
+        media_type: {
+          id: data.media_type.id,
+          name: data.media_type.name,
         },
         enabled: data.enabled,
       },

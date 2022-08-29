@@ -79,6 +79,10 @@ export async function testSonarr(id) {
   return get(`/services/sonarr/test/${id}`);
 }
 
+export async function getSonarrOptions(id) {
+  return get(`/services/sonarr/options/${id}`);
+}
+
 export async function sonarrPaths(id) {
   return get(`/services/sonarr/paths/${id}`);
 }
@@ -99,6 +103,10 @@ export async function radarrConfig() {
   return get(`/services/radarr/config`);
 }
 
+export async function getRadarrOptions(id) {
+  return get(`/services/radarr/options/${id}`);
+}
+
 export async function radarrPaths(id) {
   return get(`/services/radarr/paths/${id}`);
 }
@@ -113,23 +121,6 @@ export async function radarrLanguageProfiles(id) {
 
 export async function radarrTags(id) {
   return get(`/services/radarr/tags/${id}`);
-}
-
-export function radarrMinimumAvailability() {
-  return [
-    {
-      id: 0,
-      name: "Announced",
-    },
-    {
-      id: 1,
-      name: "In Cinemas",
-    },
-    {
-      id: 2,
-      name: "Released",
-    }
-  ];
 }
 
 export async function testRadarr(id) {

@@ -300,69 +300,31 @@ export function updateConfig(config) {
 }
 
 export async function sonarrConfig() {
-  let config = await api.sonarrConfig();
-
-  return config;
+  return api.sonarrConfig();
 }
 
 export async function sonarrDeleteInstance(uuid) {
-  return await api.deleteSonarrInstance(uuid);
+  return api.deleteSonarrInstance(uuid);
 }
 
 export async function sonarrOptions(id) {
-  let [paths, profiles, tags, languages] = await Promise.all([
-    api.sonarrPaths(id),
-    api.sonarrProfiles(id),
-    api.sonarrTags(id),
-    api.sonarrLanguageProfiles(id),
-  ]);
-
-  return {
-    paths: paths,
-    profiles: profiles,
-    tags: tags,
-    languages: languages,
-  };
+  return api.getSonarrOptions(id);
 }
 
 export async function radarrConfig() {
-  let config = await api.radarrConfig();
-
-  return config;
+  return api.radarrConfig();
 }
 
 export async function radarrDeleteInstance(uuid) {
-  return await api.deleteRadarrInstance(uuid);
+  return api.deleteRadarrInstance(uuid);
 }
 
 export async function radarrOptions(id) {
-  let [paths, profiles, tags, languages] = await Promise.all([
-    api.radarrPaths(id),
-    api.radarrProfiles(id),
-    api.radarrTags(id),
-    api.radarrLanguageProfiles(id),
-  ]);
-
-  return {
-    paths: paths,
-    profiles: profiles,
-    tags: tags,
-    languages: languages,
-  };
+  return api.getRadarrOptions(id);
 }
 
-export function saveSonarrConfig(config) {
-  return new Promise((resolve, reject) => {
-    api
-      .saveSonarrConfig({ data: JSON.stringify(config) })
-      .then(() => {
-        resolve();
-      })
-      .catch((err) => {
-        console.log(err);
-        reject();
-      });
-  });
+export async function saveSonarrConfig(config) {
+  return api.saveSonarrConfig([...config]);
 }
 
 export function testSonarr(id) {
@@ -396,7 +358,7 @@ export function testRadarr(id) {
 export function saveRadarrConfig(config) {
   return new Promise((resolve, reject) => {
     api
-      .saveRadarrConfig({ data: JSON.stringify(config) })
+      .saveRadarrConfig([...config])
       .then(() => {
         resolve();
       })

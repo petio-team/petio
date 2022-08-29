@@ -2,6 +2,7 @@ import { ZodiosInstance } from '@zodios/core';
 
 import { RadarrAPIClient, RadarrAPIEndpoints } from '@/infra/arr/radarr/index';
 import { Language } from '@/infra/arr/radarr/language';
+import { MinimumAvailability } from '@/infra/arr/radarr/minimumAvailability';
 import { Movie } from '@/infra/arr/radarr/movie';
 import { QualityProfiles } from '@/infra/arr/radarr/quality_profile';
 import { Queue } from '@/infra/arr/radarr/queue';
@@ -39,6 +40,23 @@ export default class RadarrAPI {
 
   public async GetTags(): Promise<Tag> {
     return this.client.get('/api/v3/tag');
+  }
+
+  public GetMinimumAvailability(): MinimumAvailability[] {
+    return [
+      {
+        id: 0,
+        name: 'Announced',
+      },
+      {
+        id: 1,
+        name: 'In Cinemas',
+      },
+      {
+        id: 2,
+        name: 'Released',
+      },
+    ];
   }
 
   public async GetQueue(page?: number): Promise<Queue> {

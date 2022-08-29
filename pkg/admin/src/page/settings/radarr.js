@@ -1,14 +1,11 @@
 import React from "react";
 import Api from "../../data/Api";
 
-import { v4 as uuidv4 } from "uuid";
-
 import { ReactComponent as Add } from "../../assets/svg/plus-circle.svg";
 import { ReactComponent as ServerIcon } from "../../assets/svg/server.svg";
 
 import { ReactComponent as Spinner } from "../../assets/svg/spinner.svg";
 import Modal from "../../components/Modal";
-import { radarrMinimumAvailability } from "../../data/Api/api";
 
 class Radarr extends React.Component {
   constructor(props) {
@@ -21,7 +18,7 @@ class Radarr extends React.Component {
       isMsg: false,
       wizardOpen: false,
       enabled: false,
-      title: "",
+      name: "",
       protocol: "http",
       host: "localhost",
       port: 7878,
@@ -37,14 +34,14 @@ class Radarr extends React.Component {
         id: 0,
         name: "",
       },
-      availability: {
+      media_type: {
         id: 0,
         name: "",
       },
       subpath: "/",
-      key: "",
+      token: "",
       activeServer: false,
-      uuid: '',
+      id: '',
       needsTest: false,
     };
 
@@ -66,16 +63,16 @@ class Radarr extends React.Component {
       console.log("error");
       return;
     }
-    let servers = this.state.servers;
 
+    let servers = this.state.servers;
     servers[this.state.activeServer] = {
       enabled: this.state.enabled,
-      title: this.state.title,
+      name: this.state.name,
       protocol: this.state.protocol,
       host: this.state.host,
-      key: this.state.key,
+      token: this.state.token,
       port: this.state.port,
-      subpath: this.state.subpath === "/" ? "" : this.state.subpath,
+      subpath: this.state.subpath === "/" ? "/" : this.state.subpath,
       path: {
         id: this.state.path.id,
         location: this.state.path.location,
@@ -88,11 +85,10 @@ class Radarr extends React.Component {
         id: this.state.language.id,
         name: this.state.language.name,
       },
-      availability: {
-        id: this.state.availability.id,
-        name: this.state.availability.name,
-      },
-      uuid: this.state.uuid,
+      media_type: {
+        id: this.state.media_type.id,
+        name: this.state.media_type.name,
+      }
     };
 
     await Api.saveRadarrConfig(servers);
@@ -117,7 +113,7 @@ class Radarr extends React.Component {
 
     let servers = this.state.servers;
 
-    let res = await Api.radarrDeleteInstance(servers[this.state.activeServer].uuid);
+    let res = await Api.radarrDeleteInstance(servers[this.state.activeServer].id);
     if (res.status == "error") {
       this.props.msg({
         message: res.error,
@@ -203,7 +199,7 @@ class Radarr extends React.Component {
       if (this.state[name] instanceof Object) {
         this.setState({
           [`${name}`]: {
-            id: value,
+            id: parseInt(value),
             [this.state[name].name != undefined ? 'name' : 'location']: title,
           },
         });
@@ -252,12 +248,12 @@ class Radarr extends React.Component {
         editWizardOpen: true,
         activeServer: id,
         enabled: this.state.servers[id].enabled,
-        title: this.state.servers[id].title,
+        name: this.state.servers[id].name,
         protocol: this.state.servers[id].protocol,
         host: this.state.servers[id].host,
         port: this.state.servers[id].port,
         subpath: this.state.servers[id].subpath,
-        key: this.state.servers[id].key,
+        token: this.state.servers[id].token,
         profile: {
           id: this.state.servers[id].profile.id,
           name: this.state.servers[id].profile.name,
@@ -270,20 +266,20 @@ class Radarr extends React.Component {
           id: this.state.servers[id].language.id,
           name: this.state.servers[id].language.name,
         },
-        availability: {
-          id: this.state.servers[id].availability.id,
-          name: this.state.servers[id].availability.name,
+        media_type: {
+          id: this.state.servers[id].media_type.id,
+          name: this.state.servers[id].media_type.name,
         },
-        uuid: this.state.servers[id].uuid,
+        id: this.state.servers[id].id,
         needsTest: false,
       });
-      this.getSettings(this.state.servers[id].uuid);
+      this.getSettings(this.state.servers[id].id);
     } else {
       this.setState({
         newServer: true,
         wizardOpen: true,
         activeServer: id,
-        uuid: uuidv4(),
+        id: "",
         needsTest: true,
       });
     }
@@ -292,12 +288,12 @@ class Radarr extends React.Component {
   closeWizard() {
     this.setState({
       enabled: false,
-      title: "",
+      name: "",
       protocol: "http",
       host: "localhost",
       port: 7878,
       subpath: "/",
-      key: "",
+      token: "",
       profiles: false,
       paths: false,
       profile: {
@@ -312,14 +308,14 @@ class Radarr extends React.Component {
         id: 0,
         name: "",
       },
-      availability: {
+      media_type: {
         id: 0,
         name: "",
       },
       wizardOpen: false,
       editWizardOpen: false,
       activeServer: false,
-      uuid: '',
+      id: '',
       newServer: false,
     });
   }
@@ -335,12 +331,12 @@ class Radarr extends React.Component {
     this.setState({
       [`${id}Open`]: false,
       enabled: false,
-      title: "",
+      name: "",
       protocol: "http",
       host: "localhost",
       port: null,
-      subpath: "",
-      key: "",
+      subpath: "/",
+      token: "",
       profiles: false,
       paths: false,
       profile: {
@@ -355,29 +351,29 @@ class Radarr extends React.Component {
         id: 0,
         name: "",
       },
-      availability: {
+      media_type: {
         id: 0,
         name: "",
       },
       wizardOpen: false,
       editWizardOpen: false,
       activeServer: false,
-      uuid: false,
+      id: "",
     });
   }
 
-  async getSettings(uuid) {
+  async getSettings(id) {
     try {
-      let settings = await Api.radarrOptions(uuid);
+      let settings = await Api.radarrOptions(id);
       if (settings.profiles.error || settings.paths.error) {
         return;
       }
-      if (this.state.uuid === uuid)
+      if (this.state.id === id)
         this.setState({
           profiles: settings.profiles.length > 0 ? settings.profiles : false,
           paths: settings.paths.length > 0 ? settings.paths : false,
           languages: settings.languages.length > 0 ? settings.languages : false,
-          availabilities: radarrMinimumAvailability(),
+          availabilities: settings.minimumAvailability.length > 0 ? settings.minimumAvailability : false,
         });
     } catch {
       return;
@@ -420,12 +416,12 @@ class Radarr extends React.Component {
               }
           }
         >
-          <label>Title</label>
+          <label>Name</label>
           <input
             className="styled-input--input"
             type="text"
-            name="title"
-            value={this.state.title}
+            name="name"
+            value={this.state.name}
             onChange={this.inputChange}
           />
           <label>Protocol</label>
@@ -464,17 +460,17 @@ class Radarr extends React.Component {
             value={this.state.subpath ? this.state.subpath : '/'}
             onChange={this.inputChange}
           />
-          <label>API Key</label>
+          <label>Token</label>
           <input
             className="styled-input--input frt"
             type="text"
-            name="key"
-            value={this.state.key ? this.state.key : ''}
+            name="token"
+            value={this.state.token ? this.state.token : ''}
             onChange={this.inputChange}
           />
           <button
             className="btn btn__square mb--1"
-            onClick={() => this.test(this.state.uuid, true)}
+            onClick={() => this.test(this.state.id, true)}
           >
             Test
           </button>
@@ -571,14 +567,14 @@ class Radarr extends React.Component {
                 )}
             </select>
           </div>
-          <label>Availability</label>
+          <label>Minimum Availability</label>
           <div
             className={`styled-input--select ${this.state.availabilities ? "" : "disabled"
               }`}
           >
             <select
-              name="availability"
-              value={this.state.availability.id}
+              name="media_type"
+              value={this.state.media_type.id}
               onChange={this.inputChange}
             >
               {this.state.availabilities && !this.state.needsTest ? (
@@ -628,12 +624,11 @@ class Radarr extends React.Component {
           <div className="sr--grid">
             {this.state.servers.map((server, i) => {
               serverCount++;
-              console.log(JSON.stringify(server, null, 4));
               return (
-                <div key={server.uuid} className="sr--instance">
+                <div key={server.id} className="sr--instance">
                   <div className="sr--instance--inner">
                     <ServerIcon />
-                    <p className="sr--title">{server.title}</p>
+                    <p className="sr--title">{server.name}</p>
                     <p>{`${server.protocol}://${server.host}:${server.port}`}</p>
                     <p>Status: {server.enabled ? "Enabled" : "Disabled"}</p>
                     <p>
@@ -647,10 +642,10 @@ class Radarr extends React.Component {
                       Language: {server.language.name ?? "Not set"}
                     </p>
                     <p>
-                      Minimum Availability: {server.availability.name ?? "Not set"}
+                      Minimum Availability: {server.media_type.name ?? "Not set"}
                     </p>
                     <p className="small">
-                      ID: {server.uuid ? server.uuid : "Error"}
+                      ID: {server.id ? server.id : "Error"}
                     </p>
                     <div className="btn-wrap">
                       <button
@@ -664,7 +659,7 @@ class Radarr extends React.Component {
                       </button>
                       <button
                         className="btn btn__square"
-                        onClick={() => this.test(server.uuid)}
+                        onClick={() => this.test(server.id)}
                       >
                         Test
                       </button>

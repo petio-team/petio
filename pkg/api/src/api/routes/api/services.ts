@@ -30,16 +30,7 @@ const ArrInputSchema = z.array(
     name: z.string().min(1),
     protocol: z.nativeEnum(HttpProtocol),
     host: z.string().min(1),
-    port: z.string().transform((val, ctx) => {
-      const parsed = parseInt(val);
-      if (isNaN(parsed)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'failed to parse port into a valid number',
-        });
-      }
-      return parsed;
-    }),
+    port: z.number(),
     subpath: z.string().min(1).default('/'),
     path: z.object({
       id: z.number(),
@@ -53,12 +44,26 @@ const ArrInputSchema = z.array(
       id: z.number(),
       name: z.string(),
     }),
+    media_type: z.object({
+      id: z.number(),
+      name: z.string(),
+    }),
     token: z.string().min(1),
   }),
 );
 type ArrInput = z.infer<typeof ArrInputSchema>;
 
 export default (app: Router) => {
+  route.get(
+    '/sonarr/options/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    getSonarrOptionsById,
+  );
   route.get(
     '/sonarr/paths/:id',
     validateRequest({
@@ -130,6 +135,16 @@ export default (app: Router) => {
     deleteSonarrById,
   );
   route.get(
+    '/radarr/options/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    getRadarrOptionsById,
+  );
+  route.get(
     '/radarr/paths/:id',
     validateRequest({
       params: z.object({
@@ -180,7 +195,14 @@ export default (app: Router) => {
     testRadarrConnectionById,
   );
   route.get('/radarr/config', adminRequired, getRadarrConfig);
-  route.post('/radarr/config', adminRequired, updateRadarrConfig);
+  route.post(
+    '/radarr/config',
+    validateRequest({
+      body: ArrInputSchema,
+    }),
+    adminRequired,
+    updateRadarrConfig,
+  );
   route.delete(
     '/radarr/:id',
     validateRequest({
@@ -193,6 +215,37 @@ export default (app: Router) => {
   );
 
   app.use(route.routes());
+};
+
+const getSonarrOptionsById = async (ctx: Context) => {
+  try {
+    const instance = await GetSonarrInstanceFromDb(ctx.params.id);
+    if (!instance) {
+      ctx.status = StatusCodes.NOT_FOUND;
+      ctx.body = 'no instance could be found with that id';
+      return;
+    }
+
+    const [paths, profiles, languages, tags] = await Promise.all([
+      instance.GetRootPaths(),
+      instance.GetQualityProfiles(),
+      instance.GetLanguageProfile(),
+      instance.GetTags(),
+    ]);
+
+    ctx.status = StatusCodes.OK;
+    ctx.body = {
+      paths,
+      profiles,
+      languages,
+      tags,
+    };
+  } catch (error) {
+    logger.error(error.stack);
+
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = error.message;
+  }
 };
 
 const getSonarrPathsById = async (ctx: Context) => {
@@ -340,6 +393,10 @@ const getSonarrConfig = async (ctx: Context) => {
           id: instance.language.id,
           name: instance.language.name,
         },
+        media_type: {
+          id: instance.media_type.id,
+          name: instance.media_type.name,
+        },
         enabled: instance.enabled,
       });
     }
@@ -372,6 +429,21 @@ const updateSonarrConfig = async (ctx: Context) => {
           instance.subpath,
       );
 
+      try {
+        const client = new SonarrAPI(url, instance.token);
+        const passed = await client.TestConnection();
+
+        if (!passed) {
+          throw new Error('test failed');
+        }
+      } catch (e) {
+        ctx.status = StatusCodes.BAD_REQUEST;
+        ctx.body = {
+          error: e.message,
+        };
+        return;
+      }
+
       const newInstance = await CreateOrUpdateDownloader({
         name: instance.name,
         type: DownloaderType.Sonarr,
@@ -380,6 +452,7 @@ const updateSonarrConfig = async (ctx: Context) => {
         path: instance.path,
         profile: instance.profile,
         language: instance.language,
+        media_type: instance.media_type,
         enabled: instance.enabled,
       });
 
@@ -389,12 +462,12 @@ const updateSonarrConfig = async (ctx: Context) => {
     ctx.status = StatusCodes.OK;
     ctx.body = results;
     return;
-  } catch (err) {
+  } catch (error) {
     logger.log('error', `ROUTE: Error saving sonarr config`);
-    logger.log({ level: 'error', message: err });
+    logger.log({ level: 'error', message: error });
 
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = { error: err };
+    ctx.body = { error: error };
     return;
   }
 };
@@ -448,11 +521,46 @@ const getCalendarData = async (ctx: Context) => {
 
     ctx.status = StatusCodes.OK;
     ctx.body = calendarData;
-  } catch (err) {
-    logger.error(err);
-
+  } catch (error) {
+    logger.error(error);
     ctx.status = StatusCodes.OK;
     ctx.body = [];
+  }
+};
+
+const getRadarrOptionsById = async (ctx: Context) => {
+  try {
+    const instance = await GetRadarrInstanceFromDb(ctx.params.id);
+    if (!instance) {
+      ctx.status = StatusCodes.NOT_FOUND;
+      ctx.body = 'no instance could be found with that id';
+      return;
+    }
+
+    const [paths, profiles, languages, tags, minimumAvailability] =
+      await Promise.all([
+        instance.GetRootPaths(),
+        instance.GetQualityProfiles(),
+        instance.GetLanguages(),
+        instance.GetTags(),
+        instance.GetMinimumAvailability(),
+      ]);
+
+    ctx.status = StatusCodes.OK;
+    ctx.body = {
+      paths,
+      profiles,
+      languages,
+      tags,
+      minimumAvailability,
+    };
+  } catch (error) {
+    logger.error(error);
+
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = {
+      error: 'failed to get radarr options',
+    };
   }
 };
 
@@ -601,6 +709,10 @@ const getRadarrConfig = async (ctx: Context) => {
           id: instance.language.id,
           name: instance.language.name,
         },
+        media_type: {
+          id: instance.media_type.id,
+          name: instance.media_type.name,
+        },
         enabled: instance.enabled,
       });
     }
@@ -633,6 +745,8 @@ const updateRadarrConfig = async (ctx: Context) => {
           instance.subpath,
       );
 
+      console.log(instance);
+
       const newInstance = await CreateOrUpdateDownloader({
         name: instance.name,
         type: DownloaderType.Radarr,
@@ -641,6 +755,7 @@ const updateRadarrConfig = async (ctx: Context) => {
         path: instance.path,
         profile: instance.profile,
         language: instance.language,
+        media_type: instance.media_type,
         enabled: instance.enabled,
       });
 
@@ -650,12 +765,12 @@ const updateRadarrConfig = async (ctx: Context) => {
     ctx.status = StatusCodes.OK;
     ctx.body = results;
     return;
-  } catch (err) {
+  } catch (error) {
     logger.log('error', `ROUTE: Error saving radarr config`);
-    logger.log({ level: 'error', message: err });
+    logger.log({ level: 'error', message: error });
 
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = { error: err };
+    ctx.body = { error: error };
     return;
   }
 };

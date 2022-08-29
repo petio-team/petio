@@ -6,13 +6,12 @@ import { initStore, store } from "./data/store";
 import { Provider } from "react-redux";
 import "./styles/main.scss";
 import { BrowserRouter } from "react-router-dom";
-import { API_URL } from "./data/http";
 
 const startApp = () => {
   initStore();
   ReactDOM.render(
     <Provider store={store}>
-      <BrowserRouter basename={API_URL}>
+      <BrowserRouter>
         <App />
       </BrowserRouter>
     </Provider>,
