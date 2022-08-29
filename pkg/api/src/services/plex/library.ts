@@ -799,7 +799,8 @@ export default class LibraryUpdate {
   async saveFriend(obj) {
     // Maybe delete all and rebuild each time?
     try {
-      const defaultProfile: any = await Profile.findOne({ isDefault: true }).exec();
+      const results: any = await Profile.findOne({ isDefault: true }).exec();
+      const defaultProfile = results.toObject();
 
       const newUser = await CreateOrUpdateUser({
         title: obj.title ?? obj.username ?? 'User',
