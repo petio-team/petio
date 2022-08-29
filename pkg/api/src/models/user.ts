@@ -1,5 +1,7 @@
 import { ObjectId } from 'bson';
 import { Schema, model } from 'mongoose';
+import { container } from 'tsyringe';
+import { Logger } from 'winston';
 import * as z from 'zod';
 
 export enum UserRole {
@@ -98,7 +100,7 @@ export const UserModel = model<User>('users', UserModelSchema);
 // TODO: this should be it's own service with a repository ideally
 // Gets all users
 export const GetAllUsers = async (): Promise<User[]> => {
-  const results = await UserModel.find({});
+  const results = await UserModel.find({}).exec();
   if (!results) {
     return [];
   }
@@ -116,7 +118,7 @@ export const GetAllUsers = async (): Promise<User[]> => {
 export const GetUserByEmail = async (email: string): Promise<User> => {
   const data = await UserModel.findOne({
     email: email,
-  });
+  }).exec();
   if (!data) {
     throw new Error('failed to get user by email');
   }
@@ -147,11 +149,14 @@ export const GetUserByPlexID = async (id: string): Promise<User> => {
   return parsed.data;
 };
 
+const logger = container.resolve<Logger>('Logger');
+
 // TODO: this should be it's own service with a repository ideally
 // Create a new user or update if one already exists
 export const CreateOrUpdateUser = async (user: User): Promise<User> => {
   let schema = await UserSchema.safeParseAsync(user);
   if (!schema.success) {
+    logger.error('failed to parse user data: ', schema.error);
     throw new Error('failed to parse user data');
   }
 
@@ -163,7 +168,7 @@ export const CreateOrUpdateUser = async (user: User): Promise<User> => {
     {
       upsert: true,
     },
-  );
+  ).exec();
   if (!data.acknowledged) {
     throw new Error('failed to create or update user');
   }
