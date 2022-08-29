@@ -8,7 +8,8 @@ export const cors = () => {
   const whitelist = corsDomains.split(',').map((domain) => domain.trim());
   if (IsDevelopment()) {
     // add local react dev
-    whitelist.push('http://localhost:3000');
+    whitelist.push('http://localhost:3001'); // frontend
+    whitelist.push('http://localhost:3002'); // admin
   }
 
   const corsOptions = {
