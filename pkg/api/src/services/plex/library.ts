@@ -799,8 +799,11 @@ export default class LibraryUpdate {
   async saveFriend(obj) {
     // Maybe delete all and rebuild each time?
     try {
+      let defaultProfile: any = undefined;
       const results: any = await Profile.findOne({ isDefault: true }).exec();
-      const defaultProfile = results.toObject();
+      if (results) {
+        defaultProfile = results.toObject();
+      }
 
       const newUser = await CreateOrUpdateUser({
         title: obj.title ?? obj.username ?? 'User',
@@ -808,7 +811,7 @@ export default class LibraryUpdate {
         email: obj.email.toLowerCase() ?? '',
         thumbnail: obj.thumb ?? '',
         plexId: obj.id,
-        profileId: defaultProfile ? defaultProfile._id : undefined,
+        profileId: defaultProfile ? defaultProfile._id.toString() : undefined,
         role: UserRole.User,
         owner: false,
         custom: false,
