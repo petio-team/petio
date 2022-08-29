@@ -149,14 +149,14 @@ export const GetUserByPlexID = async (id: string): Promise<User> => {
   return parsed.data;
 };
 
-const logger = container.resolve<Logger>('Logger');
-
 // TODO: this should be it's own service with a repository ideally
 // Create a new user or update if one already exists
 export const CreateOrUpdateUser = async (user: User): Promise<User> => {
   let schema = await UserSchema.safeParseAsync(user);
   if (!schema.success) {
-    logger.error('failed to parse user data: ', schema.error);
+    container
+      .resolve<Logger>('Logger')
+      .error('failed to parse user data: ', schema.error);
     throw new Error('failed to parse user data');
   }
 
