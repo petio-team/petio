@@ -154,8 +154,10 @@ function success(ctx, user, isAdmin = false) {
   const token = jwt.sign({ ...user, admin: isAdmin }, config.get('plex.token'));
 
   ctx.cookies.set('petio_jwt', token, {
-    maxAge: 2419200000,
     httpOnly: false,
+    signed: true,
+    secure: false,
+    expires: new Date(Date.now() + 2629800000),
   });
 
   ctx.status = StatusCodes.OK;
