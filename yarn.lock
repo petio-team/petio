@@ -4736,6 +4736,7 @@ __metadata:
     is-iso-date: ^0.0.1
     jsonwebtoken: ^8.5.1
     koa: ^2.13.4
+    koa-add-trailing-slashes: ^2.0.1
     koa-body: ^5.0.0
     koa-compress: ^5.1.0
     koa-helmet: ^6.1.0
@@ -12346,6 +12347,13 @@ __metadata:
   version: 2.0.5
   resolution: "klona@npm:2.0.5"
   checksum: 8c976126ea252b766e648a4866e1bccff9d3b08432474ad80c559f6c7265cf7caede2498d463754d8c88c4759895edd8210c85c0d3155e6aae4968362889466f
+  languageName: node
+  linkType: hard
+
+"koa-add-trailing-slashes@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "koa-add-trailing-slashes@npm:2.0.1"
+  checksum: 505131723f8e3eb4bf29ecc5c5421bacc5703ed742b19aabde00b87f55de65aabc43bab43ebf2b3bf7e3a00a26a75d8d4ecaa64677ebdbd9797ba0fcbc7c041f
   languageName: node
   linkType: hard
 

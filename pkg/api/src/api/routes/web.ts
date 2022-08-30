@@ -1,5 +1,6 @@
 import fs from 'fs/promises';
 import Koa from 'koa';
+import addTrailingSlashes from 'koa-add-trailing-slashes';
 import mount from 'koa-mount';
 import serve from 'koa-static';
 import path from 'path';
@@ -27,8 +28,8 @@ export default async (app: Koa) => {
     }
   }
 
-  app.use(mount('/', serve(frontendPath)));
-  app.use(mount('/admin', serve(adminPath)));
+  serveReact(app, frontendPath, '/');
+  serveReact(app, adminPath, '/admin');
 };
 
 const pathExists = async (file: string): Promise<boolean> => {
@@ -39,3 +40,10 @@ const pathExists = async (file: string): Promise<boolean> => {
     return false;
   }
 };
+
+function serveReact(app: Koa, dir: string, path: string) {
+  const spa = new Koa();
+  spa.use(addTrailingSlashes());
+  spa.use(serve(dir));
+  app.use(mount(path, spa));
+}
