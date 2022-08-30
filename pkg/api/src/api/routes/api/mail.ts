@@ -18,7 +18,16 @@ export default (app: Router) => {
       body: z.object({
         email: z.object({
           server: z.string().min(1),
-          port: z.number(),
+          port: z.string().transform((val, ctx) => {
+            const parsed = parseInt(val);
+            if (isNaN(parsed)) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'failed to parse port into a valid number',
+              });
+            }
+            return parsed;
+          }),
           user: z.string().min(1),
           pass: z.string().min(1),
           from: z.string().min(1),
