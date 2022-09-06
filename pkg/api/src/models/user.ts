@@ -170,7 +170,7 @@ export const CreateOrUpdateUser = async (user: User): Promise<User> => {
     },
   ).exec();
   if (!data.acknowledged) {
-    throw new Error('failed to create or update user' + parsed.error);
+    throw new Error('failed to create or update user');
   }
 
   schema.data.id = data.upsertedId;
