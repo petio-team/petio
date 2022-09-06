@@ -107,7 +107,7 @@ export const GetAllUsers = async (): Promise<User[]> => {
 
   const parsed = await UserSchema.array().safeParseAsync(results);
   if (!parsed.success) {
-    throw new Error('failed to parse users data');
+    throw new Error('failed to parse users data: ' + parsed.error);
   }
 
   return parsed.data;
@@ -125,7 +125,7 @@ export const GetUserByEmail = async (email: string): Promise<User> => {
 
   const parsed = await UserSchema.safeParseAsync(data.toObject());
   if (!parsed.success) {
-    throw new Error('failed to parse and validate data');
+    throw new Error('failed to parse and validate data: ' + parsed.error);
   }
 
   return parsed.data;
@@ -142,7 +142,7 @@ export const GetUserByPlexID = async (id: string): Promise<User> => {
 
   const parsed = await UserSchema.safeParseAsync(data.toObject());
   if (!parsed.success) {
-    throw new Error('failed to parse and validate data');
+    throw new Error('failed to parse and validate data: ' + parsed.error);
   }
 
   delete parsed.data.password;
@@ -170,7 +170,7 @@ export const CreateOrUpdateUser = async (user: User): Promise<User> => {
     },
   ).exec();
   if (!data.acknowledged) {
-    throw new Error('failed to create or update user');
+    throw new Error('failed to create or update user' + parsed.error);
   }
 
   schema.data.id = data.upsertedId;
