@@ -12,6 +12,7 @@ import LoggerInstance from './logger';
 const TASK_NAME = {
   FULL_LIBRARY_SCAN: 'full library scan',
   PARTIAL_LIBRARY_SCAN: 'partial library scan',
+  USERS_SCAN: 'users scan',
   USER_QUOTA_RESET: 'reset user quota',
   IMDB_CACHE: 'update imdb cache',
   TMDB_CACHE: 'update tmdb cache',
@@ -53,6 +54,22 @@ export default ({ agenda }: { agenda: Agenda }) => {
       }
     },
   );
+
+  agenda.define(TASK_NAME.USERS_SCAN, async (_job: any, done: any) => {
+    try {
+      await new LibraryUpdate().updateFriends();
+    } catch (err) {
+      LoggerInstance.error(
+        "an error occured while attempting to run task '" +
+          TASK_NAME.USERS_SCAN +
+          "'",
+        { label: 'task' },
+      );
+      LoggerInstance.debug(err);
+    } finally {
+      done();
+    }
+  });
 
   agenda.define(TASK_NAME.USER_QUOTA_RESET, async (_job: any, done: any) => {
     try {
@@ -108,6 +125,7 @@ export default ({ agenda }: { agenda: Agenda }) => {
     config.get('tasks.library.partial'),
     TASK_NAME.PARTIAL_LIBRARY_SCAN,
   );
+  agenda.every(config.get('tasks.library.users'), TASK_NAME.USERS_SCAN);
   agenda.every(config.get('tasks.quotas'), TASK_NAME.USER_QUOTA_RESET);
   agenda.every('24 hours', [TASK_NAME.IMDB_CACHE, TASK_NAME.TMDB_CACHE]);
   agenda.purge();
