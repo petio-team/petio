@@ -93,6 +93,11 @@ export const config = blueconfig({
         format: String,
         default: '30 minutes',
       },
+      users: {
+        doc: 'The interval time for scanning users',
+        format: String,
+        default: '10 minutes',
+      },
     },
     quotas: {
       doc: 'The interval time for performing a reset of user quotas',

@@ -11,7 +11,7 @@ import Movie from '@/models/movie';
 import Profile from '@/models/profile';
 import Request from '@/models/request';
 import Show from '@/models/show';
-import { CreateOrUpdateUser, UserModel, UserRole } from '@/models/user';
+import { CreateOrUpdateUser, User, UserModel, UserRole } from '@/models/user';
 import Mailer from '@/services/mail/mailer';
 import MusicMeta from '@/services/meta/musicBrainz';
 import Discord from '@/services/notifications/discord';
@@ -40,7 +40,6 @@ export default class LibraryUpdate {
     this.full = false;
     let recent: any = false;
     try {
-      await this.updateFriends();
       recent = await this.getRecent();
     } catch (err) {
       logger.warn(`CRON: Partial scan failed - unable to get recent`, {
@@ -130,7 +129,6 @@ export default class LibraryUpdate {
   async scan() {
     this.timestamp = new Date().toString();
     logger.verbose(`CRON: Running Full`, { label: 'plex.library' });
-    await this.updateFriends();
     let libraries = false;
     try {
       libraries = await this.getLibraries();
@@ -805,7 +803,7 @@ export default class LibraryUpdate {
         defaultProfile = results.toObject();
       }
 
-      const newUser = await CreateOrUpdateUser({
+      const user: User = {
         title: obj.title ?? obj.username ?? 'User',
         username: obj.username ? obj.username : obj.title,
         email: obj.email.toLowerCase() ?? '',
@@ -817,7 +815,9 @@ export default class LibraryUpdate {
         custom: false,
         disabled: false,
         quotaCount: 0,
-      });
+      }
+
+      const newUser = await CreateOrUpdateUser(user);
       logger.verbose('added new friend ' + newUser.email, {
         label: 'plex.library',
       });
