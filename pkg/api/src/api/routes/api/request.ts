@@ -91,9 +91,8 @@ const getRequestMinified = async (ctx: Context) => {
 const addRequest = async (ctx: Context) => {
   const body = ctx.request.body;
 
-  let user = body.user;
   let request = body.request;
-  let process = await new processRequest(request, user).new();
+  let process = await new processRequest(request, ctx.state.user).new();
 
   ctx.status = StatusCodes.OK;
   ctx.body = process;
@@ -104,7 +103,7 @@ const removeRequest = async (ctx: Context) => {
 
   let request = body.request;
   let reason = body.reason;
-  let process = new processRequest(request);
+  let process = new processRequest(request, ctx.state.user);
 
   await process.archive(false, true, reason);
 
@@ -154,7 +153,7 @@ const updateRequest = async (ctx: Context) => {
   let manualStatus = body.request.manualStatus;
 
   if (manualStatus === '5') {
-    new processRequest(request, false).archive(true, false, false);
+    new processRequest(request, ctx.state.user).archive(true, false, false);
 
     ctx.status = StatusCodes.OK;
     ctx.body = {};

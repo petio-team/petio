@@ -3,7 +3,7 @@ import Archive from '@/models/archive';
 import { DownloaderType, GetAllDownloaders } from '@/models/downloaders';
 import Profile from '@/models/profile';
 import Request from '@/models/request';
-import { UserModel, UserRole } from '@/models/user';
+import { User, UserModel, UserRole } from '@/models/user';
 import Radarr from '@/services/downloaders/radarr';
 import Sonarr from '@/services/downloaders/sonarr';
 import Mailer from '@/services/mail/mailer';
@@ -14,8 +14,9 @@ import { showLookup } from '@/services/tmdb/show';
 
 export default class processRequest {
   request: any;
-  user: any;
-  constructor(req = {}, usr = {}) {
+  user: User;
+
+  constructor(req = {}, usr: User) {
     this.request = req;
     this.user = usr;
   }
@@ -72,7 +73,7 @@ export default class processRequest {
       return;
     }
     let profile = userDetails.profileId
-      ? await Profile.findById(this.user.profile).exec()
+      ? await Profile.findById(this.user.profileId).exec()
       : false;
     let autoApprove = profile ? profile.autoApprove : false;
     let autoApproveTv = profile ? profile.autoApproveTv : false;
@@ -117,12 +118,8 @@ export default class processRequest {
   }
 
   async create() {
-    const userDetails = await UserModel.findOne({ id: this.user.id }).exec();
-    if (!userDetails) {
-      return;
-    }
-    const profile = userDetails.profileId
-      ? await Profile.findById(this.user.profile).exec()
+    const profile = this.user.profileId
+      ? await Profile.findById(this.user.profileId).exec()
       : false;
     let autoApprove = profile
       ? this.request.type === 'movie'
@@ -130,7 +127,7 @@ export default class processRequest {
         : profile.autoApproveTv
       : false;
 
-    if (userDetails.role === UserRole.Admin) {
+    if (this.user.role === UserRole.Admin) {
       autoApprove = true;
     }
 
@@ -394,7 +391,7 @@ export default class processRequest {
     const subtitle: any = `A new request has been added for the ${type} "${requestData.title}"`;
     const image: any = `https://image.tmdb.org/t/p/w500${requestData.thumb}`;
     [new Discord(), new Telegram()].forEach((notification) =>
-      notification.send(title, subtitle, userData.title, image),
+      notification.send(title, subtitle, userData.title as any, image),
     );
   }
 
@@ -419,15 +416,11 @@ export default class processRequest {
   }
 
   async checkQuota() {
-    let userDetails = await UserModel.findOne({ id: this.user.id }).exec();
-    if (!userDetails) {
-      return false;
-    }
-    if (userDetails.role === UserRole.Admin) return 'admin';
+    if (this.user.role === UserRole.Admin) return 'admin';
 
-    let userQuota = userDetails.quotaCount ? userDetails.quotaCount : 0;
-    let profile = userDetails.profileId
-      ? await Profile.findById(this.user.profile).exec()
+    let userQuota = this.user.quotaCount ? this.user.quotaCount : 0;
+    let profile = this.user.profileId
+      ? await Profile.findById(this.user.profileId).exec()
       : false;
     let quotaCap = profile ? profile.quota : 0;
     if (!quotaCap) {
