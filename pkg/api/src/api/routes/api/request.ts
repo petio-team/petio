@@ -154,7 +154,6 @@ const updateRequest = async (ctx: Context) => {
 
   if (manualStatus === '5') {
     new processRequest(request, ctx.state.user).archive(true, false, false);
-
     ctx.status = StatusCodes.OK;
     ctx.body = {};
     return;
@@ -162,7 +161,6 @@ const updateRequest = async (ctx: Context) => {
 
   try {
     const instances = await GetAllDownloaders();
-
     await Request.findOneAndUpdate(
       { requestId: request.requestId },
       {
@@ -174,7 +172,7 @@ const updateRequest = async (ctx: Context) => {
       { new: true, useFindAndModify: false },
     ).exec();
 
-    if (servers && request.type === 'movie') {
+    if (servers && servers.length) {
       const activeServers: IDownloader[] = servers.map((s) => {
         if (s.active) {
           const instance = instances.find((i) => i.id === s.id);
@@ -185,27 +183,14 @@ const updateRequest = async (ctx: Context) => {
       });
 
       await Bluebird.map(activeServers, async (instance) => {
-        console.log(JSON.stringify(instance, null, 4));
-        await new Radarr(instance).processRequest(request.requestId);
-      });
-    }
-
-    if (servers && request.type === 'tv') {
-      const activeServers: IDownloader[] = servers.map((s) => {
-        if (s.active) {
-          const instance = instances.find((i) => i.id === s.id);
-          if (instance) {
-            return instance;
-          }
+        if (request.type === 'movie') {
+          await new Radarr(instance).processRequest(request.requestId);
+        } else {
+          await new Sonarr(instance).addShow(request, {
+            profile: instance.profile,
+            path: instance.path,
+          });
         }
-      });
-
-      await Bluebird.map(activeServers, async (instance) => {
-        console.log(JSON.stringify(instance, null, 4));
-        await new Sonarr(instance).addShow(request, {
-          profile: instance.profile,
-          path: instance.path,
-        });
       });
     }
 
