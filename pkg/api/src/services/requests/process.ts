@@ -14,13 +14,17 @@ import { showLookup } from '@/services/tmdb/show';
 
 export default class processRequest {
   request: any;
-  user: User;
+  user: User | undefined;
 
-  constructor(req = {}, usr: User) {
+  constructor(req = {}, usr?: User) {
     this.request = req;
     this.user = usr;
   }
   async new() {
+    if (!this.user) {
+      throw new Error('user required');
+    }
+
     let out: any = {};
     let quotaPass = await this.checkQuota();
     if (quotaPass) {
@@ -68,16 +72,15 @@ export default class processRequest {
   }
 
   async existing() {
-    let userDetails = await UserModel.findOne({ id: this.user.id }).exec();
-    if (!userDetails) {
-      return;
+    if (!this.user) {
+      throw new Error('user required');
     }
-    let profile = userDetails.profileId
+    let profile = this.user.profileId
       ? await Profile.findById(this.user.profileId).exec()
       : false;
     let autoApprove = profile ? profile.autoApprove : false;
     let autoApproveTv = profile ? profile.autoApproveTv : false;
-    if (userDetails.role === 'admin') {
+    if (this.user.role === 'admin') {
       autoApprove = true;
       autoApproveTv = true;
     }
@@ -118,6 +121,10 @@ export default class processRequest {
   }
 
   async create() {
+    if (!this.user) {
+      throw new Error('user required');
+    }
+
     const profile = this.user.profileId
       ? await Profile.findById(this.user.profileId).exec()
       : false;
@@ -384,6 +391,10 @@ export default class processRequest {
   }
 
   discordNotify() {
+    if (!this.user) {
+      throw new Error('user required');
+    }
+
     let userData = this.user;
     const requestData = this.request;
     let type = requestData.type === 'tv' ? 'TV Show' : 'Movie';
@@ -416,6 +427,10 @@ export default class processRequest {
   }
 
   async checkQuota() {
+    if (!this.user) {
+      throw new Error('user required');
+    }
+
     if (this.user.role === UserRole.Admin) return 'admin';
 
     let userQuota = this.user.quotaCount ? this.user.quotaCount : 0;
