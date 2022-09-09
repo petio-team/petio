@@ -13,7 +13,6 @@ import Request from '@/models/request';
 import Show from '@/models/show';
 import { CreateOrUpdateUser, User, UserModel, UserRole } from '@/models/user';
 import Mailer from '@/services/mail/mailer';
-import MusicMeta from '@/services/meta/musicBrainz';
 import Discord from '@/services/notifications/discord';
 import Telegram from '@/services/notifications/telegram';
 import processRequest from '@/services/requests/process';
@@ -62,11 +61,6 @@ export default class LibraryUpdate {
             logger.verbose(`CRON: Partial scan - ${obj.title}`, {
               label: 'plex.library',
             });
-          }
-        } else if (obj.type === 'artist') {
-          if (!matched[obj.ratingKey]) {
-            matched[obj.ratingKey] = true;
-            await this.saveMusic(obj);
           }
         } else if (obj.type === 'show') {
           if (matched[obj.ratingKey]) {
@@ -290,8 +284,6 @@ export default class LibraryUpdate {
             let obj: any = libContent.Metadata[item];
             if (obj.type === 'movie') {
               await this.saveMovie(obj);
-            } else if (obj.type === 'artist') {
-              music.push(obj);
             } else if (obj.type === 'show') {
               await this.saveShow(obj);
             } else {
@@ -302,11 +294,6 @@ export default class LibraryUpdate {
           },
           { concurrency: config.get('general.concurrency') },
         );
-        for (let i in music) {
-          let artist = music[i];
-          await this.saveMusic(artist);
-          await this.timeout(20);
-        }
       } catch (err) {
         logger.error(`CRON: Unable to get library content`, {
           label: 'plex.library',
@@ -534,58 +521,6 @@ export default class LibraryUpdate {
       logger.log(err);
     }
   }
-
-  async saveMusic(musicObj) {
-    let musicDb: any = false;
-    let title = musicObj.title;
-    let added = false;
-    let match: any = false;
-    logger.verbose(`CRON: Music Job: ${title}`, { label: 'plex.library' });
-    try {
-      musicDb = await Music.findOne({
-        ratingKey: parseInt(musicObj.ratingKey),
-      });
-    } catch {
-      musicDb = false;
-    }
-    if (musicDb && musicDb.metaId) {
-      match = { id: musicDb.metaId, name: musicDb.metaTitle };
-    }
-    if (match && musicDb.metaId === 'no genres' && musicObj.Genre) {
-      logger.verbose(
-        `CRON: Music - "${title}" Now has genres, attempting to match`,
-        { label: 'plex.library' },
-      );
-      match = false;
-    }
-    if (!match) {
-      match = await new MusicMeta().match(musicObj.title, musicObj.Genre);
-    }
-    if (!musicDb) {
-      added = true;
-      musicDb = new Music({
-        ratingKey: musicObj.ratingKey,
-      });
-    }
-    musicDb.title = musicObj.title;
-    musicDb.metaId = match ? match.id : false;
-    musicDb.metaTitle = match ? match.name : false;
-    try {
-      await musicDb.save();
-      if (added) {
-        await this.mailAdded(musicObj, musicDb.metaId);
-        logger.verbose(`CRON: Music Added - ${musicObj.title}`, {
-          label: 'plex.library',
-        });
-      }
-    } catch (err) {
-      logger.error(`CRON: Failed to save ${title} to Db`, {
-        label: 'plex.library',
-      });
-      logger.error(err, { label: 'plex.library' });
-    }
-  }
-
   async saveShow(showObj) {
     let showDb: any = false;
     let title = showObj.title;
