@@ -26,6 +26,15 @@ export class RequestDB implements IRequestRepository {
     return result.toObject();
   }
 
+  async Create(request: Request): Promise<Request> {
+    const result = await this.model.create(request);
+    if (!result.isNew) {
+      throw new RepositoryError(`failed to create request`);
+    }
+
+    return result.toObject();
+  }
+
   async UpdateById(request: Request): Promise<Request> {
     const { id, ...update } = request;
     const result = await this.model
@@ -43,7 +52,7 @@ export class RequestDB implements IRequestRepository {
     return result.toObject();
   }
 
-  async DeleteById(id: string): Promise<Request> {
+  async RemoveById(id: string): Promise<Request> {
     const result = await this.model
       .findOneAndUpdate(
         {
@@ -55,13 +64,13 @@ export class RequestDB implements IRequestRepository {
       )
       .exec();
     if (!result) {
-      throw new RepositoryError(`failed to delete request with id: ${id}`);
+      throw new RepositoryError(`failed to remove request with id: ${id}`);
     }
 
     return result.toObject();
   }
 
-  async RemoveById(id: string): Promise<void> {
+  async DeleteById(id: string): Promise<void> {
     const result = await this.model
       .deleteOne({
         id,
