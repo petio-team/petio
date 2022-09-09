@@ -1,56 +1,15 @@
-import mongoose from 'mongoose';
+import { getModelForClass } from '@typegoose/typegoose';
 
-import { IMediaServer, MediaServerID, MediaServerType } from './dto';
-import { NotCreatedError, NotCreatedOrUpdatedError, NotDeletedError, NotFoundError, NotUpdatedError, RepositoryError, NotRemovedError, NotRestoredError } from "./errors";
-import { MediaServerModel } from './model';
-import { IMediaServerRepository } from './repository';
-import { inject, injectable } from "tsyringe";
-import { Logger } from "winston";
+import { RepositoryError } from '../errors';
+import { MediaServer, MediaServerType } from './dto';
+import { IMediaServerRepository } from './repo';
+import { MediaServerSchema } from './schema';
 
-@injectable()
 export default class MediaServerDB implements IMediaServerRepository {
-  private model: mongoose.Model<IMediaServer> = MediaServerModel;
+  private model = getModelForClass(MediaServerSchema);
 
-  constructor(
-    @inject("Logger") private logger: Logger,
-  ) {}
-
-  public async findById(
-    id: MediaServerID,
-    deleted?: boolean,
-  ): Promise<IMediaServer | RepositoryError> {
-    let filters: Record<string, any> = {};
-    if (!deleted) {
-      filters = { ...filters, deletedAt: null };
-    }
-
-    const result = await this.model
-      .findOne({ id, ...filters })
-      .exec()
-      .catch((error) => {
-        this.logger.error(error);
-        return null;
-      });
-    if (!result) {
-      return NotFoundError;
-    }
-
-    return result.toObject();
-  }
-
-  public async findByType(
-    type: MediaServerType,
-    deleted?: boolean,
-  ): Promise<IMediaServer[]> {
-    let filters: Record<string, any> = {};
-    if (!deleted) {
-      filters = { ...filters, deletedAt: null };
-    }
-
-    const results = await this.model.find({ type, ...filters }).exec().catch((error) => {
-      this.logger.error(error);
-      return null;
-    });
+  public async GetAll(): Promise<MediaServer[]> {
+    const results = await this.model.find().exec();
     if (!results) {
       return [];
     }
@@ -58,113 +17,84 @@ export default class MediaServerDB implements IMediaServerRepository {
     return results.map((i) => i.toObject());
   }
 
-  public async getAll(deleted?: boolean): Promise<IMediaServer[]> {
-    let filters: Record<string, any> = {};
-    if (!deleted) {
-      filters = { ...filters, deletedAt: null };
+  public async GetById(id: string): Promise<MediaServer> {
+    const result = await this.model.findOne({ id }).exec();
+    if (!result) {
+      throw new RepositoryError(
+        `failed to get media server by id with id ${id}`,
+      );
     }
 
-    const results = await this.model.find({ ...filters }).exec().catch((error) => {
-      this.logger.error(error);
-      return null;
-    });
+    return result.toObject();
+  }
+
+  public async GetByType(type: MediaServerType): Promise<MediaServer[]> {
+    const results = await this.model.find({ type }).exec();
     if (!results) {
       return [];
     }
 
     return results.map((i) => i.toObject());
   }
-  public async create(
-    type: MediaServerType,
-    name: string,
-    url: URL,
-    token: string,
-    enabled: boolean,
-  ): Promise<IMediaServer | RepositoryError> {
-    const result = await this.model.create({
-      type,
-      name,
-      url,
-      token,
-      enabled,
-    }).catch((error) => {
-      this.logger.error(error);
-      return null;
-    });
+
+  public async Create(mediaserver: MediaServer): Promise<MediaServer> {
+    const result = await this.model.create(mediaserver);
     if (!result) {
-      return NotCreatedError;
+      throw new Error(`failed to create media server`);
     }
+
     return result.toObject();
   }
 
-  public async updateById(
-    id: MediaServerID,
-    name?: string,
-    url?: URL,
-    token?: string,
-    enabled?: boolean,
-  ): Promise<IMediaServer | RepositoryError> {
+  public async UpdateById(mediaserver: MediaServer): Promise<MediaServer> {
+    const { id, ...update } = mediaserver;
+    if (id === undefined) {
+      throw new RepositoryError(`invalid or missing id field`);
+    }
+
     const result = await this.model
       .findOneAndUpdate(
-        { id },
         {
-          name,
-          url,
-          token,
-          enabled,
+          id,
         },
-        {
-          new: true,
-        },
+        update,
       )
-      .exec().catch(error => {
-        this.logger.error(error);
-        return null;
-      });
+      .exec();
     if (!result) {
-      return NotUpdatedError;
+      throw new Error(`failed to update media server by id with id: ${id}`);
     }
 
     return result.toObject();
   }
 
-  public async createOrUpdate(
-    id: MediaServerID,
-    type: MediaServerType,
-    name: string,
-    url: URL,
-    token: string,
-    enabled: boolean,
-  ) {
+  public async CreateOrUpdate(mediaserver: MediaServer): Promise<MediaServer> {
+    const { id, ...upsert } = mediaserver;
     const result = await this.model
       .findOneAndUpdate(
-        { id },
         {
-          type,
-          name,
-          url,
-          token,
-          enabled,
+          id,
         },
+        upsert,
         {
           upsert: true,
         },
       )
-      .exec().catch((error) => {
-        this.logger.error(error);
-        return null;
-      });
+      .exec();
     if (!result) {
-      return NotCreatedOrUpdatedError;
+      throw new Error(
+        `failed to create or update media server with url: ${upsert.url}`,
+      );
     }
 
     return result.toObject();
   }
 
-  public async deleteById(id: MediaServerID): Promise<IMediaServer | RepositoryError> {
+  public async RemoveById(id: string): Promise<void> {
     const result = await this.model
       .findOneAndUpdate(
-        { id },
+        {
+          id,
+        },
         {
           deletedAt: new Date().toDateString(),
         },
@@ -172,44 +102,32 @@ export default class MediaServerDB implements IMediaServerRepository {
           new: true,
         },
       )
-      .exec().catch((error) => {
-        this.logger.error(error)
-        return null;
-      });
+      .exec();
     if (!result) {
-      return NotDeletedError;
+      throw new Error(`failed to delete media server by id with id: ${id}`);
     }
 
     return result.toObject();
   }
 
-  public async removeById(id: MediaServerID): Promise<boolean | RepositoryError> {
-    const result = await this.model.deleteOne({ id }).exec().catch((error) => {
-      this.logger.error(error);
-      return null;
-    });
-    if (!result || !result.deletedCount) {
-      return NotRemovedError;
+  public async DeleteById(id: string): Promise<void> {
+    const result = await this.model.deleteOne({ id }).exec();
+    if (!result.deletedCount) {
+      throw new Error(`failed to remove media server by id with id: ${id}`);
     }
-
-    return true;
   }
 
-  public async restoreById(id: MediaServerID): Promise<IMediaServer | RepositoryError> {
+  public async RestoreById(id: string): Promise<MediaServer> {
     const result = await this.model
       .findOneAndUpdate(
         { id },
         {
-          deleted: false,
           deletedAt: null,
         },
       )
-      .exec().catch((error) => {
-        this.logger.error(error);
-        return null;
-      });
+      .exec();
     if (!result) {
-      return NotRestoredError;
+      throw new Error(`failed to restore media server by id with id: ${id}`);
     }
 
     return result.toObject();
