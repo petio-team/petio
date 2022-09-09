@@ -14,6 +14,7 @@ const unroot = utils.unroot;
 
 const ALLOWED_OPTION_STRICT = 'strict';
 const ALLOWED_OPTION_WARN = 'warn';
+const ALLOWED_OPTION_IGNORE = 'ignore';
 
 const BLUECONFIG_ERROR = cvtError.BLUECONFIG_ERROR;
 // 2
@@ -706,7 +707,7 @@ ConfigObjectModel.prototype.merge = function (sources, contentType) {
 ConfigObjectModel.prototype.validate = function (options) {
   options = options || {};
 
-  options.allowed = options.allowed || ALLOWED_OPTION_WARN;
+  options.allowed = options.allowed || ALLOWED_OPTION_IGNORE;
 
   if (options.output && typeof options.output !== 'function') {
     throw new CUSTOMISE_FAILED(
@@ -781,14 +782,16 @@ ConfigObjectModel.prototype.validate = function (options) {
 
     const output_err_bufs = [types_err_buf, missing_err_buf];
 
-    if (options.allowed === ALLOWED_OPTION_WARN && params_err_buf.length) {
-      let warning = 'Warning:';
-      if (process.stdout.isTTY) {
-        warning = BOLD_YELLOW_TEXT + warning + RESET_TEXT;
+    if (options.allowed !== ALLOWED_OPTION_IGNORE) {
+      if (options.allowed === ALLOWED_OPTION_WARN && params_err_buf.length) {
+        let warning = 'Warning:';
+        if (process.stdout.isTTY) {
+          warning = BOLD_YELLOW_TEXT + warning + RESET_TEXT;
+        }
+        output_function(warning + '\n' + params_err_buf);
+      } else if (options.allowed === ALLOWED_OPTION_STRICT) {
+        output_err_bufs.push(params_err_buf);
       }
-      output_function(warning + '\n' + params_err_buf);
-    } else if (options.allowed === ALLOWED_OPTION_STRICT) {
-      output_err_bufs.push(params_err_buf);
     }
 
     const output = output_err_bufs
