@@ -818,7 +818,7 @@ export default class LibraryUpdate {
       };
 
       const newUser = await CreateOrUpdateUser(user);
-      logger.verbose('added new friend ' + newUser.email, {
+      logger.verbose('synced friend ' + newUser.email, {
         label: 'plex.library',
       });
     } catch (e) {
@@ -941,14 +941,14 @@ export default class LibraryUpdate {
             );
             if (request.tvdb_id)
               new processRequest({
-                  id: request.requestId,
-                  type: request.type,
-                  title: request.title,
-                  thumb: request.thumb,
-                  imdb_id: request.imdb_id,
-                  tmdb_id: request.tmdb_id,
-                  tvdb_id: request.tvdb_id,
-                  approved: request.approved,
+                id: request.requestId,
+                type: request.type,
+                title: request.title,
+                thumb: request.thumb,
+                imdb_id: request.imdb_id,
+                tmdb_id: request.tmdb_id,
+                tvdb_id: request.tvdb_id,
+                approved: request.approved,
               }).sendToDvr(false);
           } catch (err) {
             logger.warn(
