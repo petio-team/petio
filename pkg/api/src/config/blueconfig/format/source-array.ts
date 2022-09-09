@@ -1,5 +1,5 @@
-import blueconfig from '../blueconfig';
-import { LISTOFERRORS } from '../blueconfig/error';
+import Blueconfig from '..';
+import { LISTOFERRORS } from '../error';
 
 export default {
   name: 'source-array',
@@ -12,7 +12,7 @@ export default {
 
     children.forEach((_child, keyname) => {
       try {
-        const conf = blueconfig(schema.children)
+        const conf = Blueconfig(schema.children)
           .merge(children[keyname])
           .validate();
         this.set(fullname + '.' + keyname, conf.getProperties());

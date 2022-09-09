@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto';
 import { generateKeys } from '@/utils/security';
 
 import blueconfig from './blueconfig';
-import sourceArray from './formats/source-array';
+import sourceArray from './blueconfig/format/source-array';
 
 // MAX SECURTIY KEYS
 const MAX_SECURITY_KEYS = 10;
