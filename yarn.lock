@@ -4762,7 +4762,8 @@ __metadata:
     mjml: ^4.13.0
     mocha: ^10.0.0
     module-alias: ^2.2.2
-    mongoose: ^6.6.0
+    mongodb: 4.8.1
+    mongoose: 6.5.0
     multer: ^1.4.4
     nodemailer: ^6.7.8
     nodemon: ^2.0.19
@@ -7810,7 +7811,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"denque@npm:^2.1.0":
+"denque@npm:^2.0.1, denque@npm:^2.1.0":
   version: 2.1.0
   resolution: "denque@npm:2.1.0"
   checksum: 1d4ae1d05e59ac3a3481e7b478293f4b4c813819342273f3d5b826c7ffa9753c520919ba264f377e09108d24ec6cf0ec0ac729a5686cbb8f32d797126c5dae74
@@ -14187,7 +14188,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb-connection-string-url@npm:^2.5.3":
+"mongodb-connection-string-url@npm:^2.5.2, mongodb-connection-string-url@npm:^2.5.3":
   version: 2.5.3
   resolution: "mongodb-connection-string-url@npm:2.5.3"
   dependencies:
@@ -14197,7 +14198,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb@npm:4.9.1, mongodb@npm:^4.1.0":
+"mongodb@npm:4.8.1":
+  version: 4.8.1
+  resolution: "mongodb@npm:4.8.1"
+  dependencies:
+    bson: ^4.6.5
+    denque: ^2.0.1
+    mongodb-connection-string-url: ^2.5.2
+    saslprep: ^1.0.3
+    socks: ^2.6.2
+  dependenciesMeta:
+    saslprep:
+      optional: true
+  checksum: 97ff4ebe3fde7b3b5b133d8f7a2e4d6e372c44f8223a6d40b13bb3a705bbbb48ed50958a0fc6b3a33161605723479fced8e0eb83cf7fd5271f7530e6e2d67a2d
+  languageName: node
+  linkType: hard
+
+"mongodb@npm:^4.1.0":
   version: 4.9.1
   resolution: "mongodb@npm:4.9.1"
   dependencies:
@@ -14213,18 +14230,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongoose@npm:^6.6.0":
-  version: 6.6.0
-  resolution: "mongoose@npm:6.6.0"
+"mongoose@npm:6.5.0":
+  version: 6.5.0
+  resolution: "mongoose@npm:6.5.0"
   dependencies:
     bson: ^4.6.5
     kareem: 2.4.1
-    mongodb: 4.9.1
+    mongodb: 4.8.1
     mpath: 0.9.0
     mquery: 4.0.3
     ms: 2.1.3
     sift: 16.0.0
-  checksum: 41f5bc38fd8cf394b3964b61d351de263a50cbfc94b968c186f94c584211471dbeaea65b6a9b70c84d764219a730616e4242f75263e272f5a171bed520313e2e
+  checksum: af2ce7e93f363eb65f281f7fb1e77362a6de9dd8a8f51825af3d263bd64eb556337cdcf249e112ca21c99848e7adde7af3b8d48831d01bd8dcc7c7a8495ef7ac
   languageName: node
   linkType: hard
 
