@@ -13,12 +13,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@koa/cors": "^3.4.1",
-    "@koa/multer": "^3.0.0",
-    "@koa/router": "^12.0.0",
-    "@typegoose/typegoose": "^9.11.2",
-    "@zodios/core": "^6.2.1",
-    "@zodios/plugins": "^1.0.1",
     "agenda": "^4.3.0",
     "axios": "^0.27.2",
     "bcryptjs": "2.4.3",
@@ -64,6 +58,10 @@
     "zod": "^3.19.0"
   },
   "devDependencies": {
+    "@koa/cors": "^3.4.1",
+    "@koa/multer": "^3.0.0",
+    "@koa/router": "^12.0.0",
+    "@typegoose/typegoose": "^9.11.2",
     "@types/agenda": "^4.1.0",
     "@types/bcryptjs": "^2.4.2",
     "@types/bluebird": "^3.5.36",
@@ -77,12 +75,14 @@
     "@types/koa-static": "^4.0.2",
     "@types/koa__cors": "^3.3.0",
     "@types/koa__multer": "^2.0.4",
-    "@types/koa__router": "^8.0.11",
+    "@types/koa__router": "^12.0.0",
     "@types/lodash": "^4.14.184",
     "@types/mjml": "^4.7.0",
     "@types/mocha": "^9.1.1",
-    "@types/node": "^18.7.15",
+    "@types/node": "^18.7.16",
     "@types/nodemailer": "^6.4.5",
+    "@zodios/core": "^6.2.1",
+    "@zodios/plugins": "^1.0.1",
     "dotenv": "^16.0.2",
     "mocha": "^10.0.0",
     "nodemon": "^2.0.19",
@@ -90,7 +90,7 @@
     "ts-mocha": "^10.0.0",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.1.0",
-    "typescript": "^4.8.2"
+    "typescript": "^4.8.3"
   },
   "bin": "./dist/main.js",
   "pkg": {

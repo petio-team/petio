@@ -3643,12 +3643,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/koa__router@npm:^8.0.11":
-  version: 8.0.11
-  resolution: "@types/koa__router@npm:8.0.11"
+"@types/koa__router@npm:^12.0.0":
+  version: 12.0.0
+  resolution: "@types/koa__router@npm:12.0.0"
   dependencies:
     "@types/koa": "*"
-  checksum: 81f55ed77273871728c81a20fa546ee906bebfe72fd72e3723d983a19504eb7d9578908a0fb8ef230764c5495031412df4245eee93479161bd7bd5135ca1ea04
+  checksum: ebfee772f7a9c5ff5e296a24443eb2c288fa2e5b8c60afbb460b41f0bd0d68c8a722fff5984eef7b7d90d057fe6f556171695ea83e2cdbeef3e2462f73c362b7
   languageName: node
   linkType: hard
 
@@ -3703,7 +3703,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>=12, @types/node@npm:^18.7.15":
+"@types/node@npm:*, @types/node@npm:>=12, @types/node@npm:^18.7.16":
   version: 18.7.16
   resolution: "@types/node@npm:18.7.16"
   checksum: 01a3d35c764a3f0e7370b56e1ad4203731131883c65784e020009014171b3f53c4649cde6c7aa4f1026b907ee87ef6ae6ece2bc518151dc7b81100fe8b1db3ad
@@ -4724,11 +4724,11 @@ __metadata:
     "@types/koa-static": ^4.0.2
     "@types/koa__cors": ^3.3.0
     "@types/koa__multer": ^2.0.4
-    "@types/koa__router": ^8.0.11
+    "@types/koa__router": ^12.0.0
     "@types/lodash": ^4.14.184
     "@types/mjml": ^4.7.0
     "@types/mocha": ^9.1.1
-    "@types/node": ^18.7.15
+    "@types/node": ^18.7.16
     "@types/nodemailer": ^6.4.5
     "@zodios/core": ^6.2.1
     "@zodios/plugins": ^1.0.1
@@ -4775,7 +4775,7 @@ __metadata:
     tsconfig-paths: ^4.1.0
     tslib: ^2.4.0
     tsyringe: ^4.7.0
-    typescript: ^4.8.2
+    typescript: ^4.8.3
     validator: ^13.7.0
     winston: ^3.8.2
     winston-daily-rotate-file: ^4.7.1
@@ -19782,7 +19782,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^4.4.3, typescript@npm:^4.6.4, typescript@npm:^4.8.2":
+"typescript@npm:^4.4.3, typescript@npm:^4.6.4, typescript@npm:^4.8.3":
   version: 4.8.3
   resolution: "typescript@npm:4.8.3"
   bin:
@@ -19792,7 +19792,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^4.4.3#~builtin<compat/typescript>, typescript@patch:typescript@^4.6.4#~builtin<compat/typescript>, typescript@patch:typescript@^4.8.2#~builtin<compat/typescript>":
+"typescript@patch:typescript@^4.4.3#~builtin<compat/typescript>, typescript@patch:typescript@^4.6.4#~builtin<compat/typescript>, typescript@patch:typescript@^4.8.3#~builtin<compat/typescript>":
   version: 4.8.3
   resolution: "typescript@patch:typescript@npm%3A4.8.3#~builtin<compat/typescript>::version=4.8.3&hash=7ad353"
   bin:
