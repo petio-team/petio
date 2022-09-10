@@ -53,7 +53,7 @@ function userBuild(id) {
 async function create(id) {
   try {
     let data: any = await build(id);
-    let existing = await Discovery.findOne({ id: id });
+    let existing: any = await Discovery.findOne({ id: id });
     if (existing) {
       existing.id = id;
       existing.movie = {
