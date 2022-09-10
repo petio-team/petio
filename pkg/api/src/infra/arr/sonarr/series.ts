@@ -140,4 +140,4 @@ export const SeriesEndpoint = asApi([
     ],
     response: z.object({}),
   },
-] as const);
+]);

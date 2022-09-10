@@ -23,4 +23,4 @@ export const RootFolderEndpoint = asApi([
     parameters: [],
     response: RootFolderSchema,
   },
-] as const);
+]);

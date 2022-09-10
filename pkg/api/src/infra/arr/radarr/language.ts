@@ -13,4 +13,4 @@ export const LanguageEndpoint = asApi([
     parameters: [],
     response: LanguageSchema,
   },
-] as const);
+]);

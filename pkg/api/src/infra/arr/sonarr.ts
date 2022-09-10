@@ -1,6 +1,4 @@
-import { ZodiosInstance } from '@zodios/core';
-
-import { SonarrAPIClient, SonarrAPIEndpoints } from '@/infra/arr/sonarr/index';
+import { SonarrAPIClient } from '@/infra/arr/sonarr/index';
 import { LanguageProfile } from '@/infra/arr/sonarr/language_profile';
 import { QualityProfile } from '@/infra/arr/sonarr/quality_profile';
 import { Queue } from '@/infra/arr/sonarr/queue';
@@ -10,7 +8,7 @@ import { Tag } from '@/infra/arr/sonarr/tag';
 import { DownloaderType, GetDownloaderById } from '@/models/downloaders';
 
 export default class SonarrAPI {
-  private client: ZodiosInstance<typeof SonarrAPIEndpoints>;
+  private client: ReturnType<typeof SonarrAPIClient>;
 
   constructor(url: URL, token: string) {
     this.client = SonarrAPIClient(url, token);

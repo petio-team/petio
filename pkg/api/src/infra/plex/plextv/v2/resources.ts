@@ -138,4 +138,4 @@ export const ResourcesEndpoint = asApi([
     ],
     response: ResourcesSchema,
   },
-] as const);
+]);

@@ -1,6 +1,4 @@
-import { ZodiosInstance } from '@zodios/core';
-
-import { RadarrAPIClient, RadarrAPIEndpoints } from '@/infra/arr/radarr/index';
+import { RadarrAPIClient } from '@/infra/arr/radarr/index';
 import { Language } from '@/infra/arr/radarr/language';
 import { MinimumAvailability } from '@/infra/arr/radarr/minimumAvailability';
 import { Movie } from '@/infra/arr/radarr/movie';
@@ -11,7 +9,7 @@ import { Tag } from '@/infra/arr/radarr/tag';
 import { DownloaderType, GetDownloaderById } from '@/models/downloaders';
 
 export default class RadarrAPI {
-  private client: ZodiosInstance<typeof RadarrAPIEndpoints>;
+  private client: ReturnType<typeof RadarrAPIClient>;
 
   constructor(url: URL, token: string) {
     this.client = RadarrAPIClient(url, token);

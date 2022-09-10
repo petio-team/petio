@@ -84,4 +84,4 @@ export const MovieDetailsAPI = asApi([
     ],
     response: MovieDetailsSchema,
   },
-] as const);
+]);

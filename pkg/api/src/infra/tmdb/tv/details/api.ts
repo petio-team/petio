@@ -284,4 +284,4 @@ export const TvDetailsAPI = asApi([
     ],
     response: TvDetailsSchema,
   },
-] as const);
+]);

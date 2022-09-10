@@ -113,4 +113,4 @@ export const UserEndpoint = asApi([
     ],
     response: UserSchema,
   },
-] as const);
+]);

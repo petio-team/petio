@@ -10,4 +10,4 @@ export const TVAPI = asApi([
     parameters: Parameters,
     response: TVSchema,
   },
-] as const);
+]);

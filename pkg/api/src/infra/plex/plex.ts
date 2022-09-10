@@ -1,9 +1,5 @@
-import {
-  Zodios,
-  ZodiosEnpointDescriptions,
-  ZodiosInstance,
-} from '@zodios/core';
-import { AxiosRequestConfig } from 'axios';
+import { Zodios } from '@zodios/core';
+import { pluginHeader } from '@zodios/plugins';
 
 import { HistoryEndpoint } from './plex/history';
 import { LibraryEndpoint } from './plex/library';
@@ -14,33 +10,7 @@ export const PlexAPI = (url: URL, token: string) => {
     ...LibraryEndpoint,
     ...SystemStatusEndpoint,
     ...HistoryEndpoint,
-  ] as const);
-  api.use(
-    pluginApiKey({
-      getApiKey: async () => token,
-    }),
-  );
+  ]);
+  api.use(pluginHeader('x-plex-token', async () => token));
   return api;
 };
-
-export interface ApiKeyPluginConfig {
-  getApiKey: () => Promise<string>;
-}
-
-function createRequestInterceptor(provider: ApiKeyPluginConfig) {
-  return async (config: AxiosRequestConfig) => {
-    config.headers = {
-      ...config.headers,
-      'x-plex-token': await provider.getApiKey(),
-    };
-    return config;
-  };
-}
-
-export function pluginApiKey<Api extends ZodiosEnpointDescriptions>(
-  provider: ApiKeyPluginConfig,
-) {
-  return (zodios: ZodiosInstance<Api>) => {
-    zodios.axios.interceptors.request.use(createRequestInterceptor(provider));
-  };
-}

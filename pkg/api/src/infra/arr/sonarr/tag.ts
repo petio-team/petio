@@ -16,4 +16,4 @@ export const TagEndpoint = asApi([
     parameters: [],
     response: TagSchema,
   },
-] as const);
+]);

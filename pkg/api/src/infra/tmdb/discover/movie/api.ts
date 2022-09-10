@@ -10,4 +10,4 @@ export const MovieAPI = asApi([
     parameters: Parameters,
     response: MovieSchema,
   },
-] as const);
+]);

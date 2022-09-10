@@ -291,4 +291,4 @@ export const LibraryEndpoint = asApi([
     parameters: [],
     response: MediaContainerSchema,
   },
-] as const);
+]);

@@ -98,4 +98,4 @@ export const TrendingAPI = asApi([
     parameters: [],
     response: TrendingSchema,
   },
-] as const);
+]);

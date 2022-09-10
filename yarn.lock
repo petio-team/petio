@@ -4336,22 +4336,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@zodios/core@npm:^6.2.1":
-  version: 6.4.0
-  resolution: "@zodios/core@npm:6.4.0"
+"@zodios/core@npm:^9.0.1":
+  version: 9.0.1
+  resolution: "@zodios/core@npm:9.0.1"
   peerDependencies:
     axios: ^0.x
     zod: ^3.x
-  checksum: 663043790c0186b838ecfa2b5631306d471b2e9dd139b175ac5d5ba429bc9460ba2434fe5a74bafa4e7e6d193df1c53371475195a829682aaca17626ad736464
+  checksum: 4f24a31277d167c8bf7c1c96cb2e6c29dcf33debc404cc43af93d51aa7aa47c8072902ba18bee25c87e81792764d1238771b925825fba771061bfb29fa8e4c43
   languageName: node
   linkType: hard
 
-"@zodios/plugins@npm:^1.0.1":
-  version: 1.0.2
-  resolution: "@zodios/plugins@npm:1.0.2"
+"@zodios/plugins@npm:^9.0.0":
+  version: 9.0.0
+  resolution: "@zodios/plugins@npm:9.0.0"
   peerDependencies:
-    "@zodios/core": ">=6.1.3"
-  checksum: de0034511ff1a5ea8c907cd8c2380fd39611544d5029f29c7237590936067635122e6fbb9ebfc9a6bd9c9990817e296f9f0ffb623db201104432f7dc78d92795
+    "@zodios/core": 9.x
+  checksum: f16883054b9eb4ad9ac8372571ce5d7ee576d69cd65ef800e2ed64352f4e4e5ab1872fce9df3760f2e9e0700fe76b490d6730b6e0af48a6f42b920d7f78f9f7d
   languageName: node
   linkType: hard
 
@@ -4730,8 +4730,8 @@ __metadata:
     "@types/mocha": ^9.1.1
     "@types/node": ^18.7.16
     "@types/nodemailer": ^6.4.5
-    "@zodios/core": ^6.2.1
-    "@zodios/plugins": ^1.0.1
+    "@zodios/core": ^9.0.1
+    "@zodios/plugins": ^9.0.0
     agenda: ^4.3.0
     axios: ^0.27.2
     bcryptjs: 2.4.3

@@ -246,4 +246,4 @@ export const MovieEndpoint = asApi([
     parameters: [],
     response: z.object({}),
   },
-] as const);
+]);

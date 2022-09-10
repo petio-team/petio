@@ -56,4 +56,4 @@ export const QueueEndpoint = asApi([
     ],
     response: QueueSchema,
   },
-] as const);
+]);

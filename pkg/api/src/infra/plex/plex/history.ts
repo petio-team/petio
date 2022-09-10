@@ -54,4 +54,4 @@ export const HistoryEndpoint = asApi([
     ],
     response: HistorySchema,
   },
-] as const);
+]);

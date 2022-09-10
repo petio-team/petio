@@ -1,9 +1,10 @@
+import { asParameters } from '@zodios/core';
 import { z } from 'zod';
 
 import { WatchMonetizationType } from '../types';
 import { SortByType } from './types';
 
-export const Parameters = [
+export const Parameters = asParameters([
   {
     name: 'language',
     type: 'Query',
@@ -144,4 +145,4 @@ export const Parameters = [
     type: 'Query',
     schema: z.string().optional(),
   },
-] as const;
+]);
