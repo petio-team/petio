@@ -81,7 +81,7 @@
     "@types/mocha": "^9.1.1",
     "@types/node": "^18.7.16",
     "@types/nodemailer": "^6.4.5",
-    "@zodios/core": "^6.2.1",
+    "@zodios/core": "^9.0.1",
     "@zodios/plugins": "^1.0.1",
     "dotenv": "^16.0.2",
     "mocha": "^10.0.0",
