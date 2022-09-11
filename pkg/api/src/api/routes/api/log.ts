@@ -5,10 +5,10 @@ import { Context } from 'koa';
 import path from 'path';
 
 import { adminRequired } from '@/api/middleware/auth';
-import { dataFolder } from '@/config/env';
+import env from '@/config/env';
 
-let liveLogfile = path.join(dataFolder, './logs/live1.log');
-let liveLogfile2 = path.join(dataFolder, './logs/live.log');
+let liveLogfile = path.join(env.paths.data, './logs/live1.log');
+let liveLogfile2 = path.join(env.paths.data, './logs/live.log');
 
 const route = new Router({ prefix: 'logs/' });
 

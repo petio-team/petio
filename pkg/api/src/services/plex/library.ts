@@ -2,7 +2,7 @@ import axios from 'axios';
 import Promise from 'bluebird';
 import xmlParser from 'xml-js';
 
-import { tmdbApiKey } from '@/config/env';
+import env from '@/config/env';
 import { config } from '@/config/index';
 import logger from '@/loaders/logger';
 import Music from '@/models/artist';
@@ -823,7 +823,7 @@ export default class LibraryUpdate {
   }
 
   async externalIdTv(id, type) {
-    let url = `${this.tmdb}find/${id}?api_key=${tmdbApiKey}&language=en-US&external_source=${type}_id`;
+    let url = `${this.tmdb}find/${id}?api_key=${env.api.tmdb.key}&language=en-US&external_source=${type}_id`;
     try {
       let res = await axios.get(url);
       return res.data.tv_results[0].id;
@@ -833,7 +833,7 @@ export default class LibraryUpdate {
   }
 
   async tmdbExternalIds(id) {
-    let url = `${this.tmdb}tv/${id}/external_ids?api_key=${tmdbApiKey}`;
+    let url = `${this.tmdb}tv/${id}/external_ids?api_key=${env.api.tmdb.key}`;
     try {
       let res = await axios.get(url);
       return res.data;
@@ -843,7 +843,7 @@ export default class LibraryUpdate {
   }
 
   async externalIdMovie(id, type) {
-    let url = `${this.tmdb}find/${id}?api_key=${tmdbApiKey}&language=en-US&external_source=${type}_id`;
+    let url = `${this.tmdb}find/${id}?api_key=${env.api.tmdb.key}&language=en-US&external_source=${type}_id`;
     try {
       let res = await axios.get(url);
       return res.data.movie_results[0].id;

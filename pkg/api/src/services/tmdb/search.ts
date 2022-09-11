@@ -3,7 +3,7 @@ import Promise from 'bluebird';
 import http from 'http';
 import sanitize from 'sanitize-filename';
 
-import { tmdbApiKey } from '@/config/env';
+import env from '@/config/env';
 import { config } from '@/config/index';
 import logger from '@/loaders/logger';
 import onServer from '@/services/plex/server';
@@ -53,7 +53,7 @@ export default search;
 
 async function searchMovies(term) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}search/movie?query=${term}&include_adult=false&api_key=${tmdbApiKey}&append_to_response=credits,videos`;
+  let url = `${tmdb}search/movie?query=${term}&include_adult=false&api_key=${env.api.tmdb.key}&append_to_response=credits,videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -69,7 +69,7 @@ async function searchMovies(term) {
 
 async function searchShows(term) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}search/tv?query=${term}&include_adult=false&api_key=${tmdbApiKey}&append_to_response=credits,videos`;
+  let url = `${tmdb}search/tv?query=${term}&include_adult=false&api_key=${env.api.tmdb.key}&append_to_response=credits,videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -85,7 +85,7 @@ async function searchShows(term) {
 
 async function searchPeople(term) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}search/person?query=${term}&include_adult=false&api_key=${tmdbApiKey}&append_to_response=credits,videos`;
+  let url = `${tmdb}search/person?query=${term}&include_adult=false&api_key=${env.api.tmdb.key}&append_to_response=credits,videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -101,7 +101,7 @@ async function searchPeople(term) {
 
 async function searchCompanies(term) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}search/company?query=${term}&api_key=${tmdbApiKey}`;
+  let url = `${tmdb}search/company?query=${term}&api_key=${env.api.tmdb.key}`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;

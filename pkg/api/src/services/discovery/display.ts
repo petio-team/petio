@@ -2,7 +2,7 @@ import Promise from 'bluebird';
 import cacheManager from 'cache-manager';
 import request from 'xhr-request';
 
-import { tmdbApiKey } from '@/config/env';
+import env from '@/config/env';
 import { config } from '@/config/schema';
 import logger from '@/loaders/logger';
 import Discovery from '@/models/discovery';
@@ -265,7 +265,7 @@ export default async (id, type = 'movie') => {
           }
         }
       },
-      { concurrency: config.get("general.concurrency") },
+      { concurrency: config.get('general.concurrency') },
     );
     let data = [...peopleData, ...directorData, ...recentData, ...genresData];
     data = shuffle(data);
@@ -500,7 +500,7 @@ function discoverMovie(page = 1, params = {}) {
   Object.keys(params).map((i) => {
     par += `&${i}=${params[i]}`;
   });
-  let url = `${tmdb}discover/movie?api_key=${tmdbApiKey}${par}&page=${page}&append_to_response=videos`;
+  let url = `${tmdb}discover/movie?api_key=${env.api.tmdb.key}${par}&page=${page}&append_to_response=videos`;
   return new Promise((resolve, reject) => {
     request(
       url,
@@ -525,7 +525,7 @@ function discoverShow(page = 1, params = {}) {
   Object.keys(params).map((i) => {
     par += `&${i}=${params[i]}`;
   });
-  let url = `${tmdb}discover/tv?api_key=${tmdbApiKey}${par}&page=${page}&append_to_response=videos`;
+  let url = `${tmdb}discover/tv?api_key=${env.api.tmdb.key}${par}&page=${page}&append_to_response=videos`;
   return new Promise((resolve, reject) => {
     request(
       url,
@@ -545,7 +545,7 @@ function discoverShow(page = 1, params = {}) {
 }
 function searchPeople(term) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}search/person?query=${term}&include_adult=false&api_key=${tmdbApiKey}`;
+  let url = `${tmdb}search/person?query=${term}&include_adult=false&api_key=${env.api.tmdb.key}`;
   return new Promise((resolve, reject) => {
     request(
       url,
@@ -676,7 +676,7 @@ async function comingSoon(type) {
                 videos: result.videos,
               };
       },
-      { concurrency: config.get("general.concurrency") },
+      { concurrency: config.get('general.concurrency') },
     );
     return data;
   } catch (e) {

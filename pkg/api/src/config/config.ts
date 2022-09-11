@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { container } from 'tsyringe';
 
-import { dataFolder } from '@/config/env';
+import env from '@/config/env';
 import { config } from '@/config/schema';
 import { IPC } from '@/infra/clusters/ipc';
 import logger from '@/loaders/logger';
@@ -18,7 +18,7 @@ const PETIO_CONFIG_FILE = 'petio.json';
  * @returns the path of the config file
  */
 export const getConfigPath = (): string => {
-  return path.join(dataFolder, PETIO_CONFIG_FILE);
+  return path.join(env.paths.data, PETIO_CONFIG_FILE);
 };
 
 /**

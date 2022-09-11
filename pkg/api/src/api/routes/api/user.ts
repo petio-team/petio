@@ -8,13 +8,13 @@ import { Context } from 'koa';
 import send from 'koa-send';
 import path from 'path';
 
-import { dataFolder } from '@/config/env';
+import env from '@/config/env';
 import { WriteConfig, config } from '@/config/index';
 import logger from '@/loaders/logger';
 import Profile from '@/models/profile';
 import { UserModel, UserRole } from '@/models/user';
 
-const UPLOAD_DIR = path.join(dataFolder, './uploads');
+const UPLOAD_DIR = path.join(env.paths.data, './uploads');
 const route = new Router({ prefix: '/user' });
 
 let storage = multer.diskStorage({

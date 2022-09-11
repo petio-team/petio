@@ -2,7 +2,7 @@ import axios from 'axios';
 import cacheManager from 'cache-manager';
 import http from 'http';
 
-import { tmdbApiKey } from '@/config/env';
+import env from '@/config/env';
 import logger from '@/loaders/logger';
 import fanartLookup from '@/services/fanart';
 import { lookup } from '@/services/meta/imdb';
@@ -233,7 +233,7 @@ async function getCollection(id) {
 
 async function tmdbData(id) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}movie/${id}?api_key=${tmdbApiKey}&append_to_response=credits,videos,keywords,release_dates`;
+  let url = `${tmdb}movie/${id}?api_key=${env.api.tmdb.key}&append_to_response=credits,videos,keywords,release_dates`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     let data = res.data;
@@ -250,7 +250,7 @@ async function tmdbData(id) {
 
 async function recommendationData(id, page = 1) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}movie/${id}/recommendations?api_key=${tmdbApiKey}&page=${page}&append_to_response=videos`;
+  let url = `${tmdb}movie/${id}/recommendations?api_key=${env.api.tmdb.key}&page=${page}&append_to_response=videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -261,7 +261,7 @@ async function recommendationData(id, page = 1) {
 
 async function similarData(id, page = 1) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}movie/${id}/similar?api_key=${tmdbApiKey}&page=${page}&append_to_response=videos`;
+  let url = `${tmdb}movie/${id}/similar?api_key=${env.api.tmdb.key}&page=${page}&append_to_response=videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -272,7 +272,7 @@ async function similarData(id, page = 1) {
 
 async function collectionData(id) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}collection/${id}?api_key=${tmdbApiKey}&append_to_response=videos`;
+  let url = `${tmdb}collection/${id}?api_key=${env.api.tmdb.key}&append_to_response=videos`;
 
   try {
     let res = await axios.get(url, { httpAgent: agent });
@@ -284,7 +284,7 @@ async function collectionData(id) {
 
 async function reviewsData(id) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}movie/${id}/reviews?api_key=${tmdbApiKey}`;
+  let url = `${tmdb}movie/${id}/reviews?api_key=${env.api.tmdb.key}`;
 
   try {
     let res = await axios.get(url, { httpAgent: agent });
@@ -331,7 +331,7 @@ export async function discoverMovie(page = 1, params = {}) {
   Object.keys(params).map((i) => {
     par += `&${i}=${params[i]}`;
   });
-  let url = `${tmdb}discover/movie?api_key=${tmdbApiKey}${par}&page=${page}&append_to_response=videos`;
+  let url = `${tmdb}discover/movie?api_key=${env.api.tmdb.key}${par}&page=${page}&append_to_response=videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     if (res.data && res.data.results.length > 0) {
@@ -350,7 +350,7 @@ export async function discoverMovie(page = 1, params = {}) {
 
 export async function company(id) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}company/${id}?api_key=${tmdbApiKey}`;
+  let url = `${tmdb}company/${id}?api_key=${env.api.tmdb.key}`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;

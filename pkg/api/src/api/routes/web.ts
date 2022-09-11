@@ -5,10 +5,10 @@ import mount from 'koa-mount';
 import serve from 'koa-static';
 import path from 'path';
 
-import { adminView, frontendView } from '@/config/env';
+import env from '@/config/env';
 
 export default async (app: Koa) => {
-  let frontendPath = frontendView;
+  let frontendPath = env.views.frontend;
   if (!(await pathExists(path.join(frontendPath, 'index.html')))) {
     const frontendBuildPath = path.join(frontendPath, './build');
     if (!(await pathExists(path.join(frontendBuildPath, './index.html')))) {
@@ -18,7 +18,7 @@ export default async (app: Koa) => {
     }
   }
 
-  let adminPath = adminView;
+  let adminPath = env.views.admin;
   if (!(await pathExists(path.join(adminPath, 'index.html')))) {
     const adminBuildPath = path.join(adminPath, './build');
     if (!(await pathExists(path.join(adminBuildPath, './index.html')))) {

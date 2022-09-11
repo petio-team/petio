@@ -2,7 +2,7 @@ import axios from 'axios';
 import cacheManager from 'cache-manager';
 import http from 'http';
 
-import { tmdbApiKey } from '@/config/env';
+import env from '@/config/env';
 import { TMDBAPI } from '@/infra/tmdb/tmdb';
 import logger from '@/loaders/logger';
 import fanartLookup from '@/services/fanart';
@@ -366,7 +366,7 @@ async function getSeasons(seasons, id) {
 
 async function tmdbData(id) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}tv/${id}?api_key=${tmdbApiKey}&append_to_response=aggregate_credits,videos,keywords,content_ratings,credits`;
+  let url = `${tmdb}tv/${id}?api_key=${env.api.tmdb.key}&append_to_response=aggregate_credits,videos,keywords,content_ratings,credits`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     let data = res.data;
@@ -397,7 +397,7 @@ async function tmdbData(id) {
 
 async function recommendationData(id, page = 1) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}tv/${id}/recommendations?api_key=${tmdbApiKey}&page=${page}`;
+  let url = `${tmdb}tv/${id}/recommendations?api_key=${env.api.tmdb.key}&page=${page}`;
 
   try {
     let res = await axios.get(url, { httpAgent: agent });
@@ -409,7 +409,7 @@ async function recommendationData(id, page = 1) {
 
 async function similarData(id, page = 1) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}tv/${id}/similar?api_key=${tmdbApiKey}&page=${page}`;
+  let url = `${tmdb}tv/${id}/similar?api_key=${env.api.tmdb.key}&page=${page}`;
 
   try {
     let res = await axios.get(url, { httpAgent: agent });
@@ -433,7 +433,7 @@ async function seasonsAsync(seasonList, id) {
 
 async function getSeason(id, season) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}tv/${id}/season/${season}?api_key=${tmdbApiKey}`;
+  let url = `${tmdb}tv/${id}/season/${season}?api_key=${env.api.tmdb.key}`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -444,7 +444,7 @@ async function getSeason(id, season) {
 
 async function reviewsData(id) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}tv/${id}/reviews?api_key=${tmdbApiKey}`;
+  let url = `${tmdb}tv/${id}/reviews?api_key=${env.api.tmdb.key}`;
 
   try {
     let res = await axios.get(url, { httpAgent: agent });
@@ -486,7 +486,7 @@ function findEnRating(data) {
 
 async function idLookup(id) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}tv/${id}/external_ids?api_key=${tmdbApiKey}`;
+  let url = `${tmdb}tv/${id}/external_ids?api_key=${env.api.tmdb.key}`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -503,7 +503,7 @@ export async function discoverSeries(page = 1, params = {}) {
   Object.keys(params).map((i) => {
     par += `&${i}=${params[i]}`;
   });
-  let url = `${tmdb}discover/tv?api_key=${tmdbApiKey}${par}&page=${page}`;
+  let url = `${tmdb}discover/tv?api_key=${env.api.tmdb.key}${par}&page=${page}`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     if (res.data && res.data.results.length > 0) {
@@ -522,7 +522,7 @@ export async function discoverSeries(page = 1, params = {}) {
 
 export async function network(id) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}network/${id}?api_key=${tmdbApiKey}`;
+  let url = `${tmdb}network/${id}?api_key=${env.api.tmdb.key}`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
