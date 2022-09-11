@@ -1,7 +1,5 @@
-import cluster from 'cluster';
-
-import pkg from '@/../package.json';
 import { HasConfig } from '@/config/config';
+import env from '@/config/env';
 import { config } from '@/config/schema';
 import logger from '@/loaders/logger';
 
@@ -10,7 +8,7 @@ import { removeSlashes } from './urls';
 export default async () => {
   const subpath = '/' + removeSlashes(config.get('petio.subpath'));
 
-  logger.info(`Petio v${pkg.version} [${config.get('logger.level')}]`);
+  logger.info(`Petio v${env.app.version} [${config.get('logger.level')}]`);
   logger.info(
     `Serving webui on http://${config.get('petio.host')}:${config.get(
       'petio.port',

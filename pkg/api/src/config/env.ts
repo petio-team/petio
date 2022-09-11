@@ -1,15 +1,13 @@
 import path from 'path';
 
-const pkg = require('../../package.json');
+const pkg = require('@/../package.json');
 
 const proc: Process = process;
 const ROOT_DIR = proc.pkg ? path.dirname(process.execPath) : proc.cwd();
 const APP_DIR: string = proc.pkg
   ? path.join(__dirname, '../../../../../')
   : proc.env.APP_DIR ?? path.join(__dirname, '../../../../');
-
 const VIEW_DIR = process.env.VIEWS_FOLDER ?? path.join(APP_DIR, './pkg');
-
 const DATA_DIR = process.env.DATA_FOLDER ?? path.join(ROOT_DIR, './data');
 const frontendView = path.join(VIEW_DIR, './frontend');
 const adminView = path.join(VIEW_DIR, './admin');
@@ -21,7 +19,7 @@ const corsDomains = process.env.CORS_DOMAINS || '';
 export default {
   environment: process.env.NODE_ENV ?? 'production',
   app: {
-    version: pkg.version,
+    version: '0.6.0',
     http: {
       cors: {
         domains: corsDomains,

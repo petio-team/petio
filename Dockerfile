@@ -26,7 +26,7 @@ RUN mkdir -p /app && chown petio:petio /app
 COPY --chown=petio:petio --chmod=0755 ./pkg/frontend/build /app/views/frontend
 COPY --chown=petio:petio --chmod=0755 ./pkg/admin/build /app/views/admin
 COPY --chown=petio:petio --chmod=0755 ./pkg/api/dist/index.js /app/index.js
-COPY --chown=petio:petio --chmod=0755 ./pkg/api/package.json /app/package.json
+#COPY --chown=petio:petio --chmod=0755 ./pkg/api/package.json /app/package.json
 COPY ./docker /
 
 # Give our init script permission to be executed
