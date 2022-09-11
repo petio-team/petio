@@ -27,8 +27,8 @@
     "sass": "1.34.1"
   },
   "scripts": {
-    "start": "PORT=3001 react-scripts --openssl-legacy-provider start",
-    "build": "react-scripts --openssl-legacy-provider build",
+    "start": "PORT=3001 react-scripts start",
+    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
