@@ -1,16 +1,17 @@
-import React from "react";
-import Api from "../data/Api";
-import User from "../data/User";
-import Carousel from "../components/Carousel";
-import CarouselLoading from "../components/CarouselLoading";
-import RequestCard from "../components/RequestCard";
-import Bandwidth from "../components/Bandwidth";
-import Cpu from "../components/Cpu";
-import Ram from "../components/Ram";
-import Sessions from "../components/Sessions";
+import React from 'react';
+
+import Bandwidth from '../components/Bandwidth';
+import Carousel from '../components/Carousel';
+import CarouselLoading from '../components/CarouselLoading';
+import Cpu from '../components/Cpu';
+import Ram from '../components/Ram';
+import RequestCard from '../components/RequestCard';
+import Sessions from '../components/Sessions';
+import Api from '../data/Api';
+import User from '../data/User';
 
 Number.prototype.round = function (places) {
-  return +(Math.round(this + "e+" + places) + "e-" + places);
+  return +(Math.round(this + 'e+' + places) + 'e-' + places);
 };
 
 class Dashboard extends React.Component {
@@ -42,7 +43,7 @@ class Dashboard extends React.Component {
     this.heartbeat = setInterval(() => this.pollServer(), 1000);
     this.heartbeatDelay = setInterval(() => this.pollServerDelay(), 10000);
 
-    let page = document.querySelectorAll(".page-wrap")[0];
+    let page = document.querySelectorAll('.page-wrap')[0];
     page.scrollTop = 0;
     window.scrollTo(0, 0);
   }
@@ -77,7 +78,7 @@ class Dashboard extends React.Component {
     // return elapsed;
 
     if (elapsed < msPerMinute) {
-      return Math.round(elapsed) + "s";
+      return Math.round(elapsed) + 's';
     } else if (elapsed < msPerHour) {
       let minutes = Math.floor(elapsed / msPerMinute);
       let seconds = elapsed - minutes * 60;
@@ -95,10 +96,10 @@ class Dashboard extends React.Component {
         let data = {};
         let bWidth = [];
         res.forEach((el) => {
-          let type = el["lan"] ? "Local" : "Remote";
-          let timestamp = el["at"];
+          let type = el['lan'] ? 'Local' : 'Remote';
+          let timestamp = el['at'];
           if (data[timestamp]) {
-            data[timestamp][type] += el["bytes"] * 8;
+            data[timestamp][type] += el['bytes'] * 8;
           } else {
             let time = this.timeDifference(timestamp);
             if (!time) return;
@@ -106,7 +107,7 @@ class Dashboard extends React.Component {
             data[timestamp].name = time;
             data[timestamp].Local = 0;
             data[timestamp].Remote = 0;
-            data[timestamp][type] = el["bytes"] * 8;
+            data[timestamp][type] = el['bytes'] * 8;
           }
         });
         Object.keys(data).map((key) => {
@@ -175,7 +176,7 @@ class Dashboard extends React.Component {
 
       Object.keys(requests).map((key) => {
         let request = requests[key];
-        if (request.type === "movie") {
+        if (request.type === 'movie') {
           Api.movie(key);
         } else {
           Api.series(key);
@@ -190,16 +191,16 @@ class Dashboard extends React.Component {
 
   formatIssue(issue) {
     switch (issue) {
-      case "episodes":
-        return "Missing Episodes";
-      case "subs":
-        return "Missing / Wrong Subtitles";
-      case "bad-video":
-        return "Bad Quality / Video Issue";
-      case "bad-audio":
-        return "Audio Issue / Audio Sync";
+      case 'episodes':
+        return 'Missing Episodes';
+      case 'subs':
+        return 'Missing / Wrong Subtitles';
+      case 'bad-video':
+        return 'Bad Quality / Video Issue';
+      case 'bad-audio':
+        return 'Audio Issue / Audio Sync';
       default:
-        return "Not Specified";
+        return 'Not Specified';
     }
   }
 
@@ -245,7 +246,7 @@ class Dashboard extends React.Component {
                 {Object.keys(requests).map((key) => {
                   let request = this.props.api.movie_lookup[key];
                   let users = requests[key].users;
-                  if (requests[key].type === "tv") {
+                  if (requests[key].type === 'tv') {
                     request = this.props.api.series_lookup[key];
                   }
                   if (!request) return null;
@@ -267,13 +268,13 @@ class Dashboard extends React.Component {
 
         <div
           className={
-            "widget--item widget--item__50 " +
-            (this.state.sessionsCollapsed ? "collapsed" : "")
+            'widget--item widget--item__50 ' +
+            (this.state.sessionsCollapsed ? 'collapsed' : '')
           }
         >
           <div className="widget--item--inner">
             <div className="session--toggle" onClick={this.toggleSessions}>
-              {this.state.sessionsCollapsed ? "Details" : "Overview"}
+              {this.state.sessionsCollapsed ? 'Details' : 'Overview'}
             </div>
             <div className="widget--title">Now Playing</div>
             <hr />

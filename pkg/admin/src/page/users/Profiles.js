@@ -1,14 +1,14 @@
-import React from "react";
-import Api from "../../data/Api";
+import React from 'react';
 
-import Modal from "../../components/Modal";
+import Modal from '../../components/Modal';
+import Api from '../../data/Api';
 
 class Profiles extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      np_name: "",
+      np_name: '',
       np_quota: 0,
       np_auto_approve: false,
       np_auto_approve_tv: false,
@@ -56,14 +56,14 @@ class Profiles extends React.Component {
       });
       this.props.msg({
         message: `Profile Saved: ${this.state.np_name}`,
-        type: "good",
+        type: 'good',
       });
-      this.props.closeModal("addProfile");
+      this.props.closeModal('addProfile');
       this.props.getProfiles();
     } catch {
       this.props.msg({
         message: `Failed to Save Profile: ${this.state.np_name}`,
-        type: "error",
+        type: 'error',
       });
     }
   }
@@ -82,15 +82,15 @@ class Profiles extends React.Component {
       });
       this.props.msg({
         message: `Profile Deleted: ${this.state.np_name}`,
-        type: "good",
+        type: 'good',
       });
-      this.props.closeModal("addProfile");
+      this.props.closeModal('addProfile');
       this.props.getProfiles();
       Api.allUsers();
     } catch {
       this.props.msg({
         message: `Failed to Delete Profile: ${this.state.np_name}`,
-        type: "error",
+        type: 'error',
       });
     }
   }
@@ -106,7 +106,7 @@ class Profiles extends React.Component {
   inputChange(e) {
     const target = e.target;
     const name = target.name;
-    let value = target.type === "checkbox" ? target.checked : target.value;
+    let value = target.type === 'checkbox' ? target.checked : target.value;
 
     this.setState({
       [name]: value,
@@ -134,9 +134,9 @@ class Profiles extends React.Component {
           title="Add Profile"
           open={this.props.addProfileOpen}
           close={() => {
-            this.props.closeModal("addProfile");
+            this.props.closeModal('addProfile');
             this.setState({
-              np_name: "",
+              np_name: '',
               np_auto_approve: false,
               np_quota: 0,
               np_radarr: [],
@@ -172,7 +172,7 @@ class Profiles extends React.Component {
                     }
                     name={server.uuid}
                     onChange={this.changeCheckbox}
-                  />{" "}
+                  />{' '}
                   {server.title}
                 </label>
               );
@@ -195,7 +195,7 @@ class Profiles extends React.Component {
                     }
                     name={server.uuid}
                     onChange={this.changeCheckbox}
-                  />{" "}
+                  />{' '}
                   {server.title}
                 </label>
               );
@@ -210,7 +210,7 @@ class Profiles extends React.Component {
               name="np_auto_approve"
               checked={this.state.np_auto_approve}
               onChange={this.inputChange}
-            />{" "}
+            />{' '}
             Enabled
           </label>
           <p className="sub-title mb--1">Auto Approve TV</p>
@@ -220,7 +220,7 @@ class Profiles extends React.Component {
               name="np_auto_approve_tv"
               checked={this.state.np_auto_approve_tv}
               onChange={this.inputChange}
-            />{" "}
+            />{' '}
             Enabled
           </label>
           <p className="sub-title mb--1">Quota</p>
@@ -241,7 +241,7 @@ class Profiles extends React.Component {
               name="np_default"
               checked={this.state.np_default}
               onChange={this.inputChange}
-            />{" "}
+            />{' '}
             Enabled
           </label>
         </Modal>
@@ -251,7 +251,7 @@ class Profiles extends React.Component {
             <button
               className="btn btn__square"
               onClick={() => {
-                this.props.openModal("addProfile");
+                this.props.openModal('addProfile');
                 this.setState({ activeProfile: false });
               }}
             >
@@ -284,10 +284,10 @@ class Profiles extends React.Component {
                 <td>Default</td>
                 <td>
                   {this.props.profiles
-                    ? this.search("isDefault", true, this.props.profiles)
-                      ? "No"
-                      : "Yes"
-                    : "Yes"}
+                    ? this.search('isDefault', true, this.props.profiles)
+                      ? 'No'
+                      : 'Yes'
+                    : 'Yes'}
                 </td>
                 <td>All</td>
                 <td>All</td>
@@ -298,83 +298,83 @@ class Profiles extends React.Component {
               </tr>
               {this.props.profiles && this.props.s_servers
                 ? this.props.profiles.map((profile) => {
-                  let sActive = false;
-                  let rActive = false;
-                  return (
-                    <tr key={profile._id}>
-                      <td>{profile.name}</td>
-                      <td>{profile.isDefault ? "Yes" : "No"}</td>
-                      <td>
-                        {profile.sonarr
-                          ? Object.keys(profile.sonarr).length > 0
-                            ? Object.keys(profile.sonarr).map((s) => {
-                              if (!profile.sonarr[s]) return;
-                              sActive = true;
-                              let server = this.props.findServerByUuid(
-                                s,
-                                "s_servers"
-                              );
-                              let serverName = server
-                                ? server.title
-                                : "Not Found";
-                              return (
-                                <span
-                                  key={`${profile._id}_${s}`}
-                                  className="requests--status requests--status__sonarr"
-                                >
-                                  {serverName}
-                                </span>
-                              );
-                            })
-                            : null
-                          : null}
-                        {!sActive ? "None" : null}
-                      </td>
-                      <td>
-                        {profile.radarr
-                          ? Object.keys(profile.radarr).length > 0
-                            ? Object.keys(profile.radarr).map((r) => {
-                              if (!profile.radarr[r]) return null;
-                              rActive = true;
-                              let server = this.props.findServerByUuid(
-                                r,
-                                "r_servers"
-                              );
-                              let serverName = server
-                                ? server.title
-                                : "Not Found";
+                    let sActive = false;
+                    let rActive = false;
+                    return (
+                      <tr key={profile._id}>
+                        <td>{profile.name}</td>
+                        <td>{profile.isDefault ? 'Yes' : 'No'}</td>
+                        <td>
+                          {profile.sonarr
+                            ? Object.keys(profile.sonarr).length > 0
+                              ? Object.keys(profile.sonarr).map((s) => {
+                                  if (!profile.sonarr[s]) return;
+                                  sActive = true;
+                                  let server = this.props.findServerByUuid(
+                                    s,
+                                    's_servers',
+                                  );
+                                  let serverName = server
+                                    ? server.title
+                                    : 'Not Found';
+                                  return (
+                                    <span
+                                      key={`${profile._id}_${s}`}
+                                      className="requests--status requests--status__sonarr"
+                                    >
+                                      {serverName}
+                                    </span>
+                                  );
+                                })
+                              : null
+                            : null}
+                          {!sActive ? 'None' : null}
+                        </td>
+                        <td>
+                          {profile.radarr
+                            ? Object.keys(profile.radarr).length > 0
+                              ? Object.keys(profile.radarr).map((r) => {
+                                  if (!profile.radarr[r]) return null;
+                                  rActive = true;
+                                  let server = this.props.findServerByUuid(
+                                    r,
+                                    'r_servers',
+                                  );
+                                  let serverName = server
+                                    ? server.title
+                                    : 'Not Found';
 
-                              return (
-                                <span
-                                  key={`${profile._id}_${r}`}
-                                  className="requests--status requests--status__radarr"
-                                >
-                                  {serverName}
-                                </span>
-                              );
-                            })
-                            : null
-                          : null}
-                        {!rActive ? "None" : null}
-                      </td>
-                      <td>{profile.autoApprove ? "Yes" : "No"}</td>
-                      <td>{profile.autoApproveTv ? "Yes" : "No"}</td>
-                      <td>{profile.quota === 0 ? "∞" : profile.quota}</td>
-                      <td>
-                        <p
-                          className="table-action"
-                          onClick={() => {
-                            this.props.openModal("addProfile");
+                                  return (
+                                    <span
+                                      key={`${profile._id}_${r}`}
+                                      className="requests--status requests--status__radarr"
+                                    >
+                                      {serverName}
+                                    </span>
+                                  );
+                                })
+                              : null
+                            : null}
+                          {!rActive ? 'None' : null}
+                        </td>
+                        <td>{profile.autoApprove ? 'Yes' : 'No'}</td>
+                        <td>{profile.autoApproveTv ? 'Yes' : 'No'}</td>
+                        <td>{profile.quota === 0 ? '∞' : profile.quota}</td>
+                        <td>
+                          <p
+                            className="table-action"
+                            onClick={() => {
+                              this.props.openModal('addProfile');
 
-                            this.setActiveProfile(profile._id);
-                          }}
-                        >
-                          Edit
-                        </p>
-                      </td>
-                    </tr>
-                  );
-                })
+                              this.setActiveProfile(profile._id);
+                            }}
+                          >
+                            Edit
+                          </p>
+                        </td>
+                      </tr>
+                    );
+                  })
                 : null}
             </tbody>
           </table>

@@ -1,18 +1,19 @@
-import React from "react";
-import { withRouter } from "react-router-dom";
-import { connect } from "react-redux";
-import PersonCard from "../components/PersonCard";
-import MovieCard from "../components/MovieCard";
-import Api from "../data/Api";
-import Nav from "../data/Nav";
-import Carousel from "../components/Carousel";
-import "react-lazy-load-image-component/src/effects/blur.css";
-import User from "../data/User";
-import Review from "../components/Review";
-import ReviewsList from "../components/ReviewsLists";
-import MovieShowLoading from "../components/MovieShowLoading";
-import MovieShowTop from "../components/MovieShowTop";
-import MovieShowOverview from "../components/MovieShowOverview";
+import React from 'react';
+import 'react-lazy-load-image-component/src/effects/blur.css';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+
+import Carousel from '../components/Carousel';
+import MovieCard from '../components/MovieCard';
+import MovieShowLoading from '../components/MovieShowLoading';
+import MovieShowOverview from '../components/MovieShowOverview';
+import MovieShowTop from '../components/MovieShowTop';
+import PersonCard from '../components/PersonCard';
+import Review from '../components/Review';
+import ReviewsList from '../components/ReviewsLists';
+import Api from '../data/Api';
+import Nav from '../data/Nav';
+import User from '../data/User';
 
 class Movie extends React.Component {
   constructor(props) {
@@ -66,8 +67,8 @@ class Movie extends React.Component {
   }
 
   storePos() {
-    let page = document.querySelectorAll(".page-wrap")[0];
-    let carouselsData = document.querySelectorAll(".carousel");
+    let page = document.querySelectorAll('.page-wrap')[0];
+    let carouselsData = document.querySelectorAll('.carousel');
     let carousels = [];
     carouselsData.forEach((carousel) => {
       carousels.push(carousel.scrollLeft);
@@ -90,12 +91,12 @@ class Movie extends React.Component {
   }
 
   getPos() {
-    let page = document.querySelectorAll(".page-wrap")[0];
+    let page = document.querySelectorAll('.page-wrap')[0];
     let scrollY = 0;
     let pHist = Nav.getNav(this.props.location.pathname);
     if (pHist) {
       scrollY = pHist.scroll;
-      document.querySelectorAll(".carousel").forEach((carousel, i) => {
+      document.querySelectorAll('.carousel').forEach((carousel, i) => {
         carousel.scrollLeft = pHist.carousels[i];
       });
     }
@@ -131,7 +132,7 @@ class Movie extends React.Component {
       if (requests.users.includes(this.props.user.current.id)) {
         this.props.msg({
           message: `Already Requested`,
-          type: "error",
+          type: 'error',
         });
         return;
       }
@@ -143,23 +144,23 @@ class Movie extends React.Component {
       id: movie.id,
       imdb_id: movie.imdb_id,
       tmdb_id: movie.id,
-      tvdb_id: "n/a",
+      tvdb_id: 'n/a',
       title: movie.title,
       thumb: movie.poster_path,
-      type: "movie",
+      type: 'movie',
     };
     try {
       await User.request(request, this.props.user.current);
       this.props.msg({
         message: `New Request added: ${movie.title}`,
-        type: "good",
+        type: 'good',
       });
       await User.getRequests();
       this.getRequests();
     } catch (err) {
       this.props.msg({
         message: err,
-        type: "error",
+        type: 'error',
       });
     }
     this.setState({
@@ -253,7 +254,7 @@ class Movie extends React.Component {
     if (movieData.videos && movieData.videos.results) {
       for (let i = 0; i < movieData.videos.results.length; i++) {
         let vid = movieData.videos.results[i];
-        if (vid.site === "YouTube" && !video) {
+        if (vid.site === 'YouTube' && !video) {
           video = vid;
         }
       }

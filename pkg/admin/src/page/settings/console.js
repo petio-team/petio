@@ -1,5 +1,6 @@
-import React from "react";
-import Api from "../../data/Api";
+import React from 'react';
+
+import Api from '../../data/Api';
 
 class Console extends React.Component {
   constructor(props) {
@@ -55,33 +56,33 @@ class Console extends React.Component {
           <div className="console--filter">
             <div
               className={`console--filter--item console--filter--item__info ${
-                this.state.filter_info ? "" : "disabled"
+                this.state.filter_info ? '' : 'disabled'
               }`}
-              onClick={() => this.filter("info")}
+              onClick={() => this.filter('info')}
             >
               Info
             </div>
             <div
               className={`console--filter--item console--filter--item__warn ${
-                this.state.filter_warn ? "" : "disabled"
+                this.state.filter_warn ? '' : 'disabled'
               }`}
-              onClick={() => this.filter("warn")}
+              onClick={() => this.filter('warn')}
             >
               Warning
             </div>
             <div
               className={`console--filter--item console--filter--item__error ${
-                this.state.filter_error ? "" : "disabled"
+                this.state.filter_error ? '' : 'disabled'
               }`}
-              onClick={() => this.filter("error")}
+              onClick={() => this.filter('error')}
             >
               Error
             </div>
             <div
               className={`console--filter--item console--filter--item__verbose ${
-                this.state.filter_verbose ? "" : "disabled"
+                this.state.filter_verbose ? '' : 'disabled'
               }`}
-              onClick={() => this.filter("verbose")}
+              onClick={() => this.filter('verbose')}
             >
               Verbose
             </div>
@@ -95,7 +96,7 @@ class Console extends React.Component {
                     let timestamp = ts;
                     let type = data.type;
                     let message = data.log;
-                    if (typeof message === "object" && message !== null)
+                    if (typeof message === 'object' && message !== null)
                       message = JSON.stringify(message);
                     if (filterActive && !this.state[`filter_${type}`])
                       return null;
@@ -104,12 +105,12 @@ class Console extends React.Component {
                         key={`con__${timestamp}_${message}`}
                         className={`console--item console--item__${type}`}
                       >
-                        [{new Date(timestamp).toLocaleString()}] ::{" "}
+                        [{new Date(timestamp).toLocaleString()}] ::{' '}
                         <span
                           className={`console--type console--type__${type}`}
                         >
                           {type}
-                        </span>{" "}
+                        </span>{' '}
                         :: {message}
                       </p>
                     );

@@ -1,6 +1,6 @@
-import React from "react";
-import { withRouter } from "react-router-dom";
-import { connect } from "react-redux";
+import React from 'react';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 
 class RequestCard extends React.Component {
   render() {
@@ -23,7 +23,7 @@ class RequestCard extends React.Component {
       <img
         src={`${window.location.pathname.replace(
           /\/$/,
-          ""
+          '',
         )}/images/no-poster.jpg`}
         alt={request.title}
       />
@@ -34,15 +34,15 @@ class RequestCard extends React.Component {
       <div
         key={request.id}
         data-key={request.id}
-        className={"card type--movie-tv"}
+        className={'card type--movie-tv'}
       >
         <div className="card--inner">
           <a
             className="full-link"
-            href={`${window.location.pathname.replace("/admin/", "")}/#/${
-              this.props.user.requests[request.id].type === "movie"
-                ? "movie"
-                : "series"
+            href={`${window.location.pathname.replace('/admin/', '')}/#/${
+              this.props.user.requests[request.id].type === 'movie'
+                ? 'movie'
+                : 'series'
             }/${request.id}`}
           ></a>
           <div className="request-count">
@@ -61,11 +61,11 @@ class RequestCard extends React.Component {
                     <div className="user-thumb">
                       <img
                         src={
-                          process.env.NODE_ENV === "development"
+                          process.env.NODE_ENV === 'development'
                             ? `http://localhost:7778/user/thumb/${user_id}`
                             : `${window.location.pathname
-                                .replace("/admin/", "")
-                                .replace(/\/$/, "")}/api/user/thumb/${user_id}`
+                                .replace('/admin/', '')
+                                .replace(/\/$/, '')}/api/user/thumb/${user_id}`
                         }
                       />
                     </div>
@@ -78,7 +78,7 @@ class RequestCard extends React.Component {
             <p className="title" title={request.title || request.name}>
               {request.title || request.name}
               <span className="year">
-                {type === "movie"
+                {type === 'movie'
                   ? `(${new Date(request.release_date).getFullYear()})`
                   : `(${new Date(request.first_air_date).getFullYear()})`}
               </span>

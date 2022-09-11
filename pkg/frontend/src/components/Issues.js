@@ -1,7 +1,8 @@
-import React from "react";
-import { withRouter } from "react-router-dom";
-import { connect } from "react-redux";
-import User from "../data/User";
+import React from 'react';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+
+import User from '../data/User';
 
 class Issues extends React.Component {
   constructor(props) {
@@ -10,9 +11,9 @@ class Issues extends React.Component {
     this.state = {
       id: false,
       open: this.props.open,
-      type: "",
-      option: "",
-      detail: "",
+      type: '',
+      option: '',
+      detail: '',
     };
 
     this.inputChange = this.inputChange.bind(this);
@@ -33,7 +34,7 @@ class Issues extends React.Component {
     if (!this.state.option) {
       this.props.msg({
         message: `Please pick an option`,
-        type: "error",
+        type: 'error',
       });
       return;
     }
@@ -43,7 +44,7 @@ class Issues extends React.Component {
     let data = this.props.api[`${type}_lookup`][id];
     let title = false;
     if (data) {
-      title = type === "movie" ? data.title : data.name;
+      title = type === 'movie' ? data.title : data.name;
     }
     console.log({
       mediaId: id,
@@ -63,19 +64,19 @@ class Issues extends React.Component {
         comment: this.state.detail,
       });
       this.setState({
-        type: "",
-        option: "",
-        detail: "",
+        type: '',
+        option: '',
+        detail: '',
       });
       this.props.close();
       this.props.msg({
         message: `New Issue added`,
-        type: "good",
+        type: 'good',
       });
     } catch {
       this.props.msg({
-        message: "Error adding issue, please try again later!",
-        type: "error",
+        message: 'Error adding issue, please try again later!',
+        type: 'error',
       });
     }
   }
@@ -88,14 +89,14 @@ class Issues extends React.Component {
     if (this.state.id !== this.props.match.params.id) {
       let type;
       switch (this.props.match.path) {
-        case "/movie/:id":
-          type = "movie";
+        case '/movie/:id':
+          type = 'movie';
           break;
-        case "/series/:id":
-          type = "series";
+        case '/series/:id':
+          type = 'series';
           break;
         default:
-          type = "unknown";
+          type = 'unknown';
       }
       this.props.close();
       this.setState({
@@ -113,7 +114,7 @@ class Issues extends React.Component {
 
   render() {
     return (
-      <div className={`issues--wrap ${this.state.open ? "active" : ""}`}>
+      <div className={`issues--wrap ${this.state.open ? 'active' : ''}`}>
         <div className="issues--inner">
           <div className="issues--top">
             <h3>Report an issue</h3>
@@ -158,7 +159,7 @@ class Issues extends React.Component {
                   onChange={this.inputChange}
                 >
                   <option value="">Choose an option</option>
-                  {this.state.type === "movie" ? (
+                  {this.state.type === 'movie' ? (
                     <>
                       <option value="subs">Missing Subtitles</option>
                       <option value="bad-video">

@@ -1,7 +1,8 @@
-import React from "react";
-import FilterAction from "./FilterAction";
-import FilterRow from "./FilterRow";
-import { ReactComponent as Add } from "../assets/svg/plus-circle.svg";
+import React from 'react';
+
+import { ReactComponent as Add } from '../assets/svg/plus-circle.svg';
+import FilterAction from './FilterAction';
+import FilterRow from './FilterRow';
 
 class FilterItem extends React.Component {
   render() {
@@ -14,12 +15,12 @@ class FilterItem extends React.Component {
                 className="filter--item--title"
                 style={this.props.data[i].collapsed ? { margin: 0 } : {}}
               >
-                {`${this.props.label} Filter #${i + 1}`}{" "}
+                {`${this.props.label} Filter #${i + 1}`}{' '}
                 <span
                   className="filter--item--collapse"
                   onClick={() => this.props.collapse(this.props.type, i)}
                 >
-                  {this.props.data[i].collapsed ? "Expand" : "Collapse"}
+                  {this.props.data[i].collapsed ? 'Expand' : 'Collapse'}
                 </span>
                 <span
                   className="filter--item--remove"

@@ -1,11 +1,12 @@
-import React from "react";
-import { withRouter } from "react-router-dom";
-import { connect } from "react-redux";
-import Api from "../data/Api";
-import Nav from "../data/Nav";
-import ShowCard from "../components/TvCard";
-import Carousel from "../components/Carousel";
-import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
+import React from 'react';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+
+import { ReactComponent as Spinner } from '../assets/svg/spinner.svg';
+import Carousel from '../components/Carousel';
+import ShowCard from '../components/TvCard';
+import Api from '../data/Api';
+import Nav from '../data/Nav';
 
 class Shows extends React.Component {
   constructor(props) {
@@ -20,19 +21,19 @@ class Shows extends React.Component {
   }
 
   componentWillUnmount() {
-    let page = document.querySelectorAll(".page-wrap")[0];
-    let carouselsData = document.querySelectorAll(".carousel");
+    let page = document.querySelectorAll('.page-wrap')[0];
+    let carouselsData = document.querySelectorAll('.carousel');
     let carousels = [];
     carouselsData.forEach((carousel) => {
       carousels.push(carousel.scrollLeft);
     });
-    Nav.storeNav("/tv", this.state, page.scrollTop, carousels);
+    Nav.storeNav('/tv', this.state, page.scrollTop, carousels);
   }
 
   componentDidMount() {
-    let page = document.querySelectorAll(".page-wrap")[0];
+    let page = document.querySelectorAll('.page-wrap')[0];
     let scrollY = 0;
-    let pHist = Nav.getNav("/tv");
+    let pHist = Nav.getNav('/tv');
     page.scrollTop = scrollY;
 
     if (pHist) {
@@ -55,12 +56,12 @@ class Shows extends React.Component {
   }
 
   getPos() {
-    let page = document.querySelectorAll(".page-wrap")[0];
+    let page = document.querySelectorAll('.page-wrap')[0];
     let scrollY = 0;
-    let pHist = Nav.getNav("/tv");
+    let pHist = Nav.getNav('/tv');
     if (pHist) {
       scrollY = pHist.scroll;
-      document.querySelectorAll(".carousel").forEach((carousel, i) => {
+      document.querySelectorAll('.carousel').forEach((carousel, i) => {
         carousel.scrollLeft = pHist.carousels[i];
       });
     }

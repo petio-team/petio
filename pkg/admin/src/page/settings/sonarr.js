@@ -1,11 +1,10 @@
-import React from "react";
+import React from 'react';
 
-import { ReactComponent as Add } from "../../assets/svg/plus-circle.svg";
-import { ReactComponent as ServerIcon } from "../../assets/svg/server.svg";
-import { ReactComponent as Spinner } from "../../assets/svg/spinner.svg";
-
-import Api from "../../data/Api";
-import Modal from "../../components/Modal";
+import { ReactComponent as Add } from '../../assets/svg/plus-circle.svg';
+import { ReactComponent as ServerIcon } from '../../assets/svg/server.svg';
+import { ReactComponent as Spinner } from '../../assets/svg/spinner.svg';
+import Modal from '../../components/Modal';
+import Api from '../../data/Api';
 
 class Sonarr extends React.Component {
   constructor(props) {
@@ -18,9 +17,9 @@ class Sonarr extends React.Component {
       isMsg: false,
       wizardOpen: false,
       enabled: false,
-      name: "",
-      protocol: "http",
-      host: "localhost",
+      name: '',
+      protocol: 'http',
+      host: 'localhost',
       port: 8989,
       profile: {
         id: 0,
@@ -38,8 +37,8 @@ class Sonarr extends React.Component {
         id: 0,
         name: '',
       },
-      subpath: "/",
-      token: "",
+      subpath: '/',
+      token: '',
       activeServer: false,
       id: '',
       needsTest: false,
@@ -71,7 +70,7 @@ class Sonarr extends React.Component {
       host: this.state.host,
       token: this.state.token,
       port: this.state.port,
-      subpath: this.state.subpath === "/" ? "/" : this.state.subpath,
+      subpath: this.state.subpath === '/' ? '/' : this.state.subpath,
       path: {
         id: this.state.path.id,
         location: this.state.path.location,
@@ -107,35 +106,37 @@ class Sonarr extends React.Component {
         needsTest: false,
       });
     } catch (e) {
-      console.log("failed to save sonarr settings: ", e);
+      console.log('failed to save sonarr settings: ', e);
       this.props.msg({
         message: e.message,
-        type: "error",
+        type: 'error',
       });
     }
 
     this.props.msg({
-      message: "Sonarr settings saved!",
-      type: "good",
+      message: 'Sonarr settings saved!',
+      type: 'good',
     });
   }
 
   async deleteServer(silent = false) {
     if (this.state.activeServer === false) {
       this.props.msg({
-        message: "something went wrong",
-        type: "error",
+        message: 'something went wrong',
+        type: 'error',
       });
       return;
     }
 
     let servers = this.state.servers;
 
-    let res = await Api.sonarrDeleteInstance(servers[this.state.activeServer].id);
-    if (res.status == "error") {
+    let res = await Api.sonarrDeleteInstance(
+      servers[this.state.activeServer].id,
+    );
+    if (res.status == 'error') {
       this.props.msg({
         message: res.error,
-        type: "error",
+        type: 'error',
       });
       return;
     }
@@ -144,21 +145,21 @@ class Sonarr extends React.Component {
     this.getSonarr(true);
 
     if (!silent) {
-      this.closeModal("addServer");
+      this.closeModal('addServer');
       this.closeWizard();
 
       this.props.msg({
         message: res.message,
-        type: "good",
+        type: 'good',
       });
     }
   }
 
   async test(id, add = false) {
-    console.log("test id: ", id);
-    if (!this.state.subpath.startsWith("/") && this.state.subpath.length > 0) {
+    console.log('test id: ', id);
+    if (!this.state.subpath.startsWith('/') && this.state.subpath.length > 0) {
       this.setState({
-        subpath: "/" + this.state.subpath,
+        subpath: '/' + this.state.subpath,
       });
       setTimeout(() => {
         this.test(id, add);
@@ -176,22 +177,22 @@ class Sonarr extends React.Component {
           needsTest: false,
         });
         this.props.msg({
-          message: "Sonarr Test Connection success!",
-          type: "good",
+          message: 'Sonarr Test Connection success!',
+          type: 'good',
         });
         await this.getSonarr(true);
         await this.getSettings(id);
       } else {
         this.props.msg({
-          message: "Sonarr Test Connection failed!",
-          type: "error",
+          message: 'Sonarr Test Connection failed!',
+          type: 'error',
         });
         this.deleteServer(true);
       }
     } catch (err) {
       this.props.msg({
-        message: "Sonarr Test Connection failed! Error 2",
-        type: "error",
+        message: 'Sonarr Test Connection failed! Error 2',
+        type: 'error',
       });
     }
   }
@@ -201,18 +202,18 @@ class Sonarr extends React.Component {
     const name = target.name;
     let value = target.value;
 
-    if (target.classList.contains("frt")) {
+    if (target.classList.contains('frt')) {
       this.setState({
         needsTest: true,
         enabled: false,
       });
     }
 
-    if (target.type === "checkbox") {
+    if (target.type === 'checkbox') {
       value = target.checked;
     }
 
-    if (target.type === "select-one") {
+    if (target.type === 'select-one') {
       let title = target.options[target.selectedIndex].text;
       if (this.state[name] instanceof Object) {
         this.setState({
@@ -297,7 +298,7 @@ class Sonarr extends React.Component {
         newServer: true,
         wizardOpen: true,
         activeServer: id,
-        id: "",
+        id: '',
         needsTest: true,
       });
     }
@@ -306,12 +307,12 @@ class Sonarr extends React.Component {
   closeWizard() {
     this.setState({
       enabled: false,
-      name: "",
-      protocol: "http",
-      host: "localhost",
+      name: '',
+      protocol: 'http',
+      host: 'localhost',
       port: 8989,
-      subpath: "/",
-      token: "",
+      subpath: '/',
+      token: '',
       profiles: false,
       paths: false,
       path: {
@@ -348,12 +349,12 @@ class Sonarr extends React.Component {
     this.setState({
       [`${id}Open`]: false,
       enabled: false,
-      name: "",
-      protocol: "http",
-      host: "localhost",
+      name: '',
+      protocol: 'http',
+      host: 'localhost',
       port: null,
-      subpath: "/",
-      token: "",
+      subpath: '/',
+      token: '',
       profiles: false,
       paths: false,
       path: {
@@ -414,14 +415,14 @@ class Sonarr extends React.Component {
           open={this.state.addServerOpen}
           submitText="Save"
           submit={this.saveServer}
-          close={() => this.closeModal("addServer")}
+          close={() => this.closeModal('addServer')}
           delete={
             this.state.newServer
               ? false
               : () => {
-                this.deleteServer();
-                this.closeModal("addServer");
-              }
+                  this.deleteServer();
+                  this.closeModal('addServer');
+                }
           }
         >
           <label>Name</label>
@@ -478,8 +479,9 @@ class Sonarr extends React.Component {
           />
           <label>Profile</label>
           <div
-            className={`styled-input--select ${this.state.profiles || this.state.needsTest ? "" : "disabled"
-              }`}
+            className={`styled-input--select ${
+              this.state.profiles || this.state.needsTest ? '' : 'disabled'
+            }`}
           >
             <select
               name="profile"
@@ -487,8 +489,8 @@ class Sonarr extends React.Component {
               onChange={this.inputChange}
             >
               {this.state.profiles &&
-                !this.state.newServer &&
-                !this.state.needsTest ? (
+              !this.state.newServer &&
+              !this.state.needsTest ? (
                 <>
                   <option value="">Choose an option</option>
                   {this.state.profiles.map((item) => {
@@ -502,16 +504,17 @@ class Sonarr extends React.Component {
               ) : (
                 <option value="">
                   {this.state.newServer || this.state.needsTest
-                    ? "Please save the connection"
-                    : "Loading..."}
+                    ? 'Please save the connection'
+                    : 'Loading...'}
                 </option>
               )}
             </select>
           </div>
           <label>Path</label>
           <div
-            className={`styled-input--select ${this.state.profiles || this.state.needsTest ? "" : "disabled"
-              }`}
+            className={`styled-input--select ${
+              this.state.profiles || this.state.needsTest ? '' : 'disabled'
+            }`}
           >
             <select
               name="path"
@@ -532,16 +535,17 @@ class Sonarr extends React.Component {
               ) : (
                 <option value="">
                   {this.state.newServer || this.state.needsTest
-                    ? "Please save the connection"
-                    : "Loading..."}
+                    ? 'Please save the connection'
+                    : 'Loading...'}
                 </option>
               )}
             </select>
           </div>
           <label>Language</label>
           <div
-            className={`styled-input--select ${this.state.languages || this.state.needsTest ? "" : "disabled"
-              }`}
+            className={`styled-input--select ${
+              this.state.languages || this.state.needsTest ? '' : 'disabled'
+            }`}
           >
             <select
               name="language"
@@ -562,16 +566,16 @@ class Sonarr extends React.Component {
               ) : (
                 <option value="">
                   {this.state.newServer || this.state.needsTest
-                    ? "Please save the connection"
-                    : "Loading..."}
+                    ? 'Please save the connection'
+                    : 'Loading...'}
                 </option>
               )}
             </select>
           </div>
           {!this.state.newServer &&
-            this.state.path.id != null &&
-            this.state.profile.id != null &&
-            !this.state.needsTest ? (
+          this.state.path.id != null &&
+          this.state.profile.id != null &&
+          !this.state.needsTest ? (
             <div className="checkbox-wrap mb--2">
               <input
                 type="checkbox"
@@ -602,25 +606,33 @@ class Sonarr extends React.Component {
                     <ServerIcon />
                     <p className="sr--title">{server.name}</p>
                     <p>{`${server.protocol}://${server.host}:${server.port}`}</p>
-                    <p>Status: {server.enabled ? "Enabled" : "Disabled"}</p>
+                    <p>Status: {server.enabled ? 'Enabled' : 'Disabled'}</p>
                     <p>
-                      Profile:{" "}
-                      {server.profile.name != "" ? server.profile.name : "Not set"}
+                      Profile:{' '}
+                      {server.profile.name != ''
+                        ? server.profile.name
+                        : 'Not set'}
                     </p>
                     <p>
-                      Path: {server.path.location != "" ? server.path.location : "Not set"}
+                      Path:{' '}
+                      {server.path.location != ''
+                        ? server.path.location
+                        : 'Not set'}
                     </p>
                     <p>
-                      Language: {server.language.name != "" ? server.language.name : "Not set"}
+                      Language:{' '}
+                      {server.language.name != ''
+                        ? server.language.name
+                        : 'Not set'}
                     </p>
                     <p className="small">
-                      ID: {server.id ? server.id : "Error"}
+                      ID: {server.id ? server.id : 'Error'}
                     </p>
                     <div className="btn-wrap">
                       <button
                         className="btn btn__square"
                         onClick={() => {
-                          this.openModal("addServer");
+                          this.openModal('addServer');
                           this.openWizard(i);
                         }}
                       >
@@ -635,7 +647,7 @@ class Sonarr extends React.Component {
               <div
                 className="sr--instance--inner"
                 onClick={() => {
-                  this.openModal("addServer");
+                  this.openModal('addServer');
                   this.openWizard(serverCount);
                 }}
               >

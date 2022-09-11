@@ -1,12 +1,12 @@
-import React from "react";
-import { withRouter, Link } from "react-router-dom";
-import { connect } from "react-redux";
-import Api from "../data/Api";
-import User from "../data/User";
-import { LazyLoadImage } from "react-lazy-load-image-component";
-import "react-lazy-load-image-component/src/effects/blur.css";
+import React from 'react';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/blur.css';
+import { connect } from 'react-redux';
+import { Link, withRouter } from 'react-router-dom';
 
-import { ReactComponent as RequestIcon } from "../assets/svg/request.svg";
+import { ReactComponent as RequestIcon } from '../assets/svg/request.svg';
+import Api from '../data/Api';
+import User from '../data/User';
 
 class TvCard extends React.Component {
   constructor(props) {
@@ -47,7 +47,7 @@ class TvCard extends React.Component {
       tvdb_id: series.tvdb_id,
       imdb_id: series.imdb_id,
       title: series.name,
-      type: "tv",
+      type: 'tv',
       thumb: series.poster_path,
     };
 
@@ -55,13 +55,13 @@ class TvCard extends React.Component {
       await User.request(request, this.props.user.current);
       this.props.msg({
         message: `New Request added: ${series.name}`,
-        type: "good",
+        type: 'good',
       });
       await User.getRequests();
     } catch (err) {
       this.props.msg({
         message: err,
-        type: "error",
+        type: 'error',
       });
     }
   }
@@ -95,7 +95,7 @@ class TvCard extends React.Component {
 
   render() {
     let id = this.props.series.id;
-    if (!id || id === "false") {
+    if (!id || id === 'false') {
       return null;
     }
     let series = this.props.api.series_lookup[id];
@@ -105,7 +105,7 @@ class TvCard extends React.Component {
           ref={this.card}
           key={id}
           data-key={id}
-          className={"card type--movie-tv "}
+          className={'card type--movie-tv '}
         >
           <div className="card--inner">
             <Link to={`/series/${id}`} className="full-link"></Link>
@@ -133,7 +133,7 @@ class TvCard extends React.Component {
       <LazyLoadImage
         src={`${window.location.pathname.replace(
           /\/$/,
-          ""
+          '',
         )}/images/no-poster.jpg`}
         alt={series.title}
         onLoad={this.imgLoaded}
@@ -145,9 +145,9 @@ class TvCard extends React.Component {
         key={series.id}
         data-key={series.id}
         className={`card type--movie-tv ${
-          series.on_server ? "on-server" : ""
-        } ${this.props.user.requests[series.id] ? "requested" : ""} ${
-          this.state.imgLoaded ? "img-loaded" : "img-not-loaded"
+          series.on_server ? 'on-server' : ''
+        } ${this.props.user.requests[series.id] ? 'requested' : ''} ${
+          this.state.imgLoaded ? 'img-loaded' : 'img-not-loaded'
         }`}
       >
         <div className="card--inner">
@@ -174,7 +174,7 @@ class TvCard extends React.Component {
                 {this.props.character
                   ? this.props.character
                   : series.first_air_date
-                  ? "(" + new Date(series.first_air_date).getFullYear() + ")"
+                  ? '(' + new Date(series.first_air_date).getFullYear() + ')'
                   : null}
               </span>
             </p>

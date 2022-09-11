@@ -1,6 +1,6 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { LazyLoadImage } from "react-lazy-load-image-component";
+import React from 'react';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { Link } from 'react-router-dom';
 
 class CompanyCard extends React.Component {
   constructor(props) {
@@ -50,7 +50,7 @@ class CompanyCard extends React.Component {
         key={`co__${company.id}`}
         data-key={`co__${company.id}`}
         className={`card company-card ${
-          this.state.imgLoaded ? "img-loaded" : "img-not-loaded"
+          this.state.imgLoaded ? 'img-loaded' : 'img-not-loaded'
         }`}
       >
         <div className="company-card--inner">

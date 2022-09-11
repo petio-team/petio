@@ -1,9 +1,10 @@
-import React from "react";
-import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
-import User from "../data/User";
-import Plex from "../data/Plex";
-import pjson from "../../package.json";
-import { ReactComponent as TmdbLogo } from "../assets/svg/tmdb.svg";
+import React from 'react';
+
+import pjson from '../../package.json';
+import { ReactComponent as Spinner } from '../assets/svg/spinner.svg';
+import { ReactComponent as TmdbLogo } from '../assets/svg/tmdb.svg';
+import Plex from '../data/Plex';
+import User from '../data/User';
 
 const popupCenter = (url, title, w, h) => {
   // Fixes dual-screen position | credit Tautulli
@@ -28,14 +29,14 @@ const popupCenter = (url, title, w, h) => {
   var newWindow = window.open(
     url,
     title,
-    "scrollbars=yes, width=" +
+    'scrollbars=yes, width=' +
       w +
-      ", height=" +
+      ', height=' +
       h +
-      ", top=" +
+      ', top=' +
       top +
-      ", left=" +
-      left
+      ', left=' +
+      left,
   );
 
   if (window.focus) newWindow.focus();
@@ -48,8 +49,8 @@ class Login extends React.Component {
 
     this.state = {
       loading: false,
-      username: "",
-      password: "",
+      username: '',
+      password: '',
     };
 
     this.loginForm = this.loginForm.bind(this);
@@ -77,17 +78,17 @@ class Login extends React.Component {
   login(username, password, cookie = false) {
     if (/^\s/.test(username)) {
       this.props.msg({
-        type: "error",
+        type: 'error',
         message:
-          "The username you entered contains a space before! Please remove it",
+          'The username you entered contains a space before! Please remove it',
       });
       return;
     }
     if (/^\s/.test(password)) {
       this.props.msg({
-        type: "error",
+        type: 'error',
         message:
-          "The password you entered contains a space before! Please remove it",
+          'The password you entered contains a space before! Please remove it',
       });
       return;
     }
@@ -101,8 +102,8 @@ class Login extends React.Component {
         });
         if (res.error && cookie) {
           this.props.msg({
-            message: "Your session has expired please log in again",
-            type: "error",
+            message: 'Your session has expired please log in again',
+            type: 'error',
           });
 
           return;
@@ -110,8 +111,8 @@ class Login extends React.Component {
 
         if (res.error) {
           this.props.msg({
-            message: "User Not Found",
-            type: "error",
+            message: 'User Not Found',
+            type: 'error',
           });
 
           return;
@@ -126,33 +127,33 @@ class Login extends React.Component {
         // Move this to error message
         this.props.msg({
           message:
-            "There has been an error, Petio may be temporarily unavailable",
-          type: "error",
+            'There has been an error, Petio may be temporarily unavailable',
+          type: 'error',
         });
 
-        localStorage.removeItem("petio_jwt");
+        localStorage.removeItem('petio_jwt');
       });
   }
 
   getCookie(cname) {
-    var name = cname + "=";
+    var name = cname + '=';
     var decodedCookie = decodeURIComponent(document.cookie);
-    var ca = decodedCookie.split(";");
+    var ca = decodedCookie.split(';');
     for (var i = 0; i < ca.length; i++) {
       var c = ca[i];
-      while (c.charAt(0) == " ") {
+      while (c.charAt(0) == ' ') {
         c = c.substring(1);
       }
       if (c.indexOf(name) == 0) {
         return c.substring(name.length, c.length);
       }
     }
-    return "";
+    return '';
   }
 
   loginLocal() {
-    if (this.getCookie("petio_jwt")) {
-      this.login("", false, true, true);
+    if (this.getCookie('petio_jwt')) {
+      this.login('', false, true, true);
     }
   }
 
@@ -162,7 +163,7 @@ class Login extends React.Component {
 
   async loginOauth() {
     try {
-      let plexWindow = popupCenter("", "Login with Plex", 500, 500);
+      let plexWindow = popupCenter('', 'Login with Plex', 500, 500);
       this.setState({
         loading: true,
       });
@@ -174,7 +175,7 @@ class Login extends React.Component {
       if (res.error) {
         this.props.msg({
           message: res.error,
-          type: "error",
+          type: 'error',
         });
         return;
       }
@@ -204,7 +205,7 @@ class Login extends React.Component {
               </h1>
               <p className="main-title">Login Admin</p>
               <form onSubmit={this.loginForm} autoComplete="on">
-                <p style={{ marginBottom: "5px" }}>Username / Email</p>
+                <p style={{ marginBottom: '5px' }}>Username / Email</p>
                 <input
                   type="text"
                   name="username"
@@ -213,7 +214,7 @@ class Login extends React.Component {
                   autoComplete="username"
                 />
 
-                <p style={{ marginBottom: "5px" }}>Password</p>
+                <p style={{ marginBottom: '5px' }}>Password</p>
                 <input
                   type="password"
                   name="password"

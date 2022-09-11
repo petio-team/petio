@@ -1,19 +1,18 @@
-import React from "react";
-import Api from "../data/Api";
+import React from 'react';
 
-import Modal from "../components/Modal";
-
-import { ReactComponent as Arrow } from "../assets/svg/arrow-left.svg";
-import { ReactComponent as Check } from "../assets/svg/check.svg";
-import { ReactComponent as Close } from "../assets/svg/close.svg";
-import Profiles from "./users/Profiles";
+import { ReactComponent as Arrow } from '../assets/svg/arrow-left.svg';
+import { ReactComponent as Check } from '../assets/svg/check.svg';
+import { ReactComponent as Close } from '../assets/svg/close.svg';
+import Modal from '../components/Modal';
+import Api from '../data/Api';
+import Profiles from './users/Profiles';
 
 class Users extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      sortBy: "title",
-      dir: "DESC",
+      sortBy: 'title',
+      dir: 'DESC',
       addUserOpen: false,
       bulk_users: {},
       bulk_users_all: false,
@@ -37,7 +36,7 @@ class Users extends React.Component {
     this.fileUpload = this.fileUpload.bind(this);
   }
   componentDidMount() {
-    let page = document.querySelectorAll(".page-wrap")[0];
+    let page = document.querySelectorAll('.page-wrap')[0];
     page.scrollTop = 0;
     window.scrollTo(0, 0);
     this.getArrs();
@@ -46,10 +45,10 @@ class Users extends React.Component {
   sortBy(a, b) {
     let sortVal = this.state.sortBy;
     if (a[sortVal].toLowerCase() > b[sortVal].toLowerCase()) {
-      return this.state.dir === "DESC" ? 1 : -1;
+      return this.state.dir === 'DESC' ? 1 : -1;
     }
     if (a[sortVal].toLowerCase() < b[sortVal].toLowerCase()) {
-      return this.state.dir === "DESC" ? -1 : 1;
+      return this.state.dir === 'DESC' ? -1 : 1;
     }
     return 0;
   }
@@ -67,7 +66,7 @@ class Users extends React.Component {
   sortCol(type) {
     if (!type) return;
     let sw = this.state.sortBy === type ? true : false;
-    let dir = sw ? (this.state.dir === "DESC" ? "ASC" : "DESC") : "DESC";
+    let dir = sw ? (this.state.dir === 'DESC' ? 'ASC' : 'DESC') : 'DESC';
     this.setState({
       dir: dir,
       sortBy: type,
@@ -83,15 +82,15 @@ class Users extends React.Component {
   closeModal(id) {
     this.setState({
       [`${id}Open`]: false,
-      cu_username: "",
-      cu_email: "",
-      cu_password: "",
-      cu_linked: "",
+      cu_username: '',
+      cu_email: '',
+      cu_password: '',
+      cu_linked: '',
       cu_error: false,
-      eu_email: "",
-      eu_role: "",
-      eu_profile: "",
-      eu_password: "",
+      eu_email: '',
+      eu_role: '',
+      eu_profile: '',
+      eu_password: '',
       eu_enabled: false,
       bu_error: false,
       eu_error: false,
@@ -103,15 +102,15 @@ class Users extends React.Component {
     const target = e.target;
     const name = target.name;
     let value =
-      target.type === "checkbox"
+      target.type === 'checkbox'
         ? target.checked
-        : target.type === "file"
+        : target.type === 'file'
         ? target.files[0]
         : target.value;
-    if (name === "eu_password")
-      value = value.replace("*********", "").replace("********", "");
-    if (name === "bulk_users_all") {
-      let userCheckboxes = document.querySelectorAll(".user-checkbox");
+    if (name === 'eu_password')
+      value = value.replace('*********', '').replace('********', '');
+    if (name === 'bulk_users_all') {
+      let userCheckboxes = document.querySelectorAll('.user-checkbox');
       let bu = {};
       if (!this.state.bulk_users_all)
         for (let c = 0; c < userCheckboxes.length; c++) {
@@ -152,11 +151,11 @@ class Users extends React.Component {
         r_servers: radarr,
         s_servers: sonarr,
       });
-      this.props.msg({ message: "Radarr / Sonarr Configs loaded" });
+      this.props.msg({ message: 'Radarr / Sonarr Configs loaded' });
     } catch (err) {
       this.props.msg({
-        message: "Failed to load Radarr / Sonarr Configs",
-        type: "error",
+        message: 'Failed to load Radarr / Sonarr Configs',
+        type: 'error',
       });
       console.log(err);
       this.setState({
@@ -170,7 +169,7 @@ class Users extends React.Component {
     let username = this.state.cu_username;
     try {
       let newUser = await Api.createUser({
-        id: `custom_${this.state.cu_username.replace(" ", "-")}`,
+        id: `custom_${this.state.cu_username.replace(' ', '-')}`,
         username: this.state.cu_username,
         email: this.state.cu_email,
         password: this.state.cu_password,
@@ -180,21 +179,21 @@ class Users extends React.Component {
       if (newUser.error) {
         this.props.msg({
           message: `${newUser.error}`,
-          type: "error",
+          type: 'error',
         });
       } else {
         this.props.msg({
           message: `User added ${username}`,
-          type: "good",
+          type: 'good',
         });
-        this.closeModal("addUser");
+        this.closeModal('addUser');
         Api.allUsers();
       }
     } catch (err) {
       console.log(err);
       this.props.msg({
         message: `Failed to add user: ${username}`,
-        type: "error",
+        type: 'error',
       });
     }
   }
@@ -224,14 +223,14 @@ class Users extends React.Component {
     this.setState({
       activeUser: user,
       eu_email: user.email,
-      eu_role: user.role ? user.role : "user",
-      eu_profile: user.profile ? user.profile : "",
-      eu_password: user.password === "removed" ? "*********" : "",
+      eu_role: user.role ? user.role : 'user',
+      eu_profile: user.profile ? user.profile : '',
+      eu_password: user.password === 'removed' ? '*********' : '',
       eu_enabled: user.disabled ? false : true,
       thumb_path:
-        process.env.NODE_ENV === "development"
-          ? "http://localhost:7778/user/thumb/" + user.id
-          : "/api/user/thumb/" + user.id,
+        process.env.NODE_ENV === 'development'
+          ? 'http://localhost:7778/user/thumb/' + user.id
+          : '/api/user/thumb/' + user.id,
     });
   }
 
@@ -248,7 +247,7 @@ class Users extends React.Component {
       console.log(err);
       this.props.msg({
         message: `Failed to Load Profiles`,
-        type: "error",
+        type: 'error',
       });
       this.setState({
         profiles: [],
@@ -259,13 +258,13 @@ class Users extends React.Component {
   async saveUser() {
     let userObj;
     let password =
-      !this.state.eu_password || this.state.eu_password === ""
+      !this.state.eu_password || this.state.eu_password === ''
         ? false
         : this.state.eu_password;
     if (this.state.activeUser.custom && !password) {
       this.props.msg({
-        message: "Custom users must have a password set",
-        type: "error",
+        message: 'Custom users must have a password set',
+        type: 'error',
       });
       return;
     }
@@ -278,7 +277,7 @@ class Users extends React.Component {
       disabled: this.state.eu_enabled ? false : true,
     };
 
-    if (password !== "*********" && password) {
+    if (password !== '*********' && password) {
       userObj.password = password;
     }
 
@@ -294,14 +293,14 @@ class Users extends React.Component {
       });
       this.props.msg({
         message: `Failed to Update User: ${this.state.activeUser.username}`,
-        type: "error",
+        type: 'error',
       });
     } else {
       this.props.msg({
         message: `User Updated: ${this.state.activeUser.username}`,
-        type: "good",
+        type: 'good',
       });
-      this.closeModal("editUser");
+      this.closeModal('editUser');
       Api.allUsers();
     }
   }
@@ -315,14 +314,14 @@ class Users extends React.Component {
       });
       this.props.msg({
         message: `Failed to Delete User: ${this.state.activeUser.username}`,
-        type: "error",
+        type: 'error',
       });
     } else {
       this.props.msg({
         message: `User Deleted: ${this.state.activeUser.username}`,
-        type: "good",
+        type: 'good',
       });
-      this.closeModal("editUser");
+      this.closeModal('editUser');
       Api.allUsers();
     }
   }
@@ -357,62 +356,62 @@ class Users extends React.Component {
       });
       this.props.msg({
         message: `Failed to Save Users`,
-        type: "error",
+        type: 'error',
       });
     } else {
       this.props.msg({
         message: `Users Bulk Updated`,
-        type: "info",
+        type: 'info',
       });
-      this.closeModal("bulkUsers");
+      this.closeModal('bulkUsers');
       Api.allUsers();
     }
   }
 
   async fileUpload(e) {
     e.preventDefault();
-    var validExtensions = ["jpg", "png", "jpeg"]; //array of valid extensions
+    var validExtensions = ['jpg', 'png', 'jpeg']; //array of valid extensions
     var fileName = this.state.custom_user_thumb.name;
-    var fileNameExt = fileName.substr(fileName.lastIndexOf(".") + 1);
+    var fileNameExt = fileName.substr(fileName.lastIndexOf('.') + 1);
     if (!validExtensions.includes(fileNameExt)) {
       this.props.msg({
         message:
-          "Only these file types are accepted : " + validExtensions.join(", "),
-        type: "error",
+          'Only these file types are accepted : ' + validExtensions.join(', '),
+        type: 'error',
       });
       return;
     }
     try {
       const formData = new FormData();
-      formData.append("thumb", this.state.custom_user_thumb);
+      formData.append('thumb', this.state.custom_user_thumb);
       await Api.uploadThumb(formData, this.state.activeUser.id);
       this.setState({
         thumb_path:
-          process.env.NODE_ENV === "development"
-            ? "http://localhost:7778/user/thumb/" +
+          process.env.NODE_ENV === 'development'
+            ? 'http://localhost:7778/user/thumb/' +
               this.state.activeUser.id +
-              "?update=" +
+              '?update=' +
               Date.now()
-            : "/api/user/thumb/" +
+            : '/api/user/thumb/' +
               this.state.activeUser.id +
-              "?update=" +
+              '?update=' +
               Date.now(),
         custom_user_thumb: false,
       });
-      document.getElementById("custom_thumb_upload").value = "";
+      document.getElementById('custom_thumb_upload').value = '';
       this.props.msg({
         message: `User Thumb Updated: ${this.state.activeUser.username}`,
-        type: "good",
+        type: 'good',
       });
     } catch (err) {
       this.props.msg({
         message: err,
-        type: "error",
+        type: 'error',
       });
       this.setState({
         custom_user_thumb: false,
       });
-      document.getElementById("custom_thumb_upload").value = "";
+      document.getElementById('custom_thumb_upload').value = '';
     }
   }
 
@@ -425,7 +424,7 @@ class Users extends React.Component {
         <Modal
           title="Add User"
           open={this.state.addUserOpen}
-          close={() => this.closeModal("addUser")}
+          close={() => this.closeModal('addUser')}
           submit={this.createUser}
         >
           <p className="sub-title mb--1">New user</p>
@@ -481,7 +480,7 @@ class Users extends React.Component {
         <Modal
           title="Edit User"
           open={this.state.editUserOpen}
-          close={() => this.closeModal("editUser")}
+          close={() => this.closeModal('editUser')}
           submit={this.saveUser}
           delete={
             this.state.activeUser
@@ -492,8 +491,8 @@ class Users extends React.Component {
           }
         >
           <p className="sub-title mb--1">
-            Editing{" "}
-            {this.state.activeUser ? this.state.activeUser.title : "user"}
+            Editing{' '}
+            {this.state.activeUser ? this.state.activeUser.title : 'user'}
           </p>
           <p className="sub-title mt--2 mb--1">Email</p>
           <input
@@ -512,7 +511,7 @@ class Users extends React.Component {
               onChange={this.inputChange}
             >
               {this.state.activeUser ? (
-                this.state.activeUser.role !== "admin" ? (
+                this.state.activeUser.role !== 'admin' ? (
                   <>
                     <option value="user">User</option>
                     <option value="moderator">Moderator</option>
@@ -547,7 +546,7 @@ class Users extends React.Component {
             </select>
           </div>
           {this.state.activeUser ? (
-            this.state.activeUser.role !== "admin" ? (
+            this.state.activeUser.role !== 'admin' ? (
               <>
                 <p className="sub-title mb--1">Enabled / Disabled</p>
                 <label>
@@ -556,7 +555,7 @@ class Users extends React.Component {
                     checked={this.state.eu_enabled}
                     name="eu_enabled"
                     onChange={this.inputChange}
-                  />{" "}
+                  />{' '}
                   Enable this user
                 </label>
               </>
@@ -601,7 +600,7 @@ class Users extends React.Component {
               </div>
               <button
                 className={`image-upload--submit btn btn__square ${
-                  this.state.custom_user_thumb ? "" : "disabled"
+                  this.state.custom_user_thumb ? '' : 'disabled'
                 }`}
               >
                 Upload
@@ -615,7 +614,7 @@ class Users extends React.Component {
         <Modal
           title="Bulk Edit"
           open={this.state.bulkUsersOpen}
-          close={() => this.closeModal("bulkUsers")}
+          close={() => this.closeModal('bulkUsers')}
           submit={this.bulkSave}
         >
           <p>
@@ -656,7 +655,7 @@ class Users extends React.Component {
               checked={this.state.bu_enabled}
               name="bu_enabled"
               onChange={this.inputChange}
-            />{" "}
+            />{' '}
             Enable this user
           </label>
           {this.state.bu_error ? <p>{this.state.bu_error}</p> : null}
@@ -681,19 +680,19 @@ class Users extends React.Component {
             <p className="main-title">Users</p>
             <button
               className="btn btn__square"
-              onClick={() => this.openModal("addUser")}
+              onClick={() => this.openModal('addUser')}
             >
               Add +
             </button>
             <button
               className={`btn btn__square ${
-                Object.keys(this.state.bulk_users).length > 0 ? "" : "disabled"
+                Object.keys(this.state.bulk_users).length > 0 ? '' : 'disabled'
               }`}
               onClick={() => {
-                this.openModal("bulkUsers");
+                this.openModal('bulkUsers');
                 this.setState({
                   bu_enabled: true,
-                  bu_profile: "",
+                  bu_profile: '',
                 });
               }}
             >
@@ -710,33 +709,33 @@ class Users extends React.Component {
                     className="checkbox-small"
                     type="checkbox"
                     checked={this.state.bulk_users_all}
-                    name={"bulk_users_all"}
+                    name={'bulk_users_all'}
                     onChange={this.inputChange}
                   />
                 </th>
                 <th
                   className={`sortable ${
-                    this.state.sortBy === "title" ? "active" : ""
+                    this.state.sortBy === 'title' ? 'active' : ''
                   } ${this.state.dir}`}
-                  onClick={() => this.sortCol("title")}
+                  onClick={() => this.sortCol('title')}
                 >
                   Title
                   <Arrow />
                 </th>
                 <th
                   className={`sortable ${
-                    this.state.sortBy === "username" ? "active" : ""
+                    this.state.sortBy === 'username' ? 'active' : ''
                   } ${this.state.dir}`}
-                  onClick={() => this.sortCol("username")}
+                  onClick={() => this.sortCol('username')}
                 >
                   Username
                   <Arrow />
                 </th>
                 <th
                   className={`sortable ${
-                    this.state.sortBy === "email" ? "active" : ""
+                    this.state.sortBy === 'email' ? 'active' : ''
                   } ${this.state.dir}`}
-                  onClick={() => this.sortCol("email")}
+                  onClick={() => this.sortCol('email')}
                 >
                   Email
                   <Arrow />
@@ -769,34 +768,34 @@ class Users extends React.Component {
                       />
                     </td>
                     <td>
-                      {user.title} {user.custom ? "(Custom)" : ""}
+                      {user.title} {user.custom ? '(Custom)' : ''}
                     </td>
                     <td>{user.username}</td>
                     <td>{user.email}</td>
-                    <td>{user.role ? user.role : "user"}</td>
+                    <td>{user.role ? user.role : 'user'}</td>
                     <td>
                       {user.profile
                         ? this.findProfile(user.profile)
                           ? this.findProfile(user.profile).name
-                          : "Removed"
-                        : "default"}
+                          : 'Removed'
+                        : 'default'}
                     </td>
                     <td>
                       <div className="table-icon">
                         {user.disabled ? <Close /> : <Check />}
                       </div>
                     </td>
-                    <td>{user.lastIp ? user.lastIp : "n/a"}</td>
+                    <td>{user.lastIp ? user.lastIp : 'n/a'}</td>
                     <td>
                       {user.lastLogin
                         ? `${new Date(user.lastLogin).toDateString()}`
-                        : "n/a"}
+                        : 'n/a'}
                     </td>
                     <td>
                       <p
                         className="table-action"
                         onClick={() => {
-                          this.openModal("editUser");
+                          this.openModal('editUser');
                           this.setActiveUser(user._id);
                         }}
                       >

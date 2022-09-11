@@ -1,8 +1,8 @@
-import React from "react";
-import Api from "../../data/Api";
-import Plex from "../../data/Plex";
+import React from 'react';
 
-import { ReactComponent as Spinner } from "../../assets/svg/spinner.svg";
+import { ReactComponent as Spinner } from '../../assets/svg/spinner.svg';
+import Api from '../../data/Api';
+import Plex from '../../data/Plex';
 
 /* eslint-disable */
 const popupCenter = (url, title, w, h) => {
@@ -28,14 +28,14 @@ const popupCenter = (url, title, w, h) => {
   var newWindow = window.open(
     url,
     title,
-    "scrollbars=yes, width=" +
+    'scrollbars=yes, width=' +
       w +
-      ", height=" +
+      ', height=' +
       h +
-      ", top=" +
+      ', top=' +
       top +
-      ", left=" +
-      left
+      ', left=' +
+      left,
   );
 
   if (window.focus) newWindow.focus();
@@ -48,7 +48,7 @@ class General extends React.Component {
     super(props);
 
     this.state = {
-      base_path: "",
+      base_path: '',
       login_type: false,
       plexPopular: false,
       token: false,
@@ -64,7 +64,7 @@ class General extends React.Component {
   }
 
   newToken() {
-    let plexWindow = popupCenter("", "Login with Plex", 500, 500);
+    let plexWindow = popupCenter('', 'Login with Plex', 500, 500);
     Plex.plexToken(plexWindow);
   }
 
@@ -73,7 +73,7 @@ class General extends React.Component {
     const name = target.name;
     let value = target.value;
 
-    if (target.type === "checkbox") {
+    if (target.type === 'checkbox') {
       value = target.checked;
     }
 
@@ -88,14 +88,14 @@ class General extends React.Component {
         base_path: this.state.base_path,
       });
       this.props.msg({
-        message: "Base Path Saved, Please restart!",
-        type: "good",
+        message: 'Base Path Saved, Please restart!',
+        type: 'good',
       });
     } catch (err) {
       console.log(err);
       this.props.msg({
-        message: "Failed to Save Base Path",
-        type: "error",
+        message: 'Failed to Save Base Path',
+        type: 'error',
       });
     }
   }
@@ -106,14 +106,14 @@ class General extends React.Component {
         login_type: this.state.login_type,
       });
       this.props.msg({
-        message: "Login Type Updated",
-        type: "good",
+        message: 'Login Type Updated',
+        type: 'good',
       });
     } catch (err) {
       console.log(err);
       this.props.msg({
-        message: "Failed to Change Login Type",
-        type: "error",
+        message: 'Failed to Change Login Type',
+        type: 'error',
       });
     }
   }
@@ -124,14 +124,14 @@ class General extends React.Component {
         plexPopular: this.state.plexPopular,
       });
       this.props.msg({
-        message: "Plex Popular Saved",
-        type: "good",
+        message: 'Plex Popular Saved',
+        type: 'good',
       });
     } catch (err) {
       console.log(err);
       this.props.msg({
-        message: "Failed to Save Plex Popular",
-        type: "error",
+        message: 'Failed to Save Plex Popular',
+        type: 'error',
       });
     }
   }
@@ -140,7 +140,7 @@ class General extends React.Component {
     try {
       let config = await Api.getConfig();
       this.setState({
-        base_path: config.base_path ? config.base_path : "",
+        base_path: config.base_path ? config.base_path : '',
         login_type: config.login_type ? config.login_type : 1,
         plexPopular:
           config.plexPopular === null || config.plexPopular === undefined
@@ -149,13 +149,13 @@ class General extends React.Component {
         loading: false,
       });
       this.props.msg({
-        message: "Config Loaded",
+        message: 'Config Loaded',
       });
     } catch (err) {
       console.log(err);
       this.props.msg({
-        message: "Failed to Load Config",
-        type: "good",
+        message: 'Failed to Load Config',
+        type: 'good',
       });
     }
   }
@@ -166,18 +166,18 @@ class General extends React.Component {
       if (plexConnect.error) {
         this.props.msg({
           message: `Plex Test Failed: ${plexConnect.error}`,
-          type: "error",
+          type: 'error',
         });
       } else {
         this.props.msg({
-          message: "Plex Test Passed!",
-          type: "good",
+          message: 'Plex Test Passed!',
+          type: 'good',
         });
       }
     } catch (err) {
       this.props.msg({
         message: `Plex Test Failed: ${err}`,
-        type: "error",
+        type: 'error',
       });
     }
   }
@@ -193,8 +193,8 @@ class General extends React.Component {
       });
       if (this.props.plex.token)
         this.props.msg({
-          type: "good",
-          message: "Token Updated!",
+          type: 'good',
+          message: 'Token Updated!',
         });
     }
   }
@@ -228,7 +228,7 @@ class General extends React.Component {
           </button>
           <button
             className="btn btn__square"
-            style={{ marginLeft: "10px" }}
+            style={{ marginLeft: '10px' }}
             onClick={this.testPlex}
           >
             Test
@@ -264,7 +264,7 @@ class General extends React.Component {
             Logging into the admin panel in Petio will always require a
             Username/Email &amp; Password, however the standard user panel can
             be customised for <strong>Fast Login</strong> (where a user only
-            needs to provide their Username / Email) or{" "}
+            needs to provide their Username / Email) or{' '}
             <strong>Standard Login</strong> (a user is required to enter a
             username and password)
           </p>

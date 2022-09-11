@@ -1,25 +1,26 @@
-import React from "react";
-import { withRouter } from "react-router-dom";
-import { connect } from "react-redux";
-import Api from "../data/Api";
-import { ReactComponent as SearchIcon } from "../assets/svg/search.svg";
-import { ReactComponent as ClearIcon } from "../assets/svg/close.svg";
-import MovieCard from "../components/MovieCard";
-import TvCard from "../components/TvCard";
-import Carousel from "../components/Carousel";
-import PersonCard from "../components/PersonCard";
-import CarouselLoading from "../components/CarouselLoading";
-import CarouselLoadingPerson from "../components/CarouselLoadingPerson";
-import CarouselLoadingCompany from "../components/CarouselLoadingCompany";
-import CompanyCard from "../components/CompanyCard";
-import Nav from "../data/Nav";
+import React from 'react';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+
+import { ReactComponent as ClearIcon } from '../assets/svg/close.svg';
+import { ReactComponent as SearchIcon } from '../assets/svg/search.svg';
+import Carousel from '../components/Carousel';
+import CarouselLoading from '../components/CarouselLoading';
+import CarouselLoadingCompany from '../components/CarouselLoadingCompany';
+import CarouselLoadingPerson from '../components/CarouselLoadingPerson';
+import CompanyCard from '../components/CompanyCard';
+import MovieCard from '../components/MovieCard';
+import PersonCard from '../components/PersonCard';
+import TvCard from '../components/TvCard';
+import Api from '../data/Api';
+import Nav from '../data/Nav';
 
 class Search extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      searchTerm: "",
+      searchTerm: '',
       searchActive: false,
       isLoading: false,
     };
@@ -30,11 +31,11 @@ class Search extends React.Component {
 
   clearSearch() {
     this.setState({
-      searchTerm: "",
+      searchTerm: '',
       searchActive: false,
       isLoading: false,
     });
-    document.querySelectorAll(".carousel").forEach((carousel) => {
+    document.querySelectorAll('.carousel').forEach((carousel) => {
       carousel.scrollLeft = 0;
     });
   }
@@ -81,13 +82,13 @@ class Search extends React.Component {
   componentDidMount() {
     Api.getPopular();
 
-    let page = document.querySelectorAll(".page-wrap")[0];
+    let page = document.querySelectorAll('.page-wrap')[0];
     let scrollY = 0;
     let pHist = Nav.getNav(this.props.location.pathname);
     if (pHist) {
       scrollY = pHist.scroll;
       this.setState(pHist.state);
-      document.querySelectorAll(".carousel").forEach((carousel, i) => {
+      document.querySelectorAll('.carousel').forEach((carousel, i) => {
         carousel.scrollLeft = pHist.carousels[i];
       });
     }
@@ -96,8 +97,8 @@ class Search extends React.Component {
   }
 
   componentWillUnmount() {
-    let page = document.querySelectorAll(".page-wrap")[0];
-    let carouselsData = document.querySelectorAll(".carousel");
+    let page = document.querySelectorAll('.page-wrap')[0];
+    let carouselsData = document.querySelectorAll('.carousel');
     let carousels = [];
     carouselsData.forEach((carousel) => {
       carousels.push(carousel.scrollLeft);
@@ -106,7 +107,7 @@ class Search extends React.Component {
       this.props.location.pathname,
       this.state,
       page.scrollTop,
-      carousels
+      carousels,
     );
   }
 
@@ -277,7 +278,7 @@ class Search extends React.Component {
             />
             <button
               className={`search-form--clear ${
-                this.state.searchTerm ? "active" : ""
+                this.state.searchTerm ? 'active' : ''
               }`}
               onClick={this.clearSearch}
             >

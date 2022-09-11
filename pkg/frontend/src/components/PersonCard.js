@@ -1,7 +1,7 @@
-import React from "react";
-import { withRouter, Link } from "react-router-dom";
-import { LazyLoadImage } from "react-lazy-load-image-component";
-import "react-lazy-load-image-component/src/effects/blur.css";
+import React from 'react';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/blur.css';
+import { Link, withRouter } from 'react-router-dom';
 
 class PersonCard extends React.Component {
   constructor(props) {
@@ -40,7 +40,7 @@ class PersonCard extends React.Component {
       <div
         key={person.id}
         className={`card person-card ${
-          this.state.imgLoaded ? "img-loaded" : "img-not-loaded"
+          this.state.imgLoaded ? 'img-loaded' : 'img-not-loaded'
         }`}
       >
         <div className="card--inner">
@@ -53,7 +53,7 @@ class PersonCard extends React.Component {
                   ? `https://image.tmdb.org/t/p/w200${person.profile_path}`
                   : `${window.location.pathname.replace(
                       /\/$/,
-                      ""
+                      '',
                     )}/images/no-poster-person.jpg`
               }
               onLoad={this.imgLoaded}

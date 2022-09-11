@@ -1,8 +1,9 @@
-import React from "react";
-import Api from "../data/Api";
-import { ReactComponent as MovieIcon } from "../assets/svg/movie.svg";
-import { ReactComponent as TvIcon } from "../assets/svg/tv.svg";
-import Modal from "../components/Modal";
+import React from 'react';
+
+import { ReactComponent as MovieIcon } from '../assets/svg/movie.svg';
+import { ReactComponent as TvIcon } from '../assets/svg/tv.svg';
+import Modal from '../components/Modal';
+import Api from '../data/Api';
 
 class Issues extends React.Component {
   constructor(props) {
@@ -12,7 +13,7 @@ class Issues extends React.Component {
       issues: false,
       resolveIssueOpen: false,
       activeIssue: false,
-      resolve_issue_comment: "",
+      resolve_issue_comment: '',
       issuesLoaded: false,
     };
 
@@ -38,7 +39,7 @@ class Issues extends React.Component {
     this.setState({
       [`${id}Open`]: false,
       activeIssue: false,
-      resolve_issue_comment: "",
+      resolve_issue_comment: '',
     });
   }
 
@@ -50,7 +51,7 @@ class Issues extends React.Component {
 
   async getIssues() {
     let issues = await Api.getIssues();
-    this.props.msg({ message: "Issues loaded" });
+    this.props.msg({ message: 'Issues loaded' });
     this.setState({
       issues: issues,
       issuesLoaded: true,
@@ -69,29 +70,29 @@ class Issues extends React.Component {
 
   formatIssue(issue) {
     switch (issue) {
-      case "episodes":
-        return "Missing Episodes";
-      case "season":
-        return "Missing Season";
-      case "subs":
-        return "Missing / Wrong Subtitles";
-      case "bad-video":
-        return "Bad Quality / Video Issue";
-      case "bad-audio":
-        return "Audio Issue / Audio Sync";
+      case 'episodes':
+        return 'Missing Episodes';
+      case 'season':
+        return 'Missing Season';
+      case 'subs':
+        return 'Missing / Wrong Subtitles';
+      case 'bad-video':
+        return 'Bad Quality / Video Issue';
+      case 'bad-audio':
+        return 'Audio Issue / Audio Sync';
       default:
-        return "Not Specified";
+        return 'Not Specified';
     }
   }
 
   typeIcon(type) {
     let icon = null;
     switch (type) {
-      case "movie":
+      case 'movie':
         icon = <MovieIcon />;
         break;
-      case "tv":
-      case "series":
+      case 'tv':
+      case 'series':
         icon = <TvIcon />;
         break;
       default:
@@ -104,7 +105,7 @@ class Issues extends React.Component {
   inputChange(e) {
     const target = e.target;
     const name = target.name;
-    let value = target.type === "checkbox" ? target.checked : target.value;
+    let value = target.type === 'checkbox' ? target.checked : target.value;
 
     this.setState({
       [name]: value,
@@ -117,14 +118,14 @@ class Issues extends React.Component {
     if (remove) {
       this.props.msg({
         message: `Issue Removed: ${this.state.activeIssue.title}`,
-        type: "good",
+        type: 'good',
       });
-      this.closeModal("resolveIssue");
+      this.closeModal('resolveIssue');
       this.getIssues();
     } else {
       this.props.msg({
         message: `Failed to Remove Issue: ${this.state.activeIssue.title}`,
-        type: "error",
+        type: 'error',
       });
     }
   }
@@ -136,7 +137,7 @@ class Issues extends React.Component {
           <Modal
             title="Resolve Issue"
             open={this.state.resolveIssueOpen}
-            close={() => this.closeModal("resolveIssue")}
+            close={() => this.closeModal('resolveIssue')}
             submit={this.removeIssue}
           >
             <section>
@@ -150,7 +151,7 @@ class Issues extends React.Component {
               </p>
               <p style={{ margin: 0 }}>
                 <small>
-                  {this.state.activeIssue ? this.state.activeIssue.comment : ""}
+                  {this.state.activeIssue ? this.state.activeIssue.comment : ''}
                 </small>
               </p>
             </section>
@@ -192,7 +193,7 @@ class Issues extends React.Component {
                           <p
                             className="table-action"
                             onClick={() => {
-                              this.openModal("resolveIssue");
+                              this.openModal('resolveIssue');
                               this.setActive(issue);
                             }}
                           >

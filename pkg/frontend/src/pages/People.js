@@ -1,9 +1,11 @@
-import React from "react";
-import Api from "../data/Api";
-import Carousel from "../components/Carousel";
-import PersonCard from "../components/PersonCard";
-import { withRouter } from "react-router-dom";
-import { connect } from "react-redux";
+import React from 'react';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+
+import Carousel from '../components/Carousel';
+import PersonCard from '../components/PersonCard';
+import Api from '../data/Api';
+
 // import CarouselLoading from "../components/CarouselLoading";
 // import CarouselLoadingPerson from "../components/CarouselLoadingPerson";
 

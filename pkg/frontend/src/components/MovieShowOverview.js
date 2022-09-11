@@ -1,41 +1,38 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { ReactComponent as TrailerIcon } from "../assets/svg/video.svg";
-import { ReactComponent as ResIconHd } from "../assets/svg/720p.svg";
-import { ReactComponent as ResIconFHd } from "../assets/svg/1080p.svg";
-import { ReactComponent as ResIconUHd } from "../assets/svg/4k.svg";
-import { ReactComponent as StarIcon } from "../assets/svg/star.svg";
-import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
+import React from 'react';
+import { isIOS } from 'react-device-detect';
+import { Link } from 'react-router-dom';
 
-import { ReactComponent as RequestIcon } from "../assets/svg/request.svg";
-import { ReactComponent as ReportIcon } from "../assets/svg/report.svg";
-import { ReactComponent as CheckIcon } from "../assets/svg/check.svg";
-
-import { ReactComponent as GenreAction } from "../assets/svg/genres/action.svg";
-import { ReactComponent as GenreAdventure } from "../assets/svg/genres/adventure.svg";
-import { ReactComponent as GenreAnimation } from "../assets/svg/genres/animation.svg";
-import { ReactComponent as GenreComedy } from "../assets/svg/genres/comedy.svg";
-import { ReactComponent as GenreCrime } from "../assets/svg/genres/crime.svg";
-import { ReactComponent as GenreDocumentary } from "../assets/svg/genres/documentary.svg";
-import { ReactComponent as GenreDrama } from "../assets/svg/genres/drama.svg";
-import { ReactComponent as GenreFamily } from "../assets/svg/genres/family.svg";
-import { ReactComponent as GenreFantasy } from "../assets/svg/genres/fantasy.svg";
-import { ReactComponent as GenreHistory } from "../assets/svg/genres/history.svg";
-import { ReactComponent as GenreHorror } from "../assets/svg/genres/horror.svg";
-import { ReactComponent as GenreMusic } from "../assets/svg/genres/music.svg";
-import { ReactComponent as GenreMystery } from "../assets/svg/genres/mystery.svg";
-import { ReactComponent as GenreRomance } from "../assets/svg/genres/romance.svg";
-import { ReactComponent as GenreScienceFiction } from "../assets/svg/genres/science-fiction.svg";
-import { ReactComponent as GenreTvMovie } from "../assets/svg/genres/tv-movie.svg";
-import { ReactComponent as GenreThriller } from "../assets/svg/genres/thriller.svg";
-import { ReactComponent as GenreWar } from "../assets/svg/genres/war.svg";
-import { ReactComponent as GenreWestern } from "../assets/svg/genres/western.svg";
-import { ReactComponent as GenreAnime } from "../assets/svg/genres/anime.svg";
-
-import { ReactComponent as ImdbIcon } from "../assets/svg/imdb.svg";
-import { ReactComponent as TmdbIcon } from "../assets/svg/tmdb-sm.svg";
-
-import { isIOS } from "react-device-detect";
+import { ReactComponent as ResIconUHd } from '../assets/svg/4k.svg';
+import { ReactComponent as ResIconHd } from '../assets/svg/720p.svg';
+import { ReactComponent as ResIconFHd } from '../assets/svg/1080p.svg';
+import { ReactComponent as CheckIcon } from '../assets/svg/check.svg';
+import { ReactComponent as GenreAction } from '../assets/svg/genres/action.svg';
+import { ReactComponent as GenreAdventure } from '../assets/svg/genres/adventure.svg';
+import { ReactComponent as GenreAnimation } from '../assets/svg/genres/animation.svg';
+import { ReactComponent as GenreAnime } from '../assets/svg/genres/anime.svg';
+import { ReactComponent as GenreComedy } from '../assets/svg/genres/comedy.svg';
+import { ReactComponent as GenreCrime } from '../assets/svg/genres/crime.svg';
+import { ReactComponent as GenreDocumentary } from '../assets/svg/genres/documentary.svg';
+import { ReactComponent as GenreDrama } from '../assets/svg/genres/drama.svg';
+import { ReactComponent as GenreFamily } from '../assets/svg/genres/family.svg';
+import { ReactComponent as GenreFantasy } from '../assets/svg/genres/fantasy.svg';
+import { ReactComponent as GenreHistory } from '../assets/svg/genres/history.svg';
+import { ReactComponent as GenreHorror } from '../assets/svg/genres/horror.svg';
+import { ReactComponent as GenreMusic } from '../assets/svg/genres/music.svg';
+import { ReactComponent as GenreMystery } from '../assets/svg/genres/mystery.svg';
+import { ReactComponent as GenreRomance } from '../assets/svg/genres/romance.svg';
+import { ReactComponent as GenreScienceFiction } from '../assets/svg/genres/science-fiction.svg';
+import { ReactComponent as GenreThriller } from '../assets/svg/genres/thriller.svg';
+import { ReactComponent as GenreTvMovie } from '../assets/svg/genres/tv-movie.svg';
+import { ReactComponent as GenreWar } from '../assets/svg/genres/war.svg';
+import { ReactComponent as GenreWestern } from '../assets/svg/genres/western.svg';
+import { ReactComponent as ImdbIcon } from '../assets/svg/imdb.svg';
+import { ReactComponent as ReportIcon } from '../assets/svg/report.svg';
+import { ReactComponent as RequestIcon } from '../assets/svg/request.svg';
+import { ReactComponent as Spinner } from '../assets/svg/spinner.svg';
+import { ReactComponent as StarIcon } from '../assets/svg/star.svg';
+import { ReactComponent as TmdbIcon } from '../assets/svg/tmdb-sm.svg';
+import { ReactComponent as TrailerIcon } from '../assets/svg/video.svg';
 
 class MovieShowOverview extends React.Component {
   findNested(obj, key, value) {
@@ -44,7 +41,7 @@ class MovieShowOverview extends React.Component {
       return obj;
     } else {
       for (var i = 0, len = Object.keys(obj).length; i < len; i++) {
-        if (typeof obj[i] == "object") {
+        if (typeof obj[i] == 'object') {
           var found = this.findNested(obj[i], key, value);
           if (found) {
             // If the object was found in the recursive call, bubble it up.
@@ -60,78 +57,78 @@ class MovieShowOverview extends React.Component {
     var hours = num / 60;
     var rhours = Math.floor(hours);
     var minutes = (hours - rhours) * 60;
-    var rminutes = ("0" + Math.round(minutes)).slice(-2);
-    var hrs = rhours < 1 ? "" : rhours === 1 ? "hr" : rhours > 1 ? "hrs" : "";
-    return `${rhours >= 1 ? rhours : ""}${hrs}${rminutes}m`;
+    var rminutes = ('0' + Math.round(minutes)).slice(-2);
+    var hrs = rhours < 1 ? '' : rhours === 1 ? 'hr' : rhours > 1 ? 'hrs' : '';
+    return `${rhours >= 1 ? rhours : ''}${hrs}${rminutes}m`;
   }
 
   genreIcon(name) {
     switch (name) {
-      case "Action":
+      case 'Action':
         return <GenreAction />;
-      case "Adventure":
+      case 'Adventure':
         return <GenreAdventure />;
-      case "Animation":
+      case 'Animation':
         return <GenreAnimation />;
-      case "Comedy":
+      case 'Comedy':
         return <GenreComedy />;
-      case "Crime":
+      case 'Crime':
         return <GenreCrime />;
-      case "Documentary":
+      case 'Documentary':
         return <GenreDocumentary />;
-      case "Drama":
+      case 'Drama':
         return <GenreDrama />;
-      case "Family":
+      case 'Family':
         return <GenreFamily />;
-      case "Fantasy":
+      case 'Fantasy':
         return <GenreFantasy />;
-      case "History":
+      case 'History':
         return <GenreHistory />;
-      case "Horror":
+      case 'Horror':
         return <GenreHorror />;
-      case "Music":
+      case 'Music':
         return <GenreMusic />;
-      case "Mystery":
+      case 'Mystery':
         return <GenreMystery />;
-      case "Romance":
+      case 'Romance':
         return <GenreRomance />;
-      case "Science Fiction":
+      case 'Science Fiction':
         return <GenreScienceFiction />;
-      case "TV Movie":
+      case 'TV Movie':
         return <GenreTvMovie />;
-      case "Thriller":
+      case 'Thriller':
         return <GenreThriller />;
-      case "War":
+      case 'War':
         return <GenreWar />;
-      case "Western":
+      case 'Western':
         return <GenreWestern />;
-      case "Action & Adventure":
+      case 'Action & Adventure':
         return (
           <>
             <GenreAction />
             <GenreAdventure />
           </>
         );
-      case "Kids":
+      case 'Kids':
         return <GenreFamily />;
-      case "News":
+      case 'News':
         return null;
-      case "Reality":
+      case 'Reality':
         return null;
-      case "Sci-Fi & Fantasy":
+      case 'Sci-Fi & Fantasy':
         return (
           <>
             <GenreScienceFiction />
             <GenreFantasy />
           </>
         );
-      case "Soap":
+      case 'Soap':
         return <GenreTvMovie />;
-      case "Talk":
+      case 'Talk':
         return null;
-      case "War & Politics ":
+      case 'War & Politics ':
         return <GenreWar />;
-      case "anime":
+      case 'anime':
         return <GenreAnime />;
       default:
         return null;
@@ -143,24 +140,24 @@ class MovieShowOverview extends React.Component {
 
     let director = this.findNested(
       this.props.mediaData.credits.crew,
-      "job",
-      "Director"
+      'job',
+      'Director',
     );
 
     let screenplay = this.findNested(
       this.props.mediaData.credits.crew,
-      "job",
-      "Screenplay"
+      'job',
+      'Screenplay',
     );
 
-    let userRating = "Not Reviewed";
+    let userRating = 'Not Reviewed';
     let userRatingVal = 0;
 
     let typeRequest = this.props.mediaData.episode_run_time
       ? this.props.season
         ? `season ${this.props.season}`
-        : "show"
-      : "";
+        : 'show'
+      : '';
 
     let requestBtn = this.props.requestPending ? (
       <button className="btn btn__square pending">
@@ -192,7 +189,7 @@ class MovieShowOverview extends React.Component {
     ) : this.props.requested ? (
       <button className="btn btn__square blue" onClick={this.props.request}>
         {`Requested by ${this.props.requested}
-				${this.props.requested > 1 ? "users" : "user"}`}
+				${this.props.requested > 1 ? 'users' : 'user'}`}
       </button>
     ) : (
       <button className="btn btn__square" onClick={this.props.request}>
@@ -236,7 +233,7 @@ class MovieShowOverview extends React.Component {
               .length > 0
           ) {
             Object.keys(
-              this.props.user.reviews[this.props.match.params.id]
+              this.props.user.reviews[this.props.match.params.id],
             ).map((r) => {
               ratingsUser +=
                 (this.props.user.reviews[this.props.match.params.id][r].score /
@@ -245,7 +242,7 @@ class MovieShowOverview extends React.Component {
             });
           }
           total += Object.keys(
-            this.props.user.reviews[this.props.match.params.id]
+            this.props.user.reviews[this.props.match.params.id],
           ).length;
         }
 
@@ -264,7 +261,7 @@ class MovieShowOverview extends React.Component {
           ? `${(ratingsUser / (total - ignore)).toFixed(0)}% (${
               total - ignore
             } reviews)`
-          : "Not Reviewed";
+          : 'Not Reviewed';
 
         userRatingVal = ratingsUser / (total - ignore);
       }
@@ -291,7 +288,7 @@ class MovieShowOverview extends React.Component {
     let trailerBtn = this.props.video ? (
       <button onClick={this.props.showTrailer} className="btn btn__square">
         <TrailerIcon />
-        {this.props.trailer ? "Close Trailer" : "Trailer"}
+        {this.props.trailer ? 'Close Trailer' : 'Trailer'}
       </button>
     ) : null;
 
@@ -304,16 +301,16 @@ class MovieShowOverview extends React.Component {
               {reviewBtn}
               {this.props.mediaData.available_resolutions ? (
                 <div className="resolutions">
-                  {this.props.mediaData.available_resolutions.includes("4k") ? (
+                  {this.props.mediaData.available_resolutions.includes('4k') ? (
                     <ResIconUHd />
                   ) : null}
                   {this.props.mediaData.available_resolutions.includes(
-                    "1080"
+                    '1080',
                   ) ? (
                     <ResIconFHd />
                   ) : null}
                   {this.props.mediaData.available_resolutions.includes(
-                    "720"
+                    '720',
                   ) ? (
                     <ResIconHd />
                   ) : null}
@@ -330,12 +327,12 @@ class MovieShowOverview extends React.Component {
                     : null}
                   {this.props.mediaData.first_air_date
                     ? new Date(
-                        this.props.mediaData.first_air_date
+                        this.props.mediaData.first_air_date,
                       ).getFullYear()
                     : null}
                   {!this.props.mediaData.release_date &&
                   !this.props.mediaData.first_air_date
-                    ? "Unknown"
+                    ? 'Unknown'
                     : null}
                 </p>
                 <div className="detail--bar--sep">·</div>
@@ -347,16 +344,16 @@ class MovieShowOverview extends React.Component {
                       ? this.timeConvert(
                           Array.isArray(this.props.mediaData.episode_run_time)
                             ? this.props.mediaData.episode_run_time[0]
-                            : this.props.mediaData.episode_run_time
+                            : this.props.mediaData.episode_run_time,
                         )
-                      : "Unknown"
-                    : "Not Available"}
+                      : 'Unknown'
+                    : 'Not Available'}
                 </p>
                 <div className="detail--bar--sep">·</div>
                 <p>
                   <a
                     href={`https://www.themoviedb.org/${
-                      this.props.mediaData.seasons ? "tv" : "movie"
+                      this.props.mediaData.seasons ? 'tv' : 'movie'
                     }/${this.props.mediaData.id}`}
                     className="rating-icon"
                     target="_blank"
@@ -367,12 +364,12 @@ class MovieShowOverview extends React.Component {
                   <span
                     className={`rating color-${
                       criticRating > 7.9
-                        ? "green"
+                        ? 'green'
                         : criticRating > 6.9
-                        ? "blue"
+                        ? 'blue'
                         : criticRating > 4.9
-                        ? "orange"
-                        : "red"
+                        ? 'orange'
+                        : 'red'
                     }`}
                   >
                     {criticRating}
@@ -394,14 +391,14 @@ class MovieShowOverview extends React.Component {
                         className={`rating color-${
                           this.props.mediaData.imdb_data.rating.ratingValue >
                           7.9
-                            ? "green"
+                            ? 'green'
                             : this.props.mediaData.imdb_data.rating
                                 .ratingValue > 6.9
-                            ? "blue"
+                            ? 'blue'
                             : this.props.mediaData.imdb_data.rating
                                 .ratingValue > 4.9
-                            ? "orange"
-                            : "red"
+                            ? 'orange'
+                            : 'red'
                         }`}
                       >
                         {this.props.mediaData.imdb_data.rating.ratingValue}
@@ -413,20 +410,20 @@ class MovieShowOverview extends React.Component {
                 <p>
                   <span
                     className="desktop-only"
-                    style={{ cursor: "help" }}
+                    style={{ cursor: 'help' }}
                     title="Petio reviews are a combination of Petio users on this server and external user reviews."
                   >
-                    Petio:{" "}
+                    Petio:{' '}
                   </span>
                   <span
                     className={`rating d-nm color-${
                       userRatingVal > 79
-                        ? "green"
+                        ? 'green'
                         : userRatingVal > 69
-                        ? "blue"
+                        ? 'blue'
                         : userRatingVal > 49
-                        ? "orange"
-                        : "red"
+                        ? 'orange'
+                        : 'red'
                     }`}
                   >
                     {userRating}
@@ -460,7 +457,7 @@ class MovieShowOverview extends React.Component {
                   return (
                     <Link
                       to={`/genre/${
-                        this.props.mediaData.seasons ? "tv" : "movie"
+                        this.props.mediaData.seasons ? 'tv' : 'movie'
                       }/${genre.id}`}
                       key={`genre_${genre.name}`}
                       className="genre--item"
@@ -477,11 +474,11 @@ class MovieShowOverview extends React.Component {
                         return (
                           <Link
                             to={`/genre/${
-                              this.props.mediaData.seasons ? "tv" : "movie"
+                              this.props.mediaData.seasons ? 'tv' : 'movie'
                             }/${genre.id}`}
                             key={`genre_${genre.name}`}
                             className="genre--item"
-                            style={{ textTransform: "capitalize" }}
+                            style={{ textTransform: 'capitalize' }}
                           >
                             {this.genreIcon(genre.name)}
                             {genre.name}

@@ -1,10 +1,11 @@
-import React from "react";
-import Api from "../data/Api";
-import MovieCard from "./MovieCard";
-import TvCard from "./TvCard";
-import { ReactComponent as PlayIcon } from "../assets/svg/play.svg";
-import { ReactComponent as PauseIcon } from "../assets/svg/pause.svg";
-import { ReactComponent as BufferIcon } from "../assets/svg/buffer.svg";
+import React from 'react';
+
+import { ReactComponent as BufferIcon } from '../assets/svg/buffer.svg';
+import { ReactComponent as PauseIcon } from '../assets/svg/pause.svg';
+import { ReactComponent as PlayIcon } from '../assets/svg/play.svg';
+import Api from '../data/Api';
+import MovieCard from './MovieCard';
+import TvCard from './TvCard';
 
 class SessionMedia extends React.Component {
   constructor(props) {
@@ -16,8 +17,8 @@ class SessionMedia extends React.Component {
   }
 
   componentDidMount() {
-    if (!this.props.live && this.props.type !== "clip") {
-      if (this.props.type === "movie") {
+    if (!this.props.live && this.props.type !== 'clip') {
+      if (this.props.type === 'movie') {
         this.getMovie();
       } else {
         this.getSeries();
@@ -36,7 +37,7 @@ class SessionMedia extends React.Component {
   }
 
   getMovie() {
-    Api.get_plex_media(this.props.id, "movie").then((res) => {
+    Api.get_plex_media(this.props.id, 'movie').then((res) => {
       this.setState({
         id: res.tmdb_id,
       });
@@ -44,7 +45,7 @@ class SessionMedia extends React.Component {
   }
 
   getSeries() {
-    Api.get_plex_media(this.props.id, "tv").then((res) => {
+    Api.get_plex_media(this.props.id, 'tv').then((res) => {
       this.setState({
         id: res.tmdb_id,
       });
@@ -53,25 +54,25 @@ class SessionMedia extends React.Component {
 
   render() {
     let card = null;
-    if (!this.state.id && !this.props.live && this.props.type !== "clip") {
+    if (!this.state.id && !this.props.live && this.props.type !== 'clip') {
       return null;
     }
     if (
       this.props.live ||
-      this.props.type === "clip" ||
-      this.props.type === "trailer" ||
-      this.state.id === "false"
+      this.props.type === 'clip' ||
+      this.props.type === 'trailer' ||
+      this.state.id === 'false'
     ) {
       let playbackState;
       switch (this.props.playbackState) {
-        case "playing":
-        case "streaming":
+        case 'playing':
+        case 'streaming':
           playbackState = <PlayIcon />;
           break;
-        case "paused":
+        case 'paused':
           playbackState = <PauseIcon />;
           break;
-        case "buffering":
+        case 'buffering':
           playbackState = <BufferIcon />;
           break;
         default:
@@ -87,7 +88,7 @@ class SessionMedia extends React.Component {
                 <div
                   className="session--prog"
                   style={{
-                    maxWidth: this.props.progress + "%",
+                    maxWidth: this.props.progress + '%',
                   }}
                 ></div>
               </div>
@@ -96,7 +97,7 @@ class SessionMedia extends React.Component {
           </div>
         </div>
       );
-    } else if (this.props.type === "movie") {
+    } else if (this.props.type === 'movie') {
       card = (
         <MovieCard
           key={this.props.uid}

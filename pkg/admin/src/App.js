@@ -1,19 +1,20 @@
-import React from "react";
-import { HashRouter, Switch, Route } from "react-router-dom";
-import { connect } from "react-redux";
-import Sidebar from "./components/Sidebar";
-import Login from "./components/Login";
-import Dashboard from "./page/Dashboard";
-import { ReactComponent as Spinner } from "./assets/svg/spinner.svg";
-import Api from "./data/Api";
-import Setup from "./page/Setup";
-import Settings from "./page/Settings";
-import Requests from "./page/Requests";
-import Users from "./page/Users";
-import Issues from "./page/Issues";
-import Reviews from "./page/Reviews";
-import Profile from "./page/Profile";
-import User from "./data/User";
+import React from 'react';
+import { connect } from 'react-redux';
+import { HashRouter, Route, Switch } from 'react-router-dom';
+
+import { ReactComponent as Spinner } from './assets/svg/spinner.svg';
+import Login from './components/Login';
+import Sidebar from './components/Sidebar';
+import Api from './data/Api';
+import User from './data/User';
+import Dashboard from './page/Dashboard';
+import Issues from './page/Issues';
+import Profile from './page/Profile';
+import Requests from './page/Requests';
+import Reviews from './page/Reviews';
+import Settings from './page/Settings';
+import Setup from './page/Setup';
+import Users from './page/Users';
 
 class App extends React.Component {
   constructor(props) {
@@ -50,10 +51,10 @@ class App extends React.Component {
       let res = await Api.checkConfig();
       if (res.error) {
         this.props.msg({
-          type: "error",
+          type: 'error',
           message: res.error,
         });
-        throw "Config error";
+        throw 'Config error';
       }
       if (setup && !res.ready) {
         setTimeout(() => {
@@ -112,8 +113,8 @@ class App extends React.Component {
   msg(
     data = {
       message: String,
-      type: "info",
-    }
+      type: 'info',
+    },
   ) {
     let timestamp = +new Date();
     let msgs = { ...this.state.pushMsg };
@@ -148,7 +149,7 @@ class App extends React.Component {
                   data-key={`pm__${msg.timestamp}__${i}__error`}
                   key={`pm__${msg.timestamp}__${i}__error`}
                   className={`push-msg--item ${
-                    msg.type !== "info" ? msg.type : ""
+                    msg.type !== 'info' ? msg.type : ''
                   }`}
                 >
                   {msg.message}
@@ -194,7 +195,7 @@ class App extends React.Component {
                 <div
                   key={`pm__${msg.timestamp}__${i}__setup`}
                   className={`push-msg--item ${
-                    msg.type !== "info" ? msg.type : ""
+                    msg.type !== 'info' ? msg.type : ''
                   }`}
                 >
                   {msg.message}
@@ -218,7 +219,7 @@ class App extends React.Component {
                 <div
                   key={`pm__${msg.timestamp}__${i}__login`}
                   className={`push-msg--item ${
-                    msg.type !== "info" ? msg.type : ""
+                    msg.type !== 'info' ? msg.type : ''
                   }`}
                 >
                   {msg.message}
@@ -243,7 +244,7 @@ class App extends React.Component {
                 <div
                   key={`pm__${msg.timestamp}__${i}__logged_in`}
                   className={`push-msg--item ${
-                    msg.type !== "info" ? msg.type : ""
+                    msg.type !== 'info' ? msg.type : ''
                   }`}
                 >
                   {msg.message}
@@ -260,7 +261,7 @@ class App extends React.Component {
               </div>
               <button
                 className={`nav-toggle ${
-                  this.state.mobMenuOpen ? "active" : ""
+                  this.state.mobMenuOpen ? 'active' : ''
                 }`}
                 onClick={this.toggleMobMenu}
               >

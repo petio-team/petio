@@ -1,11 +1,10 @@
-import React from "react";
-import Api from "../../data/Api";
+import React from 'react';
 
-import { ReactComponent as Add } from "../../assets/svg/plus-circle.svg";
-import { ReactComponent as ServerIcon } from "../../assets/svg/server.svg";
-
-import { ReactComponent as Spinner } from "../../assets/svg/spinner.svg";
-import Modal from "../../components/Modal";
+import { ReactComponent as Add } from '../../assets/svg/plus-circle.svg';
+import { ReactComponent as ServerIcon } from '../../assets/svg/server.svg';
+import { ReactComponent as Spinner } from '../../assets/svg/spinner.svg';
+import Modal from '../../components/Modal';
+import Api from '../../data/Api';
 
 class Radarr extends React.Component {
   constructor(props) {
@@ -18,28 +17,28 @@ class Radarr extends React.Component {
       isMsg: false,
       wizardOpen: false,
       enabled: false,
-      name: "",
-      protocol: "http",
-      host: "localhost",
+      name: '',
+      protocol: 'http',
+      host: 'localhost',
       port: 7878,
       profile: {
         id: 0,
-        name: "",
+        name: '',
       },
       path: {
         id: 0,
-        location: "",
+        location: '',
       },
       language: {
         id: 0,
-        name: "",
+        name: '',
       },
       media_type: {
         id: 0,
-        name: "",
+        name: '',
       },
-      subpath: "/",
-      token: "",
+      subpath: '/',
+      token: '',
       activeServer: false,
       id: '',
       needsTest: false,
@@ -60,7 +59,7 @@ class Radarr extends React.Component {
 
   async saveServer(silent = false) {
     if (this.state.activeServer === false) {
-      console.log("error");
+      console.log('error');
       return;
     }
 
@@ -72,7 +71,7 @@ class Radarr extends React.Component {
       host: this.state.host,
       token: this.state.token,
       port: this.state.port,
-      subpath: this.state.subpath === "/" ? "/" : this.state.subpath,
+      subpath: this.state.subpath === '/' ? '/' : this.state.subpath,
       path: {
         id: this.state.path.id,
         location: this.state.path.location,
@@ -88,7 +87,7 @@ class Radarr extends React.Component {
       media_type: {
         id: this.state.media_type.id,
         name: this.state.media_type.name,
-      }
+      },
     };
 
     await Api.saveRadarrConfig(servers);
@@ -96,8 +95,8 @@ class Radarr extends React.Component {
 
     if (!silent) {
       this.props.msg({
-        message: "Radarr settings saved!",
-        type: "good",
+        message: 'Radarr settings saved!',
+        type: 'good',
       });
     }
   }
@@ -105,19 +104,21 @@ class Radarr extends React.Component {
   async deleteServer(silent = false) {
     if (this.state.activeServer === false) {
       this.props.msg({
-        message: "something went wrong",
-        type: "error",
+        message: 'something went wrong',
+        type: 'error',
       });
       return;
     }
 
     let servers = this.state.servers;
 
-    let res = await Api.radarrDeleteInstance(servers[this.state.activeServer].id);
-    if (res.status == "error") {
+    let res = await Api.radarrDeleteInstance(
+      servers[this.state.activeServer].id,
+    );
+    if (res.status == 'error') {
       this.props.msg({
         message: res.error,
-        type: "error",
+        type: 'error',
       });
       return;
     }
@@ -126,20 +127,20 @@ class Radarr extends React.Component {
     this.getRadarr(true);
 
     if (!silent) {
-      this.closeModal("addServer");
+      this.closeModal('addServer');
       this.closeWizard();
 
       this.props.msg({
         message: res.message,
-        type: "good",
+        type: 'good',
       });
     }
   }
 
   async test(id, add = false) {
-    if (!this.state.subpath.startsWith("/") && this.state.subpath.length > 0) {
+    if (!this.state.subpath.startsWith('/') && this.state.subpath.length > 0) {
       this.setState({
-        subpath: "/" + this.state.subpath,
+        subpath: '/' + this.state.subpath,
       });
       setTimeout(() => {
         this.test(id, add);
@@ -157,23 +158,23 @@ class Radarr extends React.Component {
           needsTest: false,
         });
         this.props.msg({
-          message: "Radarr Test Connection success!",
-          type: "good",
+          message: 'Radarr Test Connection success!',
+          type: 'good',
         });
         await this.getRadarr(true);
         await this.getSettings(id);
       } else {
         this.props.msg({
-          message: "Radarr Test Connection failed!",
-          type: "error",
+          message: 'Radarr Test Connection failed!',
+          type: 'error',
         });
 
         this.deleteServer(true);
       }
     } catch (err) {
       this.props.msg({
-        message: "Radarr Test Connection failed! Error 2",
-        type: "error",
+        message: 'Radarr Test Connection failed! Error 2',
+        type: 'error',
       });
     }
   }
@@ -183,18 +184,18 @@ class Radarr extends React.Component {
     const name = target.name;
     let value = target.value;
 
-    if (target.classList.contains("frt")) {
+    if (target.classList.contains('frt')) {
       this.setState({
         needsTest: true,
         enabled: false,
       });
     }
 
-    if (target.type === "checkbox") {
+    if (target.type === 'checkbox') {
       value = target.checked;
     }
 
-    if (target.type === "select-one") {
+    if (target.type === 'select-one') {
       let title = target.options[target.selectedIndex].text;
       if (this.state[name] instanceof Object) {
         this.setState({
@@ -260,7 +261,7 @@ class Radarr extends React.Component {
         },
         path: {
           id: this.state.servers[id].path.id,
-          location: this.state.servers[id].path.location
+          location: this.state.servers[id].path.location,
         },
         language: {
           id: this.state.servers[id].language.id,
@@ -279,7 +280,7 @@ class Radarr extends React.Component {
         newServer: true,
         wizardOpen: true,
         activeServer: id,
-        id: "",
+        id: '',
         needsTest: true,
       });
     }
@@ -288,29 +289,29 @@ class Radarr extends React.Component {
   closeWizard() {
     this.setState({
       enabled: false,
-      name: "",
-      protocol: "http",
-      host: "localhost",
+      name: '',
+      protocol: 'http',
+      host: 'localhost',
       port: 7878,
-      subpath: "/",
-      token: "",
+      subpath: '/',
+      token: '',
       profiles: false,
       paths: false,
       profile: {
         id: 0,
-        name: "",
+        name: '',
       },
       path: {
         id: 0,
-        location: "",
+        location: '',
       },
       language: {
         id: 0,
-        name: "",
+        name: '',
       },
       media_type: {
         id: 0,
-        name: "",
+        name: '',
       },
       wizardOpen: false,
       editWizardOpen: false,
@@ -331,34 +332,34 @@ class Radarr extends React.Component {
     this.setState({
       [`${id}Open`]: false,
       enabled: false,
-      name: "",
-      protocol: "http",
-      host: "localhost",
+      name: '',
+      protocol: 'http',
+      host: 'localhost',
       port: null,
-      subpath: "/",
-      token: "",
+      subpath: '/',
+      token: '',
       profiles: false,
       paths: false,
       profile: {
         id: 0,
-        name: "",
+        name: '',
       },
       path: {
         id: 0,
-        location: "",
+        location: '',
       },
       language: {
         id: 0,
-        name: "",
+        name: '',
       },
       media_type: {
         id: 0,
-        name: "",
+        name: '',
       },
       wizardOpen: false,
       editWizardOpen: false,
       activeServer: false,
-      id: "",
+      id: '',
     });
   }
 
@@ -373,7 +374,10 @@ class Radarr extends React.Component {
           profiles: settings.profiles.length > 0 ? settings.profiles : false,
           paths: settings.paths.length > 0 ? settings.paths : false,
           languages: settings.languages.length > 0 ? settings.languages : false,
-          availabilities: settings.minimumAvailability.length > 0 ? settings.minimumAvailability : false,
+          availabilities:
+            settings.minimumAvailability.length > 0
+              ? settings.minimumAvailability
+              : false,
         });
     } catch {
       return;
@@ -402,18 +406,18 @@ class Radarr extends React.Component {
             this.state.needsTest
               ? false
               : () => {
-                this.saveServer();
-                this.closeModal("addServer");
-              }
+                  this.saveServer();
+                  this.closeModal('addServer');
+                }
           }
-          close={() => this.closeModal("addServer")}
+          close={() => this.closeModal('addServer')}
           delete={
             this.state.newServer
               ? false
               : () => {
-                this.deleteServer();
-                this.closeModal("addServer");
-              }
+                  this.deleteServer();
+                  this.closeModal('addServer');
+                }
           }
         >
           <label>Name</label>
@@ -476,8 +480,9 @@ class Radarr extends React.Component {
           </button>
           <label>Profile</label>
           <div
-            className={`styled-input--select ${this.state.profiles ? "" : "disabled"
-              }`}
+            className={`styled-input--select ${
+              this.state.profiles ? '' : 'disabled'
+            }`}
           >
             <select
               name="profile"
@@ -485,8 +490,8 @@ class Radarr extends React.Component {
               onChange={this.inputChange}
             >
               {this.state.profiles &&
-                !this.state.newServer &&
-                !this.state.needsTest ? (
+              !this.state.newServer &&
+              !this.state.needsTest ? (
                 <>
                   <option value="">Choose an option</option>
                   {this.state.profiles.map((item) => {
@@ -500,16 +505,17 @@ class Radarr extends React.Component {
               ) : (
                 <option value="">
                   {this.state.newServer || this.state.needsTest
-                    ? "Please test connection"
-                    : "Loading..."}
+                    ? 'Please test connection'
+                    : 'Loading...'}
                 </option>
               )}
             </select>
           </div>
           <label>Path</label>
           <div
-            className={`styled-input--select ${this.state.profiles ? "" : "disabled"
-              }`}
+            className={`styled-input--select ${
+              this.state.profiles ? '' : 'disabled'
+            }`}
           >
             <select
               name="path"
@@ -530,16 +536,17 @@ class Radarr extends React.Component {
               ) : (
                 <option value="">
                   {this.state.newServer || this.state.needsTest
-                    ? "Please test connection"
-                    : "Loading..."}
+                    ? 'Please test connection'
+                    : 'Loading...'}
                 </option>
               )}
             </select>
           </div>
           <label>Language</label>
           <div
-            className={`styled-input--select ${this.state.languages ? "" : "disabled"
-              }`}
+            className={`styled-input--select ${
+              this.state.languages ? '' : 'disabled'
+            }`}
           >
             <select
               name="language"
@@ -557,20 +564,20 @@ class Radarr extends React.Component {
                     );
                   })}
                 </>
-              ) :
-                (
-                  <option value="">
-                    {this.state.newServer || this.state.needsTest
-                      ? "Please test connection"
-                      : "Loading..."}
-                  </option>
-                )}
+              ) : (
+                <option value="">
+                  {this.state.newServer || this.state.needsTest
+                    ? 'Please test connection'
+                    : 'Loading...'}
+                </option>
+              )}
             </select>
           </div>
           <label>Minimum Availability</label>
           <div
-            className={`styled-input--select ${this.state.availabilities ? "" : "disabled"
-              }`}
+            className={`styled-input--select ${
+              this.state.availabilities ? '' : 'disabled'
+            }`}
           >
             <select
               name="media_type"
@@ -587,20 +594,19 @@ class Radarr extends React.Component {
                     );
                   })}
                 </>
-              ) :
-                (
-                  <option value="">
-                    {this.state.newServer || this.state.needsTest
-                      ? "Please test connection"
-                      : "Loading..."}
-                  </option>
-                )}
+              ) : (
+                <option value="">
+                  {this.state.newServer || this.state.needsTest
+                    ? 'Please test connection'
+                    : 'Loading...'}
+                </option>
+              )}
             </select>
           </div>
           {!this.state.newServer &&
-            this.state.path.id != null &&
-            this.state.profile.id != null &&
-            !this.state.needsTest ? (
+          this.state.path.id != null &&
+          this.state.profile.id != null &&
+          !this.state.needsTest ? (
             <div className="checkbox-wrap mb--2">
               <input
                 type="checkbox"
@@ -630,28 +636,22 @@ class Radarr extends React.Component {
                     <ServerIcon />
                     <p className="sr--title">{server.name}</p>
                     <p>{`${server.protocol}://${server.host}:${server.port}`}</p>
-                    <p>Status: {server.enabled ? "Enabled" : "Disabled"}</p>
+                    <p>Status: {server.enabled ? 'Enabled' : 'Disabled'}</p>
+                    <p>Profile: {server.profile.name ?? 'Not set'}</p>
+                    <p>Path: {server.path.location ?? 'Not set'}</p>
+                    <p>Language: {server.language.name ?? 'Not set'}</p>
                     <p>
-                      Profile:{" "}
-                      {server.profile.name ?? "Not set"}
-                    </p>
-                    <p>
-                      Path: {server.path.location ?? "Not set"}
-                    </p>
-                    <p>
-                      Language: {server.language.name ?? "Not set"}
-                    </p>
-                    <p>
-                      Minimum Availability: {server.media_type.name ?? "Not set"}
+                      Minimum Availability:{' '}
+                      {server.media_type.name ?? 'Not set'}
                     </p>
                     <p className="small">
-                      ID: {server.id ? server.id : "Error"}
+                      ID: {server.id ? server.id : 'Error'}
                     </p>
                     <div className="btn-wrap">
                       <button
                         className="btn btn__square"
                         onClick={() => {
-                          this.openModal("addServer");
+                          this.openModal('addServer');
                           this.openWizard(i);
                         }}
                       >
@@ -672,7 +672,7 @@ class Radarr extends React.Component {
               <div
                 className="sr--instance--inner"
                 onClick={() => {
-                  this.openModal("addServer");
+                  this.openModal('addServer');
                   this.openWizard(serverCount);
                 }}
               >

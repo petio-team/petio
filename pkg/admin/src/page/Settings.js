@@ -1,30 +1,30 @@
-import React from "react";
-import { connect } from "react-redux";
-import { withRouter, Link, Switch, Route } from "react-router-dom";
+import React from 'react';
+import { connect } from 'react-redux';
+import { Link, Route, Switch, withRouter } from 'react-router-dom';
 
-import { ReactComponent as GeneralIcon } from "../assets/svg/settings-general.svg";
-import { ReactComponent as ConsoleIcon } from "../assets/svg/console.svg";
-import { ReactComponent as FilterIcon } from "../assets/svg/filter.svg";
-import { ReactComponent as NotificationsIcon } from "../assets/svg/notifications.svg";
-import Console from "./settings/console";
-import General from "./settings/general";
-import Radarr from "./settings/radarr";
-import Sonarr from "./settings/sonarr";
-import Filter from "./settings/filter";
-import Notifications from "./settings/notifications";
+import { ReactComponent as ConsoleIcon } from '../assets/svg/console.svg';
+import { ReactComponent as FilterIcon } from '../assets/svg/filter.svg';
+import { ReactComponent as NotificationsIcon } from '../assets/svg/notifications.svg';
+import { ReactComponent as GeneralIcon } from '../assets/svg/settings-general.svg';
+import Console from './settings/console';
+import Filter from './settings/filter';
+import General from './settings/general';
+import Notifications from './settings/notifications';
+import Radarr from './settings/radarr';
+import Sonarr from './settings/sonarr';
 
 class Settings extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      parent: "general",
-      child: "",
+      parent: 'general',
+      child: '',
     };
   }
 
   componentDidMount() {
-    let page = document.querySelectorAll(".page-wrap")[0];
+    let page = document.querySelectorAll('.page-wrap')[0];
     page.scrollTop = 0;
     window.scrollTo(0, 0);
   }
@@ -37,8 +37,8 @@ class Settings extends React.Component {
           <Link
             to="/settings"
             className={
-              "settings--menu--item " +
-              (current === "/settings" ? "active" : "")
+              'settings--menu--item ' +
+              (current === '/settings' ? 'active' : '')
             }
           >
             <p>General</p>
@@ -49,8 +49,8 @@ class Settings extends React.Component {
           <Link
             to="/settings/radarr"
             className={
-              "settings--menu--item " +
-              (current === "/settings/radarr" ? "active" : "")
+              'settings--menu--item ' +
+              (current === '/settings/radarr' ? 'active' : '')
             }
           >
             <p>Radarr</p>
@@ -64,8 +64,8 @@ class Settings extends React.Component {
           <Link
             to="/settings/sonarr"
             className={
-              "settings--menu--item " +
-              (current === "/settings/sonarr" ? "active" : "")
+              'settings--menu--item ' +
+              (current === '/settings/sonarr' ? 'active' : '')
             }
           >
             <p>Sonarr</p>
@@ -79,8 +79,8 @@ class Settings extends React.Component {
           <Link
             to="/settings/filter"
             className={
-              "settings--menu--item " +
-              (current === "/settings/filter" ? "active" : "")
+              'settings--menu--item ' +
+              (current === '/settings/filter' ? 'active' : '')
             }
           >
             <p>Filter</p>
@@ -91,8 +91,8 @@ class Settings extends React.Component {
           <Link
             to="/settings/notifications"
             className={
-              "settings--menu--item " +
-              (current === "/settings/notifications" ? "active" : "")
+              'settings--menu--item ' +
+              (current === '/settings/notifications' ? 'active' : '')
             }
           >
             <p>Notifications</p>
@@ -103,8 +103,8 @@ class Settings extends React.Component {
           <Link
             to="/settings/console"
             className={
-              "settings--menu--item " +
-              (current === "/settings/console" ? "active" : "")
+              'settings--menu--item ' +
+              (current === '/settings/console' ? 'active' : '')
             }
           >
             <p>Console</p>

@@ -157,7 +157,7 @@ button {
     color: $primary;
 
     &:before {
-      content: "";
+      content: '';
       height: 20px;
       width: 20px;
       border: solid 3px transparent;
@@ -173,7 +173,7 @@ button {
     }
 
     &:after {
-      content: "";
+      content: '';
       height: 0px;
       width: 0px;
       border: solid 15px transparent;

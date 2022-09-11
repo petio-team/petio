@@ -1,29 +1,30 @@
-import React from "react";
-import SessionMedia from "./SessionMedia";
-import { ReactComponent as ArrowIcon } from "../assets/svg/arrow-left.svg";
-import { ReactComponent as LockIcon } from "../assets/svg/lock.svg";
-import { ReactComponent as UnlockIcon } from "../assets/svg/unlock.svg";
-import { ReactComponent as DirectIcon } from "../assets/svg/direct.svg";
-import { ReactComponent as StreamIcon } from "../assets/svg/stream.svg";
-import { ReactComponent as TranscodeIcon } from "../assets/svg/transcode.svg";
+import React from 'react';
+
+import { ReactComponent as ArrowIcon } from '../assets/svg/arrow-left.svg';
+import { ReactComponent as DirectIcon } from '../assets/svg/direct.svg';
+import { ReactComponent as LockIcon } from '../assets/svg/lock.svg';
+import { ReactComponent as StreamIcon } from '../assets/svg/stream.svg';
+import { ReactComponent as TranscodeIcon } from '../assets/svg/transcode.svg';
+import { ReactComponent as UnlockIcon } from '../assets/svg/unlock.svg';
+import SessionMedia from './SessionMedia';
 
 class Sessions extends React.Component {
   formatAudio(channels) {
     switch (channels) {
-      case "1":
-        return "(Mono)";
+      case '1':
+        return '(Mono)';
 
-      case "2":
-        return "(Stereo)";
+      case '2':
+        return '(Stereo)';
 
-      case "6":
-        return "(5.1)";
+      case '6':
+        return '(5.1)';
 
-      case "7":
-        return "(6.1)";
+      case '7':
+        return '(6.1)';
 
-      case "8":
-        return "(7.1)";
+      case '8':
+        return '(7.1)';
 
       default:
         return `(${channels})`;
@@ -32,27 +33,27 @@ class Sessions extends React.Component {
 
   formatDecision(dec) {
     switch (dec) {
-      case "copy":
-        return "Direct Stream";
+      case 'copy':
+        return 'Direct Stream';
 
-      case "transcode":
-        return "Transcode";
+      case 'transcode':
+        return 'Transcode';
 
       default:
-        return "Direct Play";
+        return 'Direct Play';
     }
   }
 
   decisionIcon(dec) {
     switch (dec) {
-      case "copy":
+      case 'copy':
         return (
           <span className="session--decision-icon stream">
             <StreamIcon />
           </span>
         );
 
-      case "transcode":
+      case 'transcode':
         return (
           <span className="session--decision-icon transcode">
             <TranscodeIcon />
@@ -80,9 +81,9 @@ class Sessions extends React.Component {
     let bitrate;
     bitrate = selectedMedia.Part[0].Stream[0].bitrate;
     if (bitrate > 1000) {
-      bitrate = Math.ceil(bitrate / 1000) + " mbps";
+      bitrate = Math.ceil(bitrate / 1000) + ' mbps';
     } else {
-      bitrate += " kbps";
+      bitrate += ' kbps';
     }
 
     return (
@@ -95,8 +96,8 @@ class Sessions extends React.Component {
             {this.decisionIcon(selectedMedia.Part[0].Stream[0].decision)}
             {this.formatDecision(selectedMedia.Part[0].Stream[0].decision)}
           </p>
-          {selectedMedia.Part[0].Stream[0].decision === "transcode" ||
-          selectedMedia.Part[0].Stream[0].decision === "copy" ? (
+          {selectedMedia.Part[0].Stream[0].decision === 'transcode' ||
+          selectedMedia.Part[0].Stream[0].decision === 'copy' ? (
             <>
               <p className="session--container">
                 <span className="session--label">Container:</span>
@@ -132,12 +133,12 @@ class Sessions extends React.Component {
           <p>
             <strong>Audio</strong>
           </p>
-          {selectedMedia.Part[0].Stream[1].decision === "transcode" ? (
+          {selectedMedia.Part[0].Stream[1].decision === 'transcode' ? (
             <p>
               {this.decisionIcon(selectedMedia.Part[0].Stream[1].decision)}
               {this.formatDecision(
-                selectedMedia.Part[0].Stream[1].decision
-              )}{" "}
+                selectedMedia.Part[0].Stream[1].decision,
+              )}{' '}
               {selectedMedia.Part[0].Stream[1].displayTitle}
               <ArrowIcon />
               <span className="upper">
@@ -150,8 +151,8 @@ class Sessions extends React.Component {
             <p>
               {this.decisionIcon(selectedMedia.Part[0].Stream[1].decision)}
               {this.formatDecision(
-                selectedMedia.Part[0].Stream[1].decision
-              )}{" "}
+                selectedMedia.Part[0].Stream[1].decision,
+              )}{' '}
               {selectedMedia.Part[0].Stream[1].displayTitle}
             </p>
           )}
@@ -171,10 +172,10 @@ class Sessions extends React.Component {
           <p>
             <strong>Player</strong>
           </p>
-          <p>{session.Player.title + " (" + session.Player.product + ")"}</p>
+          <p>{session.Player.title + ' (' + session.Player.product + ')'}</p>
           <p>
-            {session.Player.local ? "Local" : "Remote"} {session.Player.address}{" "}
-            <span className={"session--secure secure-" + session.Player.secure}>
+            {session.Player.local ? 'Local' : 'Remote'} {session.Player.address}{' '}
+            <span className={'session--secure secure-' + session.Player.secure}>
               {session.Player.secure ? <LockIcon /> : <UnlockIcon />}
             </span>
           </p>
@@ -202,12 +203,12 @@ class Sessions extends React.Component {
 
               let playback = selectedMedia.Part
                 ? selectedMedia.Part[0].decision
-                : "unknown";
+                : 'unknown';
               switch (session.type) {
-                case "episode":
+                case 'episode':
                   media = session.grandparentRatingKey;
                   break;
-                case "movie":
+                case 'movie':
                   media = session.ratingKey;
                   break;
                 default:
@@ -216,11 +217,11 @@ class Sessions extends React.Component {
               return (
                 <div
                   className="session"
-                  data-id={session.Session ? session.Session.id : "pending"}
+                  data-id={session.Session ? session.Session.id : 'pending'}
                   key={
                     session.Player.machineIdentifier +
                     session.ratingKey +
-                    "__session"
+                    '__session'
                   }
                 >
                   <SessionMedia
@@ -239,14 +240,14 @@ class Sessions extends React.Component {
                   <div className="session--info">
                     <p>User: {session.User.title}</p>
                     <p className="session--title">
-                      {session.title + (session.live ? " (Live)" : "")}
+                      {session.title + (session.live ? ' (Live)' : '')}
                     </p>
-                    {session.type === "episode" ? (
+                    {session.type === 'episode' ? (
                       <p className="session--show">
                         {session.grandparentTitle +
                           (session.parentTitle
-                            ? " | " + session.parentTitle
-                            : "")}
+                            ? ' | ' + session.parentTitle
+                            : '')}
                       </p>
                     ) : null}
                     <div className="session--playback">

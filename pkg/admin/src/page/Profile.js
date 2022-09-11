@@ -1,10 +1,10 @@
-import React from "react";
-import { withRouter } from "react-router-dom";
-import { connect } from "react-redux";
+import React from 'react';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 
 class Profile extends React.Component {
   componentDidMount() {
-    let page = document.querySelectorAll(".page-wrap")[0];
+    let page = document.querySelectorAll('.page-wrap')[0];
     page.scrollTop = 0;
     window.scrollTo(0, 0);
   }
@@ -23,14 +23,14 @@ class Profile extends React.Component {
                 className="thumb"
                 style={{
                   backgroundImage:
-                    process.env.NODE_ENV === "development"
+                    process.env.NODE_ENV === 'development'
                       ? 'url("http://localhost:7778/user/thumb/' +
                         this.props.user.current.id +
                         '")'
                       : 'url("/api/user/thumb/' +
                         this.props.user.current.id +
                         '")',
-                  color: "red",
+                  color: 'red',
                 }}
               ></a>
               <div className="hover">

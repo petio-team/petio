@@ -1,31 +1,31 @@
-import React from "react";
-import { withRouter } from "react-router-dom";
-import MovieCard from "../components/MovieCard";
-import TvCard from "../components/TvCard";
-import Api from "../data/Api";
-import Nav from "../data/Nav";
+import React from 'react';
+import { withRouter } from 'react-router-dom';
 
-import { ReactComponent as GenreAction } from "../assets/svg/genres/action.svg";
-import { ReactComponent as GenreAdventure } from "../assets/svg/genres/adventure.svg";
-import { ReactComponent as GenreAnimation } from "../assets/svg/genres/animation.svg";
-import { ReactComponent as GenreComedy } from "../assets/svg/genres/comedy.svg";
-import { ReactComponent as GenreCrime } from "../assets/svg/genres/crime.svg";
-import { ReactComponent as GenreDocumentary } from "../assets/svg/genres/documentary.svg";
-import { ReactComponent as GenreDrama } from "../assets/svg/genres/drama.svg";
-import { ReactComponent as GenreFamily } from "../assets/svg/genres/family.svg";
-import { ReactComponent as GenreFantasy } from "../assets/svg/genres/fantasy.svg";
-import { ReactComponent as GenreHistory } from "../assets/svg/genres/history.svg";
-import { ReactComponent as GenreHorror } from "../assets/svg/genres/horror.svg";
-import { ReactComponent as GenreMusic } from "../assets/svg/genres/music.svg";
-import { ReactComponent as GenreMystery } from "../assets/svg/genres/mystery.svg";
-import { ReactComponent as GenreRomance } from "../assets/svg/genres/romance.svg";
-import { ReactComponent as GenreScienceFiction } from "../assets/svg/genres/science-fiction.svg";
-import { ReactComponent as GenreTvMovie } from "../assets/svg/genres/tv-movie.svg";
-import { ReactComponent as GenreThriller } from "../assets/svg/genres/thriller.svg";
-import { ReactComponent as GenreWar } from "../assets/svg/genres/war.svg";
-import { ReactComponent as GenreWestern } from "../assets/svg/genres/western.svg";
-import { ReactComponent as GenreAnime } from "../assets/svg/genres/anime.svg";
-import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
+import { ReactComponent as GenreAction } from '../assets/svg/genres/action.svg';
+import { ReactComponent as GenreAdventure } from '../assets/svg/genres/adventure.svg';
+import { ReactComponent as GenreAnimation } from '../assets/svg/genres/animation.svg';
+import { ReactComponent as GenreAnime } from '../assets/svg/genres/anime.svg';
+import { ReactComponent as GenreComedy } from '../assets/svg/genres/comedy.svg';
+import { ReactComponent as GenreCrime } from '../assets/svg/genres/crime.svg';
+import { ReactComponent as GenreDocumentary } from '../assets/svg/genres/documentary.svg';
+import { ReactComponent as GenreDrama } from '../assets/svg/genres/drama.svg';
+import { ReactComponent as GenreFamily } from '../assets/svg/genres/family.svg';
+import { ReactComponent as GenreFantasy } from '../assets/svg/genres/fantasy.svg';
+import { ReactComponent as GenreHistory } from '../assets/svg/genres/history.svg';
+import { ReactComponent as GenreHorror } from '../assets/svg/genres/horror.svg';
+import { ReactComponent as GenreMusic } from '../assets/svg/genres/music.svg';
+import { ReactComponent as GenreMystery } from '../assets/svg/genres/mystery.svg';
+import { ReactComponent as GenreRomance } from '../assets/svg/genres/romance.svg';
+import { ReactComponent as GenreScienceFiction } from '../assets/svg/genres/science-fiction.svg';
+import { ReactComponent as GenreThriller } from '../assets/svg/genres/thriller.svg';
+import { ReactComponent as GenreTvMovie } from '../assets/svg/genres/tv-movie.svg';
+import { ReactComponent as GenreWar } from '../assets/svg/genres/war.svg';
+import { ReactComponent as GenreWestern } from '../assets/svg/genres/western.svg';
+import { ReactComponent as Spinner } from '../assets/svg/spinner.svg';
+import MovieCard from '../components/MovieCard';
+import TvCard from '../components/TvCard';
+import Api from '../data/Api';
+import Nav from '../data/Nav';
 
 class Genre extends React.Component {
   constructor(props) {
@@ -45,61 +45,61 @@ class Genre extends React.Component {
   genreName() {
     switch (parseInt(this.props.match.params.id)) {
       case 12:
-        return "Adventure";
+        return 'Adventure';
       case 14:
-        return "Fantasy";
+        return 'Fantasy';
       case 16:
-        return "Animation";
+        return 'Animation';
       case 18:
-        return "Drama";
+        return 'Drama';
       case 27:
-        return "Horror";
+        return 'Horror';
       case 28:
-        return "Action";
+        return 'Action';
       case 35:
-        return "Comedy";
+        return 'Comedy';
       case 36:
-        return "History";
+        return 'History';
       case 37:
-        return "Western";
+        return 'Western';
       case 53:
-        return "Thriller";
+        return 'Thriller';
       case 80:
-        return "Crime";
+        return 'Crime';
       case 99:
-        return "Documentary";
+        return 'Documentary';
       case 878:
-        return "Science Fiction";
+        return 'Science Fiction';
       case 9648:
-        return "Mystery";
+        return 'Mystery';
       case 10402:
-        return "Music";
+        return 'Music';
       case 10752:
-        return "War";
+        return 'War';
       case 10770:
-        return "TV Movie";
+        return 'TV Movie';
       case 10749:
-        return "Romance";
+        return 'Romance';
       case 10751:
-        return "Family";
+        return 'Family';
       case 10759:
-        return "Action & Adventure";
+        return 'Action & Adventure';
       case 10762:
-        return "Kids";
+        return 'Kids';
       case 10763:
-        return "News";
+        return 'News';
       case 10764:
-        return "Reality";
+        return 'Reality';
       case 10765:
-        return "Sci-Fi & Fantasy";
+        return 'Sci-Fi & Fantasy';
       case 10766:
-        return "Soap";
+        return 'Soap';
       case 10767:
-        return "Talk";
+        return 'Talk';
       case 10768:
-        return "War & Politics";
+        return 'War & Politics';
       case 210024:
-        return "Anime";
+        return 'Anime';
       default:
         return `Genre ${this.props.match.params.id}`;
     }
@@ -107,71 +107,71 @@ class Genre extends React.Component {
 
   genreIcon(name) {
     switch (name) {
-      case "Action":
+      case 'Action':
         return <GenreAction />;
-      case "Adventure":
+      case 'Adventure':
         return <GenreAdventure />;
-      case "Animation":
+      case 'Animation':
         return <GenreAnimation />;
-      case "Comedy":
+      case 'Comedy':
         return <GenreComedy />;
-      case "Crime":
+      case 'Crime':
         return <GenreCrime />;
-      case "Documentary":
+      case 'Documentary':
         return <GenreDocumentary />;
-      case "Drama":
+      case 'Drama':
         return <GenreDrama />;
-      case "Family":
+      case 'Family':
         return <GenreFamily />;
-      case "Fantasy":
+      case 'Fantasy':
         return <GenreFantasy />;
-      case "History":
+      case 'History':
         return <GenreHistory />;
-      case "Horror":
+      case 'Horror':
         return <GenreHorror />;
-      case "Music":
+      case 'Music':
         return <GenreMusic />;
-      case "Mystery":
+      case 'Mystery':
         return <GenreMystery />;
-      case "Romance":
+      case 'Romance':
         return <GenreRomance />;
-      case "Science Fiction":
+      case 'Science Fiction':
         return <GenreScienceFiction />;
-      case "TV Movie":
+      case 'TV Movie':
         return <GenreTvMovie />;
-      case "Thriller":
+      case 'Thriller':
         return <GenreThriller />;
-      case "War":
+      case 'War':
         return <GenreWar />;
-      case "Western":
+      case 'Western':
         return <GenreWestern />;
-      case "Action & Adventure":
+      case 'Action & Adventure':
         return (
           <>
             <GenreAction />
             <GenreAdventure />
           </>
         );
-      case "Kids":
+      case 'Kids':
         return <GenreFamily />;
-      case "News":
+      case 'News':
         return null;
-      case "Reality":
+      case 'Reality':
         return null;
-      case "Sci-Fi & Fantasy":
+      case 'Sci-Fi & Fantasy':
         return (
           <>
             <GenreScienceFiction />
             <GenreFantasy />
           </>
         );
-      case "Soap":
+      case 'Soap':
         return <GenreTvMovie />;
-      case "Talk":
+      case 'Talk':
         return null;
-      case "War & Politics":
+      case 'War & Politics':
         return <GenreWar />;
-      case "Anime":
+      case 'Anime':
         return <GenreAnime />;
       default:
         return null;
@@ -179,7 +179,7 @@ class Genre extends React.Component {
   }
 
   componentDidMount() {
-    let page = document.querySelectorAll(".page-wrap")[0];
+    let page = document.querySelectorAll('.page-wrap')[0];
     let scrollY = 0;
     let pHist = Nav.getNav(this.props.location.pathname);
     page.scrollTop = scrollY;
@@ -200,8 +200,8 @@ class Genre extends React.Component {
         scrollWatch: true,
       });
       document
-        .getElementsByClassName("page-wrap")[0]
-        .addEventListener("scroll", this.trackScrolling);
+        .getElementsByClassName('page-wrap')[0]
+        .addEventListener('scroll', this.trackScrolling);
     }
 
     if (this.state.getPos) {
@@ -214,10 +214,10 @@ class Genre extends React.Component {
 
   componentWillUnmount() {
     document
-      .getElementsByClassName("page-wrap")[0]
-      .removeEventListener("scroll", this.trackScrolling);
-    let page = document.querySelectorAll(".page-wrap")[0];
-    let carouselsData = document.querySelectorAll(".carousel");
+      .getElementsByClassName('page-wrap')[0]
+      .removeEventListener('scroll', this.trackScrolling);
+    let page = document.querySelectorAll('.page-wrap')[0];
+    let carouselsData = document.querySelectorAll('.carousel');
     let carousels = [];
     carouselsData.forEach((carousel) => {
       carousels.push(carousel.scrollLeft);
@@ -228,17 +228,17 @@ class Genre extends React.Component {
       this.props.location.pathname,
       state,
       page.scrollTop,
-      carousels
+      carousels,
     );
   }
 
   getPos() {
-    let page = document.querySelectorAll(".page-wrap")[0];
+    let page = document.querySelectorAll('.page-wrap')[0];
     let scrollY = 0;
     let pHist = Nav.getNav(this.props.location.pathname);
     if (pHist) {
       scrollY = pHist.scroll;
-      document.querySelectorAll(".carousel").forEach((carousel, i) => {
+      document.querySelectorAll('.carousel').forEach((carousel, i) => {
         carousel.scrollLeft = pHist.carousels[i];
       });
     }
@@ -251,7 +251,7 @@ class Genre extends React.Component {
   }
 
   trackScrolling = () => {
-    const wrappedElement = document.getElementsByClassName("genre--grid")[0];
+    const wrappedElement = document.getElementsByClassName('genre--grid')[0];
     if (this.isBottom(wrappedElement)) {
       if (this.state.paginating) return;
       let page = this.state.page;
@@ -267,7 +267,7 @@ class Genre extends React.Component {
       paginating: true,
     });
     let id = this.props.match.params.id;
-    let type = this.props.match.params.type === "tv" ? "show" : "movie";
+    let type = this.props.match.params.type === 'tv' ? 'show' : 'movie';
     let keywords = [210024];
     let data = keywords.includes(parseInt(id))
       ? await Api.discover(type, page, {
@@ -289,7 +289,7 @@ class Genre extends React.Component {
   }
 
   render() {
-    let type = this.props.match.params.type === "tv" ? "TV" : "Movies";
+    let type = this.props.match.params.type === 'tv' ? 'TV' : 'Movies';
     let genreName = this.genreName();
     return (
       <>
@@ -303,7 +303,7 @@ class Genre extends React.Component {
           <div className="genre--grid">
             {this.state.results ? (
               this.state.results.map((result) => {
-                if (type === "TV") {
+                if (type === 'TV') {
                   return (
                     <div
                       className="genre--grid--card"
@@ -317,7 +317,7 @@ class Genre extends React.Component {
                     </div>
                   );
                 }
-                if (type === "Movies") {
+                if (type === 'Movies') {
                   return (
                     <div
                       className="genre--grid--card"
@@ -333,7 +333,7 @@ class Genre extends React.Component {
                 }
                 return <p key={`gen__${result.title}`}>{result.title}</p>;
               })
-            ) : this.state.results === "none" ? (
+            ) : this.state.results === 'none' ? (
               <p>No results</p>
             ) : (
               <div className="spinner">

@@ -1,6 +1,7 @@
-import React from "react";
-import Api from "../../data/Api";
-import FilterItem from "../../components/FilterItem";
+import React from 'react';
+
+import FilterItem from '../../components/FilterItem';
+import Api from '../../data/Api';
 
 class Filter extends React.Component {
   constructor(props) {
@@ -9,9 +10,9 @@ class Filter extends React.Component {
     this.state = {
       movie_filters: [],
       tv_filters: [],
-      radarr_servers: "loading",
+      radarr_servers: 'loading',
       radarr_settings: {},
-      sonarr_servers: "loading",
+      sonarr_servers: 'loading',
       sonarr_settings: {},
     };
 
@@ -58,7 +59,7 @@ class Filter extends React.Component {
       [type]: filters,
     });
     this.props.msg({
-      message: "New Filter Added",
+      message: 'New Filter Added',
     });
   }
 
@@ -71,7 +72,7 @@ class Filter extends React.Component {
     });
 
     this.props.msg({
-      message: "Filter Removed",
+      message: 'Filter Removed',
     });
   }
 
@@ -81,13 +82,13 @@ class Filter extends React.Component {
       condition: false,
       operator: false,
       value: false,
-      comparison: "and",
+      comparison: 'and',
     });
     this.setState({
       [type]: filters,
     });
     this.props.msg({
-      message: "Condition Added",
+      message: 'Condition Added',
     });
   }
 
@@ -108,7 +109,7 @@ class Filter extends React.Component {
       [type]: filters,
     });
     this.props.msg({
-      message: "Action Added",
+      message: 'Action Added',
     });
   }
 
@@ -121,7 +122,7 @@ class Filter extends React.Component {
     });
 
     this.props.msg({
-      message: "Condition Removed",
+      message: 'Condition Removed',
     });
   }
 
@@ -134,7 +135,7 @@ class Filter extends React.Component {
     });
 
     this.props.msg({
-      message: "Action Removed",
+      message: 'Action Removed',
     });
   }
 
@@ -153,10 +154,10 @@ class Filter extends React.Component {
         sonarr_servers: sonarr,
       });
       radarr.map((item) => {
-        this.getSettings(item.uuid, "radarr");
+        this.getSettings(item.uuid, 'radarr');
       });
       sonarr.map((item) => {
-        this.getSettings(item.uuid, "sonarr");
+        this.getSettings(item.uuid, 'sonarr');
       });
     } catch (err) {
       console.log(err);
@@ -167,28 +168,35 @@ class Filter extends React.Component {
     }
   }
 
-  async getSettings(uuid, type = "radarr" || "sonarr") {
+  async getSettings(uuid, type = 'radarr' || 'sonarr') {
     try {
       let settings =
-        type === "radarr"
+        type === 'radarr'
           ? await Api.radarrOptions(uuid)
           : await Api.sonarrOptions(uuid);
       let current =
-        type === "radarr"
+        type === 'radarr'
           ? this.state.radarr_settings
           : this.state.sonarr_settings;
-      if (settings.profiles.error || settings.paths.error || settings.languages.error) {
-        current[uuid] = "error";
+      if (
+        settings.profiles.error ||
+        settings.paths.error ||
+        settings.languages.error
+      ) {
+        current[uuid] = 'error';
       } else {
         current[uuid] = {
           profiles: settings.profiles.length > 0 ? settings.profiles : false,
           paths: settings.paths.length > 0 ? settings.paths : false,
           languages: settings.languages.length > 0 ? settings.languages : false,
           tags: settings.tags.length > 0 ? settings.tags : false,
-          availabilities: settings.minimumAvailability.length > 0 ? settings.minimumAvailability : false,
+          availabilities:
+            settings.minimumAvailability.length > 0
+              ? settings.minimumAvailability
+              : false,
         };
       }
-      if (type === "radarr") {
+      if (type === 'radarr') {
         this.setState({
           radarr_settings: current,
         });
@@ -205,12 +213,12 @@ class Filter extends React.Component {
   inputChange(e) {
     const target = e.target;
     const name = target.name;
-    let value = target.type === "checkbox" ? target.checked : target.value;
+    let value = target.type === 'checkbox' ? target.checked : target.value;
 
     if (target.dataset.type) {
       let current = this.state[target.dataset.type];
       console.log(current, target.dataset.type);
-      if (target.dataset.row === "action") {
+      if (target.dataset.row === 'action') {
         let actionRow = target.dataset.actionRow;
         console.log(target.dataset);
         if (!Array.isArray(current[target.dataset.item].action)) {
@@ -218,9 +226,8 @@ class Filter extends React.Component {
             current[target.dataset.item].action,
           ];
         }
-        current[target.dataset.item][target.dataset.row][actionRow][
-          name
-        ] = value;
+        current[target.dataset.item][target.dataset.row][actionRow][name] =
+          value;
       } else {
         current[target.dataset.item].rows[target.dataset.row][name] = value;
       }
@@ -255,14 +262,14 @@ class Filter extends React.Component {
         tv_filters: filters.tv_filters ? filters.tv_filters : [],
       });
       this.props.msg({
-        message: "Filters Loaded",
+        message: 'Filters Loaded',
       });
       // this.setState({})
     } catch (err) {
       console.log(err);
       this.props.msg({
-        message: "Unable to Load Filters",
-        type: "error",
+        message: 'Unable to Load Filters',
+        type: 'error',
       });
     }
   }
@@ -277,13 +284,13 @@ class Filter extends React.Component {
       await Api.updateFilters(this.state.movie_filters, this.state.tv_filters);
 
       this.props.msg({
-        message: "Filters Saved",
-        type: "good",
+        message: 'Filters Saved',
+        type: 'good',
       });
     } catch (err) {
       this.props.msg({
-        message: "Failed to Save Filters",
-        type: "error",
+        message: 'Failed to Save Filters',
+        type: 'error',
       });
     }
   }
@@ -314,7 +321,7 @@ class Filter extends React.Component {
             removeAction={this.removeAction}
             removeFilter={this.removeFilter}
             addFilter={this.addFilter}
-            type={"movie_filters"}
+            type={'movie_filters'}
             label="Movie"
             inputChange={this.inputChange}
             collapse={this.collapse}
@@ -332,7 +339,7 @@ class Filter extends React.Component {
             removeAction={this.removeAction}
             removeFilter={this.removeFilter}
             addFilter={this.addFilter}
-            type={"tv_filters"}
+            type={'tv_filters'}
             label="TV Show"
             inputChange={this.inputChange}
             collapse={this.collapse}

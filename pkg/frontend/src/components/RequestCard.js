@@ -1,6 +1,6 @@
-import React from "react";
-import { withRouter, Link } from "react-router-dom";
-import { connect } from "react-redux";
+import React from 'react';
+import { connect } from 'react-redux';
+import { Link, withRouter } from 'react-router-dom';
 
 class RequestCard extends React.Component {
   render() {
@@ -22,11 +22,11 @@ class RequestCard extends React.Component {
       <div
         key={request.id}
         data-key={request.id}
-        className={"card type--movie-tv"}
+        className={'card type--movie-tv'}
       >
         <div className="card--inner">
           <Link
-            to={`/${type === "tv" ? "series" : "movie"}/${request.id}`}
+            to={`/${type === 'tv' ? 'series' : 'movie'}/${request.id}`}
             className="full-link"
           ></Link>
 
@@ -39,12 +39,12 @@ class RequestCard extends React.Component {
             <p className="title" title={request.title || request.name}>
               {request.title || request.name}
               <span className="year">
-                {type === "movie"
+                {type === 'movie'
                   ? `(${new Date(request.release_date).getFullYear()})`
                   : `(${new Date(
-                      request.first_air_date
+                      request.first_air_date,
                     ).getFullYear()} - ${new Date(
-                      request.last_air_date
+                      request.last_air_date,
                     ).getFullYear()})`}
               </span>
             </p>
@@ -57,7 +57,7 @@ class RequestCard extends React.Component {
                         {this.props.user.requests[request.id].users[user]}
                       </span>
                     );
-                  }
+                  },
                 )}
               </p>
             ) : null}

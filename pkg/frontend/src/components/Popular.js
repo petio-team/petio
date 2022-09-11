@@ -1,12 +1,13 @@
-import React from "react";
-import { withRouter } from "react-router-dom";
-import { connect } from "react-redux";
-import Api from "../data/Api";
+import React from 'react';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+
+import Api from '../data/Api';
+import Carousel from './Carousel';
+import CarouselLoading from './CarouselLoading';
 // import User from '../data/User'
-import MovieCard from "./MovieCard";
-import TvCard from "./TvCard";
-import Carousel from "./Carousel";
-import CarouselLoading from "./CarouselLoading";
+import MovieCard from './MovieCard';
+import TvCard from './TvCard';
 
 class Popular extends React.Component {
   constructor(props) {
@@ -28,7 +29,7 @@ class Popular extends React.Component {
 
   init() {
     if (!this.state.topData) {
-      this.getTop("movies");
+      this.getTop('movies');
     }
   }
 
@@ -45,7 +46,7 @@ class Popular extends React.Component {
   }
 
   render() {
-    if (this.props.type === "movie") {
+    if (this.props.type === 'movie') {
       let topData = (
         <>
           <section>
@@ -55,7 +56,7 @@ class Popular extends React.Component {
                 {Object.keys(this.state.topData).map((t) => {
                   if (
                     !this.state.topData[t].item.tmdb_id ||
-                    this.state.topData[t].item.tmdb_id === "false"
+                    this.state.topData[t].item.tmdb_id === 'false'
                   ) {
                     return null;
                   }
@@ -87,7 +88,7 @@ class Popular extends React.Component {
                 {Object.keys(this.state.topData).map((t) => {
                   if (
                     !this.state.topData[t].item.tmdb_id ||
-                    this.state.topData[t].item.tmdb_id === "false"
+                    this.state.topData[t].item.tmdb_id === 'false'
                   ) {
                     return null;
                   }

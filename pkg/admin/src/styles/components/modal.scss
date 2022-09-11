@@ -56,7 +56,7 @@
 
     select,
     .select-wrap,
-    input:not([type="checkbox"]),
+    input:not([type='checkbox']),
     textarea {
       width: 100%;
     }

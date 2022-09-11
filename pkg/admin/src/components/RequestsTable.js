@@ -1,15 +1,16 @@
-import React from "react";
-import { ReactComponent as MovieIcon } from "../assets/svg/movie.svg";
-import { ReactComponent as TvIcon } from "../assets/svg/tv.svg";
-import { ReactComponent as Arrow } from "../assets/svg/arrow-left.svg";
-import { ReactComponent as WarningIcon } from "../assets/svg/warning.svg";
+import React from 'react';
+
+import { ReactComponent as Arrow } from '../assets/svg/arrow-left.svg';
+import { ReactComponent as MovieIcon } from '../assets/svg/movie.svg';
+import { ReactComponent as TvIcon } from '../assets/svg/tv.svg';
+import { ReactComponent as WarningIcon } from '../assets/svg/warning.svg';
 
 class RequestsTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      sortBy: "title",
-      dir: "DESC",
+      sortBy: 'title',
+      dir: 'DESC',
     };
 
     this.sortBy = this.sortBy.bind(this);
@@ -20,47 +21,47 @@ class RequestsTable extends React.Component {
     let sortVal = this.state.sortBy;
     let av = a[sortVal];
     let bv = b[sortVal];
-    if (sortVal === "status") {
+    if (sortVal === 'status') {
       av = a.process_stage ? a.process_stage.message : 0;
       bv = b.process_stage ? b.process_stage.message : 0;
       if (
-        a.type === "movie" &&
+        a.type === 'movie' &&
         a.children &&
-        a.process_stage.status === "blue"
+        a.process_stage.status === 'blue'
       ) {
         if (a.children[0].info.inCinemas) {
           av = `__${a.children[0].info.inCinemas}`;
         }
       }
       if (
-        b.type === "movie" &&
+        b.type === 'movie' &&
         b.children &&
-        b.process_stage.status === "blue"
+        b.process_stage.status === 'blue'
       ) {
         if (b.children[0].info.inCinemas) {
           bv = `__${b.children[0].info.inCinemas}`;
         }
       }
-      if (a.type === "tv" && a.children && a.process_stage.status === "blue") {
+      if (a.type === 'tv' && a.children && a.process_stage.status === 'blue') {
         if (a.children[0].info.firstAired) {
           av = `__${a.children[0].info.firstAired}`;
         }
       }
-      if (b.type === "tv" && b.children && b.process_stage.status === "blue") {
+      if (b.type === 'tv' && b.children && b.process_stage.status === 'blue') {
         if (b.children[0].info.firstAired) {
           bv = `__${b.children[0].info.firstAired}`;
         }
       }
     }
-    if (!av) av = "";
-    if (!bv) bv = "";
-    if (typeof av === "string") av = av.toLowerCase();
-    if (typeof bv === "string") bv = bv.toLowerCase();
+    if (!av) av = '';
+    if (!bv) bv = '';
+    if (typeof av === 'string') av = av.toLowerCase();
+    if (typeof bv === 'string') bv = bv.toLowerCase();
     if (av > bv) {
-      return this.state.dir === "DESC" ? 1 : -1;
+      return this.state.dir === 'DESC' ? 1 : -1;
     }
     if (av < bv) {
-      return this.state.dir === "DESC" ? -1 : 1;
+      return this.state.dir === 'DESC' ? -1 : 1;
     }
     return 0;
   }
@@ -68,7 +69,7 @@ class RequestsTable extends React.Component {
   sortCol(type) {
     if (!type) return;
     let sw = this.state.sortBy === type ? true : false;
-    let dir = sw ? (this.state.dir === "DESC" ? "ASC" : "DESC") : "DESC";
+    let dir = sw ? (this.state.dir === 'DESC' ? 'ASC' : 'DESC') : 'DESC';
     this.setState({
       dir: dir,
       sortBy: type,
@@ -88,10 +89,10 @@ class RequestsTable extends React.Component {
   typeIcon(type) {
     let icon = null;
     switch (type) {
-      case "movie":
+      case 'movie':
         icon = <MovieIcon />;
         break;
-      case "tv":
+      case 'tv':
         icon = <TvIcon />;
         break;
       default:
@@ -110,10 +111,10 @@ class RequestsTable extends React.Component {
     days = days - months * 31;
     months = months - years * 12;
 
-    var message = "";
-    message += years ? years + " yr " : "";
-    message += months ? months + " m " : "";
-    message += days ? days + " d " : "";
+    var message = '';
+    message += years ? years + ' yr ' : '';
+    message += months ? months + ' m ' : '';
+    message += days ? days + ' d ' : '';
 
     return message;
   }
@@ -130,7 +131,7 @@ class RequestsTable extends React.Component {
   getYear(req) {
     if (req.media)
       if (Object.keys(req.media).length > 0) {
-        if (req.type === "movie") {
+        if (req.type === 'movie') {
           return req.media.release_date
             ? new Date(req.media.release_date).getFullYear()
             : null;
@@ -177,13 +178,13 @@ class RequestsTable extends React.Component {
                 ) : null}
                 <tr className="child">
                   <td>
-                    {type === "tv" && child.episode ? (
+                    {type === 'tv' && child.episode ? (
                       <p>
-                        Series: {child.episode.seasonNumber} Episode:{" "}
+                        Series: {child.episode.seasonNumber} Episode:{' '}
                         {child.episode.episodeNumber}
                       </p>
                     ) : null}
-                    {type === "movie" ? <p>Movie</p> : null}
+                    {type === 'movie' ? <p>Movie</p> : null}
                   </td>
                   <td colSpan="2">
                     <span className="requests--quality">
@@ -191,19 +192,19 @@ class RequestsTable extends React.Component {
                     </span>
                   </td>
                   <td colSpan="4">
-                    {" "}
+                    {' '}
                     <div className="requests--prog--wrap">
                       <div className="requests--prog">
                         <span
                           className="requests--prog--active"
                           style={{
-                            width: prog + "%",
+                            width: prog + '%',
                           }}
                         ></span>
                       </div>
 
-                      {(child.status !== "Downloading" &&
-                        child.status !== "downloading") ||
+                      {(child.status !== 'Downloading' &&
+                        child.status !== 'downloading') ||
                       !child.timeleft ? (
                         <p>
                           <strong className="capitalise">{child.status}</strong>
@@ -218,7 +219,7 @@ class RequestsTable extends React.Component {
                 </tr>
               </>
             );
-          })
+          }),
         );
       } else {
         return null;
@@ -248,9 +249,9 @@ class RequestsTable extends React.Component {
           <tr>
             <th
               className={`fixed sortable ${
-                this.state.sortBy === "title" ? "active" : ""
+                this.state.sortBy === 'title' ? 'active' : ''
               } ${this.state.dir}`}
-              onClick={() => this.sortCol("title")}
+              onClick={() => this.sortCol('title')}
             >
               Title
               <Arrow />
@@ -258,18 +259,18 @@ class RequestsTable extends React.Component {
             <th>Year</th>
             <th
               className={`sortable ${
-                this.state.sortBy === "type" ? "active" : ""
+                this.state.sortBy === 'type' ? 'active' : ''
               } ${this.state.dir}`}
-              onClick={() => this.sortCol("type")}
+              onClick={() => this.sortCol('type')}
             >
               Type
               <Arrow />
             </th>
             <th
               className={`sortable ${
-                this.state.sortBy === "status" ? "active" : ""
+                this.state.sortBy === 'status' ? 'active' : ''
               } ${this.state.dir}`}
-              onClick={() => this.sortCol("status")}
+              onClick={() => this.sortCol('status')}
             >
               Status
               <Arrow />
@@ -277,9 +278,9 @@ class RequestsTable extends React.Component {
             <th>Users</th>
             <th
               className={`fixed sortable ${
-                this.state.sortBy === "approved" ? "active" : ""
+                this.state.sortBy === 'approved' ? 'active' : ''
               } ${this.state.dir}`}
-              onClick={() => this.sortCol("approved")}
+              onClick={() => this.sortCol('approved')}
             >
               Approved
               <Arrow />
@@ -307,16 +308,16 @@ class RequestsTable extends React.Component {
                   <tr>
                     <td>
                       <a
-                        style={{ color: "inherit" }}
+                        style={{ color: 'inherit' }}
                         href={`${window.location.pathname.replace(
-                          "/admin/",
-                          ""
-                        )}/#/${req.type === "movie" ? "movie" : "series"}/${
+                          '/admin/',
+                          '',
+                        )}/#/${req.type === 'movie' ? 'movie' : 'series'}/${
                           req.requestId
                         }`}
                       >
-                        {req.title}{" "}
-                        {req.type === "tv" && !req.tvdb_id ? (
+                        {req.title}{' '}
+                        {req.type === 'tv' && !req.tvdb_id ? (
                           <span
                             className="no-id warning"
                             title="No TVDb ID for this request"
@@ -352,7 +353,7 @@ class RequestsTable extends React.Component {
                           })
                         : null}
                     </td>
-                    <td>{req.approved ? "Yes" : "No"}</td>
+                    <td>{req.approved ? 'Yes' : 'No'}</td>
                     <td>
                       <p
                         className="table-action"

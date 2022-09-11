@@ -1,14 +1,15 @@
-import React from "react";
-import { withRouter, Link } from "react-router-dom";
-import { connect } from "react-redux";
-import Api from "../data/Api";
-import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
-import { Calendar, momentLocalizer } from "react-big-calendar";
-import moment from "moment";
-import { ReactComponent as MovieIcon } from "../assets/svg/movie.svg";
-import { ReactComponent as TvIcon } from "../assets/svg/tv.svg";
-import User from "../data/User";
-import MyRequests from "../components/MyRequests";
+import moment from 'moment';
+import React from 'react';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
+import { connect } from 'react-redux';
+import { Link, withRouter } from 'react-router-dom';
+
+import { ReactComponent as MovieIcon } from '../assets/svg/movie.svg';
+import { ReactComponent as Spinner } from '../assets/svg/spinner.svg';
+import { ReactComponent as TvIcon } from '../assets/svg/tv.svg';
+import MyRequests from '../components/MyRequests';
+import Api from '../data/Api';
+import User from '../data/User';
 
 class Requests extends React.Component {
   constructor(props) {
@@ -30,7 +31,7 @@ class Requests extends React.Component {
   }
 
   componentDidMount() {
-    let page = document.querySelectorAll(".page-wrap")[0];
+    let page = document.querySelectorAll('.page-wrap')[0];
     page.scrollTop = 0;
     window.scrollTo(0, 0);
     this.getRequests();
@@ -54,14 +55,14 @@ class Requests extends React.Component {
     let calendarData = this.state.calendar.map((item) => {
       if (item.series) {
         let time = new Date(item.airDateUtc);
-        return ({
+        return {
           title: `${item.series.title} - S${item.seasonNumber.toLocaleString(
-            "en-US",
+            'en-US',
             {
               minimumIntegerDigits: 2,
               useGrouping: false,
-            }
-          )}E${item.episodeNumber.toLocaleString("en-US", {
+            },
+          )}E${item.episodeNumber.toLocaleString('en-US', {
             minimumIntegerDigits: 2,
             useGrouping: false,
           })}`,
@@ -69,21 +70,21 @@ class Requests extends React.Component {
           start: time,
           end: time,
           resource: item,
-        });
+        };
       } else {
         let time = new Date(item.inCinemas);
-        return ({
+        return {
           title: item.title,
           allDay: true,
           start: time,
           end: time,
           resource: item,
-        });
+        };
       }
     });
 
     this.setState({
-      calendarData
+      calendarData,
     });
   }
 
@@ -125,10 +126,10 @@ class Requests extends React.Component {
   typeIcon(type) {
     let icon = null;
     switch (type) {
-      case "movie":
+      case 'movie':
         icon = <MovieIcon />;
         break;
-      case "tv":
+      case 'tv':
         icon = <TvIcon />;
         break;
       default:
@@ -155,12 +156,15 @@ class Requests extends React.Component {
       return (
         <div className="calendar--event--wrap">
           <div
-            className={`calendar--event ${event.resource.hasFile ? "recorded" : ""
-              } ${this.isToday(new Date(event.resource.airDateUtc))
-                ? "airsToday"
-                : ""
-              } ${new Date(event.resource.airDateUtc) < new Date() ? "hasAired" : ""
-              }`}
+            className={`calendar--event ${
+              event.resource.hasFile ? 'recorded' : ''
+            } ${
+              this.isToday(new Date(event.resource.airDateUtc))
+                ? 'airsToday'
+                : ''
+            } ${
+              new Date(event.resource.airDateUtc) < new Date() ? 'hasAired' : ''
+            }`}
           >
             <div className="calendar--event--icon">
               {event.resource.series ? <TvIcon /> : <MovieIcon />}
@@ -203,7 +207,7 @@ class Requests extends React.Component {
                 item has been downloaded but is waiting for Plex to import
               </p>
               <p>
-                <span className="request-status blue">~1 m 2 d</span> /{" "}
+                <span className="request-status blue">~1 m 2 d</span> /{' '}
                 <span className="request-status cinema">In Cinemas</span> - Not
                 yet released, the approximate time to release (Years, Months,
                 Days) or still in cinemas.
@@ -225,7 +229,7 @@ class Requests extends React.Component {
                 month: { event: MonthEvent },
                 week: { event: MonthEvent },
               }}
-              views={["month", "agenda"]}
+              views={['month', 'agenda']}
             />
           ) : null}
         </section>
@@ -247,25 +251,27 @@ class Requests extends React.Component {
                   return (
                     <tr
                       key={req._id}
-                      className={`generic-table--row--${req.removed ? "bad" : req.complete ? "good" : "normal"
-                        }`}
+                      className={`generic-table--row--${
+                        req.removed ? 'bad' : req.complete ? 'good' : 'normal'
+                      }`}
                     >
                       <td>
                         <Link
-                          to={`/${req.type === "movie" ? "movie" : "series"}/${req.tmdb_id
-                            }`}
+                          to={`/${req.type === 'movie' ? 'movie' : 'series'}/${
+                            req.tmdb_id
+                          }`}
                         >
                           {req.title}
                         </Link>
                       </td>
                       <td>{this.typeIcon(req.type)}</td>
-                      <td>{req.approved ? "Yes" : "No"}</td>
+                      <td>{req.approved ? 'Yes' : 'No'}</td>
                       <td>
                         {req.removed
-                          ? "Removed"
+                          ? 'Removed'
                           : req.complete
-                            ? "Completed"
-                            : "other"}
+                          ? 'Completed'
+                          : 'other'}
                       </td>
                     </tr>
                   );

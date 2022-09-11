@@ -1,11 +1,12 @@
-import React from "react";
-import { ReactComponent as RequestIcon } from "../assets/svg/request.svg";
-import { ReactComponent as ReportIcon } from "../assets/svg/report.svg";
-import { ReactComponent as CheckIcon } from "../assets/svg/check.svg";
-import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
-import { ReactComponent as CloseIcon } from "../assets/svg/close.svg";
-import { LazyLoadImage } from "react-lazy-load-image-component";
-import ReactPlayer from "react-player/youtube";
+import React from 'react';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import ReactPlayer from 'react-player/youtube';
+
+import { ReactComponent as CheckIcon } from '../assets/svg/check.svg';
+import { ReactComponent as CloseIcon } from '../assets/svg/close.svg';
+import { ReactComponent as ReportIcon } from '../assets/svg/report.svg';
+import { ReactComponent as RequestIcon } from '../assets/svg/request.svg';
+import { ReactComponent as Spinner } from '../assets/svg/spinner.svg';
 
 class MovieShowTop extends React.Component {
   constructor(props) {
@@ -18,18 +19,18 @@ class MovieShowTop extends React.Component {
     this.resize = this.resize.bind(this);
   }
   componentDidMount() {
-    window.addEventListener("resize", this.resize.bind(this));
+    window.addEventListener('resize', this.resize.bind(this));
     this.resize();
   }
 
   resize() {
-    let size = "/w300";
+    let size = '/w300';
     let width = window.innerWidth;
     if (width > 300) {
-      size = "/w780";
+      size = '/w780';
     }
     if (width > 780) {
-      size = "/w1280";
+      size = '/w1280';
     }
     // if (width > 1280) {
     //   size = "/original";
@@ -38,15 +39,15 @@ class MovieShowTop extends React.Component {
   }
 
   componentWillUnmount() {
-    window.removeEventListener("resize", this.resize.bind(this));
+    window.removeEventListener('resize', this.resize.bind(this));
   }
 
   render() {
     let typeRequest = this.props.mediaData.episode_run_time
       ? this.props.season
         ? `season ${this.props.season}`
-        : "show"
-      : "";
+        : 'show'
+      : '';
     let requestBtn = this.props.requestPending ? (
       <button className="btn btn__square pending">
         <Spinner />
@@ -65,7 +66,7 @@ class MovieShowTop extends React.Component {
     ) : this.props.requested ? (
       <button className="btn btn__square blue" onClick={this.props.request}>
         {`Requested by ${this.props.requested}
-				${this.props.requested > 1 ? "users" : "user"}`}
+				${this.props.requested > 1 ? 'users' : 'user'}`}
       </button>
     ) : (
       <button className="btn btn__square" onClick={this.props.request}>
@@ -84,11 +85,11 @@ class MovieShowTop extends React.Component {
     let video = this.props.video;
 
     return (
-      <div className={`media-top ${this.props.trailer ? "show-trailer" : ""}`}>
+      <div className={`media-top ${this.props.trailer ? 'show-trailer' : ''}`}>
         <div
           className="media-backdrop"
           key={`${this.props.mediaData.title}__backdrop__${
-            this.props.trailer ? "trailer" : "n_trailer"
+            this.props.trailer ? 'trailer' : 'n_trailer'
           }`}
         >
           <div
@@ -129,7 +130,7 @@ class MovieShowTop extends React.Component {
               {this.props.mediaData.poster_path ? (
                 <LazyLoadImage
                   src={
-                    "https://image.tmdb.org/t/p/w500" +
+                    'https://image.tmdb.org/t/p/w500' +
                     this.props.mediaData.poster_path
                   }
                   alt={this.props.mediaData.title}
@@ -138,7 +139,7 @@ class MovieShowTop extends React.Component {
                 />
               ) : (
                 <LazyLoadImage
-                  src={"/images/no-poster.jpg"}
+                  src={'/images/no-poster.jpg'}
                   alt={this.props.mediaData.title}
                   effect="blur"
                   key={`${this.props.mediaData.title}__nposter`}

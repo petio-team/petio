@@ -1,7 +1,8 @@
-import React from "react";
-import CarouselLoading from "../components/CarouselLoading";
-import CarouselLoadingPerson from "../components/CarouselLoadingPerson";
-import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
+import React from 'react';
+
+import { ReactComponent as Spinner } from '../assets/svg/spinner.svg';
+import CarouselLoading from '../components/CarouselLoading';
+import CarouselLoadingPerson from '../components/CarouselLoadingPerson';
 
 class MovieShowLoading extends React.Component {
   render() {

@@ -1,7 +1,9 @@
-import React from "react";
-import { ReactComponent as LeftArrow } from "../assets/svg/back.svg";
-import { ReactComponent as RightArrow } from "../assets/svg/forward.svg";
-import { throttle } from "lodash";
+import { throttle } from 'lodash';
+import React from 'react';
+
+import { ReactComponent as LeftArrow } from '../assets/svg/back.svg';
+import { ReactComponent as RightArrow } from '../assets/svg/forward.svg';
+
 // import CarouselLoading from "./CarouselLoading";
 
 class Carousel extends React.Component {
@@ -26,12 +28,12 @@ class Carousel extends React.Component {
   }
 
   componentDidMount() {
-    let page = document.querySelectorAll(".page-wrap")[0];
+    let page = document.querySelectorAll('.page-wrap')[0];
     page.scrollTop = 0;
     window.scrollTo(0, 0);
     this.init();
-    window.addEventListener("resize", this.init);
-    page.addEventListener("scroll", this.isInViewport);
+    window.addEventListener('resize', this.init);
+    page.addEventListener('scroll', this.isInViewport);
     this.isInViewport();
   }
 
@@ -44,8 +46,8 @@ class Carousel extends React.Component {
   }
 
   componentWillUnmount() {
-    window.removeEventListener("resize", this.init);
-    window.removeEventListener("resize", this.isInViewport);
+    window.removeEventListener('resize', this.init);
+    window.removeEventListener('resize', this.isInViewport);
   }
 
   init() {
@@ -54,7 +56,7 @@ class Carousel extends React.Component {
     }
     let carousel = this.carouselRef.current;
     let wrapper = this.wrapper.current;
-    let cards = carousel.getElementsByClassName("card");
+    let cards = carousel.getElementsByClassName('card');
     let exampleCard = cards[0];
     let style = exampleCard
       ? exampleCard.currentStyle || window.getComputedStyle(exampleCard)
@@ -78,8 +80,8 @@ class Carousel extends React.Component {
 
   isInViewport() {
     if (this.state.inView) {
-      let page = document.querySelectorAll(".page-wrap")[0];
-      page.removeEventListener("scroll", this.isInViewport);
+      let page = document.querySelectorAll('.page-wrap')[0];
+      page.removeEventListener('scroll', this.isInViewport);
       return;
     }
     let carousel = this.wrapper.current;
@@ -119,7 +121,7 @@ class Carousel extends React.Component {
     carousel.scrollTo({
       top: 0,
       left: movement,
-      behavior: "smooth",
+      behavior: 'smooth',
     });
   }
 
@@ -133,7 +135,7 @@ class Carousel extends React.Component {
     carousel.scrollTo({
       top: 0,
       left: movement,
-      behavior: "smooth",
+      behavior: 'smooth',
     });
   }
 
@@ -148,19 +150,19 @@ class Carousel extends React.Component {
           });
         }
         return child;
-      }
+      },
     );
     return (
       <div
         className={`carousel--wrap ${
-          this.state.inView ? "visible" : "not-visible"
+          this.state.inView ? 'visible' : 'not-visible'
         }`}
         ref={this.wrapper}
       >
         <div className="carousel--controls">
           <div
             className={`carousel--controls--item carousel--prev ${
-              this.state.pos > 0 ? "" : "disabled"
+              this.state.pos > 0 ? '' : 'disabled'
             }`}
             onClick={this.prev}
           >
@@ -168,7 +170,7 @@ class Carousel extends React.Component {
           </div>
           <div
             className={`carousel--controls--item carousel--next ${
-              this.state.pos < this.state.max ? "" : "disabled"
+              this.state.pos < this.state.max ? '' : 'disabled'
             }`}
             onClick={this.next}
           >

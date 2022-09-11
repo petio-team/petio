@@ -1,14 +1,15 @@
-import React from "react";
-import { withRouter, Link } from "react-router-dom";
-import { connect } from "react-redux";
-import { ReactComponent as SearchIcon } from "../assets/svg/search.svg";
-import { ReactComponent as MovieIcon } from "../assets/svg/movie.svg";
-import { ReactComponent as TvIcon } from "../assets/svg/tv.svg";
-import { ReactComponent as PersonIcon } from "../assets/svg/people.svg";
-import { ReactComponent as RequestIcon } from "../assets/svg/bookmark.svg";
-import { ReactComponent as AdminIcon } from "../assets/svg/admin.svg";
-import { ReactComponent as BackIcon } from "../assets/svg/back.svg";
-import pjson from "../../package.json";
+import React from 'react';
+import { connect } from 'react-redux';
+import { Link, withRouter } from 'react-router-dom';
+
+import pjson from '../../package.json';
+import { ReactComponent as AdminIcon } from '../assets/svg/admin.svg';
+import { ReactComponent as BackIcon } from '../assets/svg/back.svg';
+import { ReactComponent as RequestIcon } from '../assets/svg/bookmark.svg';
+import { ReactComponent as MovieIcon } from '../assets/svg/movie.svg';
+import { ReactComponent as PersonIcon } from '../assets/svg/people.svg';
+import { ReactComponent as SearchIcon } from '../assets/svg/search.svg';
+import { ReactComponent as TvIcon } from '../assets/svg/tv.svg';
 
 class Sidebar extends React.Component {
   constructor(props) {
@@ -17,7 +18,7 @@ class Sidebar extends React.Component {
   }
 
   stripTrailingSlash(str) {
-    if (str.substr(-1) === "/") {
+    if (str.substr(-1) === '/') {
       return str.substr(0, str.length - 1);
     }
     return str;
@@ -37,22 +38,22 @@ class Sidebar extends React.Component {
             Pet<span>io</span>
           </p>
         </Link>
-        {current === "/" || current.startsWith("/search/") ? null : (
+        {current === '/' || current.startsWith('/search/') ? null : (
           <div className="back-btn" onClick={this.goBack}>
             <BackIcon />
           </div>
         )}
-        <Link to="/user" className={"sidebar--user-mob "}>
+        <Link to="/user" className={'sidebar--user-mob '}>
           <div className="icon">
             <div
               className="thumb"
               style={{
                 backgroundImage:
-                  process.env.NODE_ENV === "development"
+                  process.env.NODE_ENV === 'development'
                     ? 'url("http://localhost:7778/user/thumb/' + user.id + '")'
                     : 'url("' +
                       this.props.user.credentials.api +
-                      "/user/thumb/" +
+                      '/user/thumb/' +
                       user.id +
                       '")',
               }}
@@ -63,10 +64,10 @@ class Sidebar extends React.Component {
           <Link
             to="/user"
             className={
-              "sidebar--item user-profile " +
-              (current === "/user" || current.startsWith("/user/")
-                ? "active"
-                : "")
+              'sidebar--item user-profile ' +
+              (current === '/user' || current.startsWith('/user/')
+                ? 'active'
+                : '')
             }
           >
             <p>{user.title}</p>
@@ -75,13 +76,13 @@ class Sidebar extends React.Component {
                 className="thumb"
                 style={{
                   backgroundImage:
-                    process.env.NODE_ENV === "development"
+                    process.env.NODE_ENV === 'development'
                       ? 'url("http://localhost:7778/user/thumb/' +
                         user.id +
                         '")'
                       : 'url("' +
                         this.props.user.credentials.api +
-                        "/user/thumb/" +
+                        '/user/thumb/' +
                         user.id +
                         '")',
                 }}
@@ -91,10 +92,10 @@ class Sidebar extends React.Component {
           <Link
             to="/"
             className={
-              "sidebar--item " +
-              (current === "/" || current.startsWith("/search/")
-                ? "active"
-                : "")
+              'sidebar--item ' +
+              (current === '/' || current.startsWith('/search/')
+                ? 'active'
+                : '')
             }
           >
             <p>Search</p>
@@ -105,10 +106,10 @@ class Sidebar extends React.Component {
           <Link
             to="/movies"
             className={
-              "sidebar--item " +
-              (current === "/movies" || current.startsWith("/movie/")
-                ? "active"
-                : "")
+              'sidebar--item ' +
+              (current === '/movies' || current.startsWith('/movie/')
+                ? 'active'
+                : '')
             }
           >
             <p>Movies</p>
@@ -119,10 +120,10 @@ class Sidebar extends React.Component {
           <Link
             to="/tv"
             className={
-              "sidebar--item " +
-              (current === "/tv" || current.startsWith("/series/")
-                ? "active"
-                : "")
+              'sidebar--item ' +
+              (current === '/tv' || current.startsWith('/series/')
+                ? 'active'
+                : '')
             }
           >
             <p>TV Shows</p>
@@ -133,10 +134,10 @@ class Sidebar extends React.Component {
           <Link
             to="/people"
             className={
-              "sidebar--item " +
-              (current === "/people" || current.startsWith("/person/")
-                ? "active"
-                : "")
+              'sidebar--item ' +
+              (current === '/people' || current.startsWith('/person/')
+                ? 'active'
+                : '')
             }
           >
             <p>People</p>
@@ -147,10 +148,10 @@ class Sidebar extends React.Component {
           <Link
             to="/requests"
             className={
-              "sidebar--item " +
-              (current === "/requests" || current.startsWith("/requests/")
-                ? "active"
-                : "")
+              'sidebar--item ' +
+              (current === '/requests' || current.startsWith('/requests/')
+                ? 'active'
+                : '')
             }
           >
             <p>Requests</p>
@@ -158,12 +159,12 @@ class Sidebar extends React.Component {
               <RequestIcon />
             </div>
           </Link>
-          {user.role === "admin" || user.role === "moderator" ? (
+          {user.role === 'admin' || user.role === 'moderator' ? (
             <a
               className="sidebar--item"
               href={`${window.location.protocol}//${window.location.host}${
-                window.location.pathname === "/"
-                  ? ""
+                window.location.pathname === '/'
+                  ? ''
                   : this.stripTrailingSlash(window.location.pathname)
               }/admin/`}
             >

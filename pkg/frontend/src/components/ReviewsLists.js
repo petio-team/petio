@@ -1,7 +1,8 @@
-import React from "react";
-import { ReactComponent as StarIcon } from "../assets/svg/star.svg";
-import dateFormat from "dateformat";
-import { getAuth } from "../data/auth";
+import dateFormat from 'dateformat';
+import React from 'react';
+
+import { ReactComponent as StarIcon } from '../assets/svg/star.svg';
+import { getAuth } from '../data/auth';
 
 class ReviewsList extends React.Component {
   render() {
@@ -19,11 +20,11 @@ class ReviewsList extends React.Component {
                     <div
                       key={`${review._id}__${i}`}
                       className={`stars-1 star ${
-                        review.score > i ? "active" : ""
+                        review.score > i ? 'active' : ''
                       }`}
                     >
                       <StarIcon />
-                    </div>
+                    </div>,
                   );
                 }
                 let thumb = `${getAuth().api}/user/thumb/${review.user}`;
@@ -33,13 +34,13 @@ class ReviewsList extends React.Component {
                       <div
                         className="thumb"
                         style={{
-                          backgroundImage: "url(" + thumb + ")",
+                          backgroundImage: 'url(' + thumb + ')',
                         }}
                       ></div>
                     </div>
                     <div className="reviews-list--content">
                       <p className="small">
-                        {dateFormat(review.date, "dddd, mmmm dS, yyyy, h:MMtt")}
+                        {dateFormat(review.date, 'dddd, mmmm dS, yyyy, h:MMtt')}
                       </p>
                       <div className="stars-wrap">{stars}</div>
                       <p className="small capped-width__wide content-cap">
@@ -60,30 +61,30 @@ class ReviewsList extends React.Component {
                     <div
                       key={`${review.id}__${i}`}
                       className={`stars-1 star ${
-                        review.author_details.rating > i ? "active" : ""
+                        review.author_details.rating > i ? 'active' : ''
                       }`}
                     >
                       <StarIcon />
-                    </div>
+                    </div>,
                   );
                 }
               }
               let thumb = review.author_details.avatar_path
-                ? review.author_details.avatar_path.includes("https:")
+                ? review.author_details.avatar_path.includes('https:')
                   ? review.author_details.avatar_path.substring(1)
                   : `https://www.themoviedb.org/t/p/w128_and_h128_face${review.author_details.avatar_path}`
-                : "";
+                : '';
 
               let text = review.content;
               text = text.replace(
                 /\*\*\*(.*?)\*\*\*/g,
-                '<span style="display: block; margin: 0"><b>$1</b></span>'
+                '<span style="display: block; margin: 0"><b>$1</b></span>',
               );
-              text = text.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
-              text = text.replace(/__(.*?)__/g, "<u>$1</u>");
-              text = text.replace(/_/g, " ");
-              text = text.replace(/~~(.*?)~~/g, "<i>$1</i>");
-              text = text.replace(/--(.*?)--/g, " ($1) ");
+              text = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+              text = text.replace(/__(.*?)__/g, '<u>$1</u>');
+              text = text.replace(/_/g, ' ');
+              text = text.replace(/~~(.*?)~~/g, '<i>$1</i>');
+              text = text.replace(/--(.*?)--/g, ' ($1) ');
               text = text.replace(/<<(.*?)>>/g, "<a href='$1'>Link</a>");
               return (
                 <div className="reviews-list--item" key={review.id}>
@@ -91,7 +92,7 @@ class ReviewsList extends React.Component {
                     <div
                       className="thumb"
                       style={{
-                        backgroundImage: "url(" + thumb + ")",
+                        backgroundImage: 'url(' + thumb + ')',
                       }}
                     ></div>
                   </div>
@@ -99,7 +100,7 @@ class ReviewsList extends React.Component {
                     <p className="small">
                       {dateFormat(
                         review.updated_at,
-                        "dddd, mmmm dS, yyyy, h:MMtt"
+                        'dddd, mmmm dS, yyyy, h:MMtt',
                       )}
                     </p>
                     <div className="stars-wrap">{stars}</div>

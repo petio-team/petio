@@ -1,12 +1,13 @@
-import React from "react";
-import { withRouter } from "react-router-dom";
-import { connect } from "react-redux";
-import Api from "../data/Api";
+import React from 'react';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+
+import Api from '../data/Api';
+import Carousel from './Carousel';
+import CarouselLoading from './CarouselLoading';
 // import User from '../data/User'
-import MovieCard from "./MovieCard";
-import Carousel from "./Carousel";
-import TvCard from "./TvCard";
-import CarouselLoading from "./CarouselLoading";
+import MovieCard from './MovieCard';
+import TvCard from './TvCard';
 
 class History extends React.Component {
   constructor(props) {
@@ -17,7 +18,7 @@ class History extends React.Component {
       credentials: false,
       historyData: false,
       user: false,
-      text: "Loading",
+      text: 'Loading',
     };
 
     this.getHistory = this.getHistory.bind(this);
@@ -37,7 +38,7 @@ class History extends React.Component {
   getHistory() {
     if (this.props.user.current.custom && !this.props.user.current.altId) {
       this.setState({
-        text: "No history from the last 2 weeks.",
+        text: 'No history from the last 2 weeks.',
       });
       return;
     }
@@ -48,12 +49,12 @@ class History extends React.Component {
       this.props.user.current.altId
         ? this.props.user.current.altId
         : this.props.user.current.id,
-      this.props.type
+      this.props.type,
     )
       .then((res) => {
         if (Object.keys(res).length === 0) {
           this.setState({
-            text: "No history from the last 2 weeks.",
+            text: 'No history from the last 2 weeks.',
           });
           return;
         } else {
@@ -66,13 +67,13 @@ class History extends React.Component {
       .catch((err) => {
         console.log(err);
         this.setState({
-          text: "No history from the last 2 weeks.",
+          text: 'No history from the last 2 weeks.',
         });
       });
   }
 
   render() {
-    if (this.props.type === "movie") {
+    if (this.props.type === 'movie') {
       let historyData = (
         <>
           <section>
@@ -86,7 +87,7 @@ class History extends React.Component {
                 {Object.keys(this.state.historyData).map((t) => {
                   if (
                     !this.state.historyData[t].id ||
-                    this.state.historyData[t].id === "false"
+                    this.state.historyData[t].id === 'false'
                   ) {
                     return null;
                   }
@@ -100,7 +101,7 @@ class History extends React.Component {
                   );
                 })}
               </Carousel>
-            ) : this.state.text === "Loading" ? (
+            ) : this.state.text === 'Loading' ? (
               <CarouselLoading />
             ) : (
               <p>{this.state.text}</p>
@@ -124,7 +125,7 @@ class History extends React.Component {
                   // console.log(this.state.historyData[t]);
                   if (
                     !this.state.historyData[t].id ||
-                    this.state.historyData[t].id === "false"
+                    this.state.historyData[t].id === 'false'
                   ) {
                     return null;
                   }
@@ -138,7 +139,7 @@ class History extends React.Component {
                   );
                 })}
               </Carousel>
-            ) : this.state.text === "Loading" ? (
+            ) : this.state.text === 'Loading' ? (
               <CarouselLoading />
             ) : (
               <p>{this.state.text}</p>

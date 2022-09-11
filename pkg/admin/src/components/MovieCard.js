@@ -1,13 +1,13 @@
-import React from "react";
-import { withRouter } from "react-router-dom";
-import { connect } from "react-redux";
-import Api from "../data/Api";
-import { LazyLoadImage } from "react-lazy-load-image-component";
-import "react-lazy-load-image-component/src/effects/blur.css";
+import React from 'react';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/blur.css';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 
-import { ReactComponent as PlayIcon } from "../assets/svg/play.svg";
-import { ReactComponent as PauseIcon } from "../assets/svg/pause.svg";
-import { ReactComponent as BufferIcon } from "../assets/svg/buffer.svg";
+import { ReactComponent as BufferIcon } from '../assets/svg/buffer.svg';
+import { ReactComponent as PauseIcon } from '../assets/svg/pause.svg';
+import { ReactComponent as PlayIcon } from '../assets/svg/play.svg';
+import Api from '../data/Api';
 
 class MovieCard extends React.Component {
   constructor(props) {
@@ -43,7 +43,7 @@ class MovieCard extends React.Component {
   render() {
     let id = this.props.movie.id;
     let movie = this.props.api.movie_lookup[id];
-    if (!id || id === "false") {
+    if (!id || id === 'false') {
       return null;
     }
     if (!movie) {
@@ -51,7 +51,7 @@ class MovieCard extends React.Component {
         <div
           key={this.props.key}
           data-key={this.props.key}
-          className={"card type--movie-tv "}
+          className={'card type--movie-tv '}
         >
           <div className="card--inner">
             <div className="image-wrap">
@@ -77,21 +77,21 @@ class MovieCard extends React.Component {
       <LazyLoadImage
         src={`${window.location.pathname.replace(
           /\/$/,
-          ""
+          '',
         )}/images/no-poster.jpg`}
         alt={movie.title}
       />
     );
     let playbackState = null;
     switch (this.props.playbackState) {
-      case "playing":
-      case "streaming":
+      case 'playing':
+      case 'streaming':
         playbackState = <PlayIcon />;
         break;
-      case "paused":
+      case 'paused':
         playbackState = <PauseIcon />;
         break;
-      case "buffering":
+      case 'buffering':
         playbackState = <BufferIcon />;
         break;
       default:
@@ -103,7 +103,7 @@ class MovieCard extends React.Component {
         key={this.props.key}
         data-key={this.props.key}
         className={
-          "card type--movie-tv " + (movie.on_server ? "on-server" : "")
+          'card type--movie-tv ' + (movie.on_server ? 'on-server' : '')
         }
       >
         <div className="card--inner">
@@ -113,7 +113,7 @@ class MovieCard extends React.Component {
                 <div
                   className="session--prog"
                   style={{
-                    maxWidth: this.props.progress + "%",
+                    maxWidth: this.props.progress + '%',
                   }}
                 ></div>
               </div>
@@ -128,7 +128,7 @@ class MovieCard extends React.Component {
                 {this.props.character
                   ? this.props.character
                   : movie.release_date
-                  ? "(" + new Date(movie.release_date).getFullYear() + ")"
+                  ? '(' + new Date(movie.release_date).getFullYear() + ')'
                   : null}
               </span>
             </p>

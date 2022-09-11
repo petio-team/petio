@@ -1,10 +1,11 @@
-import React from "react";
-import Api from "../data/Api";
-import User from "../data/User";
-import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
-import RequestsTable from "../components/RequestsTable";
-import Modal from "../components/Modal";
-import { ReactComponent as WarningIcon } from "../assets/svg/warning.svg";
+import React from 'react';
+
+import { ReactComponent as Spinner } from '../assets/svg/spinner.svg';
+import { ReactComponent as WarningIcon } from '../assets/svg/warning.svg';
+import Modal from '../components/Modal';
+import RequestsTable from '../components/RequestsTable';
+import Api from '../data/Api';
+import User from '../data/User';
 
 class Requests extends React.Component {
   constructor(props) {
@@ -18,7 +19,7 @@ class Requests extends React.Component {
       deleteRequestOpen: false,
       edit_radarr: {},
       edit_sonarr: {},
-      req_delete_reason: "",
+      req_delete_reason: '',
     };
 
     this.getRequests = this.getRequests.bind(this);
@@ -41,7 +42,7 @@ class Requests extends React.Component {
     this.getRequests(true);
     this.heartbeat = setInterval(() => this.getRequests(true), 60000);
 
-    let page = document.querySelectorAll(".page-wrap")[0];
+    let page = document.querySelectorAll('.page-wrap')[0];
     page.scrollTop = 0;
     window.scrollTo(0, 0);
   }
@@ -56,13 +57,13 @@ class Requests extends React.Component {
     if (clear) {
       this.setState({
         [`${id}Open`]: false,
-        req_delete_reason: "",
+        req_delete_reason: '',
         activeRequest: false,
       });
     } else {
       this.setState({
         [`${id}Open`]: false,
-        req_delete_reason: "",
+        req_delete_reason: '',
       });
     }
   }
@@ -70,7 +71,7 @@ class Requests extends React.Component {
   inputChange(e) {
     const target = e.target;
     const name = target.name;
-    let value = target.type === "checkbox" ? target.checked : target.value;
+    let value = target.type === 'checkbox' ? target.checked : target.value;
 
     this.setState({
       [name]: value,
@@ -91,7 +92,7 @@ class Requests extends React.Component {
   changeServerSettings(e) {
     const target = e.target;
     const name = target.name;
-    let value = target.type === "checkbox" ? target.checked : target.value;
+    let value = target.type === 'checkbox' ? target.checked : target.value;
     let type = target.dataset.type;
     let id = target.dataset.id;
 
@@ -131,17 +132,17 @@ class Requests extends React.Component {
     if (radarr)
       await Promise.all(
         radarr.map(async (server) => {
-          let options = await this.getArrOptions(server.uuid, "radarr");
+          let options = await this.getArrOptions(server.uuid, 'radarr');
           server.options = options;
-        })
+        }),
       );
 
     if (sonarr)
       await Promise.all(
         sonarr.map(async (server) => {
-          let options = await this.getArrOptions(server.uuid, "sonarr");
+          let options = await this.getArrOptions(server.uuid, 'sonarr');
           server.options = options;
-        })
+        }),
       );
 
     this.setState({
@@ -153,7 +154,7 @@ class Requests extends React.Component {
   async getArrOptions(uuid, type) {
     try {
       let settings =
-        type === "radarr"
+        type === 'radarr'
           ? await Api.radarrOptions(uuid)
           : await Api.sonarrOptions(uuid);
       if (settings.profiles.error || settings.paths.error) {
@@ -176,10 +177,10 @@ class Requests extends React.Component {
     let edit_sonarr = {};
     let req = this.props.user.requests[reqD.requestId];
     if (!req) {
-      this.props.msg({ message: "Error editing request", type: "error" });
+      this.props.msg({ message: 'Error editing request', type: 'error' });
       return;
     }
-    if (req.type === "movie") {
+    if (req.type === 'movie') {
       if (req.radarrId.length > 0) {
         req.radarrId.map((r, i) => {
           let uuid = Object.keys(r)[0];
@@ -188,8 +189,8 @@ class Requests extends React.Component {
           let path = false;
           if (child.path) {
             path = child.path
-              .replace(`/${req.title} (${child.year})`, "")
-              .replace(`\\${req.title} (${child.year})`, "");
+              .replace(`/${req.title} (${child.year})`, '')
+              .replace(`\\${req.title} (${child.year})`, '');
           }
           edit_radarr[uuid] = {
             active: true,
@@ -211,7 +212,7 @@ class Requests extends React.Component {
         }
       }
     }
-    if (req.type === "tv") {
+    if (req.type === 'tv') {
       if (req.sonarrId.length > 0) {
         req.sonarrId.map((r, i) => {
           let uuid = Object.keys(r)[0];
@@ -245,7 +246,7 @@ class Requests extends React.Component {
       edit_radarr: edit_radarr,
       edit_sonarr: edit_sonarr,
     });
-    this.openModal("editRequest");
+    this.openModal('editRequest');
   }
 
   componentDidUpdate() {
@@ -287,7 +288,7 @@ class Requests extends React.Component {
         <p className="request-edit--server--title">
           Server name: {server.title}
         </p>
-        <label key={server.uuid} className={editable ? "" : "disabled"}>
+        <label key={server.uuid} className={editable ? '' : 'disabled'}>
           <input
             data-type={type}
             data-id={server.uuid}
@@ -299,7 +300,7 @@ class Requests extends React.Component {
                 ? true
                 : false
             }
-            name={"active"}
+            name={'active'}
             onChange={this.changeServerSettings}
           />
           Use this server
@@ -314,8 +315,8 @@ class Requests extends React.Component {
                 this.state[`edit_${type}`] &&
                 this.state[`edit_${type}`][server.uuid] &&
                 this.state[`edit_${type}`][server.uuid].active
-                  ? ""
-                  : "disabled"
+                  ? ''
+                  : 'disabled'
               }`}
             >
               <select
@@ -354,8 +355,8 @@ class Requests extends React.Component {
                 this.state[`edit_${type}`] &&
                 this.state[`edit_${type}`][server.uuid] &&
                 this.state[`edit_${type}`][server.uuid].active
-                  ? ""
-                  : "disabled"
+                  ? ''
+                  : 'disabled'
               }`}
             >
               <select
@@ -409,7 +410,7 @@ class Requests extends React.Component {
           <p style={{ margin: 0 }}>
             <small>
               {`These settings cannot be edited once sent to `}
-              <span style={{ textTransform: "capitalize" }}>{type}</span>
+              <span style={{ textTransform: 'capitalize' }}>{type}</span>
             </small>
           </p>
         )}
@@ -418,8 +419,8 @@ class Requests extends React.Component {
   }
 
   deleteReq() {
-    this.closeModal("editRequest");
-    this.openModal("deleteRequest");
+    this.closeModal('editRequest');
+    this.openModal('deleteRequest');
   }
 
   // updateReq() {
@@ -434,7 +435,7 @@ class Requests extends React.Component {
     let servers = {};
     let err = false;
     let type_server = {};
-    if (this.state.activeRequest.type === "tv") {
+    if (this.state.activeRequest.type === 'tv') {
       type_server = this.state.edit_sonarr;
     } else {
       type_server = this.state.edit_radarr;
@@ -446,30 +447,30 @@ class Requests extends React.Component {
           if (server.profile && server.path) {
             servers[r] = server;
           } else {
-            err = "Missing Path / Profile";
+            err = 'Missing Path / Profile';
           }
         }
       });
     }
 
     if (
-      this.state.activeRequest.type === "tv" &&
+      this.state.activeRequest.type === 'tv' &&
       servers &&
       !this.state.activeRequest.tvdb_id
     ) {
-      err = "No TVDb ID Cannot add to Sonarr";
+      err = 'No TVDb ID Cannot add to Sonarr';
     }
 
     if (
-      this.state.activeRequest.type === "movie" &&
+      this.state.activeRequest.type === 'movie' &&
       servers &&
       !this.state.activeRequest.tmdb_id
     ) {
-      err = "No TMDb ID Cannot add to Radarr";
+      err = 'No TMDb ID Cannot add to Radarr';
     }
 
     if (err) {
-      this.props.msg({ message: err, type: "error" });
+      this.props.msg({ message: err, type: 'error' });
       return;
     }
 
@@ -477,13 +478,13 @@ class Requests extends React.Component {
     let approved = this.state.activeRequest.approved;
 
     await Api.updateRequest(this.state.activeRequest, servers);
-    this.closeModal("editRequest", true);
+    this.closeModal('editRequest', true);
     this.getRequests(true);
     this.props.msg({
       message: approved
         ? `Request Updated: ${title}`
         : `Request Approved: ${title}`,
-      type: "good",
+      type: 'good',
     });
   }
 
@@ -495,14 +496,14 @@ class Requests extends React.Component {
         : false;
     let remove = await Api.removeRequest(request, reason);
     if (remove) {
-      this.closeModal("deleteRequest", true);
+      this.closeModal('deleteRequest', true);
       this.getRequests(true);
       this.props.msg({
         message: `Request removed - ${request.title}`,
-        type: "good",
+        type: 'good',
       });
     } else {
-      this.props.msg({ message: "Failed to remove request", type: "error" });
+      this.props.msg({ message: 'Failed to remove request', type: 'error' });
     }
   }
 
@@ -512,12 +513,12 @@ class Requests extends React.Component {
         <Modal
           title="Remove Request"
           open={this.state.deleteRequestOpen}
-          close={() => this.closeModal("deleteRequest", true)}
+          close={() => this.closeModal('deleteRequest', true)}
           submit={this.removeReq}
         >
           <p className="sub-title mb--1">
-            Removing{" "}
-            {this.state.activeRequest ? this.state.activeRequest.title : ""}
+            Removing{' '}
+            {this.state.activeRequest ? this.state.activeRequest.title : ''}
           </p>
           <textarea
             className="styled-input--textarea"
@@ -536,19 +537,19 @@ class Requests extends React.Component {
         <Modal
           title="Edit Request"
           open={this.state.editRequestOpen}
-          close={() => this.closeModal("editRequest", true)}
+          close={() => this.closeModal('editRequest', true)}
           submitText={
             this.state.activeRequest
               ? this.state.activeRequest.approved
-                ? "Save"
-                : "Save & Approve"
+                ? 'Save'
+                : 'Save & Approve'
               : false
           }
           deleteText={
             this.state.activeRequest
               ? this.state.activeRequest.approved
-                ? "Delete"
-                : "Deny"
+                ? 'Delete'
+                : 'Deny'
               : false
           }
           delete={this.deleteReq}
@@ -556,7 +557,7 @@ class Requests extends React.Component {
         >
           {this.state.activeRequest ? (
             <>
-              {this.state.activeRequest.type === "tv" &&
+              {this.state.activeRequest.type === 'tv' &&
               !this.state.activeRequest.tvdb_id ? (
                 <p className="warning-text">
                   <WarningIcon /> No TVDb ID
@@ -565,21 +566,21 @@ class Requests extends React.Component {
               <p className="sub-title mb--1">
                 {this.state.activeRequest.title}
               </p>
-              {this.state.activeRequest.type === "tv" &&
+              {this.state.activeRequest.type === 'tv' &&
               !this.state.activeRequest.tvdb_id ? (
                 <p>Can&apos;t send to DVR without TVDB ID</p>
               ) : (
                 <>
                   <p className="sub-title mt--2 mb--1">
-                    Edit{" "}
-                    {this.state.activeRequest.type === "tv"
-                      ? "Sonarr"
-                      : "Radarr"}
+                    Edit{' '}
+                    {this.state.activeRequest.type === 'tv'
+                      ? 'Sonarr'
+                      : 'Radarr'}
                   </p>
-                  {this.state.activeRequest.type === "tv" ? (
+                  {this.state.activeRequest.type === 'tv' ? (
                     this.state.s_servers && this.state.s_servers.length > 0 ? (
                       this.state.s_servers.map((server) => {
-                        return this.renderReqEdit(server, "sonarr");
+                        return this.renderReqEdit(server, 'sonarr');
                       })
                     ) : (
                       <p>No Sonarr Servers</p>
@@ -587,7 +588,7 @@ class Requests extends React.Component {
                   ) : this.state.r_servers &&
                     this.state.r_servers.length > 0 ? (
                     this.state.r_servers.map((server) => {
-                      return this.renderReqEdit(server, "radarr");
+                      return this.renderReqEdit(server, 'radarr');
                     })
                   ) : (
                     <p>No Radarr Servers</p>

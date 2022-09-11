@@ -1,12 +1,13 @@
-import React from "react";
-import { withRouter } from "react-router-dom";
-import { connect } from "react-redux";
-import Api from "../data/Api";
-import Nav from "../data/Nav";
-import MovieCard from "../components/MovieCard";
-import Carousel from "../components/Carousel";
-import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
-import CarouselLoading from "../components/CarouselLoading";
+import React from 'react';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+
+import { ReactComponent as Spinner } from '../assets/svg/spinner.svg';
+import Carousel from '../components/Carousel';
+import CarouselLoading from '../components/CarouselLoading';
+import MovieCard from '../components/MovieCard';
+import Api from '../data/Api';
+import Nav from '../data/Nav';
 
 class Movies extends React.Component {
   constructor(props) {
@@ -22,19 +23,19 @@ class Movies extends React.Component {
   }
 
   componentWillUnmount() {
-    let page = document.querySelectorAll(".page-wrap")[0];
-    let carouselsData = document.querySelectorAll(".carousel");
+    let page = document.querySelectorAll('.page-wrap')[0];
+    let carouselsData = document.querySelectorAll('.carousel');
     let carousels = [];
     carouselsData.forEach((carousel) => {
       carousels.push(carousel.scrollLeft);
     });
-    Nav.storeNav("/movies", this.state, page.scrollTop, carousels);
+    Nav.storeNav('/movies', this.state, page.scrollTop, carousels);
   }
 
   componentDidMount() {
-    let page = document.querySelectorAll(".page-wrap")[0];
+    let page = document.querySelectorAll('.page-wrap')[0];
     let scrollY = 0;
-    let pHist = Nav.getNav("/movies");
+    let pHist = Nav.getNav('/movies');
     page.scrollTop = scrollY;
 
     if (pHist) {
@@ -67,12 +68,12 @@ class Movies extends React.Component {
   }
 
   getPos() {
-    let page = document.querySelectorAll(".page-wrap")[0];
+    let page = document.querySelectorAll('.page-wrap')[0];
     let scrollY = 0;
-    let pHist = Nav.getNav("/movies");
+    let pHist = Nav.getNav('/movies');
     if (pHist) {
       scrollY = pHist.scroll;
-      document.querySelectorAll(".carousel").forEach((carousel, i) => {
+      document.querySelectorAll('.carousel').forEach((carousel, i) => {
         carousel.scrollLeft = pHist.carousels[i];
       });
     }

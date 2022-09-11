@@ -1,9 +1,10 @@
-import React from "react";
-import { withRouter } from "react-router-dom";
-import MovieCard from "../components/MovieCard";
-import Api from "../data/Api";
-import Nav from "../data/Nav";
-import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
+import React from 'react';
+import { withRouter } from 'react-router-dom';
+
+import { ReactComponent as Spinner } from '../assets/svg/spinner.svg';
+import MovieCard from '../components/MovieCard';
+import Api from '../data/Api';
+import Nav from '../data/Nav';
 
 class Company extends React.Component {
   constructor(props) {
@@ -24,7 +25,7 @@ class Company extends React.Component {
   }
 
   componentDidMount() {
-    let page = document.querySelectorAll(".page-wrap")[0];
+    let page = document.querySelectorAll('.page-wrap')[0];
     let scrollY = 0;
     let pHist = Nav.getNav(this.props.location.pathname);
     page.scrollTop = scrollY;
@@ -46,8 +47,8 @@ class Company extends React.Component {
         scrollWatch: true,
       });
       document
-        .getElementsByClassName("page-wrap")[0]
-        .addEventListener("scroll", this.trackScrolling);
+        .getElementsByClassName('page-wrap')[0]
+        .addEventListener('scroll', this.trackScrolling);
     }
 
     if (this.state.getPos) {
@@ -60,10 +61,10 @@ class Company extends React.Component {
 
   componentWillUnmount() {
     document
-      .getElementsByClassName("page-wrap")[0]
-      .removeEventListener("scroll", this.trackScrolling);
-    let page = document.querySelectorAll(".page-wrap")[0];
-    let carouselsData = document.querySelectorAll(".carousel");
+      .getElementsByClassName('page-wrap')[0]
+      .removeEventListener('scroll', this.trackScrolling);
+    let page = document.querySelectorAll('.page-wrap')[0];
+    let carouselsData = document.querySelectorAll('.carousel');
     let carousels = [];
     carouselsData.forEach((carousel) => {
       carousels.push(carousel.scrollLeft);
@@ -74,17 +75,17 @@ class Company extends React.Component {
       this.props.location.pathname,
       state,
       page.scrollTop,
-      carousels
+      carousels,
     );
   }
 
   getPos() {
-    let page = document.querySelectorAll(".page-wrap")[0];
+    let page = document.querySelectorAll('.page-wrap')[0];
     let scrollY = 0;
     let pHist = Nav.getNav(this.props.location.pathname);
     if (pHist) {
       scrollY = pHist.scroll;
-      document.querySelectorAll(".carousel").forEach((carousel, i) => {
+      document.querySelectorAll('.carousel').forEach((carousel, i) => {
         carousel.scrollLeft = pHist.carousels[i];
       });
     }
@@ -97,7 +98,7 @@ class Company extends React.Component {
   }
 
   trackScrolling = () => {
-    const wrappedElement = document.getElementsByClassName("company--grid")[0];
+    const wrappedElement = document.getElementsByClassName('company--grid')[0];
     if (this.isBottom(wrappedElement)) {
       if (this.state.paginating) return;
       let page = this.state.page;
@@ -120,7 +121,7 @@ class Company extends React.Component {
       paginating: true,
     });
     let id = this.props.match.params.id;
-    let type = "movie";
+    let type = 'movie';
     let data = await Api.discover(type, page, {
       with_companies: id,
     });
@@ -143,9 +144,9 @@ class Company extends React.Component {
       case 20580:
       case 6705:
       case 4081:
-        return "";
+        return '';
       default:
-        return "_filter(duotone,ffffff,868c96)";
+        return '_filter(duotone,ffffff,868c96)';
     }
   }
 
@@ -158,7 +159,7 @@ class Company extends React.Component {
               <img
                 title={this.state.details.name}
                 src={`https://image.tmdb.org/t/p/w500${this.filter(
-                  this.state.details.id
+                  this.state.details.id,
                 )}${this.state.details.logo_path}`}
                 className={`co__${this.state.details.id}`}
               />
@@ -171,9 +172,9 @@ class Company extends React.Component {
                 className="company--header--bg--item"
                 style={{
                   backgroundImage:
-                    "url(https://image.tmdb.org/t/p/w300" +
+                    'url(https://image.tmdb.org/t/p/w300' +
                     this.state.results[0].backdrop_path +
-                    ")",
+                    ')',
                 }}
               ></div>
             </div>
@@ -196,7 +197,7 @@ class Company extends React.Component {
                   </div>
                 );
               })
-            ) : this.state.results === "none" ||
+            ) : this.state.results === 'none' ||
               this.state.results.length === 0 ? (
               <p>No results</p>
             ) : (

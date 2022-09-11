@@ -1,27 +1,28 @@
-import React from "react";
-import { HashRouter, Switch, Route } from "react-router-dom";
-import { connect } from "react-redux";
-import User from "./data/User";
-import Api from "./data/Api";
+import React from 'react';
+import { connect } from 'react-redux';
+import { HashRouter, Route, Switch } from 'react-router-dom';
+
+import pjson from '../package.json';
+import { ReactComponent as Spinner } from './assets/svg/spinner.svg';
+import { ReactComponent as TmdbLogo } from './assets/svg/tmdb.svg';
+import Issues from './components/Issues';
 // import Plex from "./data/Plex";
-import Sidebar from "./components/Sidebar";
-import Search from "./pages/Search";
-import Series from "./pages/Series";
-import Season from "./pages/Season";
-import Movie from "./pages/Movie";
-import Actor from "./pages/Actor";
-import Issues from "./components/Issues";
-import Profile from "./pages/Profile";
-import Movies from "./pages/Movies";
-import Requests from "./pages/Requests";
-import Shows from "./pages/Shows";
-import { ReactComponent as Spinner } from "./assets/svg/spinner.svg";
-import { ReactComponent as TmdbLogo } from "./assets/svg/tmdb.svg";
-import pjson from "../package.json";
-import Genre from "./pages/Genre";
-import Networks from "./pages/Networks";
-import Company from "./pages/Company";
-import People from "./pages/People";
+import Sidebar from './components/Sidebar';
+import Api from './data/Api';
+import User from './data/User';
+import Actor from './pages/Actor';
+import Company from './pages/Company';
+import Genre from './pages/Genre';
+import Movie from './pages/Movie';
+import Movies from './pages/Movies';
+import Networks from './pages/Networks';
+import People from './pages/People';
+import Profile from './pages/Profile';
+import Requests from './pages/Requests';
+import Search from './pages/Search';
+import Season from './pages/Season';
+import Series from './pages/Series';
+import Shows from './pages/Shows';
 
 const popupCenter = (url, title, w, h) => {
   // Fixes dual-screen position | credit Tautulli
@@ -46,14 +47,14 @@ const popupCenter = (url, title, w, h) => {
   var newWindow = window.open(
     url,
     title,
-    "scrollbars=yes, width=" +
+    'scrollbars=yes, width=' +
       w +
-      ", height=" +
+      ', height=' +
       h +
-      ", top=" +
+      ', top=' +
       top +
-      ", left=" +
-      left
+      ', left=' +
+      left,
   );
 
   if (window.focus) newWindow.focus();
@@ -98,8 +99,8 @@ class App extends React.Component {
   msg(
     data = {
       message: String,
-      type: "info",
-    }
+      type: 'info',
+    },
   ) {
     let timestamp = +new Date();
     let msgs = { ...this.state.pushMsg };
@@ -134,21 +135,21 @@ class App extends React.Component {
     };
     if (/^\s/.test(username)) {
       this.msg({
-        type: "error",
+        type: 'error',
         message:
-          "The username you entered contains a space before! Please remove it",
+          'The username you entered contains a space before! Please remove it',
       });
       return;
     }
     if (/^\s/.test(password)) {
       this.msg({
-        type: "error",
+        type: 'error',
         message:
-          "The password you entered contains a space before! Please remove it",
+          'The password you entered contains a space before! Please remove it',
       });
       return;
     }
-    if (!this.props.user.credentials || this.state.config === "failed") {
+    if (!this.props.user.credentials || this.state.config === 'failed') {
       return;
     }
     this.setState({
@@ -163,7 +164,7 @@ class App extends React.Component {
       if (res.error) {
         this.msg({
           message: res.error,
-          type: "error",
+          type: 'error',
         });
         return;
       }
@@ -183,7 +184,7 @@ class App extends React.Component {
         loginMsg: error,
         loading: false,
       });
-      localStorage.removeItem("petio_jwt");
+      localStorage.removeItem('petio_jwt');
     }
   }
 
@@ -193,29 +194,29 @@ class App extends React.Component {
       isLoggedIn: false,
       isAdmin: false,
     });
-    this.msg({ message: "User logged out", type: "info" });
+    this.msg({ message: 'User logged out', type: 'info' });
   }
 
   getCookie(cname) {
-    var name = cname + "=";
+    var name = cname + '=';
     var decodedCookie = decodeURIComponent(document.cookie);
-    var ca = decodedCookie.split(";");
+    var ca = decodedCookie.split(';');
     for (var i = 0; i < ca.length; i++) {
       var c = ca[i];
-      while (c.charAt(0) == " ") {
+      while (c.charAt(0) == ' ') {
         c = c.substring(1);
       }
       if (c.indexOf(name) == 0) {
         return c.substring(name.length, c.length);
       }
     }
-    return "";
+    return '';
   }
 
   loginLocal() {
-    if (this.getCookie("petio_jwt")) {
+    if (this.getCookie('petio_jwt')) {
       if (this.props.user.credentials) {
-        this.login("", true);
+        this.login('', true);
       } else {
         setTimeout(() => {
           this.loginLocal();
@@ -251,14 +252,14 @@ class App extends React.Component {
         login_type: parseInt(res.login_type),
       });
       if (res.config === false) {
-        this.msg({ message: "Petio is not setup redirecting", type: "error" });
-        window.location.href = "/admin/";
+        this.msg({ message: 'Petio is not setup redirecting', type: 'error' });
+        window.location.href = '/admin/';
       }
     } catch {
-      this.msg({ message: "API not reachable", type: "error" });
+      this.msg({ message: 'API not reachable', type: 'error' });
       this.setState({
         error: true,
-        config: "failed",
+        config: 'failed',
       });
     }
   }
@@ -280,7 +281,7 @@ class App extends React.Component {
 
   async loginOauth() {
     try {
-      let plexWindow = popupCenter("", "Login with Plex", 500, 500);
+      let plexWindow = popupCenter('', 'Login with Plex', 500, 500);
       this.setState({
         loading: true,
       });
@@ -292,7 +293,7 @@ class App extends React.Component {
       if (res.error) {
         this.msg({
           message: res.error,
-          type: "error",
+          type: 'error',
         });
         return;
       }
@@ -308,7 +309,7 @@ class App extends React.Component {
       }
       User.getRequests();
     } catch (err) {
-      this.msg({ message: err, type: "error" });
+      this.msg({ message: err, type: 'error' });
       this.setState({
         loading: false,
       });
@@ -336,7 +337,7 @@ class App extends React.Component {
                 <div
                   key={`${msg.timestamp}__${i}`}
                   className={`push-msg--item ${
-                    msg.type !== "info" ? msg.type : ""
+                    msg.type !== 'info' ? msg.type : ''
                   }`}
                 >
                   {msg.message}
@@ -351,10 +352,10 @@ class App extends React.Component {
                   Pet<span>io</span>
                 </h1>
                 <p className="main-title">
-                  {!this.state.adminLogin ? "Login" : "Admin Login"}
+                  {!this.state.adminLogin ? 'Login' : 'Admin Login'}
                 </p>
                 <form onSubmit={this.loginForm} autoComplete="on">
-                  <p style={{ marginBottom: "5px" }}>Username / Email</p>
+                  <p style={{ marginBottom: '5px' }}>Username / Email</p>
                   <input
                     type="text"
                     name="username"
@@ -364,7 +365,7 @@ class App extends React.Component {
                   />
                   {this.state.login_type === 1 ? (
                     <>
-                      <p style={{ marginBottom: "5px" }}>Password</p>
+                      <p style={{ marginBottom: '5px' }}>Password</p>
                       <input
                         type="password"
                         name="password"
@@ -379,7 +380,7 @@ class App extends React.Component {
                       {this.state.loginMsg}
                     </div>
                   ) : null}
-                  {this.state.config === "failed" ? (
+                  {this.state.config === 'failed' ? (
                     <div className="msg msg__error msg__input">
                       API Not configured, please complete setup
                     </div>
@@ -435,7 +436,7 @@ class App extends React.Component {
                   <div
                     key={`msg__${msg.timestamp}__${i}`}
                     className={`push-msg--item ${
-                      msg.type !== "info" ? msg.type : ""
+                      msg.type !== 'info' ? msg.type : ''
                     }`}
                   >
                     {msg.message}

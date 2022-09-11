@@ -1,8 +1,9 @@
-import React from "react";
-import Api from "../data/Api";
-import { ReactComponent as MovieIcon } from "../assets/svg/movie.svg";
-import { ReactComponent as TvIcon } from "../assets/svg/tv.svg";
-import { ReactComponent as Arrow } from "../assets/svg/arrow-left.svg";
+import React from 'react';
+
+import { ReactComponent as Arrow } from '../assets/svg/arrow-left.svg';
+import { ReactComponent as MovieIcon } from '../assets/svg/movie.svg';
+import { ReactComponent as TvIcon } from '../assets/svg/tv.svg';
+import Api from '../data/Api';
 
 class Reviews extends React.Component {
   constructor(props) {
@@ -11,8 +12,8 @@ class Reviews extends React.Component {
     this.state = {
       reviews: false,
       media: false,
-      sortBy: "title",
-      dir: "DESC",
+      sortBy: 'title',
+      dir: 'DESC',
     };
 
     this.sortBy = this.sortBy.bind(this);
@@ -28,15 +29,15 @@ class Reviews extends React.Component {
     let sortVal = this.state.sortBy;
     let av = a[sortVal];
     let bv = b[sortVal];
-    if (!av) av = "";
-    if (!bv) bv = "";
-    if (typeof av === "string") av = av.toLowerCase();
-    if (typeof bv === "string") bv = bv.toLowerCase();
+    if (!av) av = '';
+    if (!bv) bv = '';
+    if (typeof av === 'string') av = av.toLowerCase();
+    if (typeof bv === 'string') bv = bv.toLowerCase();
     if (av > bv) {
-      return this.state.dir === "DESC" ? 1 : -1;
+      return this.state.dir === 'DESC' ? 1 : -1;
     }
     if (av < bv) {
-      return this.state.dir === "DESC" ? -1 : 1;
+      return this.state.dir === 'DESC' ? -1 : 1;
     }
     return 0;
   }
@@ -44,7 +45,7 @@ class Reviews extends React.Component {
   sortCol(type) {
     if (!type) return;
     let sw = this.state.sortBy === type ? true : false;
-    let dir = sw ? (this.state.dir === "DESC" ? "ASC" : "DESC") : "DESC";
+    let dir = sw ? (this.state.dir === 'DESC' ? 'ASC' : 'DESC') : 'DESC';
     this.setState({
       dir: dir,
       sortBy: type,
@@ -64,10 +65,10 @@ class Reviews extends React.Component {
   typeIcon(type) {
     let icon = null;
     switch (type) {
-      case "movie":
+      case 'movie':
         icon = <MovieIcon />;
         break;
-      case "tv":
+      case 'tv':
         icon = <TvIcon />;
         break;
       default:
@@ -98,27 +99,27 @@ class Reviews extends React.Component {
                 <tr>
                   <th
                     className={`sortable ${
-                      this.state.sortBy === "title" ? "active" : ""
+                      this.state.sortBy === 'title' ? 'active' : ''
                     } ${this.state.dir}`}
-                    onClick={() => this.sortCol("title")}
+                    onClick={() => this.sortCol('title')}
                   >
                     Title
                     <Arrow />
                   </th>
                   <th
                     className={`sortable ${
-                      this.state.sortBy === "type" ? "active" : ""
+                      this.state.sortBy === 'type' ? 'active' : ''
                     } ${this.state.dir}`}
-                    onClick={() => this.sortCol("type")}
+                    onClick={() => this.sortCol('type')}
                   >
                     Type
                     <Arrow />
                   </th>
                   <th
                     className={`sortable ${
-                      this.state.sortBy === "score" ? "active" : ""
+                      this.state.sortBy === 'score' ? 'active' : ''
                     } ${this.state.dir}`}
-                    onClick={() => this.sortCol("score")}
+                    onClick={() => this.sortCol('score')}
                   >
                     Score
                     <Arrow />
@@ -126,9 +127,9 @@ class Reviews extends React.Component {
                   <th>Comment</th>
                   <th
                     className={`sortable ${
-                      this.state.sortBy === "user" ? "active" : ""
+                      this.state.sortBy === 'user' ? 'active' : ''
                     } ${this.state.dir}`}
-                    onClick={() => this.sortCol("user")}
+                    onClick={() => this.sortCol('user')}
                   >
                     User
                     <Arrow />
@@ -145,7 +146,7 @@ class Reviews extends React.Component {
                       return (
                         <tr key={review._id}>
                           <td>
-                            {review.title ? review.title : "No title (Legacy)"}
+                            {review.title ? review.title : 'No title (Legacy)'}
                           </td>
                           <td>
                             <span className="requests--icon">

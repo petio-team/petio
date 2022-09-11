@@ -1,12 +1,13 @@
-import React from "react";
-import { withRouter } from "react-router-dom";
-import { connect } from "react-redux";
-import Api from "../data/Api";
-import Nav from "../data/Nav";
-import MovieCard from "../components/MovieCard";
-import TvCard from "../components/TvCard";
-import Carousel from "../components/Carousel";
-import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
+import React from 'react';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+
+import { ReactComponent as Spinner } from '../assets/svg/spinner.svg';
+import Carousel from '../components/Carousel';
+import MovieCard from '../components/MovieCard';
+import TvCard from '../components/TvCard';
+import Api from '../data/Api';
+import Nav from '../data/Nav';
 
 class Actor extends React.Component {
   constructor(props) {
@@ -22,7 +23,7 @@ class Actor extends React.Component {
   }
 
   componentDidMount() {
-    let page = document.querySelectorAll(".page-wrap")[0];
+    let page = document.querySelectorAll('.page-wrap')[0];
     let scrollY = 0;
     let pHist = Nav.getNav(this.props.location.pathname);
     page.scrollTop = scrollY;
@@ -45,8 +46,8 @@ class Actor extends React.Component {
   }
 
   componentWillUnmount() {
-    let page = document.querySelectorAll(".page-wrap")[0];
-    let carouselsData = document.querySelectorAll(".carousel");
+    let page = document.querySelectorAll('.page-wrap')[0];
+    let carouselsData = document.querySelectorAll('.carousel');
     let carousels = [];
     carouselsData.forEach((carousel) => {
       carousels.push(carousel.scrollLeft);
@@ -57,17 +58,17 @@ class Actor extends React.Component {
       this.props.location.pathname,
       state,
       page.scrollTop,
-      carousels
+      carousels,
     );
   }
 
   getPos() {
-    let page = document.querySelectorAll(".page-wrap")[0];
+    let page = document.querySelectorAll('.page-wrap')[0];
     let scrollY = 0;
     let pHist = Nav.getNav(this.props.location.pathname);
     if (pHist) {
       scrollY = pHist.scroll;
-      document.querySelectorAll(".carousel").forEach((carousel, i) => {
+      document.querySelectorAll('.carousel').forEach((carousel, i) => {
         carousel.scrollLeft = pHist.carousels[i];
       });
     }
@@ -83,8 +84,8 @@ class Actor extends React.Component {
   }
 
   handleScroll(e) {
-    let banner = e.currentTarget.querySelectorAll(".person--banner")[0];
-    let poster = e.currentTarget.querySelectorAll(".person--thumb--inner")[0];
+    let banner = e.currentTarget.querySelectorAll('.person--banner')[0];
+    let poster = e.currentTarget.querySelectorAll('.person--thumb--inner')[0];
     let offset =
       e.currentTarget.scrollTop > banner.offsetHeight
         ? 1
@@ -137,7 +138,7 @@ class Actor extends React.Component {
   processCredit(item, personData) {
     let credit = null;
 
-    if (personData.known_for_department !== "Acting") {
+    if (personData.known_for_department !== 'Acting') {
       // Not actor
       credit = item.jobs ? item.jobs : item.characters ? item.characters : null;
     } else {
@@ -146,7 +147,7 @@ class Actor extends React.Component {
     }
 
     if (credit) {
-      let output = "";
+      let output = '';
       for (let i in credit) {
         output += `${credit[i]} / `;
       }
@@ -261,8 +262,8 @@ class Actor extends React.Component {
                 <div className="person--bio">
                   <h3 className="sub-title mb--1">Biography</h3>
                   {personData.biography ? (
-                    <div className={`bio ${this.state.bioOpen ? "open" : ""}`}>
-                      {personData.biography.split("\n").map((str, i) => (
+                    <div className={`bio ${this.state.bioOpen ? 'open' : ''}`}>
+                      {personData.biography.split('\n').map((str, i) => (
                         <p key={`bio-${i}`}>{str}</p>
                       ))}
                     </div>
@@ -271,7 +272,7 @@ class Actor extends React.Component {
                     onClick={this.toggleBio}
                     className="person--bio--read-more"
                   >
-                    {this.state.bioOpen ? "Read less" : "Read more"}
+                    {this.state.bioOpen ? 'Read less' : 'Read more'}
                   </p>
                 </div>
               </section>
@@ -284,7 +285,7 @@ class Actor extends React.Component {
                       if (result.rating < 100) return null; // threshold to display
                       return (
                         <MovieCard
-                          key={result.id + "-cast-" + i}
+                          key={result.id + '-cast-' + i}
                           movie={result}
                           msg={this.props.msg}
                           character={this.processCredit(result, personData)}
@@ -303,7 +304,7 @@ class Actor extends React.Component {
                       if (result.rating < 100) return null; // threshold to display
                       return (
                         <TvCard
-                          key={result.id + "-cast-" + i}
+                          key={result.id + '-cast-' + i}
                           series={result}
                           msg={this.props.msg}
                           character={this.processCredit(result, personData)}

@@ -1,4 +1,4 @@
-input:not([type="checkbox"]):not(.styled-input--input):not([type="file"]) {
+input:not([type='checkbox']):not(.styled-input--input):not([type='file']) {
   display: block;
   width: 300px;
   margin-bottom: 20px;
@@ -23,7 +23,7 @@ input:not([type="checkbox"]):not(.styled-input--input):not([type="file"]) {
   }
 }
 
-input[type="checkbox"] {
+input[type='checkbox'] {
   appearance: none;
   width: 20px;
   height: 20px;
@@ -35,7 +35,7 @@ input[type="checkbox"] {
 
   &:checked {
     &:after {
-      content: "";
+      content: '';
       position: absolute;
       top: 3px;
       left: 3px;
@@ -79,7 +79,7 @@ input[type="checkbox"] {
   border-bottom: solid 2px transparent;
 
   &:after {
-    content: "";
+    content: '';
     position: absolute;
     top: 12px;
     right: 10px;

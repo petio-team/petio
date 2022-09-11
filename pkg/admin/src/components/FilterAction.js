@@ -1,10 +1,11 @@
-import React from "react";
-import { ReactComponent as Add } from "../assets/svg/plus-circle.svg";
-import { ReactComponent as Minus } from "../assets/svg/minus-circle.svg";
+import React from 'react';
+
+import { ReactComponent as Minus } from '../assets/svg/minus-circle.svg';
+import { ReactComponent as Add } from '../assets/svg/plus-circle.svg';
 
 class FilterAction extends React.Component {
   render() {
-    const fs = this.props.type === "movie_filters" ? "mf" : "tf";
+    const fs = this.props.type === 'movie_filters' ? 'mf' : 'tf';
     const data = Array.isArray(this.props.data)
       ? this.props.data
       : [this.props.data];
@@ -31,7 +32,7 @@ class FilterAction extends React.Component {
                     onChange={this.props.inputChange}
                     value={item.server}
                   >
-                    {this.props.servers === "loading" ? (
+                    {this.props.servers === 'loading' ? (
                       <option value="">Loading...</option>
                     ) : this.props.servers.length > 0 ? (
                       <>
@@ -69,8 +70,8 @@ class FilterAction extends React.Component {
                       <>
                         <option value="">Please Select</option>
                         {this.props.settings[item.server] &&
-                          this.props.settings[item.server].paths &&
-                          this.props.settings[item.server].paths.length > 0 ? (
+                        this.props.settings[item.server].paths &&
+                        this.props.settings[item.server].paths.length > 0 ? (
                           this.props.settings[item.server].paths.map(
                             (path, i) => {
                               return (
@@ -81,7 +82,7 @@ class FilterAction extends React.Component {
                                   {path.path}
                                 </option>
                               );
-                            }
+                            },
                           )
                         ) : (
                           <option value="">Loading...</option>
@@ -106,8 +107,8 @@ class FilterAction extends React.Component {
                     value={item.profile}
                   >
                     {item.server &&
-                      this.props.settings[item.server] &&
-                      this.props.settings[item.server].profiles ? (
+                    this.props.settings[item.server] &&
+                    this.props.settings[item.server].profiles ? (
                       <>
                         <option value="">Please Select</option>
                         {this.props.settings[item.server].profiles.map(
@@ -120,7 +121,7 @@ class FilterAction extends React.Component {
                                 {profile.name}
                               </option>
                             );
-                          }
+                          },
                         )}
                       </>
                     ) : (
@@ -142,8 +143,8 @@ class FilterAction extends React.Component {
                     value={item.language}
                   >
                     {item.server &&
-                      this.props.settings[item.server] &&
-                      this.props.settings[item.server].languages ? (
+                    this.props.settings[item.server] &&
+                    this.props.settings[item.server].languages ? (
                       <>
                         <option value="">Please Select</option>
                         {this.props.settings[item.server].languages.map(
@@ -156,7 +157,7 @@ class FilterAction extends React.Component {
                                 {language.name}
                               </option>
                             );
-                          }
+                          },
                         )}
                       </>
                     ) : (
@@ -165,9 +166,11 @@ class FilterAction extends React.Component {
                   </select>
                 </div>
               </div>
-              {this.props.type === "movie_filters" ? (
+              {this.props.type === 'movie_filters' ? (
                 <div className="filter--row--item">
-                  <p className="filter--row--item--title">Minimum Availability</p>
+                  <p className="filter--row--item--title">
+                    Minimum Availability
+                  </p>
                   <div className="select-wrap">
                     <select
                       data-type={this.props.type}
@@ -179,8 +182,8 @@ class FilterAction extends React.Component {
                       value={item.availability}
                     >
                       {item.server &&
-                        this.props.settings[item.server] &&
-                        this.props.settings[item.server].availabilities ? (
+                      this.props.settings[item.server] &&
+                      this.props.settings[item.server].availabilities ? (
                         <>
                           <option value="">Please Select</option>
                           {this.props.settings[item.server].availabilities.map(
@@ -193,7 +196,7 @@ class FilterAction extends React.Component {
                                   {availability.name}
                                 </option>
                               );
-                            }
+                            },
                           )}
                         </>
                       ) : (
@@ -201,7 +204,8 @@ class FilterAction extends React.Component {
                       )}
                     </select>
                   </div>
-                </div>) : null}
+                </div>
+              ) : null}
               <div className="filter--row--item">
                 <p className="filter--row--item--title">Tag</p>
                 <div className="select-wrap">
@@ -238,7 +242,7 @@ class FilterAction extends React.Component {
                   </select>
                 </div>
               </div>
-              {this.props.type === "tv_filters" ? (
+              {this.props.type === 'tv_filters' ? (
                 <div className="filter--row--item">
                   <p className="filter--row--item--title">Type</p>
                   <div className="select-wrap">
@@ -276,7 +280,7 @@ class FilterAction extends React.Component {
               ) : null}
 
               <div
-                className={`filter--row--add ${i > 0 ? "nm" : ""}`}
+                className={`filter--row--add ${i > 0 ? 'nm' : ''}`}
                 onClick={() =>
                   this.props.addAction(this.props.type, this.props.item)
                 }

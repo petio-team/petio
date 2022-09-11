@@ -1,20 +1,21 @@
-import React from "react";
-import Plex from "../data/Plex";
-import { connect } from "react-redux";
-import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
-import { ReactComponent as Windows } from "../assets/svg/windows.svg";
-import { ReactComponent as OSX } from "../assets/svg/mac.svg";
-import { ReactComponent as Linux } from "../assets/svg/linux.svg";
-import { ReactComponent as Docker } from "../assets/svg/docker.svg";
-import { ReactComponent as Server } from "../assets/svg/server.svg";
-import { ReactComponent as Good } from "../assets/svg/check.svg";
-import { ReactComponent as Bad } from "../assets/svg/close.svg";
-import { ReactComponent as TmdbLogo } from "../assets/svg/tmdb.svg";
-import { ReactComponent as LockIcon } from "../assets/svg/lock.svg";
-import { ReactComponent as UnlockIcon } from "../assets/svg/unlock.svg";
-import { ReactComponent as UnraidIcon } from "../assets/svg/unraid.svg";
-import Api from "../data/Api";
-import pjson from "../../package.json";
+import React from 'react';
+import { connect } from 'react-redux';
+
+import pjson from '../../package.json';
+import { ReactComponent as Good } from '../assets/svg/check.svg';
+import { ReactComponent as Bad } from '../assets/svg/close.svg';
+import { ReactComponent as Docker } from '../assets/svg/docker.svg';
+import { ReactComponent as Linux } from '../assets/svg/linux.svg';
+import { ReactComponent as LockIcon } from '../assets/svg/lock.svg';
+import { ReactComponent as OSX } from '../assets/svg/mac.svg';
+import { ReactComponent as Server } from '../assets/svg/server.svg';
+import { ReactComponent as Spinner } from '../assets/svg/spinner.svg';
+import { ReactComponent as TmdbLogo } from '../assets/svg/tmdb.svg';
+import { ReactComponent as UnlockIcon } from '../assets/svg/unlock.svg';
+import { ReactComponent as UnraidIcon } from '../assets/svg/unraid.svg';
+import { ReactComponent as Windows } from '../assets/svg/windows.svg';
+import Api from '../data/Api';
+import Plex from '../data/Plex';
 
 /* eslint-disable */
 const popupCenter = (url, title, w, h) => {
@@ -40,14 +41,14 @@ const popupCenter = (url, title, w, h) => {
   var newWindow = window.open(
     url,
     title,
-    "scrollbars=yes, width=" +
+    'scrollbars=yes, width=' +
       w +
-      ", height=" +
+      ', height=' +
       h +
-      ", top=" +
+      ', top=' +
       top +
-      ", left=" +
-      left
+      ', left=' +
+      left,
   );
 
   if (window.focus) newWindow.focus();
@@ -61,14 +62,14 @@ class Setup extends React.Component {
 
     this.state = {
       step: 1,
-      db: "mongo:27017",
+      db: 'mongo:27017',
       tls: false,
-      password: "",
+      password: '',
       selectedServer: false,
-      mongoStatus: "",
-      mongoType: "mongodb://",
-      mongoInstall: "docker",
-      finalText: "Getting things set up...",
+      mongoStatus: '',
+      mongoType: 'mongodb://',
+      mongoInstall: 'docker',
+      finalText: 'Getting things set up...',
     };
 
     this.inputChange = this.inputChange.bind(this);
@@ -85,16 +86,16 @@ class Setup extends React.Component {
 
   serverIcon(platform) {
     switch (platform) {
-      case "Linux":
+      case 'Linux':
         return <Linux />;
 
-      case "Windows":
+      case 'Windows':
         return <Windows />;
 
-      case "MacOSX":
+      case 'MacOSX':
         return <OSX />;
 
-      case "docker":
+      case 'docker':
         return <Docker />;
 
       default:
@@ -109,7 +110,7 @@ class Setup extends React.Component {
 
     this.setState({
       [name]: value,
-      mongoStatus: "",
+      mongoStatus: '',
     });
   }
 
@@ -127,7 +128,7 @@ class Setup extends React.Component {
   }
 
   loginOauth() {
-    let plexWindow = popupCenter("", "Login with Plex", 500, 500);
+    let plexWindow = popupCenter('', 'Login with Plex', 500, 500);
     Plex.plexAuth(plexWindow);
   }
 
@@ -175,7 +176,7 @@ class Setup extends React.Component {
 
   async testMongo() {
     this.setState({
-      mongoStatus: "pending",
+      mongoStatus: 'pending',
     });
     let db = this.state.mongoType + this.state.db;
     let test = await Api.testMongo(db);
@@ -200,9 +201,9 @@ class Setup extends React.Component {
       this.props.checkConfig(true);
     } catch {
       this.props.msg({
-        type: "error",
+        type: 'error',
         message:
-          "Setup failed, check API is running and no errors, if this persists please contact the dev team.",
+          'Setup failed, check API is running and no errors, if this persists please contact the dev team.',
       });
       this.setTimeout(() => {
         location.reload();
@@ -216,40 +217,40 @@ class Setup extends React.Component {
       to = 0;
     switch (it) {
       case 1:
-        text = "Starting things up...";
+        text = 'Starting things up...';
         to = 1000;
         break;
       case 2:
-        text = "Creating configs...";
+        text = 'Creating configs...';
         to = 1000;
         break;
       case 3:
-        text = "Connecting to the database...";
+        text = 'Connecting to the database...';
         to = 1000;
         break;
       case 4:
-        text = "Getting your friends...";
+        text = 'Getting your friends...';
         to = 1000;
         break;
       case 5:
-        text = "Loading your libraries...";
+        text = 'Loading your libraries...';
         to = 3000;
         break;
       case 6:
-        text = "Finding your embarassing movies...";
+        text = 'Finding your embarassing movies...';
         to = 3000;
         break;
       case 7:
-        text = "Finding your embarassing movies... oh wow...";
+        text = 'Finding your embarassing movies... oh wow...';
         to = 1000;
         break;
       case 8:
-        text = "Building your Petio library...";
+        text = 'Building your Petio library...';
         to = 3000;
         break;
       case 9:
         text =
-          "Building your Petio library... Grab a cup of tea this could take a few minutes...";
+          'Building your Petio library... Grab a cup of tea this could take a few minutes...';
         to = 1000;
         break;
       case 10:
@@ -292,15 +293,15 @@ class Setup extends React.Component {
   changeMongoType() {
     this.setState({
       mongoType:
-        this.state.mongoType === "mongodb+srv://"
-          ? "mongodb://"
-          : "mongodb+srv://",
-      mongoStatus: "",
+        this.state.mongoType === 'mongodb+srv://'
+          ? 'mongodb://'
+          : 'mongodb+srv://',
+      mongoStatus: '',
     });
   }
 
   componentDidMount() {
-    let page = document.querySelectorAll(".page-wrap")[0];
+    let page = document.querySelectorAll('.page-wrap')[0];
     page.scrollTop = 0;
     window.scrollTo(0, 0);
   }
@@ -308,14 +309,14 @@ class Setup extends React.Component {
   mongoPreset(type) {
     let preset;
     switch (type) {
-      case "docker":
-        preset = "mongo:27017";
+      case 'docker':
+        preset = 'mongo:27017';
         break;
-      case "unraid":
-        preset = "X.X.X.X:27017";
+      case 'unraid':
+        preset = 'X.X.X.X:27017';
         break;
       default:
-        preset = "localhost:27017";
+        preset = 'localhost:27017';
     }
     this.setState({
       mongoInstall: type,
@@ -328,39 +329,39 @@ class Setup extends React.Component {
       <div className="setup--wrap">
         <div className="setup--steps">
           <div
-            className={`setup--step ${this.state.step > 1 ? "complete" : ""} ${
-              this.state.step === 1 ? "active" : ""
+            className={`setup--step ${this.state.step > 1 ? 'complete' : ''} ${
+              this.state.step === 1 ? 'active' : ''
             }`}
           >
             1
           </div>
           <span></span>
           <div
-            className={`setup--step ${this.state.step > 2 ? "complete" : ""} ${
-              this.state.step === 2 ? "active" : ""
+            className={`setup--step ${this.state.step > 2 ? 'complete' : ''} ${
+              this.state.step === 2 ? 'active' : ''
             }`}
           >
             2
           </div>
           <span></span>
           <div
-            className={`setup--step ${this.state.step > 3 ? "complete" : ""} ${
-              this.state.step === 3 ? "active" : ""
+            className={`setup--step ${this.state.step > 3 ? 'complete' : ''} ${
+              this.state.step === 3 ? 'active' : ''
             }`}
           >
             3
           </div>
           <span></span>
           <div
-            className={`setup--step ${this.state.step > 4 ? "complete" : ""} ${
-              this.state.step === 4 ? "active" : ""
+            className={`setup--step ${this.state.step > 4 ? 'complete' : ''} ${
+              this.state.step === 4 ? 'active' : ''
             }`}
           >
             4
           </div>
           <span></span>
           <div
-            className={`setup--step ${this.state.step === 5 ? "active" : ""}`}
+            className={`setup--step ${this.state.step === 5 ? 'active' : ''}`}
           >
             5
           </div>
@@ -408,7 +409,7 @@ class Setup extends React.Component {
               />
               <button
                 className={`btn btn__square ${
-                  this.state.password ? "" : "disabled"
+                  this.state.password ? '' : 'disabled'
                 }`}
                 onClick={this.saveUser}
               >
@@ -431,8 +432,8 @@ class Setup extends React.Component {
                     <div
                       key={key}
                       className={`server-select-option ${
-                        this.state.selectedServer === key ? "selected" : ""
-                      } ${server.status !== "connected" ? "disabled" : ""}`}
+                        this.state.selectedServer === key ? 'selected' : ''
+                      } ${server.status !== 'connected' ? 'disabled' : ''}`}
                       data-id={key}
                       onClick={this.selectServer}
                     >
@@ -444,12 +445,12 @@ class Setup extends React.Component {
                           {server.name}
                           <span
                             className={`server-lock ${
-                              server.protocol === "https"
-                                ? "secure"
-                                : "insecure"
+                              server.protocol === 'https'
+                                ? 'secure'
+                                : 'insecure'
                             }`}
                           >
-                            {server.protocol === "https" ? (
+                            {server.protocol === 'https' ? (
                               <LockIcon />
                             ) : (
                               <UnlockIcon />
@@ -461,14 +462,14 @@ class Setup extends React.Component {
                       <div className="server-status">
                         <div
                           className={`server-status-item server-status-pending ${
-                            server.status === "pending" ? "active" : ""
+                            server.status === 'pending' ? 'active' : ''
                           }`}
                         >
                           <Spinner />
                         </div>
                         <div
                           className={`server-status-item server-status-good ${
-                            server.status === "connected" ? "active" : ""
+                            server.status === 'connected' ? 'active' : ''
                           }`}
                         >
                           <span>
@@ -477,7 +478,7 @@ class Setup extends React.Component {
                         </div>
                         <div
                           className={`server-status-item server-status-bad ${
-                            server.status === "failed" ? "active" : ""
+                            server.status === 'failed' ? 'active' : ''
                           }`}
                         >
                           <span>
@@ -491,10 +492,10 @@ class Setup extends React.Component {
               )}
               <button
                 className={
-                  "btn btn__square " +
-                  (this.state.selectedServer ? "" : "disabled")
+                  'btn btn__square ' +
+                  (this.state.selectedServer ? '' : 'disabled')
                 }
-                style={{ marginTop: "10px" }}
+                style={{ marginTop: '10px' }}
                 onClick={this.changeToDb}
               >
                 Next
@@ -514,26 +515,26 @@ class Setup extends React.Component {
               <div className="mongo-options">
                 <div
                   className={`mongo-option ${
-                    this.state.mongoInstall === "docker" ? "active" : ""
+                    this.state.mongoInstall === 'docker' ? 'active' : ''
                   }`}
-                  onClick={() => this.mongoPreset("docker")}
+                  onClick={() => this.mongoPreset('docker')}
                 >
                   <Docker />
                   <p>Docker</p>
                 </div>
                 <div
                   className={`mongo-option unraid ${
-                    this.state.mongoInstall === "unraid" ? "active" : ""
+                    this.state.mongoInstall === 'unraid' ? 'active' : ''
                   }`}
-                  onClick={() => this.mongoPreset("unraid")}
+                  onClick={() => this.mongoPreset('unraid')}
                 >
                   <UnraidIcon />
                 </div>
                 <div
                   className={`mongo-option ${
-                    this.state.mongoInstall === "other" ? "active" : ""
+                    this.state.mongoInstall === 'other' ? 'active' : ''
                   }`}
-                  onClick={() => this.mongoPreset("other")}
+                  onClick={() => this.mongoPreset('other')}
                 >
                   <Server />
                   <p>Other</p>
@@ -549,9 +550,9 @@ class Setup extends React.Component {
                   </div>
                   <input
                     style={
-                      this.state.mongoStatus === "pending"
-                        ? { pointerEvents: "none" }
-                        : { pointerEvents: "all" }
+                      this.state.mongoStatus === 'pending'
+                        ? { pointerEvents: 'none' }
+                        : { pointerEvents: 'all' }
                     }
                     type="text"
                     name="db"
@@ -562,14 +563,14 @@ class Setup extends React.Component {
                 <div className="mongo-status">
                   <div
                     className={`mongo-status-item mongo-status-pending ${
-                      this.state.mongoStatus === "pending" ? "active" : ""
+                      this.state.mongoStatus === 'pending' ? 'active' : ''
                     }`}
                   >
                     <Spinner />
                   </div>
                   <div
                     className={`mongo-status-item mongo-status-good ${
-                      this.state.mongoStatus === "connected" ? "active" : ""
+                      this.state.mongoStatus === 'connected' ? 'active' : ''
                     }`}
                   >
                     <span>
@@ -578,7 +579,7 @@ class Setup extends React.Component {
                   </div>
                   <div
                     className={`mongo-status-item mongo-status-bad ${
-                      this.state.mongoStatus === "failed" ? "active" : ""
+                      this.state.mongoStatus === 'failed' ? 'active' : ''
                     }`}
                   >
                     <span>
@@ -589,18 +590,18 @@ class Setup extends React.Component {
               </div>
               <button
                 className={`btn btn__square ${
-                  this.state.mongoStatus === "pending" ? "disabled" : ""
+                  this.state.mongoStatus === 'pending' ? 'disabled' : ''
                 }`}
-                style={{ marginTop: "10px", marginRight: "10px" }}
+                style={{ marginTop: '10px', marginRight: '10px' }}
                 onClick={this.testMongo}
               >
                 Test
               </button>
               <button
                 className={`btn btn__square ${
-                  this.state.mongoStatus !== "connected" ? "disabled" : ""
+                  this.state.mongoStatus !== 'connected' ? 'disabled' : ''
                 }`}
-                style={{ marginTop: "10px" }}
+                style={{ marginTop: '10px' }}
                 onClick={this.finalise}
               >
                 Finish

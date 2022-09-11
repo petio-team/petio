@@ -1,16 +1,16 @@
-import React from "react";
-import { withRouter, Link } from "react-router-dom";
-import { connect } from "react-redux";
-import Api from "../data/Api";
+import React from 'react';
+import { isIOS } from 'react-device-detect';
+import { connect } from 'react-redux';
+import { Link, withRouter } from 'react-router-dom';
 
-import MovieShowTop from "../components/MovieShowTop";
-import { ReactComponent as Spinner } from "../assets/svg/spinner.svg";
-import User from "../data/User";
-import Review from "../components/Review";
-import { ReactComponent as BackIcon } from "../assets/svg/back.svg";
-import { ReactComponent as CheckIcon } from "../assets/svg/check.svg";
-import { ReactComponent as RequestIcon } from "../assets/svg/request.svg";
-import { isIOS } from "react-device-detect";
+import { ReactComponent as BackIcon } from '../assets/svg/back.svg';
+import { ReactComponent as CheckIcon } from '../assets/svg/check.svg';
+import { ReactComponent as RequestIcon } from '../assets/svg/request.svg';
+import { ReactComponent as Spinner } from '../assets/svg/spinner.svg';
+import MovieShowTop from '../components/MovieShowTop';
+import Review from '../components/Review';
+import Api from '../data/Api';
+import User from '../data/User';
 
 class Season extends React.Component {
   constructor(props) {
@@ -29,7 +29,7 @@ class Season extends React.Component {
   }
 
   componentDidMount() {
-    let page = document.querySelectorAll(".page-wrap")[0];
+    let page = document.querySelectorAll('.page-wrap')[0];
     page.scrollTop = 0;
     window.scrollTo(0, 0);
     let id = this.props.match.params.id;
@@ -59,8 +59,8 @@ class Season extends React.Component {
         requests.seasons[this.state.season]
       ) {
         this.props.msg({
-          message: "Already Requested",
-          type: "error",
+          message: 'Already Requested',
+          type: 'error',
         });
         return;
       }
@@ -71,7 +71,7 @@ class Season extends React.Component {
       tvdb_id: series.tvdb_id,
       imdb_id: series.imdb_id,
       title: series.name,
-      type: "tv",
+      type: 'tv',
       seasons: {
         [this.state.season]: true,
       },
@@ -87,14 +87,14 @@ class Season extends React.Component {
       await User.request(request, this.props.user.current);
       this.props.msg({
         message: `New Request added: ${series.name} Season ${this.state.season}`,
-        type: "good",
+        type: 'good',
       });
       await User.getRequests();
       this.getRequests();
     } catch (err) {
       this.props.msg({
         message: err,
-        type: "error",
+        type: 'error',
       });
     }
   }
@@ -140,8 +140,8 @@ class Season extends React.Component {
     let days = Math.round(
       Math.abs(
         (firstDate.setHours(0, 0, 0, 0) - secondDate.setHours(0, 0, 0, 0)) /
-          oneDay
-      )
+          oneDay,
+      ),
     );
 
     if (firstDate < secondDate) {
@@ -154,7 +154,7 @@ class Season extends React.Component {
 
     return days < 100 ? (
       <span className="not-aired">
-        airs in {days} {days > 1 ? "days" : "day"}
+        airs in {days} {days > 1 ? 'days' : 'day'}
       </span>
     ) : (
       <span className="not-aired">Not yet aired</span>
@@ -222,7 +222,7 @@ class Season extends React.Component {
       ) : this.state.requested ? (
         <button className="btn btn__square blue" onClick={this.props.request}>
           {`Requested by ${this.state.requested}
-				${this.state.requested > 1 ? "users" : "user"}`}
+				${this.state.requested > 1 ? 'users' : 'user'}`}
         </button>
       ) : (
         <button className="btn btn__square" onClick={this.request}>
@@ -276,7 +276,7 @@ class Season extends React.Component {
                       <p>
                         {seasonData.air_date
                           ? new Date(seasonData.air_date).getFullYear()
-                          : "Unknown"}
+                          : 'Unknown'}
                       </p>
                       <div className="detail--bar--sep">·</div>
                       <p>{seasonData.name}</p>
@@ -308,8 +308,8 @@ class Season extends React.Component {
                     <div
                       key={`ep__s${episode.season_number}e${episode.episode_number}`}
                       className={`season-episode ${
-                        airDate < now ? "aired" : "not-aired"
-                      } ${epOnServer ? "on-server" : ""}`}
+                        airDate < now ? 'aired' : 'not-aired'
+                      } ${epOnServer ? 'on-server' : ''}`}
                     >
                       <div className="season-episode--img">
                         <img
@@ -322,7 +322,7 @@ class Season extends React.Component {
                       </div>
                       <div className="season-episode--info">
                         <p className="upper small ep-num">
-                          Season {episode.season_number}: Episode{" "}
+                          Season {episode.season_number}: Episode{' '}
                           {episode.episode_number} - {this.daysTillAir(airDate)}
                         </p>
                         <h4 className="sub-title">{episode.name}</h4>

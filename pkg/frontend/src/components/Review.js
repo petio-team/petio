@@ -1,6 +1,7 @@
-import React from "react";
-import { ReactComponent as StarIcon } from "../assets/svg/star.svg";
-import User from "../data/User";
+import React from 'react';
+
+import { ReactComponent as StarIcon } from '../assets/svg/star.svg';
+import User from '../data/User';
 
 class Review extends React.Component {
   constructor(props) {
@@ -26,7 +27,7 @@ class Review extends React.Component {
     try {
       let review = {
         score: this.state.rating,
-        comment: "",
+        comment: '',
       };
       User.review(this.props.item, this.props.user.id, review);
       setTimeout(() => {
@@ -37,13 +38,13 @@ class Review extends React.Component {
         });
         this.props.msg({
           message: `Review saved`,
-          type: "good",
+          type: 'good',
         });
       }, 1000);
     } catch (err) {
       this.props.msg({
         message: `Error adding review`,
-        type: "error",
+        type: 'error',
       });
     }
   }
@@ -52,24 +53,41 @@ class Review extends React.Component {
     let stars = [];
     for (let i = 0; i < 10; i++) {
       stars.push(
-        <div key={`star__${i}`} className={`stars-1 star ${this.state.rating >= i + 1 ? "active" : ""}`} data-rating={i + 1} onClick={this.setRating}>
+        <div
+          key={`star__${i}`}
+          className={`stars-1 star ${
+            this.state.rating >= i + 1 ? 'active' : ''
+          }`}
+          data-rating={i + 1}
+          onClick={this.setRating}
+        >
           <StarIcon />
-        </div>
+        </div>,
       );
     }
     return (
-      <div className={`review--wrap ${this.props.active ? "active" : ""}`}>
+      <div className={`review--wrap ${this.props.active ? 'active' : ''}`}>
         <div className="review--inner">
           <div className="review--top">
             <h3>What did you think?</h3>
           </div>
           <div className="review--main">
-            <p>Let other users know what you thought. Please note the review is not related to quality or issues, for issues please report an issue.</p>
+            <p>
+              Let other users know what you thought. Please note the review is
+              not related to quality or issues, for issues please report an
+              issue.
+            </p>
             <div className="stars-wrap">{stars}</div>
-            <div className="btn btn__square bad close-review" onClick={this.props.closeReview}>
+            <div
+              className="btn btn__square bad close-review"
+              onClick={this.props.closeReview}
+            >
               Cancel
             </div>
-            <div className="btn btn__square save-review" onClick={this.saveReview}>
+            <div
+              className="btn btn__square save-review"
+              onClick={this.saveReview}
+            >
               Save
             </div>
           </div>

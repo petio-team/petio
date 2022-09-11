@@ -1,18 +1,19 @@
-import React from "react";
-import { withRouter, Link } from "react-router-dom";
-import { connect } from "react-redux";
-import PersonCard from "../components/PersonCard";
-import TvCard from "../components/TvCard";
-import Api from "../data/Api";
-import Nav from "../data/Nav";
-import Carousel from "../components/Carousel";
-import "react-lazy-load-image-component/src/effects/blur.css";
-import User from "../data/User";
-import Review from "../components/Review";
-import ReviewsList from "../components/ReviewsLists";
-import MovieShowLoading from "../components/MovieShowLoading";
-import MovieShowTop from "../components/MovieShowTop";
-import MovieShowOverview from "../components/MovieShowOverview";
+import React from 'react';
+import 'react-lazy-load-image-component/src/effects/blur.css';
+import { connect } from 'react-redux';
+import { Link, withRouter } from 'react-router-dom';
+
+import Carousel from '../components/Carousel';
+import MovieShowLoading from '../components/MovieShowLoading';
+import MovieShowOverview from '../components/MovieShowOverview';
+import MovieShowTop from '../components/MovieShowTop';
+import PersonCard from '../components/PersonCard';
+import Review from '../components/Review';
+import ReviewsList from '../components/ReviewsLists';
+import TvCard from '../components/TvCard';
+import Api from '../data/Api';
+import Nav from '../data/Nav';
+import User from '../data/User';
 
 class Series extends React.Component {
   constructor(props) {
@@ -58,8 +59,8 @@ class Series extends React.Component {
   }
 
   storePos() {
-    let page = document.querySelectorAll(".page-wrap")[0];
-    let carouselsData = document.querySelectorAll(".carousel");
+    let page = document.querySelectorAll('.page-wrap')[0];
+    let carouselsData = document.querySelectorAll('.carousel');
     let carousels = [];
     carouselsData.forEach((carousel) => {
       carousels.push(carousel.scrollLeft);
@@ -72,12 +73,12 @@ class Series extends React.Component {
     this.getSeries(id);
     this.getRequests();
     this.getReviews();
-    let page = document.querySelectorAll(".page-wrap")[0];
+    let page = document.querySelectorAll('.page-wrap')[0];
     let scrollY = 0;
     let pHist = Nav.getNav(this.props.location.pathname);
     if (pHist) {
       scrollY = pHist.scroll;
-      document.querySelectorAll(".carousel").forEach((carousel, i) => {
+      document.querySelectorAll('.carousel').forEach((carousel, i) => {
         carousel.scrollLeft = pHist.carousels[i];
       });
     }
@@ -136,8 +137,8 @@ class Series extends React.Component {
           Object.keys(this.props.api.series_lookup[id].seasons).length
       ) {
         this.props.msg({
-          message: "Already Requested",
-          type: "error",
+          message: 'Already Requested',
+          type: 'error',
         });
         return;
       }
@@ -153,7 +154,7 @@ class Series extends React.Component {
       tvdb_id: series.tvdb_id,
       imdb_id: series.imdb_id,
       title: series.name,
-      type: "tv",
+      type: 'tv',
       thumb: series.poster_path,
       seasons: seasons,
     };
@@ -162,14 +163,14 @@ class Series extends React.Component {
       await User.request(request, this.props.user.current);
       this.props.msg({
         message: `New Request added: ${series.name}`,
-        type: "good",
+        type: 'good',
       });
       await User.getRequests();
       this.getRequests();
     } catch (err) {
       this.props.msg({
         message: err,
-        type: "error",
+        type: 'error',
       });
     }
   }
@@ -196,8 +197,8 @@ class Series extends React.Component {
     var rhours = Math.floor(hours);
     var minutes = (hours - rhours) * 60;
     var rminutes = Math.round(minutes);
-    var hrs = rhours < 1 ? "" : rhours === 1 ? "hr" : rhours > 1 ? "hrs" : "";
-    return `${rhours >= 1 ? rhours : ""} ${hrs} ${rminutes} mins`;
+    var hrs = rhours < 1 ? '' : rhours === 1 ? 'hr' : rhours > 1 ? 'hrs' : '';
+    return `${rhours >= 1 ? rhours : ''} ${hrs} ${rminutes} mins`;
   }
 
   findNested(obj, key, value) {
@@ -206,7 +207,7 @@ class Series extends React.Component {
       return obj;
     } else {
       for (var i = 0, len = Object.keys(obj).length; i < len; i++) {
-        if (typeof obj[i] == "object") {
+        if (typeof obj[i] == 'object') {
           var found = this.findNested(obj[i], key, value);
           if (found) {
             // If the object was found in the recursive call, bubble it up.
@@ -322,7 +323,7 @@ class Series extends React.Component {
     if (seriesData.videos.results) {
       for (let i = 0; i < seriesData.videos.results.length; i++) {
         let vid = seriesData.videos.results[i];
-        if (vid.site === "YouTube" && !video) {
+        if (vid.site === 'YouTube' && !video) {
           video = vid;
         }
       }
@@ -374,7 +375,7 @@ class Series extends React.Component {
               {seasons.map((season) => {
                 let seasonInfo = this.seasonEpisodes(
                   seriesData,
-                  season.season_number
+                  season.season_number,
                 );
                 let requestedSeason =
                   this.props.user.requests[id] &&
@@ -385,8 +386,8 @@ class Series extends React.Component {
                 return (
                   <div
                     className={`card type--movie-tv img-loaded ${
-                      seasonInfo.onServer ? "on-server" : ""
-                    } ${requestedSeason ? "requested" : ""}`}
+                      seasonInfo.onServer ? 'on-server' : ''
+                    } ${requestedSeason ? 'requested' : ''}`}
                     data-season_no={season.season_number}
                     data-total_eps={seasonInfo.totalEps}
                     data-avail_eps={seasonInfo.availableEps}
@@ -418,10 +419,10 @@ class Series extends React.Component {
                           {season.name}
                           <span className="year">
                             {season.air_date
-                              ? "(" +
+                              ? '(' +
                                 new Date(season.air_date).getFullYear() +
-                                ")"
-                              : ""}
+                                ')'
+                              : ''}
                           </span>
                         </p>
                       </div>
