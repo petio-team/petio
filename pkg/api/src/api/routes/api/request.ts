@@ -14,18 +14,19 @@ import { getArchive } from '@/services/requests/archive';
 import { getRequests } from '@/services/requests/display';
 import processRequest from '@/services/requests/process';
 
-const route = new Router({ prefix: '/request' });
+const routes = new Router({ prefix: '/request' });
 
 export default (app: Router) => {
-  route.get('/all', listRequests);
-  route.get('/min', getRequestMinified);
-  route.post('/add', addRequest);
-  route.get('/me', getUserRequests);
-  route.post('/remove', removeRequest);
-  route.post('/update', updateRequest);
-  route.get('/archive/:id', getArchivedRequestById);
+  routes.get('/all', listRequests);
+  routes.get('/min', getRequestMinified);
+  routes.post('/add', addRequest);
+  routes.get('/me', getUserRequests);
+  routes.post('/remove', removeRequest);
+  routes.post('/update', updateRequest);
+  routes.get('/archive/:id', getArchivedRequestById);
 
-  app.use(route.routes());
+  app.use(routes.routes());
+  app.use(routes.allowedMethods());
 };
 
 const listRequests = async (ctx: Context) => {

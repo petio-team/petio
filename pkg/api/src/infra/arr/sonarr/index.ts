@@ -1,8 +1,4 @@
-import {
-  Zodios,
-  ZodiosEnpointDescriptions,
-  ZodiosInstance,
-} from '@zodios/core';
+import { Zodios } from '@zodios/core';
 import { pluginHeader } from '@zodios/plugins';
 import URL from 'url';
 

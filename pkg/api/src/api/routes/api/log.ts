@@ -13,7 +13,7 @@ let liveLogfile2 = path.join(env.paths.data, './logs/live.log');
 const route = new Router({ prefix: 'logs/' });
 
 export default (app: Router) => {
-  route.get('/stream', streamLog);
+  route.get('/stream', adminRequired, streamLog);
 
   app.use(route.routes());
 };
