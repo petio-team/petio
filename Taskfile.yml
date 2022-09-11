@@ -36,7 +36,7 @@ tasks:
     cmds:
       - task: build:fe
       - task: build:adm
-      - task: build:api
+      - task: build:api:prod
 
   build:pre:
     cmds:
@@ -53,6 +53,11 @@ tasks:
       - yarn workspace admin run build
 
   build:api:
+    dir: pkg/api
+    cmds:
+      - yarn workspace api run build
+
+  build:api:prod:
     dir: pkg/api
     cmds:
       - yarn workspace api run build:prod
