@@ -41,7 +41,6 @@ export default async () => {
   } catch (e) {
     logger.error(e);
   }
-  return;
 };
 
 function userBuild(id) {
@@ -53,7 +52,7 @@ function userBuild(id) {
 async function create(id) {
   try {
     let data: any = await build(id);
-    let existing: any = await Discovery.findOne({ id: id });
+    let existing: any = await Discovery.findOne({ id: id }).exec();
     if (existing) {
       existing.id = id;
       existing.movie = {
@@ -94,7 +93,6 @@ async function create(id) {
       newDiscover.save();
     }
   } catch (_) {}
-  return;
 }
 
 async function build(id) {
@@ -119,15 +117,16 @@ async function build(id) {
     };
   }
   let items = data.MediaContainer.Metadata;
-  for (let i = 0; i < items.length; i++) {
-    let listItem = items[i];
+  for (const element of items) {
+    let listItem = element;
     if (listItem.type === 'movie') {
-      let dbItem = await Movie.findOne({ ratingKey: listItem.ratingKey });
+      let dbItem = await Movie.findOne({
+        ratingKey: listItem.ratingKey,
+      }).exec();
       if (dbItem) {
         if (dbItem.tmdb_id) movie.history[dbItem.tmdb_id] = dbItem.tmdb_id;
         if (dbItem.Genre) {
-          for (let g = 0; g < dbItem.Genre.length; g++) {
-            let genre = dbItem.Genre[g];
+          for (const genre of dbItem.Genre) {
             let cr = cert(dbItem.contentRating, 'movie');
             if (!movie.genres[genre.tag]) {
               movie.genres[genre.tag] = {
@@ -160,8 +159,8 @@ async function build(id) {
           }
         }
         if (dbItem.Role) {
-          for (let r = 0; r < dbItem.Role.length; r++) {
-            let actor = dbItem.Role[r].tag.replace(/[^a-zA-Z0-9 ]/g, '');
+          for (const role of dbItem.Role) {
+            let actor = role.tag.replace(/[^a-zA-Z0-9 ]/g, '');
             movie.actors[actor] = movie.actors[actor]
               ? movie.actors[actor] + 1
               : 1;
@@ -169,10 +168,10 @@ async function build(id) {
         }
 
         if (dbItem.Director) {
-          for (let r = 0; r < dbItem.Director.length; r++) {
-            let director = dbItem.Director[r].tag.replace(/[^a-zA-Z0-9 ]/g, '');
-            movie.directors[director] = movie.directors[director]
-              ? movie.directors[director] + 1
+          for (const director of dbItem.Director) {
+            let directorTag = director.tag.replace(/[^a-zA-Z0-9 ]/g, '');
+            movie.directors[directorTag] = movie.directors[directorTag]
+              ? movie.directors[directorTag] + 1
               : 1;
           }
         }
@@ -180,12 +179,11 @@ async function build(id) {
     } else if (listItem.type === 'episode') {
       if (listItem.grandparentKey) {
         let key = listItem.grandparentKey.replace('/library/metadata/', '');
-        let dbItem: any = await Show.findOne({ ratingKey: key });
+        let dbItem: any = await Show.findOne({ ratingKey: key }).exec();
         if (dbItem) {
           if (dbItem.tmdb_id) series.history[dbItem.tmdb_id] = dbItem.tmdb_id;
           if (dbItem.Genre) {
-            for (let g = 0; g < dbItem.Genre.length; g++) {
-              let genre = dbItem.Genre[g];
+            for (const genre of dbItem.Genre) {
               let cr = cert(dbItem.contentRating, 'show');
               if (!series.genres[genre.tag]) {
                 series.genres[genre.tag] = {
@@ -220,8 +218,8 @@ async function build(id) {
           }
 
           if (dbItem.Role) {
-            for (let r = 0; r < dbItem.Role.length; r++) {
-              let actor = dbItem.Role[r].tag;
+            for (const role of dbItem.Role) {
+              let actor = role.tag;
               series.actors[actor] = series.actors[actor]
                 ? series.actors[actor] + 1
                 : 1;
@@ -231,12 +229,12 @@ async function build(id) {
       }
     }
   }
-  Object.keys(movie.actors).map((key) => {
+  Object.keys(movie.actors).forEach((key) => {
     if (movie.actors[key] < 2) {
       delete movie.actors[key];
     }
   });
-  Object.keys(movie.directors).map((key) => {
+  Object.keys(movie.directors).forEach((key) => {
     if (movie.directors[key] < 2) {
       delete movie.directors[key];
     }

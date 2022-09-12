@@ -2,7 +2,6 @@ import multer from '@koa/multer';
 import Router from '@koa/router';
 import axios from 'axios';
 import bcrypt from 'bcryptjs';
-import fs from 'fs';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 import send from 'koa-send';
@@ -49,7 +48,7 @@ export default (app: Router) => {
 const getAllUsers = async (ctx: Context) => {
   let userData: any;
   try {
-    userData = await UserModel.find();
+    userData = await UserModel.find().exec();
   } catch (err) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = { error: err };
@@ -58,7 +57,7 @@ const getAllUsers = async (ctx: Context) => {
 
   if (userData) {
     let data = Object.values(Object.assign(userData));
-    Object.keys(data).map((u) => {
+    Object.keys(data).forEach((u) => {
       let user = data[u];
       if (user) {
         if (user.password) user.password = 'removed';
@@ -76,7 +75,7 @@ const getAllUsers = async (ctx: Context) => {
 const getUserById = async (ctx: Context) => {
   let userData: any;
   try {
-    userData = await UserModel.findOne({ id: ctx.params.id });
+    userData = await UserModel.findOne({ id: ctx.params.id }).exec();
   } catch (err) {
     ctx.status = StatusCodes.NOT_FOUND;
     ctx.body = { error: err };
@@ -93,7 +92,7 @@ const getUserById = async (ctx: Context) => {
 };
 
 const createCustomUser = async (ctx: Context) => {
-  const body = ctx.request.body as any;
+  const body = ctx.request.body;
 
   let user = body.user;
   if (!user) {
@@ -108,13 +107,12 @@ const createCustomUser = async (ctx: Context) => {
       { email: user.email },
       { title: user.username },
     ],
-  });
+  }).exec();
   if (dbUser) {
     ctx.status = StatusCodes.OK;
     ctx.body = {
       error: 'User exists, please change the username or email',
     };
-    return;
   } else {
     try {
       let newUser = new UserModel({
@@ -143,7 +141,7 @@ const createCustomUser = async (ctx: Context) => {
 };
 
 const editUser = async (ctx: Context) => {
-  const body = ctx.request.body as any;
+  const body = ctx.request.body;
   let user = body.user;
 
   if (!user) {
@@ -187,7 +185,7 @@ const editUser = async (ctx: Context) => {
         $set: userObj,
       },
       { new: true, useFindAndModify: false },
-    );
+    ).exec();
 
     ctx.status = StatusCodes.OK;
     ctx.body = {
@@ -204,7 +202,7 @@ const editUser = async (ctx: Context) => {
 };
 
 const editMultipleUsers = async (ctx: Context) => {
-  const body = ctx.request.body as any;
+  const body = ctx.request.body;
   let users = body.users;
   let enabled = body.enabled;
   let profile = body.profile;
@@ -230,7 +228,7 @@ const editMultipleUsers = async (ctx: Context) => {
               disabled: enabled ? false : true,
             },
           },
-        );
+        ).exec();
       }),
     );
 
@@ -247,7 +245,7 @@ const editMultipleUsers = async (ctx: Context) => {
 };
 
 const deleteUser = async (ctx: Context) => {
-  const body = ctx.request.body as any;
+  const body = ctx.request.body;
 
   let user = body.user;
   if (!user) {
@@ -297,7 +295,7 @@ const updateUserThumbnail = async (ctx: Context) => {
         },
       },
       { useFindAndModify: false },
-    );
+    ).exec();
 
     ctx.status = StatusCodes.OK;
     ctx.body = {};
@@ -313,7 +311,7 @@ const updateUserThumbnail = async (ctx: Context) => {
 const getThumbnailById = async (ctx: Context) => {
   let userData: any = false;
   try {
-    userData = await UserModel.findOne({ id: ctx.params.id });
+    userData = await UserModel.findOne({ id: ctx.params.id }).exec();
   } catch (err) {
     ctx.status = StatusCodes.BAD_REQUEST;
     ctx.body = { error: err };
@@ -356,7 +354,7 @@ const getQuota = async (ctx: Context) => {
     ctx.body = {};
     return;
   }
-  const user = await UserModel.findOne({ id: ctx.state.user.id });
+  const user = await UserModel.findOne({ id: ctx.state.user.id }).exec();
   if (!user) {
     return;
   }
@@ -367,7 +365,7 @@ const getQuota = async (ctx: Context) => {
     return;
   }
   const profile = user.profileId
-    ? await Profile.findById(user.profileId)
+    ? await Profile.findById(user.profileId).exec()
     : false;
   let total = 0;
   let current = user.quotaCount ? user.quotaCount : 0;

@@ -27,7 +27,7 @@ const memoryCache = cacheManager.caching({
 export default async (id, type = 'movie') => {
   if (!id) return { error: 'No ID' };
   try {
-    const discoveryPrefs: any = await Discovery.findOne({ id: id });
+    const discoveryPrefs: any = await Discovery.findOne({ id: id }).exec();
     let popular: any = [];
     let [upcoming, popularData]: any = await Promise.all([
       comingSoon(type),
@@ -122,7 +122,7 @@ export default async (id, type = 'movie') => {
         };
       }),
     );
-    for (var actor in mediaActors) {
+    for (const actor in mediaActors) {
       actorsSorted.push({ name: actor, count: mediaActors[actor] });
     }
     actorsSorted.sort(function (a, b) {
@@ -159,7 +159,7 @@ export default async (id, type = 'movie') => {
       }),
     );
 
-    for (var director in mediaDirectors) {
+    for (const director in mediaDirectors) {
       directorsSorted.push({ name: director, count: mediaDirectors[director] });
     }
     directorsSorted.sort(function (a, b) {
@@ -225,8 +225,8 @@ export default async (id, type = 'movie') => {
             let params: any = {};
             if (lookup.genres) {
               let genres = '';
-              for (let i = 0; i < lookup.genres.length; i++) {
-                genres += `${lookup.genres[i].id},`;
+              for (const element of lookup.genres) {
+                genres += `${element.id},`;
               }
               params.with_genres = genres;
             }
@@ -356,7 +356,7 @@ async function genreLookupData(id, genre, type) {
   }
   let certifications: any = [];
   if (Object.keys(genre.cert).length > 0) {
-    Object.keys(genre.cert).map((cert) => {
+    Object.keys(genre.cert).forEach((cert) => {
       // 10% threshold
       if (genre.count * 0.1 < genre.cert[cert]) {
         certifications.push(cert);
@@ -497,7 +497,7 @@ function genreID(genreName, type) {
 function discoverMovie(page = 1, params = {}) {
   const tmdb = 'https://api.themoviedb.org/3/';
   let par = '';
-  Object.keys(params).map((i) => {
+  Object.keys(params).forEach((i) => {
     par += `&${i}=${params[i]}`;
   });
   let url = `${tmdb}discover/movie?api_key=${env.api.tmdb.key}${par}&page=${page}&append_to_response=videos`;
@@ -522,7 +522,7 @@ function discoverMovie(page = 1, params = {}) {
 function discoverShow(page = 1, params = {}) {
   const tmdb = 'https://api.themoviedb.org/3/';
   let par = '';
-  Object.keys(params).map((i) => {
+  Object.keys(params).forEach((i) => {
     par += `&${i}=${params[i]}`;
   });
   let url = `${tmdb}discover/tv?api_key=${env.api.tmdb.key}${par}&page=${page}&append_to_response=videos`;
@@ -565,7 +565,7 @@ function searchPeople(term) {
 }
 
 function shuffle(array) {
-  var currentIndex = array.length,
+  let currentIndex = array.length,
     temporaryValue,
     randomIndex;
 

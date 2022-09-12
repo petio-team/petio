@@ -5,7 +5,6 @@ import xmlParser from 'xml-js';
 import env from '@/config/env';
 import { config } from '@/config/index';
 import logger from '@/loaders/logger';
-import Music from '@/models/artist';
 import Library from '@/models/library';
 import Movie from '@/models/movie';
 import Profile from '@/models/profile';
@@ -117,7 +116,6 @@ export default class LibraryUpdate {
     this.execMail();
     logger.verbose('Partial Scan Complete', { label: 'plex.library' });
     this.checkOldRequests();
-    return;
   }
 
   async scan() {
@@ -173,7 +171,7 @@ export default class LibraryUpdate {
       return res.data.MediaContainer;
     } catch {
       logger.warn('CRON: Recently added failed!', { label: 'plex.library' });
-      throw 'Recently added failed';
+      throw new Error('Recently added failed');
     }
   }
 
@@ -188,7 +186,7 @@ export default class LibraryUpdate {
   async saveLibrary(lib) {
     let libraryItem: any = false;
     try {
-      libraryItem = await Library.findOne({ uuid: lib.uuid });
+      libraryItem = await Library.findOne({ uuid: lib.uuid }).exec();
     } catch {
       logger.verbose('CRON: Library Not found, attempting to create', {
         label: 'plex.library',
@@ -218,7 +216,7 @@ export default class LibraryUpdate {
           contentChangedAt: lib.contentChangedAt,
           hidden: lib.hidden,
         });
-        libraryItem = await newLibrary.save();
+        await newLibrary.save();
       } catch (err) {
         logger.error(`CRON: Error`, { label: 'plex.library' });
         logger.error(err, { label: 'plex.library' });
@@ -253,7 +251,7 @@ export default class LibraryUpdate {
             },
           },
           { useFindAndModify: false },
-        );
+        ).exec();
       } catch (err) {
         logger.error(`CRON: Error`, { label: 'plex.library' });
         logger.error(err, { label: 'plex.library' });
@@ -314,7 +312,7 @@ export default class LibraryUpdate {
       let res = await axios.get(url);
       return res.data.MediaContainer;
     } catch (e) {
-      throw 'Unable to get library content';
+      throw new Error('Unable to get library content');
     }
   }
 
@@ -330,7 +328,7 @@ export default class LibraryUpdate {
       let res = await axios.get(url);
       return res.data.MediaContainer.Metadata[0];
     } catch (e) {
-      throw 'Unable to get meta';
+      throw new Error('Unable to get meta');
     }
   }
 
@@ -347,7 +345,7 @@ export default class LibraryUpdate {
       return res.data.MediaContainer.Metadata;
     } catch (e) {
       logger.error(e, { label: 'plex.library' });
-      throw 'Unable to get meta';
+      throw new Error('Unable to get meta');
     }
   }
 
@@ -362,7 +360,7 @@ export default class LibraryUpdate {
     try {
       movieDb = await Movie.findOne({
         ratingKey: parseInt(movieObj.ratingKey),
-      });
+      }).exec();
     } catch {
       movieDb = false;
     }
@@ -531,7 +529,9 @@ export default class LibraryUpdate {
     let seasons: any = [];
     logger.verbose(`CRON: TV Job: ${title}`, { label: 'plex.library' });
     try {
-      showDb = await Show.findOne({ ratingKey: parseInt(showObj.ratingKey) });
+      showDb = await Show.findOne({
+        ratingKey: parseInt(showObj.ratingKey),
+      }).exec();
     } catch {
       showDb = false;
     }
@@ -767,7 +767,7 @@ export default class LibraryUpdate {
   }
 
   async mailAdded(plexData, ref_id) {
-    let request = await Request.findOne({ tmdb_id: ref_id });
+    let request = await Request.findOne({ tmdb_id: ref_id }).exec();
     if (request) {
       await Promise.all(
         request.users.map(async (user, i) => {
@@ -779,7 +779,7 @@ export default class LibraryUpdate {
   }
 
   async sendMail(user, i, request) {
-    let userData = await UserModel.findOne({ id: user });
+    let userData = await UserModel.findOne({ id: user }).exec();
     if (!userData) {
       logger.error('CRON: Err: No user data', { label: 'plex.library' });
       return;
@@ -824,42 +824,30 @@ export default class LibraryUpdate {
 
   async externalIdTv(id, type) {
     let url = `${this.tmdb}find/${id}?api_key=${env.api.tmdb.key}&language=en-US&external_source=${type}_id`;
-    try {
-      let res = await axios.get(url);
-      return res.data.tv_results[0].id;
-    } catch (e) {
-      throw e;
-    }
+    let res = await axios.get(url);
+    return res.data.tv_results[0].id;
   }
 
   async tmdbExternalIds(id) {
     let url = `${this.tmdb}tv/${id}/external_ids?api_key=${env.api.tmdb.key}`;
-    try {
-      let res = await axios.get(url);
-      return res.data;
-    } catch (e) {
-      throw e;
-    }
+    let res = await axios.get(url);
+    return res.data;
   }
 
   async externalIdMovie(id, type) {
     let url = `${this.tmdb}find/${id}?api_key=${env.api.tmdb.key}&language=en-US&external_source=${type}_id`;
-    try {
-      let res = await axios.get(url);
-      return res.data.movie_results[0].id;
-    } catch (e) {
-      throw e;
-    }
+    let res = await axios.get(url);
+    return res.data.movie_results[0].id;
   }
 
   async checkOldRequests() {
     logger.verbose('CRON: Checking old requests', { label: 'plex.library' });
-    let requests = await Request.find();
-    for (let i = 0; i < requests.length; i++) {
+    let requests = await Request.find().exec();
+    for (const element of requests) {
       let onServer: any = false;
-      let request = requests[i];
+      let request = element;
       if (request.type === 'tv') {
-        onServer = await Show.findOne({ tmdb_id: request.tmdb_id });
+        onServer = await Show.findOne({ tmdb_id: request.tmdb_id }).exec();
         if (!request.tvdb_id) {
           logger.verbose(
             `CRON: No TVDB ID for request: ${request.title}, attempting to pull meta`,
@@ -894,7 +882,7 @@ export default class LibraryUpdate {
         }
       }
       if (request.type === 'movie') {
-        onServer = await Movie.findOne({ tmdb_id: request.tmdb_id });
+        onServer = await Movie.findOne({ tmdb_id: request.tmdb_id }).exec();
       }
 
       if (onServer) {
@@ -906,7 +894,7 @@ export default class LibraryUpdate {
         let titles: any = [];
         await Promise.all(
           request.users.map(async (user) => {
-            let userData = await UserModel.findOne({ id: user });
+            let userData = await UserModel.findOne({ id: user }).exec();
             if (!userData) return;
             emails.push(userData.email);
             titles.push(userData.title);
@@ -927,7 +915,7 @@ export default class LibraryUpdate {
   async deleteOld() {
     const deleteMovies = await Movie.find({
       petioTimestamp: { $ne: this.timestamp },
-    });
+    }).exec();
     for (let i in deleteMovies) {
       let deleteMovie = deleteMovies[i];
       logger.warn(
@@ -937,11 +925,11 @@ export default class LibraryUpdate {
       await Movie.findOneAndRemove(
         { _id: deleteMovie._id },
         { useFindAndModify: false },
-      );
+      ).exec();
     }
     const deleteShows = await Show.find({
       petioTimestamp: { $ne: this.timestamp },
-    });
+    }).exec();
     for (let i in deleteShows) {
       let deleteShow = deleteShows[i];
       logger.warn(
@@ -951,7 +939,7 @@ export default class LibraryUpdate {
       await Show.findOneAndRemove(
         { _id: deleteShow._id },
         { useFindAndModify: false },
-      );
+      ).exec();
     }
   }
 }

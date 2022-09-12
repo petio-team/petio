@@ -13,7 +13,7 @@ export async function lookup(imdb_id) {
     return false;
   }
 
-  let data = await Imdb.findOne({ id: imdb_id });
+  let data = await Imdb.findOne({ id: imdb_id }).exec();
   if (!data) return false;
   return {
     rating: { ratingValue: data.rating },
@@ -23,7 +23,7 @@ export async function lookup(imdb_id) {
 
 export async function storeCache(firstTime = false) {
   if (firstTime) {
-    let exists = await Imdb.findOne({});
+    let exists = await Imdb.findOne({}).exec();
     if (exists) {
       logger.verbose('IMDB: Cache exists skipping setup', {
         label: 'meta.imdb',
@@ -65,7 +65,7 @@ export async function storeCache(firstTime = false) {
 
 async function parseData(file): Promise<any> {
   logger.verbose('IMDB: Cache Emptying old cache', { label: 'meta.imdb' });
-  await Imdb.deleteMany({});
+  await Imdb.deleteMany({}).exec();
   logger.verbose('IMDB: Cache cleared', { label: 'meta.imdb' });
   logger.verbose('IMDB: Cache parsing download, updating local cache', {
     label: 'meta.imdb',
@@ -108,9 +108,5 @@ async function parseData(file): Promise<any> {
 }
 
 async function processBuffer(data) {
-  try {
-    await Imdb.bulkWrite(data);
-  } catch {
-    throw 'IMDB: Error cannot write to Db';
-  }
+  await Imdb.bulkWrite(data);
 }

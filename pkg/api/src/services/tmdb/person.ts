@@ -27,32 +27,20 @@ export default personLookup;
 async function getPersonInfo(id) {
   const tmdb = 'https://api.themoviedb.org/3/';
   let url = `${tmdb}person/${id}?api_key=${env.api.tmdb.key}&append_to_response=images`;
-  try {
-    let res = await axios.get(url, { httpAgent: agent });
-    return res.data;
-  } catch (err) {
-    throw err;
-  }
+  let res = await axios.get(url, { httpAgent: agent });
+  return res.data;
 }
 
 async function getPersonMovies(id) {
   const tmdb = 'https://api.themoviedb.org/3/';
   let url = `${tmdb}person/${id}/movie_credits?api_key=${env.api.tmdb.key}&append_to_response=credits,videos`;
-  try {
-    let res = await axios.get(url, { httpAgent: agent });
-    return res.data;
-  } catch (err) {
-    throw err;
-  }
+  let res = await axios.get(url, { httpAgent: agent });
+  return res.data;
 }
 
 async function getPersonShows(id) {
   const tmdb = 'https://api.themoviedb.org/3/';
   let url = `${tmdb}person/${id}/tv_credits?api_key=${env.api.tmdb.key}&append_to_response=credits,videos`;
-  try {
-    let res = await axios.get(url, { httpAgent: agent });
-    return res.data;
-  } catch (err) {
-    throw err;
-  }
+  let res = await axios.get(url, { httpAgent: agent });
+  return res.data;
 }

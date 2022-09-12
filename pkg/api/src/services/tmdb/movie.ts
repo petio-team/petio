@@ -78,8 +78,8 @@ export async function movieLookup(id, minified = false) {
           let params: any = {};
           if (movie.genres) {
             let genres = '';
-            for (let i = 0; i < movie.genres.length; i++) {
-              genres += `${movie.genres[i].id},`;
+            for (const element of movie.genres) {
+              genres += `${element.id},`;
             }
 
             params.with_genres = genres;
@@ -88,13 +88,13 @@ export async function movieLookup(id, minified = false) {
         }
       }
       if (recommendations)
-        Object.keys(recommendations.results).map((key) => {
+        Object.keys(recommendations.results).forEach((key) => {
           let recommendation = recommendations.results[key];
           if (recommendation.id !== parseInt(id))
             recommendationsData.push(recommendation.id);
         });
       if (similar)
-        Object.keys(similar.results).map((key) => {
+        Object.keys(similar.results).forEach((key) => {
           let recommendation = similar.results[key];
           if (
             recommendation.id !== parseInt(id) &&
@@ -162,7 +162,7 @@ async function getMovieData(id) {
   let data = false;
   try {
     data = await memoryCache.wrap(id, async function () {
-      return await tmdbData(id);
+      return tmdbData(id);
     });
   } catch (err) {
     logger.warn(`Error getting movie data - ${id}`, { label: 'tmdb.movie' });
@@ -175,7 +175,7 @@ export async function getRecommendations(id, page = 1) {
   let data = false;
   try {
     data = await memoryCache.wrap(`rec_${id}_${page}`, async function () {
-      return await recommendationData(id, page);
+      return recommendationData(id, page);
     });
   } catch (err) {
     logger.warn(`Error getting movie recommendations - ${id}`, {
@@ -190,7 +190,7 @@ export async function getSimilar(id, page = 1) {
   let data = false;
   try {
     data = await memoryCache.wrap(`similar_${id}_${page}`, async function () {
-      return await similarData(id, page);
+      return similarData(id, page);
     });
   } catch (err) {
     logger.warn(`Error getting movie recommendations - ${id}`, {
@@ -205,7 +205,7 @@ async function getReviews(id) {
   let data = false;
   try {
     data = await memoryCache.wrap(`rev_${id}`, async function () {
-      return await reviewsData(id);
+      return reviewsData(id);
     });
   } catch (err) {
     logger.warn(`Error getting movie reviews - ${id}`, { label: 'tmdb.movie' });
@@ -218,7 +218,7 @@ async function getCollection(id) {
   let data = false;
   try {
     data = await memoryCache.wrap(`col_${id}`, async function () {
-      return await collectionData(id);
+      return collectionData(id);
     });
   } catch (err) {
     logger.warn(`Error getting movie collections - ${id}`, {
@@ -234,64 +234,42 @@ async function getCollection(id) {
 async function tmdbData(id) {
   const tmdb = 'https://api.themoviedb.org/3/';
   let url = `${tmdb}movie/${id}?api_key=${env.api.tmdb.key}&append_to_response=credits,videos,keywords,release_dates`;
-  try {
-    let res = await axios.get(url, { httpAgent: agent });
-    let data = res.data;
-    data.timestamp = new Date();
-    if (data.release_dates) {
-      data.age_rating = findEnRating(data.release_dates.results);
-      delete data.release_dates;
-    }
-    return data;
-  } catch (err) {
-    throw err;
+  let res = await axios.get(url, { httpAgent: agent });
+  let data = res.data;
+  data.timestamp = new Date();
+  if (data.release_dates) {
+    data.age_rating = findEnRating(data.release_dates.results);
+    delete data.release_dates;
   }
+  return data;
 }
 
 async function recommendationData(id, page = 1) {
   const tmdb = 'https://api.themoviedb.org/3/';
   let url = `${tmdb}movie/${id}/recommendations?api_key=${env.api.tmdb.key}&page=${page}&append_to_response=videos`;
-  try {
-    let res = await axios.get(url, { httpAgent: agent });
-    return res.data;
-  } catch (err) {
-    throw err;
-  }
+  let res = await axios.get(url, { httpAgent: agent });
+  return res.data;
 }
 
 async function similarData(id, page = 1) {
   const tmdb = 'https://api.themoviedb.org/3/';
   let url = `${tmdb}movie/${id}/similar?api_key=${env.api.tmdb.key}&page=${page}&append_to_response=videos`;
-  try {
-    let res = await axios.get(url, { httpAgent: agent });
-    return res.data;
-  } catch (err) {
-    throw err;
-  }
+  let res = await axios.get(url, { httpAgent: agent });
+  return res.data;
 }
 
 async function collectionData(id) {
   const tmdb = 'https://api.themoviedb.org/3/';
   let url = `${tmdb}collection/${id}?api_key=${env.api.tmdb.key}&append_to_response=videos`;
-
-  try {
-    let res = await axios.get(url, { httpAgent: agent });
-    return res.data;
-  } catch (err) {
-    throw err;
-  }
+  let res = await axios.get(url, { httpAgent: agent });
+  return res.data;
 }
 
 async function reviewsData(id) {
   const tmdb = 'https://api.themoviedb.org/3/';
   let url = `${tmdb}movie/${id}/reviews?api_key=${env.api.tmdb.key}`;
-
-  try {
-    let res = await axios.get(url, { httpAgent: agent });
-    return res.data;
-  } catch (err) {
-    throw err;
-  }
+  let res = await axios.get(url, { httpAgent: agent });
+  return res.data;
 }
 
 // Lets i18n this soon
@@ -328,33 +306,25 @@ function findEnRating(data) {
 export async function discoverMovie(page = 1, params = {}) {
   const tmdb = 'https://api.themoviedb.org/3/';
   let par = '';
-  Object.keys(params).map((i) => {
+  Object.keys(params).forEach((i) => {
     par += `&${i}=${params[i]}`;
   });
   let url = `${tmdb}discover/movie?api_key=${env.api.tmdb.key}${par}&page=${page}&append_to_response=videos`;
-  try {
-    let res = await axios.get(url, { httpAgent: agent });
-    if (res.data && res.data.results.length > 0) {
-      await Promise.all(
-        res.data.results.map(async (movie) => {
-          const check: any = await onServer('movie', false, false, movie.id);
-          movie.on_server = check.exists;
-        }),
-      );
-    }
-    return res.data;
-  } catch (err) {
-    throw err;
+  let res = await axios.get(url, { httpAgent: agent });
+  if (res.data && res.data.results.length > 0) {
+    await Promise.all(
+      res.data.results.map(async (movie) => {
+        const check: any = await onServer('movie', false, false, movie.id);
+        movie.on_server = check.exists;
+      }),
+    );
   }
+  return res.data;
 }
 
 export async function company(id) {
   const tmdb = 'https://api.themoviedb.org/3/';
   let url = `${tmdb}company/${id}?api_key=${env.api.tmdb.key}`;
-  try {
-    let res = await axios.get(url, { httpAgent: agent });
-    return res.data;
-  } catch (err) {
-    throw err;
-  }
+  let res = await axios.get(url, { httpAgent: agent });
+  return res.data;
 }

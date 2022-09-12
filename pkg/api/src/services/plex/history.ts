@@ -80,11 +80,9 @@ async function parseHistory(data, type) {
     if (type === item.type || type === 'all') {
       let media_type = item.type;
       let media_id = item.ratingKey;
-      let media_title = item.title;
 
       if (media_type === 'episode' && item.grandparentKey) {
         media_id = item.grandparentKey.replace('/library/metadata/', '');
-        media_title = item.grandparentTitle;
       } else if (media_type === 'episode' && item.parentKey) {
         media_id = item.parentKey.replace('/library/metadata/', '');
       }
