@@ -202,7 +202,16 @@ export default (app: Router) => {
     adminRequired,
     testRadarrConnectionById,
   );
-  route.get('/radarr/config', adminRequired, getRadarrConfig);
+  route.get(
+    '/radarr/config',
+    validateRequest({
+      query: z.object({
+        withExtras: z.any().optional(),
+      }),
+    }),
+    adminRequired,
+    getRadarrConfig,
+  );
   route.post(
     '/radarr/config',
     validateRequest({
@@ -365,7 +374,7 @@ const testSonarrConnectionById = async (ctx: Context) => {
 };
 
 const getSonarrConfig = async (ctx: Context) => {
-  const withExtras = ctx.params.withExtras;
+  const withExtras = ctx.request.query.withExtras;
 
   try {
     const instances = await GetAllDownloaders(DownloaderType.Sonarr);
@@ -724,7 +733,7 @@ const testRadarrConnectionById = async (ctx: Context) => {
 };
 
 const getRadarrConfig = async (ctx: Context) => {
-  const withExtras = ctx.params.withExtras ? 1 : 0;
+  const withExtras = ctx.request.query.withExtras;
 
   try {
     const instances = await GetAllDownloaders(DownloaderType.Radarr);
