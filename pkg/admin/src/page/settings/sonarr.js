@@ -328,7 +328,7 @@ class Sonarr extends React.Component {
           submit={() => this.saveServer()}
           close={() => this.closeModal('addServer')}
           delete={
-            this.state.newServer
+            this.state.needsSave
               ? false
               : () => {
                 this.deleteServer();
