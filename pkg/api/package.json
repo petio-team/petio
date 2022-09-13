@@ -15,7 +15,6 @@
   "license": "MIT",
   "dependencies": {
     "@typegoose/typegoose": "^9.11.2",
-    "@types/semver": "^7.3.12",
     "@zodios/core": "^9.0.1",
     "@zodios/plugins": "^9.0.0",
     "agenda": "^4.3.0",
