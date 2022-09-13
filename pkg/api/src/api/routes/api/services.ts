@@ -14,7 +14,6 @@ import {
   DeleteDownloaderById,
   DownloaderType,
   GetAllDownloaders,
-  IDownloader,
 } from '@/models/downloaders';
 
 const route = new Router({ prefix: '/services' });
@@ -118,7 +117,7 @@ export default (app: Router) => {
     '/sonarr/config',
     validateRequest({
       query: z.object({
-        withExtras: z.boolean().optional(),
+        withExtras: z.any().optional(),
       }),
     }),
     adminRequired,
@@ -373,7 +372,7 @@ const getSonarrConfig = async (ctx: Context) => {
 
     const results = await bluebird.map(instances, async (instance) => {
       const url = new URL(instance.url);
-      const api = new SonarrAPI(url, instance.token);
+      const api = new SonarrAPI(url, instance.token, instance.version);
 
       const protocol = url.protocol.substring(0, url.protocol.length - 1);
 
@@ -477,6 +476,7 @@ const updateSonarrConfig = async (ctx: Context) => {
         type: DownloaderType.Sonarr,
         url: url.toString(),
         token: instance.token,
+        version: api.GetVersion().toString(),
         path: instance.path,
         profile: instance.profile,
         language: instance.language,
@@ -556,13 +556,12 @@ const getCalendarData = async (ctx: Context) => {
     }
 
     const now = new Date();
-
     const calendarData = await bluebird.map(instances, async (instance) => {
       const url = new URL(instance.url);
       const api =
         instance.type === DownloaderType.Sonarr
-          ? new SonarrAPI(url, instance.token)
-          : new RadarrAPI(url, instance.token);
+          ? new SonarrAPI(url, instance.token, instance.version)
+          : new RadarrAPI(url, instance.token, instance.version);
 
       return api.Calendar(
         true,
@@ -725,13 +724,13 @@ const testRadarrConnectionById = async (ctx: Context) => {
 };
 
 const getRadarrConfig = async (ctx: Context) => {
-  const withExtras = ctx.params.withExtras;
+  const withExtras = ctx.params.withExtras ? 1 : 0;
 
   try {
     const instances = await GetAllDownloaders(DownloaderType.Radarr);
     const results = await bluebird.map(instances, async (instance) => {
       const url = new URL(instance.url);
-      const api = new RadarrAPI(url, instance.token);
+      const api = new RadarrAPI(url, instance.token, instance.version);
 
       const protocol = url.protocol.substring(0, url.protocol.length - 1);
 
@@ -834,6 +833,7 @@ const updateRadarrConfig = async (ctx: Context) => {
         type: DownloaderType.Radarr,
         url: url.toString(),
         token: instance.token,
+        version: api.GetVersion().toString(),
         path: instance.path,
         profile: instance.profile,
         language: instance.language,
