@@ -235,7 +235,7 @@ class Sonarr extends React.Component {
       loading: live ? false : true,
     });
     try {
-      let sonarr = await Api.sonarrConfig();
+      let sonarr = await Api.sonarrConfig(true);
       this.setState({
         servers: sonarr,
         loading: false,

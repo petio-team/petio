@@ -64,8 +64,8 @@ export async function updateConfig(config) {
   return post(`/config/update`, config);
 }
 
-export async function sonarrConfig() {
-  return get(`/services/sonarr/config`);
+export async function sonarrConfig(withExtras = false) {
+  return get(`/services/sonarr/config${withExtras === true ? '?withExtras=true' : ''}`);
 }
 
 export async function saveSonarrConfig(config) {
@@ -99,8 +99,8 @@ export async function sonarrTags(id) {
   return get(`/services/sonarr/tags/${id}`);
 }
 
-export async function radarrConfig() {
-  return get(`/services/radarr/config`);
+export async function radarrConfig(withExtras = false) {
+  return get(`/services/radarr/config${withExtras === true ? '?withExtras=true' : ''}`);
 }
 
 export async function getRadarrOptions(id) {

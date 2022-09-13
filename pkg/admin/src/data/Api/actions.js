@@ -299,8 +299,8 @@ export function updateConfig(config) {
   });
 }
 
-export async function sonarrConfig() {
-  return api.sonarrConfig();
+export async function sonarrConfig(withExtras = false) {
+  return api.sonarrConfig(withExtras);
 }
 
 export async function sonarrDeleteInstance(uuid) {
@@ -311,8 +311,8 @@ export async function sonarrOptions(id) {
   return api.getSonarrOptions(id);
 }
 
-export async function radarrConfig() {
-  return api.radarrConfig();
+export async function radarrConfig(withExtras = false) {
+  return api.radarrConfig(withExtras);
 }
 
 export async function radarrDeleteInstance(uuid) {

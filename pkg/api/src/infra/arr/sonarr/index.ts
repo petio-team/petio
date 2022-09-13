@@ -3,6 +3,7 @@ import { pluginHeader } from '@zodios/plugins';
 import URL from 'url';
 
 import { CalendarEndpoint } from './calendar';
+import { LanguageEndpoint } from './language';
 import { LanguageProfileEndpoint } from './language_profile';
 import { QualityProfileEndpoint } from './quality_profile';
 import { QueueEndpoint } from './queue';
@@ -15,6 +16,7 @@ export const SonarrAPIClient = (url: URL, token: string) => {
   const client = new Zodios(url.toString(), [
     ...SystemStatusEndpoint,
     ...LanguageProfileEndpoint,
+    ...LanguageEndpoint,
     ...CalendarEndpoint,
     ...QualityProfileEndpoint,
     ...RootFolderEndpoint,

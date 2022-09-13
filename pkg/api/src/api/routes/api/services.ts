@@ -114,7 +114,16 @@ export default (app: Router) => {
     adminRequired,
     testSonarrConnectionById,
   );
-  route.get('/sonarr/config', adminRequired, getSonarrConfig);
+  route.get(
+    '/sonarr/config',
+    validateRequest({
+      query: z.object({
+        withExtras: z.boolean().optional(),
+      }),
+    }),
+    adminRequired,
+    getSonarrConfig,
+  );
   route.get('/calendar', getCalendarData);
   route.post(
     '/sonarr/config',
@@ -357,6 +366,8 @@ const testSonarrConnectionById = async (ctx: Context) => {
 };
 
 const getSonarrConfig = async (ctx: Context) => {
+  const withExtras = ctx.params.withExtras;
+
   try {
     const instances = await GetAllDownloaders(DownloaderType.Sonarr);
 
@@ -373,12 +384,19 @@ const getSonarrConfig = async (ctx: Context) => {
         port = parseInt(url.port);
       }
 
-      const [paths, profiles, languages, availabilities] = await Promise.all([
-        api.GetRootPaths(),
-        api.GetQualityProfiles(),
-        api.GetLanguageProfile(),
-        api.GetSeriesTypes(),
-      ]);
+      let paths: any | undefined = undefined;
+      let profiles: any | undefined = undefined;
+      let languages: any | undefined = undefined;
+      let availabilities: any | undefined = undefined;
+
+      if (withExtras) {
+        [paths, profiles, languages, availabilities] = await Promise.all([
+          api.GetRootPaths(),
+          api.GetQualityProfiles(),
+          api.GetLanguages(),
+          api.GetSeriesTypes(),
+        ]);
+      }
 
       return {
         id: instance.id,
@@ -415,6 +433,7 @@ const getSonarrConfig = async (ctx: Context) => {
     ctx.status = StatusCodes.OK;
     ctx.body = results;
   } catch (error) {
+    console.log(error);
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = error.message;
   }
@@ -468,7 +487,7 @@ const updateSonarrConfig = async (ctx: Context) => {
       const [paths, profiles, languages, availabilities] = await Promise.all([
         api.GetRootPaths(),
         api.GetQualityProfiles(),
-        api.GetLanguageProfile(),
+        api.GetLanguages(),
         api.GetSeriesTypes(),
       ]);
 
@@ -706,6 +725,8 @@ const testRadarrConnectionById = async (ctx: Context) => {
 };
 
 const getRadarrConfig = async (ctx: Context) => {
+  const withExtras = ctx.params.withExtras;
+
   try {
     const instances = await GetAllDownloaders(DownloaderType.Radarr);
     const results = await bluebird.map(instances, async (instance) => {
@@ -721,12 +742,19 @@ const getRadarrConfig = async (ctx: Context) => {
         port = parseInt(url.port);
       }
 
-      const [paths, profiles, languages, availabilities] = await Promise.all([
-        api.GetRootPaths(),
-        api.GetQualityProfiles(),
-        api.GetLanguages(),
-        api.GetMinimumAvailability(),
-      ]);
+      let paths: any | undefined = undefined;
+      let profiles: any | undefined = undefined;
+      let languages: any | undefined = undefined;
+      let availabilities: any | undefined = undefined;
+
+      if (withExtras) {
+        [paths, profiles, languages, availabilities] = await Promise.all([
+          api.GetRootPaths(),
+          api.GetQualityProfiles(),
+          api.GetLanguages(),
+          api.GetMinimumAvailability(),
+        ]);
+      }
 
       return {
         id: instance.id,

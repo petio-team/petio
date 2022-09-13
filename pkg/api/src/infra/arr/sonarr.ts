@@ -1,4 +1,7 @@
+import semver, { SemVer } from 'semver';
+
 import { SonarrAPIClient } from '@/infra/arr/sonarr/index';
+import { Language } from '@/infra/arr/sonarr/language';
 import { LanguageProfile } from '@/infra/arr/sonarr/language_profile';
 import { QualityProfile } from '@/infra/arr/sonarr/quality_profile';
 import { Queue } from '@/infra/arr/sonarr/queue';
@@ -11,19 +14,32 @@ export type SeriesType = {
   status: string;
 };
 
+export type SeriesLanguage = {
+  id: number;
+  name: string;
+};
+
 export default class SonarrAPI {
   private client: ReturnType<typeof SonarrAPIClient>;
+  private version: SemVer;
 
   constructor(url: URL, token: string) {
     this.client = SonarrAPIClient(url, token);
   }
 
+  public GetVersion(): SemVer {
+    return this.version;
+  }
+
   public async TestConnection(): Promise<boolean> {
     const response = await this.client.get('/api/v3/system/status');
     if (response) {
+      const version = semver.parse(response.version);
+      if (version) {
+        this.version = version;
+      }
       return true;
     }
-
     return false;
   }
 
@@ -37,6 +53,20 @@ export default class SonarrAPI {
 
   public async GetLanguageProfile(): Promise<LanguageProfile> {
     return this.client.get('/api/v3/languageprofile');
+  }
+
+  public async GetLanguages(): Promise<SeriesLanguage[]> {
+    if (this.version.major === 4) {
+      const results = await this.client.get('/api/v3/language');
+      return results.map((r) => {
+        return { id: r.id, name: r.name };
+      });
+    }
+
+    const results = await this.client.get('/api/v3/languageprofile');
+    return results.map((r) => {
+      return { id: r.id, name: r.name };
+    });
   }
 
   public GetSeriesTypes(): SeriesType[] {

@@ -15,6 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "@typegoose/typegoose": "^9.11.2",
+    "@types/semver": "^7.3.12",
     "@zodios/core": "^9.0.1",
     "@zodios/plugins": "^9.0.0",
     "agenda": "^4.3.0",
@@ -48,6 +49,7 @@
     "nodemailer": "^6.7.8",
     "reflect-metadata": "^0.1.13",
     "sanitize-filename": "^1.6.3",
+    "semver": "^7.3.7",
     "ts-node": "^10.9.1",
     "tsyringe": "^4.7.0",
     "validator": "^13.7.0",

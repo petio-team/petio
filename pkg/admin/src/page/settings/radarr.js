@@ -236,7 +236,7 @@ class Radarr extends React.Component {
       loading: live ? false : true,
     });
     try {
-      let radarr = await Api.radarrConfig();
+      let radarr = await Api.radarrConfig(true);
       this.setState({
         servers: radarr,
         loading: false,

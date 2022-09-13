@@ -3812,6 +3812,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/semver@npm:^7.3.12":
+  version: 7.3.12
+  resolution: "@types/semver@npm:7.3.12"
+  checksum: 35536b2fc5602904f21cae681f6c9498e177dab3f54ae37c92f9a1b7e43c35f18bcd81e1c98c1cf0d33ee046bb06c771e9928c1c00a401d56a03f56549252a15
+  languageName: node
+  linkType: hard
+
 "@types/serve-static@npm:*":
   version: 1.15.0
   resolution: "@types/serve-static@npm:1.15.0"
@@ -4720,6 +4727,7 @@ __metadata:
     "@types/mocha": ^9.1.1
     "@types/node": ^18.7.16
     "@types/nodemailer": ^6.4.5
+    "@types/semver": ^7.3.12
     "@zodios/core": ^9.0.1
     "@zodios/plugins": ^9.0.0
     agenda: ^4.3.0
@@ -4760,6 +4768,7 @@ __metadata:
     nodemon: ^2.0.19
     reflect-metadata: ^0.1.13
     sanitize-filename: ^1.6.3
+    semver: ^7.3.7
     ts-mocha: ^10.0.0
     ts-node: ^10.9.1
     tsconfig-paths: ^4.1.0
