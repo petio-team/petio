@@ -516,7 +516,7 @@ class Radarr extends React.Component {
               </div>
             </>
           ) : <></>}
-          {!this.state.newServer ? (
+          {!this.state.needsSave ? (
             <div className="checkbox-wrap mb--2">
               <input
                 type="checkbox"

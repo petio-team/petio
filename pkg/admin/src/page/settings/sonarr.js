@@ -482,7 +482,7 @@ class Sonarr extends React.Component {
                 </select>
               </div>
             </>) : <></>}
-          {!this.state.newServer ? (
+          {!this.state.needsSave ? (
             <div className="checkbox-wrap mb--2">
               <input
                 type="checkbox"
