@@ -12,6 +12,7 @@ export interface IDownloader {
   type: DownloaderType;
   url: string;
   token: string;
+  version: string;
   path: {
     id: number;
     location: string;
@@ -54,6 +55,10 @@ export const DownloaderModelSchema = new Schema<IDownloader>(
       index: true,
     },
     token: {
+      type: String,
+      required: true,
+    },
+    version: {
       type: String,
       required: true,
     },
@@ -191,6 +196,7 @@ export const CreateOrUpdateDownloader = async (
         type: data.type,
         url: data.url,
         token: data.token,
+        version: data.version,
         path: {
           id: data.path.id,
           location: data.path.location,
