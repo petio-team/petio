@@ -21,7 +21,7 @@ tasks:
   dev:adm:
     dir: pkg/admin
     cmds:
-      - yarn start
+      - yarn watch
 
   dev:compose:
     cmds:
