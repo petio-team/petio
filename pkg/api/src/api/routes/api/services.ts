@@ -734,7 +734,7 @@ const getRadarrConfig = async (ctx: Context) => {
         protocol: protocol,
         host: url.host,
         port: port,
-        subpath: url.pathname,
+        subpath: url.pathname === '' ? '/' : url.pathname,
         token: instance.token,
         profile: {
           id: instance.profile.id,
@@ -826,7 +826,7 @@ const updateRadarrConfig = async (ctx: Context) => {
         protocol: instance.protocol,
         host: instance.host,
         port: instance.port,
-        subpath: instance.subpath === '' ? '/' : '',
+        subpath: instance.subpath === '' ? '/' : instance.subpath,
         token: instance.token,
         path: instance.path,
         profile: instance.profile,

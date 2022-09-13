@@ -170,13 +170,6 @@ class Sonarr extends React.Component {
     const id = this.state.activeServer;
     let servers = this.state.servers;
 
-    if (target.classList.contains('frt')) {
-      this.setState({
-        needsSave: true,
-        enabled: false,
-      });
-    }
-
     if (target.type === 'checkbox') {
       value = target.checked;
     }
