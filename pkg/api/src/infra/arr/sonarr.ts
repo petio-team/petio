@@ -7,6 +7,10 @@ import { Series, SeriesLookup } from '@/infra/arr/sonarr/series';
 import { Tag } from '@/infra/arr/sonarr/tag';
 import { DownloaderType, GetDownloaderById } from '@/models/downloaders';
 
+export type SeriesType = {
+  status: string;
+};
+
 export default class SonarrAPI {
   private client: ReturnType<typeof SonarrAPIClient>;
 
@@ -33,6 +37,20 @@ export default class SonarrAPI {
 
   public async GetLanguageProfile(): Promise<LanguageProfile> {
     return this.client.get('/api/v3/languageprofile');
+  }
+
+  public GetSeriesTypes(): SeriesType[] {
+    return [
+      {
+        status: 'Standard',
+      },
+      {
+        status: 'Daily',
+      },
+      {
+        status: 'Anime',
+      },
+    ];
   }
 
   public async GetTags(): Promise<Tag> {

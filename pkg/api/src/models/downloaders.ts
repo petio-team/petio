@@ -24,7 +24,7 @@ export interface IDownloader {
     id: number;
     name: string;
   };
-  media_type: {
+  availability: {
     id: number;
     name: string;
   };
@@ -86,7 +86,7 @@ export const DownloaderModelSchema = new Schema<IDownloader>(
         required: true,
       },
     },
-    media_type: {
+    availability: {
       id: {
         type: Number,
         required: true,
@@ -203,9 +203,9 @@ export const CreateOrUpdateDownloader = async (
           id: data.language.id,
           name: data.language.name,
         },
-        media_type: {
-          id: data.media_type.id,
-          name: data.media_type.name,
+        availability: {
+          id: data.availability.id,
+          name: data.availability.name,
         },
         enabled: data.enabled,
       },

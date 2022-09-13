@@ -355,18 +355,8 @@ export function testRadarr(id) {
   });
 }
 
-export function saveRadarrConfig(config) {
-  return new Promise((resolve, reject) => {
-    api
-      .saveRadarrConfig([...config])
-      .then(() => {
-        resolve();
-      })
-      .catch((err) => {
-        console.log(err);
-        reject();
-      });
-  });
+export async function saveRadarrConfig(config) {
+  return api.saveRadarrConfig([...config]);
 }
 
 export function saveEmailConfig(config) {

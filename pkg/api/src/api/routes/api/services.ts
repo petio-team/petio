@@ -44,7 +44,7 @@ const ArrInputSchema = z.array(
       id: z.number(),
       name: z.string(),
     }),
-    media_type: z.object({
+    availability: z.object({
       id: z.number(),
       name: z.string(),
     }),
@@ -118,10 +118,10 @@ export default (app: Router) => {
   route.get('/calendar', getCalendarData);
   route.post(
     '/sonarr/config',
-    adminRequired,
     validateRequest({
       body: ArrInputSchema,
     }),
+    adminRequired,
     updateSonarrConfig,
   );
   route.delete(
@@ -172,7 +172,7 @@ export default (app: Router) => {
       }),
     }),
     adminRequired,
-    getRadarrLangugaesById,
+    getRadarrLanguagesById,
   );
   route.get(
     '/radarr/tags/:id',
@@ -360,20 +360,27 @@ const getSonarrConfig = async (ctx: Context) => {
   try {
     const instances = await GetAllDownloaders(DownloaderType.Sonarr);
 
-    const response = Array<any>();
-    for (const instance of instances) {
+    const results = await bluebird.map(instances, async (instance) => {
       const url = new URL(instance.url);
+      const api = new SonarrAPI(url, instance.token);
 
       const protocol = url.protocol.substring(0, url.protocol.length - 1);
 
-      let port: string;
+      let port: number;
       if (!url.port) {
-        port = url.protocol === 'http' ? '80' : '443';
+        port = url.protocol === 'http' ? 80 : 443;
       } else {
-        port = url.port;
+        port = parseInt(url.port);
       }
 
-      response.push({
+      const [paths, profiles, languages, availabilities] = await Promise.all([
+        api.GetRootPaths(),
+        api.GetQualityProfiles(),
+        api.GetLanguageProfile(),
+        api.GetSeriesTypes(),
+      ]);
+
+      return {
         id: instance.id,
         name: instance.name,
         protocol: protocol,
@@ -393,16 +400,20 @@ const getSonarrConfig = async (ctx: Context) => {
           id: instance.language.id,
           name: instance.language.name,
         },
-        media_type: {
-          id: instance.media_type.id,
-          name: instance.media_type.name,
+        availability: {
+          id: instance.availability.id,
+          name: instance.availability.name,
         },
         enabled: instance.enabled,
-      });
-    }
+        paths,
+        profiles,
+        languages,
+        availabilities,
+      };
+    });
 
     ctx.status = StatusCodes.OK;
-    ctx.body = response;
+    ctx.body = results;
   } catch (error) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = error.message;
@@ -413,8 +424,7 @@ const updateSonarrConfig = async (ctx: Context) => {
   let data = ctx.request.body as ArrInput;
 
   try {
-    const results: IDownloader[] = [];
-    for (const instance of data) {
+    const results = await bluebird.map(data, async (instance) => {
       if (instance.subpath.startsWith('/')) {
         instance.subpath = instance.subpath.substring(1);
       }
@@ -429,10 +439,9 @@ const updateSonarrConfig = async (ctx: Context) => {
           instance.subpath,
       );
 
+      const api = new SonarrAPI(url, instance.token);
       try {
-        const client = new SonarrAPI(url, instance.token);
-        const passed = await client.TestConnection();
-
+        const passed = await api.TestConnection();
         if (!passed) {
           throw new Error('test failed');
         }
@@ -452,12 +461,36 @@ const updateSonarrConfig = async (ctx: Context) => {
         path: instance.path,
         profile: instance.profile,
         language: instance.language,
-        media_type: instance.media_type,
+        availability: instance.availability,
         enabled: instance.enabled,
       });
 
-      results.push(newInstance);
-    }
+      const [paths, profiles, languages, availabilities] = await Promise.all([
+        api.GetRootPaths(),
+        api.GetQualityProfiles(),
+        api.GetLanguageProfile(),
+        api.GetSeriesTypes(),
+      ]);
+
+      return {
+        id: newInstance.id,
+        name: instance.name,
+        protocol: instance.protocol,
+        host: instance.host,
+        port: instance.port,
+        subpath: instance.subpath === '' ? '/' : '',
+        token: instance.token,
+        path: instance.path,
+        profile: instance.profile,
+        language: instance.language,
+        availability: instance.availability,
+        enabled: instance.enabled,
+        paths,
+        profiles,
+        languages,
+        availabilities,
+      };
+    });
 
     ctx.status = StatusCodes.OK;
     ctx.body = results;
@@ -612,7 +645,7 @@ const getRadarrProfilesById = async (ctx: Context) => {
   }
 };
 
-const getRadarrLangugaesById = async (ctx: Context) => {
+const getRadarrLanguagesById = async (ctx: Context) => {
   try {
     const instance = await GetRadarrInstanceFromDb(ctx.params.id);
     if (!instance) {
@@ -675,21 +708,27 @@ const testRadarrConnectionById = async (ctx: Context) => {
 const getRadarrConfig = async (ctx: Context) => {
   try {
     const instances = await GetAllDownloaders(DownloaderType.Radarr);
-
-    const response = Array<any>();
-    for (const instance of instances) {
+    const results = await bluebird.map(instances, async (instance) => {
       const url = new URL(instance.url);
+      const api = new RadarrAPI(url, instance.token);
 
       const protocol = url.protocol.substring(0, url.protocol.length - 1);
 
-      let port: string;
+      let port: number;
       if (!url.port) {
-        port = url.protocol === 'http' ? '80' : '443';
+        port = url.protocol === 'http' ? 80 : 443;
       } else {
-        port = url.port;
+        port = parseInt(url.port);
       }
 
-      response.push({
+      const [paths, profiles, languages, availabilities] = await Promise.all([
+        api.GetRootPaths(),
+        api.GetQualityProfiles(),
+        api.GetLanguages(),
+        api.GetMinimumAvailability(),
+      ]);
+
+      return {
         id: instance.id,
         name: instance.name,
         protocol: protocol,
@@ -709,16 +748,20 @@ const getRadarrConfig = async (ctx: Context) => {
           id: instance.language.id,
           name: instance.language.name,
         },
-        media_type: {
-          id: instance.media_type.id,
-          name: instance.media_type.name,
+        availability: {
+          id: instance.availability.id,
+          name: instance.availability.name,
         },
         enabled: instance.enabled,
-      });
-    }
+        paths,
+        profiles,
+        languages,
+        availabilities,
+      };
+    });
 
     ctx.status = StatusCodes.OK;
-    ctx.body = response;
+    ctx.body = results;
   } catch (error) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = error.message;
@@ -729,8 +772,7 @@ const updateRadarrConfig = async (ctx: Context) => {
   let data = ctx.request.body as ArrInput;
 
   try {
-    const results: IDownloader[] = [];
-    for (const instance of data) {
+    const results = await bluebird.map(data, async (instance) => {
       if (instance.subpath.startsWith('/')) {
         instance.subpath = instance.subpath.substring(1);
       }
@@ -745,7 +787,19 @@ const updateRadarrConfig = async (ctx: Context) => {
           instance.subpath,
       );
 
-      console.log(instance);
+      const api = new RadarrAPI(url, instance.token);
+      try {
+        const passed = await api.TestConnection();
+        if (!passed) {
+          throw new Error('test failed');
+        }
+      } catch (e) {
+        ctx.status = StatusCodes.BAD_REQUEST;
+        ctx.body = {
+          error: e.message,
+        };
+        return;
+      }
 
       const newInstance = await CreateOrUpdateDownloader({
         name: instance.name,
@@ -755,12 +809,36 @@ const updateRadarrConfig = async (ctx: Context) => {
         path: instance.path,
         profile: instance.profile,
         language: instance.language,
-        media_type: instance.media_type,
+        availability: instance.availability,
         enabled: instance.enabled,
       });
 
-      results.push(newInstance);
-    }
+      const [paths, profiles, languages, availabilities] = await Promise.all([
+        api.GetRootPaths(),
+        api.GetQualityProfiles(),
+        api.GetLanguages(),
+        api.GetMinimumAvailability(),
+      ]);
+
+      return {
+        id: newInstance.id,
+        name: instance.name,
+        protocol: instance.protocol,
+        host: instance.host,
+        port: instance.port,
+        subpath: instance.subpath === '' ? '/' : '',
+        token: instance.token,
+        path: instance.path,
+        profile: instance.profile,
+        language: instance.language,
+        availability: instance.availability,
+        enabled: instance.enabled,
+        paths,
+        profiles,
+        languages,
+        availabilities,
+      };
+    });
 
     ctx.status = StatusCodes.OK;
     ctx.body = results;

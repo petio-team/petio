@@ -6,42 +6,52 @@ import { ReactComponent as Spinner } from '../../assets/svg/spinner.svg';
 import Modal from '../../components/Modal';
 import Api from '../../data/Api';
 
+const makeRadarr = (instance) => {
+  const defaults = {
+    id: '',
+    name: 'Server',
+    protocol: 'HTTP',
+    host: 'localhost',
+    port: 7878,
+    subpath: '/',
+    token: '',
+    profile: {
+      id: 0,
+      name: '',
+    },
+    path: {
+      id: 0,
+      location: '',
+    },
+    language: {
+      id: 0,
+      name: '',
+    },
+    availability: {
+      id: 0,
+      name: '',
+    },
+    enabled: false,
+    profiles: [],
+    paths: [],
+    languages: [],
+    availabilities: [],
+  };
+  return { ...defaults, ...instance };
+};
+
 class Radarr extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      servers: false,
+      servers: [],
       loading: true,
       isError: false,
       isMsg: false,
       wizardOpen: false,
-      enabled: false,
-      name: '',
-      protocol: 'http',
-      host: 'localhost',
-      port: 7878,
-      profile: {
-        id: 0,
-        name: '',
-      },
-      path: {
-        id: 0,
-        location: '',
-      },
-      language: {
-        id: 0,
-        name: '',
-      },
-      media_type: {
-        id: 0,
-        name: '',
-      },
-      subpath: '/',
-      token: '',
-      activeServer: false,
-      id: '',
-      needsTest: false,
+      activeServer: 0,
+      needsSave: false,
     };
 
     this.inputChange = this.inputChange.bind(this);
@@ -52,66 +62,84 @@ class Radarr extends React.Component {
     this.closeWizard = this.closeWizard.bind(this);
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
-    this.getSettings = this.getSettings.bind(this);
 
     this.closeMsg = false;
   }
 
-  async saveServer(silent = false) {
-    if (this.state.activeServer === false) {
-      console.log('error');
-      return;
-    }
-
-    let servers = this.state.servers;
-    servers[this.state.activeServer] = {
-      enabled: this.state.enabled,
-      name: this.state.name,
-      protocol: this.state.protocol,
-      host: this.state.host,
-      token: this.state.token,
-      port: this.state.port,
-      subpath: this.state.subpath === '/' ? '/' : this.state.subpath,
-      path: {
-        id: this.state.path.id,
-        location: this.state.path.location,
-      },
-      profile: {
-        id: this.state.profile.id,
-        name: this.state.profile.name,
-      },
-      language: {
-        id: this.state.language.id,
-        name: this.state.language.name,
-      },
-      media_type: {
-        id: this.state.media_type.id,
-        name: this.state.media_type.name,
-      },
-    };
-
-    await Api.saveRadarrConfig(servers);
-    await this.getRadarr(true);
-
-    if (!silent) {
+  async saveServer() {
+    const server = this.state.servers[this.state.activeServer];
+    if (server.name === "") {
       this.props.msg({
-        message: 'Radarr settings saved!',
-        type: 'good',
-      });
-    }
-  }
-
-  async deleteServer(silent = false) {
-    if (this.state.activeServer === false) {
-      this.props.msg({
-        message: 'something went wrong',
+        message: "name field must not be empty",
         type: 'error',
       });
       return;
     }
 
-    let servers = this.state.servers;
+    if (server.host === "") {
+      this.props.msg({
+        message: "host field must not be empty",
+        type: 'error',
+      });
+      return;
+    }
 
+    if (server.port === "") {
+      this.props.msg({
+        message: "port field must not be empty",
+        type: 'error',
+      });
+      return;
+    }
+
+    if (server.subpath === "") {
+      this.props.msg({
+        message: "url base field must not be empty",
+        type: 'error',
+      });
+      return;
+    }
+
+    if (server.token === "") {
+      this.props.msg({
+        message: "token field must not be empty",
+        type: 'error',
+      });
+      return;
+    }
+
+    try {
+      const result = await Api.saveRadarrConfig(this.state.servers);
+      if (result.status === 'error') {
+        this.props.msg({
+          message: "failed to save request",
+          type: 'error',
+        });
+        return;
+      }
+
+      const servers = this.state.servers;
+      servers[this.state.activeServer] = result[0];
+
+      this.setState({
+        servers,
+        needsSave: false,
+      });
+
+      this.props.msg({
+        message: 'Radarr settings saved!',
+        type: 'good',
+      });
+    } catch (e) {
+      this.props.msg({
+        message: e.message,
+        type: 'error',
+      });
+    }
+  }
+
+  async deleteServer() {
+    let servers = this.state.servers;
     let res = await Api.radarrDeleteInstance(
       servers[this.state.activeServer].id,
     );
@@ -124,59 +152,15 @@ class Radarr extends React.Component {
     }
 
     servers.splice(this.state.activeServer, 1);
-    this.getRadarr(true);
+    this.state.activeServer = 0;
 
-    if (!silent) {
-      this.closeModal('addServer');
-      this.closeWizard();
+    this.closeModal('addServer');
+    this.closeWizard();
 
-      this.props.msg({
-        message: res.message,
-        type: 'good',
-      });
-    }
-  }
-
-  async test(id, add = false) {
-    if (!this.state.subpath.startsWith('/') && this.state.subpath.length > 0) {
-      this.setState({
-        subpath: '/' + this.state.subpath,
-      });
-      setTimeout(() => {
-        this.test(id, add);
-      }, 1000);
-      return;
-    }
-    if (add) {
-      await this.saveServer(true);
-    }
-    try {
-      let result = await Api.testRadarr(id);
-      if (result.connection) {
-        this.setState({
-          newServer: false,
-          needsTest: false,
-        });
-        this.props.msg({
-          message: 'Radarr Test Connection success!',
-          type: 'good',
-        });
-        await this.getRadarr(true);
-        await this.getSettings(id);
-      } else {
-        this.props.msg({
-          message: 'Radarr Test Connection failed!',
-          type: 'error',
-        });
-
-        this.deleteServer(true);
-      }
-    } catch (err) {
-      this.props.msg({
-        message: 'Radarr Test Connection failed! Error 2',
-        type: 'error',
-      });
-    }
+    this.props.msg({
+      message: res.message,
+      type: 'good',
+    });
   }
 
   inputChange(e) {
@@ -184,9 +168,12 @@ class Radarr extends React.Component {
     const name = target.name;
     let value = target.value;
 
+    const id = this.state.activeServer;
+    let servers = this.state.servers;
+
     if (target.classList.contains('frt')) {
       this.setState({
-        needsTest: true,
+        needsSave: true,
         enabled: false,
       });
     }
@@ -197,21 +184,56 @@ class Radarr extends React.Component {
 
     if (target.type === 'select-one') {
       let title = target.options[target.selectedIndex].text;
-      if (this.state[name] instanceof Object) {
-        this.setState({
-          [`${name}`]: {
+      switch (name) {
+        case "protocol": {
+          servers[id].protocol = value;
+          break;
+        }
+        case "profile": {
+          servers[id].profile = {
             id: parseInt(value),
-            [this.state[name].name != undefined ? 'name' : 'location']: title,
-          },
-        });
-      } else {
-        this.setState({
-          [name]: value,
-        });
+            name: title,
+          };
+          break;
+        }
+        case "path": {
+          servers[id].path = {
+            id: parseInt(value),
+            location: title,
+          };
+          break;
+        }
+        case "language": {
+          servers[id].language = {
+            id: parseInt(value),
+            name: title,
+          };
+          break;
+        }
+        case "availability": {
+          servers[id].availability = {
+            id: parseInt(value),
+            name: title,
+          };
+        }
       }
-    } else {
       this.setState({
-        [name]: value,
+        servers,
+      });
+    } else {
+      if (name === "port") {
+        servers[id] = {
+          ...servers[id],
+          [name]: parseInt(value),
+        };
+      } else {
+        servers[id] = {
+          ...servers[id],
+          [name]: value,
+        };
+      }
+      this.setState({
+        servers,
       });
     }
   }
@@ -227,7 +249,6 @@ class Radarr extends React.Component {
         loading: false,
       });
     } catch (err) {
-      console.log(err);
       this.setState({
         loading: false,
       });
@@ -248,75 +269,26 @@ class Radarr extends React.Component {
         newServer: false,
         editWizardOpen: true,
         activeServer: id,
-        enabled: this.state.servers[id].enabled,
-        name: this.state.servers[id].name,
-        protocol: this.state.servers[id].protocol,
-        host: this.state.servers[id].host,
-        port: this.state.servers[id].port,
-        subpath: this.state.servers[id].subpath,
-        token: this.state.servers[id].token,
-        profile: {
-          id: this.state.servers[id].profile.id,
-          name: this.state.servers[id].profile.name,
-        },
-        path: {
-          id: this.state.servers[id].path.id,
-          location: this.state.servers[id].path.location,
-        },
-        language: {
-          id: this.state.servers[id].language.id,
-          name: this.state.servers[id].language.name,
-        },
-        media_type: {
-          id: this.state.servers[id].media_type.id,
-          name: this.state.servers[id].media_type.name,
-        },
-        id: this.state.servers[id].id,
-        needsTest: false,
+        needsSave: false,
       });
-      this.getSettings(this.state.servers[id].id);
     } else {
+      let servers = this.state.servers;
+      servers[id] = makeRadarr();
       this.setState({
+        servers,
         newServer: true,
         wizardOpen: true,
         activeServer: id,
-        id: '',
-        needsTest: true,
+        needsSave: true,
       });
     }
   }
 
   closeWizard() {
     this.setState({
-      enabled: false,
-      name: '',
-      protocol: 'http',
-      host: 'localhost',
-      port: 7878,
-      subpath: '/',
-      token: '',
-      profiles: false,
-      paths: false,
-      profile: {
-        id: 0,
-        name: '',
-      },
-      path: {
-        id: 0,
-        location: '',
-      },
-      language: {
-        id: 0,
-        name: '',
-      },
-      media_type: {
-        id: 0,
-        name: '',
-      },
       wizardOpen: false,
       editWizardOpen: false,
-      activeServer: false,
-      id: '',
+      activeServer: 0,
       newServer: false,
     });
   }
@@ -324,68 +296,25 @@ class Radarr extends React.Component {
   openModal(id) {
     this.setState({
       [`${id}Open`]: true,
-      needsTest: false,
     });
   }
 
   closeModal(id) {
+    let servers = this.state.servers;
+    if (this.state.needsSave) {
+      delete servers[this.state.activeServer];
+    }
+
     this.setState({
       [`${id}Open`]: false,
-      enabled: false,
-      name: '',
-      protocol: 'http',
-      host: 'localhost',
-      port: null,
-      subpath: '/',
-      token: '',
-      profiles: false,
-      paths: false,
-      profile: {
-        id: 0,
-        name: '',
-      },
-      path: {
-        id: 0,
-        location: '',
-      },
-      language: {
-        id: 0,
-        name: '',
-      },
-      media_type: {
-        id: 0,
-        name: '',
-      },
+      servers,
       wizardOpen: false,
       editWizardOpen: false,
-      activeServer: false,
-      id: '',
+      activeServer: 0,
     });
   }
 
-  async getSettings(id) {
-    try {
-      let settings = await Api.radarrOptions(id);
-      if (settings.profiles.error || settings.paths.error) {
-        return;
-      }
-      if (this.state.id === id)
-        this.setState({
-          profiles: settings.profiles.length > 0 ? settings.profiles : false,
-          paths: settings.paths.length > 0 ? settings.paths : false,
-          languages: settings.languages.length > 0 ? settings.languages : false,
-          availabilities:
-            settings.minimumAvailability.length > 0
-              ? settings.minimumAvailability
-              : false,
-        });
-    } catch {
-      return;
-    }
-  }
-
   render() {
-    let serverCount = 0;
     if (this.state.loading) {
       return (
         <>
@@ -396,28 +325,23 @@ class Radarr extends React.Component {
       );
     }
 
+    const server = this.state.servers[this.state.activeServer];
     return (
       <>
         <Modal
           title="Add new server"
           open={this.state.addServerOpen}
           submitText="Save"
-          submit={
-            this.state.needsTest
-              ? false
-              : () => {
-                  this.saveServer();
-                  this.closeModal('addServer');
-                }
-          }
+          closeText="Close"
+          submit={() => this.saveServer()}
           close={() => this.closeModal('addServer')}
           delete={
             this.state.newServer
               ? false
               : () => {
-                  this.deleteServer();
-                  this.closeModal('addServer');
-                }
+                this.deleteServer();
+                this.closeModal('addServer');
+              }
           }
         >
           <label>Name</label>
@@ -425,14 +349,14 @@ class Radarr extends React.Component {
             className="styled-input--input"
             type="text"
             name="name"
-            value={this.state.name}
+            value={server?.name}
             onChange={this.inputChange}
           />
           <label>Protocol</label>
           <div className="styled-input--select">
             <select
               name="protocol"
-              value={this.state.protocol}
+              value={server?.protocol}
               onChange={this.inputChange}
               className="frt"
             >
@@ -445,7 +369,7 @@ class Radarr extends React.Component {
             className="styled-input--input frt"
             type="text"
             name="host"
-            value={this.state.host}
+            value={server?.host}
             onChange={this.inputChange}
           />
           <label>Port</label>
@@ -453,7 +377,7 @@ class Radarr extends React.Component {
             className="styled-input--input frt"
             type="number"
             name="port"
-            value={this.state.port ? this.state.port : 7878}
+            value={server?.port}
             onChange={this.inputChange}
           />
           <label>URL Base</label>
@@ -461,7 +385,7 @@ class Radarr extends React.Component {
             className="styled-input--input frt"
             type="text"
             name="subpath"
-            value={this.state.subpath ? this.state.subpath : '/'}
+            value={server?.subpath}
             onChange={this.inputChange}
           />
           <label>Token</label>
@@ -469,149 +393,142 @@ class Radarr extends React.Component {
             className="styled-input--input frt"
             type="text"
             name="token"
-            value={this.state.token ? this.state.token : ''}
+            value={server?.token}
             onChange={this.inputChange}
           />
-          <button
-            className="btn btn__square mb--1"
-            onClick={() => this.test(this.state.id, true)}
-          >
-            Test
-          </button>
-          <label>Profile</label>
-          <div
-            className={`styled-input--select ${
-              this.state.profiles ? '' : 'disabled'
-            }`}
-          >
-            <select
-              name="profile"
-              value={this.state.profile.id}
-              onChange={this.inputChange}
-            >
-              {this.state.profiles &&
-              !this.state.newServer &&
-              !this.state.needsTest ? (
-                <>
-                  <option value="">Choose an option</option>
-                  {this.state.profiles.map((item) => {
-                    return (
-                      <option key={`p__${item.id}`} value={item.id}>
-                        {item.name}
-                      </option>
-                    );
-                  })}
-                </>
-              ) : (
-                <option value="">
-                  {this.state.newServer || this.state.needsTest
-                    ? 'Please test connection'
-                    : 'Loading...'}
-                </option>
-              )}
-            </select>
-          </div>
-          <label>Path</label>
-          <div
-            className={`styled-input--select ${
-              this.state.profiles ? '' : 'disabled'
-            }`}
-          >
-            <select
-              name="path"
-              value={this.state.path.id}
-              onChange={this.inputChange}
-            >
-              {this.state.paths && !this.state.needsTest ? (
-                <>
-                  <option value="">Choose an option</option>
-                  {this.state.paths.map((item) => {
-                    return (
-                      <option key={`pp__${item.id}`} value={item.id}>
-                        {item.path}
-                      </option>
-                    );
-                  })}
-                </>
-              ) : (
-                <option value="">
-                  {this.state.newServer || this.state.needsTest
-                    ? 'Please test connection'
-                    : 'Loading...'}
-                </option>
-              )}
-            </select>
-          </div>
-          <label>Language</label>
-          <div
-            className={`styled-input--select ${
-              this.state.languages ? '' : 'disabled'
-            }`}
-          >
-            <select
-              name="language"
-              value={this.state.language.id}
-              onChange={this.inputChange}
-            >
-              {this.state.languages && !this.state.needsTest ? (
-                <>
-                  <option value="">Choose an option</option>
-                  {this.state.languages.map((item) => {
-                    return (
-                      <option key={`pp__${item.id}`} value={item.id}>
-                        {item.name}
-                      </option>
-                    );
-                  })}
-                </>
-              ) : (
-                <option value="">
-                  {this.state.newServer || this.state.needsTest
-                    ? 'Please test connection'
-                    : 'Loading...'}
-                </option>
-              )}
-            </select>
-          </div>
-          <label>Minimum Availability</label>
-          <div
-            className={`styled-input--select ${
-              this.state.availabilities ? '' : 'disabled'
-            }`}
-          >
-            <select
-              name="media_type"
-              value={this.state.media_type.id}
-              onChange={this.inputChange}
-            >
-              {this.state.availabilities && !this.state.needsTest ? (
-                <>
-                  {this.state.availabilities.map((item) => {
-                    return (
-                      <option key={`pp__${item.id}`} value={item.id}>
-                        {item.name}
-                      </option>
-                    );
-                  })}
-                </>
-              ) : (
-                <option value="">
-                  {this.state.newServer || this.state.needsTest
-                    ? 'Please test connection'
-                    : 'Loading...'}
-                </option>
-              )}
-            </select>
-          </div>
-          {!this.state.newServer &&
-          this.state.path.id != null &&
-          this.state.profile.id != null &&
-          !this.state.needsTest ? (
+          {!this.state.needsSave ? (
+            <>
+              <label>Profile</label>
+              <div
+                className={`styled-input--select ${server?.profiles ? '' : 'disabled'}`}
+              >
+                <select
+                  name="profile"
+                  value={server?.profile.id}
+                  onChange={this.inputChange}
+                >
+                  {server?.profiles ? (
+                    <>
+                      <option value="">Choose an option</option>
+                      {server?.profiles.map((item) => {
+                        return (
+                          <option key={`p__${item.id}`} value={item.id}>
+                            {item.name}
+                          </option>
+                        );
+                      })}
+                    </>
+                  ) : (
+                    <option value="">
+                      {'Loading...'}
+                    </option>
+                  )}
+                </select>
+              </div>
+            </>)
+            : <></>}
+          {!this.state.needsSave ? (
+            <>
+              <label>Path</label>
+              <div
+                className={`styled-input--select ${server?.paths ? '' : 'disabled'
+                  }`}
+              >
+                <select
+                  name="path"
+                  value={server?.path.id || 0}
+                  onChange={this.inputChange}
+                >
+                  {server?.paths ? (
+                    <>
+                      <option value="">Choose an option</option>
+                      {server.paths.map((item) => {
+                        return (
+                          <option key={`pp__${item.id}`} value={item.id}>
+                            {item.path}
+                          </option>
+                        );
+                      })}
+                    </>
+                  ) : (
+                    <option value="">
+                      {'Loading...'}
+                    </option>
+                  )}
+                </select>
+              </div>
+            </>
+          ) : false}
+          {!this.state.needsSave ? (
+            <>
+              <label>Language</label>
+              <div
+                className={`styled-input--select ${server?.languages ? '' : 'disabled'
+                  }`}
+              >
+                <select
+                  name="language"
+                  value={server?.language.id || 0}
+                  onChange={this.inputChange}
+                >
+                  {server?.languages ? (
+                    <>
+                      <option value="">Choose an option</option>
+                      {server.languages.map((item) => {
+                        return (
+                          <option key={`lp__${item.id}`} value={item.id}>
+                            {item.name}
+                          </option>
+                        );
+                      })}
+                    </>
+                  ) : (
+                    <option value="">
+                      {'Loading...'}
+                    </option>
+                  )}
+                </select>
+              </div>
+            </>
+          ) : <></>}
+          {!this.state.needsSave ? (
+            <>
+              <label>Minimum Availability</label>
+              <div
+                className={`styled-input--select ${server?.availability ? '' : 'disabled'
+                  }`}
+              >
+                <select
+                  name="availability"
+                  value={server?.availability.id || 0}
+                  onChange={this.inputChange}
+                >
+                  {server?.availabilities ? (
+                    <>
+                      <option value="">Choose an option</option>
+                      {server.availabilities.map((item) => {
+                        return (
+                          <option key={`avl__${item.id}`} value={item.id}>
+                            {item.name}
+                          </option>
+                        );
+                      })}
+                    </>
+                  ) : (
+                    <option value="">
+                      {'Loading...'}
+                    </option>
+                  )}
+                </select>
+              </div>
+            </>
+          ) : <></>}
+          {!this.state.newServer ? (
             <div className="checkbox-wrap mb--2">
               <input
                 type="checkbox"
                 name="enabled"
-                checked={this.state.enabled}
+                checked={server?.enabled}
                 onChange={this.inputChange}
               />
               <p>Enabled</p>
@@ -629,9 +546,8 @@ class Radarr extends React.Component {
           <p className="main-title mb--2">Servers</p>
           <div className="sr--grid">
             {this.state.servers.map((server, i) => {
-              serverCount++;
               return (
-                <div key={server.id} className="sr--instance">
+                <div key={i} className="sr--instance">
                   <div className="sr--instance--inner">
                     <ServerIcon />
                     <p className="sr--title">{server.name}</p>
@@ -642,7 +558,7 @@ class Radarr extends React.Component {
                     <p>Language: {server.language.name ?? 'Not set'}</p>
                     <p>
                       Minimum Availability:{' '}
-                      {server.media_type.name ?? 'Not set'}
+                      {server.availability.name ?? 'Not set'}
                     </p>
                     <p className="small">
                       ID: {server.id ? server.id : 'Error'}
@@ -657,12 +573,6 @@ class Radarr extends React.Component {
                       >
                         Edit
                       </button>
-                      <button
-                        className="btn btn__square"
-                        onClick={() => this.test(server.id)}
-                      >
-                        Test
-                      </button>
                     </div>
                   </div>
                 </div>
@@ -673,7 +583,7 @@ class Radarr extends React.Component {
                 className="sr--instance--inner"
                 onClick={() => {
                   this.openModal('addServer');
-                  this.openWizard(serverCount);
+                  this.openWizard(this.state.servers.length || 0);
                 }}
               >
                 <p className="sr--title">Add new</p>

@@ -24,7 +24,7 @@ class Modal extends React.Component {
                 </div>
               )}
               <div className="btn btn__square bad" onClick={this.props.close}>
-                Cancel
+                {this.props.closeText ? this.props.closeText : 'Cancel'}
               </div>
               {this.props.delete ? (
                 <div
