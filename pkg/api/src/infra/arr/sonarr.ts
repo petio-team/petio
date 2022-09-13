@@ -1,5 +1,3 @@
-import semver, { SemVer } from 'semver';
-
 import { SonarrAPIClient } from '@/infra/arr/sonarr/index';
 import { LanguageProfile } from '@/infra/arr/sonarr/language_profile';
 import { QualityProfile } from '@/infra/arr/sonarr/quality_profile';
@@ -8,6 +6,8 @@ import { RootFolder } from '@/infra/arr/sonarr/root_folder';
 import { Series, SeriesLookup } from '@/infra/arr/sonarr/series';
 import { Tag } from '@/infra/arr/sonarr/tag';
 import { DownloaderType, GetDownloaderById } from '@/models/downloaders';
+
+import { ArrVersion, parseVersion } from './version';
 
 export type SeriesType = {
   status: string;
@@ -20,26 +20,26 @@ export type SeriesLanguage = {
 
 export default class SonarrAPI {
   private client: ReturnType<typeof SonarrAPIClient>;
-  private version: SemVer = new SemVer('3.0.0');
+  private version = new ArrVersion(3, 0, 0, 0);
 
   constructor(url: URL, token: string, version?: string) {
     this.client = SonarrAPIClient(url, token);
     if (version) {
-      const v = semver.parse(version);
+      const v = parseVersion(version);
       if (v) {
         this.version = v;
       }
     }
   }
 
-  public GetVersion(): SemVer {
+  public GetVersion(): ArrVersion {
     return this.version;
   }
 
   public async TestConnection(): Promise<boolean> {
     const response = await this.client.get('/api/v3/system/status');
     if (response) {
-      const version = semver.parse(response.version);
+      const version = parseVersion(response.version);
       if (version) {
         this.version = version;
       }
