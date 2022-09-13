@@ -10,7 +10,7 @@ const makeRadarr = (instance) => {
   const defaults = {
     id: '',
     name: 'Server',
-    protocol: 'HTTP',
+    protocol: 'http',
     host: 'localhost',
     port: 7878,
     subpath: '/',
