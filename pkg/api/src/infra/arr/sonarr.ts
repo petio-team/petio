@@ -1,7 +1,6 @@
 import semver, { SemVer } from 'semver';
 
 import { SonarrAPIClient } from '@/infra/arr/sonarr/index';
-import { Language } from '@/infra/arr/sonarr/language';
 import { LanguageProfile } from '@/infra/arr/sonarr/language_profile';
 import { QualityProfile } from '@/infra/arr/sonarr/quality_profile';
 import { Queue } from '@/infra/arr/sonarr/queue';
@@ -21,10 +20,16 @@ export type SeriesLanguage = {
 
 export default class SonarrAPI {
   private client: ReturnType<typeof SonarrAPIClient>;
-  private version: SemVer;
+  private version: SemVer = new SemVer('3.0.0');
 
-  constructor(url: URL, token: string) {
+  constructor(url: URL, token: string, version?: string) {
     this.client = SonarrAPIClient(url, token);
+    if (version) {
+      const v = semver.parse(version);
+      if (v) {
+        this.version = v;
+      }
+    }
   }
 
   public GetVersion(): SemVer {

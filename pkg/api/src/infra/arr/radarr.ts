@@ -1,3 +1,5 @@
+import semver, { SemVer } from 'semver';
+
 import { RadarrAPIClient } from '@/infra/arr/radarr/index';
 import { Language } from '@/infra/arr/radarr/language';
 import { MinimumAvailability } from '@/infra/arr/radarr/minimumAvailability';
@@ -10,14 +12,29 @@ import { DownloaderType, GetDownloaderById } from '@/models/downloaders';
 
 export default class RadarrAPI {
   private client: ReturnType<typeof RadarrAPIClient>;
+  private version: SemVer = new SemVer('4.0.0');
 
-  constructor(url: URL, token: string) {
+  constructor(url: URL, token: string, version?: string) {
     this.client = RadarrAPIClient(url, token);
+    if (version) {
+      const v = semver.parse(version);
+      if (v) {
+        this.version = v;
+      }
+    }
+  }
+
+  public GetVersion(): SemVer {
+    return this.version;
   }
 
   public async TestConnection(): Promise<boolean> {
     const response = await this.client.get('/api/v3/system/status');
     if (response) {
+      const version = semver.parse(response.version);
+      if (version) {
+        this.version = version;
+      }
       return true;
     }
 
