@@ -18,7 +18,6 @@ class Filter extends React.Component {
 
     this.addFilter = this.addFilter.bind(this);
     this.getArrs = this.getArrs.bind(this);
-    this.getSettings = this.getSettings.bind(this);
     this.inputChange = this.inputChange.bind(this);
     this.addRow = this.addRow.bind(this);
     this.addAction = this.addAction.bind(this);
@@ -147,17 +146,10 @@ class Filter extends React.Component {
 
   async getArrs() {
     try {
-      let radarr = await Api.radarrConfig();
-      let sonarr = await Api.sonarrConfig();
+      const [radarr, sonarr] = await Promise.all([Api.radarrConfig(false), Api.sonarrConfig(false)]);
       this.setState({
         radarr_servers: radarr,
         sonarr_servers: sonarr,
-      });
-      radarr.map((item) => {
-        this.getSettings(item.uuid, 'radarr');
-      });
-      sonarr.map((item) => {
-        this.getSettings(item.uuid, 'sonarr');
       });
     } catch (err) {
       console.log(err);
@@ -165,48 +157,6 @@ class Filter extends React.Component {
         radarr_servers: false,
         sonarr_servers: false,
       });
-    }
-  }
-
-  async getSettings(uuid, type = 'radarr' || 'sonarr') {
-    try {
-      let settings =
-        type === 'radarr'
-          ? await Api.radarrOptions(uuid)
-          : await Api.sonarrOptions(uuid);
-      let current =
-        type === 'radarr'
-          ? this.state.radarr_settings
-          : this.state.sonarr_settings;
-      if (
-        settings.profiles.error ||
-        settings.paths.error ||
-        settings.languages.error
-      ) {
-        current[uuid] = 'error';
-      } else {
-        current[uuid] = {
-          profiles: settings.profiles.length > 0 ? settings.profiles : false,
-          paths: settings.paths.length > 0 ? settings.paths : false,
-          languages: settings.languages.length > 0 ? settings.languages : false,
-          tags: settings.tags.length > 0 ? settings.tags : false,
-          availabilities:
-            settings.minimumAvailability.length > 0
-              ? settings.minimumAvailability
-              : false,
-        };
-      }
-      if (type === 'radarr') {
-        this.setState({
-          radarr_settings: current,
-        });
-      } else {
-        this.setState({
-          sonarr_settings: current,
-        });
-      }
-    } catch {
-      return;
     }
   }
 
@@ -314,7 +264,6 @@ class Filter extends React.Component {
           <FilterItem
             data={this.state.movie_filters}
             servers={this.state.radarr_servers}
-            settings={this.state.radarr_settings}
             addRow={this.addRow}
             addAction={this.addAction}
             removeRow={this.removeRow}
@@ -332,7 +281,6 @@ class Filter extends React.Component {
           <FilterItem
             data={this.state.tv_filters}
             servers={this.state.sonarr_servers}
-            settings={this.state.sonarr_settings}
             addRow={this.addRow}
             addAction={this.addAction}
             removeRow={this.removeRow}

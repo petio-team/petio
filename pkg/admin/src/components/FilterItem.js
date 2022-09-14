@@ -55,7 +55,6 @@ class FilterItem extends React.Component {
                   })}
                   <FilterAction
                     servers={this.props.servers}
-                    settings={this.props.settings}
                     item={i}
                     type={this.props.type}
                     inputChange={this.props.inputChange}

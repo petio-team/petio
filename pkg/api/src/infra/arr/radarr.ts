@@ -1,14 +1,26 @@
 import { RadarrAPIClient } from '@/infra/arr/radarr/index';
-import { Language } from '@/infra/arr/radarr/language';
 import { MinimumAvailability } from '@/infra/arr/radarr/minimumAvailability';
 import { Movie } from '@/infra/arr/radarr/movie';
-import { QualityProfiles } from '@/infra/arr/radarr/quality_profile';
 import { Queue } from '@/infra/arr/radarr/queue';
-import { RootFolder } from '@/infra/arr/radarr/root_folder';
 import { Tag } from '@/infra/arr/radarr/tag';
 import { DownloaderType, GetDownloaderById } from '@/models/downloaders';
 
 import { ArrVersion, parseVersion } from './version';
+
+export type RootPath = {
+  id: number;
+  path: string;
+};
+
+export type QualityProfile = {
+  id: number;
+  name: string;
+};
+
+export type LanguageProfile = {
+  id: number;
+  name: string;
+};
 
 export default class RadarrAPI {
   private client: ReturnType<typeof RadarrAPIClient>;
@@ -40,16 +52,25 @@ export default class RadarrAPI {
     return false;
   }
 
-  public async GetRootPaths(): Promise<RootFolder> {
-    return this.client.get('/api/v3/rootfolder');
+  public async GetRootPaths(): Promise<RootPath[]> {
+    const paths = await this.client.get('/api/v3/rootfolder');
+    return paths.map((r) => {
+      return { id: r.id, path: r.path };
+    });
   }
 
-  public async GetQualityProfiles(): Promise<QualityProfiles> {
-    return this.client.get('/api/v3/qualityprofile');
+  public async GetQualityProfiles(): Promise<QualityProfile[]> {
+    const profiles = await this.client.get('/api/v3/qualityprofile');
+    return profiles.map((r) => {
+      return { id: r.id, name: r.name };
+    });
   }
 
-  public async GetLanguages(): Promise<Language> {
-    return this.client.get('/api/v3/language');
+  public async GetLanguages(): Promise<LanguageProfile[]> {
+    const language = await this.client.get('/api/v3/language');
+    return language.map((r) => {
+      return { id: r.id, name: r.name };
+    });
   }
 
   public async GetTags(): Promise<Tag> {

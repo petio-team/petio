@@ -45,12 +45,13 @@ class Sonarr extends React.Component {
 
     this.state = {
       servers: [],
+      newInstance: makeSonarr(),
       loading: true,
       isError: false,
       isMsg: false,
       wizardOpen: false,
       activeServer: 0,
-      needsSave: false,
+      needsSave: true,
     };
 
     this.inputChange = this.inputChange.bind(this);
@@ -66,7 +67,13 @@ class Sonarr extends React.Component {
   }
 
   async saveServer() {
-    const server = this.state.servers[this.state.activeServer];
+    let server = {};
+    if (this.state.needsSave) {
+      server = this.state.newInstance;
+    } else {
+      server = this.state.servers[this.state.activeServer];
+    }
+
     if (server.name === "") {
       this.props.msg({
         message: "name field must not be empty",
@@ -108,7 +115,7 @@ class Sonarr extends React.Component {
     }
 
     try {
-      const result = await Api.saveSonarrConfig(this.state.servers);
+      const result = await Api.saveSonarrConfig([server]);
       if (result.status === 'error') {
         this.props.msg({
           message: "failed to save request",
@@ -117,12 +124,18 @@ class Sonarr extends React.Component {
         return;
       }
 
-      const servers = this.state.servers;
-      servers[this.state.activeServer] = result[0];
+      let index = this.state.activeServer;
+      if (this.state.needsSave) {
+        index = this.state.servers.push(result[0]);
+        index -= 1;
+      } else {
+        this.state.servers[index] = result[0];
+      }
 
       this.setState({
-        servers,
         needsSave: false,
+        activeServer: index,
+        newInstance: makeSonarr(),
       });
 
       this.props.msg({
@@ -138,10 +151,9 @@ class Sonarr extends React.Component {
   }
 
   async deleteServer() {
+    const id = this.state.activeServer;
     let servers = this.state.servers;
-    let res = await Api.sonarrDeleteInstance(
-      servers[this.state.activeServer].id,
-    );
+    let res = await Api.sonarrDeleteInstance(servers[id].id);
     if (res.status == 'error') {
       this.props.msg({
         message: res.error,
@@ -150,8 +162,7 @@ class Sonarr extends React.Component {
       return;
     }
 
-    servers.splice(this.state.activeServer, 1);
-    this.getSonarr(true);
+    this.state.servers.splice(id, 1);
 
     this.closeModal('addServer');
     this.closeWizard();
@@ -167,8 +178,12 @@ class Sonarr extends React.Component {
     const name = target.name;
     let value = target.value;
 
-    const id = this.state.activeServer;
-    let servers = this.state.servers;
+    let server = {};
+    if (this.state.needsSave) {
+      server = this.state.newInstance;
+    } else {
+      server = this.state.servers[this.state.activeServer];
+    }
 
     if (target.type === 'checkbox') {
       value = target.checked;
@@ -178,52 +193,51 @@ class Sonarr extends React.Component {
       let title = target.options[target.selectedIndex].text;
       switch (name) {
         case "protocol": {
-          servers[id].protocol = value;
+          server.protocol = value;
           break;
         }
         case "profile": {
-          servers[id].profile = {
+          server.profile = {
             id: parseInt(value),
             name: title,
           };
           break;
         }
         case "path": {
-          servers[id].path = {
+          server.path = {
             id: parseInt(value),
             location: title,
           };
           break;
         }
         case "language": {
-          servers[id].language = {
+          server.language = {
             id: parseInt(value),
             name: title,
           };
           break;
         }
         case "availability": {
-          servers[id].availability = {
+          server.availability = {
             id: parseInt(value),
             name: title,
           };
         }
       }
+    } else {
+      server = {
+        ...server,
+        [name]: name === "port" ? parseInt(value) : value,
+      };
+    }
+
+    if (this.state.needsSave) {
       this.setState({
-        servers,
+        newInstance: server,
       });
     } else {
-      if (name === "port") {
-        servers[id] = {
-          ...servers[id],
-          [name]: parseInt(value),
-        };
-      } else {
-        servers[id] = {
-          ...servers[id],
-          [name]: value,
-        };
-      }
+      const servers = this.state.servers;
+      servers[this.state.activeServer] = server;
       this.setState({
         servers,
       });
@@ -235,9 +249,9 @@ class Sonarr extends React.Component {
       loading: live ? false : true,
     });
     try {
-      let sonarr = await Api.sonarrConfig(true);
+      let servers = await Api.sonarrConfig(true);
       this.setState({
-        servers: sonarr,
+        servers,
         loading: false,
       });
     } catch (err) {
@@ -264,10 +278,8 @@ class Sonarr extends React.Component {
         needsSave: false,
       });
     } else {
-      let servers = this.state.servers;
-      servers[id] = makeSonarr();
       this.setState({
-        servers,
+        newInstance: makeSonarr(),
         newServer: true,
         wizardOpen: true,
         activeServer: id,
@@ -292,14 +304,8 @@ class Sonarr extends React.Component {
   }
 
   closeModal(id) {
-    let servers = this.state.servers;
-    if (this.state.needsSave) {
-      delete servers[this.state.activeServer];
-    }
-
     this.setState({
       [`${id}Open`]: false,
-      servers,
       wizardOpen: false,
       editWizardOpen: false,
       activeServer: 0,
@@ -317,7 +323,13 @@ class Sonarr extends React.Component {
       );
     }
 
-    const server = this.state.servers[this.state.activeServer];
+    let server = {};
+    if (this.state.needsSave) {
+      server = this.state.newInstance;
+    } else {
+      server = this.state.servers[this.state.activeServer];
+    }
+
     return (
       <>
         <Modal

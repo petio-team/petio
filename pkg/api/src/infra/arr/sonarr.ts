@@ -1,8 +1,6 @@
 import { SonarrAPIClient } from '@/infra/arr/sonarr/index';
 import { LanguageProfile } from '@/infra/arr/sonarr/language_profile';
-import { QualityProfile } from '@/infra/arr/sonarr/quality_profile';
 import { Queue } from '@/infra/arr/sonarr/queue';
-import { RootFolder } from '@/infra/arr/sonarr/root_folder';
 import { Series, SeriesLookup } from '@/infra/arr/sonarr/series';
 import { Tag } from '@/infra/arr/sonarr/tag';
 import { DownloaderType, GetDownloaderById } from '@/models/downloaders';
@@ -11,6 +9,16 @@ import { ArrVersion, parseVersion } from './version';
 
 export type SeriesType = {
   status: string;
+};
+
+export type RootPath = {
+  id: number;
+  path: string;
+};
+
+export type QualityProfile = {
+  id: number;
+  name: string;
 };
 
 export type SeriesLanguage = {
@@ -48,12 +56,18 @@ export default class SonarrAPI {
     return false;
   }
 
-  public async GetRootPaths(): Promise<RootFolder> {
-    return this.client.get('/api/v3/rootfolder');
+  public async GetRootPaths(): Promise<RootPath[]> {
+    const paths = await this.client.get('/api/v3/rootfolder');
+    return paths.map((r) => {
+      return { id: r.id, path: r.path };
+    });
   }
 
-  public async GetQualityProfiles(): Promise<QualityProfile> {
-    return this.client.get('/api/v3/qualityprofile');
+  public async GetQualityProfiles(): Promise<QualityProfile[]> {
+    const profiles = await this.client.get('/api/v3/qualityprofile');
+    return profiles.map((r) => {
+      return { id: r.id, name: r.name };
+    });
   }
 
   public async GetLanguageProfile(): Promise<LanguageProfile> {

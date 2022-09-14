@@ -46,12 +46,13 @@ class Radarr extends React.Component {
 
     this.state = {
       servers: [],
+      newInstance: makeRadarr(),
       loading: true,
       isError: false,
       isMsg: false,
       wizardOpen: false,
       activeServer: 0,
-      needsSave: false,
+      needsSave: true,
     };
 
     this.inputChange = this.inputChange.bind(this);
@@ -67,7 +68,13 @@ class Radarr extends React.Component {
   }
 
   async saveServer() {
-    const server = this.state.servers[this.state.activeServer];
+    let server = {};
+    if (this.state.needsSave) {
+      server = this.state.newInstance;
+    } else {
+      server = this.state.servers[this.state.activeServer];
+    }
+
     if (server.name === "") {
       this.props.msg({
         message: "name field must not be empty",
@@ -109,8 +116,8 @@ class Radarr extends React.Component {
     }
 
     try {
-      const result = await Api.saveRadarrConfig(this.state.servers);
-      if (result.status === 'error') {
+      const result = await Api.saveRadarrConfig([server]);
+      if (result.status === "error") {
         this.props.msg({
           message: "failed to save request",
           type: 'error',
@@ -118,12 +125,18 @@ class Radarr extends React.Component {
         return;
       }
 
-      const servers = this.state.servers;
-      servers[this.state.activeServer] = result[0];
+      let index = this.state.activeServer;
+      if (this.state.needsSave) {
+        index = this.state.servers.push(result[0]);
+        index -= 1;
+      } else {
+        this.state.servers[index] = result[0];
+      }
 
       this.setState({
-        servers,
         needsSave: false,
+        activeServer: index,
+        newInstance: makeRadarr(),
       });
 
       this.props.msg({
@@ -139,11 +152,10 @@ class Radarr extends React.Component {
   }
 
   async deleteServer() {
+    const id = this.state.activeServer;
     let servers = this.state.servers;
-    let res = await Api.radarrDeleteInstance(
-      servers[this.state.activeServer].id,
-    );
-    if (res.status == 'error') {
+    let res = await Api.radarrDeleteInstance(servers[id].id);
+    if (res.status === 'error') {
       this.props.msg({
         message: res.error,
         type: 'error',
@@ -151,8 +163,7 @@ class Radarr extends React.Component {
       return;
     }
 
-    servers.splice(this.state.activeServer, 1);
-    this.state.activeServer = 0;
+    this.state.servers.splice(id, 1);
 
     this.closeModal('addServer');
     this.closeWizard();
@@ -168,8 +179,12 @@ class Radarr extends React.Component {
     const name = target.name;
     let value = target.value;
 
-    const id = this.state.activeServer;
-    let servers = this.state.servers;
+    let server = {};
+    if (this.state.needsSave) {
+      server = this.state.newInstance;
+    } else {
+      server = this.state.servers[this.state.activeServer];
+    }
 
     if (target.type === 'checkbox') {
       value = target.checked;
@@ -179,52 +194,51 @@ class Radarr extends React.Component {
       let title = target.options[target.selectedIndex].text;
       switch (name) {
         case "protocol": {
-          servers[id].protocol = value;
+          server.protocol = value;
           break;
         }
         case "profile": {
-          servers[id].profile = {
+          server.profile = {
             id: parseInt(value),
             name: title,
           };
           break;
         }
         case "path": {
-          servers[id].path = {
+          server.path = {
             id: parseInt(value),
             location: title,
           };
           break;
         }
         case "language": {
-          servers[id].language = {
+          server.language = {
             id: parseInt(value),
             name: title,
           };
           break;
         }
         case "availability": {
-          servers[id].availability = {
+          server.availability = {
             id: parseInt(value),
             name: title,
           };
         }
       }
+    } else {
+      server = {
+        ...server,
+        [name]: name === "port" ? parseInt(value) : value,
+      };
+    }
+
+    if (this.state.needsSave) {
       this.setState({
-        servers,
+        newInstance: server,
       });
     } else {
-      if (name === "port") {
-        servers[id] = {
-          ...servers[id],
-          [name]: parseInt(value),
-        };
-      } else {
-        servers[id] = {
-          ...servers[id],
-          [name]: value,
-        };
-      }
+      const servers = this.state.servers;
+      servers[this.state.activeServer] = server;
       this.setState({
         servers,
       });
@@ -236,9 +250,9 @@ class Radarr extends React.Component {
       loading: live ? false : true,
     });
     try {
-      let radarr = await Api.radarrConfig(true);
+      const servers = await Api.radarrConfig(true);
       this.setState({
-        servers: radarr,
+        servers,
         loading: false,
       });
     } catch (err) {
@@ -265,10 +279,8 @@ class Radarr extends React.Component {
         needsSave: false,
       });
     } else {
-      let servers = this.state.servers;
-      servers[id] = makeRadarr();
       this.setState({
-        servers,
+        newInstance: makeRadarr(),
         newServer: true,
         wizardOpen: true,
         activeServer: id,
@@ -293,14 +305,8 @@ class Radarr extends React.Component {
   }
 
   closeModal(id) {
-    let servers = this.state.servers;
-    if (this.state.needsSave) {
-      delete servers[this.state.activeServer];
-    }
-
     this.setState({
       [`${id}Open`]: false,
-      servers,
       wizardOpen: false,
       editWizardOpen: false,
       activeServer: 0,
@@ -318,7 +324,13 @@ class Radarr extends React.Component {
       );
     }
 
-    const server = this.state.servers[this.state.activeServer];
+    let server = {};
+    if (this.state.needsSave) {
+      server = this.state.newInstance;
+    } else {
+      server = this.state.servers[this.state.activeServer];
+    }
+
     return (
       <>
         <Modal
@@ -529,7 +541,7 @@ class Radarr extends React.Component {
           ) : null}
         </Modal>
         <section>
-          <p className="main-title mb--2">Radarr</p>
+          <p className="main-title mb--2">FRICK YOU</p>
           <p className="description">
             Radarr is a DVR. It can monitor multiple RSS feeds for new movies
             and will grab, sort, and rename them.

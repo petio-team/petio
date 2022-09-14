@@ -6,6 +6,8 @@ import { z } from 'zod';
 
 import { adminRequired } from '@/api/middleware/auth';
 import { validateRequest } from '@/api/middleware/validation';
+import { StatusBadRequest, StatusInternalServerError } from '@/api/web/request';
+import { ArrError } from '@/infra/arr/error';
 import RadarrAPI, { GetRadarrInstanceFromDb } from '@/infra/arr/radarr';
 import SonarrAPI, { GetSonarrInstanceFromDb } from '@/infra/arr/sonarr';
 import logger from '@/loaders/logger';
@@ -274,18 +276,8 @@ const getSonarrPathsById = async (ctx: Context) => {
       return;
     }
 
-    const paths = await instance.GetRootPaths();
-    const results = paths.map((path) => {
-      return {
-        id: path.id,
-        path: path.path,
-        accessible: path.accessible,
-        freeSpace: path.freeSpace,
-      };
-    });
-
     ctx.status = StatusCodes.OK;
-    ctx.body = results;
+    ctx.body = await instance.GetRootPaths();
   } catch (error) {
     logger.error(error.stack);
 
@@ -467,17 +459,9 @@ const updateSonarrConfig = async (ctx: Context) => {
       );
 
       const api = new SonarrAPI(url, instance.token);
-      try {
-        const passed = await api.TestConnection();
-        if (!passed) {
-          throw new Error('test failed');
-        }
-      } catch (e) {
-        ctx.status = StatusCodes.BAD_REQUEST;
-        ctx.body = {
-          error: e.message,
-        };
-        return;
+      const passed = await api.TestConnection();
+      if (!passed) {
+        throw new ArrError('failed to test connection to instance');
       }
 
       const newInstance = await CreateOrUpdateDownloader({
@@ -524,11 +508,15 @@ const updateSonarrConfig = async (ctx: Context) => {
     ctx.body = results;
     return;
   } catch (error) {
-    logger.log('error', `ROUTE: Error saving sonarr config`);
-    logger.log({ level: 'error', message: error });
+    logger.debug(`ROUTE: Error saving sonarr config`);
+    logger.debug({ message: error });
 
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = { error: error };
+    if (error instanceof ArrError) {
+      StatusBadRequest(ctx, error.message);
+    } else {
+      StatusInternalServerError(ctx, error.message);
+    }
+
     return;
   }
 };
@@ -633,18 +621,8 @@ const getRadarrPathsById = async (ctx: Context) => {
       return;
     }
 
-    const paths = await instance.GetRootPaths();
-    const results = paths.map((path) => {
-      return {
-        id: path.id,
-        path: path.path,
-        accessible: path.accessible,
-        freeSpace: path.freeSpace,
-      };
-    });
-
     ctx.status = StatusCodes.OK;
-    ctx.body = results;
+    ctx.body = await instance.GetRootPaths();
   } catch (error) {
     logger.error(error.stack);
 
@@ -824,17 +802,9 @@ const updateRadarrConfig = async (ctx: Context) => {
       );
 
       const api = new RadarrAPI(url, instance.token);
-      try {
-        const passed = await api.TestConnection();
-        if (!passed) {
-          throw new Error('test failed');
-        }
-      } catch (e) {
-        ctx.status = StatusCodes.BAD_REQUEST;
-        ctx.body = {
-          error: e.message,
-        };
-        return;
+      const passed = await api.TestConnection();
+      if (!passed) {
+        throw new ArrError('failed to test connection to instance');
       }
 
       const newInstance = await CreateOrUpdateDownloader({
@@ -881,11 +851,15 @@ const updateRadarrConfig = async (ctx: Context) => {
     ctx.body = results;
     return;
   } catch (error) {
-    logger.log('error', `ROUTE: Error saving radarr config`);
-    logger.log({ level: 'error', message: error });
+    logger.debug(`ROUTE: Error saving radarr config`);
+    logger.debug({ message: error });
 
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = { error: error };
+    if (error instanceof ArrError) {
+      StatusBadRequest(ctx, error.message);
+    } else {
+      StatusInternalServerError(ctx, error.message);
+    }
+
     return;
   }
 };

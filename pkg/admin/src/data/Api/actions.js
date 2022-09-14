@@ -257,46 +257,16 @@ export let currentSessions = () => {
   });
 };
 
-export function checkConfig() {
-  return new Promise((resolve, reject) => {
-    api
-      .checkConfig()
-      .then((data) => {
-        resolve(data);
-      })
-      .catch((err) => {
-        console.log(err);
-        reject();
-      });
-  });
+export async function checkConfig() {
+  return api.checkConfig();
 }
 
-export function saveConfig(config) {
-  return new Promise((resolve, reject) => {
-    api
-      .saveConfig(config)
-      .then(() => {
-        resolve();
-      })
-      .catch((err) => {
-        console.log(err);
-        reject();
-      });
-  });
+export async function saveConfig(config) {
+  return api.saveConfig(config);
 }
 
-export function updateConfig(config) {
-  return new Promise((resolve, reject) => {
-    api
-      .updateConfig(config)
-      .then(() => {
-        resolve();
-      })
-      .catch((err) => {
-        console.log(err);
-        reject();
-      });
-  });
+export async function updateConfig(config) {
+  return api.updateConfig(config);
 }
 
 export async function sonarrConfig(withExtras = false) {
