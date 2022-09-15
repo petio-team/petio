@@ -105,8 +105,8 @@ class Users extends React.Component {
       target.type === 'checkbox'
         ? target.checked
         : target.type === 'file'
-        ? target.files[0]
-        : target.value;
+          ? target.files[0]
+          : target.value;
     if (name === 'eu_password')
       value = value.replace('*********', '').replace('********', '');
     if (name === 'bulk_users_all') {
@@ -145,8 +145,19 @@ class Users extends React.Component {
 
   async getArrs() {
     try {
-      let radarr = await Api.radarrConfig();
-      let sonarr = await Api.sonarrConfig();
+      const [radarr, sonarr] = await Promise.all([Api.radarrConfig({
+        withPaths: false,
+        withProfiles: false,
+        withLanguages: false,
+        withAvailabilities: false,
+        withTags: false,
+      }), Api.sonarrConfig({
+        withPaths: false,
+        withProfiles: false,
+        withLanguages: false,
+        withAvailabilities: false,
+        withTags: false,
+      })]);
       this.setState({
         r_servers: radarr,
         s_servers: sonarr,
@@ -389,13 +400,13 @@ class Users extends React.Component {
         thumb_path:
           process.env.NODE_ENV === 'development'
             ? 'http://localhost:7778/user/thumb/' +
-              this.state.activeUser.id +
-              '?update=' +
-              Date.now()
+            this.state.activeUser.id +
+            '?update=' +
+            Date.now()
             : '/api/user/thumb/' +
-              this.state.activeUser.id +
-              '?update=' +
-              Date.now(),
+            this.state.activeUser.id +
+            '?update=' +
+            Date.now(),
         custom_user_thumb: false,
       });
       document.getElementById('custom_thumb_upload').value = '';
@@ -532,16 +543,16 @@ class Users extends React.Component {
               <option value="">Default</option>
               {this.state.profiles
                 ? Object.keys(this.state.profiles).map((p) => {
-                    let profile = this.state.profiles[p];
-                    return (
-                      <option
-                        key={`user_profile_${profile._id}`}
-                        value={profile._id}
-                      >
-                        {profile.name}
-                      </option>
-                    );
-                  })
+                  let profile = this.state.profiles[p];
+                  return (
+                    <option
+                      key={`user_profile_${profile._id}`}
+                      value={profile._id}
+                    >
+                      {profile.name}
+                    </option>
+                  );
+                })
                 : null}
             </select>
           </div>
@@ -599,15 +610,14 @@ class Users extends React.Component {
                 />
               </div>
               <button
-                className={`image-upload--submit btn btn__square ${
-                  this.state.custom_user_thumb ? '' : 'disabled'
-                }`}
+                className={`image-upload--submit btn btn__square ${this.state.custom_user_thumb ? '' : 'disabled'
+                  }`}
               >
                 Upload
               </button>
             </form>
           ) : // ) : null
-          null}
+            null}
           {this.state.eu_error ? <p>{this.state.eu_error}</p> : null}
         </Modal>
 
@@ -631,16 +641,16 @@ class Users extends React.Component {
               <option value="">Default</option>
               {this.state.profiles
                 ? Object.keys(this.state.profiles).map((p) => {
-                    let profile = this.state.profiles[p];
-                    return (
-                      <option
-                        key={`bulk_user_profile_${profile._id}`}
-                        value={profile._id}
-                      >
-                        {profile.name}
-                      </option>
-                    );
-                  })
+                  let profile = this.state.profiles[p];
+                  return (
+                    <option
+                      key={`bulk_user_profile_${profile._id}`}
+                      value={profile._id}
+                    >
+                      {profile.name}
+                    </option>
+                  );
+                })
                 : null}
             </select>
           </div>
@@ -685,9 +695,8 @@ class Users extends React.Component {
               Add +
             </button>
             <button
-              className={`btn btn__square ${
-                Object.keys(this.state.bulk_users).length > 0 ? '' : 'disabled'
-              }`}
+              className={`btn btn__square ${Object.keys(this.state.bulk_users).length > 0 ? '' : 'disabled'
+                }`}
               onClick={() => {
                 this.openModal('bulkUsers');
                 this.setState({
@@ -714,27 +723,24 @@ class Users extends React.Component {
                   />
                 </th>
                 <th
-                  className={`sortable ${
-                    this.state.sortBy === 'title' ? 'active' : ''
-                  } ${this.state.dir}`}
+                  className={`sortable ${this.state.sortBy === 'title' ? 'active' : ''
+                    } ${this.state.dir}`}
                   onClick={() => this.sortCol('title')}
                 >
                   Title
                   <Arrow />
                 </th>
                 <th
-                  className={`sortable ${
-                    this.state.sortBy === 'username' ? 'active' : ''
-                  } ${this.state.dir}`}
+                  className={`sortable ${this.state.sortBy === 'username' ? 'active' : ''
+                    } ${this.state.dir}`}
                   onClick={() => this.sortCol('username')}
                 >
                   Username
                   <Arrow />
                 </th>
                 <th
-                  className={`sortable ${
-                    this.state.sortBy === 'email' ? 'active' : ''
-                  } ${this.state.dir}`}
+                  className={`sortable ${this.state.sortBy === 'email' ? 'active' : ''
+                    } ${this.state.dir}`}
                   onClick={() => this.sortCol('email')}
                 >
                   Email
