@@ -465,14 +465,15 @@ export async function getUser(id) {
 export async function allUsers() {
   try {
     let userData = await api.allUsers();
-    let data = {};
-    userData.map((user, i) => {
+    let data = [];
+    userData.forEach((user, i) => {
       if (user) {
         data[user.id] = user;
       } else {
         console.log(`User ${i} didn't return any data, this is unusual`);
       }
     });
+    console.log(data);
     finalise({
       type: types.ALL_USERS,
       users: data,

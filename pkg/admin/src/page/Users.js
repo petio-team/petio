@@ -355,10 +355,13 @@ class Users extends React.Component {
       }
     });
 
+    const profile_id = this.state.bu_profile;
+    const enabled = this.state.bu_enabled;
+
     let upd = await Api.bulkEditUser({
       users: users,
-      profile: this.state.bu_profile,
-      enabled: this.state.bu_enabled,
+      profile: profile_id,
+      enabled: enabled,
     });
 
     if (upd.error) {
@@ -757,6 +760,8 @@ class Users extends React.Component {
             <tbody>
               {Object.keys(usersSorted).map((u) => {
                 let user = usersSorted[u];
+                const profile = this.findProfile(user.profileId);
+
                 return (
                   <tr key={user.id}>
                     <td>
@@ -780,11 +785,7 @@ class Users extends React.Component {
                     <td>{user.email}</td>
                     <td>{user.role ? user.role : 'user'}</td>
                     <td>
-                      {user.profile
-                        ? this.findProfile(user.profile)
-                          ? this.findProfile(user.profile).name
-                          : 'Removed'
-                        : 'default'}
+                      {profile ? profile?.name || 'removed' : 'default'}
                     </td>
                     <td>
                       <div className="table-icon">

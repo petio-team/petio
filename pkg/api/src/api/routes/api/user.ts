@@ -174,15 +174,15 @@ const editUser = async (ctx: Context) => {
           : bcrypt.hashSync(config.get('admin.password'), 10);
     }
 
-    if (user.role === 'admin' && user.email) {
-      config.set('admin.email', user.email);
-      WriteConfig();
-    }
-
     await UserModel.findOneAndUpdate(
       { _id: user.id },
       {
-        $set: userObj,
+        $set: {
+          email: userObj.email,
+          role: userObj.role,
+          profileId: userObj.profile,
+          disabled: userObj.disabled,
+        },
       },
       { new: true, useFindAndModify: false },
     ).exec();
@@ -224,7 +224,7 @@ const editMultipleUsers = async (ctx: Context) => {
           },
           {
             $set: {
-              profile: profile,
+              profileId: profile,
               disabled: enabled ? false : true,
             },
           },
