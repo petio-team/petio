@@ -250,7 +250,13 @@ class Radarr extends React.Component {
       loading: live ? false : true,
     });
     try {
-      const servers = await Api.radarrConfig(true);
+      const servers = await Api.radarrConfig({
+        withPaths: true,
+        withProfiles: true,
+        withLanguages: true,
+        withAvailabilities: true,
+        withTags: false,
+      });
       this.setState({
         servers,
         loading: false,

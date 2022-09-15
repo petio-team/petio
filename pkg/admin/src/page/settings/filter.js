@@ -146,7 +146,20 @@ class Filter extends React.Component {
 
   async getArrs() {
     try {
-      const [radarr, sonarr] = await Promise.all([Api.radarrConfig(false), Api.sonarrConfig(false)]);
+      const [radarr, sonarr] = await Promise.all([
+        Api.radarrConfig({
+          withPaths: true,
+          withProfiles: true,
+          withLanguages: true,
+          withAvailabilities: true,
+          withTags: true,
+        }), Api.sonarrConfig({
+          withPaths: true,
+          withProfiles: true,
+          withLanguages: true,
+          withAvailabilities: true,
+          withTags: true,
+        })]);
       this.setState({
         radarr_servers: radarr,
         sonarr_servers: sonarr,

@@ -269,8 +269,20 @@ export async function updateConfig(config) {
   return api.updateConfig(config);
 }
 
-export async function sonarrConfig(withExtras = false) {
-  return api.sonarrConfig(withExtras);
+export async function sonarrConfig({
+  withPaths = false,
+  withProfiles = false,
+  withLanguages = false,
+  withAvailabilities = false,
+  withTags = false,
+}) {
+  return api.sonarrConfig({
+    withPaths,
+    withProfiles,
+    withLanguages,
+    withAvailabilities,
+    withTags,
+  });
 }
 
 export async function sonarrDeleteInstance(uuid) {
@@ -281,8 +293,20 @@ export async function sonarrOptions(id) {
   return api.getSonarrOptions(id);
 }
 
-export async function radarrConfig(withExtras = false) {
-  return api.radarrConfig(withExtras);
+export async function radarrConfig({
+  withPaths = false,
+  withProfiles = false,
+  withLanguages = false,
+  withAvailabilities = false,
+  withTags = false,
+}) {
+  return api.radarrConfig({
+    withPaths,
+    withProfiles,
+    withLanguages,
+    withAvailabilities,
+    withTags,
+  });
 }
 
 export async function radarrDeleteInstance(uuid) {

@@ -119,7 +119,11 @@ export default (app: Router) => {
     '/sonarr/config',
     validateRequest({
       query: z.object({
-        withExtras: z.any().optional(),
+        withPaths: z.any().optional(),
+        withProfiles: z.any().optional(),
+        withLanguages: z.any().optional(),
+        withAvailabilities: z.any().optional(),
+        withTags: z.any().optional(),
       }),
     }),
     adminRequired,
@@ -208,7 +212,11 @@ export default (app: Router) => {
     '/radarr/config',
     validateRequest({
       query: z.object({
-        withExtras: z.any().optional(),
+        withPaths: z.any().optional(),
+        withProfiles: z.any().optional(),
+        withLanguages: z.any().optional(),
+        withAvailabilities: z.any().optional(),
+        withTags: z.any().optional(),
       }),
     }),
     adminRequired,
@@ -366,7 +374,13 @@ const testSonarrConnectionById = async (ctx: Context) => {
 };
 
 const getSonarrConfig = async (ctx: Context) => {
-  const withExtras = ctx.request.query.withExtras;
+  const {
+    withPaths,
+    withProfiles,
+    withLanguages,
+    withAvailabilities,
+    withTags,
+  } = ctx.request.query;
 
   try {
     const instances = await GetAllDownloaders(DownloaderType.Sonarr);
@@ -384,19 +398,13 @@ const getSonarrConfig = async (ctx: Context) => {
         port = parseInt(url.port);
       }
 
-      let paths: any | undefined = undefined;
-      let profiles: any | undefined = undefined;
-      let languages: any | undefined = undefined;
-      let availabilities: any | undefined = undefined;
-
-      if (withExtras) {
-        [paths, profiles, languages, availabilities] = await Promise.all([
-          api.GetRootPaths(),
-          api.GetQualityProfiles(),
-          api.GetLanguages(),
-          api.GetSeriesTypes(),
-        ]);
-      }
+      const [paths, profiles, languages, availabilities] = await Promise.all([
+        withPaths ? api.GetRootPaths() : undefined,
+        withProfiles ? api.GetQualityProfiles() : undefined,
+        withLanguages ? api.GetLanguages() : undefined,
+        withAvailabilities ? api.GetSeriesTypes() : undefined,
+        withTags ? api.GetTags() : undefined,
+      ]);
 
       return {
         id: instance.id,
@@ -711,7 +719,13 @@ const testRadarrConnectionById = async (ctx: Context) => {
 };
 
 const getRadarrConfig = async (ctx: Context) => {
-  const withExtras = ctx.request.query.withExtras;
+  const {
+    withPaths,
+    withProfiles,
+    withLanguages,
+    withAvailabilities,
+    withTags,
+  } = ctx.request.query;
 
   try {
     const instances = await GetAllDownloaders(DownloaderType.Radarr);
@@ -728,19 +742,14 @@ const getRadarrConfig = async (ctx: Context) => {
         port = parseInt(url.port);
       }
 
-      let paths: any | undefined = undefined;
-      let profiles: any | undefined = undefined;
-      let languages: any | undefined = undefined;
-      let availabilities: any | undefined = undefined;
-
-      if (withExtras) {
-        [paths, profiles, languages, availabilities] = await Promise.all([
-          api.GetRootPaths(),
-          api.GetQualityProfiles(),
-          api.GetLanguages(),
-          api.GetMinimumAvailability(),
+      const [paths, profiles, languages, availabilities, tags] =
+        await Promise.all([
+          withPaths ? api.GetRootPaths() : undefined,
+          withProfiles ? api.GetQualityProfiles() : undefined,
+          withLanguages ? api.GetLanguages() : undefined,
+          withAvailabilities ? api.GetMinimumAvailability() : undefined,
+          withTags ? api.GetTags() : undefined,
         ]);
-      }
 
       return {
         id: instance.id,
@@ -771,6 +780,7 @@ const getRadarrConfig = async (ctx: Context) => {
         profiles,
         languages,
         availabilities,
+        tags,
       };
     });
 

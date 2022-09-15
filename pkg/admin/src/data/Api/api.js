@@ -64,8 +64,31 @@ export async function updateConfig(config) {
   return post(`/config/update`, config);
 }
 
-export async function sonarrConfig(withExtras = false) {
-  return get(`/services/sonarr/config${withExtras === true ? '?withExtras=true' : ''}`);
+export async function sonarrConfig({
+  withPaths = false,
+  withProfiles = false,
+  withLanguages = false,
+  withAvailabilities = false,
+  withTags = false,
+}) {
+  const params = new URLSearchParams();
+  if (withPaths) {
+    params.set("withPaths", "true");
+  }
+  if (withProfiles) {
+    params.set("withProfiles", "true");
+  }
+  if (withLanguages) {
+    params.set("withLanguages", "true");
+  }
+  if (withAvailabilities) {
+    params.set("withAvailabilities", "true");
+  }
+  if (withTags) {
+    params.set("withTags", "true");
+  }
+  const strParams = params.toString();
+  return get(`/services/sonarr/config${strParams !== "" ? `?${strParams}` : ``}`);
 }
 
 export async function saveSonarrConfig(config) {
@@ -99,8 +122,31 @@ export async function sonarrTags(id) {
   return get(`/services/sonarr/tags/${id}`);
 }
 
-export async function radarrConfig(withExtras = false) {
-  return get(`/services/radarr/config${withExtras === true ? '?withExtras=true' : ''}`);
+export async function radarrConfig({
+  withPaths = false,
+  withProfiles = false,
+  withLanguages = false,
+  withAvailabilities = false,
+  withTags = false,
+}) {
+  const params = new URLSearchParams();
+  if (withPaths) {
+    params.set("withPaths", "true");
+  }
+  if (withProfiles) {
+    params.set("withProfiles", "true");
+  }
+  if (withLanguages) {
+    params.set("withLanguages", "true");
+  }
+  if (withAvailabilities) {
+    params.set("withAvailabilities", "true");
+  }
+  if (withTags) {
+    params.set("withTags", "true");
+  }
+  const strParams = params.toString();
+  return get(`/services/radarr/config${strParams !== "" ? `?${strParams}` : ``}`);
 }
 
 export async function getRadarrOptions(id) {
