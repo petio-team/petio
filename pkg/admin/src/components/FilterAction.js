@@ -70,7 +70,7 @@ class FilterAction extends React.Component {
                     data-item={this.props.item}
                     name="path"
                     onChange={this.props.inputChange}
-                    value={item.path.id}
+                    value={item.path}
                   >
                     {server ? (
                       <>
@@ -109,7 +109,7 @@ class FilterAction extends React.Component {
                     data-item={this.props.item}
                     name="profile"
                     onChange={this.props.inputChange}
-                    value={item.profile.id}
+                    value={item.profile}
                   >
                     {server ? (
                       <>
@@ -148,7 +148,7 @@ class FilterAction extends React.Component {
                     data-item={this.props.item}
                     name="language"
                     onChange={this.props.inputChange}
-                    value={item.language.id}
+                    value={item.language}
                   >
                     {server ? (
                       <>
@@ -189,7 +189,7 @@ class FilterAction extends React.Component {
                     data-item={this.props.item}
                     name="availability"
                     onChange={this.props.inputChange}
-                    value={item.availability.id}
+                    value={item.availability}
                   >
                     {server ? (
                       <>
@@ -228,7 +228,7 @@ class FilterAction extends React.Component {
                     data-item={this.props.item}
                     name="tag"
                     onChange={this.props.inputChange}
-                    value={item.tag.id}
+                    value={item.tag}
                   >
                     {server ? (
                       <>
