@@ -212,7 +212,7 @@ class Users extends React.Component {
   findServerByUuid(uuid, type) {
     for (let s in this.state[type]) {
       let server = this.state[type][s];
-      if (server.uuid === uuid) {
+      if (server.id === uuid) {
         return server;
       }
     }
@@ -222,7 +222,7 @@ class Users extends React.Component {
   findUser(id) {
     for (let u in this.props.api.users) {
       let user = this.props.api.users[u];
-      if (user._id === id) {
+      if (user.id === id) {
         return user;
       }
     }
@@ -476,7 +476,7 @@ class Users extends React.Component {
                 let user = usersAz[u];
                 return (
                   <option
-                    key={`user_linked_${user._id}`}
+                    key={`user_linked_${user.id}`}
                     value={user.altId ? user.altId : user.id}
                   >
                     {user.title}
@@ -802,7 +802,7 @@ class Users extends React.Component {
                         className="table-action"
                         onClick={() => {
                           this.openModal('editUser');
-                          this.setActiveUser(user._id);
+                          this.setActiveUser(user.id);
                         }}
                       >
                         Edit
