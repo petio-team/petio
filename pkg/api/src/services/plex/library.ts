@@ -16,6 +16,7 @@ import Discord from '@/services/notifications/discord';
 import Telegram from '@/services/notifications/telegram';
 import processRequest from '@/services/requests/process';
 import { showLookup } from '@/services/tmdb/show';
+import { ObjectId } from "mongodb";
 
 export default class LibraryUpdate {
   full: any;
@@ -744,7 +745,7 @@ export default class LibraryUpdate {
         email: obj.email.toLowerCase() ?? '',
         thumbnail: obj.thumb ?? '',
         plexId: obj.id,
-        profileId: defaultProfile ? defaultProfile._id.toString() : undefined,
+        profileId: defaultProfile ? new ObjectId(defaultProfile._id.toString()) : undefined,
         role: UserRole.User,
         owner: false,
         custom: false,
