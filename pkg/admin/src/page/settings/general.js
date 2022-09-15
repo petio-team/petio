@@ -15,13 +15,13 @@ const popupCenter = (url, title, w, h) => {
   var width = window.innerWidth
     ? window.innerWidth
     : document.documentElement.clientWidth
-    ? document.documentElement.clientWidth
-    : screen.width;
+      ? document.documentElement.clientWidth
+      : screen.width;
   var height = window.innerHeight
     ? window.innerHeight
     : document.documentElement.clientHeight
-    ? document.documentElement.clientHeight
-    : screen.height;
+      ? document.documentElement.clientHeight
+      : screen.height;
 
   var left = width / 2 - w / 2 + dualScreenLeft;
   var top = height / 2 - h / 2 + dualScreenTop;
@@ -29,13 +29,13 @@ const popupCenter = (url, title, w, h) => {
     url,
     title,
     'scrollbars=yes, width=' +
-      w +
-      ', height=' +
-      h +
-      ', top=' +
-      top +
-      ', left=' +
-      left,
+    w +
+    ', height=' +
+    h +
+    ', top=' +
+    top +
+    ', left=' +
+    left,
   );
 
   if (window.focus) newWindow.focus();
@@ -49,7 +49,7 @@ class General extends React.Component {
 
     this.state = {
       base_path: '',
-      login_type: false,
+      login_type: 1,
       plexPopular: false,
       token: false,
     };
@@ -78,7 +78,7 @@ class General extends React.Component {
     }
 
     this.setState({
-      [name]: value,
+      [name]: name === "login_type" ? parseInt(value) : value,
     });
   }
 
