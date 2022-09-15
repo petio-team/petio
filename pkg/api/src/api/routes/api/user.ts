@@ -320,7 +320,7 @@ const updateUserThumbnail = async (ctx: Context) => {
 const getThumbnailById = async (ctx: Context) => {
   let userData: any = false;
   try {
-    userData = await UserModel.findOne({ id: ctx.params.id }).exec();
+    userData = await UserModel.findOne({ _id: ctx.params.id }).exec();
   } catch (err) {
     ctx.status = StatusCodes.BAD_REQUEST;
     ctx.body = { error: err };
