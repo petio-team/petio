@@ -9,11 +9,17 @@ class FilterAction extends React.Component {
     const data = Array.isArray(this.props.data)
       ? this.props.data
       : [this.props.data];
+
     if (!Array.isArray(data)) return null;
     return (
       <>
         <div className="filter--comparison">THEN</div>
         {data.map((item, i) => {
+          let server = {};
+          if (this.props.servers) {
+            server = this.props.servers.filter((s) => s.id === item.server)[0];
+          }
+
           return (
             <div
               key={`action__${this.props.item}__${i}`}
@@ -66,20 +72,19 @@ class FilterAction extends React.Component {
                     onChange={this.props.inputChange}
                     value={item.path.id}
                   >
-                    {item.server ? (
+                    {server ? (
                       <>
                         <option value="">Please Select</option>
-                        {this.props.servers[item.server] &&
-                          this.props.servers[item.server].paths &&
-                          this.props.servers[item.server].paths.length > 0 ? (
-                          this.props.servers[item.server].paths.map(
+                        {server.paths &&
+                          server.paths.length > 0 ? (
+                          server.paths.map(
                             (path, i) => {
                               return (
                                 <option
                                   key={`${fs}__${this.props.item}__p_${i}`}
                                   value={path.id}
                                 >
-                                  {path.location}
+                                  {path.path}
                                 </option>
                               );
                             },
@@ -106,22 +111,25 @@ class FilterAction extends React.Component {
                     onChange={this.props.inputChange}
                     value={item.profile.id}
                   >
-                    {item.server &&
-                      this.props.servers[item.server] &&
-                      this.props.servers[item.server].profiles ? (
+                    {server ? (
                       <>
                         <option value="">Please Select</option>
-                        {this.props.servers[item.server].profiles.map(
-                          (profile, i) => {
-                            return (
-                              <option
-                                key={`${fs}__${this.props.item}__pf_${i}`}
-                                value={profile.id}
-                              >
-                                {profile.name}
-                              </option>
-                            );
-                          },
+                        {server.profiles &&
+                          server.profiles.length > 0 ? (
+                          server.profiles.map(
+                            (profile, i) => {
+                              return (
+                                <option
+                                  key={`${fs}__${this.props.item}__pf_${i}`}
+                                  value={profile.id}
+                                >
+                                  {profile.name}
+                                </option>
+                              );
+                            },
+                          )
+                        ) : (
+                          <option value="">Loading...</option>
                         )}
                       </>
                     ) : (
@@ -142,22 +150,25 @@ class FilterAction extends React.Component {
                     onChange={this.props.inputChange}
                     value={item.language.id}
                   >
-                    {item.server &&
-                      this.props.servers[item.server] &&
-                      this.props.servers[item.server].languages ? (
+                    {server ? (
                       <>
                         <option value="">Please Select</option>
-                        {this.props.servers[item.server].languages.map(
-                          (language, i) => {
-                            return (
-                              <option
-                                key={`${fs}__${this.props.item}__pf_${i}`}
-                                value={language.id}
-                              >
-                                {language.name}
-                              </option>
-                            );
-                          },
+                        {server.languages &&
+                          server.languages.length > 0 ? (
+                          server.languages.map(
+                            (language, i) => {
+                              return (
+                                <option
+                                  key={`${fs}__${this.props.item}__l_${i}`}
+                                  value={language.id}
+                                >
+                                  {language.name}
+                                </option>
+                              );
+                            },
+                          )
+                        ) : (
+                          <option value="">Loading...</option>
                         )}
                       </>
                     ) : (
@@ -166,46 +177,47 @@ class FilterAction extends React.Component {
                   </select>
                 </div>
               </div>
-              {this.props.type === 'movie_filters' ? (
-                <div className="filter--row--item">
-                  <p className="filter--row--item--title">
-                    Minimum Availability
-                  </p>
-                  <div className="select-wrap">
-                    <select
-                      data-type={this.props.type}
-                      data-row="action"
-                      data-action-row={i}
-                      data-item={this.props.item}
-                      name="availability"
-                      onChange={this.props.inputChange}
-                      value={item.availability}
-                    >
-                      {item.server &&
-                        this.props.servers[item.server] &&
-                        this.props.servers[item.server].availabilities ? (
-                        <>
-                          <option value="">Please Select</option>
-                          {this.props.servers[item.server].availabilities.map(
+              <div className="filter--row--item">
+                <p className="filter--row--item--title">
+                  {this.props.type === 'movie_filters' ? 'Minimum Availability' : 'Series Type'}
+                </p>
+                <div className="select-wrap">
+                  <select
+                    data-type={this.props.type}
+                    data-row="action"
+                    data-action-row={i}
+                    data-item={this.props.item}
+                    name="availability"
+                    onChange={this.props.inputChange}
+                    value={item.availability.id}
+                  >
+                    {server ? (
+                      <>
+                        <option value="">Please Select</option>
+                        {server.availabilities &&
+                          server.availabilities.length > 0 ? (
+                          server.availabilities.map(
                             (availability, i) => {
                               return (
                                 <option
-                                  key={`${fs}__${this.props.item}__pf_${i}`}
+                                  key={`${fs}__${this.props.item}__a_${i}`}
                                   value={availability.id}
                                 >
-                                  {availability.name}
+                                  {this.props.type === 'movie_filters' ? availability.name : availability.status}
                                 </option>
                               );
                             },
-                          )}
-                        </>
-                      ) : (
-                        <option value="">Choose Server</option>
-                      )}
-                    </select>
-                  </div>
+                          )
+                        ) : (
+                          <option value="">Loading...</option>
+                        )}
+                      </>
+                    ) : (
+                      <option value="">Choose Server</option>
+                    )}
+                  </select>
                 </div>
-              ) : null}
+              </div>
               <div className="filter--row--item">
                 <p className="filter--row--item--title">Tag</p>
                 <div className="select-wrap">
@@ -216,66 +228,35 @@ class FilterAction extends React.Component {
                     data-item={this.props.item}
                     name="tag"
                     onChange={this.props.inputChange}
-                    value={item.tag}
+                    value={item.tag.id}
                   >
-                    {item.server && this.props.servers[item.server] ? (
-                      this.props.servers[item.server].tags ? (
-                        <>
-                          <option value="">Don&apos;t set tag</option>
-                          {this.props.servers[item.server].tags.map((tag) => {
-                            return (
-                              <option
-                                value={tag.id}
-                                key={`${fs}__${this.props.item}__pf_${tag.id}`}
-                              >
-                                {tag.label}
-                              </option>
-                            );
-                          })}
-                        </>
-                      ) : (
-                        <option value="">No tags</option>
-                      )
+                    {server ? (
+                      <>
+                        <option value="">Please Select</option>
+                        {server.tags &&
+                          server.tags.length > 0 ? (
+                          server.tags.map(
+                            (tag, i) => {
+                              return (
+                                <option
+                                  key={`${fs}__${this.props.item}__t_${i}`}
+                                  value={tag.id}
+                                >
+                                  {tag.label}
+                                </option>
+                              );
+                            },
+                          )
+                        ) : (
+                          <option value="">No Tags</option>
+                        )}
+                      </>
                     ) : (
                       <option value="">Choose Server</option>
                     )}
                   </select>
                 </div>
               </div>
-              {this.props.type === 'tv_filters' ? (
-                <div className="filter--row--item">
-                  <p className="filter--row--item--title">Type</p>
-                  <div className="select-wrap">
-                    <select
-                      data-type={this.props.type}
-                      data-row="action"
-                      data-action-row={i}
-                      data-item={this.props.item}
-                      name="type"
-                      onChange={this.props.inputChange}
-                      value={item.type}
-                    >
-                      {item.server && this.props.servers[item.server] ? (
-                        <>
-                          <option value="">Select Option</option>
-                          {this.props.servers[item.server].availabilities.map((availability) => {
-                            return (
-                              <option
-                                value={availability.id}
-                                key={`${fs}__${this.props.item}__pf_${availability.id}`}
-                              >
-                                {availability.name}
-                              </option>
-                            );
-                          })}
-                        </>
-                      ) : (
-                        <option value="">Choose Server</option>
-                      )}
-                    </select>
-                  </div>
-                </div>
-              ) : null}
               {i > 0 ? (
                 <div
                   className="filter--row--remove"

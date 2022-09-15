@@ -10,10 +10,8 @@ class Filter extends React.Component {
     this.state = {
       movie_filters: [],
       tv_filters: [],
-      radarr_servers: 'loading',
-      radarr_settings: {},
-      sonarr_servers: 'loading',
-      sonarr_settings: {},
+      radarr_servers: [],
+      sonarr_servers: [],
     };
 
     this.addFilter = this.addFilter.bind(this);
@@ -49,7 +47,6 @@ class Filter extends React.Component {
           language: false,
           availability: false,
           tag: false,
-          type: false,
         },
       ],
       collapse: false,
@@ -102,7 +99,6 @@ class Filter extends React.Component {
       availability: false,
       server: false,
       tag: false,
-      type: false,
     });
     this.setState({
       [type]: filters,
@@ -238,8 +234,7 @@ class Filter extends React.Component {
   }
 
   componentDidMount() {
-    this.getArrs();
-    this.getFilters();
+    Promise.all([this.getArrs(), this.getFilters()]);
   }
 
   async saveFilters() {
