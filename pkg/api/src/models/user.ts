@@ -20,7 +20,7 @@ export const UserSchema = z.object({
   altId: z.string().min(1).optional(),
   plexId: z.string().min(1).optional(),
   role: z.nativeEnum(UserRole).default(UserRole.User),
-  profileId: z.string().optional(),
+  profileId: z.instanceof(ObjectId).optional(),
   // owner replaced the old custom field, and inverts it's usage
   owner: z.boolean().default(false),
   custom: z.boolean().default(false),
