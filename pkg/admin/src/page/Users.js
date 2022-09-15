@@ -113,8 +113,8 @@ class Users extends React.Component {
       let userCheckboxes = document.querySelectorAll('.user-checkbox');
       let bu = {};
       if (!this.state.bulk_users_all)
-        for (let c = 0; c < userCheckboxes.length; c++) {
-          let cb = userCheckboxes[c];
+        for (const element of userCheckboxes) {
+          let cb = element;
           bu[cb.name] = true;
         }
       this.setState({
@@ -281,7 +281,7 @@ class Users extends React.Component {
     }
 
     userObj = {
-      id: this.state.activeUser._id,
+      id: this.state.activeUser.id,
       email: this.state.eu_email,
       role: this.state.eu_role,
       profile: this.state.eu_profile,
@@ -758,7 +758,7 @@ class Users extends React.Component {
               {Object.keys(usersSorted).map((u) => {
                 let user = usersSorted[u];
                 return (
-                  <tr key={user._id}>
+                  <tr key={user.id}>
                     <td>
                       <input
                         className="checkbox-small user-checkbox"
@@ -766,10 +766,10 @@ class Users extends React.Component {
                         type="checkbox"
                         checked={
                           this.state.bulk_users
-                            ? this.state.bulk_users[user._id]
+                            ? this.state.bulk_users[user.id]
                             : false
                         }
-                        name={user._id}
+                        name={user.id}
                         onChange={this.changeCheckbox}
                       />
                     </td>
