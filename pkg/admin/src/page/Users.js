@@ -5,6 +5,7 @@ import { ReactComponent as Check } from '../assets/svg/check.svg';
 import { ReactComponent as Close } from '../assets/svg/close.svg';
 import Modal from '../components/Modal';
 import Api from '../data/Api';
+import { API_URL } from "../data/http";
 import Profiles from './users/Profiles';
 
 class Users extends React.Component {
@@ -238,10 +239,7 @@ class Users extends React.Component {
       eu_profile: user.profileId ? user.profileId : '',
       eu_password: user.password === 'removed' ? '*********' : '',
       eu_enabled: user.disabled ? false : true,
-      thumb_path:
-        process.env.NODE_ENV === 'development'
-          ? 'http://localhost:7778/user/thumb/' + user.id
-          : '/api/user/thumb/' + user.id,
+      thumb_path: API_URL + '/user/thumb/' + user.id,
     });
   }
 
@@ -400,16 +398,7 @@ class Users extends React.Component {
       formData.append('thumb', this.state.custom_user_thumb);
       await Api.uploadThumb(formData, this.state.activeUser.id);
       this.setState({
-        thumb_path:
-          process.env.NODE_ENV === 'development'
-            ? 'http://localhost:7778/user/thumb/' +
-            this.state.activeUser.id +
-            '?update=' +
-            Date.now()
-            : '/api/user/thumb/' +
-            this.state.activeUser.id +
-            '?update=' +
-            Date.now(),
+        thumb_path: `${API_URL}/user/thumb/${this.state.activeUser.id}?update=${Date.now()}`,
         custom_user_thumb: false,
       });
       document.getElementById('custom_thumb_upload').value = '';

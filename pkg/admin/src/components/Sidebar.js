@@ -10,6 +10,7 @@ import { ReactComponent as IssueIcon } from '../assets/svg/issue.svg';
 import { ReactComponent as PersonIcon } from '../assets/svg/people.svg';
 import { ReactComponent as SettingsIcon } from '../assets/svg/settings.svg';
 import { ReactComponent as ReviewIcon } from '../assets/svg/star.svg';
+import { API_URL } from "../data/http";
 
 class Sidebar extends React.Component {
   render() {
@@ -40,18 +41,7 @@ class Sidebar extends React.Component {
               <div
                 className="thumb"
                 style={{
-                  backgroundImage:
-                    process.env.NODE_ENV === 'development'
-                      ? 'url("http://localhost:7778/user/thumb/' +
-                        user.id +
-                        '")'
-                      : 'url("' +
-                        window.location.pathname
-                          .replace('/admin/', '')
-                          .replace(/\/$/, '') +
-                        '/api/user/thumb/' +
-                        user.id +
-                        '")',
+                  backgroundImage: `url("${API_URL}/user/thumb/${user.id}")`,
                 }}
               ></div>
             </div>
@@ -143,9 +133,8 @@ class Sidebar extends React.Component {
           </Link>
           <a
             className="menu--item"
-            href={`${window.location.protocol}//${
-              window.location.host
-            }${window.location.pathname.replace('/admin/', '')}`}
+            href={`${window.location.protocol}//${window.location.host
+              }${window.location.pathname.replace('/admin/', '')}`}
           >
             <p>Exit Admin</p>
             <div className="icon">

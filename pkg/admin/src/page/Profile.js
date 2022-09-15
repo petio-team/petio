@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
+import { API_URL } from "../data/http";
 
 class Profile extends React.Component {
   componentDidMount() {
@@ -22,14 +23,7 @@ class Profile extends React.Component {
                 rel="noreferrer"
                 className="thumb"
                 style={{
-                  backgroundImage:
-                    process.env.NODE_ENV === 'development'
-                      ? 'url("http://localhost:7778/user/thumb/' +
-                        this.props.user.current.id +
-                        '")'
-                      : 'url("/api/user/thumb/' +
-                        this.props.user.current.id +
-                        '")',
+                  backgroundImage: `url("${API_URL}/user/thumb/${this.props.user.current.id}")`,
                   color: 'red',
                 }}
               ></a>

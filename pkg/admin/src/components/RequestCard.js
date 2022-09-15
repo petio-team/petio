@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
+import { API_URL } from "../data/http";
 
 class RequestCard extends React.Component {
   render() {
@@ -39,11 +40,10 @@ class RequestCard extends React.Component {
         <div className="card--inner">
           <a
             className="full-link"
-            href={`${window.location.pathname.replace('/admin/', '')}/#/${
-              this.props.user.requests[request.id].type === 'movie'
+            href={`${window.location.pathname.replace('/admin/', '')}/#/${this.props.user.requests[request.id].type === 'movie'
                 ? 'movie'
                 : 'series'
-            }/${request.id}`}
+              }/${request.id}`}
           ></a>
           <div className="request-count">
             {Object.keys(this.props.user.requests[request.id].users).length}
@@ -60,13 +60,7 @@ class RequestCard extends React.Component {
                   >
                     <div className="user-thumb">
                       <img
-                        src={
-                          process.env.NODE_ENV === 'development'
-                            ? `http://localhost:7778/user/thumb/${user_id}`
-                            : `${window.location.pathname
-                                .replace('/admin/', '')
-                                .replace(/\/$/, '')}/api/user/thumb/${user_id}`
-                        }
+                        src={`${API_URL}/user/thumb/${user_id}`}
                       />
                     </div>
                   </div>
