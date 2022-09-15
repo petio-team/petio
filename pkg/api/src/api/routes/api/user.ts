@@ -2,6 +2,7 @@ import multer from '@koa/multer';
 import Router from '@koa/router';
 import axios from 'axios';
 import bcrypt from 'bcryptjs';
+import Bluebird from 'bluebird';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 import send from 'koa-send';
@@ -142,7 +143,7 @@ const createCustomUser = async (ctx: Context) => {
 
 const editUser = async (ctx: Context) => {
   const body = ctx.request.body;
-  let user = body.user;
+  const user = body.user;
 
   if (!user) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
@@ -152,40 +153,41 @@ const editUser = async (ctx: Context) => {
   }
 
   try {
-    let userObj: any = {
-      email: user.email,
-      role: user.role,
-      profile: user.profile,
-      disabled: user.disabled,
-    };
+    const u = await UserModel.findOne({ _id: user.id }).exec();
+    if (!u) {
+      throw new Error(`failed to find user with id: ${user.id}`);
+    }
+
+    if (user.clearPassword && u.role !== UserRole.Admin) {
+      u.password = undefined;
+    }
 
     if (user.password) {
-      userObj.password = bcrypt.hashSync(user.password, 10);
+      u.password = bcrypt.hashSync(user.password, 10);
     }
 
-    if (user.clearPassword) {
-      userObj.password = null;
+    if (user.profile) {
+      u.profileId = user.profile;
+    } else {
+      u.profileId = undefined;
     }
 
-    if (user.role === UserRole.Admin && !user.password) {
-      userObj.password =
-        config.get('admin.password').substring(0, 3) === '$2a'
-          ? config.get('admin.password')
-          : bcrypt.hashSync(config.get('admin.password'), 10);
+    if (user.email) {
+      u.email = user.email;
     }
 
-    await UserModel.findOneAndUpdate(
-      { _id: user.id },
-      {
-        $set: {
-          email: userObj.email,
-          role: userObj.role,
-          profileId: userObj.profile,
-          disabled: userObj.disabled,
-        },
-      },
-      { new: true, useFindAndModify: false },
-    ).exec();
+    if (user.role) {
+      u.role = user.role;
+    }
+
+    if (user.disabled) {
+      u.disabled = user.disabled;
+    }
+
+    const results = await u.save();
+    if (!results) {
+      throw new Error(`failed to save user with id: ${user.id}`);
+    }
 
     ctx.status = StatusCodes.OK;
     ctx.body = {
@@ -203,7 +205,7 @@ const editUser = async (ctx: Context) => {
 
 const editMultipleUsers = async (ctx: Context) => {
   const body = ctx.request.body;
-  let users = body.users;
+  let users = body.users as [];
   let enabled = body.enabled;
   let profile = body.profile;
 
@@ -217,18 +219,24 @@ const editMultipleUsers = async (ctx: Context) => {
 
   try {
     await Promise.all(
-      users.map(async (user) => {
-        await UserModel.updateMany(
-          {
-            _id: user,
-          },
-          {
-            $set: {
-              profileId: profile,
-              disabled: enabled ? false : true,
-            },
-          },
-        ).exec();
+      users.map(async (user: string) => {
+        const u = await UserModel.findOne({ _id: user }).exec();
+        if (!u) {
+          throw new Error(`failed to find user with id: ${user}`);
+        }
+
+        if (profile) {
+          u.profileId = profile;
+        } else {
+          u.profileId = undefined;
+        }
+
+        u.disabled = enabled ? false : true;
+
+        const results = u.save();
+        if (!results) {
+          throw new Error(`failed to save user with id: ${user}`);
+        }
       }),
     );
 
@@ -236,7 +244,8 @@ const editMultipleUsers = async (ctx: Context) => {
     ctx.body = {
       message: 'Users saved',
     };
-  } catch {
+  } catch (err) {
+    logger.error(err);
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = {
       error: 'Error editing user',

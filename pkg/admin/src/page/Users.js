@@ -235,7 +235,7 @@ class Users extends React.Component {
       activeUser: user,
       eu_email: user.email,
       eu_role: user.role ? user.role : 'user',
-      eu_profile: user.profile ? user.profile : '',
+      eu_profile: user.profileId ? user.profileId : '',
       eu_password: user.password === 'removed' ? '*********' : '',
       eu_enabled: user.disabled ? false : true,
       thumb_path:
