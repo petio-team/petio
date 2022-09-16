@@ -57,10 +57,6 @@ const attemptAuth = async (ctx: Context) => {
         label: 'routes.login',
       });
       logger.error(e);
-
-      ctx.status = StatusCodes.UNAUTHORIZED;
-      ctx.body = {};
-      return;
     }
 
   logger.verbose(`LOGIN: Request User: ${username}`, {
