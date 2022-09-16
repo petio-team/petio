@@ -2,14 +2,12 @@ import multer from '@koa/multer';
 import Router from '@koa/router';
 import axios from 'axios';
 import bcrypt from 'bcryptjs';
-import Bluebird from 'bluebird';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 import send from 'koa-send';
 import path from 'path';
 
 import env from '@/config/env';
-import { WriteConfig, config } from '@/config/index';
 import logger from '@/loaders/logger';
 import Profile from '@/models/profile';
 import { UserModel, UserRole } from '@/models/user';

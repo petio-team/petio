@@ -14,7 +14,7 @@ export const UserSchema = z.object({
   title: z.string().min(1),
   username: z.string().min(1),
   password: z.string().optional(),
-  email: z.string().email().min(1),
+  email: z.string().email().optional(),
   thumbnail: z.string().min(1),
   // altId is now used to tell if an account is custom or not
   altId: z.string().min(1).optional(),
