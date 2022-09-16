@@ -128,6 +128,7 @@ export const GetUserByEmail = async (email: string): Promise<User> => {
     throw new Error('failed to parse and validate data: ' + parsed.error);
   }
 
+  parsed.data.id = data.id;
   return parsed.data;
 };
 
@@ -145,6 +146,7 @@ export const GetUserByPlexID = async (id: string): Promise<User> => {
     throw new Error('failed to parse and validate data: ' + parsed.error);
   }
 
+  parsed.data.id = data.id;
   delete parsed.data.password;
   return parsed.data;
 };
@@ -174,6 +176,5 @@ export const CreateOrUpdateUser = async (user: User): Promise<User> => {
   }
 
   schema.data.id = data.upsertedId;
-
   return schema.data;
 };

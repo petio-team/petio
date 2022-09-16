@@ -117,7 +117,6 @@ const attemptAuth = async (ctx: Context) => {
 
 const attemptPlexAuth = async (ctx: Context) => {
   const request_ip = ctx.request.ip;
-
   const token = ctx.request.body.token;
   try {
     let userId = await plexOauth(token);
@@ -147,7 +146,10 @@ const attemptPlexAuth = async (ctx: Context) => {
 };
 
 function success(ctx, user, isAdmin = false) {
-  const token = jwt.sign({ ...user, admin: isAdmin }, config.get('plex.token'));
+  const token = jwt.sign(
+    { id: user.id, admin: isAdmin },
+    config.get('plex.token'),
+  );
 
   ctx.cookies.set('petio_jwt', token, {
     httpOnly: false,
