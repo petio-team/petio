@@ -398,13 +398,14 @@ const getSonarrConfig = async (ctx: Context) => {
         port = parseInt(url.port);
       }
 
-      const [paths, profiles, languages, availabilities] = await Promise.all([
-        withPaths ? api.GetRootPaths() : undefined,
-        withProfiles ? api.GetQualityProfiles() : undefined,
-        withLanguages ? api.GetLanguages() : undefined,
-        withAvailabilities ? api.GetSeriesTypes() : undefined,
-        withTags ? api.GetTags() : undefined,
-      ]);
+      const [paths, profiles, languages, availabilities, tags] =
+        await Promise.all([
+          withPaths ? api.GetRootPaths() : undefined,
+          withProfiles ? api.GetQualityProfiles() : undefined,
+          withLanguages ? api.GetLanguages() : undefined,
+          withAvailabilities ? api.GetSeriesTypes() : undefined,
+          withTags ? api.GetTags() : undefined,
+        ]);
 
       return {
         id: instance.id,
@@ -435,6 +436,7 @@ const getSonarrConfig = async (ctx: Context) => {
         profiles,
         languages,
         availabilities,
+        tags,
       };
     });
 
