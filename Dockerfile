@@ -1,3 +1,18 @@
+FROM node:16-alpine3.16 as builder
+
+# Work Directory
+WORKDIR /build
+
+# Add files
+COPY . .
+
+# Run yarn to fetch dependencies
+RUN yarn workspaces focus --all && \
+    yarn workspace frontend run build && \
+    yarn workspace admin run build && \
+    yarn workspace api run build:prod && \
+    chmod -R u=rwX,go=rX /build/pkg
+
 FROM alpine:3.16.0
 
 # Set enviornment variables for the app
@@ -23,11 +38,10 @@ RUN groupadd -g 1000 petio && \
 RUN mkdir -p /app && chown petio:petio /app
 
 # Copy all the build files from both frontend and backend
-COPY --chown=petio:petio --chmod=0755 ./pkg/frontend/build /app/views/frontend
-COPY --chown=petio:petio --chmod=0755 ./pkg/admin/build /app/views/admin
-COPY --chown=petio:petio --chmod=0755 ./pkg/api/dist/index.js /app/index.js
-#COPY --chown=petio:petio --chmod=0755 ./pkg/api/package.json /app/package.json
-COPY ./docker /
+COPY --from=builder --chown=petio:petio --chmod=0755 /build/pkg/frontend/build /app/views/frontend
+COPY --from=builder --chown=petio:petio --chmod=0755 /build/pkg/admin/build /app/views/admin
+COPY --from=builder --chown=petio:petio --chmod=0755 /build/pkg/api/dist/index.js /app/index.js
+COPY ./scripts/docker /
 
 # Give our init script permission to be executed
 RUN chmod +x /init.sh
