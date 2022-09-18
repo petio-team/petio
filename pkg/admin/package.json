@@ -6,13 +6,13 @@
   "dependencies": {
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^12.1.5",
-    "@testing-library/user-event": "^12.8.3",
+    "@testing-library/user-event": "^14.4.3",
     "nanoid": "^4.0.0",
     "react": "^17.0.2",
     "react-charts": "^2.0.0-beta.7",
     "react-dom": "^17.0.2",
     "react-lazy-load-image-component": "^1.5.1",
-    "react-redux": "^7.2.4",
+    "react-redux": "^8.0.2",
     "react-router": "^5.1.2",
     "react-router-dom": "^5.2.0",
     "react-scripts": "5.0.1",
@@ -20,8 +20,8 @@
     "redux": "^4.1.0",
     "redux-devtools-extension": "^2.13.9",
     "redux-thunk": "^2.3.0",
-    "sass": "1.34.1",
-    "uuid": "^8.3.2",
+    "sass": "1.54.9",
+    "uuid": "^9.0.0",
     "web-vitals": "^2.0.1"
   },
   "scripts": {
