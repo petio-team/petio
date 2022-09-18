@@ -24,6 +24,7 @@ jobs:
             type=sha,format=long
             type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'master') }}
             type=raw,value=nightly,enable=${{ github.ref == format('refs/heads/{0}', 'dev') }}
+            type=raw,value=nightly,enable=${{ github.ref == format('refs/heads/{0}', 'new-ui') }}
             type=raw,value=preview,enable=${{ github.ref == format('refs/heads/{0}', 'preview') }}
 
       - name: Set up QEMU
