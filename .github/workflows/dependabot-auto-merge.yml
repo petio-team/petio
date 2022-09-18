@@ -3,7 +3,7 @@ name: Dependabot Pull Request Approve and Merge
 on: pull_request_target
 
 jobs:
-  bot:
+  dependabot:
     if: ${{ github.actor == 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     steps:
