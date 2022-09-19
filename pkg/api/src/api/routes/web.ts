@@ -1,9 +1,9 @@
 import fs from 'fs/promises';
+import path from 'path';
 import Koa from 'koa';
 import addTrailingSlashes from 'koa-add-trailing-slashes';
 import mount from 'koa-mount';
 import serve from 'koa-static';
-import path from 'path';
 
 import env from '@/config/env';
 

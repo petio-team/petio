@@ -26,7 +26,7 @@ const getFilters = async (ctx: Context) => {
 };
 
 const updateFilter = async (ctx: Context) => {
-  const body = ctx.request.body;
+  const {body} = ctx.request;
 
   const movie_filter = body.movie;
   const tv_filter = body.tv;
@@ -46,7 +46,7 @@ const updateFilter = async (ctx: Context) => {
       );
       logger.verbose('FILTER: Movie Filter updated');
     } else {
-      let newMovie = new Filter({
+      const newMovie = new Filter({
         id: 'movie_filters',
         data: movie_filter,
       });
@@ -65,7 +65,7 @@ const updateFilter = async (ctx: Context) => {
       );
       logger.verbose('FILTER: TV Filter updated');
     } else {
-      let newTv = new Filter({
+      const newTv = new Filter({
         id: 'tv_filters',
         data: tv_filter,
       });

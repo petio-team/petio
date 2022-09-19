@@ -1,3 +1,4 @@
+import { ArrVersion, parseVersion } from './version';
 import { RadarrAPIClient } from '@/infra/arr/radarr/index';
 import { MinimumAvailability } from '@/infra/arr/radarr/minimumAvailability';
 import { Movie } from '@/infra/arr/radarr/movie';
@@ -5,7 +6,6 @@ import { Queue } from '@/infra/arr/radarr/queue';
 import { Tag } from '@/infra/arr/radarr/tag';
 import { DownloaderType, GetDownloaderById } from '@/models/downloaders';
 
-import { ArrVersion, parseVersion } from './version';
 
 export type RootPath = {
   id: number;
@@ -24,6 +24,7 @@ export type LanguageProfile = {
 
 export default class RadarrAPI {
   private client: ReturnType<typeof RadarrAPIClient>;
+
   private version = new ArrVersion(4, 0, 0, 0);
 
   constructor(url: URL, token: string, version?: string) {
@@ -54,23 +55,17 @@ export default class RadarrAPI {
 
   public async GetRootPaths(): Promise<RootPath[]> {
     const paths = await this.client.get('/api/v3/rootfolder');
-    return paths.map((r) => {
-      return { id: r.id, path: r.path };
-    });
+    return paths.map((r) => ({ id: r.id, path: r.path }));
   }
 
   public async GetQualityProfiles(): Promise<QualityProfile[]> {
     const profiles = await this.client.get('/api/v3/qualityprofile');
-    return profiles.map((r) => {
-      return { id: r.id, name: r.name };
-    });
+    return profiles.map((r) => ({ id: r.id, name: r.name }));
   }
 
   public async GetLanguages(): Promise<LanguageProfile[]> {
     const language = await this.client.get('/api/v3/language');
-    return language.map((r) => {
-      return { id: r.id, name: r.name };
-    });
+    return language.map((r) => ({ id: r.id, name: r.name }));
   }
 
   public async GetTags(): Promise<Tag> {
@@ -113,7 +108,7 @@ export default class RadarrAPI {
   public async LookupMovie(id: number): Promise<Movie> {
     return this.client.get('/api/v3/movie/lookup', {
       queries: {
-        term: 'tmdb:' + id,
+        term: `tmdb:${  id}`,
       },
     });
   }

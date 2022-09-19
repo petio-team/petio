@@ -1,8 +1,8 @@
+import { map } from 'bluebird';
 import { inject, injectable } from "tsyringe";
 import { Logger } from "winston";
 import { INotify, NotifyEvent, NotifyPayload } from "./notify";
 import { config } from '@/config/index';
-import { map } from 'bluebird';
 
 @injectable()
 export class NotificationManager {

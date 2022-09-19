@@ -1,5 +1,5 @@
-import Axios, { AxiosInstance } from "axios";
 import path from "path";
+import Axios, { AxiosInstance } from "axios";
 import { PARAMS } from "./requests/request";
 
 export default class TelegramAPI {
@@ -11,7 +11,7 @@ export default class TelegramAPI {
   /**
    * Telegram API URL
    */
-  private url: string = "https://api.telegram.org";
+  private url = "https://api.telegram.org";
 
   /**
    * Telegram API constructor

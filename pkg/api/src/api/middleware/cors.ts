@@ -21,9 +21,9 @@ export const cors = () => {
         whitelist.indexOf(ctx.request.header.origin) !== -1
       ) {
         return ctx.request.header.origin;
-      } else {
+      } 
         return 'http://localhost:7777';
-      }
+      
     },
     credentials: true,
   };

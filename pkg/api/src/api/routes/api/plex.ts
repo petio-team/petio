@@ -20,8 +20,8 @@ export default (app: Router) => {
 };
 
 const lookupByIdAndType = async (ctx: Context) => {
-  let type = ctx.params.type;
-  let id = ctx.params.id;
+  const {type} = ctx.params;
+  const {id} = ctx.params;
   if (!type || !id || type === 'undefined' || type === 'undefined') {
     ctx.status = StatusCodes.BAD_REQUEST;
     ctx.body = { error: 'invalid fields provided' };
@@ -44,8 +44,8 @@ const testPlexConnection = async (ctx: Context) => {
     await axios.get(
       `https://plex.tv/pms/resources?X-Plex-Token=${config.get('plex.token')}`,
     );
-    let connection = await axios.get(url);
-    let data = connection.data.MediaContainer;
+    const connection = await axios.get(url);
+    const data = connection.data.MediaContainer;
     if (
       data.myPlexUsername === admin.username ||
       data.myPlexUsername === admin.email
@@ -57,14 +57,14 @@ const testPlexConnection = async (ctx: Context) => {
         error: false,
       };
       return;
-    } else {
+    } 
       ctx.status = StatusCodes.OK;
       ctx.body = {
         connection: false,
         error: 'You are not the owner of this server',
       };
       return;
-    }
+    
   } catch (err) {
     logger.log({ level: 'error', message: err });
 

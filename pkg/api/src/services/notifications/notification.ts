@@ -34,6 +34,7 @@ export const getNotificationProvider = (
 
 export class BaseNotification<T extends INotification> {
   protected config: T;
+
   public logger: Logger;
 
   constructor(config: T) {

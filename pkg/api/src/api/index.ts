@@ -3,6 +3,8 @@ import koaBody from 'koa-body';
 import compress from 'koa-compress';
 import mount from 'koa-mount';
 
+import { logging } from './middleware/logging';
+import session from './middleware/session';
 import { cors } from '@/api/middleware/cors';
 import { errorHandler } from '@/api/middleware/error_handling';
 import api from '@/api/routes/api';
@@ -12,8 +14,6 @@ import logger from '@/loaders/logger';
 import { listen } from '@/utils/http';
 import { removeSlashes } from '@/utils/urls';
 
-import { logging } from './middleware/logging';
-import session from './middleware/session';
 
 export default () => {
   // create new koa instance
@@ -46,7 +46,7 @@ export default () => {
   app.use(koaBody());
 
   // get correctly formatted subpath
-  const subpath = '/' + removeSlashes(config.get('petio.subpath'));
+  const subpath = `/${  removeSlashes(config.get('petio.subpath'))}`;
 
   // session middleware
   app.use(session(app));

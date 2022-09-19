@@ -4,24 +4,24 @@ import logger from '@/loaders/logger';
 import MakePlexURL from '@/services/plex/util';
 
 function timeDifference(previous) {
-  let now = new Date();
-  let current = Math.round(now.getTime() / 1000);
+  const now = new Date();
+  const current = Math.round(now.getTime() / 1000);
   previous = new Date(previous);
-  var msPerMinute = 60;
-  var msPerHour = msPerMinute * 60;
+  const msPerMinute = 60;
+  const msPerHour = msPerMinute * 60;
 
-  var elapsed = current - previous;
+  const elapsed = current - previous;
 
   if (elapsed < msPerMinute) {
-    return Math.round(elapsed) + 's';
-  } else if (elapsed < msPerHour) {
-    let minutes = Math.floor(elapsed / msPerMinute);
-    let seconds = elapsed - minutes * 60;
+    return `${Math.round(elapsed)  }s`;
+  } if (elapsed < msPerHour) {
+    const minutes = Math.floor(elapsed / msPerMinute);
+    const seconds = elapsed - minutes * 60;
     if (minutes === 2 && seconds > 1) return false;
     return `${minutes}m${seconds}s`;
-  } else {
+  } 
     return current;
-  }
+  
 }
 
 export default async () => {
@@ -30,22 +30,22 @@ export default async () => {
   }).toString();
 
   try {
-    let res = await axios.get(url);
-    let data: any = {};
-    let bWidth: any = [];
+    const res = await axios.get(url);
+    const data: any = {};
+    const bWidth: any = [];
     res.data.MediaContainer.StatisticsBandwidth.forEach((el) => {
-      let type = el['lan'] ? 'Local' : 'Remote';
-      let timestamp = el['at'];
+      const type = el.lan ? 'Local' : 'Remote';
+      const timestamp = el.at;
       if (data[timestamp]) {
-        data[timestamp][type] += el['bytes'] * 8;
+        data[timestamp][type] += el.bytes * 8;
       } else {
-        let time = timeDifference(timestamp);
+        const time = timeDifference(timestamp);
         if (!time) return;
         data[timestamp] = {};
         data[timestamp].name = time;
         data[timestamp].Local = 0;
         data[timestamp].Remote = 0;
-        data[timestamp][type] = el['bytes'] * 8;
+        data[timestamp][type] = el.bytes * 8;
       }
     });
     Object.keys(data)

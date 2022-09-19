@@ -1,5 +1,6 @@
-import { PlexAPI } from '@/infra/plex/plex';
 import { injectable } from "tsyringe";
+import { PlexAPI } from '@/infra/plex/plex';
+
 @injectable()
 export class Plex {
   private plexapi: ReturnType<typeof PlexAPI>;

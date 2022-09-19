@@ -12,6 +12,7 @@ import Request from '@/models/request';
 
 export default class Radarr {
   instance: IDownloader;
+
   client: RadarrAPI;
 
   constructor(instance: IDownloader) {
@@ -30,27 +31,27 @@ export default class Radarr {
       return;
     }
 
-    let queue = {};
+    const queue = {};
     queue[this.instance.id] = await this.client.GetQueue();
-    let totalRecords = queue[this.instance.id].totalRecords;
-    let pageSize = queue[this.instance.id].pageSize;
-    let pages = Math.ceil(totalRecords / pageSize);
+    const {totalRecords} = queue[this.instance.id];
+    const {pageSize} = queue[this.instance.id];
+    const pages = Math.ceil(totalRecords / pageSize);
     for (let p = 2; p <= pages; p++) {
-      let queuePage = await this.client.GetQueue(p);
+      const queuePage = await this.client.GetQueue(p);
       queue[this.instance.id].records = [
         ...queue[this.instance.id].records,
         ...queuePage.records,
       ];
     }
-    queue[this.instance.id]['serverName'] = this.instance.name;
+    queue[this.instance.id].serverName = this.instance.name;
     return queue;
   }
 
   async add(
     movieData: Movie,
-    path: string = '',
-    profile: number = -1,
-    tag: string = '',
+    path = '',
+    profile = -1,
+    tag = '',
   ) {
     movieData.qualityProfileId =
       profile !== -1 ? profile : this.instance.profile.id;
@@ -80,8 +81,8 @@ export default class Radarr {
     }
   }
 
-  async processJobs(jobQ, allInstances: boolean = false) {
-    for (let job of jobQ) {
+  async processJobs(jobQ, allInstances = false) {
+    for (const job of jobQ) {
       // Target server
       if (allInstances) {
         try {

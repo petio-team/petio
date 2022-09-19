@@ -1,6 +1,6 @@
+import { randomUUID as uuidv4 } from 'crypto';
 import { modelOptions, prop } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
-import { randomUUID as uuidv4 } from 'crypto';
 
 @modelOptions({ schemaOptions: { _id: false, versionKey: false } })
 export abstract class BaseSchema extends TimeStamps {

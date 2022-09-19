@@ -96,13 +96,13 @@ const findParseAndMergeConfigs = async (): Promise<boolean> => {
   let isModified = false;
 
   for (const config of configFiles) {
-    const file = path.join(env.paths.data, config.file + '.json');
+    const file = path.join(env.paths.data, `${config.file  }.json`);
     const exists = await fileExists(file);
     if (exists) {
       const content = await fs.readFile(file);
       const parsed = await config.schema.safeParseAsync(content);
       if (!parsed.success) {
-        logger.error("failed to parse config '" + config.file + '.json');
+        logger.error(`failed to parse config '${  config.file  }.json`);
         continue;
       }
 

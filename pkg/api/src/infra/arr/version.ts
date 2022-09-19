@@ -27,19 +27,19 @@ export class ArrVersion {
     }
 
     if (this.major !== v.major) {
-      return this.major > v.major ? true : false;
+      return this.major > v.major;
     }
 
     if (this.minor !== v.minor) {
-      return this.minor > v.minor ? true : false;
+      return this.minor > v.minor;
     }
 
     if (this.patch !== v.patch) {
-      return this.patch > v.patch ? true : false;
+      return this.patch > v.patch;
     }
 
     if (this.build !== v.build) {
-      return this.build > v.build ? true : false;
+      return this.build > v.build;
     }
 
     return true;

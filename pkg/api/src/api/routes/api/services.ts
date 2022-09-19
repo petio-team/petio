@@ -361,7 +361,7 @@ const testSonarrConnectionById = async (ctx: Context) => {
     }
 
     const test = await instance.TestConnection();
-    let data = {
+    const data = {
       connection: test,
     };
 
@@ -410,9 +410,9 @@ const getSonarrConfig = async (ctx: Context) => {
       return {
         id: instance.id,
         name: instance.name,
-        protocol: protocol,
+        protocol,
         host: url.hostname,
-        port: port,
+        port,
         subpath: url.pathname,
         token: instance.token,
         profile: {
@@ -450,7 +450,7 @@ const getSonarrConfig = async (ctx: Context) => {
 };
 
 const updateSonarrConfig = async (ctx: Context) => {
-  let data = ctx.request.body as ArrInput;
+  const data = ctx.request.body as ArrInput;
 
   try {
     const results = await bluebird.map(data, async (instance) => {
@@ -459,13 +459,13 @@ const updateSonarrConfig = async (ctx: Context) => {
       }
 
       const url = new URL(
-        instance.protocol +
-          '://' +
-          instance.host +
-          ':' +
-          instance.port +
-          '/' +
-          instance.subpath,
+        `${instance.protocol 
+          }://${ 
+          instance.host 
+          }:${ 
+          instance.port 
+          }/${ 
+          instance.subpath}`,
       );
 
       const api = new SonarrAPI(url, instance.token);
@@ -527,7 +527,7 @@ const updateSonarrConfig = async (ctx: Context) => {
       StatusInternalServerError(ctx, error.message);
     }
 
-    return;
+    
   }
 };
 
@@ -536,7 +536,7 @@ const deleteSonarrById = async (ctx: Context) => {
     const deleted = await DeleteDownloaderById(ctx.params.id);
     if (!deleted) {
       ctx.status = StatusCodes.NOT_FOUND;
-      ctx.body = 'failed to delete instance with the id: ' + ctx.params.id;
+      ctx.body = `failed to delete instance with the id: ${  ctx.params.id}`;
       return;
     }
 
@@ -708,7 +708,7 @@ const testRadarrConnectionById = async (ctx: Context) => {
     }
 
     const test = await instance.TestConnection();
-    let data = {
+    const data = {
       connection: test,
     };
 
@@ -756,9 +756,9 @@ const getRadarrConfig = async (ctx: Context) => {
       return {
         id: instance.id,
         name: instance.name,
-        protocol: protocol,
+        protocol,
         host: url.hostname,
-        port: port,
+        port,
         subpath: url.pathname === '' ? '/' : url.pathname,
         token: instance.token,
         profile: {
@@ -795,7 +795,7 @@ const getRadarrConfig = async (ctx: Context) => {
 };
 
 const updateRadarrConfig = async (ctx: Context) => {
-  let data = ctx.request.body as ArrInput;
+  const data = ctx.request.body as ArrInput;
 
   try {
     const results = await bluebird.map(data, async (instance) => {
@@ -804,13 +804,13 @@ const updateRadarrConfig = async (ctx: Context) => {
       }
 
       const url = new URL(
-        instance.protocol +
-          '://' +
-          instance.host +
-          ':' +
-          instance.port +
-          '/' +
-          instance.subpath,
+        `${instance.protocol 
+          }://${ 
+          instance.host 
+          }:${ 
+          instance.port 
+          }/${ 
+          instance.subpath}`,
       );
 
       const api = new RadarrAPI(url, instance.token);
@@ -872,7 +872,7 @@ const updateRadarrConfig = async (ctx: Context) => {
       StatusInternalServerError(ctx, error.message);
     }
 
-    return;
+    
   }
 };
 
@@ -881,7 +881,7 @@ const deleteRadarrById = async (ctx: Context) => {
     const deleted = await DeleteDownloaderById(ctx.params.id);
     if (!deleted) {
       ctx.status = StatusCodes.NOT_FOUND;
-      ctx.body = 'failed to delete instance with the id: ' + ctx.params.id;
+      ctx.body = `failed to delete instance with the id: ${  ctx.params.id}`;
       return;
     }
 

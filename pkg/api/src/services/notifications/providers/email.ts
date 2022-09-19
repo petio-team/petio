@@ -64,9 +64,9 @@ export const authConfigToEmailSettings = (
   settings.port = url.arguments.value ? parseInt(url.arguments.value) : 25;
   settings.username = url.arguments.identifier || '';
   settings.password = url.arguments.secret || '';
-  settings.from = url.options['from'] || 'Petio';
+  settings.from = url.options.from || 'Petio';
 
-  if (url.options['secure']) {
+  if (url.options.secure) {
     settings.secure = true;
   }
 

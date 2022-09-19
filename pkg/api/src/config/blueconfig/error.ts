@@ -1,7 +1,7 @@
 import { stringify } from './lib/object-path';
 import * as utils from './performer/utils/utils';
 
-const unroot = utils.unroot;
+const {unroot} = utils;
 
 /**
  * @namespace ZCUSTOMERROR
@@ -106,7 +106,9 @@ class LISTOFERRORS extends BLUECONFIG_ERROR {
  */
 class SCHEMA_INVALID extends BLUECONFIG_ERROR {
   public fullname: string;
+
   public type: string;
+
   public doc: string;
 
   /**
@@ -146,6 +148,7 @@ class SCHEMA_INVALID extends BLUECONFIG_ERROR {
  */
 class CUSTOMISE_FAILED extends BLUECONFIG_ERROR {
   public type: string;
+
   public doc: string;
 
   /**
@@ -171,6 +174,7 @@ class CUSTOMISE_FAILED extends BLUECONFIG_ERROR {
  */
 class INCORRECT_USAGE extends BLUECONFIG_ERROR {
   public type: string;
+
   public doc: string;
 
   /**
@@ -196,11 +200,17 @@ class INCORRECT_USAGE extends BLUECONFIG_ERROR {
  */
 class PATH_INVALID extends BLUECONFIG_ERROR {
   public fullname: string;
+
   public path: Array<string>;
+
   public value: any;
+
   public why: any;
+
   public type: string;
+
   public doc: string;
+
   public name: string;
 
   /**
@@ -216,11 +226,11 @@ class PATH_INVALID extends BLUECONFIG_ERROR {
       const type = typeof value;
       if (type !== 'object') {
         return `"${unroot(stringify(path))}" is a ${type}`;
-      } else if (value === null) {
+      } if (value === null) {
         return `"${unroot(stringify(path))}" is null`;
-      } else {
+      } 
         return `"${fullpath}" is not defined`;
-      }
+      
     })();
 
     super(`${fullname}: cannot find "${fullpath}" property because ${why}.`);
@@ -288,7 +298,9 @@ class PATH_INVALID extends BLUECONFIG_ERROR {
  */
 class VALUE_INVALID extends BLUECONFIG_ERROR {
   private type: string;
+
   private doc: string;
+
   /**
    * @param {String}   message    Error message
    */
@@ -312,14 +324,16 @@ class VALUE_INVALID extends BLUECONFIG_ERROR {
  */
 class VALIDATE_FAILED extends BLUECONFIG_ERROR {
   public why: string;
+
   public type: string;
+
   public doc: string;
 
   /**
    * @param {String}    explains    List of explained error why validate failed
    */
   constructor(explains) {
-    super('Validate failed because wrong value(s):\n' + explains);
+    super(`Validate failed because wrong value(s):\n${  explains}`);
 
     /**
      * List of explained error why validate failed (defined with the first argument of the constructor)
@@ -347,10 +361,15 @@ class VALIDATE_FAILED extends BLUECONFIG_ERROR {
  */
 class FORMAT_INVALID extends BLUECONFIG_ERROR {
   public readonly fullname: string;
+
   public getter: Object;
+
   public value: string;
+
   public type: string;
+
   public doc: string;
+
   public message: string;
 
   /**

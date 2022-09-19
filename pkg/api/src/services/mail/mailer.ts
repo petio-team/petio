@@ -5,7 +5,9 @@ import logger from '@/loaders/logger';
 
 export default class Mailer {
   transport: any;
+
   verify: any;
+
   constructor() {
     this.transport = this._transport();
     this.verify = this._check;
@@ -14,7 +16,7 @@ export default class Mailer {
   // Validate mail settings
   async _check() {
     try {
-      let verify = await this.transport.verify();
+      const verify = await this.transport.verify();
       if (!config.get('email.from')) throw 'No From Email set';
       return verify;
     } catch (err) {
@@ -33,7 +35,7 @@ export default class Mailer {
     const transporter = nodemailer.createTransport({
       host: smtpServer,
       port: smtpPort,
-      secure: secure, // true for 465, false for other ports
+      secure, // true for 465, false for other ports
       auth: {
         user: emailUser,
         pass: emailPass,
@@ -55,7 +57,7 @@ export default class Mailer {
   // Validate mail settings
   async test() {
     try {
-      let verify = await this.verify();
+      const verify = await this.verify();
       this.mail(
         'Petio Test Email',
         'This is a test',
@@ -70,12 +72,12 @@ export default class Mailer {
           result: true,
           error: false,
         };
-      } else {
+      } 
         return {
           result: false,
           error: verify,
         };
-      }
+      
     } catch (err) {
       logger.verbose('MAILER: Verification failed', { label: 'mail.mailer' });
       logger.verbose(err, { label: 'mail.mailer' });
@@ -101,8 +103,8 @@ export default class Mailer {
     try {
       // Send mail
       to.forEach((send, i) => {
-        let timeout = i * 2000; //timeout between emails to avoid quota
-        let username = name[i] || '';
+        const timeout = i * 2000; // timeout between emails to avoid quota
+        const username = name[i] || '';
         i++;
         setTimeout(async () => {
           logger.verbose(
@@ -115,9 +117,9 @@ export default class Mailer {
               from: `"Petio" <${config.get('email.from')}>`,
               to: `${username} <${send}>`,
               bcc: config.get('admin.email'),
-              subject: subject,
+              subject,
               html: this.mailHtml(title, text, img, username),
-              text: text,
+              text,
               onError: (e) => {
                 logger.warn(`MAILER: Message failed to send`, {
                   label: 'mail.mailer',

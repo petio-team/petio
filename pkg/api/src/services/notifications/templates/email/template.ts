@@ -3,8 +3,7 @@ import { NotifyEvent, NotifyPayload } from '../../notify';
 export const renderRequestTemplate = (
   event: NotifyEvent,
   payload: NotifyPayload,
-) => {
-  return `
+) => `
   <mjml>
     <mj-head>
       <mj-title>Petio - ${event} - ${payload.title}</mj-title>
@@ -74,4 +73,3 @@ export const renderRequestTemplate = (
       </mj-wrapper>
     </mj-body>
   </mjml>`;
-};

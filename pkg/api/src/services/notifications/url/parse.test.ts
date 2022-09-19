@@ -4,8 +4,8 @@ import {
   ErrInvalidSource,
   ErrMissingServiceIdentifier,
 } from "./errors";
-import { AuthConfig } from "./url";
 import { ParseURL } from "./parse";
+import { AuthConfig } from "./url";
 
 describe('parse notification url scheme to object', () => {
   it('should return a valid source and value field', () => {

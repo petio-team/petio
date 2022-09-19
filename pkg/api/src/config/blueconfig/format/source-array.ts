@@ -3,7 +3,7 @@ import { LISTOFERRORS } from '../error';
 
 export default {
   name: 'source-array',
-  validate: function (children, schema, fullname) {
+  validate (children, schema, fullname) {
     const errors = Array<any>();
 
     if (!Array.isArray(children)) {
@@ -15,9 +15,9 @@ export default {
         const conf = Blueconfig(schema.children)
           .merge(children[keyname])
           .validate();
-        this.set(fullname + '.' + keyname, conf.getProperties());
+        this.set(`${fullname  }.${  keyname}`, conf.getProperties());
       } catch (err) {
-        err.parent = fullname + '.' + keyname;
+        err.parent = `${fullname  }.${  keyname}`;
         errors.push(err);
       }
     });

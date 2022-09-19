@@ -65,8 +65,8 @@ const attemptAuth = async (ctx: Context) => {
 
   try {
     // Find user in db
-    let dbUser = await UserModel.findOne({
-      $or: [{ username: username }, { email: username }],
+    const dbUser = await UserModel.findOne({
+      $or: [{ username }, { email: username }],
     }).exec();
 
     if (!dbUser) {
@@ -88,7 +88,7 @@ const attemptAuth = async (ctx: Context) => {
       return;
     }
 
-    let isAdmin = dbUser.role === UserRole.Admin;
+    const isAdmin = dbUser.role === UserRole.Admin;
 
     if (config.get('auth.type') === 1 || password) {
       if (dbUser.password) {
@@ -117,10 +117,10 @@ const attemptAuth = async (ctx: Context) => {
 
 const attemptPlexAuth = async (ctx: Context) => {
   const request_ip = ctx.request.ip;
-  const token = ctx.request.body.token;
+  const {token} = ctx.request.body;
   try {
-    let userId = await plexOauth(token);
-    let dbUser = await GetUserByPlexID(userId);
+    const userId = await plexOauth(token);
+    const dbUser = await GetUserByPlexID(userId);
 
     if (!dbUser) {
       ctx.status = StatusCodes.UNAUTHORIZED;
@@ -134,7 +134,7 @@ const attemptPlexAuth = async (ctx: Context) => {
       return;
     }
 
-    let isAdmin = dbUser.role === UserRole.Admin;
+    const isAdmin = dbUser.role === UserRole.Admin;
     success(ctx, dbUser, isAdmin);
     saveRequestIp(dbUser, request_ip);
   } catch (err) {
@@ -184,11 +184,11 @@ function plexAuth(username, password) {
           'X-Plex-Version': '1.0',
           'X-Plex-Client-Identifier': config.get('plex.client'),
           Authorization:
-            'Basic ' +
-            Buffer.from(`${username}:${password}`).toString('base64'),
+            `Basic ${ 
+            Buffer.from(`${username}:${password}`).toString('base64')}`,
         },
       },
-      function (err, data) {
+      (err, data) => {
         if (err) {
           logger.warn(`LOGIN: Plex auth failed for ${username}`, {
             label: 'routes.login',
@@ -217,12 +217,12 @@ function plexAuth(username, password) {
 }
 
 async function plexOauth(token) {
-  let plex = await axios.get(
+  const plex = await axios.get(
     `https://plex.tv/users/account?X-Plex-Token=${token}`,
   );
   try {
-    let data = JSON.parse(xmlParser.xml2json(plex.data, { compact: false }));
-    let user = data.elements[0].attributes;
+    const data = JSON.parse(xmlParser.xml2json(plex.data, { compact: false }));
+    const user = data.elements[0].attributes;
     return user.id;
   } catch (err) {
     logger.error(err, { label: 'routes.login' });

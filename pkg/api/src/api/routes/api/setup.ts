@@ -30,7 +30,7 @@ export default (app: Router) => {
 const testServer = async (ctx: Context) => {
   const body = ctx.request.body as SetupTestInput;
 
-  let server = body.server;
+  const {server} = body;
   if (!server) {
     logger.log('warn', 'Test Server bad request');
 
@@ -43,13 +43,13 @@ const testServer = async (ctx: Context) => {
     `Testing Server ${server.protocol}://${server.host}:${server.port}?X-Plex-Token=${server.token}`,
   );
   try {
-    let test = await testConnection(
+    const test = await testConnection(
       server.protocol,
       server.host,
       server.port,
       server.token,
     );
-    let status = test !== 200 ? 'failed' : 'connected';
+    const status = test !== 200 ? 'failed' : 'connected';
     logger.log(
       'verbose',
       `Test Server success - ${server.protocol}://${server.host}:${server.port}?X-Plex-Token=${server.token}`,
@@ -57,7 +57,7 @@ const testServer = async (ctx: Context) => {
 
     ctx.status = StatusCodes.OK;
     ctx.body = {
-      status: status,
+      status,
       code: test,
     };
   } catch (err) {
@@ -75,9 +75,9 @@ const testServer = async (ctx: Context) => {
 };
 
 const testMongo = async (ctx: Context) => {
-  const body = ctx.request.body;
+  const {body} = ctx.request;
 
-  let mongo = body.mongo;
+  const {mongo} = body;
   logger.log('verbose', `testing mongo connection: ${mongo}`);
   if (!mongo) {
     logger.log('warn', 'Mongo test bad request');
@@ -105,7 +105,7 @@ const testMongo = async (ctx: Context) => {
     logger.log('verbose', 'Attempting mongo connection');
 
     await mongoose.disconnect();
-    await mongoose.connect(mongo + '/petio');
+    await mongoose.connect(`${mongo  }/petio`);
 
     ctx.status = StatusCodes.OK;
     ctx.body = {
@@ -128,11 +128,11 @@ const testMongo = async (ctx: Context) => {
 const finishSetup = async (ctx: Context) => {
   logger.log('verbose', 'Attempting to create config file');
 
-  const body = ctx.request.body;
+  const {body} = ctx.request;
 
-  let user = body.user;
-  let server = body.server;
-  let dbUrl = body.db;
+  const {user} = body;
+  const {server} = body;
+  const dbUrl = body.db;
   if (!user || !server || !dbUrl) {
     logger.log('warn', 'Config creation missing fields');
 
@@ -141,7 +141,7 @@ const finishSetup = async (ctx: Context) => {
     return;
   }
 
-  config.set('db.url', dbUrl + '/petio');
+  config.set('db.url', `${dbUrl  }/petio`);
   config.set('plex.protocol', server.protocol);
   config.set('plex.host', server.host);
   config.set('plex.port', server.port);

@@ -38,6 +38,7 @@
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": true
     },
+    "eslint.workingDirectories": ["/workspace/pkg/api"],
     "eslint.validate": ["javascript", "typescript"],
     "editor.formatOnSave": true,
     "[javascript]": {

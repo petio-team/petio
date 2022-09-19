@@ -1,11 +1,11 @@
+import * as cvtError from "../../error";
 import { stringify } from '../../lib/object-path';
-import * as cvtError from './../../error';
 import * as utils from './utils';
 
-const unroot = utils.unroot;
+const {unroot} = utils;
 
-const PATH_INVALID = cvtError.PATH_INVALID;
-const VALUE_INVALID = cvtError.VALUE_INVALID;
+const {PATH_INVALID} = cvtError;
+const {VALUE_INVALID} = cvtError;
 
 export default function validator(strictValidation) {
   const node = this._instance;
@@ -33,9 +33,9 @@ export default function validator(strictValidation) {
           // If schema[name] doesn't exist:
           if (strictValidation) {
             const err = new VALUE_INVALID(
-              "configuration param '" +
-                unroot(stringify(fullpath)) +
-                "' not declared in the schema",
+              `configuration param '${ 
+                unroot(stringify(fullpath)) 
+                }' not declared in the schema`,
             );
             errors.undeclared.push(err);
           }

@@ -18,12 +18,8 @@ export const getRequests = async (user = false, all = false) => {
     const radarrs = instances.filter((i) => i.type === DownloaderType.Radarr);
 
     const [sonarrQ, radarrQ] = await Bluebird.all([
-      Bluebird.map(sonarrs, async (i) => {
-        return new Sonarr(i).queue();
-      }),
-      Bluebird.map(radarrs, async (i) => {
-        return new Radarr(i).queue();
-      }),
+      Bluebird.map(sonarrs, async (i) => new Sonarr(i).queue()),
+      Bluebird.map(radarrs, async (i) => new Radarr(i).queue()),
     ]);
 
     data = {};
@@ -32,14 +28,14 @@ export const getRequests = async (user = false, all = false) => {
       Bluebird.map(
         requests,
         async (request: any, _i) => {
-          let children: any = [];
+          const children: any = [];
           let media: any = [];
           if (request.users.includes(user) || all) {
             if (request.type === 'movie' && request.radarrId.length > 0) {
               for (let i = 0; i < Object.keys(request.radarrId).length; i++) {
-                let radarrIds = request.radarrId[i];
-                let rId = parseInt(radarrIds[Object.keys(radarrIds)[0]]);
-                let serverUuid = Object.keys(radarrIds)[0];
+                const radarrIds = request.radarrId[i];
+                const rId = parseInt(radarrIds[Object.keys(radarrIds)[0]]);
+                const serverUuid = Object.keys(radarrIds)[0];
 
                 const instance = instances.find((i) => i.id === serverUuid);
                 if (!instance) {
@@ -68,16 +64,16 @@ export const getRequests = async (user = false, all = false) => {
 
             if (request.type === 'tv' && request.sonarrId.length > 0) {
               for (let i = 0; i < Object.keys(request.sonarrId).length; i++) {
-                let sonarrIds = request.sonarrId[i];
-                let sId = parseInt(sonarrIds[Object.keys(sonarrIds)[0]]);
-                let serverUuid = Object.keys(sonarrIds)[0];
+                const sonarrIds = request.sonarrId[i];
+                const sId = parseInt(sonarrIds[Object.keys(sonarrIds)[0]]);
+                const serverUuid = Object.keys(sonarrIds)[0];
 
                 const instance = instances.find((i) => i.id === serverUuid);
                 if (!instance) {
                   continue;
                 }
 
-                let server = new Sonarr(instance);
+                const server = new Sonarr(instance);
                 children[i] = {};
                 children[i].id = sId;
                 try {
@@ -107,7 +103,7 @@ export const getRequests = async (user = false, all = false) => {
 
             data[request.requestId] = {
               title: request.title,
-              children: children,
+              children,
               requestId: request.requestId,
               type: request.type,
               thumb: request.thumb,
@@ -117,7 +113,7 @@ export const getRequests = async (user = false, all = false) => {
               users: request.users,
               sonarrId: request.sonarrId,
               radarrId: request.radarrId,
-              media: media,
+              media,
               approved: request.approved,
               manualStatus: request.manualStatus,
               process_stage: reqState(request, children),
@@ -193,7 +189,7 @@ function reqState(req, children) {
 
           if (element.info.seasons) {
             let missing = false;
-            for (let season of element.info.seasons) {
+            for (const season of element.info.seasons) {
               if (season.monitored) {
                 if (
                   season.statistics &&
@@ -209,8 +205,8 @@ function reqState(req, children) {
                 message: 'Downloaded',
                 step: 4,
               };
-            } else {
-              let airDate = element.info.firstAired;
+            } 
+              const airDate = element.info.firstAired;
               if (!airDate)
                 return {
                   status: 'blue',
@@ -226,7 +222,7 @@ function reqState(req, children) {
                   message: `${calcDate(diff)}`,
                   step: 3,
                 };
-              } else {
+              } 
                 if (element.info.episodeFileCount > 0) {
                   return {
                     status: 'blue',
@@ -234,8 +230,8 @@ function reqState(req, children) {
                     step: 3,
                   };
                 }
-              }
-            }
+              
+            
           }
         }
 
@@ -255,7 +251,7 @@ function reqState(req, children) {
               }
             }
             if (element.info.digitalRelease) {
-              let digitalDate = new Date(element.info.digitalRelease);
+              const digitalDate = new Date(element.info.digitalRelease);
               if (new Date().getTime() - digitalDate.getTime() < 0) {
                 return {
                   status: 'cinema',
@@ -263,8 +259,7 @@ function reqState(req, children) {
                   step: 3,
                 };
               }
-            } else {
-              if (element.info.inCinemas) {
+            } else if (element.info.inCinemas) {
                 diff = Math.ceil(
                   new Date().getTime() -
                     new Date(element.info.inCinemas).getTime(),
@@ -277,7 +272,6 @@ function reqState(req, children) {
                   };
                 }
               }
-            }
           }
 
           if (element.info.status === 'announced') {
@@ -328,26 +322,26 @@ function reqState(req, children) {
 }
 
 function calcDate(diff) {
-  var day = 1000 * 60 * 60 * 24;
+  const day = 1000 * 60 * 60 * 24;
 
-  var days = Math.ceil(diff / day);
-  var months = Math.floor(days / 31);
-  var years = Math.floor(months / 12);
-  days = days - months * 31;
-  months = months - years * 12;
+  let days = Math.ceil(diff / day);
+  let months = Math.floor(days / 31);
+  const years = Math.floor(months / 12);
+  days -= months * 31;
+  months -= years * 12;
 
-  var message = '~';
-  message += years ? years + 'y ' : '';
-  message += months ? months + 'm ' : '';
-  message += days ? days + 'd' : '';
+  let message = '~';
+  message += years ? `${years  }y ` : '';
+  message += months ? `${months  }m ` : '';
+  message += days ? `${days  }d` : '';
   if (years) message = '> 1y';
 
   return message;
 }
 
 function cinemaWindow(diff) {
-  var day = 1000 * 60 * 60 * 24;
-  var days = Math.ceil(diff / day);
+  const day = 1000 * 60 * 60 * 24;
+  const days = Math.ceil(diff / day);
   if (days >= 62) {
     return false;
   }

@@ -8,7 +8,7 @@ export default async () => {
   }).toString();
 
   try {
-    let res = await axios.get(url);
+    const res = await axios.get(url);
     return res.data;
   } catch (e) {
     // Do nothing

@@ -1,3 +1,4 @@
+import { ArrVersion, parseVersion } from './version';
 import { SonarrAPIClient } from '@/infra/arr/sonarr/index';
 import { LanguageProfile } from '@/infra/arr/sonarr/language_profile';
 import { Queue } from '@/infra/arr/sonarr/queue';
@@ -5,7 +6,6 @@ import { Series, SeriesLookup } from '@/infra/arr/sonarr/series';
 import { Tag } from '@/infra/arr/sonarr/tag';
 import { DownloaderType, GetDownloaderById } from '@/models/downloaders';
 
-import { ArrVersion, parseVersion } from './version';
 
 export type SeriesType = {
   status: string;
@@ -28,6 +28,7 @@ export type SeriesLanguage = {
 
 export default class SonarrAPI {
   private client: ReturnType<typeof SonarrAPIClient>;
+
   private version = new ArrVersion(3, 0, 0, 0);
 
   constructor(url: URL, token: string, version?: string) {
@@ -58,16 +59,12 @@ export default class SonarrAPI {
 
   public async GetRootPaths(): Promise<RootPath[]> {
     const paths = await this.client.get('/api/v3/rootfolder');
-    return paths.map((r) => {
-      return { id: r.id, path: r.path };
-    });
+    return paths.map((r) => ({ id: r.id, path: r.path }));
   }
 
   public async GetQualityProfiles(): Promise<QualityProfile[]> {
     const profiles = await this.client.get('/api/v3/qualityprofile');
-    return profiles.map((r) => {
-      return { id: r.id, name: r.name };
-    });
+    return profiles.map((r) => ({ id: r.id, name: r.name }));
   }
 
   public async GetLanguageProfile(): Promise<LanguageProfile> {
@@ -77,15 +74,11 @@ export default class SonarrAPI {
   public async GetLanguages(): Promise<SeriesLanguage[]> {
     if (this.version.major === 4) {
       const results = await this.client.get('/api/v3/language');
-      return results.map((r) => {
-        return { id: r.id, name: r.name };
-      });
+      return results.map((r) => ({ id: r.id, name: r.name }));
     }
 
     const results = await this.client.get('/api/v3/languageprofile');
-    return results.map((r) => {
-      return { id: r.id, name: r.name };
-    });
+    return results.map((r) => ({ id: r.id, name: r.name }));
   }
 
   public GetSeriesTypes(): SeriesType[] {
@@ -121,7 +114,7 @@ export default class SonarrAPI {
   public async GetSeriesLookupById(id: number): Promise<SeriesLookup> {
     return this.client.get('/api/v3/series/lookup', {
       queries: {
-        term: 'tvdb:' + id,
+        term: `tvdb:${  id}`,
       },
     });
   }

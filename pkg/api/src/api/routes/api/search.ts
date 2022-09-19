@@ -15,7 +15,7 @@ export default (app: Router) => {
 
 const searchByTerm = async (ctx: Context) => {
   try {
-    let data = await search(ctx.params.term.replace(/[^a-zA-Z0-9 ]/g, ''));
+    const data = await search(ctx.params.term.replace(/[^a-zA-Z0-9 ]/g, ''));
 
     ctx.status = StatusCodes.OK;
     ctx.body = data;

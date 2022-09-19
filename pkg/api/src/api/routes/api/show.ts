@@ -28,8 +28,8 @@ const lookupByIdMinified = async (ctx: Context) => {
 const discoverSeriesData = async (ctx: Context) => {
   const body = ctx.request.body as any;
 
-  let page = body.page ? body.page : 1;
-  let params = body.params;
+  const page = body.page ? body.page : 1;
+  const {params} = body;
 
   ctx.status = StatusCodes.OK;
   ctx.body = await discoverSeries(page, params);

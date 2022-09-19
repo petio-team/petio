@@ -1,9 +1,9 @@
 import { randomUUID } from 'crypto';
 
-import { generateKeys } from '@/utils/security';
 
 import blueconfig from './blueconfig';
 import sourceArray from './blueconfig/format/source-array';
+import { generateKeys } from '@/utils/security';
 
 // MAX SECURTIY KEYS
 const MAX_SECURITY_KEYS = 10;
@@ -191,7 +191,7 @@ export const config = blueconfig({
     client: {
       doc: 'The client id',
       format: '*',
-      default: 'petio_' + randomUUID(),
+      default: `petio_${  randomUUID()}`,
       sensitive: true,
     },
   },

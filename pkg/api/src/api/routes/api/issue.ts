@@ -27,10 +27,10 @@ const listAllIssues = async (ctx: Context) => {
 const deleteIssues = async (ctx: Context) => {
   const body = ctx.request.body as any;
   const issue_id = body.id;
-  const message = body.message;
+  const {message} = body;
 
   try {
-    let issue = await Issue.findById(issue_id);
+    const issue = await Issue.findById(issue_id);
     if (!issue) {
       ctx.status = StatusCodes.NOT_FOUND;
       ctx.body = { error: 'error no issue found' };
@@ -88,7 +88,7 @@ const addIssue = async (ctx: Context) => {
 };
 
 async function mailIssue(user_id, media_id, type, title) {
-  let userData = await UserModel.findOne({ id: user_id });
+  const userData = await UserModel.findOne({ id: user_id });
   let media: any = false;
   if (type === 'series') {
     media = await showLookup(media_id, true);
@@ -107,7 +107,7 @@ async function mailIssue(user_id, media_id, type, title) {
     logger.log('warn', 'MAILER: No user email');
     return;
   }
-  let typeF = type === 'series' ? 'TV Show' : 'Movie';
+  const typeF = type === 'series' ? 'TV Show' : 'Movie';
   new Mailer().mail(
     `Issue reported for the ${type} ${title}`,
     `Issue reported for ${typeF}: ${title}`,
@@ -119,7 +119,7 @@ async function mailIssue(user_id, media_id, type, title) {
 }
 
 async function mailIssueResolve(user_id, media_id, type, title, message) {
-  let userData = await UserModel.findOne({ id: user_id });
+  const userData = await UserModel.findOne({ id: user_id });
   let media: any = false;
   if (type === 'series') {
     media = await showLookup(media_id, true);
@@ -138,7 +138,7 @@ async function mailIssueResolve(user_id, media_id, type, title, message) {
     logger.log('warn', 'MAILER: No user email');
     return;
   }
-  let typeF = type === 'series' ? 'TV Show' : 'Movie';
+  const typeF = type === 'series' ? 'TV Show' : 'Movie';
   new Mailer().mail(
     `Issue closed for the ${typeF} ${title}`,
     `Issue closed for ${typeF}: ${title}`,

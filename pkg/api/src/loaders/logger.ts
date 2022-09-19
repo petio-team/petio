@@ -55,14 +55,12 @@ const Logger = winston.createLogger({
       tailable: true,
       format: combine(
         timestamp(),
-        printf((info) => {
-          return `${JSON.stringify({
+        printf((info) => `${JSON.stringify({
             [info.timestamp]: {
               type: info.level,
               log: info.message,
             },
-          })},`;
-        }),
+          })},`),
       ),
     }),
   ],

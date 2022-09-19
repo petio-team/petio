@@ -84,7 +84,7 @@ const UserModelSchema = new Schema<User>(
   {
     timestamps: true,
     toJSON: {
-      transform: function (_doc, ret, _options) {
+      transform (_doc, ret, _options) {
         ret.id = ret._id;
         delete ret.password;
         delete ret._id;
@@ -107,7 +107,7 @@ export const GetAllUsers = async (): Promise<User[]> => {
 
   const parsed = await UserSchema.array().safeParseAsync(results);
   if (!parsed.success) {
-    throw new Error('failed to parse users data: ' + parsed.error);
+    throw new Error(`failed to parse users data: ${  parsed.error}`);
   }
 
   return parsed.data;
@@ -117,7 +117,7 @@ export const GetAllUsers = async (): Promise<User[]> => {
 // Get a user by using an email address
 export const GetUserByEmail = async (email: string): Promise<User> => {
   const data = await UserModel.findOne({
-    email: email,
+    email,
   }).exec();
   if (!data) {
     throw new Error('failed to get user by email');
@@ -125,7 +125,7 @@ export const GetUserByEmail = async (email: string): Promise<User> => {
 
   const parsed = await UserSchema.safeParseAsync(data.toObject());
   if (!parsed.success) {
-    throw new Error('failed to parse and validate data: ' + parsed.error);
+    throw new Error(`failed to parse and validate data: ${  parsed.error}`);
   }
 
   parsed.data.id = data.id;
@@ -143,7 +143,7 @@ export const GetUserByPlexID = async (id: string): Promise<User> => {
 
   const parsed = await UserSchema.safeParseAsync(data.toObject());
   if (!parsed.success) {
-    throw new Error('failed to parse and validate data: ' + parsed.error);
+    throw new Error(`failed to parse and validate data: ${  parsed.error}`);
   }
 
   parsed.data.id = data.id;
@@ -154,7 +154,7 @@ export const GetUserByPlexID = async (id: string): Promise<User> => {
 // TODO: this should be it's own service with a repository ideally
 // Create a new user or update if one already exists
 export const CreateOrUpdateUser = async (user: User): Promise<User> => {
-  let schema = await UserSchema.safeParseAsync(user);
+  const schema = await UserSchema.safeParseAsync(user);
   if (!schema.success) {
     container
       .resolve<Logger>('Logger')

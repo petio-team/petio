@@ -1,10 +1,11 @@
+import { IMediaScanner } from './index';
 import { PlexAPI } from '@/infra/plex/plex';
 import MediaServerDB from '@/models/mediaserver/db';
 
-import { IMediaScanner } from './index';
 
 export class PlexMediaScanner implements IMediaScanner {
   private plexapi: ReturnType<typeof PlexAPI>;
+
   private model: typeof MediaServerDB;
 
   constructor(url: URL, token: string) {

@@ -18,7 +18,7 @@ export function ToURL(scheme: AuthConfig): string {
       output += scheme.arguments.identifier;
     }
     if (scheme.arguments.secret) {
-      output += `:` + scheme.arguments.secret;
+      output += `:${  scheme.arguments.secret}`;
     }
 
     if (scheme.arguments.identifier !== "" || scheme.arguments.secret !== "") {
@@ -37,7 +37,7 @@ export function ToURL(scheme: AuthConfig): string {
   if (scheme.isPath
     && scheme.arguments.extra != undefined
     && scheme.arguments.extra !== "") {
-    output += `/` + scheme.arguments.extra;
+    output += `/${  scheme.arguments.extra}`;
   }
 
   // parameters

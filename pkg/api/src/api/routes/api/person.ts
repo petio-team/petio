@@ -20,7 +20,7 @@ export default (app: Router) => {
 };
 
 const lookupById = async (ctx: Context) => {
-  let data = await personLookup(ctx.params.id);
+  const data = await personLookup(ctx.params.id);
 
   ctx.status = StatusCodes.OK;
   ctx.body = data;

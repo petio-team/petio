@@ -14,22 +14,24 @@ import { showLookup } from '@/services/tmdb/show';
 
 export default class processRequest {
   request: any;
+
   user: User | undefined;
 
   constructor(req = {}, usr?: User) {
     this.request = req;
     this.user = usr;
   }
+
   async new() {
     if (!this.user) {
       throw new Error('user required');
     }
 
     let out: any = {};
-    let quotaPass = await this.checkQuota();
+    const quotaPass = await this.checkQuota();
     if (quotaPass) {
       try {
-        let existing = await Request.findOne({
+        const existing = await Request.findOne({
           requestId: this.request.id,
         }).exec();
         if (existing) {
@@ -38,7 +40,7 @@ export default class processRequest {
           out = await this.create();
         }
         if (quotaPass !== 'admin') {
-          let updatedUser = await UserModel.findOneAndUpdate(
+          const updatedUser = await UserModel.findOneAndUpdate(
             { id: this.user.id },
             { $inc: { quotaCount: 1 } },
             { new: true, useFindAndModify: false },
@@ -75,7 +77,7 @@ export default class processRequest {
     if (!this.user) {
       throw new Error('user required');
     }
-    let profile = this.user.profileId
+    const profile = this.user.profileId
       ? await Profile.findById(this.user.profileId).exec()
       : false;
     let autoApprove = profile ? profile.autoApprove : false;
@@ -84,7 +86,7 @@ export default class processRequest {
       autoApprove = true;
       autoApproveTv = true;
     }
-    let requestDb = await Request.findOne({
+    const requestDb = await Request.findOne({
       requestId: this.request.id,
     }).exec();
     if (!requestDb) {
@@ -96,7 +98,7 @@ export default class processRequest {
       requestDb.markModified('users');
     }
     if (this.request.type === 'tv') {
-      let existingSeasons = requestDb.seasons || {};
+      const existingSeasons = requestDb.seasons || {};
       for (const [k, _v] of this.request.seasons) {
         existingSeasons[k] = true;
       }
@@ -139,7 +141,7 @@ export default class processRequest {
     }
 
     if (this.request.type === 'tv' && !this.request.tvdb_id) {
-      let lookup = await showLookup(this.request.id, true);
+      const lookup = await showLookup(this.request.id, true);
       this.request.tvdb_id = lookup.tvdb_id;
     }
 
@@ -191,8 +193,8 @@ export default class processRequest {
   }
 
   async pendingDefaults(profile) {
-    let pending: any = {};
-    let filterMatch: any = await filter(this.request);
+    const pending: any = {};
+    const filterMatch: any = await filter(this.request);
     if (filterMatch) {
       logger.info(
         'REQ: Pending Request Matched on custom filter, setting default',
@@ -206,8 +208,7 @@ export default class processRequest {
           tag: filter.tag,
         };
       }
-    } else {
-      if (this.request.type === 'movie') {
+    } else if (this.request.type === 'movie') {
         const instances = await GetAllDownloaders(DownloaderType.Radarr);
         for (const instance of instances) {
           if (!instance.id) {
@@ -236,7 +237,6 @@ export default class processRequest {
           }
         }
       }
-    }
     if (Object.keys(pending).length > 0) {
       await Request.updateOne(
         { requestId: this.request.id },
@@ -289,7 +289,7 @@ export default class processRequest {
     if (profile) {
       if (profile.radarr && this.request.type === 'movie') {
         for (const [k, _v] of profile.radarr) {
-          let active = profile.radarr[k];
+          const active = profile.radarr[k];
           if (active) {
             const instance = instances.find((i) => i.id === k);
             if (!instance) {
@@ -301,7 +301,7 @@ export default class processRequest {
       }
       if (profile.sonarr && this.request.type === 'tv') {
         for (const [k, _v] of profile.sonarr) {
-          let active = profile.sonarr[k];
+          const active = profile.sonarr[k];
           if (active) {
             const instance = instances.find((i) => i.id === k);
             if (!instance) {
@@ -338,16 +338,16 @@ export default class processRequest {
       const instances = await GetAllDownloaders();
       if (this.request.radarrId.length > 0 && this.request.type === 'movie') {
         for (let i = 0; i < Object.keys(this.request.radarrId).length; i++) {
-          let radarrIds = this.request.radarrId[i];
-          let rId = radarrIds[Object.keys(radarrIds)[0]];
-          let serverUuid = Object.keys(radarrIds)[0];
+          const radarrIds = this.request.radarrId[i];
+          const rId = radarrIds[Object.keys(radarrIds)[0]];
+          const serverUuid = Object.keys(radarrIds)[0];
 
           const instance = instances.find((i) => i.id === serverUuid);
           if (!instance) {
             continue;
           }
 
-          let server = new Radarr(instance);
+          const server = new Radarr(instance);
           try {
             await server.getClient().DeleteMovie(rId);
             logger.info(
@@ -364,9 +364,9 @@ export default class processRequest {
       }
       if (this.request.sonarrId.length > 0 && this.request.type === 'tv') {
         for (let i = 0; i < Object.keys(this.request.sonarrId).length; i++) {
-          let sonarrIds = this.request.sonarrId[i];
-          let sId = sonarrIds[Object.keys(sonarrIds)[0]];
-          let serverUuid = Object.keys(sonarrIds)[0];
+          const sonarrIds = this.request.sonarrId[i];
+          const sId = sonarrIds[Object.keys(sonarrIds)[0]];
+          const serverUuid = Object.keys(sonarrIds)[0];
 
           const instance = instances.find((i) => i.id === serverUuid);
           if (!instance) {
@@ -395,9 +395,9 @@ export default class processRequest {
       throw new Error('user required');
     }
 
-    let userData = this.user;
+    const userData = this.user;
     const requestData = this.request;
-    let type = requestData.type === 'tv' ? 'TV Show' : 'Movie';
+    const type = requestData.type === 'tv' ? 'TV Show' : 'Movie';
     const title: any = 'New Request';
     const subtitle: any = `A new request has been added for the ${type} "${requestData.title}"`;
     const image: any = `https://image.tmdb.org/t/p/w500${requestData.thumb}`;
@@ -407,7 +407,7 @@ export default class processRequest {
   }
 
   async mailRequest() {
-    let userData: any = this.user;
+    const userData: any = this.user;
     if (!userData.email) {
       logger.warn('MAILER: No user email', { label: 'requests.process' });
       return;
@@ -415,7 +415,7 @@ export default class processRequest {
     const requestData: any = this.request;
     const email: never = userData.email as never;
     const title: never = userData.title as never;
-    let type = requestData.type === 'tv' ? 'TV Show' : 'Movie';
+    const type = requestData.type === 'tv' ? 'TV Show' : 'Movie';
     new Mailer().mail(
       `You've just requested a ${type}: ${requestData.title}`,
       `${type}: ${requestData.title}`,
@@ -433,11 +433,11 @@ export default class processRequest {
 
     if (this.user.role === UserRole.Admin) return 'admin';
 
-    let userQuota = this.user.quotaCount ? this.user.quotaCount : 0;
-    let profile = this.user.profileId
+    const userQuota = this.user.quotaCount ? this.user.quotaCount : 0;
+    const profile = this.user.profileId
       ? await Profile.findById(this.user.profileId).exec()
       : false;
-    let quotaCap = profile ? profile.quota : 0;
+    const quotaCap = profile ? profile.quota : 0;
     if (!quotaCap) {
       return false;
     }
@@ -450,8 +450,8 @@ export default class processRequest {
   }
 
   async archive(complete: boolean, removed: boolean, reason = false) {
-    let oldReq = this.request;
-    let archiveRequest = new Archive({
+    const oldReq = this.request;
+    const archiveRequest = new Archive({
       requestId: this.request.requestId,
       type: this.request.type,
       title: this.request.title,
@@ -463,9 +463,9 @@ export default class processRequest {
       sonarrId: this.request.sonarrId,
       radarrId: this.request.radarrId,
       approved: this.request.approved,
-      removed: removed ? true : false,
+      removed: !!removed,
       removed_reason: reason,
-      complete: complete ? true : false,
+      complete: !!complete,
       timeStamp: this.request.timeStamp ? this.request.timeStamp : new Date(),
     });
     await archiveRequest.save();
@@ -474,7 +474,7 @@ export default class processRequest {
         requestId: this.request.requestId,
       },
       { useFindAndModify: false },
-      function (err, _data) {
+      (err, _data) => {
         if (err) {
           logger.error(`REQ: Archive Error`, { label: 'requests.process' });
           logger.error(err.message, { label: 'requests.process' });

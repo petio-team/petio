@@ -14,7 +14,7 @@ export default async (id, type) => {
   }
   if (!plexMatch) {
     return { error: 'not found, invalid key' };
-  } else {
+  } 
     return plexMatch;
-  }
+  
 };

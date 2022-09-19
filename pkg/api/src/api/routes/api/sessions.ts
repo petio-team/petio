@@ -16,7 +16,7 @@ export default (app: Router) => {
 
 const getSessionsData = async (ctx: Context) => {
   try {
-    let data = await getSessions();
+    const data = await getSessions();
 
     ctx.status = StatusCodes.OK;
     ctx.body = data.MediaContainer;

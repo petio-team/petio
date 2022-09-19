@@ -14,21 +14,21 @@ function assert(assertion, err_msg) {
 
 const email = {
   name: 'email',
-  validate: function (x) {
+  validate (x) {
     assert(isEmail(x), 'must be an email address');
   },
 };
 
 const ipaddress = {
   name: 'ipaddress',
-  validate: function (x) {
+  validate (x) {
     assert(isIP(x), 'must be an IP address');
   },
 };
 
 const url = {
   name: 'url',
-  validate: function (x) {
+  validate (x) {
     assert(isURL(x, { require_tld: false }), 'must be a URL');
   },
 };

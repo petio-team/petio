@@ -5,14 +5,12 @@ export function pluginQuery(
   valueFn: () => Promise<string>,
 ): ZodiosPlugin {
   return {
-    request: async (_, config) => {
-      return {
+    request: async (_, config) => ({
         ...config,
         queries: {
           ...config.queries,
           [key]: await valueFn(),
         },
-      };
-    },
+      }),
   };
 }

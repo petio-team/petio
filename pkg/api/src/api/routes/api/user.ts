@@ -1,3 +1,4 @@
+import path from 'path';
 import multer from '@koa/multer';
 import Router from '@koa/router';
 import axios from 'axios';
@@ -5,7 +6,6 @@ import bcrypt from 'bcryptjs';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 import send from 'koa-send';
-import path from 'path';
 
 import env from '@/config/env';
 import logger from '@/loaders/logger';
@@ -15,13 +15,13 @@ import { UserModel, UserRole } from '@/models/user';
 const UPLOAD_DIR = path.join(env.paths.data, './uploads');
 const route = new Router({ prefix: '/user' });
 
-let storage = multer.diskStorage({
-  destination: function (_req, _file, cb) {
+const storage = multer.diskStorage({
+  destination (_req, _file, cb) {
     cb(null, UPLOAD_DIR);
   },
-  filename: function (req: any, file, cb) {
+  filename (req: any, file, cb) {
     req.newThumb =
-      file.fieldname + '-' + Date.now() + path.extname(file.originalname);
+      `${file.fieldname  }-${  Date.now()  }${path.extname(file.originalname)}`;
     cb(null, req.newThumb);
   },
 });
@@ -55,9 +55,9 @@ const getAllUsers = async (ctx: Context) => {
   }
 
   if (userData) {
-    let data = Object.values(Object.assign(userData));
+    const data = Object.values(Object.assign(userData));
     Object.keys(data).forEach((u) => {
-      let user = data[u];
+      const user = data[u];
       if (user) {
         if (user.password) user.password = 'removed';
       }
@@ -91,16 +91,16 @@ const getUserById = async (ctx: Context) => {
 };
 
 const createCustomUser = async (ctx: Context) => {
-  const body = ctx.request.body;
+  const {body} = ctx.request;
 
-  let user = body.user;
+  const {user} = body;
   if (!user) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = {
       error: 'No user details',
     };
   }
-  let dbUser = await UserModel.findOne({
+  const dbUser = await UserModel.findOne({
     $or: [
       { username: user.username },
       { email: user.email },
@@ -114,7 +114,7 @@ const createCustomUser = async (ctx: Context) => {
     };
   } else {
     try {
-      let newUser = new UserModel({
+      const newUser = new UserModel({
         id: user.id,
         title: user.username,
         username: user.username,
@@ -140,8 +140,8 @@ const createCustomUser = async (ctx: Context) => {
 };
 
 const editUser = async (ctx: Context) => {
-  const body = ctx.request.body;
-  const user = body.user;
+  const {body} = ctx.request;
+  const {user} = body;
 
   if (!user) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
@@ -202,10 +202,10 @@ const editUser = async (ctx: Context) => {
 };
 
 const editMultipleUsers = async (ctx: Context) => {
-  const body = ctx.request.body;
-  let users = body.users as [];
-  let enabled = body.enabled;
-  let profile = body.profile;
+  const {body} = ctx.request;
+  const users = body.users as [];
+  const {enabled} = body;
+  const {profile} = body;
 
   if (!users) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
@@ -229,7 +229,7 @@ const editMultipleUsers = async (ctx: Context) => {
           u.profileId = undefined;
         }
 
-        u.disabled = enabled ? false : true;
+        u.disabled = !enabled;
 
         const results = u.save();
         if (!results) {
@@ -252,9 +252,9 @@ const editMultipleUsers = async (ctx: Context) => {
 };
 
 const deleteUser = async (ctx: Context) => {
-  const body = ctx.request.body;
+  const {body} = ctx.request;
 
-  let user = body.user;
+  const {user} = body;
   if (!user) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = {
@@ -335,7 +335,7 @@ const getThumbnailById = async (ctx: Context) => {
     send(ctx, `${UPLOAD_DIR}/${userData.custom_thumb}`);
     return;
   }
-  let url = userData.thumbnail;
+  const url = userData.thumbnail;
 
   try {
     const resp = await axios.get(url, {
@@ -347,7 +347,7 @@ const getThumbnailById = async (ctx: Context) => {
   } catch (e) {
     logger.log(
       'warn',
-      'ROUTE: Unable to get user thumb - Got error: ' + e.message,
+      `ROUTE: Unable to get user thumb - Got error: ${  e.message}`,
       e,
     );
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
@@ -375,14 +375,14 @@ const getQuota = async (ctx: Context) => {
     ? await Profile.findById(user.profileId).exec()
     : false;
   let total = 0;
-  let current = user.quotaCount ? user.quotaCount : 0;
+  const current = user.quotaCount ? user.quotaCount : 0;
   if (profile) {
     total = profile.quota ? profile.quota : 0;
   }
 
   ctx.status = StatusCodes.NOT_FOUND;
   ctx.body = {
-    current: current,
-    total: total,
+    current,
+    total,
   };
 };

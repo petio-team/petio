@@ -39,7 +39,7 @@ const getConfig = async (ctx: Context) => {
   let ready = false;
   if (configStatus !== false) {
     try {
-      let setupCheck = await setupReady();
+      const setupCheck = await setupReady();
       if (setupCheck.ready) {
         ready = true;
       }
@@ -61,7 +61,7 @@ const getConfig = async (ctx: Context) => {
   ctx.body = {
     config: configStatus,
     login_type: config.get('auth.type'),
-    ready: ready,
+    ready,
   };
 };
 

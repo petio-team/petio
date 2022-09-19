@@ -1,9 +1,9 @@
 import { Zodios } from '@zodios/core';
 import * as z from 'zod';
 
+import env from '../../config/env';
 import { pluginQuery } from '@/utils/zodios';
 
-import env from '../../config/env';
 
 export enum FanartTypes {
   Movies = 'movies',

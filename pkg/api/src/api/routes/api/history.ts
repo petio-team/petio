@@ -18,10 +18,10 @@ export default (app: Router) => {
 };
 
 const listHistory = async (ctx: Context) => {
-  let id = ctx.request.body.id;
+  let {id} = ctx.request.body;
   if (id === 'admin') id = 1;
   try {
-    let data = await getHistory(id, ctx.request.body.type);
+    const data = await getHistory(id, ctx.request.body.type);
     ctx.status = StatusCodes.OK;
     ctx.body = data;
   } catch (err) {
@@ -34,7 +34,7 @@ const listHistory = async (ctx: Context) => {
 
 const getServerData = async (ctx: Context) => {
   try {
-    let data = await getServerInfo();
+    const data = await getServerInfo();
     ctx.body = data.MediaContainer;
   } catch (err) {
     logger.log('warn', 'ROUTE: Error getting server info');

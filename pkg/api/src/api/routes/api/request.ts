@@ -35,7 +35,7 @@ const listRequests = async (ctx: Context) => {
 };
 
 const getUserRequests = async (ctx: Context) => {
-  let userId = ctx.state.user.id;
+  const userId = ctx.state.user.id;
   if (!userId) {
     ctx.status = StatusCodes.NOT_FOUND;
     ctx.body = {};
@@ -46,7 +46,7 @@ const getUserRequests = async (ctx: Context) => {
 };
 
 const getRequestMinified = async (ctx: Context) => {
-  let data = {};
+  const data = {};
   try {
     const requests = await Request.find().exec();
     if (!requests) {
@@ -90,32 +90,32 @@ const getRequestMinified = async (ctx: Context) => {
 };
 
 const addRequest = async (ctx: Context) => {
-  const body = ctx.request.body;
+  const {body} = ctx.request;
 
-  let request = body.request;
-  let process = await new processRequest(request, ctx.state.user).new();
+  const {request} = body;
+  const process = await new processRequest(request, ctx.state.user).new();
 
   ctx.status = StatusCodes.OK;
   ctx.body = process;
 };
 
 const removeRequest = async (ctx: Context) => {
-  const body = ctx.request.body;
+  const {body} = ctx.request;
 
-  let request = body.request;
-  let reason = body.reason;
-  let process = new processRequest(request, ctx.state.user);
+  const {request} = body;
+  const {reason} = body;
+  const process = new processRequest(request, ctx.state.user);
 
   await process.archive(false, true, reason);
 
   process.removeFromDVR();
 
-  let emails: any = [];
-  let titles: any = [];
+  const emails: any = [];
+  const titles: any = [];
 
   await Promise.all(
     request.users.map(async (user) => {
-      let userData = await UserModel.findOne({ id: user }).exec();
+      const userData = await UserModel.findOne({ id: user }).exec();
       if (!userData) {
         ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
         ctx.body = { error: 'failed to find requests by user' };
@@ -146,12 +146,12 @@ const removeRequest = async (ctx: Context) => {
 };
 
 const updateRequest = async (ctx: Context) => {
-  const body = ctx.request.body;
+  const {body} = ctx.request;
 
-  let request = body.request;
-  let servers = body.servers;
-  let approved = body.request.approved;
-  let manualStatus = body.request.manualStatus;
+  const {request} = body;
+  const {servers} = body;
+  const {approved} = body.request;
+  const {manualStatus} = body.request;
 
   if (manualStatus === '5') {
     new processRequest(request, ctx.state.user).archive(true, false, false);
@@ -167,7 +167,7 @@ const updateRequest = async (ctx: Context) => {
       {
         $set: {
           approved: true,
-          manualStatus: manualStatus,
+          manualStatus,
         },
       },
       { new: true, useFindAndModify: false },
@@ -196,18 +196,18 @@ const updateRequest = async (ctx: Context) => {
     }
 
     if (!approved) {
-      let emails: any = [];
-      let titles: any = [];
+      const emails: any = [];
+      const titles: any = [];
       await Promise.all(
         request.users.map(async (id) => {
-          let userData = await UserModel.findOne({ id }).exec();
+          const userData = await UserModel.findOne({ id }).exec();
           if (!userData) return;
           emails.push(userData.email);
           titles.push(userData.title);
         }),
       );
       const requestData = request;
-      let type = requestData.type === 'tv' ? 'TV Show' : 'Movie';
+      const type = requestData.type === 'tv' ? 'TV Show' : 'Movie';
       new Mailer().mail(
         `Request approved for ${requestData.title}`,
         `${type}: ${requestData.title}`,
@@ -230,7 +230,7 @@ const updateRequest = async (ctx: Context) => {
 };
 
 const getArchivedRequestById = async (ctx: Context) => {
-  const id = ctx.params.id;
+  const {id} = ctx.params;
 
   ctx.status = StatusCodes.OK;
   ctx.body = await getArchive(id);

@@ -5,16 +5,6 @@ import { Context } from 'koa';
 import Review from '@/models/review';
 import { UserModel } from '@/models/user';
 
-const route = new Router({ prefix: '/review' });
-
-export default (app: Router) => {
-  route.get('/all', listReviews);
-  route.get('/all/:id', getReviewById);
-  route.post('/add', addReview);
-
-  app.use(route.routes());
-};
-
 const listReviews = async (ctx: Context) => {
   try {
     ctx.status = StatusCodes.OK;
@@ -26,7 +16,7 @@ const listReviews = async (ctx: Context) => {
 };
 
 const getReviewById = async (ctx: Context) => {
-  let id = ctx.params.id;
+  const { id } = ctx.params;
   if (!id) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = { error: 'id required' };
@@ -42,17 +32,17 @@ const getReviewById = async (ctx: Context) => {
 };
 
 const addReview = async (ctx: Context) => {
-  const body = ctx.request.body as any;
+  const { body } = ctx.request;
 
-  let item = body.item;
-  let review = body.review;
-  let user = body.user;
+  const { item } = body;
+  const { review } = body;
+  const { user } = body;
   try {
-    let userData = await UserModel.findOne({ id: user });
+    const userData = await UserModel.findOne({ id: user });
     if (!userData) {
       throw new Error('failed to get user data');
     }
-    let existingReview = await Review.findOne({
+    const existingReview = await Review.findOne({
       tmdb_id: item.id,
       user: userData.id,
     });
@@ -80,4 +70,14 @@ const addReview = async (ctx: Context) => {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = { error: err };
   }
+};
+
+const route = new Router({ prefix: '/review' });
+
+export default (app: Router) => {
+  route.get('/all', listReviews);
+  route.get('/all/:id', getReviewById);
+  route.post('/add', addReview);
+
+  app.use(route.routes());
 };

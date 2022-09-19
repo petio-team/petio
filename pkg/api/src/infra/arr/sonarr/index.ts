@@ -1,6 +1,6 @@
+import URL from 'url';
 import { Zodios } from '@zodios/core';
 import { pluginHeader } from '@zodios/plugins';
-import URL from 'url';
 
 import { CalendarEndpoint } from './calendar';
 import { LanguageEndpoint } from './language';

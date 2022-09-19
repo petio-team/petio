@@ -6,7 +6,7 @@ import { HasConfig } from '@/config/index';
 export default async (ctx: Context, next: Next) => {
   const exists = await HasConfig();
   if (!exists) {
-    const path = ctx.path;
+    const {path} = ctx;
     if (path.startsWith('/api')) {
       if (
         path !== '/' &&

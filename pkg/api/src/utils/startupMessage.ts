@@ -1,12 +1,12 @@
+import { removeSlashes } from './urls';
 import { HasConfig } from '@/config/config';
 import env from '@/config/env';
 import { config } from '@/config/schema';
 import logger from '@/loaders/logger';
 
-import { removeSlashes } from './urls';
 
 export default async () => {
-  const subpath = '/' + removeSlashes(config.get('petio.subpath'));
+  const subpath = `/${  removeSlashes(config.get('petio.subpath'))}`;
 
   logger.info(`Petio v${env.app.version} [${config.get('logger.level')}]`);
   logger.info(

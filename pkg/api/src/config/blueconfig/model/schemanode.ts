@@ -1,10 +1,10 @@
-import * as cvtError from './../error';
-import * as utils from './../performer/utils/utils';
+import * as cvtError from "../error";
+import * as utils from "../performer/utils/utils";
 
-const unroot = utils.unroot;
+const {unroot} = utils;
 
-const LISTOFERRORS = cvtError.LISTOFERRORS;
-const FORMAT_INVALID = cvtError.FORMAT_INVALID;
+const {LISTOFERRORS} = cvtError;
+const {FORMAT_INVALID} = cvtError;
 
 /**
  * SchemaNode is rules for property
@@ -60,9 +60,7 @@ function SchemaNode(rawSchema) {
    * @returns  {string}    value    Getter name which origin of the value
    */
   Object.defineProperty(this.attributes, '_cvtGetOrigin', {
-    value: () => {
-      return this.getOrigin();
-    },
+    value: () => this.getOrigin(),
   });
 
   /**
@@ -96,9 +94,7 @@ function SchemaNode(rawSchema) {
    *
    */
   Object.defineProperty(this.attributes, '_cvtCoerce', {
-    value: (value) => {
-      return this.coerce(value);
-    },
+    value: (value) => this.coerce(value),
   });
 }
 
@@ -153,8 +149,8 @@ SchemaNode.prototype.validate = function (value) {
 
       err.errors.forEach((error, i) => {
         err.message +=
-          `\n    ${i + 1}) ${unroot(error.parent)}:` +
-          ('\n' + error.why).replace(/(\n)/g, '$1    ');
+          `\n    ${i + 1}) ${unroot(error.parent)}:${ 
+          (`\n${  error.why}`).replace(/(\n)/g, '$1    ')}`;
       });
 
       throw err;

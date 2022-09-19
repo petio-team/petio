@@ -32,13 +32,13 @@ const listProfiles = async (ctx: Context) => {
   } catch (err) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = { error: err };
-    return;
+    
   }
 };
 
 const saveProfile = async (ctx: Context) => {
   const body = ctx.request.body as any;
-  let profile = body.profile;
+  const {profile} = body;
   if (!profile) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = { error: 'no profile details' };
@@ -93,7 +93,7 @@ const saveProfile = async (ctx: Context) => {
     }
   } else {
     try {
-      let newProfile = new Profile({
+      const newProfile = new Profile({
         name: profile.name,
         sonarr: profile.sonarr,
         radarr: profile.radarr,
@@ -121,7 +121,7 @@ const saveProfile = async (ctx: Context) => {
 const deleteProfile = async (ctx: Context) => {
   const body = ctx.request.body as any;
 
-  let profile = body.profile;
+  const {profile} = body;
   if (!profile || !profile.id) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = {

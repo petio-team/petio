@@ -47,14 +47,14 @@ export default (app: Koa, subpath: string) => {
       debug: true,
     }).unless({
       path: [
-        subpath + '/api/health',
-        subpath + '/api/config',
-        subpath + '/api/login',
-        subpath + '/api/login/plex_login',
-        subpath + '/api/setup',
-        subpath + '/api/setup/test_server',
-        subpath + '/api/setup/test_mongo',
-        subpath + '/api/setup/set',
+        `${subpath  }/api/health`,
+        `${subpath  }/api/config`,
+        `${subpath  }/api/login`,
+        `${subpath  }/api/login/plex_login`,
+        `${subpath  }/api/setup`,
+        `${subpath  }/api/setup/test_server`,
+        `${subpath  }/api/setup/test_mongo`,
+        `${subpath  }/api/setup/set`,
       ],
     }),
   );

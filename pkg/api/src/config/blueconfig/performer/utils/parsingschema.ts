@@ -1,24 +1,22 @@
-import * as cvtError from './../../error';
-import SchemaNode from './../../model/schemanode';
+import * as cvtError from "../../error";
+import SchemaNode from "../../model/schemanode";
 import * as utils from './utils';
 
-const isObjNotNull = utils.isObjNotNull;
-const unroot = utils.unroot;
+const {isObjNotNull} = utils;
+const {unroot} = utils;
 
-const SCHEMA_INVALID = cvtError.SCHEMA_INVALID;
+const {SCHEMA_INVALID} = cvtError;
 
 const BUILT_INS_BY_NAME = {
-  Object: Object,
-  Array: Array,
-  String: String,
-  Number: Number,
-  Boolean: Boolean,
-  RegExp: RegExp,
+  Object,
+  Array,
+  String,
+  Number,
+  Boolean,
+  RegExp,
 };
 const BUILT_IN_NAMES = Object.keys(BUILT_INS_BY_NAME);
-const BUILT_INS = BUILT_IN_NAMES.map(function (name) {
-  return BUILT_INS_BY_NAME[name];
-});
+const BUILT_INS = BUILT_IN_NAMES.map((name) => BUILT_INS_BY_NAME[name]);
 
 export default function parsingSchema(
   name,
@@ -40,9 +38,7 @@ export default function parsingSchema(
   const isConfigPropFormat =
     hasFormat && isObjNotNull(hasFormat) && !Array.isArray(hasFormat);
 
-  const filterName = (name) => {
-    return name === this._defaultSubstitute ? 'default' : name;
-  }; //                    ^^^^^^^^^^^^^^^^^^ = '$~default'
+  const filterName = (name) => name === this._defaultSubstitute ? 'default' : name; //                    ^^^^^^^^^^^^^^^^^^ = '$~default'
 
   name = filterName(name);
 
@@ -64,7 +60,7 @@ export default function parsingSchema(
       _cvtProperties: {},
     };
     Object.keys(rawSchema).forEach((key) => {
-      const path = fullpath + '.' + key;
+      const path = `${fullpath  }.${  key}`;
       parsingSchema.call(
         this,
         key,
@@ -74,7 +70,7 @@ export default function parsingSchema(
       );
     });
     return;
-  } else if (
+  } if (
     this._strictParsing &&
     isObjNotNull(rawSchema) &&
     !('default' in rawSchema)
@@ -102,7 +98,7 @@ export default function parsingSchema(
 
   Object.keys(schema).forEach((keyname) => {
     if (this._getters.list[keyname]) {
-      const usedOnlyOnce = this._getters.list[keyname].usedOnlyOnce;
+      const {usedOnlyOnce} = this._getters.list[keyname];
       if (usedOnlyOnce) {
         if (!this._getterAlreadyUsed[keyname]) {
           this._getterAlreadyUsed[keyname] = new Set();
@@ -112,12 +108,12 @@ export default function parsingSchema(
         if (this._getterAlreadyUsed[keyname].has(value)) {
           if (typeof usedOnlyOnce === 'function') {
             return usedOnlyOnce(value, schema, fullpath, keyname);
-          } else {
+          } 
             const errorMessage = `uses a already used getter keyname for "${keyname}", current: \`${keyname}[${JSON.stringify(
               value,
             )}]\``;
             throw new SCHEMA_INVALID(unroot(fullpath), errorMessage);
-          }
+          
         }
 
         this._getterAlreadyUsed[keyname].add(schema[keyname]);
@@ -131,7 +127,7 @@ export default function parsingSchema(
   }
 
   // store original format function
-  let format = schema.format;
+  let {format} = schema;
   const newFormat = (() => {
     if (BUILT_INS.indexOf(format) >= 0 || BUILT_IN_NAMES.indexOf(format) >= 0) {
       // if the format property is a built-in JavaScript constructor,
@@ -143,11 +139,11 @@ export default function parsingSchema(
       schema.format = format = myFormat;
       return (value) => {
         if (formatFormat !== Object.prototype.toString.call(value)) {
-          throw new Error('must be of type ' + myFormat);
+          throw new Error(`must be of type ${  myFormat}`);
           //        ^^^^^-- will be catch in _cvtValidateFormat and convert to FORMAT_INVALID Error.
         }
       };
-    } else if (typeof format === 'string') {
+    } if (typeof format === 'string') {
       // store declared type
       if (!this.Ruler.types.has(format)) {
         throw new SCHEMA_INVALID(
@@ -157,24 +153,24 @@ export default function parsingSchema(
       }
       // use a predefined type
       return this.Ruler.types.get(format);
-    } else if (Array.isArray(format)) {
+    } if (Array.isArray(format)) {
       // assert that the value is in the whitelist, example: ['a', 'b', 'c'].include(value)
       const contains = (whitelist, value) => {
         if (!whitelist.includes(value)) {
           throw new Error(
-            'must be one of the possible values: ' + JSON.stringify(whitelist),
+            `must be one of the possible values: ${  JSON.stringify(whitelist)}`,
           );
           //        ^^^^^-- will be catch in _cvtValidateFormat and convert to FORMAT_INVALID Error.
         }
       };
       return contains.bind(null, format);
-    } else if (typeof format === 'function') {
+    } if (typeof format === 'function') {
       return format;
-    } else if (format) {
+    } if (format) {
       // Wrong type for format
       const errorMessage =
         'uses an invalid format, it must be a format name, a function, an array or a known format type';
-      const value = (format || '').toString() || 'is a ' + typeof format;
+      const value = (format || '').toString() || `is a ${  typeof format}`;
       throw new SCHEMA_INVALID(
         unroot(fullpath),
         `${errorMessage} (current: ${JSON.stringify(value)})`,
@@ -187,7 +183,7 @@ export default function parsingSchema(
       schema.format = format = myFormat;
       return (value) => {
         if (defaultFormat !== Object.prototype.toString.call(value)) {
-          throw new Error('must be of type ' + myFormat);
+          throw new Error(`must be of type ${  myFormat}`);
           //        ^^^^^-- will be catch in _cvtValidateFormat and convert to FORMAT_INVALID Error.
         }
       };

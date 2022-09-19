@@ -1,12 +1,12 @@
 import { Zodios } from '@zodios/core';
 
-import env from '@/config/env';
-import { pluginQuery } from '@/utils/zodios';
 
 import { DiscoverAPI } from './discover/discover';
 import { MovieAPI } from './movie/movies';
 import { TrendingAPI } from './trending/trending';
 import { TVAPI } from './tv/tv';
+import env from '@/config/env';
+import { pluginQuery } from '@/utils/zodios';
 
 export const TMDBAPI = new Zodios('https://api.themoviedb.org/3', [
   ...DiscoverAPI,

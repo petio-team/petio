@@ -1,10 +1,10 @@
+import * as cvtError from "../../error";
 import { parse, stringify } from '../../lib/object-path';
-import * as cvtError from './../../error';
 import * as utils from './utils';
 
-const isObjNotNull = utils.isObjNotNull;
+const {isObjNotNull} = utils;
 
-const PATH_INVALID = cvtError.PATH_INVALID;
+const {PATH_INVALID} = cvtError;
 
 export default function walk(obj, path, initializeMissing?): Object {
   if (path) {

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Promise from 'bluebird';
+import { ObjectId } from "mongodb";
 import xmlParser from 'xml-js';
 
 import env from '@/config/env';
@@ -16,13 +17,16 @@ import Discord from '@/services/notifications/discord';
 import Telegram from '@/services/notifications/telegram';
 import processRequest from '@/services/requests/process';
 import { showLookup } from '@/services/tmdb/show';
-import { ObjectId } from "mongodb";
 
 export default class LibraryUpdate {
   full: any;
+
   mailer: any;
+
   timestamp: any;
+
   tmdb: any;
+
   constructor() {
     this.mailer = [];
     this.tmdb = 'https://api.themoviedb.org/3/';
@@ -47,12 +51,12 @@ export default class LibraryUpdate {
       logger.error(err, { label: 'plex.library' });
       return;
     }
-    let matched = {};
+    const matched = {};
 
     await Promise.map(
       Object.keys(recent.Metadata),
       async (i) => {
-        let obj = recent.Metadata[i];
+        const obj = recent.Metadata[i];
 
         if (obj.type === 'movie') {
           if (!matched[obj.ratingKey]) {
@@ -73,7 +77,7 @@ export default class LibraryUpdate {
         } else if (obj.type === 'season') {
           if (!matched[obj.parentRatingKey]) {
             matched[obj.parentRatingKey] = true;
-            let parent = {
+            const parent = {
               ratingKey: obj.parentRatingKey,
               guid: obj.parentGuid,
               key: obj.parentKey,
@@ -143,13 +147,13 @@ export default class LibraryUpdate {
   }
 
   async getLibraries() {
-    let url = `${config.get('plex.protocol')}://${config.get(
+    const url = `${config.get('plex.protocol')}://${config.get(
       'plex.host',
     )}:${config.get('plex.port')}/library/sections/?X-Plex-Token=${config.get(
       'plex.token',
     )}`;
     try {
-      let res = await axios.get(url);
+      const res = await axios.get(url);
       logger.verbose('CRON: Found Libraries', { label: 'plex.library' });
       return res.data.MediaContainer;
     } catch (e) {
@@ -159,13 +163,13 @@ export default class LibraryUpdate {
   }
 
   async getRecent() {
-    let url = `${config.get('plex.protocol')}://${config.get(
+    const url = `${config.get('plex.protocol')}://${config.get(
       'plex.host',
     )}:${config.get(
       'plex.port',
     )}/library/recentlyAdded/?X-Plex-Token=${config.get('plex.token')}`;
     try {
-      let res = await axios.get(url);
+      const res = await axios.get(url);
       logger.verbose('CRON: Recently Added received', {
         label: 'plex.library',
       });
@@ -195,7 +199,7 @@ export default class LibraryUpdate {
     }
     if (!libraryItem) {
       try {
-        let newLibrary = new Library({
+        const newLibrary = new Library({
           allowSync: lib.allowSync,
           art: lib.art,
           composite: lib.composite,
@@ -258,7 +262,7 @@ export default class LibraryUpdate {
         logger.error(err, { label: 'plex.library' });
       }
       if (updatedLibraryItem) {
-        logger.verbose('CRON: Library Updated ' + lib.title, {
+        logger.verbose(`CRON: Library Updated ${  lib.title}`, {
           label: 'plex.library',
         });
       }
@@ -266,11 +270,11 @@ export default class LibraryUpdate {
   }
 
   async updateLibraryContent(libraries) {
-    for (let l in libraries.Directory) {
-      let lib = libraries.Directory[l];
-      let music: any = [];
+    for (const l in libraries.Directory) {
+      const lib = libraries.Directory[l];
+      const music: any = [];
       try {
-        let libContent = await this.getLibrary(lib.key);
+        const libContent = await this.getLibrary(lib.key);
         if (!libContent || !libContent.Metadata) {
           logger.warn(`CRON: No content in library skipping - ${lib.title}`, {
             label: 'plex.library',
@@ -280,7 +284,7 @@ export default class LibraryUpdate {
         await Promise.map(
           Object.keys(libContent.Metadata),
           async (item) => {
-            let obj: any = libContent.Metadata[item];
+            const obj: any = libContent.Metadata[item];
             if (obj.type === 'movie') {
               await this.saveMovie(obj);
             } else if (obj.type === 'show') {
@@ -304,13 +308,13 @@ export default class LibraryUpdate {
   }
 
   async getLibrary(id) {
-    let url = `${config.get('plex.protocol')}://${config.get(
+    const url = `${config.get('plex.protocol')}://${config.get(
       'plex.host',
     )}:${config.get(
       'plex.port',
     )}/library/sections/${id}/all?X-Plex-Token=${config.get('plex.token')}`;
     try {
-      let res = await axios.get(url);
+      const res = await axios.get(url);
       return res.data.MediaContainer;
     } catch (e) {
       throw new Error('Unable to get library content');
@@ -318,7 +322,7 @@ export default class LibraryUpdate {
   }
 
   async getMeta(id) {
-    let url = `${config.get('plex.protocol')}://${config.get(
+    const url = `${config.get('plex.protocol')}://${config.get(
       'plex.host',
     )}:${config.get(
       'plex.port',
@@ -326,7 +330,7 @@ export default class LibraryUpdate {
       'plex.token',
     )}`;
     try {
-      let res = await axios.get(url);
+      const res = await axios.get(url);
       return res.data.MediaContainer.Metadata[0];
     } catch (e) {
       throw new Error('Unable to get meta');
@@ -334,7 +338,7 @@ export default class LibraryUpdate {
   }
 
   async getSeason(id) {
-    let url = `${config.get('plex.protocol')}://${config.get(
+    const url = `${config.get('plex.protocol')}://${config.get(
       'plex.host',
     )}:${config.get(
       'plex.port',
@@ -342,7 +346,7 @@ export default class LibraryUpdate {
       'plex.token',
     )}`;
     try {
-      let res = await axios.get(url);
+      const res = await axios.get(url);
       return res.data.MediaContainer.Metadata;
     } catch (e) {
       logger.error(e, { label: 'plex.library' });
@@ -352,8 +356,8 @@ export default class LibraryUpdate {
 
   async saveMovie(movieObj) {
     let movieDb: any = false;
-    let title = movieObj.title;
-    let externalIds: any = {};
+    const {title} = movieObj;
+    const externalIds: any = {};
     let tmdbId = false;
     let externalId: any = false;
     let added = false;
@@ -392,7 +396,7 @@ export default class LibraryUpdate {
           );
           return;
         }
-        for (let guid of movieObj.Guid) {
+        for (const guid of movieObj.Guid) {
           if (!guid.id) {
             logger.warn(
               `CRON: Movie couldn't be matched - ${title} - no GUID ID`,
@@ -400,12 +404,12 @@ export default class LibraryUpdate {
             );
             return;
           }
-          let source = guid.id.split('://');
-          externalIds[source[0] + '_id'] = source[1];
+          const source = guid.id.split('://');
+          externalIds[`${source[0]  }_id`] = source[1];
           if (source[0] === 'tmdb') tmdbId = source[1];
         }
 
-        if (!externalIds['tmdb_id']) {
+        if (!externalIds.tmdb_id) {
           const type = Object.keys(externalIds)[0].replace('_id', '');
           try {
             tmdbId = await this.externalIdMovie(
@@ -520,9 +524,10 @@ export default class LibraryUpdate {
       logger.log(err);
     }
   }
+
   async saveShow(showObj) {
     let showDb: any = false;
-    let title = showObj.title;
+    const {title} = showObj;
     let externalIds: any = {};
     let tmdbId = false;
     let externalId = false;
@@ -551,14 +556,14 @@ export default class LibraryUpdate {
       seasons = await Promise.map(
         showObj.Children.Metadata,
         async (season: any) => {
-          let seasonData = await this.getSeason(season.ratingKey);
-          let thisSeason = {
+          const seasonData = await this.getSeason(season.ratingKey);
+          const thisSeason = {
             seasonNumber: season.index,
             title: season.title,
             episodes: {},
           };
-          for (let e in seasonData) {
-            let ep = seasonData[e];
+          for (const e in seasonData) {
+            const ep = seasonData[e];
             thisSeason.episodes[ep.index] = {
               title: ep.title,
               episodeNumber: ep.index,
@@ -588,7 +593,7 @@ export default class LibraryUpdate {
           );
           return;
         }
-        for (let guid of showObj.Guid) {
+        for (const guid of showObj.Guid) {
           if (!guid.id) {
             logger.warn(
               `CRON: Show couldn't be matched - ${title} - no GUID ID`,
@@ -596,8 +601,8 @@ export default class LibraryUpdate {
             );
             return;
           }
-          let source = guid.id.split('://');
-          externalIds[source[0] + '_id'] = source[1];
+          const source = guid.id.split('://');
+          externalIds[`${source[0]  }_id`] = source[1];
           if (source[0] === 'tmdb') tmdbId = source[1];
         }
       } catch (e) {
@@ -668,8 +673,8 @@ export default class LibraryUpdate {
     showDb.tvdb_id = idSource === 'tvdb' ? externalId : externalIds.tvdb_id;
     showDb.tmdb_id = idSource === 'tmdb' ? externalId : tmdbId;
     showDb.seasonData = {};
-    for (let s in seasons) {
-      let season: any = seasons[s];
+    for (const s in seasons) {
+      const season: any = seasons[s];
       showDb.seasonData[season.seasonNumber] = {
         seasonNumber: season.seasonNumber,
         title: season.title,
@@ -716,12 +721,12 @@ export default class LibraryUpdate {
   }
 
   async getFriends() {
-    let url = `https://plex.tv/pms/friends/all?X-Plex-Token=${config.get(
+    const url = `https://plex.tv/pms/friends/all?X-Plex-Token=${config.get(
       'plex.token',
     )}`;
     try {
-      let res = await axios.get(url);
-      let dataParse = JSON.parse(
+      const res = await axios.get(url);
+      const dataParse = JSON.parse(
         xmlParser.xml2json(res.data, { compact: false }),
       );
       return dataParse.elements[0].elements;
@@ -730,10 +735,11 @@ export default class LibraryUpdate {
       logger.error(e, { label: 'plex.library' });
     }
   }
+
   async saveFriend(obj) {
     // Maybe delete all and rebuild each time?
     try {
-      let defaultProfile: any = undefined;
+      let defaultProfile: any;
       const results: any = await Profile.findOne({ isDefault: true }).exec();
       if (results) {
         defaultProfile = results.toObject();
@@ -754,7 +760,7 @@ export default class LibraryUpdate {
       };
 
       const newUser = await CreateOrUpdateUser(user);
-      logger.verbose('synced friend ' + newUser.email, {
+      logger.verbose(`synced friend ${  newUser.email}`, {
         label: 'plex.library',
       });
     } catch (e) {
@@ -768,7 +774,7 @@ export default class LibraryUpdate {
   }
 
   async mailAdded(plexData, ref_id) {
-    let request = await Request.findOne({ tmdb_id: ref_id }).exec();
+    const request = await Request.findOne({ tmdb_id: ref_id }).exec();
     if (request) {
       await Promise.all(
         request.users.map(async (user, i) => {
@@ -780,7 +786,7 @@ export default class LibraryUpdate {
   }
 
   async sendMail(user, i, request) {
-    let userData = await UserModel.findOne({ id: user }).exec();
+    const userData = await UserModel.findOne({ id: user }).exec();
     if (!userData) {
       logger.error('CRON: Err: No user data', { label: 'plex.library' });
       return;
@@ -804,7 +810,7 @@ export default class LibraryUpdate {
   }
 
   discordNotify(user, request) {
-    let type = request.type === 'tv' ? 'TV Show' : 'Movie';
+    const type = request.type === 'tv' ? 'TV Show' : 'Movie';
     const title: any = `${request.title} added to Plex!`;
     const subtitle: any = `The ${type} "${request.title}" has been processed and is now available to watch on Plex"`;
     const image: any = `https://image.tmdb.org/t/p/w500${request.thumb}`;
@@ -824,29 +830,29 @@ export default class LibraryUpdate {
   }
 
   async externalIdTv(id, type) {
-    let url = `${this.tmdb}find/${id}?api_key=${env.api.tmdb.key}&language=en-US&external_source=${type}_id`;
-    let res = await axios.get(url);
+    const url = `${this.tmdb}find/${id}?api_key=${env.api.tmdb.key}&language=en-US&external_source=${type}_id`;
+    const res = await axios.get(url);
     return res.data.tv_results[0].id;
   }
 
   async tmdbExternalIds(id) {
-    let url = `${this.tmdb}tv/${id}/external_ids?api_key=${env.api.tmdb.key}`;
-    let res = await axios.get(url);
+    const url = `${this.tmdb}tv/${id}/external_ids?api_key=${env.api.tmdb.key}`;
+    const res = await axios.get(url);
     return res.data;
   }
 
   async externalIdMovie(id, type) {
-    let url = `${this.tmdb}find/${id}?api_key=${env.api.tmdb.key}&language=en-US&external_source=${type}_id`;
-    let res = await axios.get(url);
+    const url = `${this.tmdb}find/${id}?api_key=${env.api.tmdb.key}&language=en-US&external_source=${type}_id`;
+    const res = await axios.get(url);
     return res.data.movie_results[0].id;
   }
 
   async checkOldRequests() {
     logger.verbose('CRON: Checking old requests', { label: 'plex.library' });
-    let requests = await Request.find().exec();
+    const requests = await Request.find().exec();
     for (const element of requests) {
       let onServer: any = false;
-      let request = element;
+      const request = element;
       if (request.type === 'tv') {
         onServer = await Show.findOne({ tmdb_id: request.tmdb_id }).exec();
         if (!request.tvdb_id) {
@@ -854,7 +860,7 @@ export default class LibraryUpdate {
             `CRON: No TVDB ID for request: ${request.title}, attempting to pull meta`,
             { label: 'plex.library' },
           );
-          let lookup = await showLookup(request.tmdb_id, true);
+          const lookup = await showLookup(request.tmdb_id, true);
           request.thumb = lookup.poster_path;
           request.tvdb_id = lookup.tvdb_id;
           try {
@@ -891,11 +897,11 @@ export default class LibraryUpdate {
           label: 'plex.library',
         });
         new processRequest(request).archive(true, false, false);
-        let emails: any = [];
-        let titles: any = [];
+        const emails: any = [];
+        const titles: any = [];
         await Promise.all(
           request.users.map(async (user) => {
-            let userData = await UserModel.findOne({ id: user }).exec();
+            const userData = await UserModel.findOne({ id: user }).exec();
             if (!userData) return;
             emails.push(userData.email);
             titles.push(userData.title);
@@ -917,8 +923,8 @@ export default class LibraryUpdate {
     const deleteMovies = await Movie.find({
       petioTimestamp: { $ne: this.timestamp },
     }).exec();
-    for (let i in deleteMovies) {
-      let deleteMovie = deleteMovies[i];
+    for (const i in deleteMovies) {
+      const deleteMovie = deleteMovies[i];
       logger.warn(
         `CRON: Deleting Movie - ${deleteMovie.title} - no longer found in Plex`,
         { label: 'plex.library' },
@@ -931,8 +937,8 @@ export default class LibraryUpdate {
     const deleteShows = await Show.find({
       petioTimestamp: { $ne: this.timestamp },
     }).exec();
-    for (let i in deleteShows) {
-      let deleteShow = deleteShows[i];
+    for (const i in deleteShows) {
+      const deleteShow = deleteShows[i];
       logger.warn(
         `CRON: Deleting TV Show - ${deleteShow.title} - no longer found in Plex`,
         { label: 'plex.library' },

@@ -15,14 +15,14 @@ export default (app: Router) => {
 };
 
 const testDiscordConnection = async (ctx: Context) => {
-  let test = await new Discord().test();
+  const test = await new Discord().test();
 
   ctx.status = StatusCodes.OK;
   ctx.body = { result: test.result, error: test.error };
 };
 
 const testTelegramConnection = async (ctx: Context) => {
-  let test = await new Telegram().test();
+  const test = await new Telegram().test();
 
   ctx.status = StatusCodes.OK;
   ctx.body = { result: test.result, error: test.error };

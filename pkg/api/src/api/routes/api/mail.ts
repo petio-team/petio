@@ -95,7 +95,7 @@ const getMailConfig = async (ctx: Context) => {
 };
 
 const testConnection = async (ctx: Context) => {
-  let test = await new Mailer().test();
+  const test = await new Mailer().test();
 
   ctx.status = StatusCodes.OK;
   ctx.body = { result: test.result, error: test.error };

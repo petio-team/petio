@@ -1,10 +1,10 @@
+import { BaseNotification, INotification } from '../notification';
+import { INotify, NotifyEvent, NotifyPayload } from '../notify';
+import { AuthConfig } from '../url/url';
 import { Embeds } from '@/infra/discord/requests/request';
 import Embed, { EmbedField } from '@/infra/discord/structure/embed';
 import DiscordWebhook from '@/infra/discord/webhook';
 
-import { BaseNotification, INotification } from '../notification';
-import { INotify, NotifyEvent, NotifyPayload } from '../notify';
-import { AuthConfig } from '../url/url';
 
 export interface DiscordNotification extends INotification {
   id: string;
@@ -107,7 +107,7 @@ export const authConfigToDiscordSettings = (
     settings.token = url.arguments.value;
   }
 
-  if (url.options['thumbnail'] !== undefined) {
+  if (url.options.thumbnail !== undefined) {
     settings.thumbnail = true;
   }
 

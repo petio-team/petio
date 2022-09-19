@@ -1,6 +1,5 @@
 import { MakeRequest, Request } from '@/models/request/dto';
-import { User } from '@/models/user/dto';
-import { MakeUser } from '@/models/user/dto';
+import { User , MakeUser } from '@/models/user/dto';
 
 export enum NotifyEvent {
   // Request

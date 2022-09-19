@@ -34,9 +34,9 @@ export default (app: Router) => {
 };
 
 const handleTv = async (ctx: Context) => {
-  const ids = ctx.request.body.ids;
+  const {ids} = ctx.request.body;
   const min = ctx.request.body.min === undefined ? true : ctx.request.body.min;
-  let output = await Promise.all(
+  const output = await Promise.all(
     ids.map(async (id) => {
       if (!id) return;
       return showLookup(id, min);
@@ -47,9 +47,9 @@ const handleTv = async (ctx: Context) => {
 };
 
 const handleMovie = async (ctx: Context) => {
-  const ids = ctx.request.body.ids;
+  const {ids} = ctx.request.body;
   const min = ctx.request.body.min === undefined ? true : ctx.request.body.min;
-  let output = await Promise.all(
+  const output = await Promise.all(
     ids.map(async (id) => {
       if (!id) return;
       return movieLookup(id, min);
