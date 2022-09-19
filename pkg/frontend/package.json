@@ -18,13 +18,13 @@
     "react-lazy-load-image-component": "^1.5.1",
     "react-player": "^2.9.0",
     "react-redux": "^8.0.2",
-    "react-router": "^5.2.0",
+    "react-router": "^6.4.0",
     "react-router-dom": "^5.1.2",
     "react-scripts": "5.0.1",
     "redux": "^4.1.0",
     "redux-devtools-extension": "^2.13.9",
     "redux-thunk": "^2.3.0",
-    "sass": "1.34.1"
+    "sass": "1.54.9"
   },
   "scripts": {
     "start": "PORT=3001 react-scripts start",
