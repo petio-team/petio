@@ -22,20 +22,19 @@ ENV DATA_FOLDER="/data"
 
 # Install needed dependencies to get the image setup and then remove the cache
 RUN apk add --no-cache \
-    shadow \
-    wget \
-    bash \
-    nodejs \
+    shadow=4.10-r3 \
+    wget=1.21.3-r0 \
+    bash=5.1.16-r2 \
+    nodejs=16.16.0-r0 && \
     # Remove package cache
-    rm -rf /var/cache/apk/* \
+    rm -rf /var/cache/apk/* && \
     rm -rf /tmp/*
 
-# Create a group and user
+# Create petio user, group and create folders with permissions
 RUN groupadd -g 1000 petio && \
-    useradd -r -u 1000 -g petio petio
-
-# Make sure the app directory exists and has the correct permissions
-RUN mkdir -p /app && chown petio:petio /app
+    useradd -r -u 1000 -g petio petio \
+    # Make sure the app directory exists and has the correct permissions
+    mkdir -p /app && chown petio:petio /app
 
 # Copy all the build files from both frontend and backend
 COPY --from=builder --chown=petio:petio --chmod=0755 /build/pkg/frontend/build /app/views/frontend
