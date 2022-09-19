@@ -7,7 +7,7 @@
     "start": "nodemon",
     "inspect": "nodemon --inspect src/app.ts",
     "build": "tsc",
-    "build:prod": "yarn ncc build ./src/app.ts -o dist -m",
+    "build:prod": "yarn ncc -t build ./src/app.ts -o dist -m",
     "test": "ts-mocha --paths src/**/*.test.ts",
     "depcheck": "yarn dlx depcheck",
     "lint": "eslint . --ext .ts",
