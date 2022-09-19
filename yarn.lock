@@ -4569,6 +4569,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vercel/ncc@npm:^0.34.0":
+  version: 0.34.0
+  resolution: "@vercel/ncc@npm:0.34.0"
+  dependencies:
+    node-gyp: latest
+  bin:
+    ncc: dist/ncc/cli.js
+  checksum: 3282578e990572759454f7f8d7ef025f2ae060b261fcb28a96d165350e3665438dc8fb72caf122081d6c57277e4899dab30ea0d8759bfd90baf37286cb887597
+  languageName: node
+  linkType: hard
+
 "@webassemblyjs/ast@npm:1.11.1":
   version: 1.11.1
   resolution: "@webassemblyjs/ast@npm:1.11.1"
@@ -5134,6 +5145,7 @@ __metadata:
     "@types/nodemailer": ^6.4.6
     "@typescript-eslint/eslint-plugin": ^5.37.0
     "@typescript-eslint/parser": ^5.37.0
+    "@vercel/ncc": ^0.34.0
     "@zodios/core": ^9.0.1
     "@zodios/plugins": ^9.0.0
     agenda: ^4.3.0
