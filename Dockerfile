@@ -32,7 +32,7 @@ RUN apk add --no-cache \
 
 # Create petio user, group and create folders with permissions
 RUN groupadd -g 1000 petio && \
-    useradd -r -u 1000 -g petio petio \
+    useradd -r -u 1000 -g petio petio && \
     # Make sure the app directory exists and has the correct permissions
     mkdir -p /app && chown petio:petio /app
 
