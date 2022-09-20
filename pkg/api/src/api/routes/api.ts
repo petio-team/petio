@@ -33,8 +33,9 @@ import { config as conf } from '@/config/index';
 const api = new Router({ prefix: '/api' });
 
 export default (app: Koa, subpath: string) => {
-  if (subpath === '/') {
-    subpath = '';
+  let path = subpath;
+  if (path === '/') {
+    path = '';
   }
 
   // make sure setup is complete before allowing access to non setup routes
@@ -47,14 +48,14 @@ export default (app: Koa, subpath: string) => {
       debug: true,
     }).unless({
       path: [
-        `${subpath  }/api/health`,
-        `${subpath  }/api/config`,
-        `${subpath  }/api/login`,
-        `${subpath  }/api/login/plex_login`,
-        `${subpath  }/api/setup`,
-        `${subpath  }/api/setup/test_server`,
-        `${subpath  }/api/setup/test_mongo`,
-        `${subpath  }/api/setup/set`,
+        `${path}/api/health`,
+        `${path}/api/config`,
+        `${path}/api/login`,
+        `${path}/api/login/plex_login`,
+        `${path}/api/setup`,
+        `${path}/api/setup/test_server`,
+        `${path}/api/setup/test_mongo`,
+        `${path}/api/setup/set`,
       ],
     }),
   );
