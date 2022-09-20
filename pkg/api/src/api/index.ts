@@ -6,6 +6,7 @@ import mount from 'koa-mount';
 import logging from './middleware/logging';
 import options from "./middleware/options";
 import session from './middleware/session';
+import responseHandler from "./web/responseHandler";
 import cors from '@/api/middleware/cors';
 import errorHandler from '@/api/middleware/errorHandling';
 import api from '@/api/routes/api';
@@ -55,14 +56,17 @@ export default () => {
   // Enable body parsing
   app.use(koaBody());
 
-  // get correctly formatted subpath
-  const subpath = `/${  removeSlashes(config.get('petio.subpath'))}`;
-
   // session middleware
   app.use(session(app));
 
   // use options
   app.use(options);
+
+  // use response handler
+  app.use(responseHandler());
+
+  // get correctly formatted subpath
+  const subpath = `/${  removeSlashes(config.get('petio.subpath'))}`;
 
   // Mount endpoints
   app.use(mount(subpath, routes(subpath)));
