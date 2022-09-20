@@ -4,17 +4,6 @@ import { Context } from 'koa';
 
 import { company, discoverMovie, movieLookup } from '@/services/tmdb/movie';
 
-const route = new Router({ prefix: '/movie' });
-
-export default (app: Router) => {
-  route.get('/lookup/:id', lookupById);
-  route.get('/lookup/:id/minified', lookupByIdMinified);
-  route.post('/discover', getMovieDiscovery);
-  route.get('/company/:id', getCompanyById);
-
-  app.use(route.routes());
-};
-
 const lookupById = async (ctx: Context) => {
   ctx.status = StatusCodes.OK;
   ctx.body = await movieLookup(ctx.params.id);
@@ -38,4 +27,14 @@ const getMovieDiscovery = async (ctx: Context) => {
 const getCompanyById = async (ctx: Context) => {
   ctx.status = StatusCodes.OK;
   ctx.body = await company(ctx.params.id);
+};
+
+const route = new Router({ prefix: '/movie' });
+export default (app: Router) => {
+  route.get('/lookup/:id', lookupById);
+  route.get('/lookup/:id/minified', lookupByIdMinified);
+  route.post('/discover', getMovieDiscovery);
+  route.get('/company/:id', getCompanyById);
+
+  app.use(route.routes());
 };

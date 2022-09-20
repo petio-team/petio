@@ -73,7 +73,6 @@ const addReview = async (ctx: Context) => {
 };
 
 const route = new Router({ prefix: '/review' });
-
 export default (app: Router) => {
   route.get('/all', listReviews);
   route.get('/all/:id', getReviewById);

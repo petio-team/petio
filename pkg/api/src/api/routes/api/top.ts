@@ -12,16 +12,7 @@ import getTop from '@/services/plex/top';
 //     ttl: 86400,
 //   })
 // );
-
-const route = new Router({ prefix: '/top' });
 // cacheMiddleware.attach(route);
-
-export default (app: Router) => {
-  route.get('/movies', getMovies);
-  route.get('/shows', getShows);
-
-  app.use(route.routes());
-};
 
 const getMovies = async (ctx: Context) => {
   ctx.status = StatusCodes.OK;
@@ -31,4 +22,12 @@ const getMovies = async (ctx: Context) => {
 const getShows = async (ctx: Context) => {
   ctx.status = StatusCodes.OK;
   ctx.body = await getTop(2);
+};
+
+const route = new Router({ prefix: '/top' });
+export default (app: Router) => {
+  route.get('/movies', getMovies);
+  route.get('/shows', getShows);
+
+  app.use(route.routes());
 };

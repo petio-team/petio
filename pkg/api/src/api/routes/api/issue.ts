@@ -9,83 +9,11 @@ import Mailer from '@/services/mail/mailer';
 import { movieLookup } from '@/services/tmdb/movie';
 import { showLookup } from '@/services/tmdb/show';
 
-const route = new Router({ prefix: '/issue' });
-
-export default (app: Router) => {
-  route.get('/all', listAllIssues);
-  route.post('/add', addIssue);
-  route.post('/remove', deleteIssues);
-
-  app.use(route.routes());
-};
-
 const listAllIssues = async (ctx: Context) => {
   ctx.status = StatusCodes.OK;
   ctx.body = await Issue.find();
 };
 
-const deleteIssues = async (ctx: Context) => {
-  const body = ctx.request.body as any;
-  const issue_id = body.id;
-  const {message} = body;
-
-  try {
-    const issue = await Issue.findById(issue_id);
-    if (!issue) {
-      ctx.status = StatusCodes.NOT_FOUND;
-      ctx.body = { error: 'error no issue found' };
-      return;
-    }
-
-    mailIssueResolve(
-      issue.user,
-      issue.mediaId,
-      issue.type,
-      issue.title,
-      message,
-    );
-    await Issue.findByIdAndDelete(issue_id);
-
-    ctx.status = StatusCodes.OK;
-    ctx.body = {};
-  } catch (err) {
-    logger.error(err);
-    logger.log('warn', 'ROUTE: Error removing issue');
-    logger.log('error', err.stack);
-
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = { error: 'error removing issue' };
-  }
-};
-
-const addIssue = async (ctx: Context) => {
-  const body = ctx.request.body as any;
-
-  const newIssue = new Issue({
-    mediaId: body.mediaId,
-    type: body.type,
-    title: body.title,
-    user: body.user,
-    sonarrId: false,
-    radarrId: false,
-    issue: body.issue,
-    comment: body.comment,
-  });
-
-  try {
-    const savedIssue = await newIssue.save();
-    mailIssue(body.user, body.mediaId, body.type, body.title);
-    ctx.status = StatusCodes.OK;
-    ctx.body = savedIssue;
-  } catch (err) {
-    logger.error(err);
-    logger.log('warn', 'ROUTE: Error addding issue');
-    logger.log('error', err.stack);
-
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = { error: 'error adding issue' };
-  }
-};
 
 async function mailIssue(user_id, media_id, type, title) {
   const userData = await UserModel.findOne({ id: user_id });
@@ -148,3 +76,75 @@ async function mailIssueResolve(user_id, media_id, type, title, message) {
     [userData.title as never],
   );
 }
+
+const deleteIssues = async (ctx: Context) => {
+  const body = ctx.request.body as any;
+  const issueId = body.id;
+  const {message} = body;
+
+  try {
+    const issue = await Issue.findById(issueId);
+    if (!issue) {
+      ctx.status = StatusCodes.NOT_FOUND;
+      ctx.body = { error: 'error no issue found' };
+      return;
+    }
+
+    mailIssueResolve(
+      issue.user,
+      issue.mediaId,
+      issue.type,
+      issue.title,
+      message,
+    );
+    await Issue.findByIdAndDelete(issueId);
+
+    ctx.status = StatusCodes.OK;
+    ctx.body = {};
+  } catch (err) {
+    logger.error(err);
+    logger.log('warn', 'ROUTE: Error removing issue');
+    logger.log('error', err.stack);
+
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = { error: 'error removing issue' };
+  }
+};
+
+const addIssue = async (ctx: Context) => {
+  const body = ctx.request.body as any;
+
+  const newIssue = new Issue({
+    mediaId: body.mediaId,
+    type: body.type,
+    title: body.title,
+    user: body.user,
+    sonarrId: false,
+    radarrId: false,
+    issue: body.issue,
+    comment: body.comment,
+  });
+
+  try {
+    const savedIssue = await newIssue.save();
+    mailIssue(body.user, body.mediaId, body.type, body.title);
+    ctx.status = StatusCodes.OK;
+    ctx.body = savedIssue;
+  } catch (err) {
+    logger.error(err);
+    logger.log('warn', 'ROUTE: Error addding issue');
+    logger.log('error', err.stack);
+
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = { error: 'error adding issue' };
+  }
+};
+
+const route = new Router({ prefix: '/issue' });
+export default (app: Router) => {
+  route.get('/all', listAllIssues);
+  route.post('/add', addIssue);
+  route.post('/remove', deleteIssues);
+
+  app.use(route.routes());
+};

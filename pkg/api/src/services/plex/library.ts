@@ -15,7 +15,7 @@ import { CreateOrUpdateUser, User, UserModel, UserRole } from '@/models/user';
 import Mailer from '@/services/mail/mailer';
 import Discord from '@/services/notifications/discord';
 import Telegram from '@/services/notifications/telegram';
-import processRequest from '@/services/requests/process';
+import ProcessRequest from '@/services/requests/process';
 import { showLookup } from '@/services/tmdb/show';
 
 export default class LibraryUpdate {
@@ -781,7 +781,7 @@ export default class LibraryUpdate {
           await this.sendMail(user, i, request);
         }),
       );
-      await new processRequest(request).archive(true, false);
+      await new ProcessRequest(request).archive(true, false);
     }
   }
 
@@ -870,7 +870,7 @@ export default class LibraryUpdate {
               { label: 'plex.library' },
             );
             if (request.tvdb_id)
-              new processRequest({
+              new ProcessRequest({
                 id: request.requestId,
                 type: request.type,
                 title: request.title,
@@ -896,7 +896,7 @@ export default class LibraryUpdate {
         logger.verbose(`CRON: Found missed request - ${request.title}`, {
           label: 'plex.library',
         });
-        new processRequest(request).archive(true, false, false);
+        new ProcessRequest(request).archive(true, false, false);
         const emails: any = [];
         const titles: any = [];
         await Promise.all(

@@ -7,16 +7,6 @@ import logger from '@/loaders/logger';
 import Profile from '@/models/profile';
 import { UserModel } from '@/models/user';
 
-const route = new Router({ prefix: '/profiles' });
-
-export default (app: Router) => {
-  route.get('/all', listProfiles);
-  route.post('/save_profile', saveProfile);
-  route.post('/delete_profile', deleteProfile);
-
-  app.use(route.routes());
-};
-
 const listProfiles = async (ctx: Context) => {
   let data: any;
   try {
@@ -32,7 +22,7 @@ const listProfiles = async (ctx: Context) => {
   } catch (err) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = { error: err };
-    
+
   }
 };
 
@@ -161,4 +151,14 @@ const deleteProfile = async (ctx: Context) => {
       error: 'Failed to delete',
     };
   }
+};
+
+const route = new Router({ prefix: '/profiles' });
+
+export default (app: Router) => {
+  route.get('/all', adminRequired, listProfiles);
+  route.post('/save_profile', adminRequired, saveProfile);
+  route.post('/delete_profile', adminRequired, deleteProfile);
+
+  app.use(route.routes());
 };

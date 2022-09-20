@@ -9,31 +9,6 @@ import { config } from '@/config/schema';
 import logger from '@/loaders/logger';
 import setupReady from '@/services/setup/setup';
 
-const route = new Router({ prefix: '/config' });
-
-export default (app: Router) => {
-  route.get('/', getConfig);
-  route.post(
-    '/update',
-    validateRequest({
-      body: z.object({
-        plexToken: z.string().optional(),
-        base_path: z.string().optional(),
-        login_type: z.number().optional(),
-        plexPopular: z.boolean().optional(),
-        telegram_chat_id: z.string().optional(),
-        telegram_bot_token: z.string().optional(),
-        telegram_send_silent: z.boolean().optional(),
-        discord_webhook: z.string().optional(),
-      }),
-    }),
-    updateConfig,
-  );
-  route.get('/current', getCurrentConfig);
-
-  app.use(route.routes());
-};
-
 const getConfig = async (ctx: Context) => {
   const configStatus = await HasConfig();
   let ready = false;
@@ -68,12 +43,18 @@ const getConfig = async (ctx: Context) => {
 const updateConfig = async (ctx: Context) => {
   const {
     plexToken,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     base_path,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     login_type,
     plexPopular,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     telegram_bot_token,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     telegram_chat_id,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     telegram_send_silently,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     discord_webhook,
   } = ctx.request.body;
 
@@ -134,4 +115,28 @@ const getCurrentConfig = async (ctx: Context) => {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = 'config not found';
   }
+};
+
+const route = new Router({ prefix: '/config' });
+export default (app: Router) => {
+  route.get('/', getConfig);
+  route.post(
+    '/update',
+    validateRequest({
+      body: z.object({
+        plexToken: z.string().optional(),
+        base_path: z.string().optional(),
+        login_type: z.number().optional(),
+        plexPopular: z.boolean().optional(),
+        telegram_chat_id: z.string().optional(),
+        telegram_bot_token: z.string().optional(),
+        telegram_send_silent: z.boolean().optional(),
+        discord_webhook: z.string().optional(),
+      }),
+    }),
+    updateConfig,
+  );
+  route.get('/current', getCurrentConfig);
+
+  app.use(route.routes());
 };

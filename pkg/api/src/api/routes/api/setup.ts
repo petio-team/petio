@@ -11,22 +11,6 @@ import logger from '@/loaders/logger';
 import { CreateOrUpdateUser, UserRole } from '@/models/user';
 import testConnection from '@/services/plex/connection';
 
-const route = new Router({ prefix: '/setup' });
-
-export default (app: Router) => {
-  route.post(
-    '/test_server',
-    validateRequest({
-      body: SetupTestInputSchema,
-    }),
-    testServer,
-  );
-  route.post('/test_mongo', testMongo);
-  route.post('/set', finishSetup);
-
-  app.use(route.routes());
-};
-
 const testServer = async (ctx: Context) => {
   const body = ctx.request.body as SetupTestInput;
 
@@ -178,4 +162,19 @@ const finishSetup = async (ctx: Context) => {
     logger.log('error', 'Config creation error');
     logger.log({ level: 'error', message: err });
   }
+};
+
+const route = new Router({ prefix: '/setup' });
+export default (app: Router) => {
+  route.post(
+    '/test_server',
+    validateRequest({
+      body: SetupTestInputSchema,
+    }),
+    testServer,
+  );
+  route.post('/test_mongo', testMongo);
+  route.post('/set', finishSetup);
+
+  app.use(route.routes());
 };

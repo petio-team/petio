@@ -12,22 +12,7 @@ import Sonarr from '@/services/downloaders/sonarr';
 import Mailer from '@/services/mail/mailer';
 import { getArchive } from '@/services/requests/archive';
 import { getRequests } from '@/services/requests/display';
-import processRequest from '@/services/requests/process';
-
-const routes = new Router({ prefix: '/request' });
-
-export default (app: Router) => {
-  routes.get('/all', listRequests);
-  routes.get('/min', getRequestMinified);
-  routes.post('/add', addRequest);
-  routes.get('/me', getUserRequests);
-  routes.post('/remove', removeRequest);
-  routes.post('/update', updateRequest);
-  routes.get('/archive/:id', getArchivedRequestById);
-
-  app.use(routes.routes());
-  app.use(routes.allowedMethods());
-};
+import ProcessRequest from '@/services/requests/process';
 
 const listRequests = async (ctx: Context) => {
   ctx.status = StatusCodes.OK;
@@ -56,7 +41,7 @@ const getRequestMinified = async (ctx: Context) => {
     }
 
     await Promise.all(
-      requests.map(async (request, _i) => {
+      requests.map(async (request) => {
         if (!request.requestId) {
           return;
         }
@@ -93,7 +78,7 @@ const addRequest = async (ctx: Context) => {
   const {body} = ctx.request;
 
   const {request} = body;
-  const process = await new processRequest(request, ctx.state.user).new();
+  const process = await new ProcessRequest(request, ctx.state.user).new();
 
   ctx.status = StatusCodes.OK;
   ctx.body = process;
@@ -104,7 +89,7 @@ const removeRequest = async (ctx: Context) => {
 
   const {request} = body;
   const {reason} = body;
-  const process = new processRequest(request, ctx.state.user);
+  const process = new ProcessRequest(request, ctx.state.user);
 
   await process.archive(false, true, reason);
 
@@ -154,7 +139,7 @@ const updateRequest = async (ctx: Context) => {
   const {manualStatus} = body.request;
 
   if (manualStatus === '5') {
-    new processRequest(request, ctx.state.user).archive(true, false, false);
+    new ProcessRequest(request, ctx.state.user).archive(true, false, false);
     ctx.status = StatusCodes.OK;
     ctx.body = {};
     return;
@@ -181,6 +166,7 @@ const updateRequest = async (ctx: Context) => {
             return instance;
           }
         }
+        return undefined;
       });
 
       await Bluebird.map(activeServers, async (instance) => {
@@ -234,4 +220,18 @@ const getArchivedRequestById = async (ctx: Context) => {
 
   ctx.status = StatusCodes.OK;
   ctx.body = await getArchive(id);
+};
+
+const routes = new Router({ prefix: '/request' });
+export default (app: Router) => {
+  routes.get('/all', listRequests);
+  routes.get('/min', getRequestMinified);
+  routes.post('/add', addRequest);
+  routes.get('/me', getUserRequests);
+  routes.post('/remove', removeRequest);
+  routes.post('/update', updateRequest);
+  routes.get('/archive/:id', getArchivedRequestById);
+
+  app.use(routes.routes());
+  app.use(routes.allowedMethods());
 };

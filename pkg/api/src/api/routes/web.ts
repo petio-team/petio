@@ -7,6 +7,23 @@ import serve from 'koa-static';
 
 import env from '@/config/env';
 
+const pathExists = async (file: string): Promise<boolean> => {
+  try {
+    const stat = await fs.stat(file);
+    return stat.isFile();
+  } catch (error) {
+    return false;
+  }
+};
+
+function serveReact(app: Koa, dir: string, urlPath: string) {
+  const spa = new Koa();
+  spa.use(addTrailingSlashes());
+  spa.use(serve(dir));
+  app.use(mount(urlPath, spa));
+}
+
+
 export default async (app: Koa) => {
   let frontendPath = env.views.frontend;
   if (!(await pathExists(path.join(frontendPath, 'index.html')))) {
@@ -31,19 +48,3 @@ export default async (app: Koa) => {
   serveReact(app, frontendPath, '/');
   serveReact(app, adminPath, '/admin');
 };
-
-const pathExists = async (file: string): Promise<boolean> => {
-  try {
-    const stat = await fs.stat(file);
-    return stat.isFile();
-  } catch (error) {
-    return false;
-  }
-};
-
-function serveReact(app: Koa, dir: string, path: string) {
-  const spa = new Koa();
-  spa.use(addTrailingSlashes());
-  spa.use(serve(dir));
-  app.use(mount(path, spa));
-}

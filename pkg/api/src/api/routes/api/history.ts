@@ -7,16 +7,6 @@ import getBandwidth from '@/services/plex/bandwidth';
 import getHistory from '@/services/plex/history';
 import getServerInfo from '@/services/plex/serverInfo';
 
-const route = new Router({ prefix: '/history' });
-
-export default (app: Router) => {
-  route.post('/', listHistory);
-  route.get('/server', getServerData);
-  route.get('/bandwidth', collectBandwidth);
-
-  app.use(route.routes());
-};
-
 const listHistory = async (ctx: Context) => {
   let {id} = ctx.request.body;
   if (id === 'admin') id = 1;
@@ -53,4 +43,13 @@ const collectBandwidth = async (ctx: Context) => {
 
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
   }
+};
+
+const route = new Router({ prefix: '/history' });
+export default (app: Router) => {
+  route.post('/', listHistory);
+  route.get('/server', getServerData);
+  route.get('/bandwidth', collectBandwidth);
+
+  app.use(route.routes());
 };

@@ -13,7 +13,6 @@ import Profile from '@/models/profile';
 import { UserModel, UserRole } from '@/models/user';
 
 const UPLOAD_DIR = path.join(env.paths.data, './uploads');
-const route = new Router({ prefix: '/user' });
 
 const storage = multer.diskStorage({
   destination (_req, _file, cb) {
@@ -29,20 +28,6 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage,
 });
-
-export default (app: Router) => {
-  route.get('/all', getAllUsers);
-  route.get('/quota', getQuota);
-  route.get('/thumb/:id', getThumbnailById);
-  route.get('/:id', getUserById);
-  route.post('/create_custom', createCustomUser);
-  route.post('/edit', editUser);
-  route.post('/bulk_edit', editMultipleUsers);
-  route.post('/delete_user', deleteUser);
-  route.post('/thumb/:id', upload.single('img'), updateUserThumbnail);
-
-  app.use(route.routes());
-};
 
 const getAllUsers = async (ctx: Context) => {
   let userData: any;
@@ -272,6 +257,7 @@ const deleteUser = async (ctx: Context) => {
   }
 
   try {
+    // eslint-disable-next-line no-underscore-dangle
     await UserModel.findByIdAndDelete(user._id);
     ctx.status = StatusCodes.OK;
     ctx.body = {
@@ -385,4 +371,19 @@ const getQuota = async (ctx: Context) => {
     current,
     total,
   };
+};
+
+const route = new Router({ prefix: '/user' });
+export default (app: Router) => {
+  route.get('/all', getAllUsers);
+  route.get('/quota', getQuota);
+  route.get('/thumb/:id', getThumbnailById);
+  route.get('/:id', getUserById);
+  route.post('/create_custom', createCustomUser);
+  route.post('/edit', editUser);
+  route.post('/bulk_edit', editMultipleUsers);
+  route.post('/delete_user', deleteUser);
+  route.post('/thumb/:id', upload.single('img'), updateUserThumbnail);
+
+  app.use(route.routes());
 };

@@ -10,14 +10,6 @@ import env from '@/config/env';
 const liveLogfile = path.join(env.paths.data, './logs/live1.log');
 const liveLogfile2 = path.join(env.paths.data, './logs/live.log');
 
-const route = new Router({ prefix: 'logs/' });
-
-export default (app: Router) => {
-  route.get('/stream', adminRequired, streamLog);
-
-  app.use(route.routes());
-};
-
 const streamLog = async (ctx: Context) => {
   let dataNew; let dataOld;
   try {
@@ -38,4 +30,11 @@ const streamLog = async (ctx: Context) => {
 
   ctx.status = StatusCodes.OK;
   ctx.body = data;
+};
+
+const route = new Router({ prefix: 'logs/' });
+export default (app: Router) => {
+  route.get('/stream', adminRequired, streamLog);
+
+  app.use(route.routes());
 };

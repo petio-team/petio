@@ -4,15 +4,15 @@ import { Context } from 'koa';
 
 import trending from '@/services/tmdb/trending';
 
-const route = new Router({ prefix: '/trending' });
+const getTrending = async (ctx: Context) => {
+  ctx.status = StatusCodes.OK;
+  ctx.body = await trending();
+};
 
+const route = new Router({ prefix: '/trending' });
 export default (app: Router) => {
   route.get('/', getTrending);
 
   app.use(route.routes());
 };
 
-const getTrending = async (ctx: Context) => {
-  ctx.status = StatusCodes.OK;
-  ctx.body = await trending();
-};

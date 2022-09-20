@@ -18,7 +18,6 @@ import {
   GetAllDownloaders,
 } from '@/models/downloaders';
 
-const route = new Router({ prefix: '/services' });
 
 enum HttpProtocol {
   Http = 'http',
@@ -53,196 +52,6 @@ const ArrInputSchema = z.array(
   }),
 );
 type ArrInput = z.infer<typeof ArrInputSchema>;
-
-export default (app: Router) => {
-  route.get(
-    '/sonarr/options/:id',
-    validateRequest({
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-    }),
-    adminRequired,
-    getSonarrOptionsById,
-  );
-  route.get(
-    '/sonarr/paths/:id',
-    validateRequest({
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-    }),
-    adminRequired,
-    getSonarrPathsById,
-  );
-  route.get(
-    '/sonarr/profiles/:id',
-    validateRequest({
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-    }),
-    adminRequired,
-    getSonarrProfilesById,
-  );
-  route.get(
-    '/sonarr/languages/:id',
-    validateRequest({
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-    }),
-    adminRequired,
-    getSonarrLanguagesById,
-  );
-  route.get(
-    '/sonarr/tags/:id',
-    validateRequest({
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-    }),
-    adminRequired,
-    getSonarrTagsById,
-  );
-  route.get(
-    '/sonarr/test/:id',
-    validateRequest({
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-    }),
-    adminRequired,
-    testSonarrConnectionById,
-  );
-  route.get(
-    '/sonarr/config',
-    validateRequest({
-      query: z.object({
-        withPaths: z.any().optional(),
-        withProfiles: z.any().optional(),
-        withLanguages: z.any().optional(),
-        withAvailabilities: z.any().optional(),
-        withTags: z.any().optional(),
-      }),
-    }),
-    adminRequired,
-    getSonarrConfig,
-  );
-  route.get('/calendar', getCalendarData);
-  route.post(
-    '/sonarr/config',
-    validateRequest({
-      body: ArrInputSchema,
-    }),
-    adminRequired,
-    updateSonarrConfig,
-  );
-  route.delete(
-    '/sonarr/:id',
-    validateRequest({
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-    }),
-    adminRequired,
-    deleteSonarrById,
-  );
-  route.get(
-    '/radarr/options/:id',
-    validateRequest({
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-    }),
-    adminRequired,
-    getRadarrOptionsById,
-  );
-  route.get(
-    '/radarr/paths/:id',
-    validateRequest({
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-    }),
-    adminRequired,
-    getRadarrPathsById,
-  );
-  route.get(
-    '/radarr/profiles/:id',
-    validateRequest({
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-    }),
-    adminRequired,
-    getRadarrProfilesById,
-  );
-  route.get(
-    '/radarr/languages/:id',
-    validateRequest({
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-    }),
-    adminRequired,
-    getRadarrLanguagesById,
-  );
-  route.get(
-    '/radarr/tags/:id',
-    validateRequest({
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-    }),
-    adminRequired,
-    getRadarrTagsById,
-  );
-  route.get(
-    '/radarr/test/:id',
-    validateRequest({
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-    }),
-    adminRequired,
-    testRadarrConnectionById,
-  );
-  route.get(
-    '/radarr/config',
-    validateRequest({
-      query: z.object({
-        withPaths: z.any().optional(),
-        withProfiles: z.any().optional(),
-        withLanguages: z.any().optional(),
-        withAvailabilities: z.any().optional(),
-        withTags: z.any().optional(),
-      }),
-    }),
-    adminRequired,
-    getRadarrConfig,
-  );
-  route.post(
-    '/radarr/config',
-    validateRequest({
-      body: ArrInputSchema,
-    }),
-    adminRequired,
-    updateRadarrConfig,
-  );
-  route.delete(
-    '/radarr/:id',
-    validateRequest({
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-    }),
-    adminRequired,
-    deleteRadarrById,
-  );
-
-  app.use(route.routes());
-};
 
 const getSonarrOptionsById = async (ctx: Context) => {
   try {
@@ -395,7 +204,7 @@ const getSonarrConfig = async (ctx: Context) => {
       if (!url.port) {
         port = url.protocol === 'http' ? 80 : 443;
       } else {
-        port = parseInt(url.port);
+        port = parseInt(url.port, 10);
       }
 
       const [paths, profiles, languages, availabilities, tags] =
@@ -443,7 +252,6 @@ const getSonarrConfig = async (ctx: Context) => {
     ctx.status = StatusCodes.OK;
     ctx.body = results;
   } catch (error) {
-    console.log(error);
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = error.message;
   }
@@ -454,37 +262,38 @@ const updateSonarrConfig = async (ctx: Context) => {
 
   try {
     const results = await bluebird.map(data, async (instance) => {
-      if (instance.subpath.startsWith('/')) {
-        instance.subpath = instance.subpath.substring(1);
+      const inst = instance;
+      if (inst.subpath.startsWith('/')) {
+        inst.subpath = instance.subpath.substring(1);
       }
 
       const url = new URL(
-        `${instance.protocol 
-          }://${ 
-          instance.host 
-          }:${ 
-          instance.port 
-          }/${ 
-          instance.subpath}`,
+        `${inst.protocol
+          }://${
+            inst.host
+          }:${
+            inst.port
+          }/${
+            inst.subpath}`,
       );
 
-      const api = new SonarrAPI(url, instance.token);
+      const api = new SonarrAPI(url, inst.token);
       const passed = await api.TestConnection();
       if (!passed) {
         throw new ArrError('failed to test connection to instance');
       }
 
       const newInstance = await CreateOrUpdateDownloader({
-        name: instance.name,
+        name: inst.name,
         type: DownloaderType.Sonarr,
         url: url.toString(),
-        token: instance.token,
+        token: inst.token,
         version: api.GetVersion().toString(),
-        path: instance.path,
-        profile: instance.profile,
-        language: instance.language,
-        availability: instance.availability,
-        enabled: instance.enabled,
+        path: inst.path,
+        profile: inst.profile,
+        language: inst.language,
+        availability: inst.availability,
+        enabled: inst.enabled,
       });
 
       const [paths, profiles, languages, availabilities] = await Promise.all([
@@ -496,17 +305,17 @@ const updateSonarrConfig = async (ctx: Context) => {
 
       return {
         id: newInstance.id,
-        name: instance.name,
-        protocol: instance.protocol,
-        host: instance.host,
-        port: instance.port,
-        subpath: instance.subpath === '' ? '/' : instance.subpath,
-        token: instance.token,
-        path: instance.path,
-        profile: instance.profile,
-        language: instance.language,
-        availability: instance.availability,
-        enabled: instance.enabled,
+        name: inst.name,
+        protocol: inst.protocol,
+        host: inst.host,
+        port: inst.port,
+        subpath: inst.subpath === '' ? '/' : instance.subpath,
+        token: inst.token,
+        path: inst.path,
+        profile: inst.profile,
+        language: inst.language,
+        availability: inst.availability,
+        enabled: inst.enabled,
         paths,
         profiles,
         languages,
@@ -526,8 +335,6 @@ const updateSonarrConfig = async (ctx: Context) => {
     } else {
       StatusInternalServerError(ctx, error.message);
     }
-
-    
   }
 };
 
@@ -741,7 +548,7 @@ const getRadarrConfig = async (ctx: Context) => {
       if (!url.port) {
         port = url.protocol === 'http' ? 80 : 443;
       } else {
-        port = parseInt(url.port);
+        port = parseInt(url.port, 10);
       }
 
       const [paths, profiles, languages, availabilities, tags] =
@@ -799,37 +606,38 @@ const updateRadarrConfig = async (ctx: Context) => {
 
   try {
     const results = await bluebird.map(data, async (instance) => {
-      if (instance.subpath.startsWith('/')) {
-        instance.subpath = instance.subpath.substring(1);
+      const inst = instance;
+      if (inst.subpath.startsWith('/')) {
+        inst.subpath = instance.subpath.substring(1);
       }
 
       const url = new URL(
-        `${instance.protocol 
-          }://${ 
-          instance.host 
-          }:${ 
-          instance.port 
-          }/${ 
-          instance.subpath}`,
+        `${inst.protocol
+          }://${
+            inst.host
+          }:${
+            inst.port
+          }/${
+            inst.subpath}`,
       );
 
-      const api = new RadarrAPI(url, instance.token);
+      const api = new RadarrAPI(url, inst.token);
       const passed = await api.TestConnection();
       if (!passed) {
         throw new ArrError('failed to test connection to instance');
       }
 
       const newInstance = await CreateOrUpdateDownloader({
-        name: instance.name,
+        name: inst.name,
         type: DownloaderType.Radarr,
         url: url.toString(),
-        token: instance.token,
+        token: inst.token,
         version: api.GetVersion().toString(),
-        path: instance.path,
-        profile: instance.profile,
-        language: instance.language,
-        availability: instance.availability,
-        enabled: instance.enabled,
+        path: inst.path,
+        profile: inst.profile,
+        language: inst.language,
+        availability: inst.availability,
+        enabled: inst.enabled,
       });
 
       const [paths, profiles, languages, availabilities] = await Promise.all([
@@ -841,17 +649,17 @@ const updateRadarrConfig = async (ctx: Context) => {
 
       return {
         id: newInstance.id,
-        name: instance.name,
-        protocol: instance.protocol,
-        host: instance.host,
-        port: instance.port,
-        subpath: instance.subpath === '' ? '/' : instance.subpath,
-        token: instance.token,
-        path: instance.path,
-        profile: instance.profile,
-        language: instance.language,
-        availability: instance.availability,
-        enabled: instance.enabled,
+        name: inst.name,
+        protocol: inst.protocol,
+        host: inst.host,
+        port: inst.port,
+        subpath: inst.subpath === '' ? '/' : inst.subpath,
+        token: inst.token,
+        path: inst.path,
+        profile: inst.profile,
+        language: inst.language,
+        availability: inst.availability,
+        enabled: inst.enabled,
         paths,
         profiles,
         languages,
@@ -871,8 +679,6 @@ const updateRadarrConfig = async (ctx: Context) => {
     } else {
       StatusInternalServerError(ctx, error.message);
     }
-
-    
   }
 };
 
@@ -896,4 +702,196 @@ const deleteRadarrById = async (ctx: Context) => {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = error.message;
   }
+};
+
+
+const route = new Router({ prefix: '/services' });
+export default (app: Router) => {
+  route.get(
+    '/sonarr/options/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    getSonarrOptionsById,
+  );
+  route.get(
+    '/sonarr/paths/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    getSonarrPathsById,
+  );
+  route.get(
+    '/sonarr/profiles/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    getSonarrProfilesById,
+  );
+  route.get(
+    '/sonarr/languages/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    getSonarrLanguagesById,
+  );
+  route.get(
+    '/sonarr/tags/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    getSonarrTagsById,
+  );
+  route.get(
+    '/sonarr/test/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    testSonarrConnectionById,
+  );
+  route.get(
+    '/sonarr/config',
+    validateRequest({
+      query: z.object({
+        withPaths: z.any().optional(),
+        withProfiles: z.any().optional(),
+        withLanguages: z.any().optional(),
+        withAvailabilities: z.any().optional(),
+        withTags: z.any().optional(),
+      }),
+    }),
+    adminRequired,
+    getSonarrConfig,
+  );
+  route.get('/calendar', getCalendarData);
+  route.post(
+    '/sonarr/config',
+    validateRequest({
+      body: ArrInputSchema,
+    }),
+    adminRequired,
+    updateSonarrConfig,
+  );
+  route.delete(
+    '/sonarr/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    deleteSonarrById,
+  );
+  route.get(
+    '/radarr/options/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    getRadarrOptionsById,
+  );
+  route.get(
+    '/radarr/paths/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    getRadarrPathsById,
+  );
+  route.get(
+    '/radarr/profiles/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    getRadarrProfilesById,
+  );
+  route.get(
+    '/radarr/languages/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    getRadarrLanguagesById,
+  );
+  route.get(
+    '/radarr/tags/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    getRadarrTagsById,
+  );
+  route.get(
+    '/radarr/test/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    testRadarrConnectionById,
+  );
+  route.get(
+    '/radarr/config',
+    validateRequest({
+      query: z.object({
+        withPaths: z.any().optional(),
+        withProfiles: z.any().optional(),
+        withLanguages: z.any().optional(),
+        withAvailabilities: z.any().optional(),
+        withTags: z.any().optional(),
+      }),
+    }),
+    adminRequired,
+    getRadarrConfig,
+  );
+  route.post(
+    '/radarr/config',
+    validateRequest({
+      body: ArrInputSchema,
+    }),
+    adminRequired,
+    updateRadarrConfig,
+  );
+  route.delete(
+    '/radarr/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    }),
+    adminRequired,
+    deleteRadarrById,
+  );
+
+  app.use(route.routes());
 };

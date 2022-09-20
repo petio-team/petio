@@ -12,7 +12,7 @@ import Telegram from '@/services/notifications/telegram';
 import filter from '@/services/requests/filter';
 import { showLookup } from '@/services/tmdb/show';
 
-export default class processRequest {
+export default class ProcessRequest {
   request: any;
 
   user: User | undefined;
@@ -295,7 +295,7 @@ export default class processRequest {
             if (!instance) {
               continue;
             }
-            new Radarr(instance).processRequest(this.request.id);
+            new Radarr(instance).ProcessRequest(this.request.id);
           }
         }
       }
@@ -327,7 +327,7 @@ export default class processRequest {
           (i) => i.type === DownloaderType.Radarr,
         );
         for (const instance of radarrs) {
-          new Radarr(instance).processRequest(this.request.id);
+          new Radarr(instance).ProcessRequest(this.request.id);
         }
       }
     }
