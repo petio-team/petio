@@ -1,21 +1,21 @@
 # Folders
-.github/
-.husky/
-.trunk/
-.vscode/
-data/
-node_modules/
-pkg/admin/build/
-pkg/frontend/build/
-pkg/api/dist/
-pkg/api/build/
-pkg/api/data/
+
+.git
+.devcontainer
+.github
+.husky
+.trunk
+.vscode
+data
+build
+dist
 
 # Files
+
 .hadolint.yaml
 .markdownlint.yaml
 .node-version
-.prettierjs
+prettierjs
 .shellcheckrc
 commitlint.config.js
 docker-compose.yaml
@@ -23,3 +23,7 @@ LICENSE
 README.md
 semantic-release.json
 Taskfile.yml
+.dockerignore
+.editorconfig
+.eslintrc.js
+.prettierignore
