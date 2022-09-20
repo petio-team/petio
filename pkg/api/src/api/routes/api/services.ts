@@ -20,36 +20,32 @@ import {
 } from '@/models/downloaders';
 
 const getSonarrOptionsById = async (ctx: Context) => {
-  try {
-    const instance = await GetSonarrInstanceFromDb(ctx.params.id);
-    if (!instance) {
-      ctx.status = StatusCodes.NOT_FOUND;
-      ctx.body = 'no instance could be found with that id';
-      return;
-    }
+  const instance = await GetSonarrInstanceFromDb(ctx.params.id);
+  if (!instance) {
+    ctx.error({
+      statusCode: StatusCodes.BAD_REQUEST,
+      code: "INVALID_INSTANCE",
+      message: `No instance was found with the id: ${ctx.params.id}`
+    });
+    return;
+  }
 
-    const [paths, profiles, languages, tags] = await Promise.all([
-      instance.GetRootPaths(),
-      instance.GetQualityProfiles(),
-      instance.GetLanguageProfile(),
-      instance.GetTags(),
-    ]);
+  const [paths, profiles, languages, tags] = await Promise.all([
+    instance.GetRootPaths(),
+    instance.GetQualityProfiles(),
+    instance.GetLanguageProfile(),
+    instance.GetTags(),
+  ]);
 
-    ctx.status = StatusCodes.OK;
-    ctx.body = {
+  ctx.success({
+    statusCode: StatusCodes.OK,
+    data: {
       paths,
       profiles,
       languages,
       tags,
-    };
-  } catch (error) {
-    logger.error(error.stack);
-    ctx.error({
-      statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: 'INTERNAL_ERROR',
-      message: 'The server encountered an internal error.'
-    });
-  }
+    }
+  });
 };
 
 const getSonarrPathsById = async (ctx: Context) => {
