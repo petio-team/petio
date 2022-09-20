@@ -1,4 +1,4 @@
-version: "3.7"
+version: '3.7'
 
 services:
   vscode:
@@ -20,4 +20,13 @@ services:
       - ~/.gitconfig:/root/.gitconfig:z
     environment:
       - TZ=Europe\London
-    entrypoint: ["zsh", "-c", "while sleep 1000; do :; done"]
+    entrypoint: ['zsh', '-c', 'while sleep 1000; do :; done']
+
+  mongo:
+    image: mongo:4.4.0
+    container_name: 'petio-local-mongo'
+    hostname: mongo
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./data/db:/data/db
