@@ -2,7 +2,7 @@ import path from 'path';
 import * as winston from 'winston';
 import 'winston-daily-rotate-file';
 
-import env from '@/config/env';
+import pathsConfig from "@/config/env/paths";
 import { config } from '@/config/schema';
 
 const {
@@ -16,7 +16,7 @@ const {
   prettyPrint,
 } = winston.format;
 
-const logsFolder = path.join(env.paths.data, './logs');
+const logsFolder = path.join(pathsConfig.dataDir, './logs');
 
 const customFormat = printf(({ level, formatLabel, message, timestamp }) => {
   const lbl = formatLabel ? `[${formatLabel}] ` : '';

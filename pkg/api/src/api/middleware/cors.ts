@@ -1,14 +1,13 @@
 import Cors from '@koa/cors';
 import Koa from 'koa';
 
-import env from '@/config/env';
+import httpConfig from "@/config/env/http";
+import envConfig from "@/config/env/node";
 
 export default () => {
   // Enable cors
-  const whitelist = env.app.http.cors.domains
-    .split(',')
-    .map((domain) => domain.trim());
-  if (env.environment === 'development') {
+  const whitelist = httpConfig.corsDomains;
+  if (envConfig.isDevelopment) {
     // add local react dev
     whitelist.push('http://localhost:3001'); // frontend
     whitelist.push('http://localhost:3002'); // admin

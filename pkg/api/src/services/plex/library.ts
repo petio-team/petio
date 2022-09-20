@@ -830,19 +830,19 @@ export default class LibraryUpdate {
   }
 
   async externalIdTv(id, type) {
-    const url = `${this.tmdb}find/${id}?api_key=${env.api.tmdb.key}&language=en-US&external_source=${type}_id`;
+    const url = `${this.tmdb}find/${id}?api_key=${externalConfig.tmdbApiKey}&language=en-US&external_source=${type}_id`;
     const res = await axios.get(url);
     return res.data.tv_results[0].id;
   }
 
   async tmdbExternalIds(id) {
-    const url = `${this.tmdb}tv/${id}/external_ids?api_key=${env.api.tmdb.key}`;
+    const url = `${this.tmdb}tv/${id}/external_ids?api_key=${externalConfig.tmdbApiKey}`;
     const res = await axios.get(url);
     return res.data;
   }
 
   async externalIdMovie(id, type) {
-    const url = `${this.tmdb}find/${id}?api_key=${env.api.tmdb.key}&language=en-US&external_source=${type}_id`;
+    const url = `${this.tmdb}find/${id}?api_key=${externalConfig.tmdbApiKey}&language=en-US&external_source=${type}_id`;
     const res = await axios.get(url);
     return res.data.movie_results[0].id;
   }

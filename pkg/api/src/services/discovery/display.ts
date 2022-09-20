@@ -3,6 +3,7 @@ import cacheManager from 'cache-manager';
 import request from 'xhr-request';
 
 import env from '@/config/env';
+import externalConfig from "@/config/env/external";
 import { config } from '@/config/schema';
 import logger from '@/loaders/logger';
 import Discovery from '@/models/discovery';
@@ -106,9 +107,9 @@ export default async (id, type = 'movie') => {
               result = formatResult(result, type);
               result.on_server = onPlex.exists;
               return result;
-            } 
+            }
               return 'watched';
-            
+
           }),
         );
 
@@ -145,9 +146,9 @@ export default async (id, type = 'movie') => {
                 result = formatResult(result, type);
                 result.on_server = onPlex.exists;
                 return result;
-              } 
+              }
                 return 'watched';
-              
+
             }),
           );
 
@@ -182,9 +183,9 @@ export default async (id, type = 'movie') => {
                 result = formatResult(result, type);
                 result.on_server = onPlex.exists;
                 return result;
-              } 
+              }
                 return 'watched';
-              
+
             }),
           );
 
@@ -248,7 +249,7 @@ export default async (id, type = 'movie') => {
               title: `Because you watched "${recent.title || recent.name}"`,
               results: newRelated,
             };
-          } 
+          }
             const newRelated: any = [];
             related.results.map(async (result, i) => {
               if (!(result.id.toString() in watchHistory)) {
@@ -262,7 +263,7 @@ export default async (id, type = 'movie') => {
               title: `Because you watched "${recent.title || recent.name}"`,
               results: newRelated,
             };
-          
+
         }
       },
       { concurrency: config.get('general.concurrency') },
@@ -496,7 +497,7 @@ function discoverMovie(page = 1, params = {}) {
   Object.keys(params).forEach((i) => {
     par += `&${i}=${params[i]}`;
   });
-  const url = `${tmdb}discover/movie?api_key=${env.api.tmdb.key}${par}&page=${page}&append_to_response=videos`;
+  const url = `${tmdb}discover/movie?api_key=${externalConfig.tmdbApiKey}${par}&page=${page}&append_to_response=videos`;
   return new Promise((resolve, reject) => {
     request(
       url,
@@ -521,7 +522,7 @@ function discoverShow(page = 1, params = {}) {
   Object.keys(params).forEach((i) => {
     par += `&${i}=${params[i]}`;
   });
-  const url = `${tmdb}discover/tv?api_key=${env.api.tmdb.key}${par}&page=${page}&append_to_response=videos`;
+  const url = `${tmdb}discover/tv?api_key=${externalConfig.tmdbApiKey}${par}&page=${page}&append_to_response=videos`;
   return new Promise((resolve, reject) => {
     request(
       url,
@@ -541,7 +542,7 @@ function discoverShow(page = 1, params = {}) {
 }
 function searchPeople(term) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  const url = `${tmdb}search/person?query=${term}&include_adult=false&api_key=${env.api.tmdb.key}`;
+  const url = `${tmdb}search/person?query=${term}&include_adult=false&api_key=${externalConfig.tmdbApiKey}`;
   return new Promise((resolve, reject) => {
     request(
       url,

@@ -1,6 +1,5 @@
-import { StatusCodes } from 'http-status-codes';
 import { Context, Next } from 'koa';
-import { AnyZodObject, ZodError, ZodSchema } from 'zod';
+import { ZodError, ZodSchema } from 'zod';
 
 import { StatusBadRequest } from '../web/request';
 
@@ -53,5 +52,6 @@ export function validateRequest({
       return sendErrors(errors, ctx);
     }
     await next();
+    return undefined;
   };
 }

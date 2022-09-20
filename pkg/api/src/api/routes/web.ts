@@ -5,7 +5,7 @@ import addTrailingSlashes from 'koa-add-trailing-slashes';
 import mount from 'koa-mount';
 import serve from 'koa-static';
 
-import env from '@/config/env';
+import viewsConfig from "@/config/env/views";
 
 const pathExists = async (file: string): Promise<boolean> => {
   try {
@@ -25,7 +25,7 @@ function serveReact(app: Koa, dir: string, urlPath: string) {
 
 
 export default async (app: Koa) => {
-  let frontendPath = env.views.frontend;
+  let frontendPath = viewsConfig.frontend;
   if (!(await pathExists(path.join(frontendPath, 'index.html')))) {
     const frontendBuildPath = path.join(frontendPath, './build');
     if (!(await pathExists(path.join(frontendBuildPath, './index.html')))) {
@@ -35,7 +35,7 @@ export default async (app: Koa) => {
     }
   }
 
-  let adminPath = env.views.admin;
+  let adminPath = viewsConfig.admin;
   if (!(await pathExists(path.join(adminPath, 'index.html')))) {
     const adminBuildPath = path.join(adminPath, './build');
     if (!(await pathExists(path.join(adminBuildPath, './index.html')))) {

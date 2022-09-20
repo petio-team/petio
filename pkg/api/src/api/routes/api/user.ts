@@ -7,12 +7,12 @@ import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 import send from 'koa-send';
 
-import env from '@/config/env';
+import pathsConfig from "@/config/env/paths";
 import logger from '@/loaders/logger';
 import Profile from '@/models/profile';
 import { UserModel, UserRole } from '@/models/user';
 
-const UPLOAD_DIR = path.join(env.paths.data, './uploads');
+const UPLOAD_DIR = path.join(pathsConfig.dataDir, './uploads');
 
 const storage = multer.diskStorage({
   destination (_req, _file, cb) {

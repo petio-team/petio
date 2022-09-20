@@ -5,10 +5,10 @@ import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
 import { adminRequired } from '@/api/middleware/auth';
-import env from '@/config/env';
+import pathsConfig from "@/config/env/paths";
 
-const liveLogfile = path.join(env.paths.data, './logs/live1.log');
-const liveLogfile2 = path.join(env.paths.data, './logs/live.log');
+const liveLogfile = path.join(pathsConfig.dataDir, './logs/live1.log');
+const liveLogfile2 = path.join(pathsConfig.dataDir, './logs/live.log');
 
 const streamLog = async (ctx: Context) => {
   let dataNew; let dataOld;
