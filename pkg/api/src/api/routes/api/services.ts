@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 import { adminRequired } from '@/api/middleware/auth';
 import { validateRequest } from '@/api/middleware/validation';
+import { ArrInput, ArrInputSchema } from "@/api/schemas/downloaders";
 import { StatusBadRequest, StatusInternalServerError } from '@/api/web/request';
 import { ArrError } from '@/infra/arr/error';
 import RadarrAPI, { GetRadarrInstanceFromDb } from '@/infra/arr/radarr';
@@ -17,41 +18,6 @@ import {
   DownloaderType,
   GetAllDownloaders,
 } from '@/models/downloaders';
-
-
-enum HttpProtocol {
-  Http = 'http',
-  Https = 'https',
-}
-
-const ArrInputSchema = z.array(
-  z.object({
-    enabled: z.boolean(),
-    name: z.string().min(1),
-    protocol: z.nativeEnum(HttpProtocol),
-    host: z.string().min(1),
-    port: z.number(),
-    subpath: z.string().min(1).default('/'),
-    path: z.object({
-      id: z.number(),
-      location: z.string(),
-    }),
-    profile: z.object({
-      id: z.number(),
-      name: z.string(),
-    }),
-    language: z.object({
-      id: z.number(),
-      name: z.string(),
-    }),
-    availability: z.object({
-      id: z.number(),
-      name: z.string(),
-    }),
-    token: z.string().min(1),
-  }),
-);
-type ArrInput = z.infer<typeof ArrInputSchema>;
 
 const getSonarrOptionsById = async (ctx: Context) => {
   try {
@@ -78,9 +44,11 @@ const getSonarrOptionsById = async (ctx: Context) => {
     };
   } catch (error) {
     logger.error(error.stack);
-
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = error.message;
+    ctx.error({
+      statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: 'INTERNAL_ERROR',
+      message: 'The server encountered an internal error.'
+    });
   }
 };
 
