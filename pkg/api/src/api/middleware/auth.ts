@@ -10,8 +10,6 @@ export async function authenticate(ctx: Context) {
   const { authorization: header } = ctx.request.headers;
   const cookie = ctx.cookies.get('petio_jwt');
 
-  const bearerToken = ctx.request.header.authorization
-
   let petioJwt;
   if (ctx.request.body.authToken) {
     petioJwt = ctx.request.body.authToken;
