@@ -2,7 +2,7 @@
   "name": "project-dev",
   "dockerComposeFile": ["docker-compose.yml"],
   "service": "vscode",
-  "runServices": ["vscode"],
+  "runServices": ["vscode", "mongo"],
   "shutdownAction": "stopCompose",
   "postCreateCommand": "yarn workspaces focus --all",
   "workspaceFolder": "/workspace",
