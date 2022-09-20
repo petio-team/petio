@@ -3,7 +3,7 @@ import Koa from 'koa';
 
 import env from '@/config/env';
 
-export const cors = () => {
+export default () => {
   // Enable cors
   const whitelist = env.app.http.cors.domains
     .split(',')
@@ -21,9 +21,8 @@ export const cors = () => {
         whitelist.indexOf(ctx.request.header.origin) !== -1
       ) {
         return ctx.request.header.origin;
-      } 
+      }
         return 'http://localhost:7777';
-      
     },
     credentials: true,
   };

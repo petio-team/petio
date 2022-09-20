@@ -2,7 +2,7 @@ import morgan from 'koa-morgan';
 
 import Logger from '@/loaders/logger';
 
-export const logging = () =>
+export default () =>
   morgan((tokens: any, req: any, res: any) => {
     const msg = [
       tokens.method(req, res),
