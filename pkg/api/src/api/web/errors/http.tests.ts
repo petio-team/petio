@@ -20,7 +20,6 @@ describe('Errors', () => {
     });
     it('should bad request error', (done) => {
         const stringError = 'The request was invalid or cannot be otherwise served.';
-
         const error = new BadRequest(stringError);
         expect(error.statusCode).toEqual(StatusCodes.BAD_REQUEST);
         expect(error.code).toEqual('BAD_REQUEST');
