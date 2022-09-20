@@ -5,13 +5,13 @@ import mount from 'koa-mount';
 
 import logging from './middleware/logging';
 import options from "./middleware/options";
-import session from './middleware/session';
 import responseHandler from "./web/responseHandler";
 import cors from '@/api/middleware/cors';
 import errorHandler from '@/api/middleware/errorHandling';
 import api from '@/api/routes/api';
 import web from '@/api/routes/web';
 import { config } from '@/config/index';
+import Logger from "@/loaders/logger";
 import { listen } from '@/utils/http';
 import { removeSlashes } from '@/utils/urls';
 
@@ -37,9 +37,6 @@ export default () => {
   // Enable trusted proxies
   app.proxy = true;
 
-  // Add error handling
-  app.use(errorHandler);
-
   // Add http logging using morgan
   app.use(logging());
 
@@ -56,17 +53,18 @@ export default () => {
   // Enable body parsing
   app.use(koaBody());
 
-  // session middleware
-  app.use(session(app));
-
   // use options
-  app.use(options);
+  app.use(options());
 
   // use response handler
   app.use(responseHandler());
 
+  // Add error handling
+  app.use(errorHandler());
+  app.on('error', (err) => Logger.error(err));
+
   // get correctly formatted subpath
-  const subpath = `/${  removeSlashes(config.get('petio.subpath'))}`;
+  const subpath = `/${removeSlashes(config.get('petio.subpath'))}`;
 
   // Mount endpoints
   app.use(mount(subpath, routes(subpath)));
