@@ -20,7 +20,14 @@ export default async () => {
       logger.verbose('DISC: No Users', { label: 'discovery.build' });
       return;
     }
-    const userIds = users.map((user: User) => user.altId ? user.altId : user.plexId);
+    const userIds = users.map((user: User) => {
+      if (user.altId) {
+        return user.altId;
+      }
+      if (!user.custom) {
+        return user.plexId;
+      }
+    });
 
     await Promise.map(
       userIds,

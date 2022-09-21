@@ -3,16 +3,19 @@ import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
 import logger from '@/loaders/logger';
+import { UserModel } from '@/models/user';
 import getDiscovery from '@/services/discovery/display';
 
 const getMovies = async (ctx: Context) => {
-  const userId = ctx.state.user.altId
-    ? ctx.state.user.altId
-    : ctx.state.user.id;
-  if (!userId) {
+  const user = await UserModel.findOne({ id: ctx.state.user.id });
+
+  if (!user) {
     ctx.state = StatusCodes.NOT_FOUND;
     return;
   }
+
+  const userId = user.altId ? user.altId : user.plexId;
+
   try {
     logger.verbose(`ROUTE: Movie Discovery Profile returned for ${userId}`);
     const data: any = await getDiscovery(userId, 'movie');
@@ -25,13 +28,15 @@ const getMovies = async (ctx: Context) => {
 };
 
 const getShows = async (ctx: Context) => {
-  const userId = ctx.state.user.altId
-    ? ctx.state.user.altId
-    : ctx.state.user.id;
-  if (!userId) {
+  const user = await UserModel.findOne({ id: ctx.state.user.id });
+
+  if (!user) {
     ctx.state = StatusCodes.NOT_FOUND;
     return;
   }
+
+  const userId = user.altId ? user.altId : user.plexId;
+
   try {
     logger.verbose(`ROUTE: TV Discovery Profile returned for ${userId}`);
     const data: any = await getDiscovery(userId, 'show');
