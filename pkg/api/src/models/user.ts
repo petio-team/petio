@@ -38,6 +38,8 @@ const UserModelSchema = new Schema<User>(
     },
     username: {
       type: String,
+      unique: true,
+      index: true,
     },
     password: {
       type: String,
