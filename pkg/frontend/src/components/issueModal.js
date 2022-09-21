@@ -18,7 +18,7 @@ export default function IssueModal({
   const [detail, setDetail] = useState('');
 
   async function submit() {
-    if (!detail) {
+    if (!issueType) {
       newNotification({
         type: 'error',
         message: 'Please pick an option',
