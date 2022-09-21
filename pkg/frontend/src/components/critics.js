@@ -29,14 +29,14 @@ export default function Critics({ data }) {
               />
               <path
                 className="score-value"
-                strokeDasharray={`${data.vote_average * 10}, 100`}
+                strokeDasharray={`${Math.ceil(data.vote_average * 10)}, 100`}
                 d="M18 2.0845
           a 15.9155 15.9155 0 0 1 0 31.831
           a 15.9155 15.9155 0 0 1 0 -31.831"
               />
             </svg>
             <p className={`${typo.body} ${typo.bold}`}>
-              {data.vote_average * 10}%
+              {Math.ceil(data.vote_average * 10)}%
             </p>
           </div>
         </>
