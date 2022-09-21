@@ -1,4 +1,3 @@
-import path from 'path';
 import multer from '@koa/multer';
 import Router from '@koa/router';
 import axios from 'axios';
@@ -6,8 +5,9 @@ import bcrypt from 'bcryptjs';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 import send from 'koa-send';
+import path from 'path';
 
-import pathsConfig from "@/config/env/paths";
+import pathsConfig from '@/config/env/paths';
 import logger from '@/loaders/logger';
 import Profile from '@/models/profile';
 import { UserModel, UserRole } from '@/models/user';
@@ -15,12 +15,13 @@ import { UserModel, UserRole } from '@/models/user';
 const UPLOAD_DIR = path.join(pathsConfig.dataDir, './uploads');
 
 const storage = multer.diskStorage({
-  destination (_req, _file, cb) {
+  destination(_req, _file, cb) {
     cb(null, UPLOAD_DIR);
   },
-  filename (req: any, file, cb) {
-    req.newThumb =
-      `${file.fieldname  }-${  Date.now()  }${path.extname(file.originalname)}`;
+  filename(req: any, file, cb) {
+    req.newThumb = `${file.fieldname}-${Date.now()}${path.extname(
+      file.originalname,
+    )}`;
     cb(null, req.newThumb);
   },
 });
@@ -76,9 +77,9 @@ const getUserById = async (ctx: Context) => {
 };
 
 const createCustomUser = async (ctx: Context) => {
-  const {body} = ctx.request;
+  const { body } = ctx.request;
 
-  const {user} = body;
+  const { user } = body;
   if (!user) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = {
@@ -125,8 +126,8 @@ const createCustomUser = async (ctx: Context) => {
 };
 
 const editUser = async (ctx: Context) => {
-  const {body} = ctx.request;
-  const {user} = body;
+  const { body } = ctx.request;
+  const { user } = body;
 
   if (!user) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
@@ -187,10 +188,10 @@ const editUser = async (ctx: Context) => {
 };
 
 const editMultipleUsers = async (ctx: Context) => {
-  const {body} = ctx.request;
+  const { body } = ctx.request;
   const users = body.users as [];
-  const {enabled} = body;
-  const {profile} = body;
+  const { enabled } = body;
+  const { profile } = body;
 
   if (!users) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
@@ -237,9 +238,9 @@ const editMultipleUsers = async (ctx: Context) => {
 };
 
 const deleteUser = async (ctx: Context) => {
-  const {body} = ctx.request;
+  const { body } = ctx.request;
 
-  const {user} = body;
+  const { user } = body;
   if (!user) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = {
@@ -333,7 +334,7 @@ const getThumbnailById = async (ctx: Context) => {
   } catch (e) {
     logger.log(
       'warn',
-      `ROUTE: Unable to get user thumb - Got error: ${  e.message}`,
+      `ROUTE: Unable to get user thumb - Got error: ${e.message}`,
       e,
     );
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
@@ -366,7 +367,6 @@ const getQuota = async (ctx: Context) => {
     total = profile.quota ? profile.quota : 0;
   }
 
-  ctx.status = StatusCodes.NOT_FOUND;
   ctx.body = {
     current,
     total,
