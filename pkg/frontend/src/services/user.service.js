@@ -112,7 +112,16 @@ export async function getUserQuota() {
 }
 
 export async function watchHistory(user_id, type) {
-  return post('/history', { id: user_id, type });
+  try {
+    const data = await post('/history', { id: user_id, type });
+    updateStore({
+      type: 'user/watch-history',
+      history: data,
+    });
+    return data;
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 export async function allUsers() {

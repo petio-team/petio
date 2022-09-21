@@ -11,12 +11,17 @@ const mapStateToProps = (state) => {
   return {
     redux_user: state.user,
     redux_reviews: state.user.reviews,
+    redux_history: state.user.history,
   };
 };
 
-function MyAccount({ redux_user, redux_reviews, newNotification }) {
+function MyAccount({
+  redux_user,
+  redux_reviews,
+  redux_history,
+  newNotification,
+}) {
   const [quota, setQuota] = useState(false);
-  const [history, setHistory] = useState(false);
 
   useEffect(() => {
     async function getQuota() {
@@ -32,17 +37,15 @@ function MyAccount({ redux_user, redux_reviews, newNotification }) {
     }
     async function getHistory() {
       if (redux_user.currentUser.custom && !redux_user.currentUser.altId) {
-        setHistory({});
         return;
       }
       try {
         const userId = redux_user.currentUser.altId
           ? redux_user.currentUser.altId
           : redux_user.currentUser.id;
-        let h = await watchHistory(userId, 'all');
-        setHistory(h);
+        watchHistory(userId, 'all');
       } catch (err) {
-        setHistory('error');
+        console.log('Error getting watch history');
       }
     }
 
@@ -138,7 +141,7 @@ function MyAccount({ redux_user, redux_reviews, newNotification }) {
           Your Review Queue
         </p>
         <ReviewQueue
-          history={history}
+          history={redux_history}
           redux_reviews={redux_reviews}
           currentUser={redux_user.currentUser}
           newNotification={newNotification}

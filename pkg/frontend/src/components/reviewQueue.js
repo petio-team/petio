@@ -45,7 +45,7 @@ export default function ReviewQueue({
 
   return (
     <div className={styles.reviewQueue}>
-      {!history ? (
+      {history.length === 0 ? (
         [...Array(6)].map((e, i) => {
           return (
             <div

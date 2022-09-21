@@ -20,6 +20,7 @@ export default function (
     config: null,
     reviews: [],
     users: [],
+    history: [],
   },
   action,
 ) {
@@ -92,6 +93,11 @@ export default function (
       return {
         ...state,
         users: action.users,
+      };
+    case 'user/watch-history':
+      return {
+        ...state,
+        history: action.history,
       };
     default:
       return state;
