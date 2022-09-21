@@ -164,7 +164,7 @@ export const CreateOrUpdateUser = async (user: User): Promise<User> => {
 
   const data = await UserModel.updateOne(
     {
-      email: user.email,
+      username: user.username,
     },
     schema.data,
     {
