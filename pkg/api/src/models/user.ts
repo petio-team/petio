@@ -46,7 +46,6 @@ const UserModelSchema = new Schema<User>(
     },
     email: {
       type: String,
-      unique: true,
     },
     thumbnail: {
       type: String,
