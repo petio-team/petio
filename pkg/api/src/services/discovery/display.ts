@@ -2,7 +2,7 @@ import Promise from 'bluebird';
 import cacheManager from 'cache-manager';
 import request from 'xhr-request';
 
-import externalConfig from "@/config/env/external";
+import externalConfig from '@/config/env/external';
 import { config } from '@/config/schema';
 import logger from '@/loaders/logger';
 import Discovery from '@/models/discovery';
@@ -27,7 +27,7 @@ const memoryCache = cacheManager.caching({
 export default async (id, type = 'movie') => {
   if (!id) return { error: 'No ID' };
   try {
-    const discoveryPrefs: any = await Discovery.findOne({ id }).exec();
+    const discoveryPrefs: any = await Discovery.findOne({ id: id }).exec();
     const popular: any = [];
     const [upcoming, popularData]: any = await Promise.all([
       comingSoon(type),
@@ -107,8 +107,7 @@ export default async (id, type = 'movie') => {
               result.on_server = onPlex.exists;
               return result;
             }
-              return 'watched';
-
+            return 'watched';
           }),
         );
 
@@ -141,13 +140,17 @@ export default async (id, type = 'movie') => {
           const newDisc = await Promise.all(
             discData.map(async (result, i) => {
               if (!watchHistory[result.id]) {
-                const onPlex: any = await onServer(type, false, false, result.id);
+                const onPlex: any = await onServer(
+                  type,
+                  false,
+                  false,
+                  result.id,
+                );
                 result = formatResult(result, type);
                 result.on_server = onPlex.exists;
                 return result;
               }
-                return 'watched';
-
+              return 'watched';
             }),
           );
 
@@ -178,13 +181,17 @@ export default async (id, type = 'movie') => {
           const newDisc = await Promise.all(
             discData.map(async (result, i) => {
               if (!watchHistory[result.id]) {
-                const onPlex: any = await onServer(type, false, false, result.id);
+                const onPlex: any = await onServer(
+                  type,
+                  false,
+                  false,
+                  result.id,
+                );
                 result = formatResult(result, type);
                 result.on_server = onPlex.exists;
                 return result;
               }
-                return 'watched';
-
+              return 'watched';
             }),
           );
 
@@ -238,7 +245,12 @@ export default async (id, type = 'movie') => {
             const newRelated: any = [];
             recommendations.results.map(async (result) => {
               if (!(result.id.toString() in watchHistory)) {
-                const onPlex: any = await onServer(type, false, false, result.id);
+                const onPlex: any = await onServer(
+                  type,
+                  false,
+                  false,
+                  result.id,
+                );
                 result = formatResult(result, type);
                 result.on_server = onPlex.exists;
                 newRelated.push(result);
@@ -249,20 +261,19 @@ export default async (id, type = 'movie') => {
               results: newRelated,
             };
           }
-            const newRelated: any = [];
-            related.results.map(async (result, i) => {
-              if (!(result.id.toString() in watchHistory)) {
-                const onPlex: any = await onServer(type, false, false, result.id);
-                result = formatResult(result, type);
-                result.on_server = onPlex.exists;
-                newRelated.push(result);
-              }
-            });
-            return {
-              title: `Because you watched "${recent.title || recent.name}"`,
-              results: newRelated,
-            };
-
+          const newRelated: any = [];
+          related.results.map(async (result, i) => {
+            if (!(result.id.toString() in watchHistory)) {
+              const onPlex: any = await onServer(type, false, false, result.id);
+              result = formatResult(result, type);
+              result.on_server = onPlex.exists;
+              newRelated.push(result);
+            }
+          });
+          return {
+            title: `Because you watched "${recent.title || recent.name}"`,
+            results: newRelated,
+          };
         }
       },
       { concurrency: config.get('general.concurrency') },
@@ -292,7 +303,9 @@ export default async (id, type = 'movie') => {
 async function genreLookup(id, genre, type) {
   let data = false;
   try {
-    data = await memoryCache.wrap(`gl__${id}__${type}`, () => genreLookupData(id, genre, type));
+    data = await memoryCache.wrap(`gl__${id}__${type}`, () =>
+      genreLookupData(id, genre, type),
+    );
   } catch (err) {
     logger.error(`Error getting genre data`, { label: 'discovery.build' });
     logger.error(err, { label: 'discovery.build' });
@@ -303,7 +316,9 @@ async function genreLookup(id, genre, type) {
 async function actorLookup(match, type) {
   let data = false;
   try {
-    data = await memoryCache.wrap(`al__${match.id}__${type}`, () => actorLookupData(match, type));
+    data = await memoryCache.wrap(`al__${match.id}__${type}`, () =>
+      actorLookupData(match, type),
+    );
   } catch (err) {
     logger.error(`Error getting actor data`, { label: 'discovery.build' });
     logger.error(err, { label: 'discovery.build' });
@@ -562,8 +577,8 @@ function searchPeople(term) {
 
 function shuffle(array) {
   let currentIndex = array.length;
-    let temporaryValue;
-    let randomIndex;
+  let temporaryValue;
+  let randomIndex;
 
   while (currentIndex !== 0) {
     randomIndex = Math.floor(Math.random() * currentIndex);

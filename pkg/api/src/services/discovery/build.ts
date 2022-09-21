@@ -23,8 +23,9 @@ export default async () => {
     const userIds = users.map((user: User) => {
       if (user.altId) {
         return user.altId;
-      } if (!user.custom) {
-        return user.id;
+      }
+      if (!user.custom) {
+        return user.plexId;
       }
     });
 
