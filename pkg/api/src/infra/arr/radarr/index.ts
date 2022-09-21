@@ -1,4 +1,4 @@
-import { Zodios, ZodiosInstance } from '@zodios/core';
+import { Zodios } from '@zodios/core';
 import { pluginHeader } from '@zodios/plugins';
 
 import { CalendarEndpoint } from './calendar';
@@ -10,22 +10,17 @@ import { RootFolderEndpoint } from './root_folder';
 import { SystemStatusEndpoint } from './status';
 import { TagEndpoint } from './tag';
 
-export const RadarrAPIEndpoints = [
-  ...MovieEndpoint,
-  ...CalendarEndpoint,
-  ...RootFolderEndpoint,
-  ...QualityProfileEndpoint,
-  ...LanguageEndpoint,
-  ...SystemStatusEndpoint,
-  ...TagEndpoint,
-  ...QueueEndpoint,
-] as const;
-
-export const RadarrAPIClient = (
-  url: URL,
-  token: string,
-): ZodiosInstance<typeof RadarrAPIEndpoints> => {
-  const client = new Zodios(url.toString(), RadarrAPIEndpoints);
+export const RadarrAPIClient = (url: URL, token: string) => {
+  const client = new Zodios(url.toString(), [
+    ...MovieEndpoint,
+    ...CalendarEndpoint,
+    ...RootFolderEndpoint,
+    ...QualityProfileEndpoint,
+    ...LanguageEndpoint,
+    ...SystemStatusEndpoint,
+    ...TagEndpoint,
+    ...QueueEndpoint,
+  ]);
   client.use(pluginHeader('x-api-key', async () => token));
 
   return client;

@@ -47,4 +47,4 @@ export const CalendarEndpoint = asApi([
     ],
     response: CalendarSchema,
   },
-] as const);
+]);

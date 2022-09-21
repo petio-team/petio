@@ -46,4 +46,4 @@ export const QualityProfileEndpoint = asApi([
     parameters: [],
     response: QualityProfileSchema,
   },
-] as const);
+]);

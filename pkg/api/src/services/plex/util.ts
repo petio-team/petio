@@ -11,7 +11,7 @@ const MakePlexURL = (url, params = {}) => {
   );
   const prms = new URLSearchParams();
 
-  for (let key in params) {
+  for (const key in params) {
     if (params.hasOwnProperty(key)) {
       prms.set(key, params[key]);
     }

@@ -1,16 +1,17 @@
-import { EventSubscriber, On } from 'event-dispatch';
+import cluster from "cluster";
 import { cpus } from 'os';
+import { EventSubscriber, On } from 'event-dispatch';
 import { container } from 'tsyringe';
 
 import { config, toObject } from '@/config/index';
 import { IEventData, IPC } from '@/infra/clusters/ipc';
 import { loadSystems } from '@/loaders';
 import startupMessage from '@/utils/startupMessage';
-import cluster from "cluster";
 
 @EventSubscriber()
 export class MasterEventSubscriber {
-  private readyWorkers: number = 0;
+  private readyWorkers = 0;
+
   private ipc: IPC;
 
   constructor() {

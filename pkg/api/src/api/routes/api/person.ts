@@ -11,17 +11,18 @@ import personLookup from '@/services/tmdb/person';
 //     ttl: 86400, // Cache for 1 day
 //   })
 // );
+
+const lookupById = async (ctx: Context) => {
+  const data = await personLookup(ctx.params.id);
+
+  ctx.status = StatusCodes.OK;
+  ctx.body = data;
+};
+
 const route = new Router({ prefix: '/person' });
 
 export default (app: Router) => {
   route.get('/lookup/:id', lookupById);
 
   app.use(route.routes());
-};
-
-const lookupById = async (ctx: Context) => {
-  let data = await personLookup(ctx.params.id);
-
-  ctx.status = StatusCodes.OK;
-  ctx.body = data;
 };

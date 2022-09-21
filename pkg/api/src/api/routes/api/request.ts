@@ -12,21 +12,7 @@ import Sonarr from '@/services/downloaders/sonarr';
 import Mailer from '@/services/mail/mailer';
 import { getArchive } from '@/services/requests/archive';
 import { getRequests } from '@/services/requests/display';
-import processRequest from '@/services/requests/process';
-
-const route = new Router({ prefix: '/request' });
-
-export default (app: Router) => {
-  route.get('/all', listRequests);
-  route.get('/min', getRequestMinified);
-  route.post('/add', addRequest);
-  route.get('/me', getUserRequests);
-  route.post('/remove', removeRequest);
-  route.post('/update', updateRequest);
-  route.get('/archive/:id', getArchivedRequestById);
-
-  app.use(route.routes());
-};
+import ProcessRequest from '@/services/requests/process';
 
 const listRequests = async (ctx: Context) => {
   ctx.status = StatusCodes.OK;
@@ -34,7 +20,7 @@ const listRequests = async (ctx: Context) => {
 };
 
 const getUserRequests = async (ctx: Context) => {
-  let userId = ctx.state.user.id;
+  const userId = ctx.state.user.id;
   if (!userId) {
     ctx.status = StatusCodes.NOT_FOUND;
     ctx.body = {};
@@ -45,13 +31,21 @@ const getUserRequests = async (ctx: Context) => {
 };
 
 const getRequestMinified = async (ctx: Context) => {
-  const requests = await Request.find().exec();
-  let data = {};
+  const data = {};
   try {
-    data = {};
+    const requests = await Request.find().exec();
+    if (!requests) {
+      ctx.status = StatusCodes.NOT_FOUND;
+      ctx.body = {};
+      return;
+    }
 
     await Promise.all(
-      requests.map(async (request, i) => {
+      requests.map(async (request) => {
+        if (!request.requestId) {
+          return;
+        }
+
         data[request.requestId] = {
           title: request.title,
           requestId: request.requestId,
@@ -81,33 +75,32 @@ const getRequestMinified = async (ctx: Context) => {
 };
 
 const addRequest = async (ctx: Context) => {
-  const body = ctx.request.body;
+  const {body} = ctx.request;
 
-  let user = body.user;
-  let request = body.request;
-  let process = await new processRequest(request, user).new();
+  const {request} = body;
+  const process = await new ProcessRequest(request, ctx.state.user).new();
 
   ctx.status = StatusCodes.OK;
   ctx.body = process;
 };
 
 const removeRequest = async (ctx: Context) => {
-  const body = ctx.request.body;
+  const {body} = ctx.request;
 
-  let request = body.request;
-  let reason = body.reason;
-  let process = new processRequest(request);
+  const {request} = body;
+  const {reason} = body;
+  const process = new ProcessRequest(request, ctx.state.user);
 
   await process.archive(false, true, reason);
 
   process.removeFromDVR();
 
-  let emails: any = [];
-  let titles: any = [];
+  const emails: any = [];
+  const titles: any = [];
 
   await Promise.all(
     request.users.map(async (user) => {
-      let userData = await UserModel.findOne({ id: user }).exec();
+      const userData = await UserModel.findOne({ id: user }).exec();
       if (!userData) {
         ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
         ctx.body = { error: 'failed to find requests by user' };
@@ -138,16 +131,15 @@ const removeRequest = async (ctx: Context) => {
 };
 
 const updateRequest = async (ctx: Context) => {
-  const body = ctx.request.body;
+  const {body} = ctx.request;
 
-  let request = body.request;
-  let servers = body.servers;
-  let approved = body.request.approved;
-  let manualStatus = body.request.manualStatus;
+  const {request} = body;
+  const {servers} = body;
+  const {approved} = body.request;
+  const {manualStatus} = body.request;
 
   if (manualStatus === '5') {
-    new processRequest(request, false).archive(true, false, false);
-
+    new ProcessRequest(request, ctx.state.user).archive(true, false, false);
     ctx.status = StatusCodes.OK;
     ctx.body = {};
     return;
@@ -155,19 +147,18 @@ const updateRequest = async (ctx: Context) => {
 
   try {
     const instances = await GetAllDownloaders();
-
     await Request.findOneAndUpdate(
       { requestId: request.requestId },
       {
         $set: {
           approved: true,
-          manualStatus: manualStatus,
+          manualStatus,
         },
       },
       { new: true, useFindAndModify: false },
     ).exec();
 
-    if (servers && request.type === 'movie') {
+    if (servers && servers.length) {
       const activeServers: IDownloader[] = servers.map((s) => {
         if (s.active) {
           const instance = instances.find((i) => i.id === s.id);
@@ -175,46 +166,34 @@ const updateRequest = async (ctx: Context) => {
             return instance;
           }
         }
+        return undefined;
       });
 
       await Bluebird.map(activeServers, async (instance) => {
-        console.log(JSON.stringify(instance, null, 4));
-        await new Radarr(instance).processRequest(request.requestId);
-      });
-    }
-
-    if (servers && request.type === 'tv') {
-      const activeServers: IDownloader[] = servers.map((s) => {
-        if (s.active) {
-          const instance = instances.find((i) => i.id === s.id);
-          if (instance) {
-            return instance;
-          }
+        if (request.type === 'movie') {
+          await new Radarr(instance).processRequest(request.requestId);
+        } else {
+          await new Sonarr(instance).addShow(request, {
+            profile: instance.profile,
+            path: instance.path,
+          });
         }
-      });
-
-      await Bluebird.map(activeServers, async (instance) => {
-        console.log(JSON.stringify(instance, null, 4));
-        await new Sonarr(instance).addShow(request, {
-          profile: instance.profile,
-          path: instance.path,
-        });
       });
     }
 
     if (!approved) {
-      let emails: any = [];
-      let titles: any = [];
+      const emails: any = [];
+      const titles: any = [];
       await Promise.all(
         request.users.map(async (id) => {
-          let userData = await UserModel.findOne({ id }).exec();
+          const userData = await UserModel.findOne({ id }).exec();
           if (!userData) return;
           emails.push(userData.email);
           titles.push(userData.title);
         }),
       );
       const requestData = request;
-      let type = requestData.type === 'tv' ? 'TV Show' : 'Movie';
+      const type = requestData.type === 'tv' ? 'TV Show' : 'Movie';
       new Mailer().mail(
         `Request approved for ${requestData.title}`,
         `${type}: ${requestData.title}`,
@@ -237,8 +216,22 @@ const updateRequest = async (ctx: Context) => {
 };
 
 const getArchivedRequestById = async (ctx: Context) => {
-  const id = ctx.params.id;
+  const {id} = ctx.params;
 
   ctx.status = StatusCodes.OK;
   ctx.body = await getArchive(id);
+};
+
+const routes = new Router({ prefix: '/request' });
+export default (app: Router) => {
+  routes.get('/all', listRequests);
+  routes.get('/min', getRequestMinified);
+  routes.post('/add', addRequest);
+  routes.get('/me', getUserRequests);
+  routes.post('/remove', removeRequest);
+  routes.post('/update', updateRequest);
+  routes.get('/archive/:id', getArchivedRequestById);
+
+  app.use(routes.routes());
+  app.use(routes.allowedMethods());
 };

@@ -7,9 +7,9 @@ export function parse(str: string) {
     throw new TypeError('ObjectPath.parse must be passed a string');
   }
 
-  var i = 0;
-  var parts = Array<any>();
-  var dot, bracket, quote, closing;
+  let i = 0;
+  const parts = Array<any>();
+  let dot; let bracket; let quote; let closing;
   while (i < str.length) {
     dot = str.indexOf('.', i);
     bracket = str.indexOf('[', i);
@@ -43,7 +43,7 @@ export function parse(str: string) {
             ? closing + 2
             : closing + 1;
       } else {
-        closing = str.indexOf(quote + ']', bracket);
+        closing = str.indexOf(`${quote  }]`, bracket);
         if (closing === -1) {
           closing = str.length;
         }
@@ -52,15 +52,13 @@ export function parse(str: string) {
           bracket < str.length
         ) {
           bracket++;
-          closing = str.indexOf(quote + ']', bracket);
+          closing = str.indexOf(`${quote  }]`, bracket);
         }
         parts.push(
           str
             .slice(i + 2, closing)
             .replace(regex[quote], quote)
-            .replace(/\\+/g, function (backslash) {
-              return new Array(Math.ceil(backslash.length / 2) + 1).join('\\');
-            }),
+            .replace(/\\+/g, (backslash) => new Array(Math.ceil(backslash.length / 2) + 1).join('\\')),
         );
         i =
           str.slice(closing + 2, closing + 3) === '.'
@@ -76,21 +74,21 @@ export function stringify(arr: any[], quote?: string, forceQuote?: any) {
   if (!Array.isArray(arr)) arr = [arr];
 
   quote = quote === '"' ? '"' : "'";
-  var regexp = new RegExp('(\\\\|' + quote + ')', 'g'); // regex => /(\\|')/g
+  const regexp = new RegExp(`(\\\\|${  quote  })`, 'g'); // regex => /(\\|')/g
 
   return arr
-    .map(function (value, key) {
+    .map((value, key) => {
       let property = value.toString();
       if (!forceQuote && /^[A-z_]\w*$/.exec(property)) {
         // str with only A-z0-9_ chars will display `foo.bar`
-        return key !== 0 ? '.' + property : property;
-      } else if (!forceQuote && /^\d+$/.exec(property)) {
+        return key !== 0 ? `.${  property}` : property;
+      } if (!forceQuote && /^\d+$/.exec(property)) {
         // str with only numbers will display `foo[0]`
-        return '[' + property + ']';
-      } else {
+        return `[${  property  }]`;
+      } 
         property = property.replace(regexp, '\\$1');
-        return '[' + quote + property + quote + ']';
-      }
+        return `[${  quote  }${property  }${quote  }]`;
+      
     })
     .join('');
 }

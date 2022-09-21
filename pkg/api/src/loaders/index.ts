@@ -17,7 +17,7 @@ export default async () => {
   // if we are the master process,
   if (cluster.isPrimary) {
     // load the config if the file exists, else use defaults
-    let exists = await config();
+    const exists = await config();
     if (exists) {
       // setup workers and run forks
       setupWorkerProcesses();
@@ -41,7 +41,7 @@ export const loadSystems = async () => {
   const agenda = agendaFactory({ mongoConnection });
 
   // load jobs
-  jobs({ agenda: agenda });
+  jobs({ agenda });
 
   // load http server
   appRouter();

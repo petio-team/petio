@@ -2,7 +2,8 @@ import Promise from 'bluebird';
 import cacheManager from 'cache-manager';
 import request from 'xhr-request';
 
-import { tmdbApiKey } from '@/config/env';
+import env from '@/config/env';
+import externalConfig from "@/config/env/external";
 import { config } from '@/config/schema';
 import logger from '@/loaders/logger';
 import Discovery from '@/models/discovery';
@@ -21,21 +22,21 @@ import {
 const memoryCache = cacheManager.caching({
   store: 'memory',
   // max: 500,
-  ttl: 3600 /*seconds*/,
+  ttl: 3600 /* seconds */,
 });
 
 export default async (id, type = 'movie') => {
   if (!id) return { error: 'No ID' };
   try {
-    const discoveryPrefs = await Discovery.findOne({ id: id });
-    let popular: any = [];
-    let [upcoming, popularData]: any = await Promise.all([
+    const discoveryPrefs: any = await Discovery.findOne({ id }).exec();
+    const popular: any = [];
+    const [upcoming, popularData]: any = await Promise.all([
       comingSoon(type),
       getTop(type === 'movie' ? 1 : 2),
     ]);
     const plr = config.get('general.popular');
     if (plr || plr === null || plr === undefined) {
-      for (let p in popularData) {
+      for (const p in popularData) {
         popular.push(popularData[p]);
       }
     }
@@ -62,43 +63,43 @@ export default async (id, type = 'movie') => {
       type === 'movie'
         ? discoveryPrefs.movie.history
         : discoveryPrefs.series.history;
-    let mediaGenres =
+    const mediaGenres =
       type === 'movie'
         ? discoveryPrefs.movie.genres
         : discoveryPrefs.series.genres;
-    let mediaActors =
+    const mediaActors =
       type === 'movie'
         ? discoveryPrefs.movie.people.cast
         : discoveryPrefs.series.people.cast;
-    let mediaDirectors =
+    const mediaDirectors =
       type === 'movie'
         ? discoveryPrefs.movie.people.director
         : discoveryPrefs.series.people.director;
-    let genresSorted: any = [];
-    let actorsSorted: any = [];
-    let directorsSorted: any = [];
-    for (let genre in mediaGenres) {
+    const genresSorted: any = [];
+    const actorsSorted: any = [];
+    const directorsSorted: any = [];
+    for (const genre in mediaGenres) {
       genresSorted.push(mediaGenres[genre]);
     }
-    genresSorted.sort(function (a, b) {
+    genresSorted.sort((a, b) => {
       if (a.count > b.count) {
         return -1;
       }
     });
     genresSorted.length = 4;
-    let genreList: any = [];
-    let genresData = await Promise.all(
+    const genreList: any = [];
+    const genresData = await Promise.all(
       genresSorted.map(async (genre) => {
-        let id: any = genreID(genre.name, type);
+        const id: any = genreID(genre.name, type);
         if (!id || genreList.includes(id)) {
           return null;
         }
         genreList.push(id);
-        let discData: any = await genreLookup(id, genre, type);
+        const discData: any = await genreLookup(id, genre, type);
 
         if (!discData) return null;
 
-        let results = await Promise.all(
+        const results = await Promise.all(
           discData.map(async (result) => {
             if (!watchHistory[result.id]) {
               let onPlex: any = await onServer(type, false, false, result.id);
@@ -106,9 +107,9 @@ export default async (id, type = 'movie') => {
               result = formatResult(result, type);
               result.on_server = onPlex.exists;
               return result;
-            } else {
-              return 'watched';
             }
+              return 'watched';
+
           }),
         );
 
@@ -116,38 +117,38 @@ export default async (id, type = 'movie') => {
           title: `${genre.name} ${
             type === 'movie' ? 'movies' : 'shows'
           } you might like`,
-          results: results,
+          results,
           genre_id: id,
           ratings: `${genre.lowestRating} - ${genre.highestRating}`,
         };
       }),
     );
-    for (var actor in mediaActors) {
+    for (const actor in mediaActors) {
       actorsSorted.push({ name: actor, count: mediaActors[actor] });
     }
-    actorsSorted.sort(function (a, b) {
+    actorsSorted.sort((a, b) => {
       if (a.count > b.count) {
         return -1;
       }
     });
     if (actorsSorted.length > 4) actorsSorted.length = 4;
-    let peopleData = await Promise.all(
+    const peopleData = await Promise.all(
       actorsSorted.map(async (actor) => {
-        let lookup: any = await searchPeople(actor.name);
+        const lookup: any = await searchPeople(actor.name);
         if (lookup.results && lookup.results.length > 0) {
-          let match = lookup.results[0];
-          let discData: any = await actorLookup(match, type);
+          const match = lookup.results[0];
+          const discData: any = await actorLookup(match, type);
 
-          let newDisc = await Promise.all(
+          const newDisc = await Promise.all(
             discData.map(async (result, i) => {
               if (!watchHistory[result.id]) {
-                let onPlex: any = await onServer(type, false, false, result.id);
+                const onPlex: any = await onServer(type, false, false, result.id);
                 result = formatResult(result, type);
                 result.on_server = onPlex.exists;
                 return result;
-              } else {
-                return 'watched';
               }
+                return 'watched';
+
             }),
           );
 
@@ -159,32 +160,32 @@ export default async (id, type = 'movie') => {
       }),
     );
 
-    for (var director in mediaDirectors) {
+    for (const director in mediaDirectors) {
       directorsSorted.push({ name: director, count: mediaDirectors[director] });
     }
-    directorsSorted.sort(function (a, b) {
+    directorsSorted.sort((a, b) => {
       if (a.count > b.count) {
         return -1;
       }
     });
     if (directorsSorted.length > 4) directorsSorted.length = 4;
-    let directorData = await Promise.all(
+    const directorData = await Promise.all(
       directorsSorted.map(async (director) => {
-        let lookup: any = await searchPeople(director.name);
+        const lookup: any = await searchPeople(director.name);
         if (lookup.results && lookup.results.length > 0) {
-          let match = lookup.results[0];
-          let discData: any = await actorLookup(match, type);
+          const match = lookup.results[0];
+          const discData: any = await actorLookup(match, type);
 
-          let newDisc = await Promise.all(
+          const newDisc = await Promise.all(
             discData.map(async (result, i) => {
               if (!watchHistory[result.id]) {
-                let onPlex: any = await onServer(type, false, false, result.id);
+                const onPlex: any = await onServer(type, false, false, result.id);
                 result = formatResult(result, type);
                 result.on_server = onPlex.exists;
                 return result;
-              } else {
-                return 'watched';
               }
+                return 'watched';
+
             }),
           );
 
@@ -195,11 +196,11 @@ export default async (id, type = 'movie') => {
         }
       }),
     );
-    let recentlyViewed = await getHistory(id, type);
-    let recentData: any = await Promise.map(
+    const recentlyViewed = await getHistory(id, type);
+    const recentData: any = await Promise.map(
       Object.keys(recentlyViewed).slice(0, 5),
       async (r) => {
-        let recent = recentlyViewed[r];
+        const recent = recentlyViewed[r];
         if (recent.id) {
           let related: any =
             type === 'movie'
@@ -217,42 +218,28 @@ export default async (id, type = 'movie') => {
             results: [...related[0].results, ...related[1].results],
           };
           if (related.results.length === 0) {
-            let lookup =
+            const lookup =
               type === 'movie'
                 ? await movieLookup(recent.id, true)
                 : await showLookup(recent.id, true);
             if (!lookup) return null;
-            let params: any = {};
+            const params: any = {};
             if (lookup.genres) {
               let genres = '';
-              for (let i = 0; i < lookup.genres.length; i++) {
-                genres += `${lookup.genres[i].id},`;
+              for (const element of lookup.genres) {
+                genres += `${element.id},`;
               }
               params.with_genres = genres;
             }
-            let recommendations: any =
+            const recommendations: any =
               type === 'movie'
                 ? await discoverMovie(1, params)
                 : await discoverShow(1, params);
             if (recommendations.results.length === 0) return null;
-            let newRelated: any = [];
+            const newRelated: any = [];
             recommendations.results.map(async (result) => {
               if (!(result.id.toString() in watchHistory)) {
-                let onPlex: any = await onServer(type, false, false, result.id);
-                result = formatResult(result, type);
-                result.on_server = onPlex.exists;
-                newRelated.push(result);
-              }
-            });
-            return {
-              title: `Because you watched "${recent.title || recent.name}"`,
-              results: newRelated,
-            };
-          } else {
-            let newRelated: any = [];
-            related.results.map(async (result, i) => {
-              if (!(result.id.toString() in watchHistory)) {
-                let onPlex: any = await onServer(type, false, false, result.id);
+                const onPlex: any = await onServer(type, false, false, result.id);
                 result = formatResult(result, type);
                 result.on_server = onPlex.exists;
                 newRelated.push(result);
@@ -263,9 +250,23 @@ export default async (id, type = 'movie') => {
               results: newRelated,
             };
           }
+            const newRelated: any = [];
+            related.results.map(async (result, i) => {
+              if (!(result.id.toString() in watchHistory)) {
+                const onPlex: any = await onServer(type, false, false, result.id);
+                result = formatResult(result, type);
+                result.on_server = onPlex.exists;
+                newRelated.push(result);
+              }
+            });
+            return {
+              title: `Because you watched "${recent.title || recent.name}"`,
+              results: newRelated,
+            };
+
         }
       },
-      { concurrency: config.get("general.concurrency") },
+      { concurrency: config.get('general.concurrency') },
     );
     let data = [...peopleData, ...directorData, ...recentData, ...genresData];
     data = shuffle(data);
@@ -292,9 +293,7 @@ export default async (id, type = 'movie') => {
 async function genreLookup(id, genre, type) {
   let data = false;
   try {
-    data = await memoryCache.wrap(`gl__${id}__${type}`, function () {
-      return genreLookupData(id, genre, type);
-    });
+    data = await memoryCache.wrap(`gl__${id}__${type}`, () => genreLookupData(id, genre, type));
   } catch (err) {
     logger.error(`Error getting genre data`, { label: 'discovery.build' });
     logger.error(err, { label: 'discovery.build' });
@@ -305,9 +304,7 @@ async function genreLookup(id, genre, type) {
 async function actorLookup(match, type) {
   let data = false;
   try {
-    data = await memoryCache.wrap(`al__${match.id}__${type}`, function () {
-      return actorLookupData(match, type);
-    });
+    data = await memoryCache.wrap(`al__${match.id}__${type}`, () => actorLookupData(match, type));
   } catch (err) {
     logger.error(`Error getting actor data`, { label: 'discovery.build' });
     logger.error(err, { label: 'discovery.build' });
@@ -316,7 +313,7 @@ async function actorLookup(match, type) {
 }
 
 async function actorLookupData(match, type) {
-  let args = {
+  const args = {
     sort_by: type === 'movie' ? 'revenue.desc' : 'popularity.desc',
     'vote_count.gte': 100,
     with_people: match.id,
@@ -331,7 +328,7 @@ async function actorLookupData(match, type) {
   discData = {
     results: [...discData[0].results, ...discData[1].results],
   };
-  discData.results.sort(function (a, b) {
+  discData.results.sort((a, b) => {
     if (a.vote_average > b.vote_average) {
       return -1;
     }
@@ -340,7 +337,7 @@ async function actorLookupData(match, type) {
 }
 
 async function genreLookupData(id, genre, type) {
-  let args: any = {
+  const args: any = {
     with_genres: id,
     sort_by: type === 'movie' ? 'revenue.desc' : 'popularity.desc',
     'vote_count.gte': 1500,
@@ -354,9 +351,9 @@ async function genreLookupData(id, genre, type) {
         ? genre.highestRating + 0.5
         : genre.highestRating;
   }
-  let certifications: any = [];
+  const certifications: any = [];
   if (Object.keys(genre.cert).length > 0) {
-    Object.keys(genre.cert).map((cert) => {
+    Object.keys(genre.cert).forEach((cert) => {
       // 10% threshold
       if (genre.count * 0.1 < genre.cert[cert]) {
         certifications.push(cert);
@@ -374,7 +371,7 @@ async function genreLookupData(id, genre, type) {
   discData = {
     results: [...discData[0].results, ...discData[1].results],
   };
-  discData.results.sort(function (a, b) {
+  discData.results.sort((a, b) => {
     if (a.vote_count > b.vote_count) {
       return -1;
     }
@@ -497,10 +494,10 @@ function genreID(genreName, type) {
 function discoverMovie(page = 1, params = {}) {
   const tmdb = 'https://api.themoviedb.org/3/';
   let par = '';
-  Object.keys(params).map((i) => {
+  Object.keys(params).forEach((i) => {
     par += `&${i}=${params[i]}`;
   });
-  let url = `${tmdb}discover/movie?api_key=${tmdbApiKey}${par}&page=${page}&append_to_response=videos`;
+  const url = `${tmdb}discover/movie?api_key=${externalConfig.tmdbApiKey}${par}&page=${page}&append_to_response=videos`;
   return new Promise((resolve, reject) => {
     request(
       url,
@@ -508,7 +505,7 @@ function discoverMovie(page = 1, params = {}) {
         method: 'GET',
         json: true,
       },
-      function (err, data) {
+      (err, data) => {
         if (err) {
           reject(err);
         }
@@ -522,10 +519,10 @@ function discoverMovie(page = 1, params = {}) {
 function discoverShow(page = 1, params = {}) {
   const tmdb = 'https://api.themoviedb.org/3/';
   let par = '';
-  Object.keys(params).map((i) => {
+  Object.keys(params).forEach((i) => {
     par += `&${i}=${params[i]}`;
   });
-  let url = `${tmdb}discover/tv?api_key=${tmdbApiKey}${par}&page=${page}&append_to_response=videos`;
+  const url = `${tmdb}discover/tv?api_key=${externalConfig.tmdbApiKey}${par}&page=${page}&append_to_response=videos`;
   return new Promise((resolve, reject) => {
     request(
       url,
@@ -533,7 +530,7 @@ function discoverShow(page = 1, params = {}) {
         method: 'GET',
         json: true,
       },
-      function (err, data) {
+      (err, data) => {
         if (err) {
           reject(err);
         }
@@ -545,7 +542,7 @@ function discoverShow(page = 1, params = {}) {
 }
 function searchPeople(term) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}search/person?query=${term}&include_adult=false&api_key=${tmdbApiKey}`;
+  const url = `${tmdb}search/person?query=${term}&include_adult=false&api_key=${externalConfig.tmdbApiKey}`;
   return new Promise((resolve, reject) => {
     request(
       url,
@@ -553,7 +550,7 @@ function searchPeople(term) {
         method: 'GET',
         json: true,
       },
-      function (err, data) {
+      (err, data) => {
         if (err) {
           reject(err);
         }
@@ -565,11 +562,11 @@ function searchPeople(term) {
 }
 
 function shuffle(array) {
-  var currentIndex = array.length,
-    temporaryValue,
-    randomIndex;
+  let currentIndex = array.length;
+    let temporaryValue;
+    let randomIndex;
 
-  while (0 !== currentIndex) {
+  while (currentIndex !== 0) {
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex -= 1;
     temporaryValue = array[currentIndex];
@@ -635,9 +632,9 @@ function formatResult(result, type) {
 }
 
 async function comingSoon(type) {
-  let now = new Date().toISOString().split('T')[0];
+  const now = new Date().toISOString().split('T')[0];
   try {
-    let data: any =
+    const data: any =
       type === 'movie'
         ? await discoverMovie(1, {
             sort_by: 'popularity.desc',
@@ -652,7 +649,7 @@ async function comingSoon(type) {
     await Promise.map(
       data.results,
       async (result: any, i) => {
-        let onPlex: any =
+        const onPlex: any =
           type === 'movie'
             ? await onServer('movie', false, false, result.id)
             : await onServer('show', false, false, result.id);
@@ -676,7 +673,7 @@ async function comingSoon(type) {
                 videos: result.videos,
               };
       },
-      { concurrency: config.get("general.concurrency") },
+      { concurrency: config.get('general.concurrency') },
     );
     return data;
   } catch (e) {

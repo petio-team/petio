@@ -6,17 +6,9 @@ import { adminRequired } from '@/api/middleware/auth';
 import logger from '@/loaders/logger';
 import getSessions from '@/services/plex/sessions';
 
-const route = new Router({ prefix: '/sessions' });
-
-export default (app: Router) => {
-  route.get('/', getSessionsData);
-
-  app.use(route.routes());
-};
-
 const getSessionsData = async (ctx: Context) => {
   try {
-    let data = await getSessions();
+    const data = await getSessions();
 
     ctx.status = StatusCodes.OK;
     ctx.body = data.MediaContainer;
@@ -27,4 +19,11 @@ const getSessionsData = async (ctx: Context) => {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = {};
   }
+};
+
+const route = new Router({ prefix: '/sessions' });
+export default (app: Router) => {
+  route.get('/', adminRequired, getSessionsData);
+
+  app.use(route.routes());
 };

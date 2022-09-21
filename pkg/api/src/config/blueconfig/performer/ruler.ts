@@ -1,6 +1,6 @@
-import * as cvtError from './../error';
+import * as cvtError from "../error";
 
-const CUSTOMISE_FAILED = cvtError.CUSTOMISE_FAILED;
+const {CUSTOMISE_FAILED} = cvtError;
 
 /**
  * Validate config with format
@@ -22,17 +22,17 @@ export default Ruler;
 Ruler.prototype.add = function (name, validate, coerce, rewrite) {
   if (typeof name !== 'string') {
     throw new CUSTOMISE_FAILED(
-      'Schema name must be a string (current: "' + typeof name + '").',
+      `Schema name must be a string (current: "${  typeof name  }").`,
     );
   }
   if (typeof validate !== 'function') {
     throw new CUSTOMISE_FAILED(
-      'Validation function for "' + name + '" must be a function.',
+      `Validation function for "${  name  }" must be a function.`,
     );
   }
   if (coerce && typeof coerce !== 'function') {
     throw new CUSTOMISE_FAILED(
-      'Coerce function for "' + name + '" must be a function.',
+      `Coerce function for "${  name  }" must be a function.`,
     );
   }
 
@@ -40,7 +40,7 @@ Ruler.prototype.add = function (name, validate, coerce, rewrite) {
     const advice =
       ' Set the 4th argument (rewrite) of `addFormat` at true to skip this error.';
     throw new CUSTOMISE_FAILED(
-      'Format name "' + name + '" is already registered.' + advice,
+      `Format name "${  name  }" is already registered.${  advice}`,
     );
   }
 

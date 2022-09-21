@@ -1,6 +1,5 @@
-import { StatusCodes } from 'http-status-codes';
 import { Context, Next } from 'koa';
-import { ZodError } from 'zod';
+import { ZodError, ZodSchema } from 'zod';
 
 import { StatusBadRequest } from '../web/request';
 
@@ -25,9 +24,9 @@ export function validateRequest({
   query,
   body,
 }: {
-  params?: any;
-  query?: any;
-  body?: any;
+  params?: ZodSchema;
+  query?: ZodSchema;
+  body?: ZodSchema;
 }): (ctx: Context, next: Next) => Promise<void> {
   return async (ctx: Context, next: Next): Promise<void> => {
     const errors: Array<ErrorListItem> = [];
@@ -53,5 +52,6 @@ export function validateRequest({
       return sendErrors(errors, ctx);
     }
     await next();
+    return undefined;
   };
 }

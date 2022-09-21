@@ -10,18 +10,9 @@ import { UserModel } from '@/models/user';
 import plexLookup from '@/services/plex/lookup';
 import MakePlexURL from '@/services/plex/util';
 
-const route = new Router({ prefix: '/plex' });
-
-export default (app: Router) => {
-  route.get('/lookup/:type/:id', lookupByIdAndType);
-  route.get('/test_plex', testPlexConnection);
-
-  app.use(route.routes());
-};
-
 const lookupByIdAndType = async (ctx: Context) => {
-  let type = ctx.params.type;
-  let id = ctx.params.id;
+  const {type} = ctx.params;
+  const {id} = ctx.params;
   if (!type || !id || type === 'undefined' || type === 'undefined') {
     ctx.status = StatusCodes.BAD_REQUEST;
     ctx.body = { error: 'invalid fields provided' };
@@ -30,6 +21,20 @@ const lookupByIdAndType = async (ctx: Context) => {
     ctx.body = await plexLookup(id, type);
   }
 };
+
+async function updateCredentials(obj) {
+  if (obj.plexClientID === undefined) {
+    throw new Error('plex client id does not exist in object');
+  }
+
+  config.set('plex.client', obj.plexClientID);
+  try {
+    await WriteConfig();
+  } catch (err) {
+    logger.log({ level: 'error', message: err });
+    logger.error('PLX: Error config not found');
+  }
+}
 
 const testPlexConnection = async (ctx: Context) => {
   const url = MakePlexURL('/').toString();
@@ -44,8 +49,8 @@ const testPlexConnection = async (ctx: Context) => {
     await axios.get(
       `https://plex.tv/pms/resources?X-Plex-Token=${config.get('plex.token')}`,
     );
-    let connection = await axios.get(url);
-    let data = connection.data.MediaContainer;
+    const connection = await axios.get(url);
+    const data = connection.data.MediaContainer;
     if (
       data.myPlexUsername === admin.username ||
       data.myPlexUsername === admin.email
@@ -57,14 +62,14 @@ const testPlexConnection = async (ctx: Context) => {
         error: false,
       };
       return;
-    } else {
+    }
       ctx.status = StatusCodes.OK;
       ctx.body = {
         connection: false,
         error: 'You are not the owner of this server',
       };
       return;
-    }
+
   } catch (err) {
     logger.log({ level: 'error', message: err });
 
@@ -76,16 +81,10 @@ const testPlexConnection = async (ctx: Context) => {
   }
 };
 
-async function updateCredentials(obj) {
-  if (obj.plexClientID == undefined) {
-    throw 'plex client id does not exist in object';
-  }
+const route = new Router({ prefix: '/plex' });
+export default (app: Router) => {
+  route.get('/lookup/:type/:id', lookupByIdAndType);
+  route.get('/test_plex', testPlexConnection);
 
-  config.set('plex.client', obj.plexClientID);
-  try {
-    await WriteConfig();
-  } catch (err) {
-    logger.log({ level: 'error', message: err });
-    logger.error('PLX: Error config not found');
-  }
-}
+  app.use(route.routes());
+};

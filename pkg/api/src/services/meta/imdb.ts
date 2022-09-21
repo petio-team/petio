@@ -1,10 +1,10 @@
-import axios from 'axios';
 import fs from 'fs';
-import lineReader from 'line-reader';
 import path from 'path';
 import zlib from 'zlib';
+import axios from 'axios';
+import lineReader from 'line-reader';
 
-import { dataFolder } from '@/config/env';
+import pathsConfig from "@/config/env/paths";
 import logger from '@/loaders/logger';
 import Imdb from '@/models/imdb';
 
@@ -13,7 +13,7 @@ export async function lookup(imdb_id) {
     return false;
   }
 
-  let data = await Imdb.findOne({ id: imdb_id });
+  const data = await Imdb.findOne({ id: imdb_id }).exec();
   if (!data) return false;
   return {
     rating: { ratingValue: data.rating },
@@ -23,7 +23,7 @@ export async function lookup(imdb_id) {
 
 export async function storeCache(firstTime = false) {
   if (firstTime) {
-    let exists = await Imdb.findOne({});
+    const exists = await Imdb.findOne({}).exec();
     if (exists) {
       logger.verbose('IMDB: Cache exists skipping setup', {
         label: 'meta.imdb',
@@ -32,7 +32,7 @@ export async function storeCache(firstTime = false) {
     }
   }
   const unzip = zlib.createGunzip();
-  let tempFile = path.join(dataFolder, './imdb_dump.txt');
+  const tempFile = path.join(pathsConfig.data, './imdb_dump.txt');
   logger.verbose('IMDB: Rebuilding Cache', { label: 'meta.imdb' });
   try {
     logger.verbose('IMDB: Cache Downloading latest cache', {
@@ -65,7 +65,7 @@ export async function storeCache(firstTime = false) {
 
 async function parseData(file): Promise<any> {
   logger.verbose('IMDB: Cache Emptying old cache', { label: 'meta.imdb' });
-  await Imdb.deleteMany({});
+  await Imdb.deleteMany({}).exec();
   logger.verbose('IMDB: Cache cleared', { label: 'meta.imdb' });
   logger.verbose('IMDB: Cache parsing download, updating local cache', {
     label: 'meta.imdb',
@@ -73,7 +73,7 @@ async function parseData(file): Promise<any> {
   return new Promise((resolve, reject) => {
     let buffer: any = [];
     lineReader.eachLine(file, async (line, last, cb) => {
-      let data = line.split('\t');
+      const data = line.split('\t');
       if (data[0] === 'tconst' || (parseInt(data[2]) < 1000 && !last)) {
         cb();
         return;
@@ -108,9 +108,5 @@ async function parseData(file): Promise<any> {
 }
 
 async function processBuffer(data) {
-  try {
-    await Imdb.bulkWrite(data);
-  } catch {
-    throw 'IMDB: Error cannot write to Db';
-  }
+  await Imdb.bulkWrite(data);
 }

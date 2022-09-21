@@ -23,7 +23,7 @@ export default async () => {
     const userIds = users.map((user: User) => {
       if (user.altId) {
         return user.altId;
-      } else if (!user.custom) {
+      } if (!user.custom) {
         return user.id;
       }
     });
@@ -41,7 +41,6 @@ export default async () => {
   } catch (e) {
     logger.error(e);
   }
-  return;
 };
 
 function userBuild(id) {
@@ -52,8 +51,8 @@ function userBuild(id) {
 
 async function create(id) {
   try {
-    let data: any = await build(id);
-    let existing = await Discovery.findOne({ id: id });
+    const data: any = await build(id);
+    const existing: any = await Discovery.findOne({ id }).exec();
     if (existing) {
       existing.id = id;
       existing.movie = {
@@ -73,8 +72,8 @@ async function create(id) {
       };
       existing.save();
     } else {
-      let newDiscover = new Discovery({
-        id: id,
+      const newDiscover = new Discovery({
+        id,
         movie: {
           genres: data.movie.genres,
           people: {
@@ -94,41 +93,41 @@ async function create(id) {
       newDiscover.save();
     }
   } catch (_) {}
-  return;
 }
 
 async function build(id) {
-  let movie: any = {
+  const movie: any = {
     history: {},
     genres: {},
     actors: {},
     directors: {},
   };
-  let series: any = {
+  const series: any = {
     history: {},
     genres: {},
   };
-  let data: any = await getHistory(id);
+  const data: any = await getHistory(id);
   if (data.MediaContainer.size === 0) {
     logger.verbose(`DISC: No history for user - ${id}`, {
       label: 'discovery.build',
     });
     return {
-      movie: movie,
-      series: series,
+      movie,
+      series,
     };
   }
-  let items = data.MediaContainer.Metadata;
-  for (let i = 0; i < items.length; i++) {
-    let listItem = items[i];
+  const items = data.MediaContainer.Metadata;
+  for (const element of items) {
+    const listItem = element;
     if (listItem.type === 'movie') {
-      let dbItem = await Movie.findOne({ ratingKey: listItem.ratingKey });
+      const dbItem = await Movie.findOne({
+        ratingKey: listItem.ratingKey,
+      }).exec();
       if (dbItem) {
         if (dbItem.tmdb_id) movie.history[dbItem.tmdb_id] = dbItem.tmdb_id;
         if (dbItem.Genre) {
-          for (let g = 0; g < dbItem.Genre.length; g++) {
-            let genre = dbItem.Genre[g];
-            let cr = cert(dbItem.contentRating, 'movie');
+          for (const genre of dbItem.Genre) {
+            const cr = cert(dbItem.contentRating, 'movie');
             if (!movie.genres[genre.tag]) {
               movie.genres[genre.tag] = {
                 count: 1,
@@ -141,7 +140,7 @@ async function build(id) {
             } else {
               movie.genres[genre.tag].count = movie.genres[genre.tag].count + 1;
               if (cr) {
-                let certCount = movie.genres[genre.tag].cert[cr] || 0;
+                const certCount = movie.genres[genre.tag].cert[cr] || 0;
                 movie.genres[genre.tag].cert[cr] = certCount + 1;
               }
               if (
@@ -160,8 +159,8 @@ async function build(id) {
           }
         }
         if (dbItem.Role) {
-          for (let r = 0; r < dbItem.Role.length; r++) {
-            let actor = dbItem.Role[r].tag.replace(/[^a-zA-Z0-9 ]/g, '');
+          for (const role of dbItem.Role) {
+            const actor = role.tag.replace(/[^a-zA-Z0-9 ]/g, '');
             movie.actors[actor] = movie.actors[actor]
               ? movie.actors[actor] + 1
               : 1;
@@ -169,24 +168,23 @@ async function build(id) {
         }
 
         if (dbItem.Director) {
-          for (let r = 0; r < dbItem.Director.length; r++) {
-            let director = dbItem.Director[r].tag.replace(/[^a-zA-Z0-9 ]/g, '');
-            movie.directors[director] = movie.directors[director]
-              ? movie.directors[director] + 1
+          for (const director of dbItem.Director) {
+            const directorTag = director.tag.replace(/[^a-zA-Z0-9 ]/g, '');
+            movie.directors[directorTag] = movie.directors[directorTag]
+              ? movie.directors[directorTag] + 1
               : 1;
           }
         }
       }
     } else if (listItem.type === 'episode') {
       if (listItem.grandparentKey) {
-        let key = listItem.grandparentKey.replace('/library/metadata/', '');
-        let dbItem = await Show.findOne({ ratingKey: key });
+        const key = listItem.grandparentKey.replace('/library/metadata/', '');
+        const dbItem: any = await Show.findOne({ ratingKey: key }).exec();
         if (dbItem) {
           if (dbItem.tmdb_id) series.history[dbItem.tmdb_id] = dbItem.tmdb_id;
           if (dbItem.Genre) {
-            for (let g = 0; g < dbItem.Genre.length; g++) {
-              let genre = dbItem.Genre[g];
-              let cr = cert(dbItem.contentRating, 'show');
+            for (const genre of dbItem.Genre) {
+              const cr = cert(dbItem.contentRating, 'show');
               if (!series.genres[genre.tag]) {
                 series.genres[genre.tag] = {
                   count: 1,
@@ -200,7 +198,7 @@ async function build(id) {
                 series.genres[genre.tag].count =
                   series.genres[genre.tag].count + 1;
                 if (cr) {
-                  let certCount = series.genres[genre.tag].cert[cr] || 0;
+                  const certCount = series.genres[genre.tag].cert[cr] || 0;
                   series.genres[genre.tag].cert[cr] = certCount + 1;
                 }
                 if (
@@ -220,8 +218,8 @@ async function build(id) {
           }
 
           if (dbItem.Role) {
-            for (let r = 0; r < dbItem.Role.length; r++) {
-              let actor = dbItem.Role[r].tag;
+            for (const role of dbItem.Role) {
+              const actor = role.tag;
               series.actors[actor] = series.actors[actor]
                 ? series.actors[actor] + 1
                 : 1;
@@ -231,19 +229,19 @@ async function build(id) {
       }
     }
   }
-  Object.keys(movie.actors).map((key) => {
+  Object.keys(movie.actors).forEach((key) => {
     if (movie.actors[key] < 2) {
       delete movie.actors[key];
     }
   });
-  Object.keys(movie.directors).map((key) => {
+  Object.keys(movie.directors).forEach((key) => {
     if (movie.directors[key] < 2) {
       delete movie.directors[key];
     }
   });
   return {
-    movie: movie,
-    series: series,
+    movie,
+    series,
   };
 }
 
@@ -310,7 +308,7 @@ function cert(cert, type) {
 }
 function getHistory(id, library = false) {
   return new Promise((resolve, reject) => {
-    const params = {
+    const params: any = {
       sort: 'viewedAt:desc',
       accountID: id,
       'viewedAt>=': '0',
@@ -319,7 +317,7 @@ function getHistory(id, library = false) {
     };
 
     if (library) {
-      params['librarySectionID'] = library;
+      params.librarySectionID = library;
     }
 
     const url = MakePlexURL('/status/sessions/history/all', params);
@@ -329,7 +327,7 @@ function getHistory(id, library = false) {
         method: 'GET',
         json: true,
       },
-      function (err, data) {
+      (err, data) => {
         if (err) {
           reject(err);
         }

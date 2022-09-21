@@ -10,15 +10,13 @@ import { showLookup } from '@/services/tmdb/show';
 const memoryCache = cacheManager.caching({
   store: 'memory',
   max: 500,
-  ttl: 3600 /*seconds*/,
+  ttl: 3600 /* seconds */,
 });
 
 export default async (id, type) => {
   let data: any = false;
   try {
-    data = await memoryCache.wrap(`hist__${id}__${type}`, function () {
-      return getHistoryData(id, type);
-    });
+    data = await memoryCache.wrap(`hist__${id}__${type}`, () => getHistoryData(id, type));
   } catch (err) {
     logger.warn(`Error getting history data - ${id}`, {
       label: 'plex.history',
@@ -32,7 +30,7 @@ export default async (id, type) => {
 function getHistoryData(id, type) {
   logger.verbose('History returned from source', { label: 'plex.history' });
   return new Promise((resolve, reject) => {
-    let d = new Date();
+    const d = new Date();
     d.setMonth(d.getMonth() - 1);
     d.setHours(0, 0, 0);
     d.setMilliseconds(0);
@@ -51,7 +49,7 @@ function getHistoryData(id, type) {
         method: 'GET',
         json: true,
       },
-      function (err, data) {
+      (err, data) => {
         if (err) {
           reject(err);
         }
@@ -69,34 +67,32 @@ async function parseHistory(data, type) {
   if (type === 'show') {
     type = 'episode';
   }
-  let history = data.MediaContainer.Metadata;
-  let output = {};
+  const history = data.MediaContainer.Metadata;
+  const output = {};
   if (!history) {
     return output;
   }
-  let histArr = new Array();
+  const histArr: any = [];
   for (let i = 0; i < history.length; i++) {
-    let item = history[i];
+    const item = history[i];
     if (type === item.type || type === 'all') {
-      let media_type = item.type;
+      const media_type = item.type;
       let media_id = item.ratingKey;
-      let media_title = item.title;
 
       if (media_type === 'episode' && item.grandparentKey) {
         media_id = item.grandparentKey.replace('/library/metadata/', '');
-        media_title = item.grandparentTitle;
       } else if (media_type === 'episode' && item.parentKey) {
         media_id = item.parentKey.replace('/library/metadata/', '');
       }
 
-      let key = media_id;
+      const key = media_id;
 
       if (!histArr.includes(key)) {
         if (media_type === 'episode') {
-          let plexData: any = await plexLookup(media_id, 'show');
+          const plexData: any = await plexLookup(media_id, 'show');
           media_id = plexData.tmdb_id;
         } else {
-          let plexData: any = await plexLookup(media_id, 'movie');
+          const plexData: any = await plexLookup(media_id, 'movie');
           media_id = plexData.tmdb_id;
         }
 
@@ -108,10 +104,12 @@ async function parseHistory(data, type) {
         ) {
           output[i] =
             media_type === 'movie'
-              ? await movieLookup(media_id, false)
-              : await showLookup(media_id, false);
+              ? movieLookup(media_id, false)
+              : showLookup(media_id, false);
         }
       }
+
+
     }
   }
   return output;

@@ -1,6 +1,6 @@
 import cluster from 'cluster';
-import { EventDispatcher } from "event-dispatch";
 import process from 'process';
+import { EventDispatcher } from "event-dispatch";
 import { inject, injectable } from "tsyringe";
 
 export interface IEventData {
@@ -112,11 +112,9 @@ export class IPC {
           }
         }
       }
-    } else {
-      if (pack.toMaster === true || pack.toWorkers === true) {
+    } else if (pack.toMaster === true || pack.toWorkers === true) {
         (process as any).send(pack);
       }
-    }
   }
 
   // Used to register processes and custom callback functions

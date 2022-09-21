@@ -8,12 +8,12 @@ export default async (item) => {
   let filterMatch = false;
   let action = false;
 
-  let mediaDetails =
+  const mediaDetails =
     item.type === 'movie'
       ? await movieLookup(item.tmdb_id)
       : await showLookup(item.tmdb_id);
-  let filterId = item.type === 'movie' ? 'movie_filters' : 'tv_filters';
-  let filters = await Filter.findOne({ id: filterId });
+  const filterId = item.type === 'movie' ? 'movie_filters' : 'tv_filters';
+  const filters = await Filter.findOne({ id: filterId });
   if (!mediaDetails || !filters) return false;
   filters.data.map((f, i) => {
     if (action) return;
@@ -66,7 +66,7 @@ export default async (item) => {
 };
 
 function filterCompare(condition, value, operator, media) {
-  let mediaValues: any = getValue(condition, media);
+  const mediaValues: any = getValue(condition, media);
   let match = false;
   mediaValues.map((mediaValue) => {
     switch (operator) {

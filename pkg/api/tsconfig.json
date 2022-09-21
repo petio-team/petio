@@ -31,5 +31,5 @@
     }
   },
   "exclude": ["node_modules", "dist", "tests"],
-  "include": ["./src/**/*", "./package.json"]
+  "include": ["./src/**/*"]
 }

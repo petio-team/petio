@@ -12,6 +12,7 @@ export interface IDownloader {
   type: DownloaderType;
   url: string;
   token: string;
+  version: string;
   path: {
     id: number;
     location: string;
@@ -21,6 +22,10 @@ export interface IDownloader {
     name: string;
   };
   language: {
+    id: number;
+    name: string;
+  };
+  availability: {
     id: number;
     name: string;
   };
@@ -53,6 +58,10 @@ export const DownloaderModelSchema = new Schema<IDownloader>(
       type: String,
       required: true,
     },
+    version: {
+      type: String,
+      required: true,
+    },
     path: {
       id: {
         type: Number,
@@ -82,6 +91,15 @@ export const DownloaderModelSchema = new Schema<IDownloader>(
         required: true,
       },
     },
+    availability: {
+      id: {
+        type: Number,
+        required: true,
+      },
+      name: {
+        type: String,
+      },
+    },
     enabled: {
       type: Boolean,
       required: true,
@@ -90,7 +108,7 @@ export const DownloaderModelSchema = new Schema<IDownloader>(
   {
     timestamps: true,
     toJSON: {
-      transform: function (_doc, ret, _options) {
+      transform (_doc, ret, _options) {
         delete ret._id;
         delete ret.__v;
         return ret;
@@ -126,7 +144,7 @@ export const GetAllDownloaders = async (
 export const GetDownloaderById = async (id: string): Promise<IDownloader> => {
   const downloader = await DownloaderModel.findOne({ id }).exec();
   if (!downloader) {
-    throw new Error('no downloader exists with id: ' + id);
+    throw new Error(`no downloader exists with id: ${  id}`);
   }
 
   return downloader.toObject();
@@ -178,6 +196,7 @@ export const CreateOrUpdateDownloader = async (
         type: data.type,
         url: data.url,
         token: data.token,
+        version: data.version,
         path: {
           id: data.path.id,
           location: data.path.location,
@@ -189,6 +208,10 @@ export const CreateOrUpdateDownloader = async (
         language: {
           id: data.language.id,
           name: data.language.name,
+        },
+        availability: {
+          id: data.availability.id,
+          name: data.availability.name,
         },
         enabled: data.enabled,
       },
@@ -212,17 +235,17 @@ export const UpdateDownloader = async (data: IDownloader): Promise<boolean> => {
 
   const downloader = await DownloaderModel.updateOne(data).exec();
   if (!downloader) {
-    throw new Error('failed to update downloader with id: ' + data.id);
+    throw new Error(`failed to update downloader with id: ${  data.id}`);
   }
 
-  return downloader.modifiedCount ? true : false;
+  return !!downloader.modifiedCount;
 };
 
 export const DeleteDownloaderById = async (id: string): Promise<boolean> => {
   const downloader = await DownloaderModel.deleteOne({ id }).exec();
   if (!downloader) {
-    throw new Error('failed to delete downloader with id: ' + id);
+    throw new Error(`failed to delete downloader with id: ${  id}`);
   }
 
-  return downloader.deletedCount ? true : false;
+  return !!downloader.deletedCount;
 };

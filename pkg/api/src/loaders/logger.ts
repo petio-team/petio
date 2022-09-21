@@ -2,7 +2,7 @@ import path from 'path';
 import * as winston from 'winston';
 import 'winston-daily-rotate-file';
 
-import { dataFolder } from '@/config/env';
+import pathsConfig from "@/config/env/paths";
 import { config } from '@/config/schema';
 
 const {
@@ -16,7 +16,7 @@ const {
   prettyPrint,
 } = winston.format;
 
-const logsFolder = path.join(dataFolder, './logs');
+const logsFolder = path.join(pathsConfig.dataDir, './logs');
 
 const customFormat = printf(({ level, formatLabel, message, timestamp }) => {
   const lbl = formatLabel ? `[${formatLabel}] ` : '';
@@ -55,14 +55,12 @@ const Logger = winston.createLogger({
       tailable: true,
       format: combine(
         timestamp(),
-        printf((info) => {
-          return `${JSON.stringify({
+        printf((info) => `${JSON.stringify({
             [info.timestamp]: {
               type: info.level,
               log: info.message,
             },
-          })},`;
-        }),
+          })},`),
       ),
     }),
   ],

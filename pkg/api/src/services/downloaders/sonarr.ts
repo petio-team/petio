@@ -10,6 +10,7 @@ import Request from '@/models/request';
 
 export default class Sonarr {
   instance: IDownloader;
+
   client: SonarrAPI;
 
   constructor(instance: IDownloader) {
@@ -24,7 +25,7 @@ export default class Sonarr {
   }
 
   async queue() {
-    let queue = {};
+    const queue = {};
     const instances = await GetAllDownloaders(DownloaderType.Sonarr);
     for (const instance of instances) {
       const url = new URL(instance.url);
@@ -40,17 +41,17 @@ export default class Sonarr {
       }
 
       queue[instance.id] = await api.GetQueue();
-      let totalRecords = queue[instance.id].totalRecords;
-      let pageSize = queue[instance.id].pageSize;
-      let pages = Math.ceil(totalRecords / pageSize);
+      const {totalRecords} = queue[instance.id];
+      const {pageSize} = queue[instance.id];
+      const pages = Math.ceil(totalRecords / pageSize);
       for (let p = 2; p <= pages; p++) {
-        let queuePage = await api.GetQueue(p);
+        const queuePage = await api.GetQueue(p);
         queue[instance.id].records = [
           ...queue[instance.id].records,
           ...queuePage.records,
         ];
       }
-      queue[instance.id]['serverName'] = instance.name;
+      queue[instance.id].serverName = instance.name;
     }
     return queue;
   }
@@ -69,14 +70,14 @@ export default class Sonarr {
       return;
     }
 
-    let result: Series = await this.client.GetSeriesLookupById(
+    const result: Series = await this.client.GetSeriesLookupById(
       request.tvdb_id,
     )[0];
-    let rSeasons = request.seasons;
+    const rSeasons = request.seasons;
     if (rSeasons) {
       for (const season of result.seasons) {
         if (season) {
-          season.monitored = rSeasons[season.seasonNumber] ? true : false;
+          season.monitored = !!rSeasons[season.seasonNumber];
         }
       }
     }
@@ -142,11 +143,19 @@ export default class Sonarr {
       }
     }
     try {
-      let dbRequest = await Request.findOne({
+      const dbRequest = await Request.findOne({
         requestId: request.id,
       }).exec();
+      if (!dbRequest) {
+        logger.verbose(
+          `SERVICE - SONARR: [${this.instance.name}] No request found with id ${request.id}`,
+          { label: 'downloaders.sonarr' },
+        );
+        return;
+      }
+
       let exists = false;
-      for (let o; o < dbRequest.sonarrId.lenght; o++) {
+      for (let o; o < dbRequest.sonarrId.length; o++) {
         if (dbRequest.sonarrId[o][this.instance.id]) {
           exists = true;
           dbRequest.sonarrId[o][this.instance.id] = sonarrId;

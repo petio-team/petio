@@ -55,4 +55,4 @@ export const PinsEndpoint = asApi([
     parameters: [],
     response: PinsSchema,
   },
-] as const);
+]);

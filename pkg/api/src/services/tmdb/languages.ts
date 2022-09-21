@@ -195,7 +195,7 @@ const languages = [
  * @returns string A language name
  */
 export default (code: string): string => {
-  var language = languages
+  const language = languages
     .filter((lang) => lang.code === code)
     .map((lang) => lang.code);
 

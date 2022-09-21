@@ -5,17 +5,9 @@ import { Context } from 'koa';
 import logger from '@/loaders/logger';
 import search from '@/services/tmdb/search';
 
-const route = new Router({ prefix: '/search' });
-
-export default (app: Router) => {
-  route.get('/:term', searchByTerm);
-
-  app.use(route.routes());
-};
-
 const searchByTerm = async (ctx: Context) => {
   try {
-    let data = await search(ctx.params.term.replace(/[^a-zA-Z0-9 ]/g, ''));
+    const data = await search(ctx.params.term.replace(/[^a-zA-Z0-9 ]/g, ''));
 
     ctx.status = StatusCodes.OK;
     ctx.body = data;
@@ -29,4 +21,11 @@ const searchByTerm = async (ctx: Context) => {
       shows: [],
     };
   }
+};
+
+const route = new Router({ prefix: '/search' });
+export default (app: Router) => {
+  route.get('/:term', searchByTerm);
+
+  app.use(route.routes());
 };

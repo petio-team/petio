@@ -42,4 +42,4 @@ export const FriendsEndpoint = asApi([
     ],
     response: FriendsSchema,
   },
-] as const);
+]);

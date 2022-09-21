@@ -39,4 +39,4 @@ export const SystemStatusEndpoint = asApi([
     parameters: [],
     response: SystemStatusSchema,
   },
-] as const);
+]);

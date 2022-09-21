@@ -5,15 +5,6 @@ import { Context } from 'koa';
 import logger from '@/loaders/logger';
 import getDiscovery from '@/services/discovery/display';
 
-const route = new Router({ prefix: '/discovery' });
-
-export default (app: Router) => {
-  route.get('/movies', getMovies);
-  route.get('/shows', getShows);
-
-  app.use(route.routes());
-};
-
 const getMovies = async (ctx: Context) => {
   const userId = ctx.state.user.altId
     ? ctx.state.user.altId
@@ -24,7 +15,7 @@ const getMovies = async (ctx: Context) => {
   }
   try {
     logger.verbose(`ROUTE: Movie Discovery Profile returned for ${userId}`);
-    let data: any = await getDiscovery(userId, 'movie');
+    const data: any = await getDiscovery(userId, 'movie');
     if (data.error) throw data.error;
     ctx.body = data;
   } catch (err) {
@@ -43,7 +34,7 @@ const getShows = async (ctx: Context) => {
   }
   try {
     logger.verbose(`ROUTE: TV Discovery Profile returned for ${userId}`);
-    let data: any = await getDiscovery(userId, 'show');
+    const data: any = await getDiscovery(userId, 'show');
     if (data.error) throw data.error;
 
     ctx.status = StatusCodes.OK;
@@ -52,4 +43,12 @@ const getShows = async (ctx: Context) => {
     logger.error(err);
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
   }
+};
+
+const route = new Router({ prefix: '/discovery' });
+export default (app: Router) => {
+  route.get('/movies', getMovies);
+  route.get('/shows', getShows);
+
+  app.use(route.routes());
 };

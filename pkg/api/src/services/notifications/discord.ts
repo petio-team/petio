@@ -5,6 +5,7 @@ import logger from '@/loaders/logger';
 
 export default class Discord {
   webhook: any;
+
   constructor() {
     this.webhook = config.get('notifications.discord.url') || false;
   }
@@ -15,8 +16,8 @@ export default class Discord {
   }
 
   buildBody(content = null, data: any = null) {
-    let body: any = {
-      content: content,
+    const body: any = {
+      content,
       username: 'Petio',
       avatar_url: 'https://petio.tv/favicon.png',
     };
@@ -60,8 +61,8 @@ export default class Discord {
       label: 'notifications.discord',
     });
     const defaultText: any = 'Petio Test';
-    let body = this.buildBody(defaultText);
-    let test = await this.postHook(this.webhook, body);
+    const body = this.buildBody(defaultText);
+    const test = await this.postHook(this.webhook, body);
     if (!test) {
       logger.verbose('DSCRD: Test Failed', { label: 'notifications.discord' });
       return {
@@ -89,18 +90,18 @@ export default class Discord {
     logger.verbose(`DSCRD: Sending webhook - ${content}`, {
       label: 'notifications.discord',
     });
-    let body = this.buildBody(null, {
-      title: title,
-      content: content,
-      username: username,
-      image: image,
+    const body = this.buildBody(null, {
+      title,
+      content,
+      username,
+      image,
     });
     this.postHook(this.webhook, body);
   }
 
   async postHook(url, body) {
     try {
-      await axios({ method: 'post', url: url, data: body });
+      await axios({ method: 'post', url, data: body });
       logger.verbose('DSCRD: Webhook fired', {
         label: 'notifications.discord',
       });

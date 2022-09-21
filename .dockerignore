@@ -1,10 +1,29 @@
-# Ignore everything
-*
+# Folders
 
-# Allow files and directories
-!docker/
-!/pkg/frontend/build/
-!/pkg/api/dist/
-!/pkg/api/package.json
-!/node_modules
-!.node-version
+.git
+.devcontainer
+.github
+.husky
+.trunk
+.vscode
+data
+build
+dist
+
+# Files
+
+.hadolint.yaml
+.markdownlint.yaml
+.node-version
+prettierjs
+.shellcheckrc
+commitlint.config.js
+docker-compose.yaml
+LICENSE
+README.md
+semantic-release.json
+Taskfile.yml
+.dockerignore
+.editorconfig
+.eslintrc.js
+.prettierignore

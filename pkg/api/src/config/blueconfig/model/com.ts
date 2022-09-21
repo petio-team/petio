@@ -1,27 +1,28 @@
 import fs from 'fs';
 import { cloneDeep } from 'lodash';
 
+import * as cvtError from "../error";
 import { parse, stringify } from '../lib/object-path';
-import * as cvtError from './../error';
-import Apply from './../performer/apply';
-import parsingSchema from './../performer/utils/parsingschema';
-import * as utils from './../performer/utils/utils';
-import validator from './../performer/utils/validator';
-import walk from './../performer/utils/walk';
+import Apply from "../performer/apply";
+import parsingSchema from "../performer/utils/parsingschema";
+import * as utils from "../performer/utils/utils";
+import validator from "../performer/utils/validator";
+import walk from "../performer/utils/walk";
 import SchemaNode from './schemanode';
 
-const unroot = utils.unroot;
+const {unroot} = utils;
 
 const ALLOWED_OPTION_STRICT = 'strict';
 const ALLOWED_OPTION_WARN = 'warn';
+const ALLOWED_OPTION_IGNORE = 'ignore';
 
-const BLUECONFIG_ERROR = cvtError.BLUECONFIG_ERROR;
+const {BLUECONFIG_ERROR} = cvtError;
 // 2
-const CUSTOMISE_FAILED = cvtError.CUSTOMISE_FAILED;
-const INCORRECT_USAGE = cvtError.INCORRECT_USAGE;
-const PATH_INVALID = cvtError.PATH_INVALID;
+const {CUSTOMISE_FAILED} = cvtError;
+const {INCORRECT_USAGE} = cvtError;
+const {PATH_INVALID} = cvtError;
 // 2
-const VALIDATE_FAILED = cvtError.VALIDATE_FAILED;
+const {VALIDATE_FAILED} = cvtError;
 
 /**
  * Class for configNode, created with blueconfig class. This class is declared by `const config = blueconfig(schema)`.
@@ -162,7 +163,7 @@ ConfigObjectModel.prototype.getProperties = function () {
  */
 ConfigObjectModel.prototype.toString = function () {
   const clone = cloneDeep(this._instance.root);
-  this._sensitive.forEach(function (fullpath) {
+  this._sensitive.forEach((fullpath) => {
     const path = parse(unroot(fullpath));
     const childKey = path.pop();
     const parentKey = stringify(path);
@@ -192,9 +193,9 @@ function convertSchema(schemaObjectModel) {
     Array.isArray(schemaObjectModel)
   ) {
     return schemaObjectModel;
-  } else if (schemaObjectModel._cvtProperties) {
+  } if (schemaObjectModel._cvtProperties) {
     return convertSchema.call(this, schemaObjectModel._cvtProperties);
-  } else {
+  } 
     let isSchemaNode = false;
     if (schemaObjectModel instanceof SchemaNode) {
       schemaObjectModel = (schemaObjectModel as any).attributes;
@@ -212,7 +213,7 @@ function convertSchema(schemaObjectModel) {
     });
 
     return schema;
-  }
+  
 }
 
 /**
@@ -367,14 +368,14 @@ ConfigObjectModel.prototype.default = function (strPath) {
   } catch (err) {
     if (err instanceof PATH_INVALID) {
       throw new PATH_INVALID(
-        err.fullname + '.default',
+        `${err.fullname  }.default`,
         err.path,
         err.name,
         err.value,
       );
     } else {
       throw new INCORRECT_USAGE(
-        unroot(strPath) + ': Cannot read property "default"',
+        `${unroot(strPath)  }: Cannot read property "default"`,
       );
     }
   }
@@ -505,13 +506,13 @@ ConfigObjectModel.prototype.set = function (
     !this._getters.list[priority] &&
     !['value', 'force'].includes(priority)
   ) {
-    throw new INCORRECT_USAGE('unknown getter: ' + priority);
+    throw new INCORRECT_USAGE(`unknown getter: ${  priority}`);
   } else if (!mySchema) {
     // no schema and custom priority = impossible
     const errorMsg =
-      'you cannot set priority because "' +
-      name +
-      '" not declared in the schema';
+      `you cannot set priority because "${ 
+      name 
+      }" not declared in the schema`;
     throw new INCORRECT_USAGE(errorMsg);
   }
 
@@ -706,7 +707,7 @@ ConfigObjectModel.prototype.merge = function (sources, contentType) {
 ConfigObjectModel.prototype.validate = function (options) {
   options = options || {};
 
-  options.allowed = options.allowed || ALLOWED_OPTION_WARN;
+  options.allowed = options.allowed || ALLOWED_OPTION_IGNORE;
 
   if (options.output && typeof options.output !== 'function') {
     throw new CUSTOMISE_FAILED(
@@ -731,33 +732,33 @@ ConfigObjectModel.prototype.validate = function (options) {
 
     const fillErrorBuffer = function (errors) {
       const messages = Array<any>();
-      errors.forEach(function (err) {
+      errors.forEach((err) => {
         let err_buf = '  - ';
 
         /* if (err.type) {
           err_buf += '[' + err.type + '] '
         } */
         if (err.fullname) {
-          err_buf += unroot(err.fullname) + ': ';
+          err_buf += `${unroot(err.fullname)  }: `;
         }
         if (err.message) {
           err_buf += err.message;
         }
 
-        const hidden = !!sensitive.has('root.' + err.fullname);
+        const hidden = !!sensitive.has(`root.${  err.fullname}`);
         const value = hidden ? '[Sensitive]' : JSON.stringify(err.value);
         const getterValue = hidden
           ? '[Sensitive]'
           : JSON.stringify(err.getter && err.getter.keyname);
 
         if (err.value) {
-          err_buf += ': value was ' + value;
+          err_buf += `: value was ${  value}`;
 
           const getter = err.getter ? err.getter.name : false;
 
           if (getter) {
-            err_buf += ', getter was `' + getter;
-            err_buf += getter !== 'value' ? '[' + getterValue + ']`' : '`';
+            err_buf += `, getter was \`${  getter}`;
+            err_buf += getter !== 'value' ? `[${  getterValue  }]\`` : '`';
           }
         }
 
@@ -767,7 +768,7 @@ ConfigObjectModel.prototype.validate = function (options) {
           if (process.stdout.isTTY) {
             warning = BOLD_YELLOW_TEXT + warning + RESET_TEXT;
           }
-          err_buf += ' ' + warning;
+          err_buf += ` ${  warning}`;
         }
 
         messages.push(err_buf);
@@ -781,20 +782,20 @@ ConfigObjectModel.prototype.validate = function (options) {
 
     const output_err_bufs = [types_err_buf, missing_err_buf];
 
-    if (options.allowed === ALLOWED_OPTION_WARN && params_err_buf.length) {
-      let warning = 'Warning:';
-      if (process.stdout.isTTY) {
-        warning = BOLD_YELLOW_TEXT + warning + RESET_TEXT;
+    if (options.allowed !== ALLOWED_OPTION_IGNORE) {
+      if (options.allowed === ALLOWED_OPTION_WARN && params_err_buf.length) {
+        let warning = 'Warning:';
+        if (process.stdout.isTTY) {
+          warning = BOLD_YELLOW_TEXT + warning + RESET_TEXT;
+        }
+        output_function(`${warning  }\n${  params_err_buf}`);
+      } else if (options.allowed === ALLOWED_OPTION_STRICT) {
+        output_err_bufs.push(params_err_buf);
       }
-      output_function(warning + '\n' + params_err_buf);
-    } else if (options.allowed === ALLOWED_OPTION_STRICT) {
-      output_err_bufs.push(params_err_buf);
     }
 
     const output = output_err_bufs
-      .filter(function (str) {
-        return str.length;
-      })
+      .filter((str) => str.length)
       .join('\n');
 
     if (output.length) {

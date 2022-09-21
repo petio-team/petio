@@ -4,7 +4,7 @@ import { Context, Next } from 'koa';
 
 import { config } from '@/config/schema';
 import logger from '@/loaders/logger';
-import { User, UserModel } from '@/models/user';
+import { UserModel } from '@/models/user';
 
 export async function authenticate(ctx: Context) {
   const { authorization: header } = ctx.request.headers;
@@ -26,7 +26,7 @@ export async function authenticate(ctx: Context) {
   try {
     const jwtData = jwt.verify(petioJwt, config.get('plex.token'));
 
-    let resp = await UserModel.findOne({ email: (jwtData as any).email });
+    const resp = await UserModel.findOne({ _id: (jwtData as any).id }).exec();
     if (!resp) {
       throw new Error('no user found');
     }
@@ -40,7 +40,7 @@ export async function authenticate(ctx: Context) {
 }
 
 export const adminRequired = async (ctx: Context, next: Next) => {
-  const user = ctx.state.user;
+  const {user} = ctx.state;
   if (user && user.admin) {
     await next();
   } else {

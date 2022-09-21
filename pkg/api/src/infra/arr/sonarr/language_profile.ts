@@ -24,4 +24,4 @@ export const LanguageProfileEndpoint = asApi([
     parameters: [],
     response: LanguageProfileSchema,
   },
-] as const);
+]);

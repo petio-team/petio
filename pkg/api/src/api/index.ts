@@ -3,18 +3,29 @@ import koaBody from 'koa-body';
 import compress from 'koa-compress';
 import mount from 'koa-mount';
 
-import { cors } from '@/api/middleware/cors';
-import { errorHandler } from '@/api/middleware/error_handling';
+import logging from './middleware/logging';
+import options from "./middleware/options";
+import responseHandler from "./web/responseHandler";
+import cors from '@/api/middleware/cors';
+import errorHandler from '@/api/middleware/errorHandling';
 import api from '@/api/routes/api';
 import web from '@/api/routes/web';
 import { config } from '@/config/index';
-import logger from '@/loaders/logger';
+import Logger from "@/loaders/logger";
 import { listen } from '@/utils/http';
 import { removeSlashes } from '@/utils/urls';
 
-import { logging } from './middleware/logging';
-import session from './middleware/session';
-import v1 from './routes/v1';
+const routes = (subpath: string): Koa => {
+  const app = new Koa();
+
+  // web/frontend/react
+  web(app);
+
+  // setup old api
+  api(app, subpath);
+
+  return app;
+};
 
 export default () => {
   // create new koa instance
@@ -25,10 +36,6 @@ export default () => {
 
   // Enable trusted proxies
   app.proxy = true;
-
-  // Add error handling
-  app.use(errorHandler);
-  app.on('error', (err) => logger.error(err));
 
   // Add http logging using morgan
   app.use(logging());
@@ -46,30 +53,22 @@ export default () => {
   // Enable body parsing
   app.use(koaBody());
 
-  // get correctly formatted subpath
-  const subpath = '/' + removeSlashes(config.get('petio.subpath'));
+  // use options
+  app.use(options());
 
-  // session middleware
-  app.use(session(app));
+  // use response handler
+  app.use(responseHandler());
+
+  // Add error handling
+  app.use(errorHandler());
+  app.on('error', (err) => Logger.error(err));
+
+  // get correctly formatted subpath
+  const subpath = `/${removeSlashes(config.get('petio.subpath'))}`;
 
   // Mount endpoints
   app.use(mount(subpath, routes(subpath)));
 
   // run server
   listen({ httpApp: app });
-};
-
-const routes = (subpath: string): Koa => {
-  const app = new Koa();
-
-  // web/frontend/react
-  web(app);
-
-  // setup old api
-  api(app, subpath);
-
-  // setup v1 api
-  v1(app);
-
-  return app;
 };

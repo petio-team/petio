@@ -1,32 +1,36 @@
 version: 2
 updates:
-  - package-ecosystem: "npm"
-    directory: "/"
-    target-branch: "dev"
+  - package-ecosystem: 'github-actions'
+    directory: '/'
     schedule:
-      interval: "daily"
-  - package-ecosystem: "npm"
-    directory: "/admin"
-    target-branch: "dev"
+      interval: 'daily'
+  - package-ecosystem: 'npm'
+    directory: '/'
+    target-branch: 'dev'
     schedule:
-      interval: "daily"
-  - package-ecosystem: "npm"
-    directory: "/api"
-    target-branch: "dev"
+      interval: 'daily'
+  - package-ecosystem: 'npm'
+    directory: '/admin'
+    target-branch: 'dev'
     schedule:
-      interval: "daily"
-  - package-ecosystem: "npm"
-    directory: "/frontend"
-    target-branch: "dev"
+      interval: 'daily'
+  - package-ecosystem: 'npm'
+    directory: '/api'
+    target-branch: 'dev'
     schedule:
-      interval: "daily"
-  - package-ecosystem: "docker"
-    directory: "/"
-    target-branch: "dev"
+      interval: 'daily'
+  - package-ecosystem: 'npm'
+    directory: '/frontend'
+    target-branch: 'dev'
     schedule:
-      interval: "daily"
-  - package-ecosystem: "docker"
-    directory: "/api"
-    target-branch: "dev"
+      interval: 'daily'
+  - package-ecosystem: 'docker'
+    directory: '/'
+    target-branch: 'dev'
     schedule:
-      interval: "daily"
+      interval: 'daily'
+  - package-ecosystem: 'docker'
+    directory: '/api'
+    target-branch: 'dev'
+    schedule:
+      interval: 'daily'

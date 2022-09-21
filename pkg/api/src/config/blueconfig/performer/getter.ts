@@ -1,7 +1,7 @@
-import * as cvtError from './../error';
+import * as cvtError from "../error";
 
-const CUSTOMISE_FAILED = cvtError.CUSTOMISE_FAILED;
-const INCORRECT_USAGE = cvtError.INCORRECT_USAGE;
+const {CUSTOMISE_FAILED} = cvtError;
+const {INCORRECT_USAGE} = cvtError;
 
 /**
  * Getter will parse specified keyname and use the only argument to get the wanted
@@ -24,12 +24,12 @@ export default Getter;
 Getter.prototype.add = function (keyname, getter, usedOnlyOnce, rewrite) {
   if (typeof keyname !== 'string') {
     throw new CUSTOMISE_FAILED(
-      'Getter keyname must be a string (current: "' + typeof keyname + '").',
+      `Getter keyname must be a string (current: "${  typeof keyname  }").`,
     );
   }
   if (typeof getter !== 'function') {
     throw new CUSTOMISE_FAILED(
-      'Getter function for "' + keyname + '" must be a function.',
+      `Getter function for "${  keyname  }" must be a function.`,
     );
   }
   if (
@@ -44,14 +44,14 @@ Getter.prototype.add = function (keyname, getter, usedOnlyOnce, rewrite) {
     ].includes(keyname)
   ) {
     throw new CUSTOMISE_FAILED(
-      'Getter keyname use a reservated word: ' + keyname,
+      `Getter keyname use a reservated word: ${  keyname}`,
     );
   }
   if (this.storage.list[keyname] && !rewrite) {
     const advice =
       ' Set the 4th argument (rewrite) of `addGetter` at true to skip this error.';
     throw new CUSTOMISE_FAILED(
-      'Getter keyname "' + keyname + '" is already registered.' + advice,
+      `Getter keyname "${  keyname  }" is already registered.${  advice}`,
     );
   }
 
@@ -64,8 +64,8 @@ Getter.prototype.add = function (keyname, getter, usedOnlyOnce, rewrite) {
     this.storage.order.splice(this.storage.order.length - 1, 0, keyname);
   }
   this.storage.list[keyname] = {
-    usedOnlyOnce: usedOnlyOnce,
-    getter: getter,
+    usedOnlyOnce,
+    getter,
   };
 };
 
@@ -73,7 +73,7 @@ Getter.prototype.add = function (keyname, getter, usedOnlyOnce, rewrite) {
  * @returns Returns sorted function which sorts array to newOrder
  */
 Getter.prototype.cloneStorage = function () {
-  const storage = this.storage;
+  const {storage} = this;
   return {
     order: [...storage.order],
     list: { ...storage.list },
@@ -104,7 +104,7 @@ Getter.prototype.sortGetters = function (currentOrder, newOrder) {
       checkKey.splice(index, 1);
     } else {
       throw new INCORRECT_USAGE(
-        'Invalid order: unknown getter: ' + newOrder[i],
+        `Invalid order: unknown getter: ${  newOrder[i]}`,
       );
     }
   }
@@ -112,7 +112,7 @@ Getter.prototype.sortGetters = function (currentOrder, newOrder) {
     const message =
       checkKey.length <= 1 ? 'a getter is ' : 'several getters are ';
     throw new INCORRECT_USAGE(
-      'Invalid order: ' + message + 'missed: ' + checkKey.join(', '),
+      `Invalid order: ${  message  }missed: ${  checkKey.join(', ')}`,
     );
   }
 

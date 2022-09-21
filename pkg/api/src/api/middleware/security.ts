@@ -1,7 +1,6 @@
 import helmet from 'koa-helmet';
 
-export const securityPolicies = () => {
-  return helmet.contentSecurityPolicy({
+export default () => helmet.contentSecurityPolicy({
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'", 'https://www.youtube.com'],
@@ -20,4 +19,3 @@ export const securityPolicies = () => {
       connectSrc: ["'self'", 'https://plex.tv'],
     },
   });
-};

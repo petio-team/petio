@@ -1,29 +1,32 @@
 import axios from 'axios';
 import Promise from 'bluebird';
+import { ObjectId } from "mongodb";
 import xmlParser from 'xml-js';
 
-import { tmdbApiKey } from '@/config/env';
+import env from '@/config/env';
 import { config } from '@/config/index';
 import logger from '@/loaders/logger';
-import Music from '@/models/artist';
 import Library from '@/models/library';
 import Movie from '@/models/movie';
 import Profile from '@/models/profile';
 import Request from '@/models/request';
 import Show from '@/models/show';
-import { CreateOrUpdateUser, UserModel, UserRole } from '@/models/user';
+import { CreateOrUpdateUser, User, UserModel, UserRole } from '@/models/user';
 import Mailer from '@/services/mail/mailer';
-import MusicMeta from '@/services/meta/musicBrainz';
 import Discord from '@/services/notifications/discord';
 import Telegram from '@/services/notifications/telegram';
-import processRequest from '@/services/requests/process';
+import ProcessRequest from '@/services/requests/process';
 import { showLookup } from '@/services/tmdb/show';
 
 export default class LibraryUpdate {
   full: any;
+
   mailer: any;
+
   timestamp: any;
+
   tmdb: any;
+
   constructor() {
     this.mailer = [];
     this.tmdb = 'https://api.themoviedb.org/3/';
@@ -40,7 +43,6 @@ export default class LibraryUpdate {
     this.full = false;
     let recent: any = false;
     try {
-      await this.updateFriends();
       recent = await this.getRecent();
     } catch (err) {
       logger.warn(`CRON: Partial scan failed - unable to get recent`, {
@@ -49,12 +51,12 @@ export default class LibraryUpdate {
       logger.error(err, { label: 'plex.library' });
       return;
     }
-    let matched = {};
+    const matched = {};
 
     await Promise.map(
       Object.keys(recent.Metadata),
       async (i) => {
-        let obj = recent.Metadata[i];
+        const obj = recent.Metadata[i];
 
         if (obj.type === 'movie') {
           if (!matched[obj.ratingKey]) {
@@ -63,11 +65,6 @@ export default class LibraryUpdate {
             logger.verbose(`CRON: Partial scan - ${obj.title}`, {
               label: 'plex.library',
             });
-          }
-        } else if (obj.type === 'artist') {
-          if (!matched[obj.ratingKey]) {
-            matched[obj.ratingKey] = true;
-            await this.saveMusic(obj);
           }
         } else if (obj.type === 'show') {
           if (matched[obj.ratingKey]) {
@@ -80,7 +77,7 @@ export default class LibraryUpdate {
         } else if (obj.type === 'season') {
           if (!matched[obj.parentRatingKey]) {
             matched[obj.parentRatingKey] = true;
-            let parent = {
+            const parent = {
               ratingKey: obj.parentRatingKey,
               guid: obj.parentGuid,
               key: obj.parentKey,
@@ -119,18 +116,16 @@ export default class LibraryUpdate {
           });
         }
       },
-      { concurrency: config.get("general.concurrency") },
+      { concurrency: config.get('general.concurrency') },
     );
     this.execMail();
     logger.verbose('Partial Scan Complete', { label: 'plex.library' });
     this.checkOldRequests();
-    return;
   }
 
   async scan() {
     this.timestamp = new Date().toString();
     logger.verbose(`CRON: Running Full`, { label: 'plex.library' });
-    await this.updateFriends();
     let libraries = false;
     try {
       libraries = await this.getLibraries();
@@ -152,13 +147,13 @@ export default class LibraryUpdate {
   }
 
   async getLibraries() {
-    let url = `${config.get('plex.protocol')}://${config.get(
+    const url = `${config.get('plex.protocol')}://${config.get(
       'plex.host',
     )}:${config.get('plex.port')}/library/sections/?X-Plex-Token=${config.get(
       'plex.token',
     )}`;
     try {
-      let res = await axios.get(url);
+      const res = await axios.get(url);
       logger.verbose('CRON: Found Libraries', { label: 'plex.library' });
       return res.data.MediaContainer;
     } catch (e) {
@@ -168,20 +163,20 @@ export default class LibraryUpdate {
   }
 
   async getRecent() {
-    let url = `${config.get('plex.protocol')}://${config.get(
+    const url = `${config.get('plex.protocol')}://${config.get(
       'plex.host',
     )}:${config.get(
       'plex.port',
     )}/library/recentlyAdded/?X-Plex-Token=${config.get('plex.token')}`;
     try {
-      let res = await axios.get(url);
+      const res = await axios.get(url);
       logger.verbose('CRON: Recently Added received', {
         label: 'plex.library',
       });
       return res.data.MediaContainer;
     } catch {
       logger.warn('CRON: Recently added failed!', { label: 'plex.library' });
-      throw 'Recently added failed';
+      throw new Error('Recently added failed');
     }
   }
 
@@ -196,7 +191,7 @@ export default class LibraryUpdate {
   async saveLibrary(lib) {
     let libraryItem: any = false;
     try {
-      libraryItem = await Library.findOne({ uuid: lib.uuid });
+      libraryItem = await Library.findOne({ uuid: lib.uuid }).exec();
     } catch {
       logger.verbose('CRON: Library Not found, attempting to create', {
         label: 'plex.library',
@@ -204,7 +199,7 @@ export default class LibraryUpdate {
     }
     if (!libraryItem) {
       try {
-        let newLibrary = new Library({
+        const newLibrary = new Library({
           allowSync: lib.allowSync,
           art: lib.art,
           composite: lib.composite,
@@ -226,7 +221,7 @@ export default class LibraryUpdate {
           contentChangedAt: lib.contentChangedAt,
           hidden: lib.hidden,
         });
-        libraryItem = await newLibrary.save();
+        await newLibrary.save();
       } catch (err) {
         logger.error(`CRON: Error`, { label: 'plex.library' });
         logger.error(err, { label: 'plex.library' });
@@ -261,13 +256,13 @@ export default class LibraryUpdate {
             },
           },
           { useFindAndModify: false },
-        );
+        ).exec();
       } catch (err) {
         logger.error(`CRON: Error`, { label: 'plex.library' });
         logger.error(err, { label: 'plex.library' });
       }
       if (updatedLibraryItem) {
-        logger.verbose('CRON: Library Updated ' + lib.title, {
+        logger.verbose(`CRON: Library Updated ${  lib.title}`, {
           label: 'plex.library',
         });
       }
@@ -275,11 +270,11 @@ export default class LibraryUpdate {
   }
 
   async updateLibraryContent(libraries) {
-    for (let l in libraries.Directory) {
-      let lib = libraries.Directory[l];
-      let music: any = [];
+    for (const l in libraries.Directory) {
+      const lib = libraries.Directory[l];
+      const music: any = [];
       try {
-        let libContent = await this.getLibrary(lib.key);
+        const libContent = await this.getLibrary(lib.key);
         if (!libContent || !libContent.Metadata) {
           logger.warn(`CRON: No content in library skipping - ${lib.title}`, {
             label: 'plex.library',
@@ -289,11 +284,9 @@ export default class LibraryUpdate {
         await Promise.map(
           Object.keys(libContent.Metadata),
           async (item) => {
-            let obj: any = libContent.Metadata[item];
+            const obj: any = libContent.Metadata[item];
             if (obj.type === 'movie') {
               await this.saveMovie(obj);
-            } else if (obj.type === 'artist') {
-              music.push(obj);
             } else if (obj.type === 'show') {
               await this.saveShow(obj);
             } else {
@@ -302,13 +295,8 @@ export default class LibraryUpdate {
               });
             }
           },
-          { concurrency: config.get("general.concurrency") },
+          { concurrency: config.get('general.concurrency') },
         );
-        for (let i in music) {
-          let artist = music[i];
-          await this.saveMusic(artist);
-          await this.timeout(20);
-        }
       } catch (err) {
         logger.error(`CRON: Unable to get library content`, {
           label: 'plex.library',
@@ -320,21 +308,21 @@ export default class LibraryUpdate {
   }
 
   async getLibrary(id) {
-    let url = `${config.get('plex.protocol')}://${config.get(
+    const url = `${config.get('plex.protocol')}://${config.get(
       'plex.host',
     )}:${config.get(
       'plex.port',
     )}/library/sections/${id}/all?X-Plex-Token=${config.get('plex.token')}`;
     try {
-      let res = await axios.get(url);
+      const res = await axios.get(url);
       return res.data.MediaContainer;
     } catch (e) {
-      throw 'Unable to get library content';
+      throw new Error('Unable to get library content');
     }
   }
 
   async getMeta(id) {
-    let url = `${config.get('plex.protocol')}://${config.get(
+    const url = `${config.get('plex.protocol')}://${config.get(
       'plex.host',
     )}:${config.get(
       'plex.port',
@@ -342,15 +330,15 @@ export default class LibraryUpdate {
       'plex.token',
     )}`;
     try {
-      let res = await axios.get(url);
+      const res = await axios.get(url);
       return res.data.MediaContainer.Metadata[0];
     } catch (e) {
-      throw 'Unable to get meta';
+      throw new Error('Unable to get meta');
     }
   }
 
   async getSeason(id) {
-    let url = `${config.get('plex.protocol')}://${config.get(
+    const url = `${config.get('plex.protocol')}://${config.get(
       'plex.host',
     )}:${config.get(
       'plex.port',
@@ -358,18 +346,18 @@ export default class LibraryUpdate {
       'plex.token',
     )}`;
     try {
-      let res = await axios.get(url);
+      const res = await axios.get(url);
       return res.data.MediaContainer.Metadata;
     } catch (e) {
       logger.error(e, { label: 'plex.library' });
-      throw 'Unable to get meta';
+      throw new Error('Unable to get meta');
     }
   }
 
   async saveMovie(movieObj) {
     let movieDb: any = false;
-    let title = movieObj.title;
-    let externalIds: any = {};
+    const {title} = movieObj;
+    const externalIds: any = {};
     let tmdbId = false;
     let externalId: any = false;
     let added = false;
@@ -377,7 +365,7 @@ export default class LibraryUpdate {
     try {
       movieDb = await Movie.findOne({
         ratingKey: parseInt(movieObj.ratingKey),
-      });
+      }).exec();
     } catch {
       movieDb = false;
     }
@@ -408,7 +396,7 @@ export default class LibraryUpdate {
           );
           return;
         }
-        for (let guid of movieObj.Guid) {
+        for (const guid of movieObj.Guid) {
           if (!guid.id) {
             logger.warn(
               `CRON: Movie couldn't be matched - ${title} - no GUID ID`,
@@ -416,12 +404,12 @@ export default class LibraryUpdate {
             );
             return;
           }
-          let source = guid.id.split('://');
-          externalIds[source[0] + '_id'] = source[1];
+          const source = guid.id.split('://');
+          externalIds[`${source[0]  }_id`] = source[1];
           if (source[0] === 'tmdb') tmdbId = source[1];
         }
 
-        if (!externalIds['tmdb_id']) {
+        if (!externalIds.tmdb_id) {
           const type = Object.keys(externalIds)[0].replace('_id', '');
           try {
             tmdbId = await this.externalIdMovie(
@@ -537,60 +525,9 @@ export default class LibraryUpdate {
     }
   }
 
-  async saveMusic(musicObj) {
-    let musicDb: any = false;
-    let title = musicObj.title;
-    let added = false;
-    let match: any = false;
-    logger.verbose(`CRON: Music Job: ${title}`, { label: 'plex.library' });
-    try {
-      musicDb = await Music.findOne({
-        ratingKey: parseInt(musicObj.ratingKey),
-      });
-    } catch {
-      musicDb = false;
-    }
-    if (musicDb && musicDb.metaId) {
-      match = { id: musicDb.metaId, name: musicDb.metaTitle };
-    }
-    if (match && musicDb.metaId === 'no genres' && musicObj.Genre) {
-      logger.verbose(
-        `CRON: Music - "${title}" Now has genres, attempting to match`,
-        { label: 'plex.library' },
-      );
-      match = false;
-    }
-    if (!match) {
-      match = await new MusicMeta().match(musicObj.title, musicObj.Genre);
-    }
-    if (!musicDb) {
-      added = true;
-      musicDb = new Music({
-        ratingKey: musicObj.ratingKey,
-      });
-    }
-    musicDb.title = musicObj.title;
-    musicDb.metaId = match ? match.id : false;
-    musicDb.metaTitle = match ? match.name : false;
-    try {
-      await musicDb.save();
-      if (added) {
-        await this.mailAdded(musicObj, musicDb.metaId);
-        logger.verbose(`CRON: Music Added - ${musicObj.title}`, {
-          label: 'plex.library',
-        });
-      }
-    } catch (err) {
-      logger.error(`CRON: Failed to save ${title} to Db`, {
-        label: 'plex.library',
-      });
-      logger.error(err, { label: 'plex.library' });
-    }
-  }
-
   async saveShow(showObj) {
     let showDb: any = false;
-    let title = showObj.title;
+    const {title} = showObj;
     let externalIds: any = {};
     let tmdbId = false;
     let externalId = false;
@@ -598,7 +535,9 @@ export default class LibraryUpdate {
     let seasons: any = [];
     logger.verbose(`CRON: TV Job: ${title}`, { label: 'plex.library' });
     try {
-      showDb = await Show.findOne({ ratingKey: parseInt(showObj.ratingKey) });
+      showDb = await Show.findOne({
+        ratingKey: parseInt(showObj.ratingKey),
+      }).exec();
     } catch {
       showDb = false;
     }
@@ -617,14 +556,14 @@ export default class LibraryUpdate {
       seasons = await Promise.map(
         showObj.Children.Metadata,
         async (season: any) => {
-          let seasonData = await this.getSeason(season.ratingKey);
-          let thisSeason = {
+          const seasonData = await this.getSeason(season.ratingKey);
+          const thisSeason = {
             seasonNumber: season.index,
             title: season.title,
             episodes: {},
           };
-          for (let e in seasonData) {
-            let ep = seasonData[e];
+          for (const e in seasonData) {
+            const ep = seasonData[e];
             thisSeason.episodes[ep.index] = {
               title: ep.title,
               episodeNumber: ep.index,
@@ -636,7 +575,7 @@ export default class LibraryUpdate {
           }
           return thisSeason;
         },
-        { concurrency: config.get("general.concurrency") },
+        { concurrency: config.get('general.concurrency') },
       );
     } catch (e) {
       logger.warn(`CRON: Unable to fetch meta for ${title}`, {
@@ -654,7 +593,7 @@ export default class LibraryUpdate {
           );
           return;
         }
-        for (let guid of showObj.Guid) {
+        for (const guid of showObj.Guid) {
           if (!guid.id) {
             logger.warn(
               `CRON: Show couldn't be matched - ${title} - no GUID ID`,
@@ -662,8 +601,8 @@ export default class LibraryUpdate {
             );
             return;
           }
-          let source = guid.id.split('://');
-          externalIds[source[0] + '_id'] = source[1];
+          const source = guid.id.split('://');
+          externalIds[`${source[0]  }_id`] = source[1];
           if (source[0] === 'tmdb') tmdbId = source[1];
         }
       } catch (e) {
@@ -734,8 +673,8 @@ export default class LibraryUpdate {
     showDb.tvdb_id = idSource === 'tvdb' ? externalId : externalIds.tvdb_id;
     showDb.tmdb_id = idSource === 'tmdb' ? externalId : tmdbId;
     showDb.seasonData = {};
-    for (let s in seasons) {
-      let season: any = seasons[s];
+    for (const s in seasons) {
+      const season: any = seasons[s];
       showDb.seasonData[season.seasonNumber] = {
         seasonNumber: season.seasonNumber,
         title: season.title,
@@ -782,40 +721,46 @@ export default class LibraryUpdate {
   }
 
   async getFriends() {
-    let url = `https://plex.tv/pms/friends/all?X-Plex-Token=${config.get(
+    const url = `https://plex.tv/pms/friends/all?X-Plex-Token=${config.get(
       'plex.token',
     )}`;
     try {
-      let res = await axios.get(url);
-      let dataParse = JSON.parse(
+      const res = await axios.get(url);
+      const dataParse = JSON.parse(
         xmlParser.xml2json(res.data, { compact: false }),
       );
       return dataParse.elements[0].elements;
     } catch (e) {
       logger.error('CRON: Unable to get friends', { label: 'plex.library' });
       logger.error(e, { label: 'plex.library' });
-      throw 'Unable to get friends';
     }
   }
+
   async saveFriend(obj) {
     // Maybe delete all and rebuild each time?
     try {
-      const defaultProfile = await Profile.findOne({ isDefault: true });
+      let defaultProfile: any;
+      const results: any = await Profile.findOne({ isDefault: true }).exec();
+      if (results) {
+        defaultProfile = results.toObject();
+      }
 
-      const newUser = await CreateOrUpdateUser({
+      const user: User = {
         title: obj.title ?? obj.username ?? 'User',
         username: obj.username ? obj.username : obj.title,
         email: obj.email.toLowerCase() ?? '',
         thumbnail: obj.thumb ?? '',
         plexId: obj.id,
-        profileId: defaultProfile ? defaultProfile._id : undefined,
+        profileId: defaultProfile ? new ObjectId(defaultProfile._id.toString()) : undefined,
         role: UserRole.User,
         owner: false,
         custom: false,
         disabled: false,
         quotaCount: 0,
-      });
-      logger.verbose('added new friend ' + newUser.email, {
+      };
+
+      const newUser = await CreateOrUpdateUser(user);
+      logger.verbose(`synced friend ${  newUser.email}`, {
         label: 'plex.library',
       });
     } catch (e) {
@@ -826,23 +771,22 @@ export default class LibraryUpdate {
         label: 'plex.library',
       });
     }
-    return;
   }
 
   async mailAdded(plexData, ref_id) {
-    let request = await Request.findOne({ tmdb_id: ref_id });
+    const request = await Request.findOne({ tmdb_id: ref_id }).exec();
     if (request) {
       await Promise.all(
         request.users.map(async (user, i) => {
           await this.sendMail(user, i, request);
         }),
       );
-      await new processRequest(request).archive(true, false);
+      await new ProcessRequest(request).archive(true, false);
     }
   }
 
   async sendMail(user, i, request) {
-    let userData = await UserModel.findOne({ id: user });
+    const userData = await UserModel.findOne({ id: user }).exec();
     if (!userData) {
       logger.error('CRON: Err: No user data', { label: 'plex.library' });
       return;
@@ -866,7 +810,7 @@ export default class LibraryUpdate {
   }
 
   discordNotify(user, request) {
-    let type = request.type === 'tv' ? 'TV Show' : 'Movie';
+    const type = request.type === 'tv' ? 'TV Show' : 'Movie';
     const title: any = `${request.title} added to Plex!`;
     const subtitle: any = `The ${type} "${request.title}" has been processed and is now available to watch on Plex"`;
     const image: any = `https://image.tmdb.org/t/p/w500${request.thumb}`;
@@ -886,49 +830,37 @@ export default class LibraryUpdate {
   }
 
   async externalIdTv(id, type) {
-    let url = `${this.tmdb}find/${id}?api_key=${tmdbApiKey}&language=en-US&external_source=${type}_id`;
-    try {
-      let res = await axios.get(url);
-      return res.data.tv_results[0].id;
-    } catch (e) {
-      throw e;
-    }
+    const url = `${this.tmdb}find/${id}?api_key=${externalConfig.tmdbApiKey}&language=en-US&external_source=${type}_id`;
+    const res = await axios.get(url);
+    return res.data.tv_results[0].id;
   }
 
   async tmdbExternalIds(id) {
-    let url = `${this.tmdb}tv/${id}/external_ids?api_key=${tmdbApiKey}`;
-    try {
-      let res = await axios.get(url);
-      return res.data;
-    } catch (e) {
-      throw e;
-    }
+    const url = `${this.tmdb}tv/${id}/external_ids?api_key=${externalConfig.tmdbApiKey}`;
+    const res = await axios.get(url);
+    return res.data;
   }
 
   async externalIdMovie(id, type) {
-    let url = `${this.tmdb}find/${id}?api_key=${tmdbApiKey}&language=en-US&external_source=${type}_id`;
-    try {
-      let res = await axios.get(url);
-      return res.data.movie_results[0].id;
-    } catch (e) {
-      throw e;
-    }
+    const url = `${this.tmdb}find/${id}?api_key=${externalConfig.tmdbApiKey}&language=en-US&external_source=${type}_id`;
+    const res = await axios.get(url);
+    return res.data.movie_results[0].id;
   }
 
   async checkOldRequests() {
     logger.verbose('CRON: Checking old requests', { label: 'plex.library' });
-    let requests = await Request.find();
-    for (let i = 0; i < requests.length; i++) {
+    const requests = await Request.find().exec();
+    for (const element of requests) {
       let onServer: any = false;
-      let request = requests[i];
+      const request = element;
       if (request.type === 'tv') {
-        onServer = await Show.findOne({ tmdb_id: request.tmdb_id });
+        onServer = await Show.findOne({ tmdb_id: request.tmdb_id }).exec();
         if (!request.tvdb_id) {
           logger.verbose(
             `CRON: No TVDB ID for request: ${request.title}, attempting to pull meta`,
             { label: 'plex.library' },
           );
-          let lookup = await showLookup(request.tmdb_id, true);
+          const lookup = await showLookup(request.tmdb_id, true);
           request.thumb = lookup.poster_path;
           request.tvdb_id = lookup.tvdb_id;
           try {
@@ -938,7 +870,7 @@ export default class LibraryUpdate {
               { label: 'plex.library' },
             );
             if (request.tvdb_id)
-              new processRequest({
+              new ProcessRequest({
                 id: request.requestId,
                 type: request.type,
                 title: request.title,
@@ -957,19 +889,19 @@ export default class LibraryUpdate {
         }
       }
       if (request.type === 'movie') {
-        onServer = await Movie.findOne({ tmdb_id: request.tmdb_id });
+        onServer = await Movie.findOne({ tmdb_id: request.tmdb_id }).exec();
       }
 
       if (onServer) {
         logger.verbose(`CRON: Found missed request - ${request.title}`, {
           label: 'plex.library',
         });
-        new processRequest(request, false).archive(true, false, false);
-        let emails: any = [];
-        let titles: any = [];
+        new ProcessRequest(request).archive(true, false, false);
+        const emails: any = [];
+        const titles: any = [];
         await Promise.all(
           request.users.map(async (user) => {
-            let userData = await UserModel.findOne({ id: user });
+            const userData = await UserModel.findOne({ id: user }).exec();
             if (!userData) return;
             emails.push(userData.email);
             titles.push(userData.title);
@@ -990,9 +922,9 @@ export default class LibraryUpdate {
   async deleteOld() {
     const deleteMovies = await Movie.find({
       petioTimestamp: { $ne: this.timestamp },
-    });
-    for (let i in deleteMovies) {
-      let deleteMovie = deleteMovies[i];
+    }).exec();
+    for (const i in deleteMovies) {
+      const deleteMovie = deleteMovies[i];
       logger.warn(
         `CRON: Deleting Movie - ${deleteMovie.title} - no longer found in Plex`,
         { label: 'plex.library' },
@@ -1000,13 +932,13 @@ export default class LibraryUpdate {
       await Movie.findOneAndRemove(
         { _id: deleteMovie._id },
         { useFindAndModify: false },
-      );
+      ).exec();
     }
     const deleteShows = await Show.find({
       petioTimestamp: { $ne: this.timestamp },
-    });
-    for (let i in deleteShows) {
-      let deleteShow = deleteShows[i];
+    }).exec();
+    for (const i in deleteShows) {
+      const deleteShow = deleteShows[i];
       logger.warn(
         `CRON: Deleting TV Show - ${deleteShow.title} - no longer found in Plex`,
         { label: 'plex.library' },
@@ -1014,7 +946,7 @@ export default class LibraryUpdate {
       await Show.findOneAndRemove(
         { _id: deleteShow._id },
         { useFindAndModify: false },
-      );
+      ).exec();
     }
   }
 }

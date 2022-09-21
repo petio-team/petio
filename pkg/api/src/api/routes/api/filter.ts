@@ -5,15 +5,6 @@ import { Context } from 'koa';
 import logger from '@/loaders/logger';
 import Filter from '@/models/filter';
 
-const route = new Router({ prefix: '/filter' });
-
-export default (app: Router) => {
-  route.get('/', getFilters);
-  route.post('/update', updateFilter);
-
-  app.use(route.routes());
-};
-
 const getFilters = async (ctx: Context) => {
   try {
     ctx.status = StatusCodes.OK;
@@ -26,10 +17,10 @@ const getFilters = async (ctx: Context) => {
 };
 
 const updateFilter = async (ctx: Context) => {
-  const body = ctx.request.body;
+  const {body} = ctx.request;
 
-  const movie_filter = body.movie;
-  const tv_filter = body.tv;
+  const movieFilter = body.movie;
+  const tvFilter = body.tv;
   const existingMovie = await Filter.findOne({ id: 'movie_filters' });
   const existingTv = await Filter.findOne({ id: 'tv_filters' });
 
@@ -39,16 +30,16 @@ const updateFilter = async (ctx: Context) => {
         { id: 'movie_filters' },
         {
           $set: {
-            data: movie_filter,
+            data: movieFilter,
           },
         },
         { useFindAndModify: false },
       );
       logger.verbose('FILTER: Movie Filter updated');
     } else {
-      let newMovie = new Filter({
+      const newMovie = new Filter({
         id: 'movie_filters',
-        data: movie_filter,
+        data: movieFilter,
       });
       await newMovie.save();
       logger.verbose('FILTER: New Movie filter created');
@@ -58,16 +49,16 @@ const updateFilter = async (ctx: Context) => {
         { id: 'tv_filters' },
         {
           $set: {
-            data: tv_filter,
+            data: tvFilter,
           },
         },
         { useFindAndModify: false },
       );
       logger.verbose('FILTER: TV Filter updated');
     } else {
-      let newTv = new Filter({
+      const newTv = new Filter({
         id: 'tv_filters',
-        data: tv_filter,
+        data: tvFilter,
       });
       await newTv.save();
       logger.verbose('FILTER: New TV filter created');
@@ -81,4 +72,12 @@ const updateFilter = async (ctx: Context) => {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = {};
   }
+};
+
+const route = new Router({ prefix: '/filter' });
+export default (app: Router) => {
+  route.get('/', getFilters);
+  route.post('/update', updateFilter);
+
+  app.use(route.routes());
 };

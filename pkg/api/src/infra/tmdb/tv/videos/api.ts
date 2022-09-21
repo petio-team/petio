@@ -10,4 +10,4 @@ export const VideosAPI = asApi([
     parameters: VideosParams,
     response: VideoSchema,
   },
-] as const);
+]);

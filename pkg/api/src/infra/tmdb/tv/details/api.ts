@@ -23,7 +23,7 @@ export const TvDetailsSchema = z.object({
       production_code: z.string(),
       runtime: z.number().or(z.null()),
       season_number: z.number(),
-      still_path: z.string(),
+      still_path: z.union([z.string(), z.null()]),
       vote_average: z.number(),
       vote_count: z.number(),
     })
@@ -284,4 +284,4 @@ export const TvDetailsAPI = asApi([
     ],
     response: TvDetailsSchema,
   },
-] as const);
+]);

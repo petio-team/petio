@@ -1,6 +1,7 @@
 import bluebird from 'bluebird';
 import cacheManager from 'cache-manager';
 
+import { getMovieDetails, getShowDetails } from './show';
 import { TMDBAPI } from '@/infra/tmdb/tmdb';
 import {
   MediaType,
@@ -11,12 +12,11 @@ import {
 } from '@/infra/tmdb/trending/trending';
 import logger from '@/loaders/logger';
 
-import { getMovieDetails, getShowDetails } from './show';
 
 const memoryCache = cacheManager.caching({
   store: 'memory',
   max: 3,
-  ttl: 86400 /*seconds*/,
+  ttl: 86400 /* seconds */,
 });
 
 const Companies = [
@@ -133,15 +133,15 @@ const Networks = [
 async function trending() {
   logger.verbose(`TMDB Trending lookup`, { label: 'tmdb.trending' });
 
-  let [people, movies, shows]: any = await Promise.all([
+  const [people, movies, shows]: any = await Promise.all([
     getPerson(),
     getMovies(),
     getShows(),
   ]);
 
   return {
-    people: people,
-    movies: movies,
+    people,
+    movies,
     tv: shows,
     companies: Companies,
     networks: Networks,
@@ -154,15 +154,13 @@ export default trending;
 async function getPerson() {
   let data = {};
   try {
-    data = await memoryCache.wrap('trending_person', async function () {
+    data = await memoryCache.wrap('trending_person', async () => {
       const people = await personData();
-      return people.map((person) => {
-        return {
+      return people.map((person) => ({
           id: person.id,
           name: person.name,
           profile_path: person.profile_path,
-        };
-      });
+        }));
     });
   } catch (err) {
     logger.warn(`Error getting trending people`, {
@@ -176,11 +174,9 @@ async function getPerson() {
 async function getMovies() {
   let data = {};
   try {
-    data = await memoryCache.wrap('trending_movies', async function () {
+    data = await memoryCache.wrap('trending_movies', async () => {
       const movies = await moviesData();
-      return bluebird.map(movies, async (movie) => {
-        return getMovieDetails(movie.id);
-      });
+      return bluebird.map(movies, async (movie) => getMovieDetails(movie.id));
     });
   } catch (err) {
     logger.warn(`Error getting trending movies`, {
@@ -194,11 +190,9 @@ async function getMovies() {
 async function getShows() {
   let data = {};
   try {
-    data = await memoryCache.wrap('trending_shows', async function () {
+    data = await memoryCache.wrap('trending_shows', async () => {
       const shows = await showsData();
-      return bluebird.map(shows, (show) => {
-        return getShowDetails(show.id);
-      });
+      return bluebird.map(shows, (show) => getShowDetails(show.id));
     });
   } catch (err) {
     logger.warn(`Error getting trending shows`, {

@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import * as z from 'zod';
 
-import { dataFolder } from '@/config/env';
+import pathsConfig from "./env/paths";
 import { WriteConfig } from '@/config/index';
 import { config } from '@/config/schema';
 import logger from '@/loaders/logger';
@@ -96,13 +96,13 @@ const findParseAndMergeConfigs = async (): Promise<boolean> => {
   let isModified = false;
 
   for (const config of configFiles) {
-    const file = path.join(dataFolder, config.file + '.json');
+    const file = path.join(pathsConfig.data, `${config.file}.json`);
     const exists = await fileExists(file);
     if (exists) {
       const content = await fs.readFile(file);
       const parsed = await config.schema.safeParseAsync(content);
       if (!parsed.success) {
-        logger.error("failed to parse config '" + config.file + '.json');
+        logger.error(`failed to parse config '${  config.file  }.json`);
         continue;
       }
 

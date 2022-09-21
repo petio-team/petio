@@ -23,7 +23,7 @@ function isWindowsNamedPipe(x) {
 const int = {
   name: 'int',
   coerce: (value) => toInt(value),
-  validate: function (value) {
+  validate (value) {
     assert(Number.isInteger(value), 'must be an integer');
   },
 };
@@ -43,7 +43,7 @@ const integer = {
 const nat = {
   name: 'nat',
   coerce: (value) => toInt(value),
-  validate: function (value) {
+  validate (value) {
     assert(Number.isInteger(value) && value >= 0, 'must be a positive integer');
   },
 };
@@ -54,7 +54,7 @@ const nat = {
 const port = {
   name: 'port',
   coerce: (value) => toInt(value),
-  validate: function (value) {
+  validate (value) {
     assert(
       Number.isInteger(value) && value >= 0 && value <= 65535,
       'ports must be within range 0 - 65535',
@@ -67,7 +67,7 @@ const port = {
  */
 const windows_named_pipe = {
   name: 'windows_named_pipe',
-  validate: function (value) {
+  validate (value) {
     assert(isWindowsNamedPipe(value), 'must be a valid pipe');
   },
 };
@@ -78,7 +78,7 @@ const windows_named_pipe = {
 const port_or_windows_named_pipe = {
   name: 'port_or_windows_named_pipe',
   coerce: (v) => (isWindowsNamedPipe(v) ? v : parseInt(v, 10)),
-  validate: function (value) {
+  validate (value) {
     if (!isWindowsNamedPipe(value)) {
       try {
         port.validate(value);

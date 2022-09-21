@@ -5,8 +5,11 @@ import logger from '@/loaders/logger';
 
 export default class Telegram {
   botToken: any;
+
   chatId: any;
+
   sendSilently: any;
+
   constructor() {
     this.botToken = config.get('notifications.telegram.token') || null;
     this.chatId = config.get('notifications.telegram.id') || null;
@@ -41,8 +44,8 @@ export default class Telegram {
       label: 'notifications.telegram',
     });
     const defaultText: any = 'Petio Test';
-    let text = this.buildText(defaultText);
-    let test = await this.postMessage(text);
+    const text = this.buildText(defaultText);
+    const test = await this.postMessage(text);
     if (!test) {
       logger.verbose('Telegram: Test Failed', {
         label: 'notifications.telegram',
@@ -75,10 +78,10 @@ export default class Telegram {
       label: 'notifications.telegram',
     });
     const text = this.buildText(null, {
-      title: title,
-      content: content,
-      username: username,
-      image: image,
+      title,
+      content,
+      username,
+      image,
     });
     this.postMessage(text);
   }

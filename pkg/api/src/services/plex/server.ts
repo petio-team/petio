@@ -3,7 +3,7 @@ import Movie from '@/models/movie';
 import Show from '@/models/show';
 
 export default async (type, imdb, tvdb, tmdb) => {
-  let clientId = config.get('plex.client');
+  const clientId = config.get('plex.client');
   if (type === 'movie') {
     let foundItemsImdb: any = false;
     let foundItemsTvdb: any = false;
@@ -31,12 +31,12 @@ export default async (type, imdb, tvdb, tmdb) => {
       found = foundItemsTmdb;
     }
 
-    let resolutions: any = [];
+    const resolutions: any = [];
 
     if (found && found.length > 0) {
-      let exists: any = [];
+      const exists: any = [];
       Object.keys(found).forEach((i) => {
-        let item: any = found[i];
+        const item: any = found[i];
         if (item.Media.length > 0) {
           resolutions.push(item.Media[0].videoResolution);
           exists.push({
@@ -50,11 +50,11 @@ export default async (type, imdb, tvdb, tmdb) => {
           versions: exists,
           serverKey: clientId,
         },
-        resolutions: resolutions,
+        resolutions,
       };
-    } else {
+    } 
       return { exists: false, resolutions: [] };
-    }
+    
   }
 
   if (type === 'show' || type === 'tv') {
@@ -85,10 +85,10 @@ export default async (type, imdb, tvdb, tmdb) => {
     }
 
     if (found && found.length > 0) {
-      let exists: any = [];
-      let resolutions: any = [];
+      const exists: any = [];
+      const resolutions: any = [];
       Object.keys(found).forEach((i) => {
-        let item = found[i];
+        const item = found[i];
         const seasons = item.seasonData;
         if (
           seasons &&
@@ -100,13 +100,13 @@ export default async (type, imdb, tvdb, tmdb) => {
           resolutions.push(seasons[1].episodes[1].resolution);
           exists.push({
             ratingKey: item.ratingKey,
-            seasons: seasons,
+            seasons,
             resolution: seasons[1].episodes[1].resolution,
           });
         } else {
           exists.push({
             ratingKey: item.ratingKey,
-            seasons: seasons,
+            seasons,
             resolution: 'unknown',
           });
         }
@@ -116,10 +116,10 @@ export default async (type, imdb, tvdb, tmdb) => {
           versions: exists,
           serverKey: clientId,
         },
-        resolutions: resolutions,
+        resolutions,
       };
-    } else {
+    } 
       return { exists: false, resolutions: [] };
-    }
+    
   }
 };

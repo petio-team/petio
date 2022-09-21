@@ -1,6 +1,6 @@
-import * as cvtError from './../error';
+import * as cvtError from "../error";
 
-const CUSTOMISE_FAILED = cvtError.CUSTOMISE_FAILED;
+const {CUSTOMISE_FAILED} = cvtError;
 
 /**
  * Load and parse file with parser

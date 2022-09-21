@@ -7,21 +7,11 @@ import getBandwidth from '@/services/plex/bandwidth';
 import getHistory from '@/services/plex/history';
 import getServerInfo from '@/services/plex/serverInfo';
 
-const route = new Router({ prefix: '/history' });
-
-export default (app: Router) => {
-  route.post('/', listHistory);
-  route.get('/server', getServerData);
-  route.get('/bandwidth', collectBandwidth);
-
-  app.use(route.routes());
-};
-
 const listHistory = async (ctx: Context) => {
-  let id = ctx.request.body.id;
+  let {id} = ctx.request.body;
   if (id === 'admin') id = 1;
   try {
-    let data = await getHistory(id, ctx.request.body.type);
+    const data = await getHistory(id, ctx.request.body.type);
     ctx.status = StatusCodes.OK;
     ctx.body = data;
   } catch (err) {
@@ -34,7 +24,7 @@ const listHistory = async (ctx: Context) => {
 
 const getServerData = async (ctx: Context) => {
   try {
-    let data = await getServerInfo();
+    const data = await getServerInfo();
     ctx.body = data.MediaContainer;
   } catch (err) {
     logger.log('warn', 'ROUTE: Error getting server info');
@@ -53,4 +43,13 @@ const collectBandwidth = async (ctx: Context) => {
 
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
   }
+};
+
+const route = new Router({ prefix: '/history' });
+export default (app: Router) => {
+  route.post('/', listHistory);
+  route.get('/server', getServerData);
+  route.get('/bandwidth', collectBandwidth);
+
+  app.use(route.routes());
 };

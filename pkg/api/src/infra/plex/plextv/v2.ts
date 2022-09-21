@@ -10,4 +10,4 @@ export const APIv2 = asApi([
   ...FriendsEndpoint,
   ...ResourcesEndpoint,
   ...PinsEndpoint,
-] as const);
+]);

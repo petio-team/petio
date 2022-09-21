@@ -1,8 +1,8 @@
+import http from 'http';
 import axios from 'axios';
 import cacheManager from 'cache-manager';
-import http from 'http';
 
-import { tmdbApiKey } from '@/config/env';
+import externalConfig from "@/config/env/external";
 import { TMDBAPI } from '@/infra/tmdb/tmdb';
 import logger from '@/loaders/logger';
 import fanartLookup from '@/services/fanart';
@@ -14,7 +14,7 @@ const agent = new http.Agent({ family: 4 });
 const memoryCache = cacheManager.caching({
   store: 'memory',
   max: 500,
-  ttl: 86400 /*seconds*/,
+  ttl: 86400 /* seconds */,
 });
 
 export async function showLookup(id, minified = false) {
@@ -24,12 +24,12 @@ export async function showLookup(id, minified = false) {
   logger.debug(`TMDB Show Lookup ${id}`, {
     label: 'tmdb.show',
   });
-  let external: any = await externalId(id);
+  const external: any = await externalId(id);
   let show: any = false;
   let data: any;
   try {
     data = await getShowData(id);
-    show = Object.assign({}, data);
+    show = { ...data};
   } catch {
     return { error: 'not found' };
   }
@@ -88,12 +88,12 @@ export async function showLookup(id, minified = false) {
       delete show.languages;
       if (!minified) {
         show.server_seasons = onPlex.seasons;
-        let seasons = Object.assign({}, seasonsLookup);
-        let seasonData = {};
-        let recommendationsData: any = [];
-        Object.keys(seasons).map((key) => {
-          let season = seasons[key];
-          Object.keys(season.episodes).map((ep) => {
+        const seasons = { ...seasonsLookup};
+        const seasonData = {};
+        const recommendationsData: any = [];
+        Object.keys(seasons).forEach((key) => {
+          const season = seasons[key];
+          Object.keys(season.episodes).forEach((ep) => {
             delete season.episodes[ep].guest_stars;
             delete season.episodes[ep].crew;
             delete season.episodes[ep].production_code;
@@ -106,11 +106,11 @@ export async function showLookup(id, minified = false) {
           recommendations.results.length === 0 &&
           similar.results.length === 0
         ) {
-          let params: any = {};
+          const params: any = {};
           if (show.genres) {
             let genres = '';
-            for (let i = 0; i < show.genres.length; i++) {
-              genres += `${show.genres[i].id},`;
+            for (const element of show.genres) {
+              genres += `${element.id},`;
             }
 
             params.with_genres = genres;
@@ -118,14 +118,14 @@ export async function showLookup(id, minified = false) {
           recommendations = await discoverSeries(1, params);
         }
         if (recommendations)
-          Object.keys(recommendations.results).map((key) => {
-            let recommendation = recommendations.results[key];
+          Object.keys(recommendations.results).forEach((key) => {
+            const recommendation = recommendations.results[key];
             if (recommendation.id !== parseInt(id))
               recommendationsData.push(recommendation.id);
           });
         if (similar)
-          Object.keys(similar.results).map((key) => {
-            let recommendation = similar.results[key];
+          Object.keys(similar.results).forEach((key) => {
+            const recommendation = similar.results[key];
             if (
               recommendation.id !== parseInt(id) &&
               !recommendationsData.includes(recommendation.id)
@@ -275,9 +275,7 @@ export const getMovieDetails = async (id: number) => {
 async function getShowData(id) {
   let data = false;
   try {
-    data = await memoryCache.wrap(id, async function () {
-      return await tmdbData(id);
-    });
+    data = await memoryCache.wrap(id, async () => tmdbData(id));
   } catch (err) {
     logger.warn(`Error getting show data - ${id}`, {
       label: 'tmdb.show',
@@ -290,9 +288,7 @@ async function getShowData(id) {
 async function externalId(id) {
   let data = false;
   try {
-    data = await memoryCache.wrap(`ext_${id}`, async function () {
-      return await idLookup(id);
-    });
+    data = await memoryCache.wrap(`ext_${id}`, async () => idLookup(id));
   } catch (err) {
     logger.verbose(`Error getting external ID - ${id}`, {
       label: 'tmdb.show',
@@ -305,9 +301,7 @@ async function externalId(id) {
 export async function getRecommendations(id, page = 1) {
   let data = false;
   try {
-    data = await memoryCache.wrap(`rec_${id}__${page}`, async function () {
-      return await recommendationData(id, page);
-    });
+    data = await memoryCache.wrap(`rec_${id}__${page}`, async () => recommendationData(id, page));
   } catch (err) {
     logger.warn(`Error getting recommendation data - ${id}`, {
       label: 'tmdb.show',
@@ -320,9 +314,7 @@ export async function getRecommendations(id, page = 1) {
 export async function getSimilar(id, page = 1) {
   let data = false;
   try {
-    data = await memoryCache.wrap(`similar_${id}__${page}`, async function () {
-      return await similarData(id, page);
-    });
+    data = await memoryCache.wrap(`similar_${id}__${page}`, async () => similarData(id, page));
   } catch (err) {
     logger.warn(`Error getting similar data - ${id}`, {
       label: 'tmdb.show',
@@ -335,9 +327,7 @@ export async function getSimilar(id, page = 1) {
 async function getReviews(id) {
   let data = false;
   try {
-    data = await memoryCache.wrap(`rev_${id}`, async function () {
-      return await reviewsData(id);
-    });
+    data = await memoryCache.wrap(`rev_${id}`, async () => reviewsData(id));
   } catch (err) {
     logger.warn(`Error getting review data - ${id}`, {
       label: 'tmdb.show',
@@ -350,9 +340,7 @@ async function getReviews(id) {
 async function getSeasons(seasons, id) {
   let data: any = false;
   try {
-    data = await memoryCache.wrap(`seasons_${id}`, async function () {
-      return await seasonsData(seasons, id);
-    });
+    data = await memoryCache.wrap(`seasons_${id}`, async () => seasonsData(seasons, id));
   } catch (err) {
     logger.warn(`Error getting season data - ${id}`, {
       label: 'tmdb.show',
@@ -366,62 +354,48 @@ async function getSeasons(seasons, id) {
 
 async function tmdbData(id) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}tv/${id}?api_key=${tmdbApiKey}&append_to_response=aggregate_credits,videos,keywords,content_ratings,credits`;
-  try {
-    let res = await axios.get(url, { httpAgent: agent });
-    let data = res.data;
-    if (data.aggregate_credits) {
-      if (data.aggregate_credits.cast.length > 50)
-        data.aggregate_credits.cast.length = 50;
-      data.credits.cast = [];
-      data.aggregate_credits.cast.map((item, i) => {
-        let character = item.roles.length > 0 ? item.roles[0].character : false;
-        data.credits.cast[i] = {
-          name: item.name,
-          profile_path: item.profile_path,
-          character: character,
-          id: item.id,
-        };
-      });
-      delete data.aggregate_credits;
-    }
-    if (data.content_ratings) {
-      data.age_rating = findEnRating(data.content_ratings.results);
-      delete data.content_ratings;
-    }
-    return data;
-  } catch (err) {
-    throw err;
+  const url = `${tmdb}tv/${id}?api_key=${externalConfig.tmdbApiKey}&append_to_response=aggregate_credits,videos,keywords,content_ratings,credits`;
+  const res = await axios.get(url, { httpAgent: agent });
+  const {data} = res;
+  if (data.aggregate_credits) {
+    if (data.aggregate_credits.cast.length > 50)
+      data.aggregate_credits.cast.length = 50;
+    data.credits.cast = [];
+    data.aggregate_credits.cast.map((item, i) => {
+      const character = item.roles.length > 0 ? item.roles[0].character : false;
+      data.credits.cast[i] = {
+        name: item.name,
+        profile_path: item.profile_path,
+        character,
+        id: item.id,
+      };
+    });
+    delete data.aggregate_credits;
   }
+  if (data.content_ratings) {
+    data.age_rating = findEnRating(data.content_ratings.results);
+    delete data.content_ratings;
+  }
+  return data;
 }
 
 async function recommendationData(id, page = 1) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}tv/${id}/recommendations?api_key=${tmdbApiKey}&page=${page}`;
-
-  try {
-    let res = await axios.get(url, { httpAgent: agent });
-    return res.data;
-  } catch (err) {
-    throw err;
-  }
+  const url = `${tmdb}tv/${id}/recommendations?api_key=${externalConfig.tmdbApiKey}&page=${page}`;
+  const res = await axios.get(url, { httpAgent: agent });
+  return res.data;
 }
 
 async function similarData(id, page = 1) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}tv/${id}/similar?api_key=${tmdbApiKey}&page=${page}`;
-
-  try {
-    let res = await axios.get(url, { httpAgent: agent });
-    return res.data;
-  } catch (err) {
-    throw err;
-  }
+  const url = `${tmdb}tv/${id}/similar?api_key=${externalConfig.tmdbApiKey}&page=${page}`;
+  const res = await axios.get(url, { httpAgent: agent });
+  return res.data;
 }
 
 async function seasonsData(seasons, id) {
-  let seasonList: any = [];
-  Object.keys(seasons).map((key) => {
+  const seasonList: any = [];
+  Object.keys(seasons).forEach((key) => {
     seasonList.push(seasons[key].season_number);
   });
   return seasonsAsync(seasonList, id);
@@ -433,25 +407,16 @@ async function seasonsAsync(seasonList, id) {
 
 async function getSeason(id, season) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}tv/${id}/season/${season}?api_key=${tmdbApiKey}`;
-  try {
-    let res = await axios.get(url, { httpAgent: agent });
-    return res.data;
-  } catch (err) {
-    throw err;
-  }
+  const url = `${tmdb}tv/${id}/season/${season}?api_key=${eexternalConfig.tmdbApiKey}`;
+  const res = await axios.get(url, { httpAgent: agent });
+  return res.data;
 }
 
 async function reviewsData(id) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}tv/${id}/reviews?api_key=${tmdbApiKey}`;
-
-  try {
-    let res = await axios.get(url, { httpAgent: agent });
-    return res.data;
-  } catch (err) {
-    throw err;
-  }
+  const url = `${tmdb}tv/${id}/reviews?api_key=${externalConfig.tmdbApiKey}`;
+  const res = await axios.get(url, { httpAgent: agent });
+  return res.data;
 }
 
 // Lets i18n this soon
@@ -486,9 +451,9 @@ function findEnRating(data) {
 
 async function idLookup(id) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}tv/${id}/external_ids?api_key=${tmdbApiKey}`;
+  const url = `${tmdb}tv/${id}/external_ids?api_key=${externalConfig.tmdbApiKey}`;
   try {
-    let res = await axios.get(url, { httpAgent: agent });
+    const res = await axios.get(url, { httpAgent: agent });
     return res.data;
   } catch (err) {
     logger.error(`failed to look up show ${id}`, { label: 'tmdb.show' });
@@ -500,33 +465,25 @@ async function idLookup(id) {
 export async function discoverSeries(page = 1, params = {}) {
   const tmdb = 'https://api.themoviedb.org/3/';
   let par = '';
-  Object.keys(params).map((i) => {
+  Object.keys(params).forEach((i) => {
     par += `&${i}=${params[i]}`;
   });
-  let url = `${tmdb}discover/tv?api_key=${tmdbApiKey}${par}&page=${page}`;
-  try {
-    let res = await axios.get(url, { httpAgent: agent });
-    if (res.data && res.data.results.length > 0) {
-      await Promise.all(
-        res.data.results.map(async (show) => {
-          const check: any = await onServer('show', false, false, show.id);
-          show.on_server = check.exists;
-        }),
-      );
-    }
-    return res.data;
-  } catch (err) {
-    throw err;
+  const url = `${tmdb}discover/tv?api_key=${externalConfig.tmdbApiKey}${par}&page=${page}`;
+  const res = await axios.get(url, { httpAgent: agent });
+  if (res.data && res.data.results.length > 0) {
+    await Promise.all(
+      res.data.results.map(async (show) => {
+        const check: any = await onServer('show', false, false, show.id);
+        show.on_server = check.exists;
+      }),
+    );
   }
+  return res.data;
 }
 
 export async function network(id) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  let url = `${tmdb}network/${id}?api_key=${tmdbApiKey}`;
-  try {
-    let res = await axios.get(url, { httpAgent: agent });
-    return res.data;
-  } catch (err) {
-    throw err;
-  }
+  const url = `${tmdb}network/${id}?api_key=${externalConfig.tmdbApiKey}`;
+  const res = await axios.get(url, { httpAgent: agent });
+  return res.data;
 }

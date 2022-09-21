@@ -4,7 +4,7 @@ import GetterInterface from './performer/getter';
 import ParserInterface from './performer/parser';
 import RulerInterface from './performer/ruler';
 
-const CUSTOMISE_FAILED = cvtError.CUSTOMISE_FAILED;
+const {CUSTOMISE_FAILED} = cvtError;
 
 /**
  * Cutomize Blueconfig before make a ConfigObjectModel (= COM, Like DOM but not for Document, for Config)

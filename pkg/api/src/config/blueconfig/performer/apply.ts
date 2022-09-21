@@ -2,7 +2,7 @@ import { cloneDeep } from 'lodash';
 
 import * as utils from './utils/utils';
 
-const isObjNotNull = utils.isObjNotNull;
+const {isObjNotNull} = utils;
 
 /**
  * Apply values/getters on COM
@@ -43,7 +43,7 @@ Apply.prototype.getters = function applyGetters(schema, node) {
         if (!getterObj || !(getterName in mySchema.attributes)) {
           continue;
         }
-        const getter = getterObj.getter;
+        const {getter} = getterObj;
         const value = cloneDeep(mySchema.attributes[getterName]);
         const stopPropagation = () => {
           propagationAsked = true;

@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { container } from 'tsyringe';
 
-import { dataFolder } from '@/config/env';
+import pathsConfig from "./env/paths";
 import { config } from '@/config/schema';
 import { IPC } from '@/infra/clusters/ipc';
 import logger from '@/loaders/logger';
@@ -17,9 +17,7 @@ const PETIO_CONFIG_FILE = 'petio.json';
  * Gets the path of the config file
  * @returns the path of the config file
  */
-export const getConfigPath = (): string => {
-  return path.join(dataFolder, PETIO_CONFIG_FILE);
-};
+export const getConfigPath = (): string => path.join(pathsConfig.dataDir, PETIO_CONFIG_FILE);
 
 /**
  * Attempts to load the config file and validate it
@@ -44,7 +42,7 @@ const loadAndValidateConfig = async (file: string): Promise<boolean> => {
  */
 export const LoadConfig = async (): Promise<boolean> => {
   try {
-    return loadAndValidateConfig(getConfigPath());
+    return await loadAndValidateConfig(getConfigPath());
   } catch (error) {
     logger.error(error);
     return false;
@@ -55,24 +53,20 @@ export const LoadConfig = async (): Promise<boolean> => {
  * Checks if the config has been loaded
  * @returns true if config had been loaded else false
  */
-export const HasConfig = async (): Promise<boolean> => {
-  return fileExists(getConfigPath());
-};
+export const HasConfig = async (): Promise<boolean> => fileExists(getConfigPath());
 
 /**
  * Get the properties of the config
  * @returns an object of config properties
  */
-export const toObject = (): Object => {
-  return config.getProperties();
-};
+export const toObject = (): Object => config.getProperties();
 
 /**
  * Attempts to write the config data to the config file
  * @returns true if the config was written and false if it failed
  */
 export const WriteConfig = async (
-  updateClusters: boolean = true,
+  updateClusters = true,
 ): Promise<boolean> => {
   try {
     const properties = config.getProperties();

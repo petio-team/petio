@@ -1,5 +1,7 @@
 import { ObjectId } from 'bson';
 import { Schema, model } from 'mongoose';
+import { container } from 'tsyringe';
+import { Logger } from 'winston';
 import * as z from 'zod';
 
 export enum UserRole {
@@ -12,13 +14,13 @@ export const UserSchema = z.object({
   title: z.string().min(1),
   username: z.string().min(1),
   password: z.string().optional(),
-  email: z.string().email().min(1),
+  email: z.string().email().optional(),
   thumbnail: z.string().min(1),
   // altId is now used to tell if an account is custom or not
   altId: z.string().min(1).optional(),
   plexId: z.string().min(1).optional(),
   role: z.nativeEnum(UserRole).default(UserRole.User),
-  profileId: z.string().optional(),
+  profileId: z.instanceof(ObjectId).optional(),
   // owner replaced the old custom field, and inverts it's usage
   owner: z.boolean().default(false),
   custom: z.boolean().default(false),
@@ -82,7 +84,7 @@ const UserModelSchema = new Schema<User>(
   {
     timestamps: true,
     toJSON: {
-      transform: function (_doc, ret, _options) {
+      transform (_doc, ret, _options) {
         ret.id = ret._id;
         delete ret.password;
         delete ret._id;
@@ -98,14 +100,14 @@ export const UserModel = model<User>('users', UserModelSchema);
 // TODO: this should be it's own service with a repository ideally
 // Gets all users
 export const GetAllUsers = async (): Promise<User[]> => {
-  const results = await UserModel.find({});
+  const results = await UserModel.find({}).exec();
   if (!results) {
     return [];
   }
 
   const parsed = await UserSchema.array().safeParseAsync(results);
   if (!parsed.success) {
-    throw new Error('failed to parse users data');
+    throw new Error(`failed to parse users data: ${  parsed.error}`);
   }
 
   return parsed.data;
@@ -115,25 +117,48 @@ export const GetAllUsers = async (): Promise<User[]> => {
 // Get a user by using an email address
 export const GetUserByEmail = async (email: string): Promise<User> => {
   const data = await UserModel.findOne({
-    email: email,
-  });
+    email,
+  }).exec();
   if (!data) {
     throw new Error('failed to get user by email');
   }
 
   const parsed = await UserSchema.safeParseAsync(data.toObject());
   if (!parsed.success) {
-    throw new Error('failed to parse and validate data');
+    throw new Error(`failed to parse and validate data: ${  parsed.error}`);
   }
 
+  parsed.data.id = data.id;
+  return parsed.data;
+};
+
+// Get a user by using an email address
+export const GetUserByPlexID = async (id: string): Promise<User> => {
+  const data = await UserModel.findOne({
+    plexId: id,
+  }).exec();
+  if (!data) {
+    throw new Error('failed to get user by plex id');
+  }
+
+  const parsed = await UserSchema.safeParseAsync(data.toObject());
+  if (!parsed.success) {
+    throw new Error(`failed to parse and validate data: ${  parsed.error}`);
+  }
+
+  parsed.data.id = data.id;
+  delete parsed.data.password;
   return parsed.data;
 };
 
 // TODO: this should be it's own service with a repository ideally
 // Create a new user or update if one already exists
 export const CreateOrUpdateUser = async (user: User): Promise<User> => {
-  let schema = await UserSchema.safeParseAsync(user);
+  const schema = await UserSchema.safeParseAsync(user);
   if (!schema.success) {
+    container
+      .resolve<Logger>('Logger')
+      .error('failed to parse user data: ', schema.error);
     throw new Error('failed to parse user data');
   }
 
@@ -145,12 +170,11 @@ export const CreateOrUpdateUser = async (user: User): Promise<User> => {
     {
       upsert: true,
     },
-  );
+  ).exec();
   if (!data.acknowledged) {
     throw new Error('failed to create or update user');
   }
 
   schema.data.id = data.upsertedId;
-
   return schema.data;
 };

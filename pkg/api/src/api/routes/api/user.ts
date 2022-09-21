@@ -1,28 +1,26 @@
+import path from 'path';
 import multer from '@koa/multer';
 import Router from '@koa/router';
+import axios from 'axios';
 import bcrypt from 'bcryptjs';
-import http from 'follow-redirects';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 import send from 'koa-send';
-import path from 'path';
 
-import { dataFolder } from '@/config/env';
-import { WriteConfig, config } from '@/config/index';
+import pathsConfig from "@/config/env/paths";
 import logger from '@/loaders/logger';
 import Profile from '@/models/profile';
 import { UserModel, UserRole } from '@/models/user';
 
-const UPLOAD_DIR = path.join(dataFolder, './uploads');
-const route = new Router({ prefix: '/user' });
+const UPLOAD_DIR = path.join(pathsConfig.dataDir, './uploads');
 
-let storage = multer.diskStorage({
-  destination: function (_req, _file, cb) {
+const storage = multer.diskStorage({
+  destination (_req, _file, cb) {
     cb(null, UPLOAD_DIR);
   },
-  filename: function (req: any, file, cb) {
+  filename (req: any, file, cb) {
     req.newThumb =
-      file.fieldname + '-' + Date.now() + path.extname(file.originalname);
+      `${file.fieldname  }-${  Date.now()  }${path.extname(file.originalname)}`;
     cb(null, req.newThumb);
   },
 });
@@ -31,24 +29,10 @@ const upload = multer({
   storage,
 });
 
-export default (app: Router) => {
-  route.get('/all', getAllUsers);
-  route.get('/quota', getQuota);
-  route.get('/thumb/:id', getThumbnailById);
-  route.get('/:id', getUserById);
-  route.post('/create_custom', createCustomUser);
-  route.post('/edit', editUser);
-  route.post('/bulk_edit', editMultipleUsers);
-  route.post('/delete_user', deleteUser);
-  route.post('/thumb/:id', upload.single('img'), updateUserThumbnail);
-
-  app.use(route.routes());
-};
-
 const getAllUsers = async (ctx: Context) => {
   let userData: any;
   try {
-    userData = await UserModel.find();
+    userData = await UserModel.find().exec();
   } catch (err) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = { error: err };
@@ -56,9 +40,9 @@ const getAllUsers = async (ctx: Context) => {
   }
 
   if (userData) {
-    let data = Object.values(Object.assign(userData));
-    Object.keys(data).map((u) => {
-      let user = data[u];
+    const data = Object.values(Object.assign(userData));
+    Object.keys(data).forEach((u) => {
+      const user = data[u];
       if (user) {
         if (user.password) user.password = 'removed';
       }
@@ -75,7 +59,7 @@ const getAllUsers = async (ctx: Context) => {
 const getUserById = async (ctx: Context) => {
   let userData: any;
   try {
-    userData = await UserModel.findOne({ id: ctx.params.id });
+    userData = await UserModel.findOne({ id: ctx.params.id }).exec();
   } catch (err) {
     ctx.status = StatusCodes.NOT_FOUND;
     ctx.body = { error: err };
@@ -92,31 +76,30 @@ const getUserById = async (ctx: Context) => {
 };
 
 const createCustomUser = async (ctx: Context) => {
-  const body = ctx.request.body as any;
+  const {body} = ctx.request;
 
-  let user = body.user;
+  const {user} = body;
   if (!user) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = {
       error: 'No user details',
     };
   }
-  let dbUser = await UserModel.findOne({
+  const dbUser = await UserModel.findOne({
     $or: [
       { username: user.username },
       { email: user.email },
       { title: user.username },
     ],
-  });
+  }).exec();
   if (dbUser) {
     ctx.status = StatusCodes.OK;
     ctx.body = {
       error: 'User exists, please change the username or email',
     };
-    return;
   } else {
     try {
-      let newUser = new UserModel({
+      const newUser = new UserModel({
         id: user.id,
         title: user.username,
         username: user.username,
@@ -142,8 +125,8 @@ const createCustomUser = async (ctx: Context) => {
 };
 
 const editUser = async (ctx: Context) => {
-  const body = ctx.request.body as any;
-  let user = body.user;
+  const {body} = ctx.request;
+  const {user} = body;
 
   if (!user) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
@@ -153,40 +136,41 @@ const editUser = async (ctx: Context) => {
   }
 
   try {
-    let userObj: any = {
-      email: user.email,
-      role: user.role,
-      profile: user.profile,
-      disabled: user.disabled,
-    };
+    const u = await UserModel.findOne({ _id: user.id }).exec();
+    if (!u) {
+      throw new Error(`failed to find user with id: ${user.id}`);
+    }
+
+    if (user.clearPassword && u.role !== UserRole.Admin) {
+      u.password = undefined;
+    }
 
     if (user.password) {
-      userObj.password = bcrypt.hashSync(user.password, 10);
+      u.password = bcrypt.hashSync(user.password, 10);
     }
 
-    if (user.clearPassword) {
-      userObj.password = null;
+    if (user.profile) {
+      u.profileId = user.profile;
+    } else {
+      u.profileId = undefined;
     }
 
-    if (user.role === UserRole.Admin && !user.password) {
-      userObj.password =
-        config.get('admin.password').substring(0, 3) === '$2a'
-          ? config.get('admin.password')
-          : bcrypt.hashSync(config.get('admin.password'), 10);
+    if (user.email) {
+      u.email = user.email;
     }
 
-    if (user.role === 'admin' && user.email) {
-      config.set('admin.email', user.email);
-      WriteConfig();
+    if (user.role) {
+      u.role = user.role;
     }
 
-    await UserModel.findOneAndUpdate(
-      { _id: user.id },
-      {
-        $set: userObj,
-      },
-      { new: true, useFindAndModify: false },
-    );
+    if (user.disabled) {
+      u.disabled = user.disabled;
+    }
+
+    const results = await u.save();
+    if (!results) {
+      throw new Error(`failed to save user with id: ${user.id}`);
+    }
 
     ctx.status = StatusCodes.OK;
     ctx.body = {
@@ -203,10 +187,10 @@ const editUser = async (ctx: Context) => {
 };
 
 const editMultipleUsers = async (ctx: Context) => {
-  const body = ctx.request.body as any;
-  let users = body.users;
-  let enabled = body.enabled;
-  let profile = body.profile;
+  const {body} = ctx.request;
+  const users = body.users as [];
+  const {enabled} = body;
+  const {profile} = body;
 
   if (!users) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
@@ -218,18 +202,24 @@ const editMultipleUsers = async (ctx: Context) => {
 
   try {
     await Promise.all(
-      users.map(async (user) => {
-        await UserModel.updateMany(
-          {
-            _id: user,
-          },
-          {
-            $set: {
-              profile: profile,
-              disabled: enabled ? false : true,
-            },
-          },
-        );
+      users.map(async (user: string) => {
+        const u = await UserModel.findOne({ _id: user }).exec();
+        if (!u) {
+          throw new Error(`failed to find user with id: ${user}`);
+        }
+
+        if (profile) {
+          u.profileId = profile;
+        } else {
+          u.profileId = undefined;
+        }
+
+        u.disabled = !enabled;
+
+        const results = u.save();
+        if (!results) {
+          throw new Error(`failed to save user with id: ${user}`);
+        }
       }),
     );
 
@@ -237,7 +227,8 @@ const editMultipleUsers = async (ctx: Context) => {
     ctx.body = {
       message: 'Users saved',
     };
-  } catch {
+  } catch (err) {
+    logger.error(err);
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = {
       error: 'Error editing user',
@@ -246,9 +237,9 @@ const editMultipleUsers = async (ctx: Context) => {
 };
 
 const deleteUser = async (ctx: Context) => {
-  const body = ctx.request.body as any;
+  const {body} = ctx.request;
 
-  let user = body.user;
+  const {user} = body;
   if (!user) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = {
@@ -266,6 +257,7 @@ const deleteUser = async (ctx: Context) => {
   }
 
   try {
+    // eslint-disable-next-line no-underscore-dangle
     await UserModel.findByIdAndDelete(user._id);
     ctx.status = StatusCodes.OK;
     ctx.body = {
@@ -296,7 +288,7 @@ const updateUserThumbnail = async (ctx: Context) => {
         },
       },
       { useFindAndModify: false },
-    );
+    ).exec();
 
     ctx.status = StatusCodes.OK;
     ctx.body = {};
@@ -312,41 +304,40 @@ const updateUserThumbnail = async (ctx: Context) => {
 const getThumbnailById = async (ctx: Context) => {
   let userData: any = false;
   try {
-    userData = await UserModel.findOne({ id: ctx.params.id });
+    userData = await UserModel.findOne({ _id: ctx.params.id }).exec();
   } catch (err) {
     ctx.status = StatusCodes.BAD_REQUEST;
     ctx.body = { error: err };
     return;
   }
 
-  if (userData) {
-    if (userData.custom_thumb) {
-      send(ctx, `${UPLOAD_DIR}/${userData.custom_thumb}`);
-      return;
-    }
-    let url = userData.thumb;
+  if (!userData) {
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = 'user data missing';
+    return;
+  }
 
-    var options = {
-      host: 'plex.tv',
-      path: url.replace('https://plex.tv', ''),
-      method: 'GET',
-      headers: {
-        'content-type': 'image/png',
-      },
-    };
+  if (userData.custom_thumb) {
+    send(ctx, `${UPLOAD_DIR}/${userData.custom_thumb}`);
+    return;
+  }
+  const url = userData.thumbnail;
 
-    var request = http
-      .get(options, function (response) {
-        ctx.response.header['Content-Type'] = response.headers['content-type'];
-      })
-      .on('error', function (e) {
-        logger.log(
-          'warn',
-          'ROUTE: Unable to get user thumb - Got error: ' + e.message,
-          e,
-        );
-      });
-    request.end();
+  try {
+    const resp = await axios.get(url, {
+      responseType: 'stream',
+    });
+    ctx.response.set('Content-Type', 'image/png');
+    ctx.status = StatusCodes.OK;
+    ctx.body = resp.data;
+  } catch (e) {
+    logger.log(
+      'warn',
+      `ROUTE: Unable to get user thumb - Got error: ${  e.message}`,
+      e,
+    );
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = 'Unable to get user thumb';
   }
 };
 
@@ -356,7 +347,7 @@ const getQuota = async (ctx: Context) => {
     ctx.body = {};
     return;
   }
-  const user = await UserModel.findOne({ id: ctx.state.user.id });
+  const user = await UserModel.findOne({ id: ctx.state.user.id }).exec();
   if (!user) {
     return;
   }
@@ -367,17 +358,32 @@ const getQuota = async (ctx: Context) => {
     return;
   }
   const profile = user.profileId
-    ? await Profile.findById(user.profileId)
+    ? await Profile.findById(user.profileId).exec()
     : false;
   let total = 0;
-  let current = user.quotaCount ? user.quotaCount : 0;
+  const current = user.quotaCount ? user.quotaCount : 0;
   if (profile) {
     total = profile.quota ? profile.quota : 0;
   }
 
   ctx.status = StatusCodes.NOT_FOUND;
   ctx.body = {
-    current: current,
-    total: total,
+    current,
+    total,
   };
+};
+
+const route = new Router({ prefix: '/user' });
+export default (app: Router) => {
+  route.get('/all', getAllUsers);
+  route.get('/quota', getQuota);
+  route.get('/thumb/:id', getThumbnailById);
+  route.get('/:id', getUserById);
+  route.post('/create_custom', createCustomUser);
+  route.post('/edit', editUser);
+  route.post('/bulk_edit', editMultipleUsers);
+  route.post('/delete_user', deleteUser);
+  route.post('/thumb/:id', upload.single('img'), updateUserThumbnail);
+
+  app.use(route.routes());
 };
