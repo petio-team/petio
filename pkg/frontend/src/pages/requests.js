@@ -30,7 +30,6 @@ function Requests({ requests, requestsArchive, currentUser }) {
     if (!requests || Object.keys(requests).length === 0) return;
     let tv = [];
     let movie = [];
-    console.log(requests);
     Object.keys(requests).forEach((key) => {
       const request = requests[key];
       if (request.type === 'movie') movie.push(request.tmdb_id);
@@ -56,7 +55,10 @@ function Requests({ requests, requestsArchive, currentUser }) {
             Object.keys(requests).map((key) => {
               const request = requests[key];
               return (
-                <Request request={request} key={`request_${request._id}`} />
+                <Request
+                  request={request}
+                  key={`request_${request.media.id}`}
+                />
               );
             })
           ) : (

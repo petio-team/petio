@@ -17,7 +17,7 @@ const mapStateToProps = (state) => {
 function Issues({ redux_issues }) {
   useEffect(() => {
     getIssues();
-  });
+  }, []);
 
   if (redux_issues.length === 0)
     return (
@@ -28,9 +28,12 @@ function Issues({ redux_issues }) {
 
   return (
     <div className={styles.dashboard__module}>
-      {redux_issues.map((issue) => {
+      {redux_issues.map((issue, i) => {
         return (
-          <div className={styles.dashboard__issue}>
+          <div
+            key={`admin__dashboard__issue__${i}`}
+            className={styles.dashboard__issue}
+          >
             <p className={typo.body}>
               <b>{issue.title}:</b> {formatIssue(issue.issue)}
             </p>
