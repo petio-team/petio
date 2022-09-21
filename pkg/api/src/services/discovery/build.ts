@@ -20,18 +20,12 @@ export default async () => {
       logger.verbose('DISC: No Users', { label: 'discovery.build' });
       return;
     }
-    const userIds = users.map((user: User) => {
-      if (user.altId) {
-        return user.altId;
-      } if (!user.custom) {
-        return user.id;
-      }
-    });
+    const userIds = users.map((user: User) => user.altId ? user.altId : user.plexId);
 
     await Promise.map(
       userIds,
       async (i) => {
-        await userBuild(i);
+        await create(i);
       },
       { concurrency: config.get('general.concurrency') },
     );
@@ -42,12 +36,6 @@ export default async () => {
     logger.error(e);
   }
 };
-
-function userBuild(id) {
-  return new Promise((resolve) => {
-    create(id).then(() => resolve());
-  });
-}
 
 async function create(id) {
   try {
@@ -92,7 +80,9 @@ async function create(id) {
       });
       newDiscover.save();
     }
-  } catch (_) {}
+  } catch (e) {
+    logger.error(e);
+  }
 }
 
 async function build(id) {
