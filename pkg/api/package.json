@@ -6,14 +6,13 @@
   "scripts": {
     "start": "node ./build/src/app.js",
     "watch": "nodemon",
-    "inspect": "nodemon --inspect src/app.ts",
+    "inspect": "nodemon --exec \"node --require tsconfig-paths/register --require ts-node/register --inspect ./src/app.ts\"",
     "build": "tsc && tsc-alias",
     "build:prod": "yarn ncc -t build ./src/app.ts -o dist -m",
     "test": "ts-mocha --paths src/**/*.test.ts",
     "depcheck": "yarn depcheck",
     "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint --fix . --ext .ts",
-    "clinic": "clinic doctor -- node ./build/src/app.js"
+    "lint:fix": "eslint --fix . --ext .ts"
   },
   "author": "",
   "license": "MIT",
@@ -29,6 +28,7 @@
     "bcryptjs": "2.4.3",
     "bluebird": "^3.7.2",
     "cache-manager": "4.1.0",
+    "cache-manager-mongodb": "^0.3.0",
     "decimal.js": "^10.4.1",
     "dotenv": "^16.0.2",
     "event-dispatch": "^0.4.1",
@@ -67,6 +67,8 @@
     "zod": "^3.19.0"
   },
   "devDependencies": {
+    "@swc/core": "^1.3.2",
+    "@swc/helpers": "^0.4.11",
     "@types/agenda": "^4.1.0",
     "@types/bcryptjs": "^2.4.2",
     "@types/bluebird": "^3.5.36",
@@ -99,6 +101,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "mocha": "^10.0.0",
     "nodemon": "^2.0.20",
+    "regenerator-runtime": "^0.13.9",
     "ts-mocha": "^10.0.0",
     "tsconfig-paths": "^4.1.0",
     "typescript": "^4.8.3"
