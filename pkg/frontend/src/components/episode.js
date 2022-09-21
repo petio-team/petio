@@ -88,7 +88,9 @@ export default function Episode({
           {daysTillAir(airDate)}
         </p>
       </div>
-      <p className={`${typo.body} ${styles.episode__name}`}>{episode.name}</p>
+      <p className={`${typo.small} ${typo.bold} ${styles.episode__name}`}>
+        {episode.name}
+      </p>
       {mobile ? null : (
         <p className={`${typo.small} ${styles.episode__overview}`}>
           {episode.overview.length > 160

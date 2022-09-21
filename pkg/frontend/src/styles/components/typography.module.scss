@@ -75,16 +75,14 @@
 
 .small {
   font-size: 8px;
-  line-height: 16px;
+  line-height: 1.5;
 
   @media (min-width: $lg) {
     font-size: 10px;
-    line-height: 20px;
   }
 
   @media (min-width: $xxxl) {
     font-size: 12px;
-    line-height: 22px;
   }
 }
 
