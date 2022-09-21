@@ -21,6 +21,7 @@ export default function (
     reviews: [],
     users: [],
     history: [],
+    issues: [],
   },
   action,
 ) {
@@ -98,6 +99,11 @@ export default function (
       return {
         ...state,
         history: action.history,
+      };
+    case 'user/all-issues':
+      return {
+        ...state,
+        issues: action.issues,
       };
     default:
       return state;

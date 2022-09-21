@@ -2,8 +2,14 @@ import { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 
 import Meta from '../components/meta';
+import MyIssues from '../components/myIssues';
 import ReviewQueue from '../components/reviewQueue';
-import { getUserQuota, logout, watchHistory } from '../services/user.service';
+import {
+  getIssues,
+  getUserQuota,
+  logout,
+  watchHistory,
+} from '../services/user.service';
 import typo from '../styles/components/typography.module.scss';
 import styles from '../styles/views/myAccount.module.scss';
 
@@ -12,6 +18,7 @@ const mapStateToProps = (state) => {
     redux_user: state.user,
     redux_reviews: state.user.reviews,
     redux_history: state.user.history,
+    redux_issues: state.user.issues,
   };
 };
 
@@ -19,6 +26,7 @@ function MyAccount({
   redux_user,
   redux_reviews,
   redux_history,
+  redux_issues,
   newNotification,
 }) {
   const [quota, setQuota] = useState(false);
@@ -51,6 +59,7 @@ function MyAccount({
 
     getQuota();
     getHistory();
+    getIssues();
     // eslint-disable-next-line
   }, []);
 
@@ -111,7 +120,10 @@ function MyAccount({
             >
               Your Issues
             </p>
-            <p className={typo.body}>No active issues</p>
+            <MyIssues
+              issues={redux_issues}
+              userId={redux_user.currentUser.id}
+            />
           </div>
           <div className={styles.accountItem}>
             <p

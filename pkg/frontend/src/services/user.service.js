@@ -149,6 +149,19 @@ export async function addIssue(issue) {
   return post('/issue/add', issue);
 }
 
+export async function getIssues() {
+  try {
+    const data = await get(`/issue/all`);
+    updateStore({
+      type: 'user/all-issues',
+      issues: data,
+    });
+    return data;
+  } catch (e) {
+    console.log(e);
+  }
+}
+
 function updateStore(data = {}) {
   if (Object.keys(data).length === 0) return false;
   return store.dispatch(data);
