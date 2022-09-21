@@ -1,7 +1,5 @@
 import typo from '../styles/components/typography.module.scss';
 
-// import styles from '../styles/views/myAccount.module.scss';
-
 export default function MyIssues({ issues, userId }) {
   const userIssues = issues.filter((issue) => issue.user === userId);
   if (userIssues.length === 0)
@@ -10,7 +8,7 @@ export default function MyIssues({ issues, userId }) {
     <div className="test">
       {userIssues.map((issue) => {
         return (
-          <p className={typo.body}>
+          <p key={`myissues__${issue._id}`} className={typo.body}>
             <b>{issue.title}:</b> {formatIssue(issue.issue)}
           </p>
         );
