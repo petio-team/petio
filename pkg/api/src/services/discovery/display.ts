@@ -137,6 +137,8 @@ export default async (id, type = 'movie') => {
           const match = lookup.results[0];
           const discData: any = await actorLookup(match, type);
 
+          if (!discData) return null;
+
           const newDisc = await Promise.all(
             discData.map(async (result, i) => {
               if (!watchHistory[result.id]) {
@@ -177,6 +179,8 @@ export default async (id, type = 'movie') => {
         if (lookup.results && lookup.results.length > 0) {
           const match = lookup.results[0];
           const discData: any = await actorLookup(match, type);
+
+          if (!discData) return null;
 
           const newDisc = await Promise.all(
             discData.map(async (result, i) => {
