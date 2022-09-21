@@ -1,3 +1,4 @@
+import path from 'path';
 import multer from '@koa/multer';
 import Router from '@koa/router';
 import axios from 'axios';
@@ -5,7 +6,6 @@ import bcrypt from 'bcryptjs';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 import send from 'koa-send';
-import path from 'path';
 
 import pathsConfig from '@/config/env/paths';
 import logger from '@/loaders/logger';
@@ -367,6 +367,7 @@ const getQuota = async (ctx: Context) => {
     total = profile.quota ? profile.quota : 0;
   }
 
+  ctx.status = StatusCodes.OK;
   ctx.body = {
     current,
     total,
