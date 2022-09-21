@@ -3,7 +3,7 @@ import Promise from 'bluebird';
 import { ObjectId } from "mongodb";
 import xmlParser from 'xml-js';
 
-import env from '@/config/env';
+import externalConfig from "@/config/env/external";
 import { config } from '@/config/index';
 import logger from '@/loaders/logger';
 import Library from '@/models/library';

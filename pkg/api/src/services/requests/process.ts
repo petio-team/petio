@@ -295,7 +295,7 @@ export default class ProcessRequest {
             if (!instance) {
               continue;
             }
-            new Radarr(instance).ProcessRequest(this.request.id);
+            new Radarr(instance).processRequest(this.request.id);
           }
         }
       }
@@ -327,7 +327,7 @@ export default class ProcessRequest {
           (i) => i.type === DownloaderType.Radarr,
         );
         for (const instance of radarrs) {
-          new Radarr(instance).ProcessRequest(this.request.id);
+          new Radarr(instance).processRequest(this.request.id);
         }
       }
     }

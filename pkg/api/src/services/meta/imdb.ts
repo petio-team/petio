@@ -32,7 +32,7 @@ export async function storeCache(firstTime = false) {
     }
   }
   const unzip = zlib.createGunzip();
-  const tempFile = path.join(pathsConfig.data, './imdb_dump.txt');
+  const tempFile = path.join(pathsConfig.dataDir, './imdb_dump.txt');
   logger.verbose('IMDB: Rebuilding Cache', { label: 'meta.imdb' });
   try {
     logger.verbose('IMDB: Cache Downloading latest cache', {

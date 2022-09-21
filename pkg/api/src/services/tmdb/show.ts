@@ -407,7 +407,7 @@ async function seasonsAsync(seasonList, id) {
 
 async function getSeason(id, season) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  const url = `${tmdb}tv/${id}/season/${season}?api_key=${eexternalConfig.tmdbApiKey}`;
+  const url = `${tmdb}tv/${id}/season/${season}?api_key=${externalConfig.tmdbApiKey}`;
   const res = await axios.get(url, { httpAgent: agent });
   return res.data;
 }

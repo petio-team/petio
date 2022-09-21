@@ -96,7 +96,7 @@ const findParseAndMergeConfigs = async (): Promise<boolean> => {
   let isModified = false;
 
   for (const config of configFiles) {
-    const file = path.join(pathsConfig.data, `${config.file}.json`);
+    const file = path.join(pathsConfig.dataDir, `${config.file}.json`);
     const exists = await fileExists(file);
     if (exists) {
       const content = await fs.readFile(file);
