@@ -84,6 +84,15 @@ const UserModelSchema = new Schema<User>(
   },
   {
     timestamps: true,
+    toObject: {
+      transform (_doc, ret, _options) {
+        ret.id = ret._id;
+        delete ret.password;
+        delete ret._id;
+        delete ret.__v;
+        return ret;
+      },
+    },
     toJSON: {
       transform (_doc, ret, _options) {
         ret.id = ret._id;
@@ -106,7 +115,8 @@ export const GetAllUsers = async (): Promise<User[]> => {
     return [];
   }
 
-  const parsed = await UserSchema.array().safeParseAsync(results);
+  const users = results.map((u) => u.toObject());
+  const parsed = await UserSchema.array().safeParseAsync(users);
   if (!parsed.success) {
     throw new Error(`failed to parse users data: ${  parsed.error}`);
   }
