@@ -209,34 +209,34 @@ export default class ProcessRequest {
         };
       }
     } else if (this.request.type === 'movie') {
-        const instances = await GetAllDownloaders(DownloaderType.Radarr);
-        for (const instance of instances) {
-          if (!instance.id) {
-            continue;
-          }
-          if (profile.radarr && profile.radarr[instance.id]) {
-            pending[instance.id] = {
-              path: instance.path.location,
-              profile: instance.profile.name,
-              tag: false,
-            };
-          }
+      const instances = await GetAllDownloaders(DownloaderType.Radarr);
+      for (const instance of instances) {
+        if (!instance.id) {
+          continue;
         }
-      } else {
-        const instances = await GetAllDownloaders(DownloaderType.Sonarr);
-        for (const instance of instances) {
-          if (!instance.id) {
-            continue;
-          }
-          if (profile.sonarr && profile.sonarr[instance.id]) {
-            pending[instance.id] = {
-              path: instance.path.location,
-              profile: instance.profile.name,
-              tag: false,
-            };
-          }
+        if (profile.radarr && profile.radarr[instance.id]) {
+          pending[instance.id] = {
+            path: instance.path.location,
+            profile: instance.profile.name,
+            tag: false,
+          };
         }
       }
+    } else {
+      const instances = await GetAllDownloaders(DownloaderType.Sonarr);
+      for (const instance of instances) {
+        if (!instance.id) {
+          continue;
+        }
+        if (profile.sonarr && profile.sonarr[instance.id]) {
+          pending[instance.id] = {
+            path: instance.path.location,
+            profile: instance.profile.name,
+            tag: false,
+          };
+        }
+      }
+    }
     if (Object.keys(pending).length > 0) {
       await Request.updateOne(
         { requestId: this.request.id },
@@ -431,11 +431,17 @@ export default class ProcessRequest {
       throw new Error('user required');
     }
 
-    if (this.user.role === UserRole.Admin) return 'admin';
+    const user = await UserModel.findOne({
+      id: this.user.id,
+    });
 
-    const userQuota = this.user.quotaCount ? this.user.quotaCount : 0;
-    const profile = this.user.profileId
-      ? await Profile.findById(this.user.profileId).exec()
+    if (!user) throw new Error('user required');
+
+    if (user.role === UserRole.Admin) return 'admin';
+
+    const userQuota = user.quotaCount ? user.quotaCount : 0;
+    const profile = user.profileId
+      ? await Profile.findById(user.profileId).exec()
       : false;
     const quotaCap = profile ? profile.quota : 0;
     if (!quotaCap) {
