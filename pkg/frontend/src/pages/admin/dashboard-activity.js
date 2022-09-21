@@ -67,8 +67,8 @@ function Activity({ system }) {
             }
           }
 
-          let playback = selectedMedia.Part
-            ? selectedMedia.Part[0].decision
+          let playback = session.TranscodeSession
+            ? session.TranscodeSession.videoDecision
             : 'unknown';
           switch (session.type) {
             case 'episode':
