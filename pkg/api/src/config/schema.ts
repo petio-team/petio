@@ -1,8 +1,8 @@
 import { randomUUID } from 'crypto';
 
 
-import blueconfig from './blueconfig';
-import sourceArray from './blueconfig/format/source-array';
+import blueconfig from '../infra/blueconfig';
+import sourceArray from '../infra/blueconfig/format/source-array';
 import { generateKeys } from '@/utils/security';
 
 // MAX SECURTIY KEYS
