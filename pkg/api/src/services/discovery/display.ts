@@ -2,7 +2,6 @@ import Promise from 'bluebird';
 import cacheManager from 'cache-manager';
 import request from 'xhr-request';
 
-import env from '@/config/env';
 import externalConfig from "@/config/env/external";
 import { config } from '@/config/schema';
 import logger from '@/loaders/logger';

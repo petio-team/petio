@@ -3,7 +3,7 @@ import Promise from 'bluebird';
 import { ObjectId } from "mongodb";
 import xmlParser from 'xml-js';
 
-import env from '@/config/env';
+import externalConfig from "@/config/env/external";
 import { config } from '@/config/index';
 import logger from '@/loaders/logger';
 import Library from '@/models/library';
@@ -748,7 +748,7 @@ export default class LibraryUpdate {
       const user: User = {
         title: obj.title ?? obj.username ?? 'User',
         username: obj.username ? obj.username : obj.title,
-        email: obj.email.toLowerCase() ?? '',
+        email: obj.email.toLowerCase() ?? undefined,
         thumbnail: obj.thumb ?? '',
         plexId: obj.id,
         profileId: defaultProfile ? new ObjectId(defaultProfile._id.toString()) : undefined,
