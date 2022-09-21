@@ -11,7 +11,7 @@ export default function MyIssues({ issues, userId }) {
       {userIssues.map((issue) => {
         return (
           <p className={typo.body}>
-            <b>{issue.title}:</b> {toTitleCase(issue.issue)}
+            <b>{issue.title}:</b> {formatIssue(issue.issue)}
           </p>
         );
       })}
@@ -19,8 +19,19 @@ export default function MyIssues({ issues, userId }) {
   );
 }
 
-function toTitleCase(str) {
-  return str.replace(/\w\S*/g, function (txt) {
-    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-  });
+function formatIssue(issue) {
+  switch (issue) {
+    case 'season':
+      return 'Missing Season';
+    case 'subs':
+      return 'Missing Subtitles';
+    case 'bad-video':
+      return 'Bad Quality / Video Issue';
+    case 'bad-audio':
+      return 'Audio Issue / Audio Sync';
+    case 'other':
+      return 'Other';
+    default:
+      return '';
+  }
 }
