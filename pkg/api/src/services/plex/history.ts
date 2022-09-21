@@ -16,7 +16,9 @@ const memoryCache = cacheManager.caching({
 export default async (id, type) => {
   let data: any = false;
   try {
-    data = await memoryCache.wrap(`hist__${id}__${type}`, () => getHistoryData(id, type));
+    data = await memoryCache.wrap(`hist__${id}__${type}`, () =>
+      getHistoryData(id, type),
+    );
   } catch (err) {
     logger.warn(`Error getting history data - ${id}`, {
       label: 'plex.history',
@@ -68,11 +70,11 @@ async function parseHistory(data, type) {
     type = 'episode';
   }
   const history = data.MediaContainer.Metadata;
-  const output = {};
   if (!history) {
-    return output;
+    return {};
   }
   const histArr: any = [];
+  const items: any = [];
   for (let i = 0; i < history.length; i++) {
     const item = history[i];
     if (type === item.type || type === 'all') {
@@ -98,19 +100,25 @@ async function parseHistory(data, type) {
 
         histArr.push(key);
 
-        if (
-          (media_type === type || type === 'all') &&
-          Object.keys(output).length < 19
-        ) {
-          output[i] =
-            media_type === 'movie'
-              ? movieLookup(media_id, false)
-              : showLookup(media_id, false);
-        }
+        if (media_type === type || type === 'all')
+          items.push({
+            media_id: media_id,
+            media_type: media_type,
+          });
       }
-
-
     }
   }
+
+  const output = await Promise.all(
+    items.map(async (item) => {
+      const lookup =
+        item.media_type === 'movie'
+          ? movieLookup(item.media_id, false)
+          : showLookup(item.media_id, false);
+      return lookup;
+    }),
+  );
+
+  output.length = 21;
   return output;
 }
