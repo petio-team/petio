@@ -760,7 +760,7 @@ export default class LibraryUpdate {
       };
 
       const newUser = await CreateOrUpdateUser(user);
-      logger.verbose(`synced friend ${  newUser.email}`, {
+      logger.verbose(`synced friend ${  newUser.username}`, {
         label: 'plex.library',
       });
     } catch (e) {
