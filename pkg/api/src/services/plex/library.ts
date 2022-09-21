@@ -748,7 +748,7 @@ export default class LibraryUpdate {
       const user: User = {
         title: obj.title ?? obj.username ?? 'User',
         username: obj.username ? obj.username : obj.title,
-        email: obj.email.toLowerCase() ?? '',
+        email: obj.email.toLowerCase() ?? undefined,
         thumbnail: obj.thumb ?? '',
         plexId: obj.id,
         profileId: defaultProfile ? new ObjectId(defaultProfile._id.toString()) : undefined,
