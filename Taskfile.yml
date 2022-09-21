@@ -11,22 +11,36 @@ tasks:
   dev:api:
     dir: pkg/api
     cmds:
-      - yarn workspace api run start
+      - yarn workspace api run watch
 
   dev:fe:
     dir: pkg/frontend
     cmds:
-      - yarn start
+      - yarn workspace frontned run watch
 
   dev:adm:
     dir: pkg/admin
     cmds:
-      - yarn watch
+      - yarn workspace admin run watch
 
   dev:compose:
     cmds:
       - docker-compose up -d
       - docker-compose logs -f petio
+
+  # -
+  # Run app
+  # -
+  run:api:
+    cmds:
+      - yarn workspace api run start
+
+  # -
+  # Debug/Benchmark/Analysis app
+  # -
+  debug:api:
+    cmds:
+      - yarn workspace api run clinic
 
   # -
   # Run build related tasks
