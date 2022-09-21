@@ -124,7 +124,7 @@ function Requests({ requests, requestsArchive, currentUser }) {
                 })
               ) : (
                 <tr>
-                  <td>You don't have any archive requests</td>
+                  <td colSpan={7}>You don't have any archive requests</td>
                 </tr>
               )}
             </tbody>
