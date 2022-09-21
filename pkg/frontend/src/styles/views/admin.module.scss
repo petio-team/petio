@@ -202,6 +202,17 @@
   &__requests {
     margin-bottom: 10px;
   }
+
+  &__issue {
+    padding: 10px;
+    border-radius: 5px;
+    background: rgba($white, 0.1);
+    margin-bottom: 10px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
 }
 
 .session {
