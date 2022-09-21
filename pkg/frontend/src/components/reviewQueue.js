@@ -84,11 +84,10 @@ export default function ReviewQueue({
           const item = history[i];
           const reviewed = isReviewed(item);
           const type = item.episode_run_time ? 'tv' : 'movie';
-          console.log(reviewed);
           if (!item.id) return null;
           return (
             <div
-              key={`reviewq__${item.id}`}
+              key={`reviewq__${i}__${item.id}`}
               className={styles.reviewQueue__item}
             >
               <Link to={`${item ? `/${type}/${item.id}` : '#'}`}></Link>
