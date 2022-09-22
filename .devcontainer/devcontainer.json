@@ -6,7 +6,7 @@
   "shutdownAction": "stopCompose",
   "postCreateCommand": "yarn workspaces focus --all",
   "workspaceFolder": "/workspace",
-  "forwardPorts": ["vscode:7777"],
+  "forwardPorts": ["vscode:7777", "mongo:27017"],
   // "overrideCommand": "",
   "extensions": [
     "mohsen1.prettify-json",
