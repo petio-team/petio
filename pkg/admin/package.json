@@ -20,7 +20,7 @@
     "redux": "^4.1.0",
     "redux-devtools-extension": "^2.13.9",
     "redux-thunk": "^2.3.0",
-    "sass": "1.54.9",
+    "sass": "1.55.0",
     "uuid": "^9.0.0",
     "web-vitals": "^3.0.2"
   },
