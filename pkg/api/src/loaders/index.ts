@@ -1,5 +1,6 @@
 import cluster from 'cluster';
 
+import Logger from "./logger";
 import agendaFactory from '@/loaders/agenda';
 import config from '@/loaders/config';
 import di from '@/loaders/di';
@@ -13,20 +14,27 @@ import startupMessage from '@/utils/startupMessage';
 export default async () => {
   // inject everything into di
   di();
-
   // if we are the master process,
   if (cluster.isPrimary) {
     // load the config if the file exists, else use defaults
     const exists = await config();
+    // show the startup message so the user knows everything is ready to go
+    startupMessage();
+    // if config exists lets run first time cache, and clusters
     if (exists) {
+      // load database
+      await mongoose();
       // setup workers and run forks
       await setupWorkerProcesses();
     } else {
       // load http server
       appRouter();
     }
-    // Show the startup message so the user knows everything is ready to go
-    startupMessage(!exists);
+    if (!exists) {
+      Logger.warn(
+        'Initial setup is required, please proceed to the Web UI to begin the setup',
+      );
+    }
   } else if (cluster.isWorker) {
     // load worker events
     setupWorkers();
@@ -36,13 +44,10 @@ export default async () => {
 export const loadSystems = async () => {
   // load database
   const mongoConnection = await mongoose();
-
   // load agenda
   const agenda = agendaFactory({ mongoConnection });
-
   // load jobs
   jobs({ agenda });
-
   // load http server
   appRouter();
 };
