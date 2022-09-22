@@ -261,9 +261,10 @@ class Setup extends React.Component {
       case 9:
         text =
           'Building your Petio library... Grab a cup of tea this could take a few minutes...';
-        to = 1000;
+        to = 5000;
         break;
       default:
+        text = 'Building first time cache....';
         this.healthCheck();
         to = 5000;
         break;
