@@ -1,6 +1,6 @@
 import { URL, URLSearchParams } from 'url';
 
-import { config } from '@/config/schema';
+import { config } from '@/config/index';
 
 const MakePlexURL = (url, params = {}) => {
   const baseurl = new URL(

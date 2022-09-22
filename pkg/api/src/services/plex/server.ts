@@ -1,4 +1,4 @@
-import { config } from '@/config/schema';
+import { config } from '@/config/index';
 import Movie from '@/models/movie';
 import Show from '@/models/show';
 
@@ -52,9 +52,9 @@ export default async (type, imdb, tvdb, tmdb) => {
         },
         resolutions,
       };
-    } 
+    }
       return { exists: false, resolutions: [] };
-    
+
   }
 
   if (type === 'show' || type === 'tv') {
@@ -118,8 +118,8 @@ export default async (type, imdb, tvdb, tmdb) => {
         },
         resolutions,
       };
-    } 
+    }
       return { exists: false, resolutions: [] };
-    
+
   }
 };

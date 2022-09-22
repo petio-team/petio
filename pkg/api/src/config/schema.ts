@@ -10,7 +10,7 @@ const MAX_SECURITY_KEYS = 10;
 
 blueconfig.addFormat(sourceArray);
 
-export const config = blueconfig({
+export default blueconfig({
   general: {
     popular: {
       doc: 'Enabled showing popular media',

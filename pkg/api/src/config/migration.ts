@@ -3,8 +3,7 @@ import path from 'path';
 import * as z from 'zod';
 
 import pathsConfig from "./env/paths";
-import { WriteConfig } from '@/config/index';
-import { config } from '@/config/schema';
+import config from '@/config/schema';
 import logger from '@/loaders/logger';
 import { fileExists } from '@/utils/file';
 

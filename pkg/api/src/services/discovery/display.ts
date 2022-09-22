@@ -3,7 +3,7 @@ import cacheManager from 'cache-manager';
 import request from 'xhr-request';
 
 import externalConfig from '@/config/env/external';
-import { config } from '@/config/schema';
+import { config } from '@/config/index';
 import logger from '@/loaders/logger';
 import Discovery from '@/models/discovery';
 import getHistory from '@/services/plex/history';
@@ -27,7 +27,7 @@ const memoryCache = cacheManager.caching({
 export default async (id, type = 'movie') => {
   if (!id) return { error: 'No ID' };
   try {
-    const discoveryPrefs: any = await Discovery.findOne({ id: id }).exec();
+    const discoveryPrefs: any = await Discovery.findOne({ id }).exec();
     const popular: any = [];
     const [upcoming, popularData]: any = await Promise.all([
       comingSoon(type),

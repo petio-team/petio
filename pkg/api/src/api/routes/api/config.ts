@@ -5,7 +5,7 @@ import * as z from 'zod';
 
 import { validateRequest } from '@/api/middleware/validation';
 import { HasConfig, WriteConfig } from '@/config/config';
-import { config } from '@/config/schema';
+import { config } from '@/config/index';
 import logger from '@/loaders/logger';
 import setupReady from '@/services/setup/setup';
 

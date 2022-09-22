@@ -20,13 +20,13 @@ export default async () => {
     const exists = await config();
     if (exists) {
       // setup workers and run forks
-      setupWorkerProcesses();
+      await setupWorkerProcesses();
     } else {
       // load http server
       appRouter();
-      // Show the startup message so the user knows everything is ready to go
-      await startupMessage();
     }
+    // Show the startup message so the user knows everything is ready to go
+    startupMessage(!exists);
   } else if (cluster.isWorker) {
     // load worker events
     setupWorkers();

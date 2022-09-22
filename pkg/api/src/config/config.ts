@@ -3,7 +3,7 @@ import path from 'path';
 import { container } from 'tsyringe';
 
 import pathsConfig from "./env/paths";
-import { config } from '@/config/schema';
+import configSchema from '@/config/schema';
 import { IPC } from '@/infra/clusters/ipc';
 import logger from '@/loaders/logger';
 import { fileExists } from '@/utils/file';
@@ -20,6 +20,32 @@ const PETIO_CONFIG_FILE = 'petio.json';
 export const getConfigPath = (): string => path.join(pathsConfig.dataDir, PETIO_CONFIG_FILE);
 
 /**
+ * Attempts to write the config data to the config file
+ * @returns true if the config was written and false if it failed
+ */
+ export const WriteConfig = async (
+  updateClusters = true,
+): Promise<boolean> => {
+  try {
+    const properties = configSchema.getProperties();
+    const data = JSON.stringify(properties, null, 2);
+    await fs.writeFile(getConfigPath(), data);
+
+    if (updateClusters) {
+      // update other clusters with new config changes
+      container
+        .resolve(IPC)
+        .messageSiblings({ action: 'onConfigUpdate', data: properties });
+    }
+
+    return true;
+  } catch (error) {
+    logger.error(error);
+    return false;
+  }
+};
+
+/**
  * Attempts to load the config file and validate it
  * @param path the path to the file to load
  * @returns void
@@ -27,7 +53,7 @@ export const getConfigPath = (): string => path.join(pathsConfig.dataDir, PETIO_
 const loadAndValidateConfig = async (file: string): Promise<boolean> => {
   const stat = await fileExists(file);
   if (stat) {
-    config.loadFile(file).validate();
+    configSchema.loadFile(file).validate();
     // We call this here to make sure we write new values to config
     WriteConfig(false);
     return true;
@@ -59,30 +85,4 @@ export const HasConfig = async (): Promise<boolean> => fileExists(getConfigPath(
  * Get the properties of the config
  * @returns an object of config properties
  */
-export const toObject = (): Object => config.getProperties();
-
-/**
- * Attempts to write the config data to the config file
- * @returns true if the config was written and false if it failed
- */
-export const WriteConfig = async (
-  updateClusters = true,
-): Promise<boolean> => {
-  try {
-    const properties = config.getProperties();
-    const data = JSON.stringify(properties, null, 2);
-    await fs.writeFile(getConfigPath(), data);
-
-    if (updateClusters) {
-      // update other clusters with new config changes
-      container
-        .resolve(IPC)
-        .messageSiblings({ action: 'onConfigUpdate', data: properties });
-    }
-
-    return true;
-  } catch (error) {
-    logger.error(error);
-    return false;
-  }
-};
+export const toObject = (): Object => configSchema.getProperties();

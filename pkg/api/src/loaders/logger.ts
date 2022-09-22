@@ -3,7 +3,7 @@ import * as winston from 'winston';
 import 'winston-daily-rotate-file';
 
 import pathsConfig from "@/config/env/paths";
-import { config } from '@/config/schema';
+import config from '@/config/schema';
 
 const {
   combine,

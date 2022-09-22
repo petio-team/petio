@@ -7,8 +7,7 @@ export default async (): Promise<boolean> => {
     await WriteConfig();
     exists = true;
   } else {
-    await LoadConfig();
-    exists = true;
+    exists = await LoadConfig();
   }
   return exists;
 };

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { config } from '@/config/schema';
+import { config } from '@/config/index';
 import logger from '@/loaders/logger';
 
 export default class Discord {
