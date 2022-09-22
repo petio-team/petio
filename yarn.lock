@@ -5565,7 +5565,7 @@ __metadata:
     lodash: ^4.17.21
     mjml: ^4.13.0
     mocha: ^10.0.0
-    mongodb: 4.9.1
+    mongodb: 4.10.0
     mongoose: ^6.6.1
     multer: ^1.4.4
     nodemailer: ^6.7.8
@@ -13706,6 +13706,22 @@ __metadata:
     "@types/whatwg-url": ^8.2.1
     whatwg-url: ^11.0.0
   checksum: 1b7a97ccff75176319801ab3552ac472c8657a026268416be52ff3821db66ce869a70f8ac629dc2b18d94b997e8408d485bf1142c3afbecd02d713521b14e9ba
+  languageName: node
+  linkType: hard
+
+"mongodb@npm:4.10.0":
+  version: 4.10.0
+  resolution: "mongodb@npm:4.10.0"
+  dependencies:
+    bson: ^4.7.0
+    denque: ^2.1.0
+    mongodb-connection-string-url: ^2.5.3
+    saslprep: ^1.0.3
+    socks: ^2.7.0
+  dependenciesMeta:
+    saslprep:
+      optional: true
+  checksum: 4847fe69b6d3baddc440936d306b4d00fa40a1dafabd387f9fb6f3ecd63b27c41f11b2cc46774ac2bf17e9b508d35908ebe21f47badf3449fb7afcbde2733951
   languageName: node
   linkType: hard
 
