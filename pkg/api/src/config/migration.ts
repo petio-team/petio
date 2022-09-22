@@ -81,53 +81,6 @@ const configFiles: ConfigParse[] = [
   },
 ];
 
-export const migrateConfigs = async (): Promise<void> => {
-  try {
-    const isModified = await findParseAndMergeConfigs();
-    if (isModified) {
-      await WriteConfig();
-    }
-  } catch (error) {
-    logger.error(error);
-  }
-};
-
-const findParseAndMergeConfigs = async (): Promise<boolean> => {
-  let isModified = false;
-
-  for (const config of configFiles) {
-    const file = path.join(pathsConfig.dataDir, `${config.file}.json`);
-    const exists = await fileExists(file);
-    if (exists) {
-      const content = await fs.readFile(file);
-      const parsed = await config.schema.safeParseAsync(content);
-      if (!parsed.success) {
-        logger.error(`failed to parse config '${  config.file  }.json`);
-        continue;
-      }
-
-      const output = parsed.data.toString();
-
-      switch (config.file) {
-        case 'main':
-          transformMainConfig(output);
-          break;
-        case 'email':
-          transformEmailConfig(output);
-          break;
-        case 'radarr':
-          transformRadarrConfig(output);
-          break;
-        case 'sonarr':
-          transformSonarrConfig(output);
-      }
-
-      isModified = true;
-    }
-  }
-
-  return isModified;
-};
 
 const transformMainConfig = (data: any): void => {
   const output = data as MainConfig;
@@ -166,7 +119,7 @@ const transformSonarrConfig = (data: any): void => {
   const output = data as Array<ArrConfig>;
   const sonarrs: any = [];
 
-  for (const instance of output) {
+  Object.values(output).forEach((instance) => {
     sonarrs.push({
       uuid: instance.uuid,
       title: instance.title,
@@ -189,7 +142,7 @@ const transformSonarrConfig = (data: any): void => {
       },
       enabled: instance.enabled,
     });
-  }
+  });
 
   config.set('sonarr', sonarrs);
 };
@@ -198,7 +151,7 @@ const transformRadarrConfig = (data: any): void => {
   const output = data as Array<ArrConfig>;
   const radarrs: any = [];
 
-  for (const instance of output) {
+  Object.values(output).forEach((instance) => {
     radarrs.push({
       uuid: instance.uuid,
       title: instance.title,
@@ -221,7 +174,56 @@ const transformRadarrConfig = (data: any): void => {
       },
       enabled: instance.enabled,
     });
-  }
+  });
 
   config.set('radarr', radarrs);
+};
+
+const findParseAndMergeConfigs = async (): Promise<boolean> => {
+  let isModified = false;
+
+  Object.values(configFiles).forEach(async (cfg) => {
+    const file = path.join(pathsConfig.dataDir, `${config.file}.json`);
+    const exists = await fileExists(file);
+    if (exists) {
+      const content = await fs.readFile(file);
+      const parsed = await config.schema.safeParseAsync(content);
+      if (!parsed.success) {
+        logger.error(`failed to parse config '${  config.file  }.json`);
+        return;
+      }
+
+      const output = parsed.data.toString();
+
+      switch (cfg.file) {
+        case 'main':
+          transformMainConfig(output);
+          break;
+        case 'email':
+          transformEmailConfig(output);
+          break;
+        case 'radarr':
+          transformRadarrConfig(output);
+          break;
+        case 'sonarr':
+          transformSonarrConfig(output);
+          break;
+        default:
+          return;
+      }
+
+      isModified = true;
+    }
+  });
+
+  return isModified;
+};
+
+export default async (): Promise<boolean> => {
+  try {
+    return await findParseAndMergeConfigs();
+  } catch (error) {
+    logger.error(error);
+  }
+  return false;
 };

@@ -1,16 +1,14 @@
-import { LoadConfig } from '@/config/index';
-import { migrateConfigs } from '@/config/migration';
+import { LoadConfig, WriteConfig } from '@/config/index';
+import Migrate from '@/config/migration';
 
 export default async (): Promise<boolean> => {
-  let exists = await LoadConfig();
-
-  if (!exists) {
-    // check for old config files
-    await migrateConfigs();
-
-    // reload config
-    exists = await LoadConfig();
+  let exists = false;
+  if (await Migrate()) {
+    await WriteConfig();
+    exists = true;
+  } else {
+    await LoadConfig();
+    exists = true;
   }
-
   return exists;
 };
