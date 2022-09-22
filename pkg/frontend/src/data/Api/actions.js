@@ -15,7 +15,7 @@ export async function getPopular() {
       let movie = {
         isMinified: true,
         id: result.id,
-        title: result.title,
+        title: result.name,
         release_date: result.release_date,
         on_server: result.on_server ? true : false,
         poster_path: result.poster_path,
