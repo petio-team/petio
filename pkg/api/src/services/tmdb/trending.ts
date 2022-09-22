@@ -1,6 +1,6 @@
 import bluebird from 'bluebird';
-import cacheManager from 'cache-manager';
 
+import cache from "../cache/cache";
 import { getMovieDetails, getShowDetails } from './show';
 import { TMDBAPI } from '@/infra/tmdb/tmdb';
 import {
@@ -11,13 +11,6 @@ import {
   TrendingTv,
 } from '@/infra/tmdb/trending/trending';
 import logger from '@/loaders/logger';
-
-
-const memoryCache = cacheManager.caching({
-  store: 'memory',
-  max: 3,
-  ttl: 86400 /* seconds */,
-});
 
 const Companies = [
   {
@@ -154,7 +147,7 @@ export default trending;
 async function getPerson() {
   let data = {};
   try {
-    data = await memoryCache.wrap('trending_person', async () => {
+    data = await cache.wrap('trending_person', async () => {
       const people = await personData();
       return people.map((person) => ({
           id: person.id,
@@ -174,7 +167,7 @@ async function getPerson() {
 async function getMovies() {
   let data = {};
   try {
-    data = await memoryCache.wrap('trending_movies', async () => {
+    data = await cache.wrap('trending_movies', async () => {
       const movies = await moviesData();
       return bluebird.map(movies, async (movie) => getMovieDetails(movie.id));
     });
@@ -190,7 +183,7 @@ async function getMovies() {
 async function getShows() {
   let data = {};
   try {
-    data = await memoryCache.wrap('trending_shows', async () => {
+    data = await cache.wrap('trending_shows', async () => {
       const shows = await showsData();
       return bluebird.map(shows, (show) => getShowDetails(show.id));
     });

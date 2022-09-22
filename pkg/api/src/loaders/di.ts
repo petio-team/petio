@@ -3,6 +3,8 @@ import { container } from 'tsyringe';
 import { Logger } from 'winston';
 
 import logger from '@/loaders/logger';
+import CacheDB from "@/models/cache/db";
+import ICacheRepository from "@/models/cache/repository";
 import MediaServerDB from '@/models/mediaserver/db';
 import { IMediaServerRepository } from '@/models/mediaserver/repo';
 import { NotificationDB } from '@/models/notification/db';
@@ -20,4 +22,5 @@ export default () => {
   container.register<INotificationRepository>('Notification', { useClass: NotificationDB });
   container.register<IUserRepository>('User', { useClass: UserDB });
   container.register<ISettingsRepository>('Settings', { useClass: SettingsDB });
+  container.register<ICacheRepository>('Cache', { useClass: CacheDB });
 };

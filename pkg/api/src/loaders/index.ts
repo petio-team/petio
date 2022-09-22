@@ -8,6 +8,7 @@ import '@/loaders/events';
 import jobs from '@/loaders/jobs';
 import appRouter from '@/loaders/koa';
 import mongoose from '@/loaders/mongoose';
+import cache from "@/services/cache";
 import { setupWorkerProcesses, setupWorkers } from '@/services/cluster/setup';
 import startupMessage from '@/utils/startupMessage';
 
@@ -24,6 +25,8 @@ export default async () => {
     if (exists) {
       // load database
       await mongoose();
+      // check for first time cache
+      await cache();
       // setup workers and run forks
       await setupWorkerProcesses();
     } else {
