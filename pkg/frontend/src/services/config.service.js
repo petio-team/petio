@@ -145,6 +145,10 @@ export function testTelegram() {
   return get(`/hooks/telegram/test`);
 }
 
+export function getHealth() {
+  return get('/health');
+}
+
 function updateStore(data = {}) {
   if (Object.keys(data).length === 0) return false;
   return store.dispatch(data);

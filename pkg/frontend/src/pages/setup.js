@@ -7,7 +7,7 @@ import SetupAuth from '../components/setup/setupAuth';
 import SetupDb from '../components/setup/setupDb';
 import SetupServer from '../components/setup/setupServer';
 import SetupUser from '../components/setup/setupUser';
-import { saveConfig } from '../services/config.service';
+import { getHealth, saveConfig } from '../services/config.service';
 import typo from '../styles/components/typography.module.scss';
 import styles from '../styles/views/setup.module.scss';
 
@@ -41,12 +41,29 @@ function Setup({ config, redux_user, newNotification }) {
       message: 'Saving your config',
     });
     try {
-      saveConfig(config);
+      await saveConfig(config);
+      newNotification({ type: 'success', message: 'Config saved', id: nId });
+      updateStep(4);
+      const sId = newNotification({
+        type: 'loading',
+        message: 'Installing Petio...',
+      });
       setTimeout(() => {
-        window.location.reload();
-      }, 4000); // for now just wait until api has time to build
+        healthCheck();
+      }, 10000); // for now just wait until api has time to build
     } catch (e) {
       newNotification({ type: 'error', message: e, id: nId });
+    }
+  }
+
+  async function healthCheck() {
+    try {
+      await getHealth();
+      window.location.reload();
+    } catch {
+      setTimeout(() => {
+        healthCheck();
+      }, 5000);
     }
   }
 
@@ -99,6 +116,9 @@ function Setup({ config, redux_user, newNotification }) {
           setSetupDb={setSetupDb}
         />
       );
+      break;
+    case 4:
+      content = <p className={typo.body}>loading, please wait...</p>;
       break;
     default:
       break;
