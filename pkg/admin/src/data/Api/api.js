@@ -1,27 +1,27 @@
-import { get, post, upload, del } from "../http";
+import { del, get, post, upload } from '../http';
 
 export async function popular() {
-  return get("/trending");
+  return get('/trending');
 }
 
 export async function top(type) {
-  return get(type === "movie" ? "/top/movies" : "/top/shows");
+  return get(type === 'movie' ? '/top/movies' : '/top/shows');
 }
 
 export async function history(user_id, type) {
-  return post("/history", { id: user_id, type });
+  return post('/history', { id: user_id, type });
 }
 
 export async function getBandwidth() {
-  return get("/history/bandwidth");
+  return get('/history/bandwidth');
 }
 
 export async function getServerInfo() {
-  return get("/history/server");
+  return get('/history/server');
 }
 
 export async function getCurrentSessions() {
-  return get("/sessions");
+  return get('/sessions');
 }
 
 export async function get_plex_media(id, type) {
@@ -30,12 +30,12 @@ export async function get_plex_media(id, type) {
 
 export async function movie(id = false, minified) {
   if (!id) return Promise.resolve(false);
-  return get(`/movie/lookup/${id}${minified ? "/minified" : ""}`);
+  return get(`/movie/lookup/${id}${minified ? '/minified' : ''}`);
 }
 
 export async function series(id = false, minified) {
   if (!id) return Promise.resolve(false);
-  return get(`/show/lookup/${id}${minified ? "/minified" : ""}`);
+  return get(`/show/lookup/${id}${minified ? '/minified' : ''}`);
 }
 
 export async function person(id = false) {
@@ -53,7 +53,7 @@ export async function actor(id = false) {
 }
 
 export async function checkConfig() {
-  return get("/config");
+  return get('/config');
 }
 
 export async function saveConfig(config) {
@@ -73,22 +73,24 @@ export async function sonarrConfig({
 }) {
   const params = new URLSearchParams();
   if (withPaths) {
-    params.set("withPaths", "true");
+    params.set('withPaths', 'true');
   }
   if (withProfiles) {
-    params.set("withProfiles", "true");
+    params.set('withProfiles', 'true');
   }
   if (withLanguages) {
-    params.set("withLanguages", "true");
+    params.set('withLanguages', 'true');
   }
   if (withAvailabilities) {
-    params.set("withAvailabilities", "true");
+    params.set('withAvailabilities', 'true');
   }
   if (withTags) {
-    params.set("withTags", "true");
+    params.set('withTags', 'true');
   }
   const strParams = params.toString();
-  return get(`/services/sonarr/config${strParams !== "" ? `?${strParams}` : ``}`);
+  return get(
+    `/services/sonarr/config${strParams !== '' ? `?${strParams}` : ``}`,
+  );
 }
 
 export async function saveSonarrConfig(config) {
@@ -131,22 +133,24 @@ export async function radarrConfig({
 }) {
   const params = new URLSearchParams();
   if (withPaths) {
-    params.set("withPaths", "true");
+    params.set('withPaths', 'true');
   }
   if (withProfiles) {
-    params.set("withProfiles", "true");
+    params.set('withProfiles', 'true');
   }
   if (withLanguages) {
-    params.set("withLanguages", "true");
+    params.set('withLanguages', 'true');
   }
   if (withAvailabilities) {
-    params.set("withAvailabilities", "true");
+    params.set('withAvailabilities', 'true');
   }
   if (withTags) {
-    params.set("withTags", "true");
+    params.set('withTags', 'true');
   }
   const strParams = params.toString();
-  return get(`/services/radarr/config${strParams !== "" ? `?${strParams}` : ``}`);
+  return get(
+    `/services/radarr/config${strParams !== '' ? `?${strParams}` : ``}`,
+  );
 }
 
 export async function getRadarrOptions(id) {
@@ -291,4 +295,8 @@ export function testPlex() {
 
 export function updatePlexToken() {
   return get(`/plex/update_token`);
+}
+
+export async function health() {
+  return get('/health');
 }

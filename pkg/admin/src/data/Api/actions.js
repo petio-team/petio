@@ -1,6 +1,6 @@
-import { store } from "../store";
-import * as types from "../actionTypes";
-import * as api from "./api";
+import * as types from '../actionTypes';
+import { store } from '../store';
+import * as api from './api';
 
 function finalise(data = false) {
   if (!data) return false;
@@ -56,7 +56,7 @@ export async function series(id, minified = false) {
   let series = await api.series(id, minified);
 
   if (!series.id) {
-    throw "Unable to get series info";
+    throw 'Unable to get series info';
   }
 
   series.isMinified = minified;
@@ -172,7 +172,7 @@ export let top = (type) => {
       })
       .catch((err) => {
         console.log(err);
-        reject("Error getting plex movies");
+        reject('Error getting plex movies');
       });
   });
 };
@@ -186,7 +186,7 @@ export async function history(user_id, type) {
       })
       .catch((err) => {
         console.log(err);
-        reject("Error getting plex movies");
+        reject('Error getting plex movies');
       });
   });
 }
@@ -198,7 +198,7 @@ export let get_plex_media = (id, type) => {
       .then((res) => {
         resolve(res);
 
-        if (type === "movie") {
+        if (type === 'movie') {
           finalise({
             type: types.MOVIE_LOOKUP,
             movie: movie,
@@ -449,11 +449,11 @@ export async function getUser(id) {
     finalise({
       type: types.GET_USER,
       user: {
-        email: "User Not Found",
+        email: 'User Not Found',
         recommendationsPlaylistId: false,
         thumb: false,
-        title: "User Not Found",
-        username: "User Not Found",
+        title: 'User Not Found',
+        username: 'User Not Found',
         __v: false,
         id: false,
       },
@@ -489,7 +489,7 @@ export async function testMongo(mongo) {
     return result.status;
   } catch (err) {
     console.log(err);
-    return "failed";
+    return 'failed';
   }
 }
 
@@ -652,10 +652,10 @@ export async function uploadThumb(post, id) {
     let data = await api.uploadThumb(post, id);
     return data;
   } catch (err) {
-    if (err.message === "API returned status code 413") {
-      throw "File Exceeds Upload Limit!";
+    if (err.message === 'API returned status code 413') {
+      throw 'File Exceeds Upload Limit!';
     } else {
-      throw "Failed to Upload Thumb";
+      throw 'Failed to Upload Thumb';
     }
   }
 }
@@ -666,6 +666,10 @@ export async function testPlex() {
     return data;
   } catch (err) {
     console.log(err);
-    throw "Unable to test, please try again later";
+    throw 'Unable to test, please try again later';
   }
+}
+
+export async function checkHealth() {
+  return api.health();
 }

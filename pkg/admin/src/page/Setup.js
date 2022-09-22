@@ -211,6 +211,16 @@ class Setup extends React.Component {
     }
   }
 
+  async healthCheck() {
+    try {
+      await Api.checkHealth();
+      console.log('server online reloading');
+      location.reload();
+    } catch {
+      console.log('server polled not online');
+    }
+  }
+
   async waitText(it = 1) {
     if (this.state.exiting) return;
     let text,
@@ -253,23 +263,9 @@ class Setup extends React.Component {
           'Building your Petio library... Grab a cup of tea this could take a few minutes...';
         to = 1000;
         break;
-      case 10:
-        text =
-          "If you're library is extremely big or your server connection is remote this might take a little while...";
-        to = 120000;
-        break;
-      case 11:
-        text =
-          "We're not done, but you can start using Petio now while the rest of your library scans. Just a second we'll let you in....";
-        to = 120000;
-        break;
-      case 12:
-        text =
-          "We're not done, but you can start using Petio now while the rest of your library scans. Just a second we'll let you in....";
-        to = 3000;
-        break;
-      case 13:
-        location.reload();
+      default:
+        this.healthCheck();
+        to = 5000;
         break;
     }
     it++;
