@@ -1,5 +1,4 @@
 import { getModelForClass } from "@typegoose/typegoose";
-import { RepositoryError } from "../errors";
 import { defaultSettingsId, MakeSettings, Settings } from "./dto";
 import ISettingsRepository from "./repository";
 import SettingsSchema from "./schema";
@@ -27,7 +26,7 @@ export default class SettingsDB implements ISettingsRepository {
       }
     ).exec();
     if (!result) {
-      throw new RepositoryError(`failed to upsert settings`);
+      return settings;
     }
 
     return result.toObject();

@@ -1,18 +1,23 @@
 import cluster from 'cluster';
 
 import Logger from "./logger";
+import api from "@/api";
 import agendaFactory from '@/loaders/agenda';
 import config from '@/loaders/config';
 import di from '@/loaders/di';
 import '@/loaders/events';
 import jobs from '@/loaders/jobs';
-import appRouter from '@/loaders/koa';
 import mongoose from '@/loaders/mongoose';
 import cache from "@/services/cache";
 import { setupWorkerProcesses, setupWorkers } from '@/services/cluster/setup';
 import startupMessage from '@/utils/startupMessage';
 
-export default async () => {
+const runAPI = async () => {
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  api(init);
+};
+
+const init = async () => {
   // inject everything into di
   di();
   // if we are the master process,
@@ -31,7 +36,7 @@ export default async () => {
       await setupWorkerProcesses();
     } else {
       // load http server
-      appRouter();
+      await runAPI();
     }
     if (!exists) {
       Logger.warn(
@@ -43,6 +48,7 @@ export default async () => {
     setupWorkers();
   }
 };
+export default init;
 
 export const loadSystems = async () => {
   // load database
@@ -52,5 +58,5 @@ export const loadSystems = async () => {
   // load jobs
   jobs({ agenda });
   // load http server
-  appRouter();
+  await runAPI();
 };
