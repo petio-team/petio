@@ -12,7 +12,7 @@ import api from '@/api/routes/api';
 import web from '@/api/routes/web';
 import { config } from '@/config/index';
 import Logger from "@/loaders/logger";
-import { listen } from '@/utils/http';
+import listen from '@/utils/http';
 import { removeSlashes } from '@/utils/urls';
 
 const routes = (subpath: string): Koa => {
@@ -27,7 +27,7 @@ const routes = (subpath: string): Koa => {
   return app;
 };
 
-export default () => {
+export default (reloadFn: () => Promise<void>) => {
   // create new koa instance
   const app = new Koa();
 
@@ -70,5 +70,5 @@ export default () => {
   app.use(mount(subpath, routes(subpath)));
 
   // run server
-  listen({ httpApp: app });
+  listen({ httpApp: app, reloadFn });
 };

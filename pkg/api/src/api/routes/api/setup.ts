@@ -150,8 +150,10 @@ const finishSetup = async (ctx: Context) => {
     });
 
     await WriteConfig(false);
-    logger.info('restarting to apply new configurations');
-    await ctx.reload();
+    setTimeout(async () => {
+      logger.info('restarting to apply new configurations');
+      return ctx.reload()
+    }, 1000);
 
     ctx.status = StatusCodes.OK;
     ctx.body = {};
@@ -159,8 +161,8 @@ const finishSetup = async (ctx: Context) => {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = 'error creating config';
 
-    logger.log('error', 'Config creation error');
-    logger.log({ level: 'error', message: err });
+    logger.error('Config creation error');
+    logger.error(err);
   }
 };
 
