@@ -1,0 +1,27 @@
+@import '../global/variables.module.scss';
+
+.critics {
+  display: flex;
+  align-items: center;
+  margin-top: $spacing;
+
+  @media (min-width: $lg) {
+    margin-top: 0;
+    margin-left: #{$spacing * 2};
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    margin-right: #{$spacing * 2};
+
+    p {
+      margin-left: $spacing;
+    }
+
+    svg {
+      height: 18px;
+      width: auto;
+    }
+  }
+}

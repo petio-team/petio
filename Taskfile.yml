@@ -18,11 +18,6 @@ tasks:
     cmds:
       - yarn workspace frontned run watch
 
-  dev:adm:
-    dir: pkg/admin
-    cmds:
-      - yarn workspace admin run watch
-
   dev:compose:
     cmds:
       - docker-compose up -d
@@ -49,7 +44,6 @@ tasks:
     deps: ['build:pre']
     cmds:
       - task: build:fe
-      - task: build:adm
       - task: build:api:prod
 
   build:pre:
@@ -60,11 +54,6 @@ tasks:
     dir: pkg/frontend
     cmds:
       - yarn workspace frontend run build
-
-  build:adm:
-    dir: pkg/admin
-    cmds:
-      - yarn workspace admin run build
 
   build:api:
     dir: pkg/api

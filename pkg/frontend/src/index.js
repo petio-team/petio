@@ -1,19 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
+import { HashRouter } from 'react-router-dom';
 
-import App from './App';
-import { initAuth } from './data/auth';
-import { initStore, store } from './data/store';
-import * as serviceWorker from './serviceWorker';
-import './styles/main.scss';
+import App from './pages/_app';
+import store from './redux/store';
+import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 
 const startApp = () => {
-  initStore();
-  initAuth();
   ReactDOM.render(
     <Provider store={store}>
-      <App />
+      <HashRouter>
+        <App />
+      </HashRouter>
     </Provider>,
     document.getElementById('root'),
   );
@@ -24,4 +23,4 @@ if (!window.cordova) {
 } else {
   document.addEventListener('deviceready', startApp, false);
 }
-serviceWorker.unregister();
+serviceWorkerRegistration.unregister();

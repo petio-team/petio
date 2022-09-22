@@ -1,0 +1,289 @@
+@import '../global/variables.module.scss';
+
+.inner {
+  display: flex;
+  flex-direction: column;
+
+  @media (min-width: $md) {
+    flex-wrap: nowrap;
+    flex-direction: row;
+  }
+}
+
+.sidebar {
+  background: $grey;
+  width: 100%;
+  margin-right: 40px;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 20px;
+
+  @media (min-width: $md) {
+    margin-bottom: 20px;
+    width: 300px;
+    min-width: 300px;
+  }
+
+  &__item {
+    display: block;
+    padding: 15px 20px;
+
+    &__active,
+    &:hover {
+      background: $orange;
+      color: $grey;
+    }
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-gap: 20px;
+  width: 100%;
+
+  @media (min-width: $lg) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  &__item {
+    background: $grey;
+    overflow: hidden;
+    border-radius: 5px;
+
+    &__title {
+      background: rgba($white, 0.1);
+      padding: 10px 20px;
+      border-bottom: solid 1px rgba($white, 0.2);
+    }
+
+    &__content {
+      padding: 20px;
+    }
+  }
+}
+
+.arr {
+  &__wrap {
+    width: 100%;
+  }
+
+  &__add {
+    background: $grey;
+    padding: 20px;
+    border-radius: 5px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+
+    &:hover {
+      outline: solid 1px $white;
+    }
+  }
+
+  &__item {
+    @extend .arr__add;
+
+    &__active {
+      background: darken($green, 20);
+
+      &:hover {
+        outline: solid 2px $green;
+      }
+    }
+
+    &__disabled {
+      background: darken($red, 20);
+
+      &:hover {
+        outline: solid 2px $red;
+      }
+    }
+
+    &__icon {
+      height: 30px;
+      margin-right: 15px;
+
+      svg {
+        height: 100%;
+      }
+    }
+
+    &__content {
+      display: flex;
+      width: 100%;
+      align-items: center;
+    }
+  }
+
+  &__modal {
+    position: relative;
+    z-index: 2;
+    width: 500px;
+    min-height: 500px;
+    max-height: 80%;
+    background: $grey;
+    border-radius: 5px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    /* width */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+      background: lighten($grey, 5);
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+      background: lighten($grey, 20);
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+      background: lighten($grey, 30);
+    }
+
+    &__wrap {
+      z-index: 100;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba($black, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    &__close {
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+
+    &__title {
+      padding: 10px 20px;
+      border-bottom: solid 1px rgba($white, 0.2);
+    }
+
+    &__content {
+      padding: 20px;
+      overflow-y: auto;
+      max-height: 100%;
+    }
+  }
+}
+
+.filter {
+  &__wrap {
+    width: 100%;
+
+    // p {
+    //   width: 500px;
+    //   max-width: 100%;
+    // }
+  }
+
+  &__grid {
+    margin-top: 10px;
+
+    button {
+      width: 200px;
+      max-width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    &__section {
+      margin-bottom: 20px;
+    }
+
+    &__add {
+      background: $grey;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+
+    &__item {
+      background: $grey;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+      position: relative;
+
+      &__collapse {
+        cursor: pointer;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        color: $orange;
+      }
+
+      &__section {
+        background: rgba($white, 0.1);
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 10px;
+
+        &__action {
+          background: rgba($white, 0.1);
+          border: solid 1.5px $orange;
+          padding: 10px;
+          border-radius: 5px;
+          margin-top: 10px;
+        }
+
+        &__add {
+          margin-top: 10px;
+          cursor: pointer;
+        }
+
+        &__overview {
+          b {
+            font-weight: 500;
+            color: $orange;
+          }
+        }
+      }
+
+      &__remove {
+        margin-top: 10px;
+      }
+    }
+  }
+
+  &__row {
+    background: rgba($white, 0.1);
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+
+    &__remove {
+      display: inline-block;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    &__content {
+      display: flex;
+      margin: 0 -10px;
+      flex-wrap: wrap;
+
+      &__item {
+        padding: 0 10px;
+        width: calc(100% / 3);
+        margin-bottom: 10px;
+      }
+    }
+  }
+}

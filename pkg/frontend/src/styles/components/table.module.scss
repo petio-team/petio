@@ -1,0 +1,50 @@
+@import '../global/variables.module.scss';
+@import '../components/typography.module.scss';
+
+.base {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    text-align: left;
+    padding: 10px;
+
+    @extend .small;
+
+    &:nth-child(odd) {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    &:nth-child(even) {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    &.fixed {
+      width: 300px;
+    }
+  }
+
+  th {
+    border-bottom: solid 4px $black;
+  }
+
+  td {
+    border-bottom: solid 2px $black;
+  }
+
+  tr {
+    &:last-child {
+      td {
+        border-bottom: none;
+      }
+    }
+  }
+}
+
+.rounded {
+  @extend .base;
+
+  border-radius: 5px;
+  overflow: hidden;
+}

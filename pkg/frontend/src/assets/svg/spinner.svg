@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; display: block;" width="201px" height="201px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
 <circle cx="50" cy="50" r="32" stroke="#ffffff" stroke-width="0" fill="none"></circle>
-<circle cx="50" cy="50" r="32" stroke="#e5a00d" stroke-width="2" stroke-linecap="round" fill="none">
+<circle cx="50" cy="50" r="32" stroke="#ff8300" stroke-width="6" stroke-linecap="round" fill="none">
   <animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1.5873015873015872s" values="0 50 50;180 50 50;720 50 50" keyTimes="0;0.5;1"></animateTransform>
   <animate attributeName="stroke-dasharray" repeatCount="indefinite" dur="1.5873015873015872s" values="0 201.06192982974676;176.93449825017714 24.127431579569617;0 201.06192982974676" keyTimes="0;0.5;1"></animate>
 </circle>

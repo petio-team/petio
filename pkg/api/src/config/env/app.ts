@@ -3,7 +3,7 @@ type AppConfig = {
 };
 
 const appConfig: AppConfig = {
-  version: '0.6.0',
+  version: '1.0.0',
 };
 
 export default appConfig;

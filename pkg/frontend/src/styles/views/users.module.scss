@@ -1,0 +1,21 @@
+@import '../global/variables.module.scss';
+
+.table {
+  margin-bottom: #{$spacing * 4};
+
+  &2 {
+    margin-top: #{$spacing * 2};
+  }
+}
+
+.title {
+  margin-bottom: #{$spacing * 6};
+}
+
+.subtitle {
+  margin-bottom: #{$spacing * 2};
+
+  p:nth-child(2) {
+    margin-top: #{$spacing * 1};
+  }
+}

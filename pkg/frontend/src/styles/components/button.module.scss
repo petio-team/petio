@@ -1,0 +1,225 @@
+@import '../global/variables.module.scss';
+
+$btnWidth: 1.5px;
+
+.base {
+  &:focus,
+  &:hover {
+    outline: none;
+  }
+
+  appearance: none;
+  height: 35px;
+  line-height: 33px;
+  line-height: 1;
+  background: none;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  padding: 0 10px;
+  font-size: 13px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  letter-spacing: 1px;
+  border: solid $btnWidth transparent;
+
+  @media (min-width: $xxxl) {
+    height: 50px;
+    padding: 0 20px;
+    font-size: 20px;
+  }
+
+  &[disabled] {
+    opacity: 0.2;
+    cursor: no-drop;
+    pointer-events: none;
+  }
+}
+
+// Orange
+.primary {
+  @extend .base;
+  background: $orange;
+  border: solid $btnWidth $orange;
+  color: $black;
+
+  @media (min-width: $lg) {
+    &:hover:not(.disabled) {
+      background: darken($orange, 10);
+      border-color: darken($orange, 10);
+    }
+  }
+
+  &__blue {
+    @extend .primary;
+    background: $blue;
+    color: $white;
+    border: solid $btnWidth $blue;
+    opacity: 1 !important;
+
+    @media (min-width: $lg) {
+      &:hover:not(.disabled) {
+        background: darken($blue, 10);
+        border-color: darken($blue, 10);
+      }
+    }
+  }
+
+  &__red {
+    @extend .primary;
+    background: $red;
+    color: $white;
+    border: solid $btnWidth $red;
+    opacity: 1 !important;
+
+    @media (min-width: $lg) {
+      &:hover:not(.disabled) {
+        background: darken($red, 10);
+        border-color: darken($red, 10);
+      }
+    }
+  }
+}
+
+.secondary {
+  @extend .base;
+  background: none;
+  border: solid $btnWidth $orange;
+  color: $orange;
+
+  @media (min-width: $lg) {
+    &:hover {
+      background: $orange;
+      border-color: $orange;
+      color: $black;
+    }
+  }
+
+  &__red {
+    @extend .secondary;
+    border: solid $btnWidth $red;
+    color: $red;
+
+    @media (min-width: $lg) {
+      &:hover {
+        background: $red;
+        border-color: $red;
+        color: $white;
+      }
+    }
+  }
+}
+
+.disabled {
+  opacity: 0.2;
+  cursor: no-drop;
+  pointer-events: none;
+}
+
+.auto {
+  width: auto;
+}
+
+.small {
+  width: 200px;
+}
+
+.icon {
+  @extend .base;
+
+  border-radius: 50%;
+  width: 35px;
+  border: solid $btnWidth $white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+
+  svg {
+    width: 15px;
+    height: 15px;
+    // object-fit: contain;
+
+    path {
+      fill: $white;
+    }
+  }
+
+  @media (min-width: $lg) {
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  @media (min-width: $xxxl) {
+    width: 50px;
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+.counter {
+  @extend .base;
+
+  width: 35px;
+  min-width: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: -55px;
+  border-radius: 50%;
+  background: $blue;
+  color: $white;
+  border-color: $blue;
+  padding: 0;
+  // transition: margin 0.3s ease;
+  animation: forwards counter-in-mob 0.3s linear 1s;
+  position: relative;
+  z-index: -1;
+
+  @media (min-width: $lg) {
+    animation: forwards counter-in 0.3s linear 1s;
+    margin-right: 20px;
+  }
+}
+
+@keyframes counter-in-mob {
+  0% {
+    margin-left: -55px;
+  }
+
+  100% {
+    margin-left: 10px;
+  }
+}
+
+@keyframes counter-in {
+  0% {
+    margin-left: -55px;
+    margin-right: 20px;
+  }
+
+  100% {
+    margin-left: 10px;
+    margin-right: -10px;
+  }
+}
+
+.wrap {
+  display: flex;
+  flex-wrap: wrap;
+}
