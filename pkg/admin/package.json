@@ -27,7 +27,6 @@
   "scripts": {
     "start": "PORT=3002 react-scripts start",
     "build": "react-scripts build",
-    "watch": "cra-build-watch",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -46,7 +45,6 @@
     ]
   },
   "devDependencies": {
-    "cra-build-watch": "^3.4.0",
     "eslint": "^8.23.1",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
