@@ -1,6 +1,5 @@
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
-import { MongoServerError } from 'mongodb';
 
 interface IResponse {
   status: 'success' | 'error';
@@ -67,15 +66,4 @@ export const StatusBadRequest = (ctx: Context, error: string, extra?: any) => {
 export const StatusOk = (ctx: Context, data: any) => {
   ctx.status = StatusCodes.OK;
   ctx.body = MakeResponse(data);
-};
-
-export const handleCommonErrors = (ctx: Context, error) => {
-  if (error instanceof MongoServerError) {
-    // duplicate entry
-    if (error.code === 11000) {
-      StatusBadRequest(ctx, 'duplicate entry');
-      return;
-    }
-  }
-  StatusInternalServerError(ctx, error.message);
 };

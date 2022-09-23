@@ -1,11 +1,12 @@
-import { Db } from 'mongodb';
-import { connect } from 'mongoose';
+import { connect, Connection } from 'mongoose';
 import { container } from 'tsyringe';
 import { Logger } from 'winston';
 
 import { config } from '@/config/index';
 
-export default async (): Promise<Db | null> => {
+export type DB = Connection["db"];
+
+export default async (): Promise<DB | null> => {
   const connection = await connect(config.get('db.url'), {
     autoCreate: true,
     autoIndex: true,
