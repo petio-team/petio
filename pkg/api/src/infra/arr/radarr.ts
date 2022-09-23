@@ -44,6 +44,9 @@ export default class RadarrAPI {
   public async TestConnection(): Promise<boolean> {
     const response = await this.client.get('/api/v3/system/status');
     if (response) {
+      if (response.appName !== "Radarr") {
+        return false;
+      }
       const version = parseVersion(response.version);
       if (version) {
         this.version = version;

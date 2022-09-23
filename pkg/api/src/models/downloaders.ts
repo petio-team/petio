@@ -13,22 +13,10 @@ export interface IDownloader {
   url: string;
   token: string;
   version: string;
-  path: {
-    id: number;
-    location: string;
-  };
-  profile: {
-    id: number;
-    name: string;
-  };
-  language: {
-    id: number;
-    name: string;
-  };
-  availability: {
-    id: number;
-    name: string;
-  };
+  path: number;
+  profile: number;
+  language: number;
+  availability: number;
   enabled: boolean;
 }
 
@@ -63,42 +51,24 @@ export const DownloaderModelSchema = new Schema<IDownloader>(
       required: true,
     },
     path: {
-      id: {
-        type: Number,
-        required: true,
-      },
-      location: {
-        type: String,
-        required: true,
-      },
+      type: Number,
+      required: true,
+      default: 0,
     },
     profile: {
-      id: {
-        type: Number,
-        required: true,
-      },
-      name: {
-        type: String,
-      },
+      type: Number,
+      required: true,
+      default: 0,
     },
     language: {
-      id: {
-        type: Number,
-        required: true,
-      },
-      name: {
-        type: String,
-        required: true,
-      },
+      type: Number,
+      required: true,
+      default: 0,
     },
     availability: {
-      id: {
-        type: Number,
-        required: true,
-      },
-      name: {
-        type: String,
-      },
+      type: Number,
+      required: true,
+      default: 0,
     },
     enabled: {
       type: Boolean,
@@ -197,22 +167,10 @@ export const CreateOrUpdateDownloader = async (
         url: data.url,
         token: data.token,
         version: data.version,
-        path: {
-          id: data.path.id,
-          location: data.path.location,
-        },
-        profile: {
-          id: data.profile.id,
-          name: data.profile.name,
-        },
-        language: {
-          id: data.language.id,
-          name: data.language.name,
-        },
-        availability: {
-          id: data.availability.id,
-          name: data.availability.name,
-        },
+        path: data.path,
+        profile: data.profile,
+        language: data.language,
+        availability: data.availability,
         enabled: data.enabled,
       },
     },

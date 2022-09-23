@@ -8,7 +8,8 @@ import { DownloaderType, GetDownloaderById } from '@/models/downloaders';
 
 
 export type SeriesType = {
-  status: string;
+  id: number;
+  name: string;
 };
 
 export type RootPath = {
@@ -48,6 +49,9 @@ export default class SonarrAPI {
   public async TestConnection(): Promise<boolean> {
     const response = await this.client.get('/api/v3/system/status');
     if (response) {
+      if (response.appName !== "Sonarr") {
+        return false;
+      }
       const version = parseVersion(response.version);
       if (version) {
         this.version = version;
@@ -84,13 +88,16 @@ export default class SonarrAPI {
   public GetSeriesTypes(): SeriesType[] {
     return [
       {
-        status: 'Standard',
+        id: 0,
+        name: 'Standard',
       },
       {
-        status: 'Daily',
+        id: 1,
+        name: 'Daily',
       },
       {
-        status: 'Anime',
+        id: 2,
+        name: 'Anime',
       },
     ];
   }

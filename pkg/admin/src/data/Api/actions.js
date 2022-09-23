@@ -318,7 +318,7 @@ export async function radarrOptions(id) {
 }
 
 export async function saveSonarrConfig(config) {
-  return api.saveSonarrConfig([...config]);
+  return api.saveSonarrConfig(config);
 }
 
 export function testSonarr(id) {
@@ -350,7 +350,7 @@ export function testRadarr(id) {
 }
 
 export async function saveRadarrConfig(config) {
-  return api.saveRadarrConfig([...config]);
+  return api.saveRadarrConfig(config);
 }
 
 export function saveEmailConfig(config) {

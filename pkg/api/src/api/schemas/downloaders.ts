@@ -5,31 +5,17 @@ enum HttpProtocol {
   Https = 'https',
 }
 
-export const ArrInputSchema = z.array(
-  z.object({
-    enabled: z.boolean(),
-    name: z.string().min(1),
-    protocol: z.nativeEnum(HttpProtocol),
-    host: z.string().min(1),
-    port: z.number(),
-    subpath: z.string().min(1).default('/'),
-    path: z.object({
-      id: z.number(),
-      location: z.string(),
-    }),
-    profile: z.object({
-      id: z.number(),
-      name: z.string(),
-    }),
-    language: z.object({
-      id: z.number(),
-      name: z.string(),
-    }),
-    availability: z.object({
-      id: z.number(),
-      name: z.string(),
-    }),
-    token: z.string().min(1),
-  }),
-);
+export const ArrInputSchema = z.object({
+  enabled: z.boolean(),
+  name: z.string().min(1),
+  protocol: z.nativeEnum(HttpProtocol),
+  host: z.string().min(1),
+  port: z.number(),
+  subpath: z.string().min(1).default('/'),
+  path: z.number(),
+  profile: z.number(),
+  language: z.number(),
+  availability: z.number(),
+  token: z.string().min(1),
+});
 export type ArrInput = z.infer<typeof ArrInputSchema>;

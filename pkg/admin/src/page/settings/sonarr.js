@@ -15,22 +15,10 @@ const makeSonarr = (instance) => {
     port: 8989,
     subpath: '/',
     token: '',
-    profile: {
-      id: 0,
-      name: '',
-    },
-    path: {
-      id: 0,
-      location: '',
-    },
-    language: {
-      id: 0,
-      name: '',
-    },
-    availability: {
-      id: 0,
-      name: '',
-    },
+    profile: 0,
+    path: 0,
+    language: 0,
+    availability: 0,
     enabled: false,
     profiles: [],
     paths: [],
@@ -45,13 +33,13 @@ class Sonarr extends React.Component {
 
     this.state = {
       servers: [],
-      newInstance: makeSonarr(),
       loading: true,
       isError: false,
       isMsg: false,
       wizardOpen: false,
-      activeServer: 0,
       needsSave: true,
+      activeInstance: makeSonarr(),
+      activeInstanceId: 0,
     };
 
     this.inputChange = this.inputChange.bind(this);
@@ -67,13 +55,7 @@ class Sonarr extends React.Component {
   }
 
   async saveServer() {
-    let server = {};
-    if (this.state.needsSave) {
-      server = this.state.newInstance;
-    } else {
-      server = this.state.servers[this.state.activeServer];
-    }
-
+    let server = this.state.activeInstance;
     if (server.name === "") {
       this.props.msg({
         message: "name field must not be empty",
@@ -115,7 +97,7 @@ class Sonarr extends React.Component {
     }
 
     try {
-      const result = await Api.saveSonarrConfig([server]);
+      const result = await Api.saveSonarrConfig(server);
       if (result.status === 'error') {
         this.props.msg({
           message: "failed to save request",
@@ -124,18 +106,20 @@ class Sonarr extends React.Component {
         return;
       }
 
-      let index = this.state.activeServer;
+      let index = this.state.activeInstanceId;
       if (this.state.needsSave) {
-        index = this.state.servers.push(result[0]);
+        index = this.state.servers.push(result);
         index -= 1;
       } else {
-        this.state.servers[index] = result[0];
+        this.state.servers[index] = result;
       }
+
+
 
       this.setState({
         needsSave: false,
-        activeServer: index,
-        newInstance: makeSonarr(),
+        activeInstanceId: index,
+        activeInstance: { ...this.state.servers[index] },
       });
 
       this.props.msg({
@@ -151,7 +135,7 @@ class Sonarr extends React.Component {
   }
 
   async deleteServer() {
-    const id = this.state.activeServer;
+    const id = this.state.activeInstanceId;
     let servers = this.state.servers;
     let res = await Api.sonarrDeleteInstance(servers[id].id);
     if (res.status == 'error') {
@@ -178,50 +162,33 @@ class Sonarr extends React.Component {
     const name = target.name;
     let value = target.value;
 
-    let server = {};
-    if (this.state.needsSave) {
-      server = this.state.newInstance;
-    } else {
-      server = this.state.servers[this.state.activeServer];
-    }
+    let server = this.state.activeInstance;
 
     if (target.type === 'checkbox') {
       value = target.checked;
     }
 
     if (target.type === 'select-one') {
-      let title = target.options[target.selectedIndex].text;
       switch (name) {
         case "protocol": {
           server.protocol = value;
           break;
         }
         case "profile": {
-          server.profile = {
-            id: parseInt(value),
-            name: title,
-          };
+          server.profile = parseInt(value, 10);
           break;
         }
         case "path": {
-          server.path = {
-            id: parseInt(value),
-            location: title,
-          };
+          server.path = parseInt(value, 10);
           break;
         }
         case "language": {
-          server.language = {
-            id: parseInt(value),
-            name: title,
-          };
+          server.language = parseInt(value, 10);
           break;
         }
         case "availability": {
-          server.availability = {
-            id: parseInt(value),
-            name: title,
-          };
+          server.availability = parseInt(value, 10);
+          break;
         }
       }
     } else {
@@ -231,17 +198,9 @@ class Sonarr extends React.Component {
       };
     }
 
-    if (this.state.needsSave) {
-      this.setState({
-        newInstance: server,
-      });
-    } else {
-      const servers = this.state.servers;
-      servers[this.state.activeServer] = server;
-      this.setState({
-        servers,
-      });
-    }
+    this.setState({
+      activeInstance: server,
+    });
   }
 
   async getSonarr(live = false) {
@@ -277,18 +236,18 @@ class Sonarr extends React.Component {
 
   openWizard(id) {
     if (this.state.servers[id]) {
+      const activeInstance = { ...this.state.servers[id] };
       this.setState({
-        newServer: false,
+        activeInstance,
         editWizardOpen: true,
-        activeServer: id,
+        activeInstanceId: id,
         needsSave: false,
       });
     } else {
       this.setState({
-        newInstance: makeSonarr(),
-        newServer: true,
+        activeInstance: makeSonarr(),
         wizardOpen: true,
-        activeServer: id,
+        activeInstanceId: id,
         needsSave: true,
       });
     }
@@ -298,8 +257,7 @@ class Sonarr extends React.Component {
     this.setState({
       wizardOpen: false,
       editWizardOpen: false,
-      activeServer: 0,
-      newServer: false,
+      activeInstanceId: 0,
     });
   }
 
@@ -314,8 +272,70 @@ class Sonarr extends React.Component {
       [`${id}Open`]: false,
       wizardOpen: false,
       editWizardOpen: false,
-      activeServer: 0,
+      activeInstanceId: 0,
     });
+  }
+
+  renderServers(servers) {
+    return (
+      servers.map((server, i) => {
+        const id = server.id ? server.id : 'Error';
+        const enabled = server.enabled ? 'Enabled' : 'Disabled';
+
+        let profile = 'No set';
+        if (server.profiles) {
+          const pfl = server.profiles.filter((p) => p.id === server.profile)[0];
+          profile = pfl ? pfl.name : server.profiles[0].name;
+        }
+
+        let path = 'Not set';
+        if (server.paths) {
+          const pa = server.paths.filter((p) => p.id === server.path)[0];
+          path = pa ? pa.path : server.paths[0].path;
+        }
+
+        let language = 'Not set';
+        if (server.languages) {
+          const la = server.languages.filter((p) => p.id === server.language)[0];
+          language = la ? la.name : server.languages[0].name;
+        }
+
+        let availability = 'Not set';
+        if (server.availabilities) {
+          const av = server.availabilities.filter((a) => a.id === server.availability)[0];
+          availability = av ? av.name : server.availabilities[0].name;
+        }
+
+        return (
+          <div key={id} className="sr--instance">
+            <div className="sr--instance--inner">
+              <ServerIcon />
+              <p className="sr--title">{server.name}</p>
+              <p>{`${server.protocol}://${server.host}:${server.port}`}</p>
+              <p>Status: {enabled}</p>
+              <p>Profile: {profile}</p>
+              <p>Path: {path}</p>
+              <p>Language: {language}</p>
+              <p>Type: {availability}</p>
+              <p className="small">
+                ID: {id}
+              </p>
+              <div className="btn-wrap">
+                <button
+                  className="btn btn__square"
+                  onClick={() => {
+                    this.openModal('addServer');
+                    this.openWizard(i);
+                  }}
+                >
+                  Edit
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })
+    )
   }
 
   render() {
@@ -329,11 +349,29 @@ class Sonarr extends React.Component {
       );
     }
 
-    let server = {};
-    if (this.state.needsSave) {
-      server = this.state.newInstance;
-    } else {
-      server = this.state.servers[this.state.activeServer];
+    let server = this.state.activeInstance;
+    let profile = 0;
+    if (server.profiles && server.profiles.length) {
+      const pfl = server.profiles.filter((p) => p.id === server.profile)[0];
+      profile = pfl ? pfl.id : server.profiles[0].id;
+    }
+
+    let path = 0;
+    if (server.paths && server.paths.length) {
+      const pa = server.paths.filter((p) => p.id === server.path)[0];
+      path = pa ? pa.id : server.paths[0].id;
+    }
+
+    let language = 0;
+    if (server.languages && server.languages.length) {
+      const la = server.languages.filter((p) => p.id === server.language)[0];
+      language = la ? la.id : server.languages[0].id;
+    }
+
+    let availability = 0;
+    if (server.availabilities && server.availabilities.length) {
+      const av = server.availabilities.filter((a) => a.id === server.availability)[0];
+      availability = av ? av.id : server.availabilities[0].id;
     }
 
     return (
@@ -415,7 +453,7 @@ class Sonarr extends React.Component {
               >
                 <select
                   name="profile"
-                  value={server?.profile.id || 0}
+                  value={profile}
                   onChange={this.inputChange}
                 >
                   {server?.profiles ? (
@@ -447,7 +485,7 @@ class Sonarr extends React.Component {
               >
                 <select
                   name="path"
-                  value={server?.path.id || 0}
+                  value={path}
                   onChange={this.inputChange}
                 >
                   {server?.paths ? (
@@ -478,13 +516,44 @@ class Sonarr extends React.Component {
               >
                 <select
                   name="language"
-                  value={server?.language.id || 0}
+                  value={language}
                   onChange={this.inputChange}
                 >
                   {server?.languages ? (
                     <>
                       <option value="">Choose an option</option>
                       {server.languages.map((item) => {
+                        return (
+                          <option key={`pp__${item.id}`} value={item.id}>
+                            {item.name}
+                          </option>
+                        );
+                      })}
+                    </>
+                  ) : (
+                    <option value="">
+                      {'Loading...'}
+                    </option>
+                  )}
+                </select>
+              </div>
+            </>) : <></>}
+            {!this.state.needsSave ? (
+            <>
+              <label>Series Type</label>
+              <div
+                className={`styled-input--select ${server?.availabilities ? '' : 'disabled'
+                  }`}
+              >
+                <select
+                  name="availability"
+                  value={availability}
+                  onChange={this.inputChange}
+                >
+                  {server?.availabilities ? (
+                    <>
+                      <option value="">Choose an option</option>
+                      {server.availabilities.map((item) => {
                         return (
                           <option key={`pp__${item.id}`} value={item.id}>
                             {item.name}
@@ -523,50 +592,7 @@ class Sonarr extends React.Component {
         <section>
           <p className="main-title mb--2">Servers</p>
           <div className="sr--grid">
-            {this.state.servers.map((server, i) => {
-              return (
-                <div key={server.id} className="sr--instance">
-                  <div className="sr--instance--inner">
-                    <ServerIcon />
-                    <p className="sr--title">{server.name}</p>
-                    <p>{`${server.protocol}://${server.host}:${server.port}`}</p>
-                    <p>Status: {server.enabled ? 'Enabled' : 'Disabled'}</p>
-                    <p>
-                      Profile:{' '}
-                      {server.profile.name != ''
-                        ? server.profile.name
-                        : 'Not set'}
-                    </p>
-                    <p>
-                      Path:{' '}
-                      {server.path.location != ''
-                        ? server.path.location
-                        : 'Not set'}
-                    </p>
-                    <p>
-                      Language:{' '}
-                      {server.language.name != ''
-                        ? server.language.name
-                        : 'Not set'}
-                    </p>
-                    <p className="small">
-                      ID: {server.id ? server.id : 'Error'}
-                    </p>
-                    <div className="btn-wrap">
-                      <button
-                        className="btn btn__square"
-                        onClick={() => {
-                          this.openModal('addServer');
-                          this.openWizard(i);
-                        }}
-                      >
-                        Edit
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            { this.renderServers(this.state.servers) }
             <div className="sr--instance sr--add-new">
               <div
                 className="sr--instance--inner"

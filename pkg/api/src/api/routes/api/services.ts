@@ -155,140 +155,120 @@ const getSonarrConfig = async (ctx: Context) => {
     withTags,
   } = ctx.request.query;
 
-  try {
-    const instances = await GetAllDownloaders(DownloaderType.Sonarr);
+  const instances = await GetAllDownloaders(DownloaderType.Sonarr);
 
-    const results = await bluebird.map(instances, async (instance) => {
-      const url = new URL(instance.url);
-      const api = new SonarrAPI(url, instance.token, instance.version);
+  const results = await bluebird.map(instances, async (instance) => {
+    const url = new URL(instance.url);
+    const api = new SonarrAPI(url, instance.token, instance.version);
 
-      const protocol = url.protocol.substring(0, url.protocol.length - 1);
+    const protocol = url.protocol.substring(0, url.protocol.length - 1);
 
-      let port: number;
-      if (!url.port) {
-        port = url.protocol === 'http' ? 80 : 443;
-      } else {
-        port = parseInt(url.port, 10);
-      }
+    let port: number;
+    if (!url.port) {
+      port = url.protocol === 'http' ? 80 : 443;
+    } else {
+      port = parseInt(url.port, 10);
+    }
 
-      const [paths, profiles, languages, availabilities, tags] =
-        await Promise.all([
-          withPaths ? api.GetRootPaths() : undefined,
-          withProfiles ? api.GetQualityProfiles() : undefined,
-          withLanguages ? api.GetLanguages() : undefined,
-          withAvailabilities ? api.GetSeriesTypes() : undefined,
-          withTags ? api.GetTags() : undefined,
-        ]);
+    const [paths, profiles, languages, availabilities, tags] =
+      await Promise.all([
+        withPaths ? api.GetRootPaths() : undefined,
+        withProfiles ? api.GetQualityProfiles() : undefined,
+        withLanguages ? api.GetLanguages() : undefined,
+        withAvailabilities ? api.GetSeriesTypes() : undefined,
+        withTags ? api.GetTags() : undefined,
+      ]);
 
-      return {
-        id: instance.id,
-        name: instance.name,
-        protocol,
-        host: url.hostname,
-        port,
-        subpath: url.pathname,
-        token: instance.token,
-        profile: {
-          id: instance.profile.id,
-          name: instance.profile.name,
-        },
-        path: {
-          id: instance.path.id,
-          location: instance.path.location,
-        },
-        language: {
-          id: instance.language.id,
-          name: instance.language.name,
-        },
-        availability: {
-          id: instance.availability.id,
-          name: instance.availability.name,
-        },
-        enabled: instance.enabled,
-        paths,
-        profiles,
-        languages,
-        availabilities,
-        tags,
-      };
-    });
+    return {
+      id: instance.id,
+      name: instance.name,
+      protocol,
+      host: url.hostname,
+      port,
+      subpath: url.pathname,
+      token: instance.token,
+      profile: instance.profile,
+      path: instance.path,
+      language: instance.language,
+      availability: instance.availability,
+      enabled: instance.enabled,
+      paths,
+      profiles,
+      languages,
+      availabilities,
+      tags,
+    };
+  });
 
-    ctx.status = StatusCodes.OK;
-    ctx.body = results;
-  } catch (error) {
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = error.message;
-  }
+  ctx.status = StatusCodes.OK;
+  ctx.body = results;
 };
 
 const updateSonarrConfig = async (ctx: Context) => {
-  const data = ctx.request.body as ArrInput;
+  const instance = ctx.request.body as ArrInput;
 
   try {
-    const results = await bluebird.map(data, async (instance) => {
-      const inst = instance;
-      if (inst.subpath.startsWith('/')) {
-        inst.subpath = instance.subpath.substring(1);
-      }
+    if (instance.subpath.startsWith('/')) {
+      instance.subpath = instance.subpath.substring(1);
+    }
 
-      const url = new URL(
-        `${inst.protocol
-          }://${
-            inst.host
-          }:${
-            inst.port
-          }/${
-            inst.subpath}`,
-      );
+    const url = new URL(
+      `${instance.protocol
+        }://${
+          instance.host
+        }:${
+          instance.port
+        }/${
+          instance.subpath}`,
+    );
 
-      const api = new SonarrAPI(url, inst.token);
-      const passed = await api.TestConnection();
-      if (!passed) {
-        throw new ArrError('failed to test connection to instance');
-      }
+    const api = new SonarrAPI(url, instance.token);
+    const passed = await api.TestConnection();
+    if (!passed) {
+      throw new ArrError('failed to test connection to instance');
+    }
 
-      const newInstance = await CreateOrUpdateDownloader({
-        name: inst.name,
-        type: DownloaderType.Sonarr,
-        url: url.toString(),
-        token: inst.token,
-        version: api.GetVersion().toString(),
-        path: inst.path,
-        profile: inst.profile,
-        language: inst.language,
-        availability: inst.availability,
-        enabled: inst.enabled,
-      });
-
-      const [paths, profiles, languages, availabilities] = await Promise.all([
-        api.GetRootPaths(),
-        api.GetQualityProfiles(),
-        api.GetLanguages(),
-        api.GetSeriesTypes(),
-      ]);
-
-      return {
-        id: newInstance.id,
-        name: inst.name,
-        protocol: inst.protocol,
-        host: inst.host,
-        port: inst.port,
-        subpath: inst.subpath === '' ? '/' : instance.subpath,
-        token: inst.token,
-        path: inst.path,
-        profile: inst.profile,
-        language: inst.language,
-        availability: inst.availability,
-        enabled: inst.enabled,
-        paths,
-        profiles,
-        languages,
-        availabilities,
-      };
+    const newInstance = await CreateOrUpdateDownloader({
+      name: instance.name,
+      type: DownloaderType.Sonarr,
+      url: url.toString(),
+      token: instance.token,
+      version: api.GetVersion().toString(),
+      path: instance.path,
+      profile: instance.profile,
+      language: instance.language,
+      availability: instance.availability,
+      enabled: instance.enabled,
     });
 
+    const [paths, profiles, languages, availabilities] = await Promise.all([
+      api.GetRootPaths(),
+      api.GetQualityProfiles(),
+      api.GetLanguages(),
+      api.GetSeriesTypes(),
+    ]);
+
+    const result = {
+      id: newInstance.id,
+      name: instance.name,
+      protocol: instance.protocol,
+      host: instance.host,
+      port: instance.port,
+      subpath: instance.subpath === '' ? '/' : instance.subpath,
+      token: instance.token,
+      path: instance.path,
+      profile: instance.profile,
+      language: instance.language,
+      availability: instance.availability,
+      enabled: instance.enabled,
+      paths,
+      profiles,
+      languages,
+      availabilities,
+    };
+
     ctx.status = StatusCodes.OK;
-    ctx.body = results;
+    ctx.body = result;
     return;
   } catch (error) {
     logger.debug(`ROUTE: Error saving sonarr config`);
@@ -500,108 +480,89 @@ const getRadarrConfig = async (ctx: Context) => {
     withTags,
   } = ctx.request.query;
 
-  try {
-    const instances = await GetAllDownloaders(DownloaderType.Radarr);
-    const results = await bluebird.map(instances, async (instance) => {
-      const url = new URL(instance.url);
-      const api = new RadarrAPI(url, instance.token, instance.version);
+  const instances = await GetAllDownloaders(DownloaderType.Radarr);
+  const results = await bluebird.map(instances, async (instance) => {
+    const url = new URL(instance.url);
+    const api = new RadarrAPI(url, instance.token, instance.version);
 
-      const protocol = url.protocol.substring(0, url.protocol.length - 1);
+    const protocol = url.protocol.substring(0, url.protocol.length - 1);
 
-      let port: number;
-      if (!url.port) {
-        port = url.protocol === 'http' ? 80 : 443;
-      } else {
-        port = parseInt(url.port, 10);
-      }
+    let port: number;
+    if (!url.port) {
+      port = url.protocol === 'http' ? 80 : 443;
+    } else {
+      port = parseInt(url.port, 10);
+    }
 
-      const [paths, profiles, languages, availabilities, tags] =
-        await Promise.all([
-          withPaths ? api.GetRootPaths() : undefined,
-          withProfiles ? api.GetQualityProfiles() : undefined,
-          withLanguages ? api.GetLanguages() : undefined,
-          withAvailabilities ? api.GetMinimumAvailability() : undefined,
-          withTags ? api.GetTags() : undefined,
-        ]);
+    const [paths, profiles, languages, availabilities, tags] =
+      await Promise.all([
+        withPaths ? api.GetRootPaths() : undefined,
+        withProfiles ? api.GetQualityProfiles() : undefined,
+        withLanguages ? api.GetLanguages() : undefined,
+        withAvailabilities ? api.GetMinimumAvailability() : undefined,
+        withTags ? api.GetTags() : undefined,
+      ]);
 
-      return {
-        id: instance.id,
-        name: instance.name,
-        protocol,
-        host: url.hostname,
-        port,
-        subpath: url.pathname === '' ? '/' : url.pathname,
-        token: instance.token,
-        profile: {
-          id: instance.profile.id,
-          name: instance.profile.name,
-        },
-        path: {
-          id: instance.path.id,
-          location: instance.path.location,
-        },
-        language: {
-          id: instance.language.id,
-          name: instance.language.name,
-        },
-        availability: {
-          id: instance.availability.id,
-          name: instance.availability.name,
-        },
-        enabled: instance.enabled,
-        paths,
-        profiles,
-        languages,
-        availabilities,
-        tags,
-      };
-    });
+    return {
+      id: instance.id,
+      name: instance.name,
+      protocol,
+      host: url.hostname,
+      port,
+      subpath: url.pathname === '' ? '/' : url.pathname,
+      token: instance.token,
+      profile: instance.profile,
+      path: instance.path,
+      language: instance.language,
+      availability: instance.availability,
+      enabled: instance.enabled,
+      paths,
+      profiles,
+      languages,
+      availabilities,
+      tags,
+    };
+  });
 
-    ctx.status = StatusCodes.OK;
-    ctx.body = results;
-  } catch (error) {
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = error.message;
-  }
+  ctx.status = StatusCodes.OK;
+  ctx.body = results;
 };
 
 const updateRadarrConfig = async (ctx: Context) => {
-  const data = ctx.request.body as ArrInput;
+  const instance = ctx.request.body as ArrInput;
 
   try {
-    const results = await bluebird.map(data, async (instance) => {
-      const inst = instance;
-      if (inst.subpath.startsWith('/')) {
-        inst.subpath = instance.subpath.substring(1);
+      if (instance.subpath.startsWith('/')) {
+        instance.subpath = instance.subpath.substring(1);
       }
 
       const url = new URL(
-        `${inst.protocol
+        `${instance.protocol
           }://${
-            inst.host
+            instance.host
           }:${
-            inst.port
+            instance.port
           }/${
-            inst.subpath}`,
+            instance.subpath}`,
       );
 
-      const api = new RadarrAPI(url, inst.token);
+      const api = new RadarrAPI(url, instance.token);
       const passed = await api.TestConnection();
       if (!passed) {
         throw new ArrError('failed to test connection to instance');
       }
 
       const newInstance = await CreateOrUpdateDownloader({
-        name: inst.name,
+        name: instance.name,
         type: DownloaderType.Radarr,
         url: url.toString(),
-        token: inst.token,
+        token: instance.token,
         version: api.GetVersion().toString(),
-        path: inst.path,
-        profile: inst.profile,
-        language: inst.language,
-        availability: inst.availability,
-        enabled: inst.enabled,
+        path: instance.path,
+        profile: instance.profile,
+        language: instance.language,
+        availability: instance.availability,
+        enabled: instance.enabled,
       });
 
       const [paths, profiles, languages, availabilities] = await Promise.all([
@@ -611,28 +572,27 @@ const updateRadarrConfig = async (ctx: Context) => {
         api.GetMinimumAvailability(),
       ]);
 
-      return {
+      const result = {
         id: newInstance.id,
-        name: inst.name,
-        protocol: inst.protocol,
-        host: inst.host,
-        port: inst.port,
-        subpath: inst.subpath === '' ? '/' : inst.subpath,
-        token: inst.token,
-        path: inst.path,
-        profile: inst.profile,
-        language: inst.language,
-        availability: inst.availability,
-        enabled: inst.enabled,
+        name: instance.name,
+        protocol: instance.protocol,
+        host: instance.host,
+        port: instance.port,
+        subpath: instance.subpath === '' ? '/' : instance.subpath,
+        token: instance.token,
+        path: instance.path,
+        profile: instance.profile,
+        language: instance.language,
+        availability: instance.availability,
+        enabled: instance.enabled,
         paths,
         profiles,
         languages,
         availabilities,
       };
-    });
 
     ctx.status = StatusCodes.OK;
-    ctx.body = results;
+    ctx.body = result;
     return;
   } catch (error) {
     logger.debug(`ROUTE: Error saving radarr config`);
