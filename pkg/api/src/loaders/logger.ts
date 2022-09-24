@@ -62,6 +62,11 @@ const Logger = winston.createLogger({
             },
           })},`),
       ),
+      log: (info, next) => {
+        if (info.level !== "http") {
+          next();
+        }
+      }
     }),
   ],
 });
