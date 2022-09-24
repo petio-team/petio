@@ -176,10 +176,8 @@ class Filter extends React.Component {
 
     if (target.dataset.type) {
       let current = this.state[target.dataset.type];
-      console.log(current, target.dataset.type);
       if (target.dataset.row === 'action') {
         let actionRow = target.dataset.actionRow;
-        console.log(target.dataset);
         if (!Array.isArray(current[target.dataset.item].action)) {
           current[target.dataset.item].action = [
             current[target.dataset.item].action,

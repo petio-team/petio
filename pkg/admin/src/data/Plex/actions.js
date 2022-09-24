@@ -163,7 +163,6 @@ async function getUser(token) {
       let connections = server.getElementsByTagName("Connection");
 
       for (let connection of connections) {
-        console.log(connection);
         let uri = connection.getAttribute("uri");
         let details = getUrlDetails(uri);
         setup.servers[
@@ -189,7 +188,6 @@ async function getUser(token) {
     platform: "docker",
     status: "pending",
   };
-  console.log(setup.servers);
   finalise({
     type: types.PLEX_DETAILS,
     servers: setup.servers,
@@ -210,7 +208,6 @@ function testPlexServers(servers, token) {
 async function testPlexServer(server, key) {
   try {
     let test = await testServer(server);
-    console.log(test);
     server.status = test.status;
     finalise({
       type: types.PLEX_SERVER,

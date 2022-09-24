@@ -130,7 +130,6 @@ export async function search(term) {
     });
 
     searchResults.shows.forEach((series) => {
-      // console.log(series);
       series.isMinified = true;
       finalise({
         type: types.SERIES_LOOKUP,
@@ -473,7 +472,6 @@ export async function allUsers() {
         console.log(`User ${i} didn't return any data, this is unusual`);
       }
     });
-    console.log(data);
     finalise({
       type: types.ALL_USERS,
       users: data,

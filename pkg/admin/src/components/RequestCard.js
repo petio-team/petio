@@ -11,7 +11,6 @@ class RequestCard extends React.Component {
     }
 
     if (!this.props.user.requests[request.id]) {
-      console.log(this.props);
       return null;
     }
 

@@ -162,7 +162,6 @@ class RequestsTable extends React.Component {
         render.push(
           server.status.map((child, row) => {
             if (!child) {
-              console.log(req);
               return null;
             }
 

@@ -92,7 +92,6 @@ class Dashboard extends React.Component {
   pollServer() {
     Api.bandwidth()
       .then((res) => {
-        // console.log(res);
         let data = {};
         let bWidth = [];
         res.forEach((el) => {
