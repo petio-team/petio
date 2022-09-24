@@ -32,7 +32,7 @@ const streamLog = async (ctx: Context) => {
   ctx.body = data;
 };
 
-const route = new Router({ prefix: 'logs/' });
+const route = new Router({ prefix: '/logs' });
 export default (app: Router) => {
   route.get('/stream', adminRequired, streamLog);
 

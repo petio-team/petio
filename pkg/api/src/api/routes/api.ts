@@ -40,7 +40,6 @@ export default (app: Koa, subpath: string) => {
 
   // make sure setup is complete before allowing access to non setup routes
   app.use(setupMiddleware);
-
   api.use(
     jwt({
       secret: conf.get('plex.token'),
