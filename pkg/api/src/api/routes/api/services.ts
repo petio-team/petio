@@ -25,7 +25,7 @@ const getSonarrOptionsById = async (ctx: Context) => {
     ctx.error({
       statusCode: StatusCodes.BAD_REQUEST,
       code: "INVALID_INSTANCE",
-      message: `No instance was found with the id: ${ctx.params.id}`
+      message: `no instance was found with the id: ${ctx.params.id}`
     });
     return;
   }
@@ -33,7 +33,7 @@ const getSonarrOptionsById = async (ctx: Context) => {
   const [paths, profiles, languages, tags] = await Promise.all([
     instance.GetRootPaths(),
     instance.GetQualityProfiles(),
-    instance.GetLanguageProfile(),
+    instance.GetLanguages(),
     instance.GetTags(),
   ]);
 
@@ -95,7 +95,7 @@ const getSonarrLanguagesById = async (ctx: Context) => {
       return;
     }
 
-    const languages = await instance.GetLanguageProfile();
+    const languages = await instance.GetLanguages();
 
     ctx.status = StatusCodes.OK;
     ctx.body = languages;
@@ -305,36 +305,34 @@ const deleteSonarrById = async (ctx: Context) => {
 };
 
 const getCalendarData = async (ctx: Context) => {
-  try {
-    const instances = await GetAllDownloaders();
-    if (!instances.length) {
-      ctx.status = StatusCodes.OK;
-      ctx.body = [];
-      return;
-    }
-
-    const now = new Date();
-    const calendarData = await bluebird.map(instances, async (instance) => {
-      const url = new URL(instance.url);
-      const api =
-        instance.type === DownloaderType.Sonarr
-          ? new SonarrAPI(url, instance.token, instance.version)
-          : new RadarrAPI(url, instance.token, instance.version);
-
-      return api.Calendar(
-        true,
-        new Date(now.getFullYear(), now.getMonth() - 1, 1),
-        new Date(now.getFullYear(), now.getMonth() + 2, 1),
-      );
+  const instances = await GetAllDownloaders();
+  if (!instances.length) {
+    ctx.success({
+      statusCode: StatusCodes.OK,
+      data: [],
     });
-
-    ctx.status = StatusCodes.OK;
-    ctx.body = calendarData;
-  } catch (error) {
-    logger.error(error);
-    ctx.status = StatusCodes.OK;
-    ctx.body = [];
+    return;
   }
+
+  const now = new Date();
+  const calendarData = await bluebird.map(instances, async (instance) => {
+    const url = new URL(instance.url);
+    const api =
+      instance.type === DownloaderType.Sonarr
+        ? new SonarrAPI(url, instance.token, instance.version)
+        : new RadarrAPI(url, instance.token, instance.version);
+
+    return api.Calendar(
+      true,
+      new Date(now.getFullYear(), now.getMonth() - 1, 1),
+      new Date(now.getFullYear(), now.getMonth() + 2, 1),
+    );
+  });
+
+  ctx.success({
+    statusCode: StatusCodes.OK,
+    data: calendarData.flat(),
+  });
 };
 
 const getRadarrOptionsById = async (ctx: Context) => {

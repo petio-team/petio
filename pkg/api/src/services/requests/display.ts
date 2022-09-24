@@ -10,9 +10,10 @@ import { movieLookup } from '@/services/tmdb/movie';
 import { showLookup } from '@/services/tmdb/show';
 
 export const getRequests = async (user = false, all = false) => {
-  const requests = await Request.find().exec();
   let data = {};
   try {
+    const requests = await Request.find().exec();
+
     const instances = await GetAllDownloaders();
     const sonarrs = instances.filter((i) => i.type === DownloaderType.Sonarr);
     const radarrs = instances.filter((i) => i.type === DownloaderType.Radarr);
@@ -39,7 +40,7 @@ export const getRequests = async (user = false, all = false) => {
 
                 const instance = instances.find((i) => i.id === serverUuid);
                 if (!instance) {
-                  continue;
+                  return;
                 }
 
                 const server = new Radarr(instance);
@@ -205,7 +206,7 @@ function reqState(req, children) {
                 message: 'Downloaded',
                 step: 4,
               };
-            } 
+            }
               const airDate = element.info.firstAired;
               if (!airDate)
                 return {
@@ -222,7 +223,7 @@ function reqState(req, children) {
                   message: `${calcDate(diff)}`,
                   step: 3,
                 };
-              } 
+              }
                 if (element.info.episodeFileCount > 0) {
                   return {
                     status: 'blue',
@@ -230,8 +231,8 @@ function reqState(req, children) {
                     step: 3,
                   };
                 }
-              
-            
+
+
           }
         }
 

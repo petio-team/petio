@@ -16,47 +16,52 @@ class Requests extends React.Component {
     super(props);
 
     this.state = {
-      requests: false,
-      archive: false,
+      requests: {},
+      archive: {},
       loaded: false,
-      calendar: false,
-      calendarData: false,
+      calendarData: [],
     };
 
-    this.getRequests = this.getRequests.bind(this);
-    this.getCalendar = this.getCalendar.bind(this);
     this.getCalendarData = this.getCalendarData.bind(this);
-    this.getArchive = this.getArchive.bind(this);
     this.typeIcon = this.typeIcon.bind(this);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     let page = document.querySelectorAll('.page-wrap')[0];
     page.scrollTop = 0;
     window.scrollTo(0, 0);
-    this.getRequests();
-    this.getCalendar();
-    this.getArchive();
+
+    const [requests, calendar, archive] = await Promise.all([
+      User.myRequests(),
+      Api.guideCalendar(),
+      User.getArchive(this.props.user.current.id),
+    ]);
+
+    this.setState({
+      requests,
+      archive: {
+        ...archive,
+        requests: archive.requests.reverse(),
+      },
+      calendarData: this.getCalendarData(calendar.data),
+      loaded: true,
+    });
   }
 
-  async getCalendar() {
-    try {
-      let data = await Api.guideCalendar();
-      this.setState({
-        calendar: data,
-      });
-      this.getCalendarData();
-    } catch (err) {
-      console.log(err);
-    }
-  }
+  getCalendarData(calendar) {
+    let calendarData = calendar.map((item) => {
+      if (item.item === "show") {
+        console.log("is a show");
+        console.log(item);
+      } else {
+        console.log("is a movie");
+        console.log(item);
+      }
 
-  getCalendarData() {
-    let calendarData = this.state.calendar.map((item) => {
-      if (item.series) {
-        let time = new Date(item.airDateUtc);
-        return {
-          title: `${item.series.title} - S${item.seasonNumber.toLocaleString(
+      if (item.type === "show") {
+        let time = new Date(item.airDate);
+        const data = {
+          title: `${item.title} - S${item.seasonNumber.toLocaleString(
             'en-US',
             {
               minimumIntegerDigits: 2,
@@ -71,6 +76,8 @@ class Requests extends React.Component {
           end: time,
           resource: item,
         };
+        console.log(data);
+        return data;
       } else {
         let time = new Date(item.inCinemas);
         return {
@@ -83,38 +90,7 @@ class Requests extends React.Component {
       }
     });
 
-    this.setState({
-      calendarData,
-    });
-  }
-
-  async getRequests() {
-    let requests;
-    try {
-      requests = await User.myRequests();
-    } catch {
-      requests = {};
-    }
-
-    this.setState({
-      requests: requests,
-      loaded: true,
-    });
-  }
-
-  async getArchive() {
-    let archive;
-    const id = this.props.user.current.id;
-    try {
-      archive = await User.getArchive(id);
-      archive.requests = archive.requests.reverse();
-    } catch {
-      archive = {};
-    }
-
-    this.setState({
-      archive: archive,
-    });
+    return calendarData;
   }
 
   isToday(someDate) {
@@ -153,21 +129,22 @@ class Requests extends React.Component {
     }
 
     const MonthEvent = ({ event }) => {
+      const airDate = event.resource.tvdbid ? event.resource.airDate : event.resource.airDateUtc;
       return (
         <div className="calendar--event--wrap">
           <div
             className={`calendar--event ${
               event.resource.hasFile ? 'recorded' : ''
             } ${
-              this.isToday(new Date(event.resource.airDateUtc))
+              this.isToday(new Date(airDate))
                 ? 'airsToday'
                 : ''
             } ${
-              new Date(event.resource.airDateUtc) < new Date() ? 'hasAired' : ''
+              new Date(airDate) < new Date() ? 'hasAired' : ''
             }`}
           >
             <div className="calendar--event--icon">
-              {event.resource.series ? <TvIcon /> : <MovieIcon />}
+              {event.resource.tvdbid ? <TvIcon /> : <MovieIcon />}
             </div>
             <p>{event.title}</p>
           </div>
@@ -278,7 +255,7 @@ class Requests extends React.Component {
                 })
               ) : (
                 <tr>
-                  <td colSpan="4">Empty</td>
+                  <td colSpan={4}>Empty</td>
                 </tr>
               )}
             </tbody>

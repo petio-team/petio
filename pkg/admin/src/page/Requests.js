@@ -110,14 +110,14 @@ class Requests extends React.Component {
   async getArrs() {
     try {
       const [radarr, sonarr] = await Promise.all([Api.radarrConfig({
-        withPaths: false,
-        withProfiles: false,
+        withPaths: true,
+        withProfiles: true,
         withLanguages: false,
         withAvailabilities: false,
         withTags: false,
       }), Api.sonarrConfig({
-        withPaths: false,
-        withProfiles: false,
+        withPaths: true,
+        withProfiles: true,
         withLanguages: false,
         withAvailabilities: false,
         withTags: false,
@@ -126,60 +126,12 @@ class Requests extends React.Component {
         r_servers: radarr,
         s_servers: sonarr,
       });
-      this.processServers();
     } catch (err) {
       console.log(err);
       this.setState({
         r_servers: false,
         s_servers: false,
       });
-    }
-  }
-
-  async processServers() {
-    let radarr = this.state.r_servers;
-    let sonarr = this.state.s_servers;
-
-    if (radarr)
-      await Promise.all(
-        radarr.map(async (server) => {
-          let options = await this.getArrOptions(server.uuid, 'radarr');
-          server.options = options;
-        }),
-      );
-
-    if (sonarr)
-      await Promise.all(
-        sonarr.map(async (server) => {
-          let options = await this.getArrOptions(server.uuid, 'sonarr');
-          server.options = options;
-        }),
-      );
-
-    this.setState({
-      s_servers: sonarr,
-      r_servers: radarr,
-    });
-  }
-
-  async getArrOptions(uuid, type) {
-    try {
-      let settings =
-        type === 'radarr'
-          ? await Api.radarrOptions(uuid)
-          : await Api.sonarrOptions(uuid);
-      if (settings.profiles.error || settings.paths.error) {
-        return;
-      }
-      return {
-        profiles: settings.profiles,
-        paths: settings.paths,
-      };
-    } catch {
-      return {
-        profiles: false,
-        paths: false,
-      };
     }
   }
 
@@ -281,7 +233,7 @@ class Requests extends React.Component {
   findServerByUuid(uuid, type) {
     for (let s in this.state[type]) {
       let server = this.state[type][s];
-      if (server.uuid === uuid) {
+      if (server.id === uuid) {
         return server;
       }
     }
@@ -294,20 +246,20 @@ class Requests extends React.Component {
     return (
       <div
         className="request-edit--server--wrap"
-        key={`${type}_server_${server.uuid}`}
+        key={`${type}_server_${server.id}`}
       >
         <p className="request-edit--server--title">
           Server name: {server.title}
         </p>
-        <label key={server.uuid} className={editable ? '' : 'disabled'}>
+        <label key={server.id} className={editable ? '' : 'disabled'}>
           <input
             data-type={type}
-            data-id={server.uuid}
+            data-id={server.id}
             type="checkbox"
             checked={
               this.state[`edit_${type}`] &&
-                this.state[`edit_${type}`][server.uuid] &&
-                this.state[`edit_${type}`][server.uuid].active
+                this.state[`edit_${type}`][server.id] &&
+                this.state[`edit_${type}`][server.id].active
                 ? true
                 : false
             }
@@ -317,36 +269,36 @@ class Requests extends React.Component {
           Use this server
         </label>
 
-        {server.options ? (
+        {server.profiles && server.paths ? (
           <>
             <p className="request-edit--server--subtitle">Profile</p>
             <div
               className={`styled-input--select ${editable &&
                   this.state[`edit_${type}`] &&
-                  this.state[`edit_${type}`][server.uuid] &&
-                  this.state[`edit_${type}`][server.uuid].active
+                  this.state[`edit_${type}`][server.id] &&
+                  this.state[`edit_${type}`][server.id].active
                   ? ''
                   : 'disabled'
                 }`}
             >
               <select
                 data-type={type}
-                data-id={server.uuid}
+                data-id={server.id}
                 name="profile"
                 value={
                   this.state[`edit_${type}`] &&
-                    this.state[`edit_${type}`][server.uuid]
-                    ? this.state[`edit_${type}`][server.uuid].profile
+                    this.state[`edit_${type}`][server.id]
+                    ? this.state[`edit_${type}`][server.id].profile
                     : false
                 }
                 onChange={this.changeServerSettings}
               >
                 <option value="">Please choose</option>
-                {server.options.profiles ? (
-                  server.options.profiles.map((profile) => {
+                {server.profiles ? (
+                  server.profiles.map((profile) => {
                     return (
                       <option
-                        key={`${type}_profile_${server.uuid}_${profile.id}`}
+                        key={`${type}_profile_${server.id}_${profile.id}`}
                         value={profile.id}
                       >
                         {profile.name}
@@ -362,31 +314,31 @@ class Requests extends React.Component {
             <div
               className={`styled-input--select ${editable &&
                   this.state[`edit_${type}`] &&
-                  this.state[`edit_${type}`][server.uuid] &&
-                  this.state[`edit_${type}`][server.uuid].active
+                  this.state[`edit_${type}`][server.id] &&
+                  this.state[`edit_${type}`][server.id].active
                   ? ''
                   : 'disabled'
                 }`}
             >
               <select
                 data-type={type}
-                data-id={server.uuid}
+                data-id={server.id}
                 name="path"
                 value={
                   this.state[`edit_${type}`] &&
-                    this.state[`edit_${type}`][server.uuid] &&
-                    this.state[`edit_${type}`][server.uuid].path
-                    ? this.state[`edit_${type}`][server.uuid].path
+                    this.state[`edit_${type}`][server.id] &&
+                    this.state[`edit_${type}`][server.id].path
+                    ? this.state[`edit_${type}`][server.id].path
                     : false
                 }
                 onChange={this.changeServerSettings}
               >
                 <option value="">Please choose</option>
-                {server.options.paths ? (
-                  server.options.paths.map((path) => {
+                {server.paths ? (
+                  server.paths.map((path) => {
                     return (
                       <option
-                        key={`${type}_profile_${server.uuid}_${path.id}`}
+                        key={`${type}_profile_${server.id}_${path.id}`}
                         value={path.path}
                       >
                         {path.path}
