@@ -80,10 +80,7 @@ export const SeriesSchema = z.object({
     .optional(),
   id: z.number(),
 });
-export const SeriesLookupSchema = z.array(SeriesSchema);
-
 export type Series = z.infer<typeof SeriesSchema>;
-export type SeriesLookup = z.infer<typeof SeriesLookupSchema>;
 
 export const SeriesEndpoint = asApi([
   {
@@ -102,7 +99,7 @@ export const SeriesEndpoint = asApi([
         schema: z.string(),
       },
     ],
-    response: SeriesLookupSchema,
+    response: SeriesSchema.array(),
   },
   {
     method: 'put',
@@ -111,7 +108,7 @@ export const SeriesEndpoint = asApi([
       {
         name: 'body',
         type: 'Body',
-        schema: SeriesSchema,
+        schema: SeriesSchema.partial(),
       },
     ],
     response: SeriesSchema,

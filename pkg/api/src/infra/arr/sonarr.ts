@@ -1,39 +1,29 @@
+import { QualityProfile, RootPath, LanguageProfile, SeriesType, Tag, Queue, Series } from "./sonarr/types";
 import { ArrVersion, parseVersion } from './version';
-import { SonarrAPIClient } from '@/infra/arr/sonarr/index';
-import { LanguageProfile } from '@/infra/arr/sonarr/language_profile';
-import { Queue } from '@/infra/arr/sonarr/queue';
-import { Series, SeriesLookup } from '@/infra/arr/sonarr/series';
-import { Tag } from '@/infra/arr/sonarr/tag';
+import ClientV3 from '@/infra/arr/sonarr/v3';
+import ClientV4 from '@/infra/arr/sonarr/v4';
 import { DownloaderType, GetDownloaderById } from '@/models/downloaders';
 
-
-export type SeriesType = {
-  id: number;
-  name: string;
-};
-
-export type RootPath = {
-  id: number;
-  path: string;
-};
-
-export type QualityProfile = {
-  id: number;
-  name: string;
-};
-
-export type SeriesLanguage = {
-  id: number;
-  name: string;
-};
-
 export default class SonarrAPI {
-  private client: ReturnType<typeof SonarrAPIClient>;
+  /**
+   * Instance of the v3 Sonarr Client
+   */
+  private ClientV3: ClientV3;
 
+  /**
+   * Instance of the v4 Sonarr Client
+   */
+  private ClientV4: ClientV4;
+
+  /**
+   * The current version of the client
+   */
   private version = new ArrVersion(3, 0, 0, 0);
 
   constructor(url: URL, token: string, version?: string) {
-    this.client = SonarrAPIClient(url, token);
+    this.ClientV3 = new ClientV3(url, token);
+    this.ClientV4 = new ClientV4(url, token);
+
     if (version) {
       const v = parseVersion(version);
       if (v) {
@@ -47,9 +37,9 @@ export default class SonarrAPI {
   }
 
   public async TestConnection(): Promise<boolean> {
-    const response = await this.client.get('/api/v3/system/status');
+    const response = await this.ClientV3.GetSystemStatus();
     if (response) {
-      if (response.appName !== "Sonarr") {
+      if (response.version !== "Sonarr") {
         return false;
       }
       const version = parseVersion(response.version);
@@ -62,29 +52,25 @@ export default class SonarrAPI {
   }
 
   public async GetRootPaths(): Promise<RootPath[]> {
-    const paths = await this.client.get('/api/v3/rootfolder');
-    return paths.map((r) => ({ id: r.id, path: r.path }));
+    return this.ClientV3.GetRootFolders();
   }
 
   public async GetQualityProfiles(): Promise<QualityProfile[]> {
-    const profiles = await this.client.get('/api/v3/qualityprofile');
-    return profiles.map((r) => ({ id: r.id, name: r.name }));
+    return this.ClientV3.GetQualityProfiles();
   }
 
-  public async GetLanguageProfile(): Promise<LanguageProfile> {
-    return this.client.get('/api/v3/languageprofile');
-  }
-
-  public async GetLanguages(): Promise<SeriesLanguage[]> {
-    if (this.version.major === 4) {
-      const results = await this.client.get('/api/v3/language');
-      return results.map((r) => ({ id: r.id, name: r.name }));
+  public async GetLanguages(): Promise<LanguageProfile[]> {
+    switch(this.version.major) {
+      case 4: {
+        return this.ClientV4.GetLanguages();
+      }
+      default: {
+        return this.ClientV3.GetLanguageProfile();
+      }
     }
-
-    const results = await this.client.get('/api/v3/languageprofile');
-    return results.map((r) => ({ id: r.id, name: r.name }));
   }
 
+  // eslint-disable-next-line class-methods-use-this
   public GetSeriesTypes(): SeriesType[] {
     return [
       {
@@ -102,61 +88,44 @@ export default class SonarrAPI {
     ];
   }
 
-  public async GetTags(): Promise<Tag> {
-    return this.client.get('/api/v3/tag');
+  public async GetTags(): Promise<Tag[]> {
+    return this.ClientV3.GetTags();
   }
 
   public async GetQueue(page?: number): Promise<Queue> {
-    return this.client.get('/api/v3/queue', {
-      queries: {
-        page,
-      },
-    });
+    switch(this.version.major) {
+      case 4: {
+        return this.ClientV4.GetQueue(page);
+      }
+      default: {
+        return this.ClientV3.GetQueue(page);
+
+      }
+    }
   }
 
   public async GetSeriesById(id: number): Promise<Series> {
-    return this.client.get('/api/v3/series/:id', { params: { id } });
+    return this.ClientV3.GetSeriesById(id);
   }
 
-  public async GetSeriesLookupById(id: number): Promise<SeriesLookup> {
-    return this.client.get('/api/v3/series/lookup', {
-      queries: {
-        term: `tvdb:${  id}`,
-      },
-    });
+  public async GetSeriesLookupById(id: number): Promise<Series[]> {
+    return this.ClientV3.GetSeriesLookupById(id);
   }
 
   public async UpdateSeriesById(id: number, data: Series) {
-    return this.client.put('/api/v3/series/:id', data, {
-      params: {
-        id,
-      },
-    });
+    return this.ClientV3.UpdateSeriesById(id, data);
   }
 
   public async CreateSeries(data: Series) {
-    return this.client.post('/api/v3/series', data);
+    return this.ClientV3.CreateSeries(data);
   }
 
   public async DeleteSeries(id: number, deleteFiles?: boolean) {
-    return this.client.delete('/api/v3/series/:id', undefined, {
-      params: {
-        id,
-      },
-      queries: {
-        deleteFiles,
-      },
-    });
+    return this.ClientV3.DeleteSeries(id, deleteFiles);
   }
 
   public async Calendar(unmonitored?: boolean, start?: Date, end?: Date) {
-    return this.client.get('/api/v3/calendar', {
-      queries: {
-        unmonitored,
-        start,
-        end,
-      },
-    });
+    return this.ClientV3.GetCalendar(unmonitored, start, end);
   }
 }
 

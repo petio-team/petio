@@ -1,9 +1,9 @@
 import { ArrVersion, parseVersion } from './version';
-import { RadarrAPIClient } from '@/infra/arr/radarr/index';
-import { MinimumAvailability } from '@/infra/arr/radarr/minimumAvailability';
-import { Movie } from '@/infra/arr/radarr/movie';
-import { Queue } from '@/infra/arr/radarr/queue';
-import { Tag } from '@/infra/arr/radarr/tag';
+import RadarrAPIClient from '@/infra/arr/radarr/v4/client';
+import { MinimumAvailability } from '@/infra/arr/radarr/v4/minimumAvailability';
+import { Movie } from '@/infra/arr/radarr/v4/movie';
+import { Queue } from '@/infra/arr/radarr/v4/queue';
+import { Tag } from '@/infra/arr/radarr/v4/tag';
 import { DownloaderType, GetDownloaderById } from '@/models/downloaders';
 
 
