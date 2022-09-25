@@ -203,7 +203,7 @@ class FilterAction extends React.Component {
                                   key={`${fs}__${this.props.item}__a_${i}`}
                                   value={availability.id}
                                 >
-                                  {this.props.type === 'movie_filters' ? availability.name : availability.status}
+                                  {availability.name}
                                 </option>
                               );
                             },
@@ -242,7 +242,7 @@ class FilterAction extends React.Component {
                                   key={`${fs}__${this.props.item}__t_${i}`}
                                   value={tag.id}
                                 >
-                                  {tag.label}
+                                  {tag.name}
                                 </option>
                               );
                             },
