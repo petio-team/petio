@@ -50,24 +50,16 @@ class Requests extends React.Component {
 
   getCalendarData(calendar) {
     let calendarData = calendar.map((item) => {
-      if (item.item === "show") {
-        console.log("is a show");
-        console.log(item);
-      } else {
-        console.log("is a movie");
-        console.log(item);
-      }
-
-      if (item.type === "show") {
+      if (item.show) {
         let time = new Date(item.airDate);
         const data = {
-          title: `${item.title} - S${item.seasonNumber.toLocaleString(
+          title: `${item.title} - S${item.show.seasonNumber.toLocaleString(
             'en-US',
             {
               minimumIntegerDigits: 2,
               useGrouping: false,
             },
-          )}E${item.episodeNumber.toLocaleString('en-US', {
+          )}E${item.show.episodeNumber.toLocaleString('en-US', {
             minimumIntegerDigits: 2,
             useGrouping: false,
           })}`,
@@ -76,10 +68,9 @@ class Requests extends React.Component {
           end: time,
           resource: item,
         };
-        console.log(data);
         return data;
       } else {
-        let time = new Date(item.inCinemas);
+        let time = new Date(item.airDate);
         return {
           title: item.title,
           allDay: true,

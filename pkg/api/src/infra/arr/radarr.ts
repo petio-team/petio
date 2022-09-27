@@ -1,9 +1,6 @@
+import { Availability, Calendar, Media, Queue, Tag } from "./types";
 import { ArrVersion, parseVersion } from './version';
-import RadarrAPIClient from '@/infra/arr/radarr/v4/client';
-import { MinimumAvailability } from '@/infra/arr/radarr/v4/minimumAvailability';
-import { Movie } from '@/infra/arr/radarr/v4/movie';
-import { Queue } from '@/infra/arr/radarr/v4/queue';
-import { Tag } from '@/infra/arr/radarr/v4/tag';
+import ClientV4 from '@/infra/arr/radarr/v4';
 import { DownloaderType, GetDownloaderById } from '@/models/downloaders';
 
 
@@ -23,12 +20,13 @@ export type LanguageProfile = {
 };
 
 export default class RadarrAPI {
-  private client: ReturnType<typeof RadarrAPIClient>;
+  private ClientV4: ClientV4;
 
   private version = new ArrVersion(4, 0, 0, 0);
 
   constructor(url: URL, token: string, version?: string) {
-    this.client = RadarrAPIClient(url, token);
+    this.ClientV4 = new ClientV4(url, token);
+
     if (version) {
       const v = parseVersion(version);
       if (v) {
@@ -42,9 +40,9 @@ export default class RadarrAPI {
   }
 
   public async TestConnection(): Promise<boolean> {
-    const response = await this.client.get('/api/v3/system/status');
+    const response = await this.ClientV4.GetSystemStatus();
     if (response) {
-      if (response.appName !== "Radarr") {
+      if (response.name !== "Radarr") {
         return false;
       }
       const version = parseVersion(response.version);
@@ -57,25 +55,23 @@ export default class RadarrAPI {
   }
 
   public async GetRootPaths(): Promise<RootPath[]> {
-    const paths = await this.client.get('/api/v3/rootfolder');
-    return paths.map((r) => ({ id: r.id, path: r.path }));
+    return this.ClientV4.GetRootPaths();
   }
 
   public async GetQualityProfiles(): Promise<QualityProfile[]> {
-    const profiles = await this.client.get('/api/v3/qualityprofile');
-    return profiles.map((r) => ({ id: r.id, name: r.name }));
+    return this.ClientV4.GetQualityProfiles();
   }
 
   public async GetLanguages(): Promise<LanguageProfile[]> {
-    const language = await this.client.get('/api/v3/language');
-    return language.map((r) => ({ id: r.id, name: r.name }));
+    return this.ClientV4.GetLanguages();
   }
 
-  public async GetTags(): Promise<Tag> {
-    return this.client.get('/api/v3/tag');
+  public async GetTags(): Promise<Tag[]> {
+    return this.ClientV4.GetTags();
   }
 
-  public GetMinimumAvailability(): MinimumAvailability[] {
+  // eslint-disable-next-line class-methods-use-this
+  public GetMinimumAvailability(): Availability[] {
     return [
       {
         id: 0,
@@ -93,49 +89,27 @@ export default class RadarrAPI {
   }
 
   public async GetQueue(page?: number): Promise<Queue> {
-    return this.client.get('/api/v3/queue', {
-      queries: {
-        page,
-      },
-    });
+    return this.ClientV4.GetQueue(page);
   }
 
-  public async GetMovie(id: number): Promise<Movie> {
-    return this.client.get('/api/v3/movie/:id', {
-      params: {
-        id,
-      },
-    });
+  public async GetMovie(id: number): Promise<Media> {
+    return this.ClientV4.GetMovie(id);
   }
 
-  public async LookupMovie(id: number): Promise<Movie> {
-    return this.client.get('/api/v3/movie/lookup', {
-      queries: {
-        term: `tmdb:${  id}`,
-      },
-    });
+  public async LookupMovie(id: number): Promise<Media> {
+    return this.ClientV4.LookupMovie(id);
   }
 
-  public async CreateMovie(data: Movie): Promise<Movie> {
-    return this.client.post('/api/v3/movie', data);
+  public async CreateMovie(media: Media) {
+    this.ClientV4.CreateMovie(media);
   }
 
   public async DeleteMovie(id: number): Promise<void> {
-    this.client.delete('/api/v3/movie/:id', undefined, {
-      params: {
-        id,
-      },
-    });
+    this.ClientV4.DeleteMovie(id);
   }
 
-  public async Calendar(unmonitored?: boolean, start?: Date, end?: Date) {
-    return this.client.get('/api/v3/calendar', {
-      queries: {
-        unmonitored,
-        start,
-        end,
-      },
-    });
+  public async Calendar(unmonitored?: boolean, start?: Date, end?: Date): Promise<Calendar> {
+    return this.ClientV4.Calendar(unmonitored, start, end);
   }
 }
 

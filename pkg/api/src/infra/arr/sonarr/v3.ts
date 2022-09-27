@@ -1,4 +1,4 @@
-import { RootPath, Status, QualityProfile, LanguageProfile, Tag, Series, Queue, Calendar } from "./types";
+import { RootPath, Status, QualityProfile, LanguageProfile, Tag, Series, Queue, Calendar } from "../types";
 import Client from './v3/client';
 import { SeriesSchema } from "./v3/series";
 
@@ -77,7 +77,7 @@ export default class SonarrAPIV3 {
       airTime: data.airTime,
     });
 
-    return this.client.post('/api/v3/series', series);
+    this.client.post('/api/v3/series', series);
   }
 
   public async DeleteSeries(id: number, deleteFiles?: boolean) {
@@ -123,11 +123,12 @@ export default class SonarrAPIV3 {
     return results.map((r) => ({
       id: r.id,
       title: r.title,
-      seasonNumber: r.seasonNumber,
-      episodeNumber: r.episodeNumber,
       airDate: r.airDateUtc,
-      tvdbid: r.tvdbId,
-      type: 'show',
+      show: {
+        seasonNumber: r.seasonNumber,
+        episodeNumber: r.episodeNumber,
+        tvdbid: r.tvdbId,
+      }
     }));
   }
 }

@@ -3,7 +3,7 @@ export type Status = {
   version: string;
 }
 
-export type SeriesType = {
+export type Availability = {
   id: number;
   name: string;
 };
@@ -40,19 +40,29 @@ export type QueueItem = {
   status: string;
 }
 
-export type Series = {
+export enum MediaType {
+  Movie = 'movie',
+  Show = 'show',
+};
+
+export type Media = {
   id: number;
   title: string;
   status: string;
   airTime: string;
+  type: MediaType;
 };
 
 export type Calendar = {
-  type: string;
   id: number,
   title: string,
   airDate: string;
-  seasonNumber: number;
-  episodeNumber: number;
-  tvdbid: number,
+  show?: {
+    seasonNumber: number;
+    episodeNumber: number;
+    tvdbid: number,
+  },
+  movie?: {
+    tmdbid: number,
+  }
 }

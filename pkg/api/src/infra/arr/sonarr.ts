@@ -1,4 +1,4 @@
-import { QualityProfile, RootPath, LanguageProfile, SeriesType, Tag, Queue, Series } from "./sonarr/types";
+import { QualityProfile, RootPath, LanguageProfile, Availability, Tag, Queue, Media } from "./types";
 import { ArrVersion, parseVersion } from './version';
 import ClientV3 from '@/infra/arr/sonarr/v3';
 import ClientV4 from '@/infra/arr/sonarr/v4';
@@ -71,7 +71,7 @@ export default class SonarrAPI {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  public GetSeriesTypes(): SeriesType[] {
+  public GetSeriesTypes(): Availability[] {
     return [
       {
         id: 0,
@@ -104,19 +104,19 @@ export default class SonarrAPI {
     }
   }
 
-  public async GetSeriesById(id: number): Promise<Series> {
+  public async GetSeriesById(id: number): Promise<Media> {
     return this.ClientV3.GetSeriesById(id);
   }
 
-  public async GetSeriesLookupById(id: number): Promise<Series[]> {
+  public async GetSeriesLookupById(id: number): Promise<Media[]> {
     return this.ClientV3.GetSeriesLookupById(id);
   }
 
-  public async UpdateSeriesById(id: number, data: Series) {
+  public async UpdateSeriesById(id: number, data: Media) {
     return this.ClientV3.UpdateSeriesById(id, data);
   }
 
-  public async CreateSeries(data: Series) {
+  public async CreateSeries(data: Media) {
     return this.ClientV3.CreateSeries(data);
   }
 

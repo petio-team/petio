@@ -1,4 +1,4 @@
-import { LanguageProfile, Queue } from "./types";
+import { LanguageProfile, Queue } from "../types";
 import Client from './v4/client';
 
 export default class SonarrAPIV4 {

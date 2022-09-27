@@ -192,10 +192,7 @@ export const MovieSchema = z.object({
   }),
   popularity: z.number(),
 });
-export const MoviesSchema = z.array(MovieSchema);
-
 export type Movie = z.infer<typeof MovieSchema>;
-export type Movies = z.infer<typeof MovieSchema>;
 
 export const MovieEndpoint = asApi([
   {
@@ -208,7 +205,7 @@ export const MovieEndpoint = asApi([
         schema: z.number().positive().optional(),
       },
     ],
-    response: MoviesSchema,
+    response: MovieSchema.array(),
   },
   {
     method: 'get',
