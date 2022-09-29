@@ -1,8 +1,8 @@
+import { ArrError } from "./error";
 import { Availability, Calendar, Media, Queue, Tag } from "./types";
 import { ArrVersion, parseVersion } from './version';
 import ClientV4 from '@/infra/arr/radarr/v4';
 import { DownloaderType, GetDownloaderById } from '@/models/downloaders';
-
 
 export type RootPath = {
   id: number;
@@ -39,19 +39,18 @@ export default class RadarrAPI {
     return this.version;
   }
 
-  public async TestConnection(): Promise<boolean> {
+  public async TestConnection(): Promise<void> {
     const response = await this.ClientV4.GetSystemStatus();
-    if (response) {
-      if (response.name !== "Radarr") {
-        return false;
-      }
-      const version = parseVersion(response.version);
-      if (version) {
-        this.version = version;
-      }
-      return true;
+    if (!response) {
+      throw new ArrError(`failed to get response from instance`);
     }
-    return false;
+    if (response.name !== "Radarr") {
+      throw new ArrError(`instance type is not radarr`);
+    }
+    const version = parseVersion(response.version);
+    if (version) {
+      this.version = version;
+    }
   }
 
   public async GetRootPaths(): Promise<RootPath[]> {

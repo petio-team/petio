@@ -98,7 +98,13 @@ class Radarr extends React.Component {
     }
 
     try {
-      const result = await Api.saveRadarrConfig(server);
+      const request = server;
+      delete request.profiles;
+      delete request.paths;
+      delete request.availabilities;
+      delete request.languages;
+
+      const result = await Api.saveRadarrConfig(request);
       if (result.status === "error") {
         this.props.msg({
           message: "failed to save request",

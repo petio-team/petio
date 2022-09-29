@@ -223,10 +223,7 @@ const updateSonarrConfig = async (ctx: Context) => {
     );
 
     const api = new SonarrAPI(url, instance.token);
-    const passed = await api.TestConnection();
-    if (!passed) {
-      throw new ArrError('failed to test connection to instance');
-    }
+    await api.TestConnection();
 
     const newInstance = await CreateOrUpdateDownloader({
       name: instance.name,
@@ -545,10 +542,7 @@ const updateRadarrConfig = async (ctx: Context) => {
       );
 
       const api = new RadarrAPI(url, instance.token);
-      const passed = await api.TestConnection();
-      if (!passed) {
-        throw new ArrError('failed to test connection to instance');
-      }
+      await api.TestConnection();
 
       const newInstance = await CreateOrUpdateDownloader({
         name: instance.name,

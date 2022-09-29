@@ -1,3 +1,4 @@
+import { ArrError } from "./error";
 import { QualityProfile, RootPath, LanguageProfile, Availability, Tag, Queue, Media } from "./types";
 import { ArrVersion, parseVersion } from './version';
 import ClientV3 from '@/infra/arr/sonarr/v3';
@@ -36,19 +37,18 @@ export default class SonarrAPI {
     return this.version;
   }
 
-  public async TestConnection(): Promise<boolean> {
+  public async TestConnection(): Promise<void> {
     const response = await this.ClientV3.GetSystemStatus();
-    if (response) {
-      if (response.version !== "Sonarr") {
-        return false;
-      }
-      const version = parseVersion(response.version);
-      if (version) {
-        this.version = version;
-      }
-      return true;
+    if (!response) {
+      throw new ArrError(`failed to get response from instance`);
     }
-    return false;
+    if (response.name !== "Sonarr") {
+      throw new ArrError(`instance type is not sonarr`);
+    }
+    const version = parseVersion(response.version);
+    if (version) {
+      this.version = version;
+    }
   }
 
   public async GetRootPaths(): Promise<RootPath[]> {

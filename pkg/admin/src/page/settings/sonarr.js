@@ -97,7 +97,13 @@ class Sonarr extends React.Component {
     }
 
     try {
-      const result = await Api.saveSonarrConfig(server);
+      const request = server;
+      delete request.profiles;
+      delete request.paths;
+      delete request.availabilities;
+      delete request.languages;
+
+      const result = await Api.saveSonarrConfig(request);
       if (result.status === 'error') {
         this.props.msg({
           message: "failed to save request",
@@ -113,8 +119,6 @@ class Sonarr extends React.Component {
       } else {
         this.state.servers[index] = result;
       }
-
-
 
       this.setState({
         needsSave: false,
