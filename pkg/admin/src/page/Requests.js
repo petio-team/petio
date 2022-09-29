@@ -25,7 +25,6 @@ class Requests extends React.Component {
     this.getRequests = this.getRequests.bind(this);
     this.editReq = this.editReq.bind(this);
     this.getArrs = this.getArrs.bind(this);
-    this.processServers = this.processServers.bind(this);
     this.changeServerSettings = this.changeServerSettings.bind(this);
     this.renderReqEdit = this.renderReqEdit.bind(this);
     this.deleteReq = this.deleteReq.bind(this);
