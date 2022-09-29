@@ -36,9 +36,11 @@ class Requests extends React.Component {
   }
 
   componentDidMount() {
-    this.getArrs();
-    User.getRequests(true);
-    this.getRequests(true);
+    Promise.all([
+      this.getArrs(),
+      User.getRequests(true),
+      this.getRequests(true),
+    ]);
     this.heartbeat = setInterval(() => this.getRequests(true), 60000);
 
     let page = document.querySelectorAll('.page-wrap')[0];
