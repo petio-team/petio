@@ -51,10 +51,10 @@ class Movies extends React.Component {
       //   this.setState(pHist.state);
       // }
     } else {
-      if (!Object.keys(this.props.api.popular).length > 0) {
-        Api.getPopular();
-      }
-      this.getPersonalised();
+      Promise.all([
+        !(Object.keys(this.props.api.popular).length > 0) ? Api.getPopular() : undefined,
+        this.getPersonalised(),
+      ]);
     }
   }
 

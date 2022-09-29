@@ -34,15 +34,11 @@ class Season extends React.Component {
     window.scrollTo(0, 0);
     let id = this.props.match.params.id;
 
-    this.getReviews();
-    this.getRequests();
-
-    if (!this.props.api.series_lookup[id]) {
-      // check for cached
-      Api.series(id);
-    } else if (this.props.api.series_lookup[id].isMinified) {
-      Api.series(id);
-    }
+    Promise.all([
+      this.getReviews(),
+      this.getRequests(),
+      !this.props.api.series_lookup[id] || this.props.api.series_lookup[id].isMinified ? Api.series(id) : undefined,
+    ]);
   }
 
   componentDidUpdate() {

@@ -33,8 +33,10 @@ class Company extends React.Component {
     if (pHist) {
       this.setState(pHist.state);
     } else {
-      this.getResults();
-      this.getDetails();
+      Promise.all([
+        this.getResults(),
+        this.getDetails(),
+      ]);
       setTimeout(() => {
         this.getResults(2);
       }, 200);

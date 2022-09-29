@@ -69,10 +69,11 @@ class Series extends React.Component {
   }
 
   init() {
-    let id = this.props.match.params.id;
-    this.getSeries(id);
-    this.getRequests();
-    this.getReviews();
+    Promise.all([
+      this.getSeries(),
+      this.getRequests(),
+      this.getReviews(),
+    ]);
     let page = document.querySelectorAll('.page-wrap')[0];
     let scrollY = 0;
     let pHist = Nav.getNav(this.props.location.pathname);
