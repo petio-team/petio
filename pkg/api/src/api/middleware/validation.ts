@@ -13,7 +13,7 @@ export function sendErrors(
 ): void {
   const errorsList = errors.map((e) => {
     const errStr = JSON.parse(e.errors).map(
-      (o) => `code: ${o.code}, expected: ${o.expected}, received: ${o.received}, path: ${JSON.stringify(o.path)}, message: ${o.message}`
+      (o) => `code: ${o.code}, expected: ${o.expected}, received: ${o.received}, path: ${JSON.stringify(o.path)}, message: ${o.message} `
     );
     return `[${e.type}] ${errStr}`
   });
