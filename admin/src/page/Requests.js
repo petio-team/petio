@@ -350,11 +350,6 @@ class Requests extends React.Component {
                     ? this.state[`edit_${type}`][server.uuid]?.path
                     : false
                 }
-                dataValue={
-                  this.state[`edit_${type}`][server.uuid]?.path
-                    ? this.state[`edit_${type}`][server.uuid]?.path
-                    : false
-                }
                 onChange={this.changeServerSettings}
               >
                 <option value="">Please choose</option>
