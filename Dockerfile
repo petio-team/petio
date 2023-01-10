@@ -13,7 +13,7 @@ RUN yarn workspaces focus --all && \
     yarn workspace api run build:prod && \
     chmod -R u=rwX,go=rX /build/pkg
 
-FROM alpine:3.16.2
+FROM alpine:3.17.1
 
 # Set enviornment variables for the app
 ENV APP_DIR="/app"
