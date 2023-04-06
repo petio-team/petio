@@ -25,7 +25,7 @@ RUN apk add --no-cache \
     shadow=4.10-r3 \
     wget=1.21.3-r0 \
     bash=5.1.16-r2 \
-    nodejs=16.16.0-r0 && \
+    nodejs=16.20.0-r0 && \
     # Remove package cache
     rm -rf /var/cache/apk/* && \
     rm -rf /tmp/*
