@@ -1,10 +1,7 @@
 import { Store } from "cache-manager";
 import CacheDB from "@/models/cache/db";
-import { RepositoryError } from "@/models/errors";
 
-export type CacheResultFn = (error: Error, result: any) => void;
-
-class MongooseStore implements Store {
+export default class MongooseStore implements Store {
   private db = new CacheDB();
 
   private expiry: number = 60 * 1000;
@@ -13,84 +10,60 @@ class MongooseStore implements Store {
     this.expiry = (args.expiry) ? args.expiry : 60 * 1000;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  result(fn?: CacheResultFn, error?: any, result?: any) {
-      if (fn) {
-          fn(error, result);
-      }
-      return result;
-  }
-
-  async get(key: any, options: any, fn: CacheResultFn) {
-      try {
-        const result = await this.db.Get(key);
-        if (result.expiry && result.expiry < new Date()) {
-          return await this.del(key, null, fn)
-        }
-        return this.result(fn, null, result.value);
-      } catch (e) {
-        if (e instanceof RepositoryError) {
-          return this.result(fn);
-        }
-        return this.result(fn, e);
-      }
-  }
-
-  async set(key: any, value: any, options: any, fn: CacheResultFn) {
-    try {
-      const ttl = options.expiry || this.expiry;
-      const expiry = ttl > 0 ? new Date(Date.now() + options.ttl * 1000) : ttl;
-
-      await this.db.Set({
-        key,
-        value,
-        expiry,
-      });
-      return this.result(fn);
-    } catch (e) {
-      if (e instanceof RepositoryError) {
-        return this.result(fn);
-      }
-      return this.result(fn, e);
+  async get(key: any): Promise<any> {
+    const result = await this.db.Get(key);
+    if (!result) {
+      return {};
     }
+    if (result.expiry && result.expiry < new Date()) {
+      return this.del(key);
+    }
+    return result.value;
   }
 
-  async del(key: any, options: any, fn: CacheResultFn) {
-    try {
+  async set(key: any, value: any, options: any): Promise<void> {
+    const expiry = options && options.ttl > 0 ? new Date(Date.now() + options.ttl * 1000) : new Date(this.expiry);
+
+    this.db.Set({
+      key,
+      value,
+      expiry,
+    });
+  }
+
+  async del(key: any): Promise<void> {
+    this.db.Delete(key);
+  }
+
+  async reset(): Promise<void> {
+    this.db.Reset();
+  }
+
+  async keys(): Promise<string[]> {
+    return this.db.Keys();
+  }
+
+  async mget(...args: string[]): Promise<unknown[]> {
+      return Promise.allSettled(
+        args.map((x) => this.db.Get(x))
+      );
+  }
+
+  async mdel(...args: string[]): Promise<void> {
+    for (const key of args) {
       this.db.Delete(key);
-      return this.result(fn);
-    } catch (e) {
-      return this.result(fn, e);
     }
   }
 
-  async reset(key: any, fn: any) {
-    try {
-      if (typeof key === "function") {
-        // eslint-disable-next-line no-param-reassign
-        fn = key;
-        // eslint-disable-next-line no-param-reassign
-        key = null;
-      }
-      await this.db.Reset();
-      return fn ? fn() : undefined;
-    } catch (e) {
-      return this.result(fn, e);
+  async mset(args, ttl?) {
+    const opt = { ttl: ttl !== undefined ? ttl : this.expiry } as const;
+    for (const [key, value] of args) {
+      this.set(key, value, opt);
     }
   }
 
-  async keys(fn: any) {
-    try {
-      const results = await this.db.Keys();
-      return this.result(fn, null, results);
-    } catch (e) {
-      return this.result(fn, e);
-    }
+  async ttl(key: string): Promise<number> {
+      const value = await this.db.Get(key);
+      return value.expiry.getTime();
   }
-}
-
-export default {
-  create (args) {
-    return new MongooseStore(args);
-  },
 }

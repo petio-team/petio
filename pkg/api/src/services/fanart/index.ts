@@ -1,18 +1,11 @@
-import cacheManager from 'cache-manager';
-
+import cache from "../cache/cache";
 import { FanartAPI } from '@/infra/fanart/api';
 import logger from '@/loaders/logger';
 
-const memoryCache = cacheManager.caching({
-  store: 'memory',
-  max: 500,
-  ttl: 86400 /* seconds */,
-});
-
 export default async (id, type) => {
-  let data: any = false;
+  let data: any = {};
   try {
-    data = await memoryCache.wrap(id, async () => FanartAPI.get('/:type/:id', {
+    data = cache.wrap(id, async () => FanartAPI.get('/:type/:id', {
         params: {
           id,
           type,

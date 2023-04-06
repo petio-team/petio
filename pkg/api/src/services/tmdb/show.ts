@@ -1,7 +1,7 @@
 import http from 'http';
 import axios from 'axios';
-import cacheManager from 'cache-manager';
 
+import cache from "../cache/cache";
 import externalConfig from "@/config/env/external";
 import { TMDBAPI } from '@/infra/tmdb/tmdb';
 import logger from '@/loaders/logger';
@@ -11,11 +11,6 @@ import onServer from '@/services/plex/server';
 import getLanguage from '@/services/tmdb/languages';
 
 const agent = new http.Agent({ family: 4 });
-const memoryCache = cacheManager.caching({
-  store: 'memory',
-  max: 500,
-  ttl: 86400 /* seconds */,
-});
 
 export async function showLookup(id, minified = false) {
   if (!id || id == 'false') {
@@ -275,7 +270,7 @@ export const getMovieDetails = async (id: number) => {
 async function getShowData(id) {
   let data = false;
   try {
-    data = await memoryCache.wrap(id, async () => tmdbData(id));
+    data = await cache.wrap(id, async () => tmdbData(id));
   } catch (err) {
     logger.warn(`Error getting show data - ${id}`, {
       label: 'tmdb.show',
@@ -288,7 +283,7 @@ async function getShowData(id) {
 async function externalId(id) {
   let data = false;
   try {
-    data = await memoryCache.wrap(`ext_${id}`, async () => idLookup(id));
+    data = await cache.wrap(`ext_${id}`, async () => idLookup(id));
   } catch (err) {
     logger.verbose(`Error getting external ID - ${id}`, {
       label: 'tmdb.show',
@@ -301,7 +296,7 @@ async function externalId(id) {
 export async function getRecommendations(id, page = 1) {
   let data = false;
   try {
-    data = await memoryCache.wrap(`rec_${id}__${page}`, async () => recommendationData(id, page));
+    data = await cache.wrap(`rec_${id}__${page}`, async () => recommendationData(id, page));
   } catch (err) {
     logger.warn(`Error getting recommendation data - ${id}`, {
       label: 'tmdb.show',
@@ -314,7 +309,7 @@ export async function getRecommendations(id, page = 1) {
 export async function getSimilar(id, page = 1) {
   let data = false;
   try {
-    data = await memoryCache.wrap(`similar_${id}__${page}`, async () => similarData(id, page));
+    data = await cache.wrap(`similar_${id}__${page}`, async () => similarData(id, page));
   } catch (err) {
     logger.warn(`Error getting similar data - ${id}`, {
       label: 'tmdb.show',
@@ -327,7 +322,7 @@ export async function getSimilar(id, page = 1) {
 async function getReviews(id) {
   let data = false;
   try {
-    data = await memoryCache.wrap(`rev_${id}`, async () => reviewsData(id));
+    data = await cache.wrap(`rev_${id}`, async () => reviewsData(id));
   } catch (err) {
     logger.warn(`Error getting review data - ${id}`, {
       label: 'tmdb.show',
@@ -340,7 +335,7 @@ async function getReviews(id) {
 async function getSeasons(seasons, id) {
   let data: any = false;
   try {
-    data = await memoryCache.wrap(`seasons_${id}`, async () => seasonsData(seasons, id));
+    data = await cache.wrap(`seasons_${id}`, async () => seasonsData(seasons, id));
   } catch (err) {
     logger.warn(`Error getting season data - ${id}`, {
       label: 'tmdb.show',

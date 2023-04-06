@@ -1,7 +1,7 @@
 import http from 'http';
 import axios from 'axios';
-import cacheManager from 'cache-manager';
 
+import cache from "../cache/cache";
 import externalConfig from "@/config/env/external";
 import logger from '@/loaders/logger';
 import fanartLookup from '@/services/fanart';
@@ -10,11 +10,6 @@ import onServer from '@/services/plex/server';
 import getLanguage from '@/services/tmdb/languages';
 
 const agent = new http.Agent({ family: 4 });
-const memoryCache = cacheManager.caching({
-  store: 'memory',
-  max: 500,
-  ttl: 86400 /* seconds */,
-});
 
 export async function movieLookup(id, minified = false) {
   logger.verbose(`TMDB Movie Lookup ${id}`, { label: 'tmdb.movie' });
@@ -161,7 +156,7 @@ export async function movieLookup(id, minified = false) {
 async function getMovieData(id) {
   let data = false;
   try {
-    data = await memoryCache.wrap(id, async () => tmdbData(id));
+    data = await cache.wrap(id, async () => tmdbData(id));
   } catch (err) {
     logger.warn(`Error getting movie data - ${id}`, { label: 'tmdb.movie' });
     logger.error(err, { label: 'tmdb.movie' });
@@ -172,7 +167,7 @@ async function getMovieData(id) {
 export async function getRecommendations(id, page = 1) {
   let data = false;
   try {
-    data = await memoryCache.wrap(`rec_${id}_${page}`, async () => recommendationData(id, page));
+    data = await cache.wrap(`rec_${id}_${page}`, async () => recommendationData(id, page));
   } catch (err) {
     logger.warn(`Error getting movie recommendations - ${id}`, {
       label: 'tmdb.movie',
@@ -185,7 +180,7 @@ export async function getRecommendations(id, page = 1) {
 export async function getSimilar(id, page = 1) {
   let data = false;
   try {
-    data = await memoryCache.wrap(`similar_${id}_${page}`, async () => similarData(id, page));
+    data = await cache.wrap(`similar_${id}_${page}`, async () => similarData(id, page));
   } catch (err) {
     logger.warn(`Error getting movie recommendations - ${id}`, {
       label: 'tmdb.movie',
@@ -198,7 +193,7 @@ export async function getSimilar(id, page = 1) {
 async function getReviews(id) {
   let data = false;
   try {
-    data = await memoryCache.wrap(`rev_${id}`, async () => reviewsData(id));
+    data = await cache.wrap(`rev_${id}`, async () => reviewsData(id));
   } catch (err) {
     logger.warn(`Error getting movie reviews - ${id}`, { label: 'tmdb.movie' });
     logger.log(err, { label: 'tmdb.movie' });
@@ -209,7 +204,7 @@ async function getReviews(id) {
 async function getCollection(id) {
   let data = false;
   try {
-    data = await memoryCache.wrap(`col_${id}`, async () => collectionData(id));
+    data = await cache.wrap(`col_${id}`, async () => collectionData(id));
   } catch (err) {
     logger.warn(`Error getting movie collections - ${id}`, {
       label: 'tmdb.movie',

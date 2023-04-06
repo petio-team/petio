@@ -1,22 +1,15 @@
 import axios from 'axios';
-import cacheManager from 'cache-manager';
-
+import cache from "../cache/cache";
 import logger from '@/loaders/logger';
 import plexLookup from '@/services/plex/lookup';
 import MakePlexURL from '@/services/plex/util';
 import { movieLookup } from '@/services/tmdb/movie';
 import { showLookup } from '@/services/tmdb/show';
 
-const memoryCache = cacheManager.caching({
-  store: 'memory',
-  max: 500,
-  ttl: 604800 /* seconds - one week */,
-});
-
 export default async (type) => {
   let data: any = false;
   try {
-    data = await memoryCache.wrap(`pop__${type}`, () => getTopData(type));
+    data = await cache.wrap(`pop__${type}`, () => getTopData(type));
   } catch (err) {
     logger.warn(`Error getting top data - ${type}`, { label: 'plex.top' });
     logger.error(err, { label: 'plex.top' });

@@ -1,7 +1,7 @@
 import Promise from 'bluebird';
-import cacheManager from 'cache-manager';
 import request from 'xhr-request';
 
+import cache from "../cache/cache";
 import externalConfig from '@/config/env/external';
 import { config } from '@/config/index';
 import logger from '@/loaders/logger';
@@ -17,12 +17,6 @@ import {
   getRecommendations as getShowRecommendations,
   showLookup,
 } from '@/services/tmdb/show';
-
-const memoryCache = cacheManager.caching({
-  store: 'memory',
-  // max: 500,
-  ttl: 3600 /* seconds */,
-});
 
 export default async (id, type = 'movie') => {
   if (!id) return { error: 'No ID' };
@@ -307,7 +301,7 @@ export default async (id, type = 'movie') => {
 async function genreLookup(id, genre, type) {
   let data = false;
   try {
-    data = await memoryCache.wrap(`gl__${id}__${type}`, () =>
+    data = await cache.wrap(`gl__${id}__${type}`, () =>
       genreLookupData(id, genre, type),
     );
   } catch (err) {

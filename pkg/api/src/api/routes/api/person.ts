@@ -4,14 +4,6 @@ import { Context } from 'koa';
 
 import personLookup from '@/services/tmdb/person';
 
-// const cacheMiddleware = new ExpressCache(
-//   cacheManager.caching({
-//     store: "memory",
-//     max: 100,
-//     ttl: 86400, // Cache for 1 day
-//   })
-// );
-
 const lookupById = async (ctx: Context) => {
   const data = await personLookup(ctx.params.id);
 

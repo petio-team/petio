@@ -1,22 +1,16 @@
-import cacheManager from 'cache-manager';
 import request from 'xhr-request';
 
+import cache from "../cache/cache";
 import logger from '@/loaders/logger';
 import plexLookup from '@/services/plex/lookup';
 import MakePlexURL from '@/services/plex/util';
 import { movieLookup } from '@/services/tmdb/movie';
 import { showLookup } from '@/services/tmdb/show';
 
-const memoryCache = cacheManager.caching({
-  store: 'memory',
-  max: 500,
-  ttl: 3600 /* seconds */,
-});
-
 export default async (id, type) => {
   let data: any = false;
   try {
-    data = await memoryCache.wrap(`hist__${id}__${type}`, () =>
+    data = await cache.wrap(`hist__${id}__${type}`, () =>
       getHistoryData(id, type),
     );
   } catch (err) {
@@ -102,8 +96,8 @@ async function parseHistory(data, type) {
 
         if (media_type === type || type === 'all')
           items.push({
-            media_id: media_id,
-            media_type: media_type,
+            media_id,
+            media_type,
           });
       }
     }
