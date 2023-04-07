@@ -7,6 +7,7 @@ import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 import send from 'koa-send';
 
+import { adminRequired } from "../middleware/auth";
 import pathsConfig from '@/config/env/paths';
 import logger from '@/loaders/logger';
 import Profile from '@/models/profile';
@@ -343,16 +344,7 @@ const getThumbnailById = async (ctx: Context) => {
 };
 
 const getQuota = async (ctx: Context) => {
-  if (!ctx.state.user) {
-    ctx.status = StatusCodes.NOT_FOUND;
-    ctx.body = {};
-    return;
-  }
-  const user = await UserModel.findOne({ id: ctx.state.user.id }).exec();
-  if (!user) {
-    return;
-  }
-
+  const user = await UserModel.findOne({ _id: ctx.state.user.id }).exec();
   if (!user) {
     ctx.status = StatusCodes.NOT_FOUND;
     ctx.body = {};
@@ -376,14 +368,14 @@ const getQuota = async (ctx: Context) => {
 
 const route = new Router({ prefix: '/user' });
 export default (app: Router) => {
-  route.get('/all', getAllUsers);
+  route.get('/all', getAllUsers, adminRequired);
   route.get('/quota', getQuota);
   route.get('/thumb/:id', getThumbnailById);
   route.get('/:id', getUserById);
-  route.post('/create_custom', createCustomUser);
+  route.post('/create_custom', createCustomUser, adminRequired);
   route.post('/edit', editUser);
-  route.post('/bulk_edit', editMultipleUsers);
-  route.post('/delete_user', deleteUser);
+  route.post('/bulk_edit', editMultipleUsers, adminRequired);
+  route.post('/delete_user', deleteUser, adminRequired);
   route.post('/thumb/:id', upload.single('img'), updateUserThumbnail);
 
   app.use(route.routes());
