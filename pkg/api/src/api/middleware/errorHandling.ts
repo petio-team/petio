@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
 import { DefaultContext } from 'koa';
-import HttpError from "../web/errors/http";
-import NotFound from "../web/errors/notFound";
+import HttpError from "../http/errors/http";
+import NotFound from "../http/errors/notFound";
 
 export default () => async (ctx: DefaultContext, next: () => Promise<any>) => {
   try {

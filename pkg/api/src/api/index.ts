@@ -5,7 +5,7 @@ import mount from 'koa-mount';
 
 import logging from './middleware/logging';
 import options from "./middleware/options";
-import responseHandler from "./web/responseHandler";
+import responseHandler from "./http/responseHandler";
 import cors from '@/api/middleware/cors';
 import errorHandler from '@/api/middleware/errorHandling';
 import api from '@/api/routes/api';

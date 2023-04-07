@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { adminRequired } from '@/api/middleware/auth';
 import { validateRequest } from '@/api/middleware/validation';
 import { ArrInput, ArrInputSchema } from "@/api/schemas/downloaders";
-import { StatusBadRequest, StatusInternalServerError } from '@/api/web/request';
+import { StatusBadRequest, StatusInternalServerError } from '@/api/http/request';
 import { ArrError } from '@/infra/arr/error';
 import RadarrAPI, { GetRadarrInstanceFromDb } from '@/infra/arr/radarr';
 import SonarrAPI, { GetSonarrInstanceFromDb } from '@/infra/arr/sonarr';
