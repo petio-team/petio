@@ -2,7 +2,6 @@ import * as HttpStatus from 'http-status-codes';
 import jwt from 'jsonwebtoken';
 import { Context, Next } from 'koa';
 
-import { config } from '@/config/index';
 import logger from '@/loaders/logger';
 import { UserModel } from '@/models/user';
 
