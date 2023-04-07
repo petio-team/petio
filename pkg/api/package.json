@@ -20,7 +20,7 @@
     "@koa/cors": "^3.4.2",
     "@koa/multer": "^3.0.0",
     "@koa/router": "^12.0.0",
-    "@typegoose/typegoose": "^9.12.1",
+    "@typegoose/typegoose": "^11.0.0",
     "@zodios/core": "^9.3.3",
     "@zodios/plugins": "^9.0.0",
     "agenda": "^4.3.0",
