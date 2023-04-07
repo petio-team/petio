@@ -42,7 +42,7 @@ export default (app: Koa, subpath: string) => {
   app.use(setupMiddleware);
   api.use(
     jwt({
-      secret: conf.get('plex.token'),
+      secret: conf.get('petio.keys'),
       cookie: 'petio_jwt',
       debug: true,
     }).unless({

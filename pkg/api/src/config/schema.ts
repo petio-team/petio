@@ -51,6 +51,12 @@ export default blueconfig({
       default: [],
       env: 'PETIO_TRUSTED_PROXIES',
     },
+    identifier: {
+      doc: 'Unique generated identifier for use in third party apps',
+      format: String,
+      default: randomUUID(),
+      sensitive: true,
+    },
     keys: {
       doc: 'A list of keys used to encrypt data',
       format: Array,
@@ -186,12 +192,6 @@ export default blueconfig({
       doc: 'The token used to authenticate',
       format: String,
       default: '',
-      sensitive: true,
-    },
-    client: {
-      doc: 'The client id',
-      format: '*',
-      default: `petio_${  randomUUID()}`,
       sensitive: true,
     },
   },

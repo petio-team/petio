@@ -28,7 +28,7 @@ export async function authenticate(ctx: Context) {
 
   let userData;
   try {
-    const jwtData: any = jwt.verify(petioJwt, config.get('plex.token'));
+    const jwtData: any = jwt.verify(petioJwt, ctx.app.keys[0]);
     if (!jwtData) {
       removeCookie(ctx);
       throw new Error(`jwt data was invalid`);

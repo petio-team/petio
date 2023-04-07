@@ -15,7 +15,7 @@ import { GetUserByPlexID, UserModel, UserRole } from '@/models/user';
 function success(ctx, user, isAdmin = false) {
   const token = jwt.sign(
     { id: user.id, admin: isAdmin },
-    config.get('plex.token'),
+    ctx.app.keys[0],
   );
 
   ctx.cookies.set('petio_jwt', token, {
@@ -112,7 +112,7 @@ function plexAuth(username, password) {
           'X-Plex-Platform-Version': '1.0',
           'X-Plex-Device-Name': 'Petio API',
           'X-Plex-Version': '1.0',
-          'X-Plex-Client-Identifier': config.get('plex.client'),
+          'X-Plex-Client-Identifier': `petio_${  config.get('petio.identifier')}`,
           Authorization:
             `Basic ${
             Buffer.from(`${username}:${password}`).toString('base64')}`,
