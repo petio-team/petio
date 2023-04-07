@@ -20,6 +20,7 @@ services:
       - ~/.gitconfig:/root/.gitconfig:z
     environment:
       - TZ=Europe\London
+      - DB_URL=mongodb://mongo:27017/petio
     entrypoint: ['zsh', '-c', 'while sleep 1000; do :; done']
 
   mongo:
