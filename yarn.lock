@@ -5490,7 +5490,6 @@ __metadata:
     koa-mount: ^4.0.0
     koa-send: ^5.0.1
     koa-session: ^6.2.0
-    koa-session-mongoose: ^3.0.1
     koa-static: ^5.0.0
     line-reader: ^0.4.0
     lodash: ^4.17.21
@@ -12057,15 +12056,6 @@ __metadata:
     http-errors: ^1.7.3
     resolve-path: ^1.4.0
   checksum: a9fbaadbe0f50efd157a733df4a1cc2b3b79b0cdf12e67c718641e6038d1792c0bebe40913e6d4ceb707d970301155be3859b98d1ef08b0fd1766f7326b82853
-  languageName: node
-  linkType: hard
-
-"koa-session-mongoose@npm:^3.0.1":
-  version: 3.0.1
-  resolution: "koa-session-mongoose@npm:3.0.1"
-  peerDependencies:
-    mongoose: ">=5.0.0"
-  checksum: c690c901e36a0eacb470e2ced74aa378c918d6b9a5f54959ca566444ee52a90cd4d9d7ff27b7e8970778141b932150dd642e398995fae74aa4d94073e6f10fcb
   languageName: node
   linkType: hard
 
