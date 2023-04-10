@@ -1,4 +1,4 @@
-import { Agenda } from 'agenda';
+import { Agenda } from '@hokify/agenda';
 
 import LoggerInstance from './logger';
 import { config } from '@/config/index';
@@ -17,7 +17,7 @@ const TASK_NAME = {
   TMDB_CACHE: 'update tmdb cache',
 } as const;
 
-export default ({ agenda }: { agenda: Agenda }) => {
+export default async ({ agenda }: { agenda: Agenda }) => {
   agenda.define(TASK_NAME.FULL_LIBRARY_SCAN, async (_job: any, done: any) => {
     try {
       await new LibraryUpdate().scan();
@@ -56,7 +56,8 @@ export default ({ agenda }: { agenda: Agenda }) => {
 
   agenda.define(TASK_NAME.USERS_SCAN, async (_job: any, done: any) => {
     try {
-      await new LibraryUpdate().updateFriends();
+      const library = new LibraryUpdate();
+      await library.updateFriends();
     } catch (err) {
       LoggerInstance.error(
         `an error occured while attempting to run task '${
@@ -118,14 +119,19 @@ export default ({ agenda }: { agenda: Agenda }) => {
     }
   });
 
-  agenda.start();
-  agenda.every(config.get('tasks.library.full'), TASK_NAME.FULL_LIBRARY_SCAN);
-  agenda.every(
+  await agenda.start();
+  await agenda.every(config.get('tasks.library.full'), TASK_NAME.FULL_LIBRARY_SCAN);
+  await agenda.every(
     config.get('tasks.library.partial'),
     TASK_NAME.PARTIAL_LIBRARY_SCAN,
   );
-  agenda.every(config.get('tasks.library.users'), TASK_NAME.USERS_SCAN);
-  agenda.every(config.get('tasks.quotas'), TASK_NAME.USER_QUOTA_RESET);
-  agenda.every('24 hours', [TASK_NAME.IMDB_CACHE, TASK_NAME.TMDB_CACHE]);
-  agenda.purge();
+  await agenda.every(config.get('tasks.library.users'), TASK_NAME.USERS_SCAN);
+  await agenda.every(config.get('tasks.quotas'), TASK_NAME.USER_QUOTA_RESET);
+  await agenda.every('24 hours', [TASK_NAME.IMDB_CACHE, TASK_NAME.TMDB_CACHE]);
+
+  // temp solution until library fixes it
+  try {
+    await agenda.purge();
+  // eslint-disable-next-line no-empty
+  } catch (_) {}
 };

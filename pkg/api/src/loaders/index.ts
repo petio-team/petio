@@ -56,7 +56,7 @@ export const loadSystems = async () => {
   // load agenda
   const agenda = agendaFactory({ mongoConnection });
   // load jobs
-  jobs({ agenda });
+  await jobs({ agenda });
   // load http server
   await runAPI();
 };
