@@ -5478,6 +5478,8 @@ __metadata:
     "@zodios/core": ^9.3.3
     "@zodios/plugins": ^9.0.0
     axios: ^0.27.2
+    axios-auth-refresh: ^3.3.6
+    axios-cache-interceptor: ^1.0.1
     bcryptjs: 2.4.3
     bluebird: ^3.7.2
     bson: ^5.0.1
@@ -5494,6 +5496,7 @@ __metadata:
     eslint-plugin-prettier: ^4.2.1
     event-dispatch: ^0.4.1
     http-status-codes: ^2.2.0
+    is-retry-allowed: ^3.0.0
     jsonwebtoken: ^8.5.1
     koa: ^2.13.4
     koa-add-trailing-slashes: ^2.0.1
@@ -5517,6 +5520,7 @@ __metadata:
     nodemon: ^2.0.20
     reflect-metadata: ^0.1.13
     regenerator-runtime: ^0.13.9
+    rxjs: ^7.8.0
     sanitize-filename: ^1.6.3
     ts-mocha: ^10.0.0
     ts-node: ^10.9.1
@@ -5763,6 +5767,28 @@ __metadata:
   version: 4.4.3
   resolution: "axe-core@npm:4.4.3"
   checksum: c3ea000d9ace3ba0bc747c8feafc24b0de62a0f7d93021d0f77b19c73fca15341843510f6170da563d51535d6cfb7a46c5fc0ea36170549dbb44b170208450a2
+  languageName: node
+  linkType: hard
+
+"axios-auth-refresh@npm:^3.3.6":
+  version: 3.3.6
+  resolution: "axios-auth-refresh@npm:3.3.6"
+  peerDependencies:
+    axios: ">= 0.18 < 0.19.0 || >= 0.19.1"
+  checksum: 74206569065a4ece84830210d4f21900aa9690259c3c21743efb195309bcbcb6c3f5e59ce973ea8fe5d9155f5b241001c35448e527da9f32d7ee37d030d51544
+  languageName: node
+  linkType: hard
+
+"axios-cache-interceptor@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "axios-cache-interceptor@npm:1.0.1"
+  dependencies:
+    cache-parser: ^1.2.4
+    fast-defer: ^1.1.7
+    object-code: ^1.2.4
+  peerDependencies:
+    axios: ^1
+  checksum: f004940ee2fd2260237ba0c943acdf03811b9265041d40b57ff49435d2c7bc170902de97c2e7330f229a8dd5babbbef5c5e2ad31541cf36d5b6b5dceef23ec74
   languageName: node
   linkType: hard
 
@@ -6333,6 +6359,13 @@ __metadata:
     lodash.clonedeep: ^4.5.0
     lru-cache: ~7.18.3
   checksum: 1f1ec19c902c01817af782c2fc3ba96705325794e20fc4865ec9382eb91c1cee76dc560a63f774cb54b85067142134b5338183c4cc7f465375fb063ce62b84ac
+  languageName: node
+  linkType: hard
+
+"cache-parser@npm:^1.2.4":
+  version: 1.2.4
+  resolution: "cache-parser@npm:1.2.4"
+  checksum: de9fc4ab7af318109f1e53474e674d43997bc7b8676157e4f28e7dc60fda2f434ee138aa9d9abb9f849c55e73202ee74865afaa4e00298de70c4326510680c19
   languageName: node
   linkType: hard
 
@@ -9161,6 +9194,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fast-defer@npm:^1.1.7":
+  version: 1.1.7
+  resolution: "fast-defer@npm:1.1.7"
+  checksum: c0f816fe3f83ca7e12c56a6631c6819a50349fb7e1931cec88e883168b523c65605e6e0df32c8fba6c341860c29ecc6fe2531ba8a418d27d31da6544ad1bf45b
+  languageName: node
+  linkType: hard
+
 "fast-diff@npm:^1.1.2":
   version: 1.2.0
   resolution: "fast-diff@npm:1.2.0"
@@ -10839,6 +10879,13 @@ __metadata:
   version: 1.0.0
   resolution: "is-regexp@npm:1.0.0"
   checksum: be692828e24cba479ec33644326fa98959ec68ba77965e0291088c1a741feaea4919d79f8031708f85fd25e39de002b4520622b55460660b9c369e6f7187faef
+  languageName: node
+  linkType: hard
+
+"is-retry-allowed@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "is-retry-allowed@npm:3.0.0"
+  checksum: 12d17b44410484c6b0292ca38127b2ad026b65d1c1ead40f055effb2498c1a65b28ac5bc8f0383d0d091f84c1f791c3e09da32219fc3a745c3b1bab106db6cfb
   languageName: node
   linkType: hard
 
@@ -13935,6 +13982,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"object-code@npm:^1.2.4":
+  version: 1.2.4
+  resolution: "object-code@npm:1.2.4"
+  checksum: b5dd65c81793705c996cacaea4009287d88629add24e70f8a610d58747fea6d19196e43bf32e134aab582dc1f3ba4867cbacaf84e1d194b70126cd33689c8d5b
+  languageName: node
+  linkType: hard
+
 "object-hash@npm:^2.0.1":
   version: 2.2.0
   resolution: "object-hash@npm:2.2.0"
@@ -14467,6 +14521,7 @@ __metadata:
     commitlint: ^17.0.0
     husky: ^8.0.1
     prettier: ^2.6.2
+    promise-throttle: ^1.1.2
   languageName: unknown
   linkType: soft
 
@@ -15498,6 +15553,13 @@ __metadata:
     err-code: ^2.0.2
     retry: ^0.12.0
   checksum: f96a3f6d90b92b568a26f71e966cbbc0f63ab85ea6ff6c81284dc869b41510e6cdef99b6b65f9030f0db422bf7c96652a3fff9f2e8fb4a0f069d8f4430359429
+  languageName: node
+  linkType: hard
+
+"promise-throttle@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "promise-throttle@npm:1.1.2"
+  checksum: 9c147f7c4be88590b8e42bc3ed159768515b6536e185ddc088b9d21cf59b0b10185e741efda475659417e7bd56db0226b5c202998ca925f918906473f4f003ed
   languageName: node
   linkType: hard
 
@@ -16647,6 +16709,15 @@ __metadata:
   dependencies:
     queue-microtask: ^1.2.2
   checksum: cb4f97ad25a75ebc11a8ef4e33bb962f8af8516bb2001082ceabd8902e15b98f4b84b4f8a9b222e5d57fc3bd1379c483886ed4619367a7680dad65316993021d
+  languageName: node
+  linkType: hard
+
+"rxjs@npm:^7.8.0":
+  version: 7.8.0
+  resolution: "rxjs@npm:7.8.0"
+  dependencies:
+    tslib: ^2.1.0
+  checksum: 61b4d4fd323c1043d8d6ceb91f24183b28bcf5def4f01ca111511d5c6b66755bc5578587fe714ef5d67cf4c9f2e26f4490d4e1d8cabf9bd5967687835e9866a2
   languageName: node
   linkType: hard
 
@@ -18171,7 +18242,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.5.0":
+"tslib@npm:^2.1.0, tslib@npm:^2.5.0":
   version: 2.5.0
   resolution: "tslib@npm:2.5.0"
   checksum: ae3ed5f9ce29932d049908ebfdf21b3a003a85653a9a140d614da6b767a93ef94f460e52c3d787f0e4f383546981713f165037dc2274df212ea9f8a4541004e1
