@@ -9,7 +9,7 @@ export const SetupTestInputSchema = z.object({
     port: z
       .string()
       .min(1)
-      .transform((v) => parseInt(v)),
+      .transform((v) => parseInt(v, 10)),
     protocol: z.enum(['http', 'https']),
     status: z.string().min(1),
     token: z.string().min(1),
