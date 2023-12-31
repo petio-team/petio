@@ -771,7 +771,7 @@ class LibraryUpdate {
   }
 
   async getFriends() {
-    let url = `https://plex.tv/pms/friends/all?X-Plex-Token=${this.config.plexToken}`;
+    let url = `https://plex.tv/api/users?X-Plex-Token=${this.config.plexToken}`;
     try {
       let res = await axios.get(url);
       let dataParse = JSON.parse(
