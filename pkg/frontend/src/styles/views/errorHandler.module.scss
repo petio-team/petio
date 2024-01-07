@@ -1,0 +1,24 @@
+@import '../global/variables.module.scss';
+.wrap {
+  margin-top: 40px;
+
+  @media (min-width: $lg) {
+    margin-top: 120px;
+  }
+
+  p {
+    margin-top: #{$spacing * 2};
+  }
+}
+
+.errorBlock {
+  margin-top: $spacing;
+  background: $grey;
+  padding: 20px;
+  margin-top: #{$spacing * 4};
+
+  code {
+    color: red;
+    background: none;
+  }
+}

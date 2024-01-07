@@ -8,7 +8,7 @@
     />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1, user-scalable=0"
     />
     <meta content="Petio - Request, Review, Discover" name="description" />
     <link
@@ -151,13 +151,33 @@
     <meta name="msapplication-TileColor" content="#3f4245" />
     <meta
       name="msapplication-TileImage"
-      content="/favicon/ms-icon-144x144.png"
+      content="%PUBLIC_URL%/favicon/ms-icon-144x144.png"
     />
     <meta name="theme-color" content="#3f4245" />
-    <title>Petio - Request, Review, Discover</title>
+    <title>Petio</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <!--
+        .:xxxxxxxxxdoc,.   'lxxxxxxxxxxxxd;.lxxxxxxxxxxxxxxxxl..;::;.     ..,;:cccc:;,..
+        .xWMMWWNNWWMMWNOc. ;KMMMWWWWWNNWWXl,kWWWNNWMMMMWWWWNNk''oxxo'   .,codxddddddxdoc,.
+        .xMMM0c,;;:ckNMMNo.;KMMNx;;;;;;;;,..';;;;;c0MMM0c;;;;'.'oxxo'  .cdxdo:,...',:odxdc.
+        .xMMMk.     .dWMM0,;KMMNl.                .kMMMk.      'oxxo' .cdxdc.       ..cdddc.
+        .xMMMk.     .kWMMO';KMMWKkkkkkkkd,        .kMMMk.      'oxxo'.,dxxl'          'oxxo,
+        .xMMMKocclld0WMMXc.;KMMMNXXXXXXX0:        .kMMMk.      'oxxo'.;dxxl.          .lxxd;.
+        .xMMMMMMMMMMWN0d,. ;KMMNd'''''''..        .kMMMk.      'oxxo'.'oxxo,.        .;oxxo'
+        .xMMMKdlollc:,..   ;KMMNl.                .kMMMk.      'oxxo' .;oxdo:..    ..:oxxo,.
+        .xMMMk.            ;KMMWKkxxxxxxxxl.      .kMMMk.      'oxxo'  .,ldxdol:::clodxdc'.
+        .dNNNx.            ,0NNNNNNNNNNNNNk.      .dNNNd.      'lddl'    .':loddddddoc;'.
+        .,,,..            .',,,,,,,,,,,,,'.      ..,,,..      ......       ...''''...
+
+        https://petio.tv
+    -->
+    <script>
+      const url = window.location.pathname;
+      if (url.substr(-1) != '/')
+        window.location.href = `${window.location.origin}${window.location.pathname}/`;
+    </script>
   </body>
 </html>

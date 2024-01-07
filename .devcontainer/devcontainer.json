@@ -4,52 +4,55 @@
   "service": "vscode",
   "runServices": ["vscode", "mongo"],
   "shutdownAction": "stopCompose",
-  "postCreateCommand": "yarn workspaces focus --all",
+  "postCreateCommand": "~/.ssh.sh",
   "workspaceFolder": "/workspace",
-  "forwardPorts": ["vscode:7777", "mongo:27017"],
   // "overrideCommand": "",
-  "extensions": [
-    "mohsen1.prettify-json",
-    "dbaeumer.vscode-eslint",
-    "ms-vscode.vscode-typescript-tslint-plugin",
-    "esbenp.prettier-vscode",
-    "visualstudioexptteam.vscodeintellicode",
-    "christian-kohler.npm-intellisense",
-    "eg2.vscode-npm-script",
-    "eamodio.gitlens", // IDE Git information
-    "davidanson.vscode-markdownlint",
-    "ms-azuretools.vscode-docker", // Docker integration and linting
-    "shardulm94.trailing-spaces", // Show trailing spaces
-    "Gruntfuggly.todo-tree", // Highlights TODO comments
-    "bierner.emojisense", // Emoji sense for markdown
-    "stkb.rewrap", // rewrap comments after n characters on one line
-    "vscode-icons-team.vscode-icons", // Better file extension icons
-    "github.vscode-pull-request-github", // Github interaction
-    "redhat.vscode-yaml", // Kubernetes, Drone syntax highlighting
-    "bajdzis.vscode-database", // Supports connections to mysql or postgres, over SSL, socked
-    "IBM.output-colorizer", // Colorize your output/test logs
-    "usernamehw.errorlens",
-    "EditorConfig.EditorConfig"
-  ],
-  "settings": {
-    "files.eol": "\n",
-    "remote.extensionKind": {
-      "ms-azuretools.vscode-docker": "workspace"
-    },
-    "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true
-    },
-    "eslint.workingDirectories": ["/workspace/pkg/api"],
-    "eslint.validate": ["javascript", "typescript"],
-    "editor.formatOnSave": true,
-    "[javascript]": {
-      "editor.defaultFormatter": "esbenp.prettier-vscode",
-      "editor.formatOnSave": false
-    },
-    "[typescript]": {
-      "editor.defaultFormatter": "esbenp.prettier-vscode",
-      "editor.formatOnSave": false
-    },
-    "prettier-eslint.eslintIntegration": true
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "mohsen1.prettify-json",
+        "dbaeumer.vscode-eslint",
+        "ms-vscode.vscode-typescript-tslint-plugin",
+        "esbenp.prettier-vscode",
+        "visualstudioexptteam.vscodeintellicode",
+        "christian-kohler.npm-intellisense",
+        "eg2.vscode-npm-script",
+        "eamodio.gitlens", // IDE Git information
+        "davidanson.vscode-markdownlint",
+        "ms-azuretools.vscode-docker", // Docker integration and linting
+        "shardulm94.trailing-spaces", // Show trailing spaces
+        "Gruntfuggly.todo-tree", // Highlights TODO comments
+        "bierner.emojisense", // Emoji sense for markdown
+        "stkb.rewrap", // rewrap comments after n characters on one line
+        "vscode-icons-team.vscode-icons", // Better file extension icons
+        "github.vscode-pull-request-github", // Github interaction
+        "redhat.vscode-yaml", // Kubernetes, Drone syntax highlighting
+        "bajdzis.vscode-database", // Supports connections to mysql or postgres, over SSL, socked
+        "IBM.output-colorizer", // Colorize your output/test logs
+        "usernamehw.errorlens",
+        "EditorConfig.EditorConfig"
+      ],
+      "settings": {
+        "files.eol": "\n",
+        "remote.extensionKind": {
+          "ms-azuretools.vscode-docker": "workspace"
+        },
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": true
+        },
+        "eslint.workingDirectories": ["/workspace/pkg/api"],
+        "eslint.validate": ["javascript", "typescript"],
+        "editor.formatOnSave": true,
+        "[javascript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode",
+          "editor.formatOnSave": false
+        },
+        "[typescript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode",
+          "editor.formatOnSave": false
+        },
+        "prettier-eslint.eslintIntegration": true
+      }
+    }
   }
 }

@@ -1,0 +1,252 @@
+@import '../global/variables.module.scss';
+@import './movie.module.scss';
+@import '../components/typography.module.scss';
+
+.episodes {
+  margin: 20px 0;
+
+  @media (min-width: $lg) {
+    margin: 100px 0;
+  }
+
+  &__top {
+    position: relative;
+    margin-bottom: $spacing;
+  }
+
+  &__title {
+    @extend .carousel_title;
+
+    &__dropdown {
+      transition: color 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+
+      svg path {
+        transition: fill 0.3s ease;
+      }
+
+      &:hover {
+        color: $orange;
+
+        svg path {
+          fill: $orange;
+        }
+      }
+    }
+
+    svg {
+      width: 6px;
+      height: auto;
+      transform: rotate(90deg);
+      margin-left: $spacing;
+    }
+  }
+
+  &__all {
+    position: absolute;
+    z-index: 10;
+    top: calc(100% + 10px);
+    left: 0;
+    background: $grey;
+    border-radius: 2px;
+
+    &__inner {
+      max-height: 50vh;
+      overflow-y: auto;
+      padding: $spacing #{$spacing * 2};
+    }
+
+    &:before {
+      content: '';
+      width: 10px;
+      height: 10px;
+      position: absolute;
+      top: -5px;
+      left: #{$spacing * 2};
+      transform: rotate(45deg);
+      background: $grey;
+      z-index: -1;
+    }
+
+    p {
+      padding: 2px 0;
+      cursor: pointer;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: $orange;
+      }
+
+      &:first-child {
+        padding-top: 0;
+      }
+
+      &:last-child {
+        padding-bottom: 0;
+      }
+    }
+  }
+
+  &__grid {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -#{$spacing};
+  }
+
+  &__more {
+    display: flex;
+    justify-content: center;
+
+    p {
+      color: $orange;
+      cursor: pointer;
+    }
+  }
+}
+
+.episode {
+  width: calc(100% / 2);
+  padding: 0 $spacing #{$spacing * 2} $spacing;
+
+  @media (min-width: $lg) {
+    width: calc(100% / 3);
+  }
+
+  &__overview {
+    margin-bottom: $spacing;
+  }
+
+  &__info {
+    display: flex;
+    // justify-content: space-between;
+    // align-items: center;
+
+    &__aired {
+      color: $green;
+    }
+
+    &__airsToday {
+      color: $blue;
+    }
+
+    &__notAired {
+      color: $red;
+    }
+
+    &__onPlex {
+      color: $orange;
+      margin-left: $spacing;
+    }
+  }
+
+  &__image {
+    padding-bottom: 56%;
+    position: relative;
+    overflow: hidden;
+    border-radius: 2px;
+    margin-bottom: $spacing;
+    width: 100%;
+
+    img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    &__placeholder {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: $grey;
+    }
+
+    &__status {
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: 2;
+      padding: 5px;
+      display: flex;
+      flex-direction: row-reverse;
+
+      &:after {
+        content: '';
+        position: absolute;
+        top: -25%;
+        right: -25%;
+        width: 150%;
+        height: 150%;
+        background: radial-gradient(
+          circle,
+          rgba(0, 0, 0, 1) 30%,
+          rgba(0, 0, 0, 0.2) 60%,
+          rgba(0, 0, 0, 0) 70%
+        );
+        opacity: 0.2;
+      }
+
+      @media (min-width: $lg) {
+        padding: 10px;
+      }
+
+      &__item {
+        height: 15px;
+        width: 15px;
+        border-radius: 50%;
+        z-index: 4;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      &__on_server {
+        background: $green;
+
+        svg {
+          width: 9px;
+          height: 9px;
+          fill: $greenLight;
+        }
+      }
+
+      &__requested {
+        background: $blue;
+
+        svg {
+          width: 9px;
+          height: 9px;
+          fill: darken($blue, 10);
+        }
+      }
+    }
+  }
+
+  &__top {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 10px 0;
+
+    &__number {
+      margin-right: 20px;
+    }
+  }
+}
+
+.no_poster {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: #{$spacing * 2};
+  white-space: initial !important;
+  color: $orange;
+  word-break: break-word;
+}

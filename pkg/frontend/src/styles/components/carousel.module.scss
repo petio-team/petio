@@ -1,0 +1,114 @@
+@import '../global/variables.module.scss';
+
+.wrap {
+  position: relative;
+  z-index: 2;
+  margin: #{$spacing * 2} 0;
+
+  @media (min-width: $lg) {
+    margin: #{$spacing * 10} 0;
+  }
+
+  &__nospacing {
+    margin: 0;
+  }
+}
+
+.track {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow: auto visible;
+  padding: 20px 20px;
+  margin: -10px -20px -20px;
+  overscroll-behavior-x: none;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  @media (min-width: $lg) {
+    padding: 100px $containerGutterSm;
+    margin: -90px -#{$containerGutterSm} -100px;
+  }
+
+  @media (min-width: $xl) {
+    padding: 100px $containerGutter;
+    margin: -90px -#{$containerGutter} -100px;
+  }
+
+  &__nospacing {
+    margin: 8px -20px -2px;
+    padding: 2px 20px;
+
+    @media (min-width: $lg) {
+      padding: 2px $containerGutterSm;
+      margin: 8px -#{$containerGutterSm} -2px;
+    }
+
+    @media (min-width: $xl) {
+      padding: 2px $containerGutter;
+      margin: 8px -#{$containerGutter} -2px;
+    }
+  }
+
+  &::-webkit-scrollbar {
+    -webkit-appearance: none;
+    height: 0;
+    display: none;
+    width: 0; /* Remove scrollbar space */
+    background: transparent; /* Optional: just make scrollbar invisible */
+  }
+}
+
+.controls {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: none;
+
+  @media (min-width: $lg) {
+    display: flex;
+  }
+
+  &__next,
+  &__prev {
+    display: flex;
+    cursor: pointer;
+
+    svg {
+      height: 20px;
+      width: 20px;
+
+      @media (min-width: $xxxl) {
+        height: 30px;
+        width: 30px;
+      }
+
+      path {
+        fill: $orange;
+        transition: fill 0.3s ease;
+      }
+    }
+
+    &:hover {
+      svg {
+        path {
+          fill: darken($orange, 10);
+        }
+      }
+    }
+  }
+
+  &__disabled {
+    pointer-events: none;
+    opacity: 0.2;
+  }
+
+  &__prev {
+    svg {
+      transform: scaleX(-1);
+    }
+  }
+
+  &__next {
+    margin-left: 10px;
+  }
+}

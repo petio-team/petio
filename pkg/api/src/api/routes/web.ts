@@ -35,16 +35,5 @@ export default async (app: Koa) => {
     }
   }
 
-  let adminPath = viewsConfig.admin;
-  if (!(await pathExists(path.join(adminPath, 'index.html')))) {
-    const adminBuildPath = path.join(adminPath, './build');
-    if (!(await pathExists(path.join(adminBuildPath, './index.html')))) {
-      throw new Error('unable to find views files for admin');
-    } else {
-      adminPath = adminBuildPath;
-    }
-  }
-
   serveReact(app, frontendPath, '/');
-  serveReact(app, adminPath, '/admin');
 };

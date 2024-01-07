@@ -1,0 +1,249 @@
+@import '../global/variables.module.scss';
+
+.wrap {
+  margin-top: 40px;
+
+  @media (min-width: $lg) {
+    margin-top: 120px;
+  }
+}
+
+.username {
+  margin-top: 10px;
+}
+
+.signOut {
+  color: $orange;
+  cursor: pointer;
+}
+
+.block {
+  padding: 20px;
+  background: $grey;
+  margin: 50px 0;
+
+  &__title {
+    margin-bottom: 10px;
+
+    @media (min-width: $lg) {
+      margin-bottom: 20px;
+    }
+  }
+}
+
+.accountItems {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.accountItem {
+  width: 100%;
+  margin-top: 20px;
+
+  &:nth-child(1) {
+    margin-top: 0;
+  }
+
+  @media (min-width: $lg) {
+    width: 33%;
+    margin-top: 0;
+  }
+}
+
+.prefBtn {
+  appearance: none;
+  border: none;
+  background: none;
+  color: $orange;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  margin-top: 10px;
+  font-weight: 700;
+}
+
+.divide {
+  margin: 20px 0;
+
+  @media (min-width: $lg) {
+    margin: 50px 0;
+  }
+}
+
+.reviewQueue {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 50px;
+  margin-left: -10px;
+  margin-right: -10px;
+
+  &__loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+
+    svg {
+      width: 50px;
+      height: 50px;
+    }
+  }
+
+  &__empty {
+    padding: 0 10px 20px 10px;
+    width: 100%;
+  }
+
+  &__item {
+    width: 100%;
+    padding: 0 10px 20px 10px;
+    position: relative;
+
+    @media (min-width: $md) {
+      width: calc(100% / 2);
+    }
+
+    @media (min-width: $lg) {
+      width: calc(100% / 3);
+    }
+
+    a {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 5;
+    }
+
+    &__inner {
+      background: $grey;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    &__image {
+      position: relative;
+      padding-bottom: 50%;
+      height: 0;
+
+      &__img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    &__noLogo {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: rgba(white, 0.1);
+    }
+
+    &__logo {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 10px;
+
+      span {
+        height: 100%;
+        width: 100%;
+      }
+
+      &__img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: center;
+      }
+
+      &__text {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: rgba(black, 0.5);
+        padding: 20px;
+      }
+    }
+
+    &__content {
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 60px;
+      overflow: hidden;
+
+      p {
+        padding-right: 50px;
+      }
+    }
+
+    &__btns {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+
+      button {
+        margin-left: 10px;
+      }
+    }
+  }
+}
+
+.actions {
+  &__btn {
+    position: relative;
+    z-index: 10;
+    // margin: 0 #{$spacing * 2} 0 0;
+
+    // @media (min-width: $lg) {
+    //   margin-left: 0;
+    //   margin-right: #{$spacing * 2};
+    // }
+
+    &__up {
+      opacity: 1;
+      border-color: $green;
+
+      svg path {
+        fill: $green;
+      }
+    }
+
+    &__down {
+      opacity: 1;
+      border-color: $red;
+
+      svg path {
+        fill: $red;
+      }
+    }
+
+    &__disabled {
+      opacity: 0.2;
+      pointer-events: none;
+    }
+  }
+}

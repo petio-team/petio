@@ -1,0 +1,10 @@
+
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <g id="Desktop" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="TV-Info" transform="translate(-932.000000, -419.000000)" fill="#FF8300" fill-rule="nonzero">
+            <g id="c-warning" transform="translate(932.000000, 419.000000)">
+                <path d="M12,0 C5.383,0 0,5.383 0,12 C0,18.617 5.383,24 12,24 C18.617,24 24,18.617 24,12 C24,5.383 18.617,0 12,0 Z M13.645,5 L13,14 L11,14 L10.392,5 L13.645,5 Z M12,20 C10.895,20 10,19.105 10,18 C10,16.895 10.895,16 12,16 C13.105,16 14,16.895 14,18 C14,19.105 13.105,20 12,20 Z" id="Shape"></path>
+            </g>
+        </g>
+    </g>
+</svg>

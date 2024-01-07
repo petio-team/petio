@@ -5,10 +5,10 @@ import { Context } from 'koa';
 import mongoose from 'mongoose';
 
 import { validateRequest } from '@/api/middleware/validation';
-import { SetupTestInput, SetupTestInputSchema } from '@/api/schemas/setup';
 import { WriteConfig, config } from '@/config/index';
 import logger from '@/loaders/logger';
 import { CreateOrUpdateUser, UserRole } from '@/models/user';
+import { SetupTestInput, SetupTestInputSchema } from '@/schemas/setup';
 import testConnection from '@/services/plex/connection';
 
 const testServer = async (ctx: Context) => {

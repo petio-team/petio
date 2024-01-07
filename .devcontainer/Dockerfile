@@ -1,4 +1,4 @@
-FROM qmcgaw/basedevcontainer:v0.17.0-alpine
+FROM qmcgaw/basedevcontainer:v0.24.0-alpine
 # Install Alpine packages
 RUN apk add -q --update --progress --no-cache nodejs npm yarn curl
 # Setup shells

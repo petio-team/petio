@@ -4,10 +4,9 @@ import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 import { z } from 'zod';
 
+import { StatusBadRequest, StatusInternalServerError } from '@/api/http/request';
 import { adminRequired } from '@/api/middleware/auth';
 import { validateRequest } from '@/api/middleware/validation';
-import { ArrInput, ArrInputSchema } from "@/api/schemas/downloaders";
-import { StatusBadRequest, StatusInternalServerError } from '@/api/http/request';
 import { ArrError } from '@/infra/arr/error';
 import RadarrAPI, { GetRadarrInstanceFromDb } from '@/infra/arr/radarr';
 import SonarrAPI, { GetSonarrInstanceFromDb } from '@/infra/arr/sonarr';
@@ -18,6 +17,7 @@ import {
   DownloaderType,
   GetAllDownloaders,
 } from '@/models/downloaders';
+import { ArrInput, ArrInputSchema } from "@/schemas/downloaders";
 
 const getSonarrOptionsById = async (ctx: Context) => {
   const instance = await GetSonarrInstanceFromDb(ctx.params.id);
