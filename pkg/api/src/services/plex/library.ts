@@ -721,7 +721,7 @@ export default class LibraryUpdate {
   }
 
   async getFriends() {
-    const url = `https://plex.tv/pms/friends/all?X-Plex-Token=${config.get(
+    const url = `https://plex.tv/api/users?X-Plex-Token=${config.get(
       'plex.token',
     )}`;
     try {
