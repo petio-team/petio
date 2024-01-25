@@ -6,6 +6,7 @@
   "shutdownAction": "stopCompose",
   "postCreateCommand": "~/.ssh.sh",
   "workspaceFolder": "/workspace",
+  "initializeCommand": "echo 'Hello World!'",
   // "overrideCommand": "",
   "customizations": {
     "vscode": {
