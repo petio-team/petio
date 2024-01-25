@@ -1,11 +1,17 @@
 {
   "name": "project-dev",
-  "dockerComposeFile": ["docker-compose.yml"],
+  "dockerComposeFile": [
+    "docker-compose.yml"
+  ],
   "service": "vscode",
-  "runServices": ["vscode", "mongo"],
+  "runServices": [
+    "vscode",
+    "mongo"
+  ],
   "shutdownAction": "stopCompose",
   "postCreateCommand": "~/.ssh.sh",
   "workspaceFolder": "/workspace",
+  "initializeCommand": "ls",
   // "overrideCommand": "",
   "customizations": {
     "vscode": {
@@ -40,8 +46,13 @@
         "editor.codeActionsOnSave": {
           "source.fixAll.eslint": true
         },
-        "eslint.workingDirectories": ["/workspace/pkg/api"],
-        "eslint.validate": ["javascript", "typescript"],
+        "eslint.workingDirectories": [
+          "/workspace/pkg/api"
+        ],
+        "eslint.validate": [
+          "javascript",
+          "typescript"
+        ],
         "editor.formatOnSave": true,
         "[javascript]": {
           "editor.defaultFormatter": "esbenp.prettier-vscode",
