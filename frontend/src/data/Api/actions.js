@@ -449,3 +449,11 @@ export async function batchLookup(ids, type) {
     throw "Unable to lookup";
   }
 }
+
+export async function checkInvitationCode(code) {
+  return api.checkInvitationCode(code);
+}
+
+export async function acceptInvitation(acceptedBy, invitCode) {
+  return api.acceptInvitation(acceptedBy, invitCode);
+}

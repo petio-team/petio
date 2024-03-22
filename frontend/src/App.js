@@ -21,6 +21,7 @@ import Genre from "./pages/Genre";
 import Networks from "./pages/Networks";
 import Company from "./pages/Company";
 import People from "./pages/People";
+import Invitation from "./pages/Invitation";
 
 const popupCenter = (url, title, w, h) => {
   // Fixes dual-screen position | credit Tautulli
@@ -81,6 +82,7 @@ class App extends React.Component {
     this.inputChange = this.inputChange.bind(this);
     this.logout = this.logout.bind(this);
     this.msg = this.msg.bind(this);
+    this.invitForm = this.invitForm.bind(this);
     this.loginOauth = this.loginOauth.bind(this);
   }
 
@@ -123,17 +125,26 @@ class App extends React.Component {
     this.login(username);
   }
 
-  invitForm(e) {
+  async invitForm(e) {
     e.preventDefault();
     let code = this.state.invitCode;
-    if (code === "") {
+    if (!code || code?.length !== 6) {
       this.msg({
         type: "error",
-        message: "Please enter an invitation code",
+        message: "Please enter an valid invitation code",
       });
       return;
     }
-    this.checkInvitCode(code);
+    try {
+      await Api.checkInvitationCode(code);
+      window.location.href = `/#/invitation/${code}`;
+    } catch (error) {
+      console.dir(error);
+      this.msg({
+        type: "error",
+        message: error.message,
+      });
+    }
   }
 
   async login(username, cookie = false) {
@@ -359,26 +370,42 @@ class App extends React.Component {
           {!this.state.loading || !this.props.user.credentials ? (
             <>
               <div className="login--inner">
-                <h1 className="logo">
-                  PET<span>IO</span>
-                </h1>
-                <p className="main-title">
-                  {!this.state.adminLogin ? "Login" : "Admin Login"}
-                </p>
                 <HashRouter>
                   <Switch>
                     <Route path="/invitation" exact>
+                      <h1 className="logo">
+                        PET<span>IO</span>
+                      </h1>
+                      <p className="main-title">Invitation</p>
                       <form onSubmit={this.invitForm}>
-                        <p style={{ marginBottom: "5px" }}>Invitation code</p>
                         <input
                           type="text"
                           name="invitCode"
                           value={this.state.invitationCode}
+                          placeholder="Enter your invitation code"
                           onChange={this.inputChange}
                         />
+                        <button
+                          className="btn btn__square btn__full"
+                          onClick={this.invitForm}
+                        >
+                          Check code
+                        </button>
                       </form>
+                      <div className="align-end" style={{ marginTop: 10 }}>
+                        <a href="/#/user">Back to Login</a>
+                      </div>
+                    </Route>
+                    <Route path="/invitation/:code" exact>
+                      <Invitation msg={this.msg} />
                     </Route>
                     <Route path="*" exact>
+                      <h1 className="logo">
+                        PET<span>IO</span>
+                      </h1>
+                      <p className="main-title">
+                        {!this.state.adminLogin ? "Login" : "Admin Login"}
+                      </p>
                       <form onSubmit={this.loginForm} autoComplete="on">
                         <p style={{ marginBottom: "5px" }}>Username / Email</p>
                         <input
@@ -429,12 +456,11 @@ class App extends React.Component {
                         <p>or</p>
                       </div>
                       <div>
-                        <button
-                          className="btn btn__square btn__full"
-                          onClick={this.loginOauth}
-                        >
-                          Inscription code
-                        </button>
+                        <a href="/#/invitation">
+                          <button className="btn btn__square btn__full">
+                            Inscription code
+                          </button>
+                        </a>
                       </div>
                     </Route>
                   </Switch>

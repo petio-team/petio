@@ -72,10 +72,15 @@ export async function batchLookup(ids, type) {
   return post(`/batch/${type}`, { ids: ids });
 }
 
-export async function getInvitation(id) {
-  return post(`/invitation`, { id });
+export async function checkInvitationCode(code) {
+  return get(`/invitation/${code}`, undefined, "handle");
 }
 
 export async function acceptInvitation(acceptedBy, invitCode) {
-  return post(`/invitation/accept`, { acceptedBy, invitCode });
+  return post(
+    `/invitation/accept`,
+    { acceptedBy, invitCode },
+    undefined,
+    "handle"
+  );
 }

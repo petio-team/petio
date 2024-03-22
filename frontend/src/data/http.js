@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 const isDev = process.env.NODE_ENV === "development";
 const origin = isDev ? "http://localhost:7778" : "";
 const basePath = window.location.pathname.replace(/\/$/, "");
@@ -35,7 +36,7 @@ export class HttpError extends Error {
   }
 }
 
-function parseResponse(response) {
+function parseResponse(response, type = "text") {
   if (response.ok) {
     return response
       .clone()
@@ -43,13 +44,25 @@ function parseResponse(response) {
       .catch(() => response.text());
   }
   console.log(new HttpError(response.status));
+
   return response
     .clone()
     .json()
-    .catch(() => response.text());
+    .catch(() => response[type]?.());
 }
 
-export function get(path, options = {}) {
+function handleResponse(response) {
+  if (response.ok) {
+    return response.clone().json();
+  }
+
+  return response.json().then((err) => {
+    console.error(`[API ${response.status}]`, err);
+    throw err;
+  });
+}
+
+export function get(path, options = {}, handleType = "parse") {
   const mergedOptions = {
     credentials: "include",
     ...options,
@@ -58,10 +71,12 @@ export function get(path, options = {}) {
       ...options.headers,
     },
   };
-  return fetch(API_URL + path, mergedOptions).then(parseResponse);
+  return fetch(API_URL + path, mergedOptions).then((res) =>
+    handleType === "parse" ? parseResponse(res) : handleResponse(res)
+  );
 }
 
-export function post(path, data, options = {}) {
+export function post(path, data, options = {}, handleType = "parse") {
   const mergedOptions = {
     credentials: "include",
     method: "POST",
@@ -73,10 +88,12 @@ export function post(path, data, options = {}) {
     },
     body: JSON.stringify(data),
   };
-  return fetch(API_URL + path, mergedOptions).then(parseResponse);
+  return fetch(API_URL + path, mergedOptions).then((res) =>
+    handleType === "parse" ? parseResponse(res) : handleResponse(res)
+  );
 }
 
-export function put(path, data, options = {}) {
+export function put(path, data, options = {}, handleType = "parse") {
   const mergedOptions = {
     credentials: "include",
     method: "PUT",
@@ -88,18 +105,23 @@ export function put(path, data, options = {}) {
     },
     body: JSON.stringify(data),
   };
-  return fetch(API_URL + path, mergedOptions).then(parseResponse);
+  return fetch(API_URL + path, mergedOptions).then((res) =>
+    handleType === "parse" ? parseResponse(res) : handleResponse(res)
+  );
 }
 
-export function del(path, options = {}) {
+export function del(path, options = {}, handleType = "parse") {
   const mergedOptions = {
     credentials: "include",
     method: "DELETE",
     ...options,
     headers: {
+      "Content-Type": "application/json",
       ...maybeGetAuthHeader(),
       ...options.headers,
     },
   };
-  return fetch(API_URL + path, mergedOptions).then(parseResponse);
+  return fetch(API_URL + path, mergedOptions).then((res) =>
+    handleType === "parse" ? parseResponse(res) : handleResponse(res)
+  );
 }

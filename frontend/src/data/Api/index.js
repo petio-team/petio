@@ -16,6 +16,8 @@ import {
   discoveryMovies,
   discoveryShows,
   batchLookup,
+  checkInvitationCode,
+  acceptInvitation,
 } from "./actions";
 
 export default {
@@ -36,4 +38,6 @@ export default {
   discoveryMovies,
   discoveryShows,
   batchLookup,
+  checkInvitationCode,
+  acceptInvitation,
 };

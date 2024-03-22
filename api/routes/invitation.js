@@ -3,11 +3,11 @@ const adminInvitationRouter = express.Router();
 const userInvitationRouter = express.Router();
 const Invitation = require("../models/invitation");
 const logger = require("../util/logger");
-const LibraryUpdate = require("../plex/libraryUpdate");
+const Library = require("../models/library");
 const User = require("../models/user");
 
 async function formatInvitation(invitation) {
-  const libraries = (await new LibraryUpdate().getLibraries()).Directory || [];
+  const libraries = await Library.find();
 
   return {
     _id: invitation._id,
@@ -27,17 +27,6 @@ async function formatInvitation(invitation) {
     downloadPermitted: invitation.downloadPermitted,
   };
 }
-
-adminInvitationRouter.get("/checkCode/:code", async (req, res) => {
-  const { code } = req.params;
-  try {
-    const invitation = await Invitation.findOne({ invitCode: code });
-    res.status(200).json({ valid: !!invitation, invitation });
-  } catch (err) {
-    res.status(500).json({ error: err });
-    return;
-  }
-});
 
 adminInvitationRouter.get("/", async (req, res) => {
   try {
@@ -203,6 +192,41 @@ userInvitationRouter.post("/accept", async (req, res) => {
   } catch (err) {
     logger.log("error", "ROUTE: Invitation failed to update");
     logger.log({ level: "error", message: err });
+  }
+});
+
+userInvitationRouter.get("/:code", async (req, res) => {
+  const { code } = req.params;
+  try {
+    const invitation = await Invitation.findOne({ invitCode: code });
+    if (invitation) {
+      if (new Date(invitation.expireOn) < new Date()) {
+        res.status(400).json({
+          valid: false,
+          message: "Invitation expired, please ask a new code.",
+        });
+        return;
+      } else if (invitation.maxUses && invitation.used >= invitation.maxUses) {
+        res
+          .status(400)
+          .json({ valid: false, message: "Invitation code has been used up." });
+        return;
+      } else {
+        res
+          .status(200)
+          .json({
+            valid: true,
+            invitation: await formatInvitation(invitation),
+          });
+        return;
+      }
+    }
+    res
+      .status(404)
+      .json({ valid: false, message: "Invitation code not found." });
+  } catch (err) {
+    res.status(500).json({ error: err });
+    return;
   }
 });
 

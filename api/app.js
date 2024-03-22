@@ -144,8 +144,8 @@ class Main {
       this.e.use("/review", authRequired, reviewRoute);
       this.e.use("/user", userRoute);
       this.e.use("/genie", authRequired, genieRoute);
+      this.e.use("/invitation", userInvitationRouter);
       this.e.use("/invitations", authRequired, adminInvitationRouter);
-      this.e.use("/invitations", authRequired, userInvitationRouter);
       this.e.use("/sessions", authRequired, sessionsRoute);
       this.e.use("/services", authRequired, servicesRoute);
       this.e.use("/mail", authRequired, mailRoute);
