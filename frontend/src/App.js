@@ -12,6 +12,7 @@ import Movie from "./pages/Movie";
 import Actor from "./pages/Actor";
 import Issues from "./components/Issues";
 import Profile from "./pages/Profile";
+import Invitations from "./pages/Invitation";
 import Movies from "./pages/Movies";
 import Requests from "./pages/Requests";
 import Shows from "./pages/Shows";
@@ -348,7 +349,7 @@ class App extends React.Component {
             <>
               <div className="login--inner">
                 <h1 className="logo">
-                  Pet<span>io</span>
+                  Pon<span>pon</span>
                 </h1>
                 <p className="main-title">
                   {!this.state.adminLogin ? "Login" : "Admin Login"}
@@ -499,6 +500,13 @@ class App extends React.Component {
                 <div className="page-wrap">
                   <div className="generic-wrap">
                     <Requests />
+                  </div>
+                </div>
+              </Route>
+              <Route exact path="/invitations">
+                <div className="page-wrap">
+                  <div className="generic-wrap">
+                    <Invitations />
                   </div>
                 </div>
               </Route>

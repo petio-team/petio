@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 const isDev = process.env.NODE_ENV === "development";
 const origin = isDev ? "http://localhost:7778" : "";
 const basePath = isDev

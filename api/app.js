@@ -29,6 +29,10 @@ const personRoute = require("./routes/person");
 const loginRoute = require("./routes/login");
 const trendingRoute = require("./routes/trending");
 const requestRoute = require("./routes/request");
+const {
+  adminInvitationRouter,
+  userInvitationRouter,
+} = require("./routes/invitation");
 const topRoute = require("./routes/top");
 const historyRoute = require("./routes/history");
 const plexRoute = require("./routes/plex");
@@ -46,7 +50,7 @@ const filterRoute = require("./routes/filter");
 const discoveryRoute = require("./routes/discovery");
 const notificationsRoute = require("./routes/notifications");
 const batchRoute = require("./routes/batch");
-const { authRequired } = require("./middleware/auth");
+const { authRequired, adminRequired } = require("./middleware/auth");
 
 class Main {
   constructor() {
@@ -140,6 +144,8 @@ class Main {
       this.e.use("/review", authRequired, reviewRoute);
       this.e.use("/user", userRoute);
       this.e.use("/genie", authRequired, genieRoute);
+      this.e.use("/invitations", authRequired, adminInvitationRouter);
+      this.e.use("/invitations", authRequired, userInvitationRouter);
       this.e.use("/sessions", authRequired, sessionsRoute);
       this.e.use("/services", authRequired, servicesRoute);
       this.e.use("/mail", authRequired, mailRoute);

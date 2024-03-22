@@ -149,6 +149,19 @@ input[type="checkbox"] {
       color: black;
       background: white;
     }
+
+    &[multiple] {
+      height: auto;
+      padding: 10px;
+      min-height: 40px;
+      max-height: 120px;
+      overflow-y: auto;
+
+      option {
+        color: white;
+        background: transparent;
+      }
+    }
   }
 
   &--textarea {

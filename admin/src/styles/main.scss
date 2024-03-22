@@ -55,6 +55,7 @@ $grid-breakpoints: $breakpoints;
 @import "globals/body";
 @import "globals/page";
 @import "globals/sidebar";
+@import "globals/flex";
 
 // components
 @import "components/input";
@@ -79,3 +80,7 @@ $grid-breakpoints: $breakpoints;
 @import "pages/settings";
 @import "pages/requests";
 @import "pages/profile";
+
+body > iframe {
+  display: none !important;
+}

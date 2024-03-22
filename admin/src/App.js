@@ -14,6 +14,7 @@ import Issues from "./page/Issues";
 import Reviews from "./page/Reviews";
 import Profile from "./page/Profile";
 import User from "./data/User";
+import Invitation from "./page/Invitation";
 
 class App extends React.Component {
   constructor(props) {
@@ -307,6 +308,15 @@ class App extends React.Component {
                 <Route path="/issues">
                   <div className="page-wrap">
                     <Issues
+                      user={this.props.user}
+                      api={this.props.api}
+                      msg={this.msg}
+                    />
+                  </div>
+                </Route>
+                <Route path="/invitations">
+                  <div className="page-wrap">
+                    <Invitation
                       user={this.props.user}
                       api={this.props.api}
                       msg={this.msg}

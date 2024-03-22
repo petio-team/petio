@@ -173,6 +173,10 @@ button {
     opacity: 0.2;
     pointer-events: none;
   }
+
+  &.align-right {
+    margin-left: auto;
+  }
 }
 
 @keyframes spinner1 {

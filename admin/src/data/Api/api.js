@@ -1,4 +1,4 @@
-import { get, post, upload } from "../http";
+import { get, post, put, upload } from "../http";
 
 export async function popular() {
   return get("/trending");
@@ -222,4 +222,32 @@ export function testPlex() {
 
 export function updatePlexToken() {
   return get(`/plex/update_token`);
+}
+
+export async function getPlexLibraries() {
+  return get(`/invitations/libraries`);
+}
+
+export async function getInvitations() {
+  return get(`/invitations`);
+}
+
+export async function getInvitation(id) {
+  return post(`/invitations`, id);
+}
+
+export async function addInvitation(invitation) {
+  return put(`/invitations`, invitation);
+}
+
+export async function deleteInvitation(id) {
+  return post(`/invitations/delete`, { id });
+}
+
+export async function updateInvitation(invitation) {
+  return post(`/invitations`, invitation);
+}
+
+export async function acceptInvitation(acceptedBy, inviteCode) {
+  return post(`/invitations/accept`, { acceptedBy, inviteCode });
 }
