@@ -3,7 +3,6 @@ import { HashRouter, Switch, Route } from "react-router-dom";
 import { connect } from "react-redux";
 import User from "./data/User";
 import Api from "./data/Api";
-// import Plex from "./data/Plex";
 import Sidebar from "./components/Sidebar";
 import Search from "./pages/Search";
 import Series from "./pages/Series";

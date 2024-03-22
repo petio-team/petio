@@ -229,6 +229,7 @@ class Users extends React.Component {
       eu_password: user.password === "removed" ? "*********" : "",
       eu_enabled: user.disabled ? false : true,
       thumb_path:
+        // eslint-disable-next-line no-undef
         process.env.NODE_ENV === "development"
           ? "http://localhost:7778/user/thumb/" + user.id
           : "/api/user/thumb/" + user.id,
@@ -388,6 +389,7 @@ class Users extends React.Component {
       await Api.uploadThumb(formData, this.state.activeUser.id);
       this.setState({
         thumb_path:
+          // eslint-disable-next-line no-undef
           process.env.NODE_ENV === "development"
             ? "http://localhost:7778/user/thumb/" +
               this.state.activeUser.id +
