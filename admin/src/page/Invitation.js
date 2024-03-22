@@ -35,7 +35,7 @@ export class Invitation extends React.Component {
       this.setState({
         invForm: {
           _id: invitation._id,
-          code: invitation.inviteCode || this.generateInvitationCode(),
+          code: invitation.invitCode || this.generateInvitationCode(),
           email: invitation.email || "",
           expireOn: invitation.expireOn || "",
           maxUses: invitation.maxUses || "",
@@ -96,7 +96,7 @@ export class Invitation extends React.Component {
       const invitation = {
         _id: this.state.invForm._id,
         email: this.state.invForm.email,
-        inviteCode: this.state.invForm.code,
+        invitCode: this.state.invForm.code,
         expireOn:
           this.getInvitationExpireOnDate(this.state.invForm.expireOn) ||
           undefined,
@@ -190,7 +190,7 @@ export class Invitation extends React.Component {
           <tbody>
             {this.state.invitations.map((invitation) => {
               const {
-                inviteCode,
+                invitCode,
                 email,
                 invitedBy,
                 acceptedBy,
@@ -207,7 +207,7 @@ export class Invitation extends React.Component {
 
               return (
                 <tr key={_id}>
-                  <td>{inviteCode}</td>
+                  <td>{invitCode}</td>
                   <td>{email}</td>
                   <td>{invitedBy.email}</td>
                   <td>{acceptedBy?.map((user) => user.email).join(", ")}</td>

@@ -757,9 +757,9 @@ export async function updateInvitation(invitation) {
     throw "Unable to update invitation";
   }
 }
-export async function acceptInvitation(acceptedBy, inviteCode) {
+export async function acceptInvitation(acceptedBy, invitCode) {
   try {
-    const data = await api.acceptInvitation(acceptedBy, inviteCode);
+    const data = await api.acceptInvitation(acceptedBy, invitCode);
     return data;
   } catch (err) {
     console.log(err);

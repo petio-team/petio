@@ -6,10 +6,12 @@ const logger = require("../util/logger");
 const LibraryUpdate = require("../plex/libraryUpdate");
 const User = require("../models/user");
 
-async function formatInvitation(invitation, libraries) {
+async function formatInvitation(invitation) {
+  const libraries = (await new LibraryUpdate().getLibraries()).Directory || [];
+
   return {
     _id: invitation._id,
-    inviteCode: invitation.inviteCode,
+    invitCode: invitation.invitCode,
     email: invitation.email,
     invitedBy: await User.findById(invitation.invitedBy),
     acceptedBy: await Promise.all(
@@ -26,13 +28,22 @@ async function formatInvitation(invitation, libraries) {
   };
 }
 
+adminInvitationRouter.get("/checkCode/:code", async (req, res) => {
+  const { code } = req.params;
+  try {
+    const invitation = await Invitation.findOne({ invitCode: code });
+    res.status(200).json({ valid: !!invitation, invitation });
+  } catch (err) {
+    res.status(500).json({ error: err });
+    return;
+  }
+});
+
 adminInvitationRouter.get("/", async (req, res) => {
   try {
-    const libraries =
-      (await new LibraryUpdate().getLibraries()).Directory || [];
     const invitations = await Invitation.find();
     const completeInvitations = await Promise.all(
-      invitations.map((inv) => formatInvitation(inv, libraries))
+      invitations.map((inv) => formatInvitation(inv))
     );
 
     res.status(200).json(completeInvitations);
@@ -51,7 +62,7 @@ adminInvitationRouter.put("/", async (req, res) => {
   }
 
   const {
-    inviteCode,
+    invitCode,
     invitedBy,
     expireOn,
     libraries,
@@ -61,13 +72,13 @@ adminInvitationRouter.put("/", async (req, res) => {
   } = invitation;
 
   try {
-    if (!inviteCode || !invitedBy) {
+    if (!invitCode || !invitedBy) {
       res.status(403).json({ error: "Missing required fields" });
       return;
     }
 
     const newInvitation = new Invitation({
-      inviteCode,
+      invitCode,
       invitedBy,
       email,
       acceptedBy: [],
@@ -126,15 +137,10 @@ adminInvitationRouter.post("/", async (req, res) => {
       { useFindAndModify: false }
     );
 
-    const libraries =
-      (await new LibraryUpdate().getLibraries()).Directory || [];
     res
       .status(200)
       .json(
-        await formatInvitation(
-          { ...updatedInvitation._doc, ...invitation },
-          libraries
-        )
+        await formatInvitation({ ...updatedInvitation._doc, ...invitation })
       );
     return;
   } catch {
@@ -153,16 +159,16 @@ adminInvitationRouter.get("/libraries", async (req, res) => {
 });
 
 userInvitationRouter.post("/accept", async (req, res) => {
-  const { inviteCode, acceptedBy } = req.body;
+  const { invitCode, acceptedBy } = req.body;
 
-  if (!inviteCode) {
+  if (!invitCode) {
     res.status(500).json({ error: "No invitation code provided." });
     return;
   }
 
   let invitation;
   try {
-    invitation = await Invitation.findOne({ inviteCode });
+    invitation = await Invitation.findOne({ invitCode });
   } catch (err) {
     logger.log("error", "ROUTE: Invitation failed to get");
     logger.log({ level: "error", message: err });

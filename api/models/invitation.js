@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const InvitationSchema = mongoose.Schema(
   {
-    inviteCode: String,
+    invitCode: String,
     invitedBy: String,
     invitedOn: Date,
     expireOn: Date,

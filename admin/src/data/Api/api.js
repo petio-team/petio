@@ -248,6 +248,6 @@ export async function updateInvitation(invitation) {
   return post(`/invitations`, invitation);
 }
 
-export async function acceptInvitation(acceptedBy, inviteCode) {
-  return post(`/invitations/accept`, { acceptedBy, inviteCode });
+export async function acceptInvitation(acceptedBy, invitCode) {
+  return post(`/invitations/accept`, { acceptedBy, invitCode });
 }

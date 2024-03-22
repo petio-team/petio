@@ -12,7 +12,6 @@ import Movie from "./pages/Movie";
 import Actor from "./pages/Actor";
 import Issues from "./components/Issues";
 import Profile from "./pages/Profile";
-import Invitations from "./pages/Invitation";
 import Movies from "./pages/Movies";
 import Requests from "./pages/Requests";
 import Shows from "./pages/Shows";
@@ -123,6 +122,19 @@ class App extends React.Component {
     let username = this.state.username;
 
     this.login(username);
+  }
+
+  invitForm(e) {
+    e.preventDefault();
+    let code = this.state.invitCode;
+    if (code === "") {
+      this.msg({
+        type: "error",
+        message: "Please enter an invitation code",
+      });
+      return;
+    }
+    this.checkInvitCode(code);
   }
 
   async login(username, cookie = false) {
@@ -349,55 +361,85 @@ class App extends React.Component {
             <>
               <div className="login--inner">
                 <h1 className="logo">
-                  Pon<span>pon</span>
+                  PET<span>IO</span>
                 </h1>
                 <p className="main-title">
                   {!this.state.adminLogin ? "Login" : "Admin Login"}
                 </p>
-                <form onSubmit={this.loginForm} autoComplete="on">
-                  <p style={{ marginBottom: "5px" }}>Username / Email</p>
-                  <input
-                    type="text"
-                    name="username"
-                    value={this.state.username}
-                    onChange={this.inputChange}
-                    autoComplete="username"
-                  />
-                  {this.state.login_type === 1 ? (
-                    <>
-                      <p style={{ marginBottom: "5px" }}>Password</p>
-                      <input
-                        type="password"
-                        name="password"
-                        value={this.state.password}
-                        onChange={this.inputChange}
-                        autoComplete="password"
-                      />
-                    </>
-                  ) : null}
-                  {this.state.loginMsg ? (
-                    <div className="msg msg__error msg__input">
-                      {this.state.loginMsg}
-                    </div>
-                  ) : null}
-                  {this.state.config === "failed" ? (
-                    <div className="msg msg__error msg__input">
-                      API Not configured, please complete setup
-                    </div>
-                  ) : null}
-                  <button className="btn btn__square btn__full">Login</button>
-                </form>
-                <div className="login--inner--divide">
-                  <p>or</p>
-                </div>
-                <div>
-                  <button
-                    className="btn btn__square btn__full"
-                    onClick={this.loginOauth}
-                  >
-                    Login with Plex
-                  </button>
-                </div>
+                <HashRouter>
+                  <Switch>
+                    <Route path="/invitation" exact>
+                      <form onSubmit={this.invitForm}>
+                        <p style={{ marginBottom: "5px" }}>Invitation code</p>
+                        <input
+                          type="text"
+                          name="invitCode"
+                          value={this.state.invitationCode}
+                          onChange={this.inputChange}
+                        />
+                      </form>
+                    </Route>
+                    <Route path="*" exact>
+                      <form onSubmit={this.loginForm} autoComplete="on">
+                        <p style={{ marginBottom: "5px" }}>Username / Email</p>
+                        <input
+                          type="text"
+                          name="username"
+                          value={this.state.username}
+                          onChange={this.inputChange}
+                          autoComplete="username"
+                        />
+                        {this.state.login_type === 1 ? (
+                          <>
+                            <p style={{ marginBottom: "5px" }}>Password</p>
+                            <input
+                              type="password"
+                              name="password"
+                              value={this.state.password}
+                              onChange={this.inputChange}
+                              autoComplete="password"
+                            />
+                          </>
+                        ) : null}
+                        {this.state.loginMsg ? (
+                          <div className="msg msg__error msg__input">
+                            {this.state.loginMsg}
+                          </div>
+                        ) : null}
+                        {this.state.config === "failed" ? (
+                          <div className="msg msg__error msg__input">
+                            API Not configured, please complete setup
+                          </div>
+                        ) : null}
+                        <button className="btn btn__square btn__full">
+                          Login
+                        </button>
+                      </form>
+                      <div className="login--inner--divide">
+                        <p>or</p>
+                      </div>
+                      <div>
+                        <button
+                          className="btn btn__square btn__full"
+                          onClick={this.loginOauth}
+                        >
+                          Login with Plex
+                        </button>
+                      </div>
+                      <div className="login--inner--divide">
+                        <p>or</p>
+                      </div>
+                      <div>
+                        <button
+                          className="btn btn__square btn__full"
+                          onClick={this.loginOauth}
+                        >
+                          Inscription code
+                        </button>
+                      </div>
+                    </Route>
+                  </Switch>
+                </HashRouter>
               </div>
               <div className="credits">
                 <a href="https://fanart.tv/" target="_blank" rel="noreferrer">
@@ -500,13 +542,6 @@ class App extends React.Component {
                 <div className="page-wrap">
                   <div className="generic-wrap">
                     <Requests />
-                  </div>
-                </div>
-              </Route>
-              <Route exact path="/invitations">
-                <div className="page-wrap">
-                  <div className="generic-wrap">
-                    <Invitations />
                   </div>
                 </div>
               </Route>
