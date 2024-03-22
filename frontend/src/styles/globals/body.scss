@@ -30,6 +30,12 @@ body {
   }
 }
 
+body {
+  & > iframe {
+    display: none;
+  }
+}
+
 // body {
 //   @include media-breakpoint-down(md) {
 //     position: relative;

@@ -48,6 +48,12 @@ import {
   testDiscord,
   testTelegram,
   testPlex,
+  getPlexLibraries,
+  getInvitations,
+  addInvitation,
+  deleteInvitation,
+  updateInvitation,
+  acceptInvitation,
 } from "./actions";
 
 export default {
@@ -100,4 +106,10 @@ export default {
   testDiscord,
   testTelegram,
   testPlex,
+  getPlexLibraries,
+  getInvitations,
+  addInvitation,
+  deleteInvitation,
+  updateInvitation,
+  acceptInvitation,
 };

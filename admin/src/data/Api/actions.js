@@ -710,3 +710,59 @@ export async function testPlex() {
     throw "Unable to test, please try again later";
   }
 }
+
+export async function getPlexLibraries() {
+  try {
+    const data = await api.getPlexLibraries();
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw "Unable to get libraries";
+  }
+}
+
+export async function getInvitations() {
+  try {
+    const data = await api.getInvitations();
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw "Unable to get invitations";
+  }
+}
+export async function addInvitation(invitation) {
+  try {
+    const data = await api.addInvitation(invitation);
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw "Unable to add invitation";
+  }
+}
+export async function deleteInvitation(id) {
+  try {
+    const data = await api.deleteInvitation(id);
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw "Unable to delete invitation";
+  }
+}
+export async function updateInvitation(invitation) {
+  try {
+    const data = await api.updateInvitation(invitation);
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw "Unable to update invitation";
+  }
+}
+export async function acceptInvitation(acceptedBy, inviteCode) {
+  try {
+    const data = await api.acceptInvitation(acceptedBy, inviteCode);
+    return data;
+  } catch (err) {
+    console.log(err);
+    throw "Unable to accept invitation";
+  }
+}

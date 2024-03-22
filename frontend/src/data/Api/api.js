@@ -1,4 +1,4 @@
-import { get, post } from "../http";
+import { get, post, put, del } from "../http";
 
 export async function popular() {
   return get("/trending");
@@ -70,4 +70,28 @@ export async function discoveryShows() {
 
 export async function batchLookup(ids, type) {
   return post(`/batch/${type}`, { ids: ids });
+}
+
+export async function getInvitations() {
+  return post(`/invitation`);
+}
+
+export async function getInvitation(id) {
+  return post(`/invitation`, { id });
+}
+
+export async function addInvitation(invitation) {
+  return put(`/invitation`, { invitation });
+}
+
+export async function deleteInvitation(id) {
+  return del(`/invitation`, { id });
+}
+
+export async function updateInvitation(invitation) {
+  return post(`/invitation`, { invitation });
+}
+
+export async function acceptInvitation(acceptedBy, inviteCode) {
+  return post(`/invitation/accept`, { acceptedBy, inviteCode });
 }

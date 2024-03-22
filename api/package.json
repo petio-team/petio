@@ -4,7 +4,8 @@
   "description": "Rest Api for Petio",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "dev": "nodemon app.js"
   },
   "author": "",
   "license": "ISC",
@@ -41,7 +42,8 @@
     "zlib": "^1.0.5"
   },
   "devDependencies": {
-    "dotenv": "^8.2.0"
+    "dotenv": "^8.2.0",
+    "nodemon": "^3.1.0"
   },
   "bin": "app.js",
   "targets": [

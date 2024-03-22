@@ -6,6 +6,7 @@ import { ReactComponent as PersonIcon } from "../assets/svg/people.svg";
 import { ReactComponent as ReviewIcon } from "../assets/svg/star.svg";
 import { ReactComponent as RequestIcon } from "../assets/svg/bookmark.svg";
 import { ReactComponent as SettingsIcon } from "../assets/svg/settings.svg";
+import { ReactComponent as InvitationIcon } from "../assets/svg/invitation.svg";
 import { ReactComponent as AdminIcon } from "../assets/svg/admin.svg";
 import { ReactComponent as IssueIcon } from "../assets/svg/issue.svg";
 import pjson from "../../package.json";
@@ -123,6 +124,20 @@ class Sidebar extends React.Component {
             <p>Users</p>
             <div className="icon">
               <PersonIcon />
+            </div>
+          </Link>
+          <Link
+            to="/invitations"
+            className={
+              "menu--item " +
+              (current === "/invitations" || current.startsWith("/invitations/")
+                ? "active"
+                : "")
+            }
+          >
+            <p>Invitations</p>
+            <div className="icon">
+              <InvitationIcon />
             </div>
           </Link>
           <Link
