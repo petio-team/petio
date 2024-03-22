@@ -35,7 +35,7 @@ class Sidebar extends React.Component {
       <div className="sidebar--inner">
         <Link to="/" className="logo">
           <p className="logo-text" title="Petio">
-            Pet<span>io</span>
+            Pon<span>pon</span>
           </p>
         </Link>
         {current === "/" || current.startsWith("/search/") ? null : (

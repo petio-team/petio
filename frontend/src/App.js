@@ -349,7 +349,7 @@ class App extends React.Component {
             <>
               <div className="login--inner">
                 <h1 className="logo">
-                  Pet<span>io</span>
+                  Pon<span>pon</span>
                 </h1>
                 <p className="main-title">
                   {!this.state.adminLogin ? "Login" : "Admin Login"}
