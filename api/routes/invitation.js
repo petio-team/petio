@@ -214,6 +214,15 @@ userInvitationRouter.post("/accept", async (req, res) => {
     return;
   }
 
+  if (invitation.email && invitation.email !== plexUser.user.email) {
+    res.status(403).json({
+      level: "error",
+      message:
+        "You can't use this invitation code with this email. Use the one in the invitation.",
+    });
+    return;
+  }
+
   try {
     await addUserToPlexServer(invitation, plexUser);
   } catch (err) {
