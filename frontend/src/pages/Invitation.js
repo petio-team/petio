@@ -22,7 +22,6 @@ function Invitation(props) {
   async function checkCode(code) {
     try {
       const res = await Api.checkInvitationCode(code);
-      console.log(res.invitation);
       setInvitation(res.invitation);
     } catch (error) {
       msg({
@@ -36,10 +35,10 @@ function Invitation(props) {
   async function register(setIndex) {
     try {
       const plexWindow = popupCenter("", "Register on Plex", 700, 2300);
-      const plexUser = await User.plexAuth(plexWindow);
+      const plexUserIdentity = await User.plexRegistration(plexWindow);
+      console.log(plexUserIdentity);
       setIndex((step) => step + 1);
-      const res = await Api.acceptInvitation(plexUser, code);
-      console.log(res);
+      const res = await Api.acceptInvitation(plexUserIdentity, code);
       setRedirectUrl(res.redirectUrl);
     } catch (error) {
       msg({

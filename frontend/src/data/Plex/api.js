@@ -13,7 +13,6 @@ export function getPins() {
   let url = "https://plex.tv/api/v2/pins?strong=true";
   let method = "post";
   let headers = plexHeaders;
-  console.log(headers);
   return process(url, headers, method).then((response) => response.json());
 }
 

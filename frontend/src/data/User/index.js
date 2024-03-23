@@ -9,6 +9,7 @@ import {
   myRequests,
   quota,
   plexAuth,
+  plexRegistration,
   getArchive,
 } from "./actions";
 
@@ -23,5 +24,6 @@ export default {
   myRequests,
   quota,
   plexAuth,
+  plexRegistration,
   getArchive,
 };

@@ -5,6 +5,48 @@ import { initAuth } from "../auth";
 import { validatePin, getPins } from "../Plex/api";
 import Nav from "../Nav";
 
+const plex_oauth_loader = `
+<style>
+  .login-loader-container {
+    font-family: Open Sans, Arial, sans-serif;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+  .login-loader-message {
+    color: #282A2D;
+    text-align: center;
+    position: absolute;
+    left: 50%;
+    top: 25%;
+    transform: translate(-50%, -50%);
+  }
+  .login-loader {
+    border: 5px solid #ccc;
+    -webkit-animation: spin 1s linear infinite;
+    animation: spin 1s linear infinite;
+    border-top: 5px solid #282A2D;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    position: relative;
+    left: calc(50% - 25px);
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
+<div class=login-loader-container>  
+  <div class=login-loader-message>  
+    <div class=login-loader></div>  
+    <br>
+    Redirecting to the Plex login page...
+  </div>
+</div>`;
+
 function getCookie(cname) {
   var name = cname + "=";
   var decodedCookie = decodeURIComponent(document.cookie);
@@ -75,51 +117,9 @@ export function logout() {
 }
 
 export async function plexAuth(plexWindow) {
-  const plex_oauth_loader =
-    "<style>" +
-    ".login-loader-container {" +
-    'font-family: "Open Sans", Arial, sans-serif;' +
-    "position: absolute;" +
-    "top: 0;" +
-    "right: 0;" +
-    "bottom: 0;" +
-    "left: 0;" +
-    "}" +
-    ".login-loader-message {" +
-    "color: #282A2D;" +
-    "text-align: center;" +
-    "position: absolute;" +
-    "left: 50%;" +
-    "top: 25%;" +
-    "transform: translate(-50%, -50%);" +
-    "}" +
-    ".login-loader {" +
-    "border: 5px solid #ccc;" +
-    "-webkit-animation: spin 1s linear infinite;" +
-    "animation: spin 1s linear infinite;" +
-    "border-top: 5px solid #282A2D;" +
-    "border-radius: 50%;" +
-    "width: 50px;" +
-    "height: 50px;" +
-    "position: relative;" +
-    "left: calc(50% - 25px);" +
-    "}" +
-    "@keyframes spin {" +
-    "0% { transform: rotate(0deg); }" +
-    "100% { transform: rotate(360deg); }" +
-    "}" +
-    "</style>" +
-    '<div class="login-loader-container">' +
-    '<div class="login-loader-message">' +
-    '<div class="login-loader"></div>' +
-    "<br>" +
-    "Redirecting to the Plex login page..." +
-    "</div>" +
-    "</div>";
   plexWindow.document.body.innerHTML = plex_oauth_loader;
   try {
     let pins = await getPins();
-    console.log(pins);
     plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=df9e71a5-a6cd-488e-8730-aaa9195f7435&code=${pins.code}`;
     let data = await waitForPin(plexWindow, pins.id);
     return data;
@@ -128,11 +128,15 @@ export async function plexAuth(plexWindow) {
   }
 }
 
-async function waitForPin(plexWindow, id) {
+async function waitForPin(plexWindow, id, type = "login") {
   await timeout(1000);
-  let response = await validatePin(id);
+  const response = await validatePin(id);
+
   if (response.authToken) {
     plexWindow.close();
+
+    if (type === "registration") return response;
+
     let data = await api.plexLogin(response.authToken);
 
     if (data.user) {
@@ -157,7 +161,7 @@ async function waitForPin(plexWindow, id) {
       error: "Plex window closed",
     };
   } else {
-    return await waitForPin(plexWindow, id);
+    return await waitForPin(plexWindow, id, type);
   }
 }
 
@@ -281,5 +285,16 @@ export async function quota() {
   } catch (err) {
     console.log(err);
     throw "Unable to get Quota";
+  }
+}
+
+export async function plexRegistration(plexWindow) {
+  plexWindow.document.body.innerHTML = plex_oauth_loader;
+  try {
+    let pins = await getPins();
+    plexWindow.location.href = `https://app.plex.tv/auth/#!?clientID=df9e71a5-a6cd-488e-8730-aaa9195f7435&code=${pins.code}`;
+    return await waitForPin(plexWindow, pins.id, "registration");
+  } catch (err) {
+    throw err;
   }
 }

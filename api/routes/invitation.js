@@ -3,9 +3,10 @@ const Invitation = require("../models/invitation");
 const logger = require("../util/logger");
 const Libraries = require("../models/library");
 const User = require("../models/user");
-const addUserToPlexServer = require("../plex/invitations");
+const { addUserToPlexServer, getPlexUser } = require("../plex/invitations");
 const getConfig = require("../util/config");
 const updateConfig = require("../util/updateConfig");
+const LibraryUpdate = require("../plex/libraryUpdate");
 
 const adminInvitationRouter = express.Router();
 const userInvitationRouter = express.Router();
@@ -19,7 +20,7 @@ async function formatInvitation(invitation) {
     email: invitation.email,
     invitedBy: await User.findById(invitation.invitedBy),
     acceptedBy: await Promise.all(
-      invitation.acceptedBy.map(async (id) => User.findById(id))
+      invitation.acceptedBy.map(async (email) => User.findOne({ email }))
     ),
     maxUses: invitation.maxUses,
     used: invitation.used,
@@ -126,7 +127,6 @@ adminInvitationRouter.post("/", async (req, res) => {
 adminInvitationRouter.get("/redirectUrl", async (req, res) => {
   try {
     const config = getConfig();
-    console.log(config);
     res.status(200).json({ urlRedirection: config.redirectUrlAfterInvite });
   } catch {
     res.status(500).json({ error: "Failed to get URL redirection" });
@@ -173,15 +173,19 @@ adminInvitationRouter.get("/libraries", async (req, res) => {
 });
 
 userInvitationRouter.post("/accept", async (req, res) => {
-  const { invitCode, plexUser } = req.body;
+  const { invitCode, plexUserIdentity } = req.body;
 
   if (!invitCode) {
-    res.status(500).json({ error: "No invitation code provided." });
+    res
+      .status(500)
+      .json({ level: "error", message: "No invitation code provided." });
     return;
   }
 
-  if (!plexUser) {
-    res.status(500).json({ error: "Failed to load user datas." });
+  if (!plexUserIdentity.authToken) {
+    res
+      .status(500)
+      .json({ level: "error", message: "Failed to load user datas." });
     return;
   }
 
@@ -214,7 +218,28 @@ userInvitationRouter.post("/accept", async (req, res) => {
     return;
   }
 
-  if (invitation.email && invitation.email !== plexUser.user.email) {
+  let plexUser;
+
+  try {
+    plexUser = await getPlexUser(plexUserIdentity);
+    if (!plexUser) {
+      res.status(404).json({
+        level: "error",
+        message:
+          "Failed to get user data from Plex. Please check your Plex account.",
+      });
+      return;
+    }
+  } catch (err) {
+    logger.log("error", "ROUTE: Invitation failed to get user data from Plex");
+    logger.log({ level: "error", message: err });
+    res
+      .status(404)
+      .json({ level: "error", message: "Failed to retrive user from Plex" });
+    return;
+  }
+
+  if (invitation.email && invitation.email !== plexUser.email) {
     res.status(403).json({
       level: "error",
       message:
@@ -232,9 +257,21 @@ userInvitationRouter.post("/accept", async (req, res) => {
   }
 
   try {
-    await Invitation.findOneAndUpdate({ _id: invitation._id }, invitation);
-    const config = getConfig();
+    await Invitation.findOneAndUpdate(
+      { _id: invitation._id },
+      {
+        $push: { acceptedBy: plexUser.email },
+        $inc: { used: 1 },
+        acceptedOn: new Date(),
+      },
+      {
+        useFindAndModify: false,
+      }
+    );
 
+    await new LibraryUpdate().updateFriends();
+
+    const config = getConfig();
     res.status(200).json({
       redirectUrl: config.redirectUrlAfterInvite,
     });

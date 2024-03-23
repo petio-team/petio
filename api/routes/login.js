@@ -157,12 +157,7 @@ router.post("/plex_login", async (req, res) => {
   const request_ip = req.ip;
   const token = req.body.token;
   try {
-    console.info(req.body);
-
     let userId = await plexOauth(token);
-
-    console.info(userId);
-
     let dbUser = await User.findOne({ id: userId });
     if (!dbUser) throw "User not found";
     if (dbUser.disabled) throw "User is disabled";

@@ -250,8 +250,8 @@ class Invitation extends React.Component {
           <thead>
             <tr>
               <th>Code</th>
-              <th>To</th>
               <th>Invited by</th>
+              <th>To</th>
               <th>Accepted by</th>
               <th>Uses</th>
               <th>Expiration</th>
@@ -262,55 +262,61 @@ class Invitation extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {this.state.invitations.map((invitation) => {
-              const {
-                invitCode,
-                email,
-                invitedBy,
-                acceptedBy,
-                libraries,
-                maxUses,
-                used,
-                invitedOn,
-                expireOn,
-                downloadPermitted,
-                _id,
-              } = invitation;
+            {this.state.invitations
+              .sort((a, b) => (b.invitedOn < a.invitedOn ? -1 : 1))
+              .map((invitation) => {
+                const {
+                  invitCode,
+                  email,
+                  invitedBy,
+                  acceptedBy,
+                  libraries,
+                  maxUses,
+                  used,
+                  invitedOn,
+                  expireOn,
+                  downloadPermitted,
+                  _id,
+                } = invitation;
 
-              return (
-                <tr key={_id}>
-                  <td>{invitCode}</td>
-                  <td>{email}</td>
-                  <td>{invitedBy.email}</td>
-                  <td>{acceptedBy?.map((user) => user.email).join(", ")}</td>
-                  <td>{!maxUses ? "Unlimited" : `${used}/${maxUses}`}</td>
-                  <td>
-                    {!expireOn ? "Unlimited" : moment(expireOn).fromNow()}
-                  </td>
-                  <td>{moment(invitedOn).fromNow()}</td>
-                  <td>{libraries.map((l) => l.title).join(", ")}</td>
-                  <td>{downloadPermitted ? "✔" : "✘"}</td>
-                  <td>
-                    <p
-                      className="table-action"
-                      onClick={() => {
-                        this.openModal("addInvit", invitation);
-                      }}
-                    >
-                      Edit
-                    </p>
-                    <p
-                      className="table-action"
-                      onClick={() => {
-                        this.deleteInvitation(invitation._id);
-                      }}
-                    >
-                      Delete
-                    </p>
-                  </td>
-                </tr>
-              );
-            })}
+                return (
+                  <tr key={_id}>
+                    <td>{invitCode}</td>
+                    <td>{invitedBy.email}</td>
+                    <td>{email || "Anyone"}</td>
+                    <td style={{ whiteSpace: "break-spaces" }}>
+                      {acceptedBy?.map((user) => user.email).join("\n")}
+                    </td>
+                    <td>{!maxUses ? "Unlimited" : `${used}/${maxUses}`}</td>
+                    <td>
+                      {!expireOn ? "Unlimited" : moment(expireOn).fromNow()}
+                    </td>
+                    <td>{moment(invitedOn).fromNow()}</td>
+                    <td style={{ whiteSpace: "break-spaces" }}>
+                      {libraries.map((l) => l.title).join("\n")}
+                    </td>
+                    <td>{downloadPermitted ? "✔" : "✘"}</td>
+                    <td>
+                      <p
+                        className="table-action"
+                        onClick={() => {
+                          this.openModal("addInvit", invitation);
+                        }}
+                      >
+                        Edit
+                      </p>
+                      <p
+                        className="table-action"
+                        onClick={() => {
+                          this.deleteInvitation(invitation._id);
+                        }}
+                      >
+                        Delete
+                      </p>
+                    </td>
+                  </tr>
+                );
+              })}
           </tbody>
         </table>
 
