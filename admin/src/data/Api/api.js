@@ -229,29 +229,32 @@ export async function getPlexLibraries() {
 }
 
 export async function getInvitations() {
-  return get(`/invitations`);
+  return get(`/invitations`, undefined, "handle");
 }
 
 export async function getInvitation(id) {
-  return post(`/invitations`, id);
+  return post(`/invitations`, id, "handle");
 }
 
 export async function addInvitation(invitation) {
-  return put(`/invitations`, invitation);
+  return put(`/invitations`, invitation, "handle");
 }
 
 export async function deleteInvitation(id) {
-  return post(`/invitations/delete`, { id });
+  return post(`/invitations/delete`, { id }, "handle");
 }
 
 export async function updateInvitation(invitation) {
-  return post(`/invitations`, invitation);
-}
-
-export async function modifyRedirectUrl(redirectUrl) {
-  return post(`/redirectUrl`, { redirectUrl }, "handle");
+  return post(`/invitations`, invitation, "handle");
 }
 
 export async function acceptInvitation(acceptedBy, invitCode) {
-  return post(`/invitations/accept`, { acceptedBy, invitCode });
+  return post(`/invitations/accept`, { acceptedBy, invitCode }, "handle");
+}
+
+export function getUrlRedirection() {
+  return get(`/invitations/redirectUrl`, undefined, "handle");
+}
+export function updateUrlRedirection(urlRedirection) {
+  return post(`/invitations/redirectUrl`, { urlRedirection }, "handle");
 }

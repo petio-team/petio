@@ -4,6 +4,37 @@
   align-items: center;
   flex-flow: row nowrap;
   height: 100%;
+
+  *::-webkit-scrollbar {
+    background-color: transparent;
+    width: 12px;
+    height: 12px;
+    z-index: 999999;
+  }
+
+  *::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 12px;
+    border: 0 solid #4a443a;
+  }
+
+  *::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  *:hover::-webkit-scrollbar-thumb {
+    background-color: #a0a0a5;
+    border: 2px solid #4a443a;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: #a0a0a5;
+    border: 2px solid #a0a0a5;
+  }
 }
 
 .stepper-nav {
@@ -29,7 +60,7 @@
   height: calc(100% - 45px);
   max-height: calc(100% - 45px);
   overflow: hidden;
-  background-color: rgba(255, 255, 255, 0.06);
+  background-color: #4a443a;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   border-radius: 5px;
   border: rgba(255, 255, 255, 0.05) solid 1px;
@@ -73,7 +104,7 @@
   flex-flow: row nowrap;
   align-items: center;
   padding-right: 30px;
-  padding-top: 8px;
+  padding-top: 16px;
 
   &[incoming-step="true"] {
     opacity: 0.3;
@@ -93,6 +124,7 @@
     font-size: 1.5em;
     font-weight: 500;
     color: rgba(255, 255, 255, 0.8);
+    padding-top: 0px !important;
   }
 
   & h4 {

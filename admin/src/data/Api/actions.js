@@ -712,67 +712,26 @@ export async function testPlex() {
 }
 
 export async function getPlexLibraries() {
-  try {
-    const data = await api.getPlexLibraries();
-    return data;
-  } catch (err) {
-    console.log(err);
-    throw "Unable to get libraries";
-  }
+  return api.getPlexLibraries();
 }
-
 export async function getInvitations() {
-  try {
-    const data = await api.getInvitations();
-    return data;
-  } catch (err) {
-    console.log(err);
-    throw "Unable to get invitations";
-  }
+  return api.getInvitations();
 }
 export async function addInvitation(invitation) {
-  try {
-    const data = await api.addInvitation(invitation);
-    return data;
-  } catch (err) {
-    console.log(err);
-    throw "Unable to add invitation";
-  }
+  return api.addInvitation(invitation);
 }
 export async function deleteInvitation(id) {
-  try {
-    const data = await api.deleteInvitation(id);
-    return data;
-  } catch (err) {
-    console.log(err);
-    throw "Unable to delete invitation";
-  }
+  return api.deleteInvitation(id);
 }
 export async function updateInvitation(invitation) {
-  try {
-    const data = await api.updateInvitation(invitation);
-    return data;
-  } catch (err) {
-    console.log(err);
-    throw "Unable to update invitation";
-  }
+  return api.deleteInvitation(invitation);
 }
-
-export async function modifyRedirectUrl(redirectUrl) {
-  try {
-    await api.modifyRedirectUrl(redirectUrl);
-  } catch (err) {
-    console.log(err);
-    throw "Unable to update redirectUrl";
-  }
-}
-
 export async function acceptInvitation(acceptedBy, invitCode) {
-  try {
-    const data = await api.acceptInvitation(acceptedBy, invitCode);
-    return data;
-  } catch (err) {
-    console.log(err);
-    throw "Unable to accept invitation";
-  }
+  return api.deleteInvitation(acceptedBy, invitCode);
+}
+export function getUrlRedirection() {
+  return api.getUrlRedirection();
+}
+export function updateUrlRedirection(urlRedirection) {
+  return api.updateUrlRedirection(urlRedirection);
 }

@@ -1,7 +1,7 @@
 const express = require("express");
 const Invitation = require("../models/invitation");
 const logger = require("../util/logger");
-const Library = require("../models/library");
+const Libraries = require("../models/library");
 const User = require("../models/user");
 const addUserToPlexServer = require("../plex/invitations");
 const getConfig = require("../util/config");
@@ -11,7 +11,7 @@ const adminInvitationRouter = express.Router();
 const userInvitationRouter = express.Router();
 
 async function formatInvitation(invitation) {
-  const libraries = await Library.find();
+  const libraries = await Libraries.find();
 
   return {
     _id: invitation._id,
@@ -35,13 +35,16 @@ async function formatInvitation(invitation) {
 adminInvitationRouter.get("/", async (req, res) => {
   try {
     const invitations = await Invitation.find();
+
     const completeInvitations = await Promise.all(
-      invitations.map((inv) => formatInvitation(inv))
+      invitations.map(formatInvitation)
     );
 
     res.status(200).json(completeInvitations);
   } catch (err) {
-    res.status(500).json({ error: err });
+    res
+      .status(500)
+      .json({ level: "error", message: "Failed to get invitations" });
     return;
   }
 });
@@ -84,7 +87,7 @@ adminInvitationRouter.put("/", async (req, res) => {
     });
 
     await newInvitation.save();
-    res.status(200).json(newInvitation);
+    res.status(200).json(await formatInvitation(newInvitation));
   } catch (err) {
     logger.log("error", "ROUTE: Invitation failed to save");
     logger.log({ level: "error", message: err });
@@ -92,18 +95,55 @@ adminInvitationRouter.put("/", async (req, res) => {
   }
 });
 
-adminInvitationRouter.post("/redirectUrl", async (req, res) => {
-  const { redirectUrl } = req.body;
-  if (!redirectUrl) {
-    res.status(400).json({ message: "redirectUrl not provided" });
+adminInvitationRouter.post("/", async (req, res) => {
+  const invitation = req.body;
+
+  if (!invitation || !invitation._id) {
+    res.status(403).json({ error: "No invitation details" });
     return;
   }
 
   try {
-    updateConfig("appLoginUrl", redirectUrl);
-    res.status(200).json({ message: "Invitation deleted" });
+    const updatedInvitation = await Invitation.findOneAndUpdate(
+      { _id: invitation._id },
+      {
+        expireOn: invitation.expireOn,
+        maxUses: invitation.maxUses,
+        email: invitation.email,
+        libraries: invitation.libraries,
+        downloadPermitted: invitation.downloadPermitted,
+      },
+      { new: true }
+    );
+
+    res.status(200).json(await formatInvitation(updatedInvitation));
+    return;
   } catch {
-    res.status(500).json({ error: "Failed to update redirectUrl" });
+    res.status(500).json({ error: "Failed to update" });
+  }
+});
+
+adminInvitationRouter.get("/redirectUrl", async (req, res) => {
+  try {
+    const config = getConfig();
+    console.log(config);
+    res.status(200).json({ urlRedirection: config.redirectUrlAfterInvite });
+  } catch {
+    res.status(500).json({ error: "Failed to get URL redirection" });
+  }
+});
+
+adminInvitationRouter.post("/redirectUrl", async (req, res) => {
+  let { urlRedirection } = req.body;
+  if (!urlRedirection) {
+    urlRedirection = "https://app.plex.tv/desktop/#!/";
+  }
+
+  try {
+    updateConfig("redirectUrlAfterInvite", urlRedirection);
+    res.status(200).json({ urlRedirection });
+  } catch {
+    res.status(500).json({ error: "Failed to update URL redirection" });
   }
 });
 
@@ -122,44 +162,10 @@ adminInvitationRouter.post("/delete", async (req, res) => {
   }
 });
 
-adminInvitationRouter.post("/", async (req, res) => {
-  const invitation = req.body;
-
-  if (!invitation || !invitation._id) {
-    res.status(403).json({ error: "No invitation details" });
-    return;
-  }
-
-  try {
-    const updatedInvitation = await Invitation.findOneAndUpdate(
-      { _id: invitation._id },
-      {
-        $set: {
-          expireOn: invitation.expireOn,
-          maxUses: invitation.maxUses,
-          email: invitation.email,
-          libraries: invitation.libraries,
-          downloadPermitted: invitation.downloadPermitted,
-        },
-      },
-      { useFindAndModify: false }
-    );
-
-    res
-      .status(200)
-      .json(
-        await formatInvitation({ ...updatedInvitation._doc, ...invitation })
-      );
-    return;
-  } catch {
-    res.status(500).json({ error: "Failed to update" });
-  }
-});
-
 adminInvitationRouter.get("/libraries", async (req, res) => {
   try {
-    const plexLibraries = await new LibraryUpdate().getLibraries();
-    res.status(200).json(plexLibraries.Directory || []);
+    const libraries = await Libraries.find();
+    res.status(200).json(libraries || []);
   } catch (err) {
     res.status(500).json({ error: err });
     return;
@@ -210,23 +216,23 @@ userInvitationRouter.post("/accept", async (req, res) => {
 
   try {
     await addUserToPlexServer(invitation, plexUser);
-    await Invitation.findOneAndUpdate(invitation, {
-      $set: {
-        accepted: true,
-        acceptedBy: [...invitation.acceptedBy, plexUser.user],
-        acceptedOn: new Date(),
-        used: invitation.used + 1,
-      },
-    });
+  } catch (err) {
+    logger.log({ level: "error", message: err.message });
+    res.status(400).json({ level: "error", message: err.message });
+    return;
+  }
+
+  try {
+    await Invitation.findOneAndUpdate({ _id: invitation._id }, invitation);
     const config = getConfig();
 
     res.status(200).json({
-      redirectUrl: config.appLoginUrl || "https://app.plex.tv/desktop/#!/",
+      redirectUrl: config.redirectUrlAfterInvite,
     });
   } catch (err) {
     logger.log("error", "ROUTE: Invitation failed to update");
-    logger.log({ level: "error", message: e });
-    res.status(400).json({ message: "Invitation refused." });
+    logger.log({ level: "error", message: err.message });
+    res.status(400).json({ level: "error", message: err.message });
   }
 });
 

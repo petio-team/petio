@@ -118,6 +118,37 @@ p {
   }
 }
 
+.input-button-group-with-label {
+  text-align: right;
+  & label {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 14px;
+    width: 100%;
+  }
+
+  margin-left: auto;
+}
+
+.input-button-group {
+  height: 35px;
+  display: flex;
+  align-items: center;
+
+  & > * {
+    margin: 0px !important;
+    height: 35px !important;
+    border-width: 1px;
+    border-radius: 0px;
+  }
+
+  & input:first-of-type {
+    border-radius: 5px 0 0 5px !important;
+  }
+  & button:last-of-type {
+    border-radius: 0 5px 5px 0 !important;
+  }
+}
+
 code {
   background: rgba($grey-medium, 0.3);
   border-radius: 4px;
