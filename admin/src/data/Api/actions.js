@@ -757,6 +757,16 @@ export async function updateInvitation(invitation) {
     throw "Unable to update invitation";
   }
 }
+
+export async function modifyRedirectUrl(redirectUrl) {
+  try {
+    await api.modifyRedirectUrl(redirectUrl);
+  } catch (err) {
+    console.log(err);
+    throw "Unable to update redirectUrl";
+  }
+}
+
 export async function acceptInvitation(acceptedBy, invitCode) {
   try {
     const data = await api.acceptInvitation(acceptedBy, invitCode);

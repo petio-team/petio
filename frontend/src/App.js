@@ -23,7 +23,7 @@ import Company from "./pages/Company";
 import People from "./pages/People";
 import Invitation from "./pages/Invitation";
 
-const popupCenter = (url, title, w, h) => {
+export const popupCenter = (url, title, w, h) => {
   // Fixes dual-screen position | credit Tautulli
   var dualScreenLeft =
     window.screenLeft != undefined ? window.screenLeft : window.screenX;

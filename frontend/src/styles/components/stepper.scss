@@ -6,9 +6,14 @@
   height: 100%;
 }
 
+.stepper-nav {
+  display: flex;
+  flex-flow: column nowrap;
+  padding: 0px 20px;
+}
+
 .stepper-content {
-  min-width: 600px;
-  max-width: 100%;
+  width: 800px;
   height: 100%;
   min-height: 400px;
   max-height: 600px;
@@ -37,7 +42,6 @@
   max-height: 100%;
   height: 100%;
   transition: left 0.3s ease;
-  width: fit-content;
 }
 
 .step-component-overflow {
@@ -51,8 +55,9 @@
 
 .step-component {
   min-width: 100%;
-  height: fit-content;
-  padding: 20px;
+  max-width: 100%;
+  height: inherit;
+  padding: 40px 50px;
 }
 
 .stepper-navigation {
@@ -73,10 +78,13 @@
   &[incoming-step="true"] {
     opacity: 0.3;
     transform: scale(0.8);
+    transform-origin: 6%;
   }
 
   &[past-step="true"] {
+    opacity: 0.7;
     transform: scale(0.8);
+    transform-origin: 6%;
   }
 }
 

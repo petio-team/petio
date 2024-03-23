@@ -1,10 +1,14 @@
 const express = require("express");
-const adminInvitationRouter = express.Router();
-const userInvitationRouter = express.Router();
 const Invitation = require("../models/invitation");
 const logger = require("../util/logger");
 const Library = require("../models/library");
 const User = require("../models/user");
+const addUserToPlexServer = require("../plex/invitations");
+const getConfig = require("../util/config");
+const updateConfig = require("../util/updateConfig");
+
+const adminInvitationRouter = express.Router();
+const userInvitationRouter = express.Router();
 
 async function formatInvitation(invitation) {
   const libraries = await Library.find();
@@ -88,6 +92,21 @@ adminInvitationRouter.put("/", async (req, res) => {
   }
 });
 
+adminInvitationRouter.post("/redirectUrl", async (req, res) => {
+  const { redirectUrl } = req.body;
+  if (!redirectUrl) {
+    res.status(400).json({ message: "redirectUrl not provided" });
+    return;
+  }
+
+  try {
+    updateConfig("appLoginUrl", redirectUrl);
+    res.status(200).json({ message: "Invitation deleted" });
+  } catch {
+    res.status(500).json({ error: "Failed to update redirectUrl" });
+  }
+});
+
 adminInvitationRouter.post("/delete", async (req, res) => {
   const { id } = req.body;
   if (!id) {
@@ -148,10 +167,15 @@ adminInvitationRouter.get("/libraries", async (req, res) => {
 });
 
 userInvitationRouter.post("/accept", async (req, res) => {
-  const { invitCode, acceptedBy } = req.body;
+  const { invitCode, plexUser } = req.body;
 
   if (!invitCode) {
     res.status(500).json({ error: "No invitation code provided." });
+    return;
+  }
+
+  if (!plexUser) {
+    res.status(500).json({ error: "Failed to load user datas." });
     return;
   }
 
@@ -164,34 +188,45 @@ userInvitationRouter.post("/accept", async (req, res) => {
   }
 
   if (!invitation) {
-    res.status(404).json({ error: "Wrong invitation code." });
+    res.status(404).json({ level: "error", message: "Wrong invitation code." });
     return;
   }
 
-  if (
-    typeof invitation.maxUses === "number" &&
-    invitation.used < invitation.maxUses
-  ) {
-    res.status(403).json({ error: "Invitation code has been used up." });
+  if (typeof invitation.maxUses && invitation.used >= invitation.maxUses) {
+    res.status(403).json({
+      level: "error",
+      message: "Invitation code has been used up. Please ask another code.",
+    });
     return;
   }
 
   if (invitation.expireOn < new Date()) {
-    res.status(403).json({ error: "Invitation code has expired." });
+    res.status(403).json({
+      level: "error",
+      message: "Invitation code has expired. Please ask another code.",
+    });
     return;
   }
 
   try {
+    await addUserToPlexServer(invitation, plexUser);
     await Invitation.findOneAndUpdate(invitation, {
       $set: {
         accepted: true,
-        acceptedBy: [...invitation.acceptedBy, acceptedBy],
+        acceptedBy: [...invitation.acceptedBy, plexUser.user],
+        acceptedOn: new Date(),
         used: invitation.used + 1,
       },
     });
+    const config = getConfig();
+
+    res.status(200).json({
+      redirectUrl: config.appLoginUrl || "https://app.plex.tv/desktop/#!/",
+    });
   } catch (err) {
     logger.log("error", "ROUTE: Invitation failed to update");
-    logger.log({ level: "error", message: err });
+    logger.log({ level: "error", message: e });
+    res.status(400).json({ message: "Invitation refused." });
   }
 });
 
@@ -212,12 +247,10 @@ userInvitationRouter.get("/:code", async (req, res) => {
           .json({ valid: false, message: "Invitation code has been used up." });
         return;
       } else {
-        res
-          .status(200)
-          .json({
-            valid: true,
-            invitation: await formatInvitation(invitation),
-          });
+        res.status(200).json({
+          valid: true,
+          invitation: await formatInvitation(invitation),
+        });
         return;
       }
     }

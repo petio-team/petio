@@ -248,6 +248,10 @@ export async function updateInvitation(invitation) {
   return post(`/invitations`, invitation);
 }
 
+export async function modifyRedirectUrl(redirectUrl) {
+  return post(`/redirectUrl`, { redirectUrl }, "handle");
+}
+
 export async function acceptInvitation(acceptedBy, invitCode) {
   return post(`/invitations/accept`, { acceptedBy, invitCode });
 }

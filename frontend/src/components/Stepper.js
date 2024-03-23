@@ -41,7 +41,7 @@ export function Stepper(props) {
 
   return (
     <div className="stepper">
-      <div className="stepper--nav">{stepsTitles}</div>
+      <div className="stepper-nav">{stepsTitles}</div>
       <div className="stepper-content">
         <div className="stepper-components">
           <div
@@ -52,7 +52,9 @@ export function Stepper(props) {
           </div>
         </div>
         <div className="stepper-navigation">
-          {(navigate === "both" || navigate === "prev") && index !== 0 ? (
+          {steps[index]?.prevButton ? (
+            steps[index]?.prevButton({ index, setIndex })
+          ) : (navigate === "both" || navigate === "prev") && index !== 0 ? (
             <button
               className="btn btn__square"
               disabled={index === 0}
@@ -70,8 +72,10 @@ export function Stepper(props) {
           ) : (
             <div />
           )}
-          {(navigate === "both" || navigate === "next") &&
-          index !== steps.length - 1 ? (
+          {steps[index]?.nextButton ? (
+            steps[index]?.nextButton({ index, setIndex })
+          ) : (navigate === "both" || navigate === "next") &&
+            index !== steps.length - 1 ? (
             <button
               className="btn btn__square"
               onClick={async () => {

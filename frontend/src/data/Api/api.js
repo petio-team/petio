@@ -76,11 +76,6 @@ export async function checkInvitationCode(code) {
   return get(`/invitation/${code}`, undefined, "handle");
 }
 
-export async function acceptInvitation(acceptedBy, invitCode) {
-  return post(
-    `/invitation/accept`,
-    { acceptedBy, invitCode },
-    undefined,
-    "handle"
-  );
+export async function acceptInvitation(acceptedInvitation) {
+  return post(`/invitation/accept`, acceptedInvitation, undefined, "handle");
 }

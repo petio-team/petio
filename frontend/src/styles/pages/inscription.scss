@@ -1,0 +1,44 @@
+.inscription-wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-height: 100vh;
+  min-height: 100vh;
+  position: relative;
+  pointer-events: all;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  p {
+    width: 100%;
+    max-width: none;
+    color: rgba(255, 255, 255, 0.8);
+    padding-left: 10px;
+    margin-bottom: 10px;
+
+    .bold {
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: bolder;
+    }
+
+    &.rootPadding {
+      padding-top: 10px;
+      padding-left: 0;
+    }
+  }
+
+  h2 {
+    color: rgba(255, 255, 255, 0.8);
+    padding-bottom: 20px;
+  }
+
+  h3 {
+    padding-top: 20px;
+    padding-bottom: 10px;
+    color: rgba(255, 255, 255, 0.8);
+  }
+}

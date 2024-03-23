@@ -157,7 +157,12 @@ export class Invitation extends React.Component {
     return (
       <>
         <section>
-          <div className="icon"></div>
+          <h1 className="title-btn">
+            <p className="main-title">Login redirection URL</p>
+            <input className="styled-input--input" placeholder="URL" />
+          </h1>
+        </section>
+        <section>
           <h1 className="title-btn">
             <p className="main-title">Invitations</p>
             <button

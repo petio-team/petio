@@ -134,6 +134,7 @@ async function waitForPin(plexWindow, id) {
   if (response.authToken) {
     plexWindow.close();
     let data = await api.plexLogin(response.authToken);
+
     if (data.user) {
       if (data.loggedIn) {
         finalise({

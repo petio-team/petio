@@ -4,7 +4,6 @@ import { connect } from "react-redux";
 import { ReactComponent as SearchIcon } from "../assets/svg/search.svg";
 import { ReactComponent as MovieIcon } from "../assets/svg/movie.svg";
 import { ReactComponent as TvIcon } from "../assets/svg/tv.svg";
-import { ReactComponent as InvitationIcon } from "../assets/svg/genres/history.svg";
 import { ReactComponent as PersonIcon } from "../assets/svg/people.svg";
 import { ReactComponent as RequestIcon } from "../assets/svg/bookmark.svg";
 import { ReactComponent as AdminIcon } from "../assets/svg/admin.svg";
@@ -151,20 +150,6 @@ class Sidebar extends React.Component {
             <p>Requests</p>
             <div className="icon">
               <RequestIcon />
-            </div>
-          </Link>
-          <Link
-            to="/invitations"
-            className={
-              "sidebar--item " +
-              (current === "/invitations" || current.startsWith("/invitations/")
-                ? "active"
-                : "")
-            }
-          >
-            <p>Invitations</p>
-            <div className="icon">
-              <InvitationIcon />
             </div>
           </Link>
           {user.role === "admin" || user.role === "moderator" ? (
