@@ -54,6 +54,8 @@ import {
   deleteInvitation,
   updateInvitation,
   acceptInvitation,
+  getUrlRedirection,
+  updateUrlRedirection,
 } from "./actions";
 
 export default {
@@ -112,4 +114,6 @@ export default {
   deleteInvitation,
   updateInvitation,
   acceptInvitation,
+  getUrlRedirection,
+  updateUrlRedirection,
 };

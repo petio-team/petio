@@ -169,6 +169,7 @@ button {
     width: 120px;
   }
 
+  &[disabled],
   &.disabled {
     opacity: 0.2;
     pointer-events: none;

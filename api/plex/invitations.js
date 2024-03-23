@@ -38,7 +38,7 @@ async function getLibrarySectionIds(distantServer, libraries) {
   return librarySectionIds || [];
 }
 
-async function getInvitation(
+async function addInvitation(
   localServer,
   invitation,
   plexUser,
@@ -58,18 +58,15 @@ async function getInvitation(
     },
   };
 
-  console.log(invitationRequest);
-
   try {
-    const plexInvitation = await axios.post(invitationUrl, invitationRequest, {
-      headers: {
-        "Content-Type": "application/json",
-      },
+    await axios.post(invitationUrl, invitationRequest, {
+      headers: { "Content-Type": "application/json" },
     });
-    console.log(plexInvitation.data);
-    return plexInvitation.data;
-  } catch (error) {
-    console.log(error.response.data);
+  } catch (err) {
+    const error = JSON.parse(
+      xmlParser.xml2json(err.response.data, { compact: true })
+    );
+    throw new Error(error.Response._attributes.status);
   }
 }
 
@@ -81,7 +78,7 @@ async function addUserToPlexServer(invitation, plexUser) {
       distantServer,
       invitation.libraries
     );
-    await getInvitation(localServer, invitation, plexUser, librarySectionIds);
+    await addInvitation(localServer, invitation, plexUser, librarySectionIds);
   } catch (e) {
     console.error(e);
     throw e;

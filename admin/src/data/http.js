@@ -52,7 +52,18 @@ function parseResponse(response) {
     .catch(() => response.text());
 }
 
-export function get(path, options = {}) {
+function handleResponse(response) {
+  if (response.ok) {
+    return response.clone().json();
+  }
+
+  return response.json().then((err) => {
+    console.error(`[API ${response.status}]`, err);
+    throw err;
+  });
+}
+
+export function get(path, options = {}, handleType = "parse") {
   const mergedOptions = {
     credentials: "include",
     ...options,
@@ -61,10 +72,12 @@ export function get(path, options = {}) {
       ...options.headers,
     },
   };
-  return fetch(API_URL + path, mergedOptions).then(parseResponse);
+  return fetch(API_URL + path, mergedOptions).then(
+    handleType === "parse" ? parseResponse : handleResponse
+  );
 }
 
-export function post(path, data, options = {}) {
+export function post(path, data, options = {}, handleType = "parse") {
   const mergedOptions = {
     credentials: "include",
     method: "POST",
@@ -76,10 +89,12 @@ export function post(path, data, options = {}) {
     },
     body: JSON.stringify(data),
   };
-  return fetch(API_URL + path, mergedOptions).then(parseResponse);
+  return fetch(API_URL + path, mergedOptions).then(
+    handleType === "parse" ? parseResponse : handleResponse
+  );
 }
 
-export function put(path, data, options = {}) {
+export function put(path, data, options = {}, handleType = "parse") {
   const mergedOptions = {
     credentials: "include",
     method: "PUT",
@@ -91,10 +106,12 @@ export function put(path, data, options = {}) {
     },
     body: JSON.stringify(data),
   };
-  return fetch(API_URL + path, mergedOptions).then(parseResponse);
+  return fetch(API_URL + path, mergedOptions).then(
+    handleType === "parse" ? parseResponse : handleResponse
+  );
 }
 
-export function del(path, options = {}) {
+export function del(path, options = {}, handleType = "parse") {
   const mergedOptions = {
     credentials: "include",
     method: "DELETE",
@@ -104,10 +121,12 @@ export function del(path, options = {}) {
       ...options.headers,
     },
   };
-  return fetch(API_URL + path, mergedOptions).then(parseResponse);
+  return fetch(API_URL + path, mergedOptions).then(
+    handleType === "parse" ? parseResponse : handleResponse
+  );
 }
 
-export function upload(path, data, options = {}) {
+export function upload(path, data, options = {}, handleType = "parse") {
   const mergedOptions = {
     credentials: "include",
     method: "POST",
@@ -118,5 +137,7 @@ export function upload(path, data, options = {}) {
     },
     body: data,
   };
-  return fetch(API_URL + path, mergedOptions).then(parseResponse);
+  return fetch(API_URL + path, mergedOptions).then(
+    handleType === "parse" ? parseResponse : handleResponse
+  );
 }

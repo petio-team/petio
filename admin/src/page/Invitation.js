@@ -13,7 +13,7 @@ const initialInvitationForm = {
   downloadPermitted: "",
 };
 
-export class Invitation extends React.Component {
+class Invitation extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -25,9 +25,13 @@ export class Invitation extends React.Component {
       plexLibrariesLoading: true,
       // invitation form
       invForm: initialInvitationForm,
+      urlRedirection: "",
+      urlRedirectionEdit: "",
     };
 
     this.addInvitation = this.addInvitation.bind(this);
+    this.getUrlRedirection = this.getUrlRedirection.bind(this);
+    this.updateUrlRedirection = this.updateUrlRedirection.bind(this);
   }
 
   openModal(id, invitation) {
@@ -59,6 +63,7 @@ export class Invitation extends React.Component {
   componentDidMount() {
     this.getPlexLibraries();
     this.getInvitations();
+    this.getUrlRedirection();
   }
 
   getInvitationExpireOnDate(expireOn) {
@@ -87,8 +92,15 @@ export class Invitation extends React.Component {
   }
 
   async getInvitations() {
-    const invitations = await Api.getInvitations();
-    this.setState({ invitations });
+    try {
+      const invitations = await Api.getInvitations();
+      this.setState({ invitations });
+    } catch (error) {
+      this.props.msg({
+        message: error.message,
+        type: error.level,
+      });
+    }
   }
 
   async addInvitation() {
@@ -134,6 +146,40 @@ export class Invitation extends React.Component {
     }
   }
 
+  async getUrlRedirection() {
+    try {
+      const { urlRedirection } = await Api.getUrlRedirection();
+      this.setState({
+        urlRedirection: urlRedirection || "",
+        urlRedirectionEdit: urlRedirection || "",
+      });
+    } catch (error) {
+      console.error(error);
+      this.props.msg({
+        message: error.message,
+        type: error.level,
+      });
+    }
+  }
+
+  async updateUrlRedirection() {
+    try {
+      const { urlRedirection } = await Api.updateUrlRedirection(
+        this.state.urlRedirectionEdit
+      );
+      this.setState({
+        urlRedirection: urlRedirection || "",
+        urlRedirectionEdit: urlRedirection || "",
+      });
+    } catch (error) {
+      console.error(error);
+      this.props.msg({
+        message: error.message,
+        type: error.level,
+      });
+    }
+  }
+
   generateInvitationCode() {
     let code = "";
     const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -158,12 +204,6 @@ export class Invitation extends React.Component {
       <>
         <section>
           <h1 className="title-btn">
-            <p className="main-title">Login redirection URL</p>
-            <input className="styled-input--input" placeholder="URL" />
-          </h1>
-        </section>
-        <section>
-          <h1 className="title-btn">
             <p className="main-title">Invitations</p>
             <button
               className="btn btn__square"
@@ -174,6 +214,35 @@ export class Invitation extends React.Component {
             >
               Add +
             </button>
+            <div className="input-button-group-with-label">
+              <label htmlFor="urlRedirection">
+                URL redirection after invitation acceptance
+              </label>
+              <form onSubmit={this.updateUrlRedirection}>
+                <div className="input-button-group">
+                  <input
+                    id="urlRedirection"
+                    value={this.state.urlRedirectionEdit}
+                    style={{ width: "400px" }}
+                    className="styled-input--input"
+                    placeholder="URL redirection after invitation acceptance"
+                    onChange={(e) =>
+                      this.setState({ urlRedirectionEdit: e.target.value })
+                    }
+                  />
+                  <button
+                    className="btn btn__square"
+                    type="submit"
+                    disabled={
+                      this.state.urlRedirection ===
+                      this.state.urlRedirectionEdit
+                    }
+                  >
+                    ✔
+                  </button>
+                </div>
+              </form>
+            </div>
           </h1>
         </section>
 
@@ -207,8 +276,6 @@ export class Invitation extends React.Component {
                 downloadPermitted,
                 _id,
               } = invitation;
-
-              console.log(invitation);
 
               return (
                 <tr key={_id}>

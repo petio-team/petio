@@ -50,7 +50,7 @@ const filterRoute = require("./routes/filter");
 const discoveryRoute = require("./routes/discovery");
 const notificationsRoute = require("./routes/notifications");
 const batchRoute = require("./routes/batch");
-const { authRequired, adminRequired } = require("./middleware/auth");
+const { authRequired } = require("./middleware/auth");
 
 class Main {
   constructor() {
@@ -334,6 +334,7 @@ class Main {
         adminId: user.id,
         adminThumb: user.thumb,
         adminDisplayName: user.username,
+        redirectUrlAfterInvite: "https://app.plex.tv/desktop/#!/",
         fanartApi: "ee409f6fb0c5cd2352e7a454d3f580d4",
         base_path: "",
         plexPopular: true,
