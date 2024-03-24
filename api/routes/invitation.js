@@ -114,7 +114,7 @@ adminInvitationRouter.post("/", async (req, res) => {
         libraries: invitation.libraries,
         downloadPermitted: invitation.downloadPermitted,
       },
-      { new: true }
+      { useFindAndModify: false, new: true }
     );
 
     res.status(200).json(await formatInvitation(updatedInvitation));

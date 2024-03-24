@@ -34,55 +34,10 @@ class Invitation extends React.Component {
     this.updateUrlRedirection = this.updateUrlRedirection.bind(this);
   }
 
-  openModal(id, invitation) {
-    if (invitation) {
-      this.setState({
-        invForm: {
-          _id: invitation._id,
-          code: invitation.invitCode || this.generateInvitationCode(),
-          email: invitation.email || "",
-          expireOn: invitation.expireOn || "",
-          maxUses: invitation.maxUses || "",
-          libraries: invitation.libraries.map((l) => l.uuid),
-          downloadPermitted: !!invitation.downloadPermitted,
-        },
-      });
-    }
-
-    this.setState({
-      [`${id}Open`]: true,
-    });
-  }
-
-  closeModal(id) {
-    this.setState({
-      [`${id}Open`]: false,
-    });
-  }
-
   componentDidMount() {
     this.getPlexLibraries();
     this.getInvitations();
     this.getUrlRedirection();
-  }
-
-  getInvitationExpireOnDate(expireOn) {
-    switch (expireOn) {
-      case "expire1Day":
-        return new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
-      case "expire1Week":
-        return new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000);
-      case "expire1Month":
-        return new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1000);
-      case "expire6Months":
-        return new Date(new Date().getTime() + 6 * 30 * 24 * 60 * 60 * 1000);
-      case "expire1Year":
-        return new Date(new Date().getTime() + 365 * 24 * 60 * 60 * 1000);
-      case "expireNever":
-        return null;
-      default:
-        return null;
-    }
   }
 
   async getPlexLibraries() {
@@ -180,6 +135,32 @@ class Invitation extends React.Component {
     }
   }
 
+  openModal(id, invitation) {
+    if (invitation) {
+      this.setState({
+        invForm: {
+          _id: invitation._id,
+          code: invitation.invitCode || this.generateInvitationCode(),
+          email: invitation.email || "",
+          expireOn: invitation.expireOn || "",
+          maxUses: invitation.maxUses || "",
+          libraries: invitation.libraries.map((l) => l.uuid),
+          downloadPermitted: !!invitation.downloadPermitted,
+        },
+      });
+    }
+
+    this.setState({
+      [`${id}Open`]: true,
+    });
+  }
+
+  closeModal(id) {
+    this.setState({
+      [`${id}Open`]: false,
+    });
+  }
+
   generateInvitationCode() {
     let code = "";
     const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -191,6 +172,25 @@ class Invitation extends React.Component {
       return this.generateInvitationCode();
 
     return code;
+  }
+
+  getInvitationExpireOnDate(expireOn) {
+    switch (expireOn) {
+      case "expire1Day":
+        return new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
+      case "expire1Week":
+        return new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000);
+      case "expire1Month":
+        return new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1000);
+      case "expire6Months":
+        return new Date(new Date().getTime() + 6 * 30 * 24 * 60 * 60 * 1000);
+      case "expire1Year":
+        return new Date(new Date().getTime() + 365 * 24 * 60 * 60 * 1000);
+      case "expireNever":
+        return null;
+      default:
+        return null;
+    }
   }
 
   inputChange(field, value) {

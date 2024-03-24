@@ -724,7 +724,7 @@ export async function deleteInvitation(id) {
   return api.deleteInvitation(id);
 }
 export async function updateInvitation(invitation) {
-  return api.deleteInvitation(invitation);
+  return api.updateInvitation(invitation);
 }
 export async function acceptInvitation(acceptedBy, invitCode) {
   return api.deleteInvitation(acceptedBy, invitCode);
