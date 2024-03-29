@@ -2,7 +2,7 @@ import cookies from 'js-cookie';
 
 const isDev = process.env.NODE_ENV === 'development';
 const origin = isDev
-  ? 'http://localhost:7777'
+  ? process.env.REACT_APP_API_URL ?? 'http://localhost:7777'
   : typeof window === 'undefined'
   ? ''
   : `${window.location.protocol}//${window.location.host}`;

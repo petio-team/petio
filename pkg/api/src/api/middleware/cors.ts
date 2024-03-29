@@ -9,8 +9,7 @@ export default () => {
   const whitelist = httpConfig.corsDomains;
   if (envConfig.isDevelopment) {
     // add local react dev
-    whitelist.push('http://localhost:3001'); // frontend
-    whitelist.push('http://localhost:3002'); // admin
+    whitelist.push('http://localhost:3000'); // frontend
   }
 
   const corsOptions = {
