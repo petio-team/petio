@@ -23,7 +23,7 @@ async function getTopData(type) {
   d.setMonth(d.getMonth() - 1);
   d.setHours(0, 0, 0);
   d.setMilliseconds(0);
-  const timestamp = (d.getTime() / 1000) | 0;
+  const timestamp = (d.getTime() / 1000) || 0;
 
   const url = MakePlexURL('/library/all/top', {
     type,
@@ -43,21 +43,32 @@ async function parseTop(data, type) {
   const top = data.MediaContainer.Metadata;
   const output = {};
   if (!top)
+    // eslint-disable-next-line @typescript-eslint/no-throw-literal
     throw "No Plex Top Data, you're probably not a Plex Pass user. This is not an error";
-  for (let i = 0; i < top.length; i++) {
-    const item = top[i];
-    const {ratingKey} = item;
+  const promises = top.map(async (item: { ratingKey: any; }) => {
+    const { ratingKey } = item;
     let plexData: any = false;
     if (type === 2) {
       plexData = await plexLookup(ratingKey, 'show');
     } else {
       plexData = await plexLookup(ratingKey, 'movie');
     }
-    if (plexData.tmdb_id)
-      output[plexData.tmdb_id] =
-        type === 2
-          ? await showLookup(plexData.tmdb_id, true)
-          : await movieLookup(plexData.tmdb_id, true);
+    if (plexData.tmdb_id) {
+      return type === 2
+        ? showLookup(plexData.tmdb_id, true)
+        : movieLookup(plexData.tmdb_id, true);
+    }
+    return null;
+  });
+  const results = await Promise.all(promises);
+
+  for (let i = 0; i < top.length; i++) {
+    const item = top[i];
+    const { ratingKey } = item;
+    const result = results[i];
+    if (result) {
+      output[result.tmdb_id] = result;
+    }
   }
   return output;
 }

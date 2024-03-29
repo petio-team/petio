@@ -21,7 +21,7 @@ import {
 export default async (id, type = 'movie') => {
   if (!id) return { error: 'No ID' };
   try {
-    const discoveryPrefs: any = await Discovery.findOne({ id }).exec();
+    const discoveryPrefs: any = await Discovery.findOne({ altId: id }).exec();
     const popular: any = [];
     const [upcoming, popularData]: any = await Promise.all([
       comingSoon(type),

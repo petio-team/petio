@@ -2,15 +2,15 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
+import { StatusNotFound } from "../http/request";
 import logger from '@/loaders/logger';
 import { UserModel } from '@/models/user';
 import getDiscovery from '@/services/discovery/display';
 
 const getMovies = async (ctx: Context) => {
-  const user = await UserModel.findOne({ id: ctx.state.user.id });
-
+  const user = await UserModel.findById(ctx.state.user.id);
   if (!user) {
-    ctx.state = StatusCodes.NOT_FOUND;
+    StatusNotFound(ctx, "Could not get discovery by authed user");
     return;
   }
 
@@ -28,10 +28,9 @@ const getMovies = async (ctx: Context) => {
 };
 
 const getShows = async (ctx: Context) => {
-  const user = await UserModel.findOne({ id: ctx.state.user.id });
-
+  const user = await UserModel.findById(ctx.state.user.id);
   if (!user) {
-    ctx.state = StatusCodes.NOT_FOUND;
+    StatusNotFound(ctx, "Could not get discovery by authed user");
     return;
   }
 
