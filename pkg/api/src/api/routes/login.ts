@@ -69,7 +69,7 @@ async function saveRequestIp(user, request_ip) {
 
 const attemptPlexAuth = async (ctx: Context) => {
   const requestIp = ctx.request.ip;
-  const {token} = ctx.request.body;
+  const { token } = ctx.request.body;
   try {
     const userId = await plexOauth(token);
     const dbUser = await GetUserByPlexID(userId);
@@ -112,10 +112,9 @@ function plexAuth(username, password) {
           'X-Plex-Platform-Version': '1.0',
           'X-Plex-Device-Name': 'Petio API',
           'X-Plex-Version': '1.0',
-          'X-Plex-Client-Identifier': `petio_${  config.get('petio.identifier')}`,
+          'X-Plex-Client-Identifier': `petio_${config.get('petio.identifier')}`,
           Authorization:
-            `Basic ${
-            Buffer.from(`${username}:${password}`).toString('base64')}`,
+            `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`,
         },
       },
       (err, data) => {
@@ -156,8 +155,8 @@ const attemptAuth = async (ctx: Context) => {
     config.set('auth.type', 1);
   }
 
-  logger.verbose(`LOGIN: New login attempted`, { label: 'routes.login' });
-  logger.verbose(`LOGIN: Request IP: ${requestIp}`, {
+  logger.debug(`LOGIN: New login attempted`, { label: 'routes.login' });
+  logger.debug(`LOGIN: Request IP: ${requestIp}`, {
     label: 'routes.login',
   });
 
@@ -172,19 +171,19 @@ const attemptAuth = async (ctx: Context) => {
       }
 
       success(ctx, user, user.owner);
-      logger.verbose(`LOGIN: Request User: ${user.username}`, {
+      logger.debug(`LOGIN: Request User: ${user.username}`, {
         label: 'routes.login',
       });
       return;
     } catch (e) {
       // if existing jwt failed, continue onto normal login flow
-      logger.verbose(`LOGIN: No JWT: ${requestIp}`, {
+      logger.debug(`LOGIN: No JWT: ${requestIp}`, {
         label: 'routes.login',
       });
       logger.error(e);
     }
 
-  logger.verbose(`LOGIN: Request User: ${username}`, {
+  logger.debug(`LOGIN: Request User: ${username}`, {
     label: 'routes.login',
   });
 

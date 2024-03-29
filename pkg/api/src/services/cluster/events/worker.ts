@@ -2,6 +2,7 @@ import { EventSubscriber, On } from "event-dispatch";
 import { config } from '@/config/index';
 import { IEventData } from "@/infra/clusters/ipc";
 import { loadSystems } from "@/loaders";
+import logger from "@/loaders/logger";
 
 @EventSubscriber()
 export default class WorkerEventSubscriber {
@@ -12,6 +13,8 @@ export default class WorkerEventSubscriber {
     if (event.data.config) {
       // load the config data provided by the master process
       config.load(event.data.config);
+      logger.setLevel(config.get('logger.level'));
+      logger.debug(`Worker ${process.pid} is ready!`);
     }
 
     // start loading all the main systems of the app

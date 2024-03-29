@@ -33,8 +33,8 @@ export default class Radarr {
 
     const queue = {};
     queue[this.instance.id] = await this.client.GetQueue();
-    const {totalRecords} = queue[this.instance.id];
-    const {pageSize} = queue[this.instance.id];
+    const { totalRecords } = queue[this.instance.id];
+    const { pageSize } = queue[this.instance.id];
     const pages = Math.ceil(totalRecords / pageSize);
     for (let p = 2; p <= pages; p++) {
       const queuePage = await this.client.GetQueue(p);
@@ -55,9 +55,8 @@ export default class Radarr {
   ) {
     movieData.qualityProfileId =
       profile !== -1 ? profile : this.instance.profile.id;
-    movieData.rootFolderPath = `${
-      path !== '' ? path : this.instance.path.location
-    }`;
+    movieData.rootFolderPath = `${path !== '' ? path : this.instance.path.location
+      }`;
     movieData.addOptions = {
       searchForMovie: true,
     };
@@ -89,14 +88,14 @@ export default class Radarr {
           const radarrData = await this.client.LookupMovie(job.tmdb_id);
           let radarrId = -1;
           if (radarrData[0].id) {
-            logger.verbose(
+            logger.debug(
               `SERVICE - RADARR: [${this.instance.name}] Job skipped already found for ${job.title}`,
               { label: 'downloaders.radarr' },
             );
             radarrId = radarrData[0].id;
           } else {
             radarrId = await this.add(radarrData[0]);
-            logger.verbose(
+            logger.debug(
               `SERVICE - RADARR: [${this.instance.name}] Radarr job added for ${job.title}`,
               { label: 'downloaders.radarr' },
             );
@@ -123,7 +122,7 @@ export default class Radarr {
         const instances = await GetAllDownloaders(DownloaderType.Radarr);
         for (const instance of instances) {
           if (!instance.enabled) {
-            logger.verbose(
+            logger.debug(
               `SERVICE - RADARR: [${instance.name}] Server not active`,
               { label: 'downloaders.radarr' },
             );
@@ -137,14 +136,14 @@ export default class Radarr {
             const radarrData = await api.LookupMovie(job.tmdb_id);
             let radarrId = -1;
             if (radarrData[0].id) {
-              logger.verbose(
+              logger.debug(
                 `SERVICE - RADARR: [${instance.name}] Job skipped already found for ${job.title}`,
                 { label: 'downloaders.radarr' },
               );
               radarrId = radarrData[0].id;
             } else {
               radarrId = await this.add(radarrData[0]);
-              logger.verbose(
+              logger.debug(
                 `SERVICE - RADARR: [${instance.name}] Radarr job added for ${job.title}`,
                 { label: 'downloaders.radarr' },
               );
@@ -177,7 +176,7 @@ export default class Radarr {
       const radarrData = await this.client.LookupMovie(job.id);
       let radarrId = -1;
       if (radarrData[0] && radarrData[0].id) {
-        logger.verbose(
+        logger.debug(
           `SERVICE - RADARR: [${this.instance.name}] Job skipped already found for ${job.title}`,
           { label: 'downloaders.radarr' },
         );
@@ -189,7 +188,7 @@ export default class Radarr {
           manual.profile,
           manual.tag,
         );
-        logger.verbose(
+        logger.debug(
           `SERVICE - RADARR: [${this.instance.name}] Radarr job added for ${job.title}`,
           { label: 'downloaders.radarr' },
         );
@@ -214,12 +213,12 @@ export default class Radarr {
   }
 
   async processRequest(id) {
-    logger.verbose(`SERVICE - RADARR: Processing request`, {
+    logger.debug(`SERVICE - RADARR: Processing request`, {
       label: 'downloaders.radarr',
     });
     const req = await Request.findOne({ requestId: id }).exec();
     if (!req) {
-      logger.verbose(`SERVICE - RADARR: no request found`, {
+      logger.debug(`SERVICE - RADARR: no request found`, {
         label: 'downloaders.radarr',
       });
       return;
@@ -227,17 +226,17 @@ export default class Radarr {
 
     if (req.type === 'movie') {
       if (!req.tmdb_id) {
-        logger.verbose(`SERVICE - RADARR: TMDB ID not found for ${req.title}`, {
+        logger.debug(`SERVICE - RADARR: TMDB ID not found for ${req.title}`, {
           label: 'downloaders.radarr',
         });
       } else if (req.radarrId.length === 0) {
         if (!req.approved) {
-          logger.verbose(
+          logger.debug(
             `SERVICE - RADARR: Request requires approval - ${req.title}`,
             { label: 'downloaders.radarr' },
           );
         } else {
-          logger.verbose('SERVICE - RADARR: Request passed to queue', {
+          logger.debug('SERVICE - RADARR: Request passed to queue', {
             label: 'downloaders.radarr',
           });
           this.processJobs([req]);

@@ -24,7 +24,7 @@ export async function showLookup(id, minified = false) {
   let data: any;
   try {
     data = await getShowData(id);
-    show = { ...data};
+    show = { ...data };
   } catch {
     return { error: 'not found' };
   }
@@ -83,7 +83,7 @@ export async function showLookup(id, minified = false) {
       delete show.languages;
       if (!minified) {
         show.server_seasons = onPlex.seasons;
-        const seasons = { ...seasonsLookup};
+        const seasons = { ...seasonsLookup };
         const seasonData = {};
         const recommendationsData: any = [];
         Object.keys(seasons).forEach((key) => {
@@ -206,15 +206,15 @@ export const getShowDetails = async (id: number) => {
       backdrop_path: details.backdrop_path,
       videos: details.videos
         ? {
-            results: [
-              ...details.videos.results.filter(
-                (obj) => obj.type == 'Teaser' && obj.site == 'YouTube',
-              ),
-              ...details.videos.results.filter(
-                (obj) => obj.type == 'Trailer' && obj.site == 'YouTube',
-              ),
-            ],
-          }
+          results: [
+            ...details.videos.results.filter(
+              (obj) => obj.type == 'Teaser' && obj.site == 'YouTube',
+            ),
+            ...details.videos.results.filter(
+              (obj) => obj.type == 'Trailer' && obj.site == 'YouTube',
+            ),
+          ],
+        }
         : [],
     };
   } catch (e) {
@@ -251,15 +251,15 @@ export const getMovieDetails = async (id: number) => {
       backdrop_path: details.backdrop_path,
       videos: details.videos
         ? {
-            results: [
-              ...details.videos.results.filter(
-                (obj) => obj.type == 'Teaser' && obj.site == 'YouTube',
-              ),
-              ...details.videos.results.filter(
-                (obj) => obj.type == 'Trailer' && obj.site == 'YouTube',
-              ),
-            ],
-          }
+          results: [
+            ...details.videos.results.filter(
+              (obj) => obj.type == 'Teaser' && obj.site == 'YouTube',
+            ),
+            ...details.videos.results.filter(
+              (obj) => obj.type == 'Trailer' && obj.site == 'YouTube',
+            ),
+          ],
+        }
         : [],
     };
   } catch (e) {
@@ -285,7 +285,7 @@ async function externalId(id) {
   try {
     data = await cache.wrap(`ext_${id}`, async () => idLookup(id));
   } catch (err) {
-    logger.verbose(`Error getting external ID - ${id}`, {
+    logger.debug(`Error getting external ID - ${id}`, {
       label: 'tmdb.show',
     });
     logger.debug(err, { label: 'tmdb.show' });
@@ -351,7 +351,7 @@ async function tmdbData(id) {
   const tmdb = 'https://api.themoviedb.org/3/';
   const url = `${tmdb}tv/${id}?api_key=${externalConfig.tmdbApiKey}&append_to_response=aggregate_credits,videos,keywords,content_ratings,credits`;
   const res = await axios.get(url, { httpAgent: agent });
-  const {data} = res;
+  const { data } = res;
   if (data.aggregate_credits) {
     if (data.aggregate_credits.cast.length > 50)
       data.aggregate_credits.cast.length = 50;
@@ -423,9 +423,9 @@ function findEnLogo(logos) {
       logo.lang === 'en' &&
       !logoUrl &&
       logo.url !==
-        'https://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png' &&
+      'https://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png' &&
       logo.url !==
-        'http://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png'
+      'http://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png'
     ) {
       logoUrl = logo.url;
     }

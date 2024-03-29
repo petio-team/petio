@@ -12,7 +12,7 @@ import getLanguage from '@/services/tmdb/languages';
 const agent = new http.Agent({ family: 4 });
 
 export async function movieLookup(id, minified = false) {
-  logger.verbose(`TMDB Movie Lookup ${id}`, { label: 'tmdb.movie' });
+  logger.debug(`TMDB Movie Lookup ${id}`, { label: 'tmdb.movie' });
   if (!id || id == 'false') {
     return 'No ID';
   }
@@ -21,7 +21,7 @@ export async function movieLookup(id, minified = false) {
   let data: any;
   try {
     data = await getMovieData(id);
-    movie = { ...data};
+    movie = { ...data };
   } catch {
     return { error: 'unable to get movie data' };
   }
@@ -220,7 +220,7 @@ async function tmdbData(id) {
   const tmdb = 'https://api.themoviedb.org/3/';
   const url = `${tmdb}movie/${id}?api_key=${externalConfig.tmdbApiKey}&append_to_response=credits,videos,keywords,release_dates`;
   const res = await axios.get(url, { httpAgent: agent });
-  const {data} = res;
+  const { data } = res;
   data.timestamp = new Date();
   if (data.release_dates) {
     data.age_rating = findEnRating(data.release_dates.results);
@@ -266,9 +266,9 @@ function findEnLogo(logos) {
       logo.lang === 'en' &&
       !logoUrl &&
       logo.url !==
-        'https://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png' &&
+      'https://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png' &&
       logo.url !==
-        'http://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png'
+      'http://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png'
     ) {
       logoUrl = logo.url;
     }

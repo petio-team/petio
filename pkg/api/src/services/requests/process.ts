@@ -243,11 +243,11 @@ export default class ProcessRequest {
         { $set: { pendingDefault: pending } },
       ).exec();
 
-      logger.verbose('REQ: Pending Defaults set for later', {
+      logger.debug('REQ: Pending Defaults set for later', {
         label: 'requests.process',
       });
     } else {
-      logger.verbose('REQ: No Pending Defaults to Set', {
+      logger.debug('REQ: No Pending Defaults to Set', {
         label: 'requests.process',
       });
     }
@@ -262,7 +262,7 @@ export default class ProcessRequest {
         'REQ: Matched on custom filter, sending to specified server',
         { label: 'requests.process' },
       );
-      logger.verbose('REQ: Sending to DVR', { label: 'requests.process' });
+      logger.debug('REQ: Sending to DVR', { label: 'requests.process' });
       if (this.request.type === 'movie') {
         for (const match of filterMatch) {
           const instance = instances.find((i) => i.id === match.server);
@@ -284,7 +284,7 @@ export default class ProcessRequest {
       }
       return;
     }
-    logger.verbose('REQ: Sending to DVR', { label: 'requests.process' });
+    logger.debug('REQ: Sending to DVR', { label: 'requests.process' });
     // If profile is set use arrs from profile
     if (profile) {
       if (profile.radarr && this.request.type === 'movie') {
@@ -313,7 +313,7 @@ export default class ProcessRequest {
       }
     } else {
       // No profile set send to all arrs
-      logger.verbose('REQ: No profile for DVR', { label: 'requests.process' });
+      logger.debug('REQ: No profile for DVR', { label: 'requests.process' });
       if (this.request.type === 'tv') {
         const sonarrs = instances.filter(
           (i) => i.type === DownloaderType.Sonarr,
@@ -483,7 +483,7 @@ export default class ProcessRequest {
     )
       .exec()
       .then((_data) => {
-        logger.verbose(`REQ: Request ${oldReq.title} Archived!`, {
+        logger.debug(`REQ: Request ${oldReq.title} Archived!`, {
           label: 'requests.process',
         });
       })

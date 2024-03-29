@@ -25,7 +25,7 @@ export async function storeCache(firstTime = false) {
   if (firstTime) {
     const exists = await Imdb.findOne({}).exec();
     if (exists) {
-      logger.verbose('IMDB: Cache exists skipping setup', {
+      logger.debug('IMDB: Cache exists skipping setup', {
         label: 'meta.imdb',
       });
       return;
@@ -33,9 +33,9 @@ export async function storeCache(firstTime = false) {
   }
   const unzip = zlib.createGunzip();
   const tempFile = path.join(pathsConfig.dataDir, './imdb_dump.txt');
-  logger.verbose('IMDB: Rebuilding Cache', { label: 'meta.imdb' });
+  logger.debug('IMDB: Rebuilding Cache', { label: 'meta.imdb' });
   try {
-    logger.verbose('IMDB: Cache Downloading latest cache', {
+    logger.debug('IMDB: Cache Downloading latest cache', {
       label: 'meta.imdb',
     });
     const res = await axios({
@@ -43,14 +43,14 @@ export async function storeCache(firstTime = false) {
       method: 'GET',
       responseType: 'stream',
     });
-    logger.verbose('IMDB: Cache Storing to temp', { label: 'meta.imdb' });
+    logger.debug('IMDB: Cache Storing to temp', { label: 'meta.imdb' });
     const fileStream = fs.createWriteStream(tempFile);
     res.data.pipe(unzip).pipe(fileStream);
     fileStream.on('close', async () => {
-      logger.verbose('IMDB: Cache Download complete', { label: 'meta.imdb' });
+      logger.debug('IMDB: Cache Download complete', { label: 'meta.imdb' });
       try {
         await parseData(tempFile);
-        logger.verbose('IMDB: Cache Finished', { label: 'meta.imdb' });
+        logger.debug('IMDB: Cache Finished', { label: 'meta.imdb' });
       } catch (e) {
         logger.error(e, { label: 'meta.imdb' });
         logger.error('IMDB: Cache failed - db write issue', {
@@ -64,10 +64,10 @@ export async function storeCache(firstTime = false) {
 }
 
 async function parseData(file): Promise<any> {
-  logger.verbose('IMDB: Cache Emptying old cache', { label: 'meta.imdb' });
+  logger.debug('IMDB: Cache Emptying old cache', { label: 'meta.imdb' });
   await Imdb.deleteMany({}).exec();
-  logger.verbose('IMDB: Cache cleared', { label: 'meta.imdb' });
-  logger.verbose('IMDB: Cache parsing download, updating local cache', {
+  logger.debug('IMDB: Cache cleared', { label: 'meta.imdb' });
+  logger.debug('IMDB: Cache parsing download, updating local cache', {
     label: 'meta.imdb',
   });
   return new Promise((resolve, reject) => {

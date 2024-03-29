@@ -17,7 +17,7 @@ const getFilters = async (ctx: Context) => {
 };
 
 const updateFilter = async (ctx: Context) => {
-  const {body} = ctx.request;
+  const { body } = ctx.request;
 
   const movieFilter = body.movie;
   const tvFilter = body.tv;
@@ -35,14 +35,14 @@ const updateFilter = async (ctx: Context) => {
         },
         { useFindAndModify: false },
       );
-      logger.verbose('FILTER: Movie Filter updated');
+      logger.debug('FILTER: Movie Filter updated');
     } else {
       const newMovie = new Filter({
         id: 'movie_filters',
         data: movieFilter,
       });
       await newMovie.save();
-      logger.verbose('FILTER: New Movie filter created');
+      logger.debug('FILTER: New Movie filter created');
     }
     if (existingTv) {
       await Filter.findOneAndUpdate(
@@ -54,14 +54,14 @@ const updateFilter = async (ctx: Context) => {
         },
         { useFindAndModify: false },
       );
-      logger.verbose('FILTER: TV Filter updated');
+      logger.debug('FILTER: TV Filter updated');
     } else {
       const newTv = new Filter({
         id: 'tv_filters',
         data: tvFilter,
       });
       await newTv.save();
-      logger.verbose('FILTER: New TV filter created');
+      logger.debug('FILTER: New TV filter created');
     }
     logger.info('FILTER: Filters updated');
     ctx.status = StatusCodes.OK;

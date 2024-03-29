@@ -49,7 +49,7 @@ export default class Discord {
 
   async test() {
     if (!this.check()) {
-      logger.verbose('DSCRD: No Webhook defined', {
+      logger.debug('DSCRD: No Webhook defined', {
         label: 'notifications.discord',
       });
       return {
@@ -57,20 +57,20 @@ export default class Discord {
         error: 'No webhook found',
       };
     }
-    logger.verbose('DSCRD: Sending test webhook', {
+    logger.debug('DSCRD: Sending test webhook', {
       label: 'notifications.discord',
     });
     const defaultText: any = 'Petio Test';
     const body = this.buildBody(defaultText);
     const test = await this.postHook(this.webhook, body);
     if (!test) {
-      logger.verbose('DSCRD: Test Failed', { label: 'notifications.discord' });
+      logger.debug('DSCRD: Test Failed', { label: 'notifications.discord' });
       return {
         result: false,
         error: 'Failed to send webhook',
       };
     }
-    logger.verbose('DSCRD: Test passed', { label: 'notifications.discord' });
+    logger.debug('DSCRD: Test passed', { label: 'notifications.discord' });
     return {
       result: true,
       error: false,
@@ -79,7 +79,7 @@ export default class Discord {
 
   send(title = null, content = null, username = null, image = null) {
     if (!this.check()) {
-      logger.verbose('DSCRD: No Webhook defined', {
+      logger.debug('DSCRD: No Webhook defined', {
         label: 'notifications.discord',
       });
       return {
@@ -87,7 +87,7 @@ export default class Discord {
         error: 'No webhook found',
       };
     }
-    logger.verbose(`DSCRD: Sending webhook - ${content}`, {
+    logger.debug(`DSCRD: Sending webhook - ${content}`, {
       label: 'notifications.discord',
     });
     const body = this.buildBody(null, {
@@ -102,13 +102,13 @@ export default class Discord {
   async postHook(url, body) {
     try {
       await axios({ method: 'post', url, data: body });
-      logger.verbose('DSCRD: Webhook fired', {
+      logger.debug('DSCRD: Webhook fired', {
         label: 'notifications.discord',
       });
       return true;
     } catch (err) {
       logger.error(err, { label: 'notifications.discord' });
-      logger.verbose('DSCRD: Failed to send webhook', {
+      logger.debug('DSCRD: Failed to send webhook', {
         label: 'notifications.discord',
       });
       return false;

@@ -32,7 +32,7 @@ export default class Telegram {
 
   async test() {
     if (!this.check()) {
-      logger.verbose('Telegram: Chat id or bot token missing', {
+      logger.debug('Telegram: Chat id or bot token missing', {
         label: 'notifications.telegram',
       });
       return {
@@ -40,14 +40,14 @@ export default class Telegram {
         error: 'Chat id or bot token missing',
       };
     }
-    logger.verbose('Telegram: Sending test message', {
+    logger.debug('Telegram: Sending test message', {
       label: 'notifications.telegram',
     });
     const defaultText: any = 'Petio Test';
     const text = this.buildText(defaultText);
     const test = await this.postMessage(text);
     if (!test) {
-      logger.verbose('Telegram: Test Failed', {
+      logger.debug('Telegram: Test Failed', {
         label: 'notifications.telegram',
       });
       return {
@@ -55,7 +55,7 @@ export default class Telegram {
         error: 'Failed to send message',
       };
     }
-    logger.verbose('Telegram: Test passed', {
+    logger.debug('Telegram: Test passed', {
       label: 'notifications.telegram',
     });
     return {
@@ -66,7 +66,7 @@ export default class Telegram {
 
   send(title = null, content = null, username = null, image = null) {
     if (!this.check()) {
-      logger.verbose('Telegram: No config defined', {
+      logger.debug('Telegram: No config defined', {
         label: 'notifications.telegram',
       });
       return {
@@ -74,7 +74,7 @@ export default class Telegram {
         error: 'No config found',
       };
     }
-    logger.verbose(`Telegram: Sending message - ${content}`, {
+    logger.debug(`Telegram: Sending message - ${content}`, {
       label: 'notifications.telegram',
     });
     const text = this.buildText(null, {
@@ -102,12 +102,12 @@ export default class Telegram {
           params,
         },
       );
-      logger.verbose('Telegram: message sent', {
+      logger.debug('Telegram: message sent', {
         label: 'notifications.telegram',
       });
       return true;
     } catch (err) {
-      logger.verbose('Telegram: Failed to send message', {
+      logger.debug('Telegram: Failed to send message', {
         label: 'notifications.telegram',
       });
       return false;

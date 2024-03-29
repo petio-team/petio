@@ -10,14 +10,14 @@ import { GetAllUsers, User } from '@/models/user';
 import MakePlexURL from '@/services/plex/util';
 
 export default async () => {
-  logger.verbose('DISC: Started building discovery profiles', {
+  logger.debug('DISC: Started building discovery profiles', {
     label: 'discovery.build',
   });
 
   try {
     const users = await GetAllUsers();
     if (users.length === 0) {
-      logger.verbose('DISC: No Users', { label: 'discovery.build' });
+      logger.debug('DISC: No Users', { label: 'discovery.build' });
       return;
     }
     const userIds = users.map((user: User) => {
@@ -36,7 +36,7 @@ export default async () => {
       },
       { concurrency: config.get('general.concurrency') },
     );
-    logger.verbose('DISC: Finished building discovery profiles', {
+    logger.debug('DISC: Finished building discovery profiles', {
       label: 'discovery.build',
     });
   } catch (e) {
@@ -105,7 +105,7 @@ async function build(id) {
   };
   const data: any = await getHistory(id);
   if (data.MediaContainer.size === 0) {
-    logger.verbose(`DISC: No history for user - ${id}`, {
+    logger.debug(`DISC: No history for user - ${id}`, {
       label: 'discovery.build',
     });
     return {
@@ -297,7 +297,7 @@ function cert(cert, type) {
       return false;
 
     default:
-      logger.verbose(`DISC: Unmapped Cert Rating - ${cert}`, {
+      logger.debug(`DISC: Unmapped Cert Rating - ${cert}`, {
         label: 'discovery.build',
       });
       return false;

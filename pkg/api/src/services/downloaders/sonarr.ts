@@ -41,8 +41,8 @@ export default class Sonarr {
       }
 
       queue[instance.id] = await api.GetQueue();
-      const {totalRecords} = queue[instance.id];
-      const {pageSize} = queue[instance.id];
+      const { totalRecords } = queue[instance.id];
+      const { pageSize } = queue[instance.id];
       const pages = Math.ceil(totalRecords / pageSize);
       for (let p = 2; p <= pages; p++) {
         const queuePage = await api.GetQueue(p);
@@ -59,7 +59,7 @@ export default class Sonarr {
   async addShow(request, filter: any = false) {
     let sonarrId = -1;
     if (!request.tvdb_id) {
-      logger.verbose(
+      logger.debug(
         `SERVICE - SONARR: TVDB ID not found for ${request.title}`,
         { label: 'downloaders.sonarr' },
       );
@@ -87,9 +87,8 @@ export default class Sonarr {
     );
 
     result.seasonFolder = true;
-    result.rootFolderPath = `${
-      filter && filter.path ? filter.path : this.instance.path.location
-    }`;
+    result.rootFolderPath = `${filter && filter.path ? filter.path : this.instance.path.location
+      }`;
     result.addOptions = {
       searchForMissingEpisodes: true,
     };
@@ -101,13 +100,13 @@ export default class Sonarr {
 
     if (result.id) {
       sonarrId = result.id;
-      logger.verbose(
+      logger.debug(
         `SERVICE - SONARR: Request exists - Updating ${request.title}`,
         { label: 'downloaders.sonarr' },
       );
       try {
         await this.client.UpdateSeriesById(result.id, result);
-        logger.verbose(
+        logger.debug(
           `SERVICE - SONARR: [${this.instance.name}] Sonnar job updated for ${request.title}`,
           { label: 'downloaders.sonarr' },
         );
@@ -128,7 +127,7 @@ export default class Sonarr {
           );
         }
 
-        logger.verbose(
+        logger.debug(
           `SERVICE - SONARR: [${this.instance.name}] Sonnar job added for ${request.title}`,
           { label: 'downloaders.sonarr' },
         );
@@ -147,7 +146,7 @@ export default class Sonarr {
         requestId: request.id,
       }).exec();
       if (!dbRequest) {
-        logger.verbose(
+        logger.debug(
           `SERVICE - SONARR: [${this.instance.name}] No request found with id ${request.id}`,
           { label: 'downloaders.sonarr' },
         );

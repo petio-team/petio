@@ -4,6 +4,7 @@ import Logger from "./logger";
 import api from "@/api";
 import agendaFactory from '@/loaders/agenda';
 import config from '@/loaders/config';
+import { config as mainConfig } from '@/config';
 import di from '@/loaders/di';
 import '@/loaders/events';
 import jobs from '@/loaders/jobs';
@@ -11,6 +12,7 @@ import mongoose from '@/loaders/mongoose';
 import cache from "@/services/cache";
 import { setupWorkerProcesses, setupWorkers } from '@/services/cluster/setup';
 import startupMessage from '@/utils/startupMessage';
+import logger from "./logger";
 
 const runAPI = async () => {
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -24,10 +26,9 @@ const init = async () => {
   if (cluster.isPrimary) {
     // load the config if the file exists, else use defaults
     const exists = await config();
-    // show the startup message so the user knows everything is ready to go
-    startupMessage();
     // if config exists lets run first time cache, and clusters
     if (exists) {
+      logger.setLevel(mainConfig.get('logger.level'));
       // load database
       await mongoose();
       // check for first time cache
@@ -38,6 +39,8 @@ const init = async () => {
       // load http server
       await runAPI();
     }
+    // show the startup message so the user knows everything is ready to go
+    startupMessage();
     if (!exists) {
       Logger.warn(
         'Initial setup is required, please proceed to the Web UI to begin the setup',

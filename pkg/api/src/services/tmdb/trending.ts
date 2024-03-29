@@ -124,7 +124,7 @@ const Networks = [
 ];
 
 async function trending() {
-  logger.verbose(`TMDB Trending lookup`, { label: 'tmdb.trending' });
+  logger.debug(`TMDB Trending lookup`, { label: 'tmdb.trending' });
 
   const [people, movies, shows]: any = await Promise.all([
     getPerson(),
@@ -150,10 +150,10 @@ async function getPerson() {
     data = await cache.wrap('trending_person', async () => {
       const people = await personData();
       return people.map((person) => ({
-          id: person.id,
-          name: person.name,
-          profile_path: person.profile_path,
-        }));
+        id: person.id,
+        name: person.name,
+        profile_path: person.profile_path,
+      }));
     });
   } catch (err) {
     logger.warn(`Error getting trending people`, {
@@ -199,7 +199,7 @@ async function getShows() {
 // Lookup layer
 
 async function personData(): Promise<TrendingPeople[]> {
-  logger.verbose('Person from source not cache', {
+  logger.debug('Person from source not cache', {
     label: 'tmdb.trending',
   });
   const data = await TMDBAPI.get('/trending/:media_type/:time_window', {
@@ -212,7 +212,7 @@ async function personData(): Promise<TrendingPeople[]> {
 }
 
 async function moviesData(): Promise<TrendingMovie[]> {
-  logger.verbose('Movies from source not cache', {
+  logger.debug('Movies from source not cache', {
     label: 'tmdb.trending',
   });
   const data = await TMDBAPI.get('/trending/:media_type/:time_window', {
@@ -225,7 +225,7 @@ async function moviesData(): Promise<TrendingMovie[]> {
 }
 
 async function showsData(): Promise<TrendingTv[]> {
-  logger.verbose('Shows from source not cache', {
+  logger.debug('Shows from source not cache', {
     label: 'tmdb.trending',
   });
   const data = await TMDBAPI.get('/trending/:media_type/:time_window', {

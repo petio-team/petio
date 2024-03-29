@@ -14,16 +14,15 @@ import testConnection from '@/services/plex/connection';
 const testServer = async (ctx: Context) => {
   const body = ctx.request.body as SetupTestInput;
 
-  const {server} = body;
+  const { server } = body;
   if (!server) {
-    logger.log('warn', 'Test Server bad request');
+    logger.warn('Test Server bad request');
 
     ctx.status = StatusCodes.BAD_REQUEST;
     ctx.body = 'bad request';
     return;
   }
-  logger.log(
-    'verbose',
+  logger.debug(
     `Testing Server ${server.protocol}://${server.host}:${server.port}?X-Plex-Token=${server.token}`,
   );
   try {
@@ -34,8 +33,7 @@ const testServer = async (ctx: Context) => {
       server.token,
     );
     const status = test !== 200 ? 'failed' : 'connected';
-    logger.log(
-      'verbose',
+    logger.debug(
       `Test Server success - ${server.protocol}://${server.host}:${server.port}?X-Plex-Token=${server.token}`,
     );
 
@@ -45,8 +43,7 @@ const testServer = async (ctx: Context) => {
       code: test,
     };
   } catch (err) {
-    logger.log(
-      'verbose',
+    logger.debug(
       `Test Server failed - ${server.protocol}://${server.host}:${server.port}?X-Plex-Token=${server.token}`,
     );
 
@@ -59,10 +56,10 @@ const testServer = async (ctx: Context) => {
 };
 
 const testMongo = async (ctx: Context) => {
-  const {body} = ctx.request;
+  const { body } = ctx.request;
 
-  const {mongo} = body;
-  logger.log('verbose', `testing mongo connection: ${mongo}`);
+  const { mongo } = body;
+  logger.log('debug', `testing mongo connection: ${mongo}`);
   if (!mongo) {
     logger.log('warn', 'Mongo test bad request');
 
@@ -86,17 +83,17 @@ const testMongo = async (ctx: Context) => {
         return;
       }
     }
-    logger.log('verbose', 'Attempting mongo connection');
+    logger.log('debug', 'Attempting mongo connection');
 
     await mongoose.disconnect();
-    await mongoose.connect(`${mongo  }/petio`);
+    await mongoose.connect(`${mongo}/petio`);
 
     ctx.status = StatusCodes.OK;
     ctx.body = {
       status: 'connected',
     };
 
-    logger.log('verbose', 'Mongo test connection success');
+    logger.log('debug', 'Mongo test connection success');
   } catch (err) {
     ctx.status = StatusCodes.UNAUTHORIZED;
     ctx.body = {
@@ -110,12 +107,12 @@ const testMongo = async (ctx: Context) => {
 };
 
 const finishSetup = async (ctx: Context) => {
-  logger.log('verbose', 'Attempting to create config file');
+  logger.log('debug', 'Attempting to create config file');
 
-  const {body} = ctx.request;
+  const { body } = ctx.request;
 
-  const {user} = body;
-  const {server} = body;
+  const { user } = body;
+  const { server } = body;
   const dbUrl = body.db;
   if (!user || !server || !dbUrl) {
     logger.log('warn', 'Config creation missing fields');
@@ -125,7 +122,7 @@ const finishSetup = async (ctx: Context) => {
     return;
   }
 
-  config.set('db.url', `${dbUrl  }/petio`);
+  config.set('db.url', `${dbUrl}/petio`);
   config.set('plex.protocol', server.protocol);
   config.set('plex.host', server.host);
   config.set('plex.port', server.port);
@@ -152,7 +149,7 @@ const finishSetup = async (ctx: Context) => {
     await WriteConfig(false);
     setTimeout(async () => {
       logger.info('restarting to apply new configurations');
-      return ctx.reload()
+      return ctx.reload();
     }, 1000);
 
     ctx.status = StatusCodes.OK;

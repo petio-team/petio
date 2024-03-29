@@ -24,7 +24,7 @@ export default async (id, type) => {
 };
 
 function getHistoryData(id, type) {
-  logger.verbose('History returned from source', { label: 'plex.history' });
+  logger.debug('History returned from source', { label: 'plex.history' });
   return new Promise((resolve, reject) => {
     const d = new Date();
     d.setMonth(d.getMonth() - 1);

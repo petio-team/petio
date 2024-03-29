@@ -1,0 +1,16 @@
+{
+    "keepSettings": {
+        "type": 1,
+        "amount": 7
+    },
+    "auditFilename": "audit.json",
+    "hashType": "md5",
+    "extension": "",
+    "files": [
+        {
+            "date": 1711739330003,
+            "name": "/workspace/pkg/api/data/logs/petio-2024-03-29.log",
+            "hash": "6e92f6892d5452b65bc772cb222e273e"
+        }
+    ]
+}

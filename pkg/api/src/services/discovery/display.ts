@@ -34,7 +34,7 @@ export default async (id, type = 'movie') => {
       }
     }
     if (!discoveryPrefs) {
-      logger.verbose(
+      logger.debug(
         `DISC: No user data yet for ${id} - this is likely still being built, generic discovery returned`,
         { label: 'discovery.build' },
       );
@@ -106,9 +106,8 @@ export default async (id, type = 'movie') => {
         );
 
         return {
-          title: `${genre.name} ${
-            type === 'movie' ? 'movies' : 'shows'
-          } you might like`,
+          title: `${genre.name} ${type === 'movie' ? 'movies' : 'shows'
+            } you might like`,
           results,
           genre_id: id,
           ratings: `${genre.lowestRating} - ${genre.highestRating}`,
@@ -209,13 +208,13 @@ export default async (id, type = 'movie') => {
           let related: any =
             type === 'movie'
               ? await Promise.all([
-                  getMovieRecommendations(recent.id, 1),
-                  getMovieRecommendations(recent.id, 2),
-                ])
+                getMovieRecommendations(recent.id, 1),
+                getMovieRecommendations(recent.id, 2),
+              ])
               : await Promise.all([
-                  getShowRecommendations(recent.id, 1),
-                  getShowRecommendations(recent.id, 2),
-                ]);
+                getShowRecommendations(recent.id, 1),
+                getShowRecommendations(recent.id, 2),
+              ]);
           if (!related[0].results) related[0].results = [];
           if (!related[1].results) related[1].results = [];
           related = {
@@ -442,7 +441,7 @@ function genreID(genreName, type) {
         return 37;
 
       default:
-        logger.verbose(`DISC: Genre not mapped ${genreName}`, {
+        logger.debug(`DISC: Genre not mapped ${genreName}`, {
           label: 'discovery.build',
         });
         return false;
@@ -496,7 +495,7 @@ function genreID(genreName, type) {
       case 'Western':
         return 37;
       default:
-        logger.verbose(`DISC: Genre not mapped ${genreName}`, {
+        logger.debug(`DISC: Genre not mapped ${genreName}`, {
           label: 'discovery.build',
         });
         return false;
@@ -649,15 +648,15 @@ async function comingSoon(type) {
     const data: any =
       type === 'movie'
         ? await discoverMovie(1, {
-            sort_by: 'popularity.desc',
-            'primary_release_date.gte': now,
-            with_original_language: 'en',
-          })
+          sort_by: 'popularity.desc',
+          'primary_release_date.gte': now,
+          with_original_language: 'en',
+        })
         : await discoverShow(1, {
-            sort_by: 'popularity.desc',
-            'first_air_date.gte': now,
-            with_original_language: 'en',
-          });
+          sort_by: 'popularity.desc',
+          'first_air_date.gte': now,
+          with_original_language: 'en',
+        });
     await Promise.map(
       data.results,
       async (result: any, i) => {
@@ -669,21 +668,21 @@ async function comingSoon(type) {
         data.results[i] =
           type === 'movie'
             ? {
-                on_server: onPlex.exists,
-                title: result.title,
-                poster_path: result.poster_path,
-                release_date: result.release_date,
-                id: result.id,
-                videos: result.videos,
-              }
+              on_server: onPlex.exists,
+              title: result.title,
+              poster_path: result.poster_path,
+              release_date: result.release_date,
+              id: result.id,
+              videos: result.videos,
+            }
             : {
-                on_server: onPlex.exists,
-                name: result.name,
-                poster_path: result.poster_path,
-                first_air_date: result.first_air_date,
-                id: result.id,
-                videos: result.videos,
-              };
+              on_server: onPlex.exists,
+              name: result.name,
+              poster_path: result.poster_path,
+              first_air_date: result.first_air_date,
+              id: result.id,
+              videos: result.videos,
+            };
       },
       { concurrency: config.get('general.concurrency') },
     );

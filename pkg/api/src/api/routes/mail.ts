@@ -38,7 +38,7 @@ const createMail = async (ctx: Context) => {
     return;
   }
 
-  logger.log('verbose', 'MAILER: Config updated');
+  logger.log('debug', 'MAILER: Config updated');
 
   ctx.status = StatusCodes.OK;
   ctx.body = { config: config.get('email') };

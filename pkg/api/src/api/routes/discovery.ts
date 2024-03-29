@@ -17,7 +17,7 @@ const getMovies = async (ctx: Context) => {
   const userId = user.altId ? user.altId : user.plexId;
 
   try {
-    logger.verbose(`ROUTE: Movie Discovery Profile returned for ${userId}`);
+    logger.debug(`ROUTE: Movie Discovery Profile returned for ${userId}`);
     const data: any = await getDiscovery(userId, 'movie');
     if (data.error) throw data.error;
     ctx.body = data;
@@ -37,7 +37,7 @@ const getShows = async (ctx: Context) => {
   const userId = user.altId ? user.altId : user.plexId;
 
   try {
-    logger.verbose(`ROUTE: TV Discovery Profile returned for ${userId}`);
+    logger.debug(`ROUTE: TV Discovery Profile returned for ${userId}`);
     const data: any = await getDiscovery(userId, 'show');
     if (data.error) throw data.error;
 

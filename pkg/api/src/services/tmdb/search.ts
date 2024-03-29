@@ -13,7 +13,7 @@ import { showLookup } from '@/services/tmdb/show';
 const agent = new http.Agent({ family: 4 });
 
 async function search(term) {
-  logger.verbose(`TMDB Search ${term}`, { label: 'tmdb.search' });
+  logger.debug(`TMDB Search ${term}`, { label: 'tmdb.search' });
 
   const [movies, shows, people, companies] = await Promise.all([
     searchMovies(sanitize(term)),

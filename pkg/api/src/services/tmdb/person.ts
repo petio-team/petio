@@ -7,7 +7,7 @@ import logger from '@/loaders/logger';
 const agent = new http.Agent({ family: 4 });
 
 async function personLookup(id) {
-  logger.verbose(`TMDB Person Lookup ${id}`, {
+  logger.debug(`TMDB Person Lookup ${id}`, {
     label: 'tmdb.person',
   });
   const info = await getPersonInfo(id);

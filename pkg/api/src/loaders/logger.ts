@@ -1,74 +1,61 @@
+import pino, { Logger } from 'pino';
 import path from 'path';
-import * as winston from 'winston';
-import 'winston-daily-rotate-file';
+import * as FileStreamRotator from 'file-stream-rotator';
 
 import pathsConfig from "@/config/env/paths";
-import config from '@/config/schema';
-
-const {
-  combine,
-  timestamp,
-  printf,
-  splat,
-  colorize,
-  label,
-  errors,
-  prettyPrint,
-} = winston.format;
+import PinoPretty from "pino-pretty";
+import { env } from "process";
 
 const logsFolder = path.join(pathsConfig.dataDir, './logs');
 
-const customFormat = printf(({ level, formatLabel, message, timestamp }) => {
-  const lbl = formatLabel ? `[${formatLabel}] ` : '';
-  return `${timestamp} ${lbl}${level}: ${message}`;
-});
+function createLogger(level: string): Logger {
+  return pino({
+    level: level
+  }, pino.multistream([
+    {
+      level: level,
+      stream: PinoPretty({
+        translateTime: 'SYS:mm-dd-yyyy hh:mm:ss TT',
+        ignore: 'pid,hostname',
+        singleLine: true,
+        sync: true,
+      })
+    },
+    {
+      level: level,
+      stream: FileStreamRotator.getStream({
+        filename: path.join(logsFolder, 'petio-%DATE%.log'),
+        frequency: 'daily',
+        verbose: false,
+        create_symlink: true,
+        audit_file: path.join(logsFolder, 'audit.json'),
+        date_format: 'YYYY-MM-DD',
+        max_logs: '7d',
+      })
+    }
+  ]));
+}
 
-const Logger = winston.createLogger({
-  level: config.get('logger.level') || 'debug',
-  format: combine(
-    errors({ stack: true }),
-    splat(),
-    prettyPrint(),
-    label({
-      label: 'label',
-    }),
-    timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    customFormat,
-  ),
-  transports: [
-    new winston.transports.Console({
-      handleExceptions: true,
-      format: combine(colorize(), splat(), timestamp(), customFormat),
-    }),
-    new winston.transports.DailyRotateFile({
-      filename: path.join(logsFolder, `petio-%DATE%.log`),
-      maxSize: '20m',
-      maxFiles: '7d',
-      createSymlink: true,
-      symlinkName: 'petio.log',
-    }),
-    new winston.transports.File({
-      filename: path.join(logsFolder, 'live.log'),
-      level: 'silly',
-      maxsize: 100000,
-      maxFiles: 1,
-      tailable: true,
-      format: combine(
-        timestamp(),
-        printf((info) => `${JSON.stringify({
-          [info.timestamp]: {
-            type: info.level,
-            log: info.message,
-          },
-        })},`),
-      ),
-      log: (info, next) => {
-        if (info.level !== "http") {
-          next();
-        }
-      }
-    }),
-  ],
-});
+let logger = createLogger(env.LOG_LEVEL || 'info');
 
-export default Logger;
+export default {
+  setLevel: (level: string) => {
+    logger = createLogger(level);
+  },
+  info: (message: string, obj = undefined) => {
+    logger.info(obj, message);
+  },
+  warn: (message: string, obj = undefined) => {
+    logger.warn(obj, message);
+  },
+  error: (message: string, obj = undefined) => {
+    logger.error(obj, message);
+  },
+  debug: (message: string, obj = undefined) => {
+    logger.debug(obj, message);
+  },
+  log: (level: string, message: string, obj = undefined) => {
+    logger[level](obj, message);
+  },
+  core: logger,
+};
