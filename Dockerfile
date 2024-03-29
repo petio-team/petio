@@ -9,7 +9,6 @@ COPY . .
 # Run yarn to fetch dependencies
 RUN yarn workspaces focus --all && \
     yarn workspace frontend run build && \
-    yarn workspace admin run build && \
     yarn workspace api run build:prod && \
     chmod -R u=rwX,go=rX /build/pkg
 
@@ -38,7 +37,6 @@ RUN groupadd -g 1000 petio && \
 
 # Copy all the build files from both frontend and backend
 COPY --from=builder --chown=petio:petio --chmod=0755 /build/pkg/frontend/build /app/views/frontend
-COPY --from=builder --chown=petio:petio --chmod=0755 /build/pkg/admin/build /app/views/admin
 COPY --from=builder --chown=petio:petio --chmod=0755 /build/pkg/api/dist/index.js /app/index.js
 COPY ./scripts/docker /
 
