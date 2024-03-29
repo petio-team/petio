@@ -262,7 +262,7 @@ export default class LibraryUpdate {
         logger.error(err, { label: 'plex.library' });
       }
       if (updatedLibraryItem) {
-        logger.verbose(`CRON: Library Updated ${  lib.title}`, {
+        logger.verbose(`CRON: Library Updated ${lib.title}`, {
           label: 'plex.library',
         });
       }
@@ -356,7 +356,7 @@ export default class LibraryUpdate {
 
   async saveMovie(movieObj) {
     let movieDb: any = false;
-    const {title} = movieObj;
+    const { title } = movieObj;
     const externalIds: any = {};
     let tmdbId = false;
     let externalId: any = false;
@@ -405,7 +405,7 @@ export default class LibraryUpdate {
             return;
           }
           const source = guid.id.split('://');
-          externalIds[`${source[0]  }_id`] = source[1];
+          externalIds[`${source[0]}_id`] = source[1];
           if (source[0] === 'tmdb') tmdbId = source[1];
         }
 
@@ -527,7 +527,7 @@ export default class LibraryUpdate {
 
   async saveShow(showObj) {
     let showDb: any = false;
-    const {title} = showObj;
+    const { title } = showObj;
     let externalIds: any = {};
     let tmdbId = false;
     let externalId = false;
@@ -602,7 +602,7 @@ export default class LibraryUpdate {
             return;
           }
           const source = guid.id.split('://');
-          externalIds[`${source[0]  }_id`] = source[1];
+          externalIds[`${source[0]}_id`] = source[1];
           if (source[0] === 'tmdb') tmdbId = source[1];
         }
       } catch (e) {
@@ -760,7 +760,7 @@ export default class LibraryUpdate {
       };
 
       const newUser = await CreateOrUpdateUser(user);
-      logger.verbose(`synced friend ${  newUser.username}`, {
+      logger.verbose(`synced friend ${newUser.username}`, {
         label: 'plex.library',
       });
     } catch (e) {

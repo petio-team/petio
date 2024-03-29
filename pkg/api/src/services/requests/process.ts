@@ -475,21 +475,21 @@ export default class ProcessRequest {
       timeStamp: this.request.timeStamp ? this.request.timeStamp : new Date(),
     });
     await archiveRequest.save();
-    Request.findOneAndRemove(
+    await Request.findOneAndRemove(
       {
         requestId: this.request.requestId,
       },
       { useFindAndModify: false },
-      (err, _data) => {
-        if (err) {
-          logger.error(`REQ: Archive Error`, { label: 'requests.process' });
-          logger.error(err.message, { label: 'requests.process' });
-        } else {
-          logger.verbose(`REQ: Request ${oldReq.title} Archived!`, {
-            label: 'requests.process',
-          });
-        }
-      },
-    );
+    )
+      .exec()
+      .then((_data) => {
+        logger.verbose(`REQ: Request ${oldReq.title} Archived!`, {
+          label: 'requests.process',
+        });
+      })
+      .catch((err) => {
+        logger.error(`REQ: Archive Error`, { label: 'requests.process' });
+        logger.error(err.message, { label: 'requests.process' });
+      });
   }
 }

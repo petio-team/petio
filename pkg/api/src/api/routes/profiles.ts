@@ -28,7 +28,7 @@ const listProfiles = async (ctx: Context) => {
 
 const saveProfile = async (ctx: Context) => {
   const body = ctx.request.body as any;
-  const {profile} = body;
+  const { profile } = body;
   if (!profile) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = { error: 'no profile details' };
@@ -111,7 +111,7 @@ const saveProfile = async (ctx: Context) => {
 const deleteProfile = async (ctx: Context) => {
   const body = ctx.request.body as any;
 
-  const {profile} = body;
+  const { profile } = body;
   if (!profile || !profile.id) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = {
@@ -140,7 +140,7 @@ const deleteProfile = async (ctx: Context) => {
   }
 
   try {
-    await Profile.findOneAndDelete({ _id: profile.id });
+    await Profile.findOneAndRemove({ _id: profile.id });
     ctx.status = StatusCodes.OK;
     ctx.body = {
       message: 'Profile deleted',
