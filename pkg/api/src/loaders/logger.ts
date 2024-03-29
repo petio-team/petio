@@ -56,11 +56,11 @@ const Logger = winston.createLogger({
       format: combine(
         timestamp(),
         printf((info) => `${JSON.stringify({
-            [info.timestamp]: {
-              type: info.level,
-              log: info.message,
-            },
-          })},`),
+          [info.timestamp]: {
+            type: info.level,
+            log: info.message,
+          },
+        })},`),
       ),
       log: (info, next) => {
         if (info.level !== "http") {
