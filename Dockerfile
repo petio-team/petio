@@ -13,7 +13,7 @@ RUN yarn workspaces focus --all && \
     yarn workspace api run build:prod && \
     chmod -R u=rwX,go=rX /build/pkg
 
-FROM alpine:3.16.2
+FROM alpine
 
 # Set enviornment variables for the app
 ENV APP_DIR="/app"
@@ -22,10 +22,10 @@ ENV DATA_FOLDER="/data"
 
 # Install needed dependencies to get the image setup and then remove the cache
 RUN apk add --no-cache \
-    shadow=4.10-r3 \
-    wget=1.21.3-r0 \
-    bash=5.1.16-r2 \
-    nodejs=16.20.0-r0 && \
+    shadow \
+    wget \
+    bash \
+    nodejs && \
     # Remove package cache
     rm -rf /var/cache/apk/* && \
     rm -rf /tmp/*
