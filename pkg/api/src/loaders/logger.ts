@@ -10,7 +10,6 @@ const logsFolder = path.join(pathsConfig.dataDir, './logs');
 function createLogger(level: string): PinoLogger {
   return pino({
     level,
-    redact: ['api_key'],
   }, pino.multistream([
     {
       level,
