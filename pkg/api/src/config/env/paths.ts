@@ -8,10 +8,9 @@ type PathsConfig = {
 };
 
 const proc: Process = process;
-const ROOT_DIR = proc.pkg ? path.dirname(process.execPath) : proc.cwd();
-const APP_DIR: string = proc.pkg
-  ? path.join(__dirname, '../../../../../')
-  : proc.env.APP_DIR ?? path.join(ROOT_DIR, '../..');
+
+const ROOT_DIR = proc.cwd();
+const APP_DIR = proc.env.APP_DIR ?? path.join(__dirname, '../../..');
 const VIEWS_DIR = process.env.VIEWS_FOLDER ?? path.join(APP_DIR, './pkg');
 const DATA_DIR = process.env.DATA_FOLDER ?? path.join(ROOT_DIR, './data');
 

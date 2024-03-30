@@ -24,7 +24,7 @@
   "pkg": {
     "scripts": [],
     "assets": [
-      "./frontend/build/**/*"
+      "./pkg/frontend/build/**/*"
     ],
     "targets": [
       "node16-alpine-arm64",
