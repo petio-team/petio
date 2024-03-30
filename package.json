@@ -3,7 +3,7 @@
   "private": true,
   "author": "Petio Team",
   "license": "MIT",
-  "bin": "./pkg/api/dist/index.js",
+  "bin": "./dist/api/index.js",
   "workspaces": [
     "pkg/api",
     "pkg/frontend",
@@ -38,7 +38,7 @@
       "node16-windows-x64",
       "node16-windows-arm64"
     ],
-    "outputPath": "dist"
+    "outputPath": "dist/releases"
   },
   "packageManager": "yarn@3.2.1"
 }

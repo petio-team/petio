@@ -23,7 +23,6 @@ function serveReact(app: Koa, dir: string, urlPath: string) {
   app.use(mount(urlPath, spa));
 }
 
-
 export default async (app: Koa) => {
   let frontendPath = viewsConfig.frontend;
   if (!(await pathExists(path.join(frontendPath, 'index.html')))) {

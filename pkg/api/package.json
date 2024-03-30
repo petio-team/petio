@@ -8,7 +8,7 @@
     "watch": "nodemon",
     "inspect": "nodemon --exec \"node --require tsconfig-paths/register --require ts-node/register --inspect ./src/app.ts\"",
     "build": "tsc && tsc-alias",
-    "build:prod": "yarn ncc -t build ./src/app.ts -o dist -m",
+    "build:prod": "yarn ncc -t build ./src/app.ts -o ../../dist/api -m",
     "test": "ts-mocha --paths src/**/*.test.ts",
     "depcheck": "depcheck",
     "lint": "eslint . --ext .ts",
