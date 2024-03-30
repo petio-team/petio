@@ -2,6 +2,7 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
+import logger from '@/loaders/logger';
 import Review from '@/models/review';
 import { UserModel } from '@/models/user';
 
@@ -38,7 +39,7 @@ const addReview = async (ctx: Context) => {
   const { review } = body;
   const { user } = body;
   try {
-    const userData = await UserModel.findOne({ id: user });
+    const userData = await UserModel.findById(user);
     if (!userData) {
       throw new Error('failed to get user data');
     }
@@ -67,6 +68,7 @@ const addReview = async (ctx: Context) => {
     ctx.status = StatusCodes.OK;
     ctx.body = savedReview;
   } catch (err) {
+    logger.error('Failed to add review', err);
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = { error: err };
   }
