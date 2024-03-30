@@ -15,7 +15,7 @@ function createLogger(level: string): Logger {
     {
       level: level,
       stream: PinoPretty({
-        translateTime: 'SYS:mm-dd-yyyy hh:mm:ss TT',
+        translateTime: 'SYS:standard',
         ignore: 'pid,hostname',
         singleLine: true,
         sync: true,
