@@ -1,14 +1,13 @@
-import pino, { Logger } from 'pino';
+import pino, { Logger as PinoLogger } from 'pino';
 import path from 'path';
 import * as FileStreamRotator from 'file-stream-rotator';
 
 import pathsConfig from "@/config/env/paths";
 import PinoPretty from "pino-pretty";
-import { env } from "process";
 
 const logsFolder = path.join(pathsConfig.dataDir, './logs');
 
-function createLogger(level: string): Logger {
+function createLogger(level: string): PinoLogger {
   return pino({
     level: level
   }, pino.multistream([
@@ -36,10 +35,13 @@ function createLogger(level: string): Logger {
   ]));
 }
 
-let logger = createLogger(env.LOG_LEVEL || 'info');
+let logger = createLogger('info');
 
-export default {
+const loggerObj = {
   setLevel: (level: string) => {
+    if (!['info', 'warn', 'error', 'debug', 'trace'].includes(level)) {
+      throw new Error(`Invalid log level [${level}] expected one of [info, warn, error, debug, trace]`);
+    }
     logger = createLogger(level);
   },
   info: (message: string, obj = undefined) => {
@@ -59,3 +61,6 @@ export default {
   },
   core: logger,
 };
+export type Logger = typeof loggerObj;
+
+export default loggerObj;

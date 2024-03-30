@@ -5250,8 +5250,6 @@ __metadata:
     xml-js: ^1.6.11
     yargs-parser: ^21.1.1
     zod: ^3.19.0
-  bin:
-    api: ./dist/main.js
   languageName: unknown
   linkType: soft
 
@@ -14021,6 +14019,8 @@ __metadata:
     commitlint: ^17.0.0
     husky: ^8.0.1
     prettier: ^2.6.2
+  bin:
+    petio: ./dist/api/index.js
   languageName: unknown
   linkType: soft
 

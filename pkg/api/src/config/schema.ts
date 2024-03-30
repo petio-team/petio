@@ -66,7 +66,7 @@ export default blueconfig({
   logger: {
     level: {
       doc: 'The level of output the log provides',
-      format: ['error', 'warn', 'info', 'debug', 'trace'],
+      format: String,
       default: 'info',
       env: 'LOG_LEVEL',
       args: 'loglevel',

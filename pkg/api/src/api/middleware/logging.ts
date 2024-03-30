@@ -1,6 +1,5 @@
 import logger from "@/loaders/logger";
 import { Context, Next } from "koa";
-import pino from "pino";
 import PinoHttp from "pino-http";
 
 const httpLogger = PinoHttp({

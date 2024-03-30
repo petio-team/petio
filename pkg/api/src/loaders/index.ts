@@ -26,9 +26,9 @@ const init = async () => {
   if (cluster.isPrimary) {
     // load the config if the file exists, else use defaults
     const exists = await config();
+    logger.setLevel(mainConfig.get('logger.level'));
     // if config exists lets run first time cache, and clusters
     if (exists) {
-      logger.setLevel(mainConfig.get('logger.level'));
       // load database
       await mongoose();
       // check for first time cache
@@ -36,6 +36,7 @@ const init = async () => {
       // setup workers and run forks
       await setupWorkerProcesses();
     } else {
+
       // load http server
       await runAPI();
     }

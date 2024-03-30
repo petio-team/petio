@@ -1,8 +1,7 @@
 import { EventDispatcher } from 'event-dispatch';
 import { container } from 'tsyringe';
-import { Logger } from 'winston';
 
-import logger from '@/loaders/logger';
+import logger, { Logger } from '@/loaders/logger';
 import CacheDB from "@/models/cache/db";
 import ICacheRepository from "@/models/cache/repository";
 import MediaServerDB from '@/models/mediaserver/db';
