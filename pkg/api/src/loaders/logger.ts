@@ -9,7 +9,8 @@ const logsFolder = path.join(pathsConfig.dataDir, './logs');
 
 function createLogger(level: string): PinoLogger {
   return pino({
-    level: level
+    level: level,
+    redact: ['api_key'],
   }, pino.multistream([
     {
       level: level,
@@ -44,19 +45,19 @@ const loggerObj = {
     }
     logger = createLogger(level);
   },
-  info: (message: string, obj = undefined) => {
+  info: (message: string, obj = {}) => {
     logger.info(obj, message);
   },
-  warn: (message: string, obj = undefined) => {
+  warn: (message: string, obj = {}) => {
     logger.warn(obj, message);
   },
-  error: (message: string, obj = undefined) => {
+  error: (message: string, obj = {}) => {
     logger.error(obj, message);
   },
-  debug: (message: string, obj = undefined) => {
+  debug: (message: string, obj = {}) => {
     logger.debug(obj, message);
   },
-  log: (level: string, message: string, obj = undefined) => {
+  log: (level: string, message: string, obj = {}) => {
     logger[level](obj, message);
   },
   core: logger,
