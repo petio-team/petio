@@ -37,7 +37,7 @@ RUN groupadd -g 1000 petio && \
 
 # Copy all the build files from both frontend and backend
 COPY --from=builder --chown=petio:petio --chmod=0755 /build/pkg/frontend/build /app/views/frontend
-COPY --from=builder --chown=petio:petio --chmod=0755 /build/pkg/api/dist/index.js /app/index.js
+COPY --from=builder --chown=petio:petio --chmod=0755 /build/dist/api/index.js /app/index.js
 COPY ./scripts/docker /
 
 # Give our init script permission to be executed
