@@ -3,6 +3,7 @@ build/
 data/
 db/
 logs/
+dist/
 .eslintcache
 *.log
 .DS_Store

@@ -81,9 +81,12 @@ tasks:
   # Package
   # -
   pkg:
-    dir: pkg/api
+    deps:
+      - 'build:pre'
+      - 'build:fe'
+      - 'build:api:prod'
     cmds:
-      - pkg . --no-bytecode --public-packages "*"
+      - yarn run release
 
   pkg:docker:
     dir: pkg/api

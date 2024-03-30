@@ -3,11 +3,16 @@
   "private": true,
   "author": "Petio Team",
   "license": "MIT",
+  "bin": "./pkg/api/dist/index.js",
   "workspaces": [
     "pkg/api",
     "pkg/frontend",
     "pkg/admin"
   ],
+  "scripts": {
+    "prepare": "is-ci || husky install",
+    "release": "pkg . --no-bytecode --public-packages \"*\" --public"
+  },
   "devDependencies": {
     "@commitlint/cli": "^16.2.3",
     "@commitlint/config-conventional": "^16.2.1",
@@ -16,8 +21,24 @@
     "husky": "^8.0.1",
     "prettier": "^2.6.2"
   },
-  "scripts": {
-    "prepare": "is-ci || husky install"
+  "pkg": {
+    "scripts": [],
+    "assets": [
+      "./frontend/build/**/*"
+    ],
+    "targets": [
+      "node16-alpine-arm64",
+      "node16-alpine-x64",
+      "node16-linux-arm64",
+      "node16-linux-x64",
+      "node16-linuxstatic-arm64",
+      "node16-linuxstatic-x64",
+      "node16-macos-x64",
+      "node16-macos-arm64",
+      "node16-windows-x64",
+      "node16-windows-arm64"
+    ],
+    "outputPath": "dist"
   },
   "packageManager": "yarn@3.2.1"
 }
