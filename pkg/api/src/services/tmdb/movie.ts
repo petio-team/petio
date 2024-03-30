@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import http from 'http';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 
 import cache from "../cache/cache";
 import externalConfig from "@/config/env/external";
@@ -13,7 +14,7 @@ const agent = new http.Agent({ family: 4 });
 
 export async function movieLookup(id, minified = false) {
   logger.debug(`TMDB Movie Lookup ${id}`, { label: 'tmdb.movie' });
-  if (!id || id == 'false') {
+  if (!id || id === 'false') {
     return 'No ID';
   }
   const fanart: any = minified ? false : await fanartLookup(id, 'movies');
@@ -43,11 +44,16 @@ export async function movieLookup(id, minified = false) {
     try {
       let collectionData: any = false;
       let [
+        // eslint-disable-next-line prefer-const
         onPlex,
         recommendations,
+        // eslint-disable-next-line prefer-const
         similar,
-        imdb_data,
+        // eslint-disable-next-line prefer-const
+        imdbData,
+        // eslint-disable-next-line prefer-const
         collection,
+        // eslint-disable-next-line prefer-const
         reviews,
       ]: any = await Promise.all([
         onServer('movie', movie.imdb_id, false, id),
@@ -63,7 +69,7 @@ export async function movieLookup(id, minified = false) {
       const recommendationsData: any = [];
       movie.on_server = onPlex.exists;
       movie.available_resolutions = onPlex.resolutions;
-      movie.imdb_data = imdb_data;
+      movie.imdb_data = imdbData;
       movie.reviews = reviews.results;
       if (!minified) {
         if (
@@ -73,6 +79,7 @@ export async function movieLookup(id, minified = false) {
           const params: any = {};
           if (movie.genres) {
             let genres = '';
+            // eslint-disable-next-line no-restricted-syntax
             for (const element of movie.genres) {
               genres += `${element.id},`;
             }
@@ -85,23 +92,20 @@ export async function movieLookup(id, minified = false) {
       if (recommendations)
         Object.keys(recommendations.results).forEach((key) => {
           const recommendation = recommendations.results[key];
-          if (recommendation.id !== parseInt(id))
+          if (recommendation.id !== parseInt(id, 10))
             recommendationsData.push(recommendation.id);
         });
       if (similar)
         Object.keys(similar.results).forEach((key) => {
           const recommendation = similar.results[key];
           if (
-            recommendation.id !== parseInt(id) &&
+            recommendation.id !== parseInt(id, 10) &&
             !recommendationsData.includes(recommendation.id)
           )
             recommendationsData.push(recommendation.id);
         });
       if (!minified && movie.belongs_to_collection) {
-        collectionData = [];
-        collection.parts.map((part) => {
-          collectionData.push(part.id);
-        });
+        collectionData = collection.parts.map((part) => part.id);
       }
 
       movie.recommendations = recommendationsData;
@@ -109,11 +113,17 @@ export async function movieLookup(id, minified = false) {
       movie.keywords = movie.keywords.keywords;
       movie.videos = {
         results: [
-          ...movie.videos.results.filter(
-            (obj) => obj.type == 'Trailer' && obj.site == 'YouTube',
+          ...(movie.videos.results as Array<{
+            type: string;
+            site: string;
+          }>).filter(
+            (obj) => obj.type === 'Trailer' && obj.site === 'YouTube',
           ),
-          ...movie.videos.results.filter(
-            (obj) => obj.type == 'Teaser' && obj.site == 'YouTube',
+          ...(movie.videos.results as Array<{
+            type: string;
+            site: string;
+          }>).filter(
+            (obj) => obj.type === 'Teaser' && obj.site === 'YouTube',
           ),
         ],
       };
@@ -151,12 +161,47 @@ export async function movieLookup(id, minified = false) {
       return { error: 'not found' };
     }
   }
+  return {};
 }
 
-async function getMovieData(id) {
-  let data = false;
+interface MovieData {
+  id: number;
+  imdb_id: string;
+  belongs_to_collection: {
+    id: number;
+  };
+  keywords: {
+    keywords: string[];
+  };
+  videos: {
+    results: {
+      type: string;
+      site: string;
+    }[];
+  };
+  production_countries: any;
+  adult: any;
+  original_title: any;
+  credits: any;
+  genres: any;
+  homepage: any;
+  popularity: any;
+  recommendations: any;
+  revenue: any;
+  runtime: any;
+  spoken_languages: any;
+  status: any;
+  tagline: any;
+  vote_average: any;
+  vote_count: any;
+  original_language: string;
+  overview: string;
+}
+
+async function getMovieData(id: number): Promise<MovieData | false> {
+  let data: MovieData | false = false;
   try {
-    data = await cache.wrap(id, async () => tmdbData(id));
+    data = await cache.wrap<MovieData | false>(`movie_data_${id}`, async () => tmdbData(id));
   } catch (err) {
     logger.warn(`Error getting movie data - ${id}`, { label: 'tmdb.movie' });
     logger.error(err, { label: 'tmdb.movie' });
@@ -190,21 +235,21 @@ export async function getSimilar(id, page = 1) {
   return data;
 }
 
-async function getReviews(id) {
-  let data = false;
+async function getReviews(id: number): Promise<any> {
+  let data: any = false;
   try {
     data = await cache.wrap(`rev_${id}`, async () => reviewsData(id));
   } catch (err) {
     logger.warn(`Error getting movie reviews - ${id}`, { label: 'tmdb.movie' });
-    logger.log(err, { label: 'tmdb.movie' });
+    logger.error(err, { label: 'tmdb.movie' });
   }
   return data;
 }
 
-async function getCollection(id) {
-  let data = false;
+async function getCollection(id: number): Promise<any> {
+  let data: any = false;
   try {
-    data = await cache.wrap(`col_${id}`, async () => collectionData(id));
+    data = await cache.wrap(`col_${id}`, async () => getCollectionData(id));
   } catch (err) {
     logger.warn(`Error getting movie collections - ${id}`, {
       label: 'tmdb.movie',
@@ -216,7 +261,7 @@ async function getCollection(id) {
 
 // Lookup Layer
 
-async function tmdbData(id) {
+async function tmdbData(id: number): Promise<MovieData> {
   const tmdb = 'https://api.themoviedb.org/3/';
   const url = `${tmdb}movie/${id}?api_key=${externalConfig.tmdbApiKey}&append_to_response=credits,videos,keywords,release_dates`;
   const res = await axios.get(url, { httpAgent: agent });
@@ -229,37 +274,37 @@ async function tmdbData(id) {
   return data;
 }
 
-async function recommendationData(id, page = 1) {
+async function recommendationData(id: number, page = 1): Promise<any> {
   const tmdb = 'https://api.themoviedb.org/3/';
   const url = `${tmdb}movie/${id}/recommendations?api_key=${externalConfig.tmdbApiKey}&page=${page}&append_to_response=videos`;
   const res = await axios.get(url, { httpAgent: agent });
   return res.data;
 }
 
-async function similarData(id, page = 1) {
-  const tmdb = 'https://api.themoviedb.org/3/';
-  const url = `${tmdb}movie/${id}/similar?api_key=${externalConfig.tmdbApiKey}&page=${page}&append_to_response=videos`;
-  const res = await axios.get(url, { httpAgent: agent });
+async function similarData(id: number, page = 1): Promise<any> {
+  const tmdb: string = 'https://api.themoviedb.org/3/';
+  const url: string = `${tmdb}movie/${id}/similar?api_key=${externalConfig.tmdbApiKey}&page=${page}&append_to_response=videos`;
+  const res: any = await axios.get(url, { httpAgent: agent });
   return res.data;
 }
 
-async function collectionData(id) {
-  const tmdb = 'https://api.themoviedb.org/3/';
-  const url = `${tmdb}collection/${id}?api_key=${externalConfig.tmdbApiKey}&append_to_response=videos`;
-  const res = await axios.get(url, { httpAgent: agent });
+async function getCollectionData(id: number): Promise<any> {
+  const tmdb: string = 'https://api.themoviedb.org/3/';
+  const url: string = `${tmdb}collection/${id}?api_key=${externalConfig.tmdbApiKey}&append_to_response=videos`;
+  const res: any = await axios.get(url, { httpAgent: agent });
   return res.data;
 }
 
-async function reviewsData(id) {
-  const tmdb = 'https://api.themoviedb.org/3/';
-  const url = `${tmdb}movie/${id}/reviews?api_key=${externalConfig.tmdbApiKey}`;
-  const res = await axios.get(url, { httpAgent: agent });
+async function reviewsData(id: number): Promise<any> {
+  const tmdb: string = 'https://api.themoviedb.org/3/';
+  const url: string = `${tmdb}movie/${id}/reviews?api_key=${externalConfig.tmdbApiKey}`;
+  const res: any = await axios.get(url, { httpAgent: agent });
   return res.data;
 }
 
 // Lets i18n this soon
-function findEnLogo(logos) {
-  let logoUrl = false;
+function findEnLogo(logos: { lang: string; url: string; }[]): string | false {
+  let logoUrl: string | false = false;
   logos.forEach((logo) => {
     // For some reason fanart defaults to this obscure logo sometimes so lets exclude it
     if (
@@ -278,8 +323,8 @@ function findEnLogo(logos) {
 }
 
 // Lets i18n this soon
-function findEnRating(data) {
-  let rating = false;
+function findEnRating(data: { iso_3166_1: string; release_dates: { certification: string; }[]; }[]): string | false {
+  let rating: string | false = false;
   data.forEach((item) => {
     if (item.iso_3166_1 === 'US') {
       rating = item.release_dates[0].certification;
@@ -298,7 +343,7 @@ export async function discoverMovie(page = 1, params = {}) {
   const res = await axios.get(url, { httpAgent: agent });
   if (res.data && res.data.results.length > 0) {
     await Promise.all(
-      res.data.results.map(async (movie) => {
+      res.data.results.map(async (movie: MovieData) => {
         const check: any = await onServer('movie', false, false, movie.id);
         movie.on_server = check.exists;
       }),
@@ -307,9 +352,14 @@ export async function discoverMovie(page = 1, params = {}) {
   return res.data;
 }
 
-export async function company(id) {
+interface CompanyData {
+  id: number;
+  [x: string]: any;
+}
+
+export async function company(id: number): Promise<CompanyData> {
   const tmdb = 'https://api.themoviedb.org/3/';
   const url = `${tmdb}company/${id}?api_key=${externalConfig.tmdbApiKey}`;
-  const res = await axios.get(url, { httpAgent: agent });
+  const res: AxiosResponse<CompanyData> = await axios.get(url, { httpAgent: agent });
   return res.data;
 }
