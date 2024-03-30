@@ -30,5 +30,7 @@ services:
     image: mongo:4.4.0
     container_name: 'petio-mongo-${MONGO_CONTAINER_ID:-local}'
     hostname: mongo
+    ports:
+      - "${MONGO_EXPOSED_PORT:-27017}:27017"
     volumes:
       - ./data/db:/data/db
