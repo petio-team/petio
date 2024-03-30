@@ -73,7 +73,7 @@ export default class ProcessRequest {
     return out;
   }
 
-  async existing() {
+  async existing(): Promise<{ message: string; user: string; request: any; } | undefined> {
     if (!this.user) {
       throw new Error('user required');
     }
@@ -99,6 +99,7 @@ export default class ProcessRequest {
     }
     if (this.request.type === 'tv') {
       const existingSeasons = requestDb.seasons || {};
+      // eslint-disable-next-line no-restricted-syntax
       for (const [k, _v] of this.request.seasons) {
         existingSeasons[k] = true;
       }
@@ -130,11 +131,15 @@ export default class ProcessRequest {
     const profile = this.user.profileId
       ? await Profile.findById(this.user.profileId).exec()
       : false;
-    let autoApprove = profile
-      ? this.request.type === 'movie'
-        ? profile.autoApprove
-        : profile.autoApproveTv
-      : false;
+    let autoApprove = false;
+
+    if (profile) {
+      if (this.request.type === 'movie') {
+        autoApprove = profile.autoApprove ?? false;
+      } else {
+        autoApprove = profile.autoApproveTv ?? false;
+      }
+    }
 
     if (this.user.role === UserRole.Admin) {
       autoApprove = true;
@@ -200,38 +205,41 @@ export default class ProcessRequest {
         'REQ: Pending Request Matched on custom filter, setting default',
         { label: 'requests.process' },
       );
+      // eslint-disable-next-line no-restricted-syntax
       for (const [k, _v] of filterMatch) {
-        const filter = filterMatch[k];
-        pending[filter.server] = {
-          path: filter.path,
-          profile: filter.profile,
-          tag: filter.tag,
+        const matchedFilter = filterMatch[k];
+        pending[matchedFilter.server] = {
+          path: matchedFilter.path,
+          profile: matchedFilter.profile,
+          tag: matchedFilter.tag,
         };
       }
     } else if (this.request.type === 'movie') {
       const instances = await GetAllDownloaders(DownloaderType.Radarr);
+      // eslint-disable-next-line no-restricted-syntax
       for (const instance of instances) {
         if (!instance.id) {
-          continue;
+          return;
         }
         if (profile.radarr && profile.radarr[instance.id]) {
           pending[instance.id] = {
-            path: instance.path.location,
-            profile: instance.profile.name,
+            path: instance.path,
+            profile: instance.profile,
             tag: false,
           };
         }
       }
     } else {
       const instances = await GetAllDownloaders(DownloaderType.Sonarr);
+      // eslint-disable-next-line no-restricted-syntax
       for (const instance of instances) {
         if (!instance.id) {
-          continue;
+          return;
         }
         if (profile.sonarr && profile.sonarr[instance.id]) {
           pending[instance.id] = {
-            path: instance.path.location,
-            profile: instance.profile.name,
+            path: instance.path,
+            profile: instance.profile,
             tag: false,
           };
         }
@@ -264,19 +272,21 @@ export default class ProcessRequest {
       );
       logger.debug('REQ: Sending to DVR', { label: 'requests.process' });
       if (this.request.type === 'movie') {
+        // eslint-disable-next-line no-restricted-syntax
         for (const match of filterMatch) {
           const instance = instances.find((i) => i.id === match.server);
           if (!instance) {
-            continue;
+            return;
           }
 
           new Radarr(instance).manualAdd(this.request, match);
         }
       } else {
+        // eslint-disable-next-line no-restricted-syntax
         for (const match of filterMatch) {
           const instance = instances.find((i) => i.id === match.server);
           if (!instance) {
-            continue;
+            return;
           }
 
           new Sonarr(instance).addShow({ id: match.server }, this.request);
@@ -288,24 +298,26 @@ export default class ProcessRequest {
     // If profile is set use arrs from profile
     if (profile) {
       if (profile.radarr && this.request.type === 'movie') {
+        // eslint-disable-next-line no-restricted-syntax
         for (const [k, _v] of profile.radarr) {
           const active = profile.radarr[k];
           if (active) {
             const instance = instances.find((i) => i.id === k);
             if (!instance) {
-              continue;
+              return;
             }
             new Radarr(instance).processRequest(this.request.id);
           }
         }
       }
       if (profile.sonarr && this.request.type === 'tv') {
+        // eslint-disable-next-line no-restricted-syntax
         for (const [k, _v] of profile.sonarr) {
           const active = profile.sonarr[k];
           if (active) {
             const instance = instances.find((i) => i.id === k);
             if (!instance) {
-              continue;
+              return;
             }
             new Sonarr(instance).addShow({ id: k }, this.request);
           }
@@ -318,6 +330,7 @@ export default class ProcessRequest {
         const sonarrs = instances.filter(
           (i) => i.type === DownloaderType.Sonarr,
         );
+        // eslint-disable-next-line no-restricted-syntax
         for (const instance of sonarrs) {
           new Sonarr(instance).addShow(false, this.request);
         }
@@ -326,6 +339,7 @@ export default class ProcessRequest {
         const radarrs = instances.filter(
           (i) => i.type === DownloaderType.Radarr,
         );
+        // eslint-disable-next-line no-restricted-syntax
         for (const instance of radarrs) {
           new Radarr(instance).processRequest(this.request.id);
         }
@@ -337,14 +351,14 @@ export default class ProcessRequest {
     if (this.request) {
       const instances = await GetAllDownloaders();
       if (this.request.radarrId.length > 0 && this.request.type === 'movie') {
-        for (let i = 0; i < Object.keys(this.request.radarrId).length; i++) {
+        for (let i = 0; i < Object.keys(this.request.radarrId).length; i += 1) {
           const radarrIds = this.request.radarrId[i];
           const rId = radarrIds[Object.keys(radarrIds)[0]];
           const serverUuid = Object.keys(radarrIds)[0];
 
-          const instance = instances.find((i) => i.id === serverUuid);
+          const instance = instances.find((j) => j.id === serverUuid);
           if (!instance) {
-            continue;
+            return;
           }
 
           const server = new Radarr(instance);
@@ -363,7 +377,7 @@ export default class ProcessRequest {
         }
       }
       if (this.request.sonarrId.length > 0 && this.request.type === 'tv') {
-        for (let i = 0; i < Object.keys(this.request.sonarrId).length; i++) {
+        for (let i = 0; i < Object.keys(this.request.sonarrId).length; i += 1) {
           const sonarrIds = this.request.sonarrId[i];
           const sId = sonarrIds[Object.keys(sonarrIds)[0]];
           const serverUuid = Object.keys(sonarrIds)[0];
@@ -431,10 +445,7 @@ export default class ProcessRequest {
       throw new Error('user required');
     }
 
-    const user = await UserModel.findOne({
-      id: this.user.id,
-    });
-
+    const user = await UserModel.findById(this.user.id);
     if (!user) throw new Error('user required');
 
     if (user.role === UserRole.Admin) return 'admin';
@@ -482,7 +493,7 @@ export default class ProcessRequest {
       { useFindAndModify: false },
     )
       .exec()
-      .then((_data) => {
+      .then(() => {
         logger.debug(`REQ: Request ${oldReq.title} Archived!`, {
           label: 'requests.process',
         });

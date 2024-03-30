@@ -66,8 +66,10 @@ const getRequestMinified = async (ctx: Context) => {
       }),
     );
   } catch (err) {
-    logger.log('error', `ROUTE: Error getting requests`);
-    logger.log({ level: 'error', message: err });
+    logger.error(`ROUTE: Error getting requests`, err);
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = {};
+    return;
   }
 
   ctx.status = StatusCodes.OK;
@@ -75,20 +77,24 @@ const getRequestMinified = async (ctx: Context) => {
 };
 
 const addRequest = async (ctx: Context) => {
-  const {body} = ctx.request;
+  const { body } = ctx.request;
+  const { request } = body;
 
-  const {request} = body;
-  const process = await new ProcessRequest(request, ctx.state.user).new();
-
-  ctx.status = StatusCodes.OK;
-  ctx.body = process;
+  try {
+    ctx.status = StatusCodes.OK;
+    ctx.body = await new ProcessRequest(request, ctx.state.user).new();
+  } catch (err) {
+    logger.error(`ROUTE: Error adding request`, err);
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = {};
+  }
 };
 
 const removeRequest = async (ctx: Context) => {
-  const {body} = ctx.request;
+  const { body } = ctx.request;
 
-  const {request} = body;
-  const {reason} = body;
+  const { request } = body;
+  const { reason } = body;
   const process = new ProcessRequest(request, ctx.state.user);
 
   await process.archive(false, true, reason);
@@ -112,14 +118,11 @@ const removeRequest = async (ctx: Context) => {
     }),
   );
   new Mailer().mail(
-    `Your request was ${request.approved ? 'removed' : 'denied'} for ${
-      request.title
+    `Your request was ${request.approved ? 'removed' : 'denied'} for ${request.title
     }`,
-    `Your request was ${request.approved ? 'removed' : 'denied'} for ${
-      request.title
+    `Your request was ${request.approved ? 'removed' : 'denied'} for ${request.title
     }`,
-    `Unfortunately your request could not be processed.${
-      reason ? ` This is because - ${reason}.` : ''
+    `Unfortunately your request could not be processed.${reason ? ` This is because - ${reason}.` : ''
     } Thanks for your request anyway!`,
     `https://image.tmdb.org/t/p/w500${request.thumb}`,
     emails,
@@ -131,12 +134,12 @@ const removeRequest = async (ctx: Context) => {
 };
 
 const updateRequest = async (ctx: Context) => {
-  const {body} = ctx.request;
+  const { body } = ctx.request;
 
-  const {request} = body;
-  const {servers} = body;
-  const {approved} = body.request;
-  const {manualStatus} = body.request;
+  const { request } = body;
+  const { servers } = body;
+  const { approved } = body.request;
+  const { manualStatus } = body.request;
 
   if (manualStatus === '5') {
     new ProcessRequest(request, ctx.state.user).archive(true, false, false);
@@ -207,8 +210,7 @@ const updateRequest = async (ctx: Context) => {
     ctx.status = StatusCodes.OK;
     ctx.body = {};
   } catch (err) {
-    logger.log('error', `ROUTE: Error updating requests`);
-    logger.log({ level: 'error', message: err });
+    logger.error(`ROUTE: Error updating requests`, err);
 
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = {};
@@ -216,7 +218,7 @@ const updateRequest = async (ctx: Context) => {
 };
 
 const getArchivedRequestById = async (ctx: Context) => {
-  const {id} = ctx.params;
+  const { id } = ctx.params;
 
   ctx.status = StatusCodes.OK;
   ctx.body = await getArchive(id);

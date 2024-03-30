@@ -35,7 +35,7 @@ export const getRequests = async (user = false, all = false) => {
             if (request.type === 'movie' && request.radarrId.length > 0) {
               for (let i = 0; i < Object.keys(request.radarrId).length; i++) {
                 const radarrIds = request.radarrId[i];
-                const rId = parseInt(radarrIds[Object.keys(radarrIds)[0]]);
+                const rId = parseInt(radarrIds[Object.keys(radarrIds)[0]], 10);
                 const serverUuid = Object.keys(radarrIds)[0];
 
                 const instance = instances.find((i) => i.id === serverUuid);
@@ -66,7 +66,7 @@ export const getRequests = async (user = false, all = false) => {
             if (request.type === 'tv' && request.sonarrId.length > 0) {
               for (let i = 0; i < Object.keys(request.sonarrId).length; i++) {
                 const sonarrIds = request.sonarrId[i];
-                const sId = parseInt(sonarrIds[Object.keys(sonarrIds)[0]]);
+                const sId = parseInt(sonarrIds[Object.keys(sonarrIds)[0]], 10);
                 const serverUuid = Object.keys(sonarrIds)[0];
 
                 const instance = instances.find((i) => i.id === serverUuid);
@@ -207,30 +207,30 @@ function reqState(req, children) {
                 step: 4,
               };
             }
-              const airDate = element.info.firstAired;
-              if (!airDate)
-                return {
-                  status: 'blue',
-                  message: 'Awaiting Info',
-                  step: 3,
-                };
-              diff = Math.ceil(
-                new Date(airDate).getTime() - new Date().getTime(),
-              );
-              if (diff > 0) {
-                return {
-                  status: 'blue',
-                  message: `${calcDate(diff)}`,
-                  step: 3,
-                };
-              }
-                if (element.info.episodeFileCount > 0) {
-                  return {
-                    status: 'blue',
-                    message: 'Partially Downloaded',
-                    step: 3,
-                  };
-                }
+            const airDate = element.info.firstAired;
+            if (!airDate)
+              return {
+                status: 'blue',
+                message: 'Awaiting Info',
+                step: 3,
+              };
+            diff = Math.ceil(
+              new Date(airDate).getTime() - new Date().getTime(),
+            );
+            if (diff > 0) {
+              return {
+                status: 'blue',
+                message: `${calcDate(diff)}`,
+                step: 3,
+              };
+            }
+            if (element.info.episodeFileCount > 0) {
+              return {
+                status: 'blue',
+                message: 'Partially Downloaded',
+                step: 3,
+              };
+            }
 
 
           }
@@ -241,7 +241,7 @@ function reqState(req, children) {
             if (element.info.inCinemas) {
               diff = Math.ceil(
                 new Date(element.info.inCinemas).getTime() -
-                  new Date().getTime(),
+                new Date().getTime(),
               );
               if (diff > 0) {
                 return {
@@ -261,18 +261,18 @@ function reqState(req, children) {
                 };
               }
             } else if (element.info.inCinemas) {
-                diff = Math.ceil(
-                  new Date().getTime() -
-                    new Date(element.info.inCinemas).getTime(),
-                );
-                if (cinemaWindow(diff)) {
-                  return {
-                    status: 'cinema',
-                    message: 'In Cinemas',
-                    step: 3,
-                  };
-                }
+              diff = Math.ceil(
+                new Date().getTime() -
+                new Date(element.info.inCinemas).getTime(),
+              );
+              if (cinemaWindow(diff)) {
+                return {
+                  status: 'cinema',
+                  message: 'In Cinemas',
+                  step: 3,
+                };
               }
+            }
           }
 
           if (element.info.status === 'announced') {
@@ -332,9 +332,9 @@ function calcDate(diff) {
   months -= years * 12;
 
   let message = '~';
-  message += years ? `${years  }y ` : '';
-  message += months ? `${months  }m ` : '';
-  message += days ? `${days  }d` : '';
+  message += years ? `${years}y ` : '';
+  message += months ? `${months}m ` : '';
+  message += days ? `${days}d` : '';
   if (years) message = '> 1y';
 
   return message;
