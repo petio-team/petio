@@ -1,19 +1,19 @@
-import pino, { Logger as PinoLogger } from 'pino';
 import path from 'path';
 import * as FileStreamRotator from 'file-stream-rotator';
+import pino, { Logger as PinoLogger } from 'pino';
 
-import pathsConfig from "@/config/env/paths";
 import PinoPretty from "pino-pretty";
+import pathsConfig from "@/config/env/paths";
 
 const logsFolder = path.join(pathsConfig.dataDir, './logs');
 
 function createLogger(level: string): PinoLogger {
   return pino({
-    level: level,
+    level,
     redact: ['api_key'],
   }, pino.multistream([
     {
-      level: level,
+      level,
       stream: PinoPretty({
         translateTime: 'SYS:standard',
         ignore: 'pid,hostname',
@@ -22,7 +22,7 @@ function createLogger(level: string): PinoLogger {
       })
     },
     {
-      level: level,
+      level,
       stream: FileStreamRotator.getStream({
         filename: path.join(logsFolder, 'petio-%DATE%.log'),
         frequency: 'daily',
