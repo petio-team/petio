@@ -34,13 +34,13 @@ const popupCenter = (url, title, w, h) => {
   var width = window.innerWidth
     ? window.innerWidth
     : document.documentElement.clientWidth
-    ? document.documentElement.clientWidth
-    : screen.width;
+      ? document.documentElement.clientWidth
+      : window.screen.width;
   var height = window.innerHeight
     ? window.innerHeight
     : document.documentElement.clientHeight
-    ? document.documentElement.clientHeight
-    : screen.height;
+      ? document.documentElement.clientHeight
+      : window.screen.height;
 
   var left = width / 2 - w / 2 + dualScreenLeft;
   var top = height / 2 - h / 2 + dualScreenTop;
@@ -48,16 +48,17 @@ const popupCenter = (url, title, w, h) => {
     url,
     title,
     'scrollbars=yes, width=' +
-      w +
-      ', height=' +
-      h +
-      ', top=' +
-      top +
-      ', left=' +
-      left,
+    w +
+    ', height=' +
+    h +
+    ', top=' +
+    top +
+    ', left=' +
+    left,
   );
-
-  if (window.focus) newWindow.focus();
+  if (newWindow) {
+    newWindow.focus();
+  }
   return newWindow;
 };
 
@@ -98,7 +99,7 @@ class App extends React.Component {
 
   msg(
     data = {
-      message: String,
+      message: '',
       type: 'info',
     },
   ) {
@@ -136,6 +137,7 @@ class App extends React.Component {
     if (/^\s/.test(username)) {
       this.msg({
         type: 'error',
+        // @ts-ignore
         message:
           'The username you entered contains a space before! Please remove it',
       });
@@ -144,6 +146,7 @@ class App extends React.Component {
     if (/^\s/.test(password)) {
       this.msg({
         type: 'error',
+        // @ts-ignore
         message:
           'The password you entered contains a space before! Please remove it',
       });
@@ -336,9 +339,8 @@ class App extends React.Component {
               return (
                 <div
                   key={`${msg.timestamp}__${i}`}
-                  className={`push-msg--item ${
-                    msg.type !== 'info' ? msg.type : ''
-                  }`}
+                  className={`push-msg--item ${msg.type !== 'info' ? msg.type : ''
+                    }`}
                 >
                   {msg.message}
                 </div>
@@ -363,7 +365,7 @@ class App extends React.Component {
                     onChange={this.inputChange}
                     autoComplete="username"
                   />
-                  {this.state.login_type === 1 ? (
+                  {this.state.login_type === true ? (
                     <>
                       <p style={{ marginBottom: '5px' }}>Password</p>
                       <input
@@ -435,9 +437,8 @@ class App extends React.Component {
                 return (
                   <div
                     key={`msg__${msg.timestamp}__${i}`}
-                    className={`push-msg--item ${
-                      msg.type !== 'info' ? msg.type : ''
-                    }`}
+                    className={`push-msg--item ${msg.type !== 'info' ? msg.type : ''
+                      }`}
                   >
                     {msg.message}
                   </div>

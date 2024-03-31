@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Route, Switch } from 'react-router';
-import { Link } from 'react-router-dom';
+import { Link, Route, Switch } from 'react-router-dom';
+
 
 import NotFound from '../404';
 import { Login } from '../../components/login';

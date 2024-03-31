@@ -1,4 +1,5 @@
-import { Route, Switch, useHistory } from 'react-router';
+import { useHistory } from 'react-router';
+import { Route, Switch } from 'react-router-dom';
 
 import AdminSettingsSidebar from '../../components/adminSettingsSidebar';
 import Meta from '../../components/meta';
