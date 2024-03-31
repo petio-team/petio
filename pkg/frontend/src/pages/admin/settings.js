@@ -1,5 +1,5 @@
-import { useHistory } from 'react-router';
 import { Route, Switch } from 'react-router-dom';
+import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
 
 import AdminSettingsSidebar from '../../components/adminSettingsSidebar';
 import Meta from '../../components/meta';
@@ -11,13 +11,13 @@ import SettingsGeneral from './settings-general';
 import SettingsNotifications from './settings-notifications';
 
 export default function Settings({ newNotification }) {
-  const history = useHistory();
+  const location = useLocation();
   return (
     <div className={styles.wrap}>
       <Meta title="Admin Settings" />
       <div className="container">
         <div className={styles.inner}>
-          <AdminSettingsSidebar current={history.location.pathname} />
+          <AdminSettingsSidebar current={location.pathname} />
 
           <Switch>
             <Route exact path="/admin/settings">
