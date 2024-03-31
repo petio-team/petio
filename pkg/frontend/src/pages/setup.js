@@ -44,7 +44,7 @@ function Setup({ config, redux_user, newNotification }) {
       await saveConfig(config);
       newNotification({ type: 'success', message: 'Config saved', id: nId });
       updateStep(4);
-      const sId = newNotification({
+      newNotification({
         type: 'loading',
         message: 'Installing Petio...',
       });
@@ -71,13 +71,12 @@ function Setup({ config, redux_user, newNotification }) {
   for (let i = 0; i < 4; i++) {
     steps.push(
       <div
-        className={`${styles.step} ${
-          step > i
+        className={`${styles.step} ${step > i
             ? styles.step__complete
             : step === i
-            ? styles.step__active
-            : ''
-        }`}
+              ? styles.step__active
+              : ''
+          }`}
         key={`setup_step_${i}`}
       >
         <p className={typo.body}>{i + 1}</p>
