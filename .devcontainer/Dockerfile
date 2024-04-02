@@ -1,4 +1,4 @@
-FROM qmcgaw/nodedevcontainer
+FROM ghcr.io/adrfranklin/nodedevcontainer:latest
 # Install Alpine packages
 RUN apk add -q --update --progress --no-cache curl
 # Install Task
