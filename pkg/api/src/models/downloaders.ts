@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { randomUUID as uuidv4 } from 'crypto';
 import { Document, Schema, model } from 'mongoose';
 
@@ -7,7 +8,7 @@ export enum DownloaderType {
 }
 
 export interface IDownloader {
-  id?: string;
+  id: string;
   name: string;
   type: DownloaderType;
   url: string;
@@ -78,8 +79,10 @@ export const DownloaderModelSchema = new Schema<IDownloader>(
   {
     timestamps: true,
     toJSON: {
-      transform (_doc, ret, _options) {
+      transform(_doc, ret) {
+        // eslint-disable-next-line no-param-reassign
         delete ret._id;
+        // eslint-disable-next-line no-param-reassign
         delete ret.__v;
         return ret;
       },
@@ -114,7 +117,7 @@ export const GetAllDownloaders = async (
 export const GetDownloaderById = async (id: string): Promise<IDownloader> => {
   const downloader = await DownloaderModel.findOne({ id }).exec();
   if (!downloader) {
-    throw new Error(`no downloader exists with id: ${  id}`);
+    throw new Error(`no downloader exists with id: ${id}`);
   }
 
   return downloader.toObject();
@@ -134,10 +137,6 @@ export const CreateDownloader = async (
 export const CreateOrUpdateDownloader = async (
   data: IDownloader,
 ): Promise<IDownloader> => {
-  if (!data.id) {
-    data.id = uuidv4();
-  }
-
   const downloader = await DownloaderModel.findOneAndUpdate(
     {
       $or: [
@@ -193,7 +192,7 @@ export const UpdateDownloader = async (data: IDownloader): Promise<boolean> => {
 
   const downloader = await DownloaderModel.updateOne(data).exec();
   if (!downloader) {
-    throw new Error(`failed to update downloader with id: ${  data.id}`);
+    throw new Error(`failed to update downloader with id: ${data.id}`);
   }
 
   return !!downloader.modifiedCount;
@@ -202,7 +201,7 @@ export const UpdateDownloader = async (data: IDownloader): Promise<boolean> => {
 export const DeleteDownloaderById = async (id: string): Promise<boolean> => {
   const downloader = await DownloaderModel.deleteOne({ id }).exec();
   if (!downloader) {
-    throw new Error(`failed to delete downloader with id: ${  id}`);
+    throw new Error(`failed to delete downloader with id: ${id}`);
   }
 
   return !!downloader.deletedCount;

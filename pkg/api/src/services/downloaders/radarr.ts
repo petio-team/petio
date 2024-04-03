@@ -1,5 +1,3 @@
-import { URL } from 'url';
-
 import RadarrAPI from '@/infra/arr/radarr';
 import { Movie } from '@/infra/arr/radarr/movie';
 import logger from '@/loaders/logger';

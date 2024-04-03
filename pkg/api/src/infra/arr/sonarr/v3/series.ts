@@ -33,9 +33,8 @@ export const SeriesSchema = z.object({
           releaseGroups: z.array(z.string()),
           percentOfEpisodes: z.number(),
         }),
-      })
-      .optional(),
-  ),
+      }),
+  ).optional(),
   year: z.number(),
   path: z.string(),
   qualityProfileId: z.number(),

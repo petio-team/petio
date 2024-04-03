@@ -1,24 +1,25 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import axios from 'axios';
 import cache from "../cache/cache";
-import logger from '@/loaders/logger';
+import loggerMain from '@/loaders/logger';
 import plexLookup from '@/services/plex/lookup';
 import MakePlexURL from '@/services/plex/util';
 import { movieLookup } from '@/services/tmdb/movie';
 import { showLookup } from '@/services/tmdb/show';
 
-export default async (type) => {
+const logger = loggerMain.core.child({ label: "plex.top" });
+
+export default async (type: number) => {
   try {
     const data = await cache.wrap(`pop__${type}`, () => getTopData(type));
     return data;
   } catch (err) {
-    logger.warn(`Error getting top data - ${type}`, { label: 'plex.top' });
-    logger.error(err, { label: 'plex.top' });
+    logger.error(`Error getting top data - ${type}`, err);
     return [];
   }
 };
 
-async function getTopData(type) {
+async function getTopData(type: any) {
   const d = new Date();
   d.setMonth(d.getMonth() - 1);
   d.setHours(0, 0, 0);
@@ -35,16 +36,15 @@ async function getTopData(type) {
     const res = await axios.get(url);
     return await parseTop(res.data, type);
   } catch (e) {
-    // Do nothing
     return {};
   }
 }
 
-async function parseTop(data, type) {
+async function parseTop(data: { MediaContainer: { Metadata: any; }; }, type: number): Promise<{ [key: string]: any; }> {
   const top = data.MediaContainer.Metadata;
-  if (!top)
-    // eslint-disable-next-line @typescript-eslint/no-throw-literal
-    throw "No Plex Top Data, you're probably not a Plex Pass user. This is not an error";
+  if (!top) {
+    throw new Error("No Plex Top Data, you're probably not a Plex Pass user. This is not an error");
+  }
   const promises = top.map(async (item: { ratingKey: any; }) => {
     const { ratingKey } = item;
     let plexData: any = false;
@@ -61,7 +61,7 @@ async function parseTop(data, type) {
     }
     return null;
   })
-    .filter((r) => r !== null);
+    .filter((r: null) => r !== null);
   const results = await Promise.all(promises);
   const mergedResults = results.reduce((acc, item) => {
     if (item) {

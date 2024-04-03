@@ -1,4 +1,4 @@
-export function calcDate(diff) {
+export function calcDate(diff: number) {
   const day = 1000 * 60 * 60 * 24;
 
   let days = Math.ceil(diff / day);
@@ -16,7 +16,7 @@ export function calcDate(diff) {
   return message;
 }
 
-export function cinemaWindow(diff) {
+export function cinemaWindow(diff: number) {
   const day = 1000 * 60 * 60 * 24;
   const days = Math.ceil(diff / day);
   if (days >= 62) {
