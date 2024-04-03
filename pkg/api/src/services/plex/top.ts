@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import axios from 'axios';
 import cache from "../cache/cache";
 import logger from '@/loaders/logger';
@@ -7,15 +8,14 @@ import { movieLookup } from '@/services/tmdb/movie';
 import { showLookup } from '@/services/tmdb/show';
 
 export default async (type) => {
-  let data: any = false;
   try {
-    data = await cache.wrap(`pop__${type}`, () => getTopData(type));
+    const data = await cache.wrap(`pop__${type}`, () => getTopData(type));
+    return data;
   } catch (err) {
     logger.warn(`Error getting top data - ${type}`, { label: 'plex.top' });
     logger.error(err, { label: 'plex.top' });
     return [];
   }
-  return data;
 };
 
 async function getTopData(type) {
@@ -36,12 +36,12 @@ async function getTopData(type) {
     return await parseTop(res.data, type);
   } catch (e) {
     // Do nothing
+    return {};
   }
 }
 
 async function parseTop(data, type) {
   const top = data.MediaContainer.Metadata;
-  const output = {};
   if (!top)
     // eslint-disable-next-line @typescript-eslint/no-throw-literal
     throw "No Plex Top Data, you're probably not a Plex Pass user. This is not an error";
@@ -54,21 +54,21 @@ async function parseTop(data, type) {
       plexData = await plexLookup(ratingKey, 'movie');
     }
     if (plexData.tmdb_id) {
-      return type === 2
-        ? showLookup(plexData.tmdb_id, true)
-        : movieLookup(plexData.tmdb_id, true);
+      const rt = type === 2
+        ? await showLookup(plexData.tmdb_id, true)
+        : await movieLookup(plexData.tmdb_id, true);
+      return { [plexData.tmdb_id]: rt };
     }
     return null;
-  });
+  })
+    .filter((r) => r !== null);
   const results = await Promise.all(promises);
-
-  for (let i = 0; i < top.length; i++) {
-    const item = top[i];
-    const { ratingKey } = item;
-    const result = results[i];
-    if (result) {
-      output[result.tmdb_id] = result;
+  const mergedResults = results.reduce((acc, item) => {
+    if (item) {
+      const key = Object.keys(item)[0];
+      acc[key] = item[key];
     }
-  }
-  return output;
+    return acc;
+  }, {});
+  return mergedResults;
 }
