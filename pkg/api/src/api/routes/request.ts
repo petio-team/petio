@@ -11,7 +11,7 @@ import Radarr from '@/services/downloaders/radarr';
 import Sonarr from '@/services/downloaders/sonarr';
 import Mailer from '@/services/mail/mailer';
 import { getArchive } from '@/services/requests/archive';
-import { getRequests } from '@/services/requests/display';
+import { getAllUserRequests, getRequests } from '@/services/requests/display';
 import ProcessRequest from '@/services/requests/process';
 
 const listRequests = async (ctx: Context) => {
@@ -20,14 +20,26 @@ const listRequests = async (ctx: Context) => {
 };
 
 const getUserRequests = async (ctx: Context) => {
-  const userId = ctx.state.user.id;
-  if (!userId) {
-    ctx.status = StatusCodes.NOT_FOUND;
-    ctx.body = {};
+  try {
+    const userId = ctx.state.user.id;
+    if (!userId) {
+      ctx.error({
+        statusCode: StatusCodes.BAD_REQUEST,
+        code: 'USER_NOT_FOUND',
+        message: 'User not found',
+      });
+      return;
+    }
+    const requests = await getAllUserRequests(userId);
+    ctx.ok(requests);
+  } catch (err) {
+    logger.error(`Error getting user requests`, err);
+    ctx.error({
+      statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Internal Server Error',
+    });
   }
-
-  ctx.status = StatusCodes.OK;
-  ctx.body = await getRequests(userId, false);
 };
 
 const getRequestMinified = async (ctx: Context) => {
@@ -67,8 +79,11 @@ const getRequestMinified = async (ctx: Context) => {
     );
   } catch (err) {
     logger.error(`ROUTE: Error getting requests`, err);
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = {};
+    ctx.error({
+      statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Internal Server Error',
+    });
     return;
   }
 
@@ -85,8 +100,11 @@ const addRequest = async (ctx: Context) => {
     ctx.body = await new ProcessRequest(request, ctx.state.user).new();
   } catch (err) {
     logger.error(`ROUTE: Error adding request`, err);
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = {};
+    ctx.error({
+      statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Internal Server Error',
+    });
   }
 };
 
@@ -211,9 +229,11 @@ const updateRequest = async (ctx: Context) => {
     ctx.body = {};
   } catch (err) {
     logger.error(`ROUTE: Error updating requests`, err);
-
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = {};
+    ctx.error({
+      statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Internal Server Error',
+    });
   }
 };
 

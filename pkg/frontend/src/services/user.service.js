@@ -46,7 +46,10 @@ export async function getRequests(min = true) {
 export async function myRequests() {
   try {
     const data = await get('/request/me');
-    updateStore({ type: 'user/my-requests', requests: data });
+    if (data.status !== 'success') {
+      return;
+    }
+    updateStore({ type: 'user/my-requests', requests: data.data });
     return data;
   } catch (e) {
     console.log(e);
