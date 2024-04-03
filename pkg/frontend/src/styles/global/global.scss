@@ -1,3 +1,21 @@
+:root {
+  --primary: #d79b23;
+  --primary-dark: #c78c0d;
+  --black: #101010;
+  --grey: #f2f2f2;
+  --grey-light: #e0e3e6;
+  --grey-medium: #868c96;
+  --grey-dark: #343536;
+  --red: #e95151;
+  --orange: var(--primary);
+  --green: #98dd32;
+  --blue: #3d85b8;
+  --purple: #6810af;
+  --teal: #1f7979;
+  --good: var(--green);
+  --bad: var(--red);
+}
+
 html,
 body {
   padding: 0;
