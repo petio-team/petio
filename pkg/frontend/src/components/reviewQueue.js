@@ -17,7 +17,7 @@ export default function ReviewQueue({
   newNotification,
 }) {
   function isReviewed(data) {
-    if (!data.id) return false;
+    if (!data || !data.id) return false;
     if (redux_reviews && redux_reviews.length > 0 && currentUser) {
       const review = redux_reviews.filter((r) => {
         return (
@@ -82,6 +82,7 @@ export default function ReviewQueue({
       ) : Object.keys(history).length > 0 ? (
         Object.keys(history).map((i) => {
           const item = history[i];
+          if (!item) return null;
           const reviewed = isReviewed(item);
           const type = item.episode_run_time ? 'tv' : 'movie';
           if (!item.id) return null;
