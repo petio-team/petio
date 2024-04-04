@@ -1,6 +1,6 @@
-import logger from "@/loaders/logger";
 import { Context, Next } from "koa";
 import PinoHttp from "pino-http";
+import logger from "@/loaders/logger";
 
 const httpLogger = PinoHttp({
   logger: logger.core,
@@ -21,19 +21,19 @@ const httpLogger = PinoHttp({
     })
   },
   wrapSerializers: true,
-  customLogLevel: function (req, res, err) {
+  customLogLevel(req, res, err) {
     if (res.statusCode >= 400 && res.statusCode < 500) {
       return 'warn';
-    } else if (res.statusCode >= 500 || err) {
+    } if (res.statusCode >= 500 || err) {
       return 'error';
-    } else if (res.statusCode >= 300 && res.statusCode < 400) {
+    } if (res.statusCode >= 300 && res.statusCode < 400) {
       return 'silent';
     }
-    return 'info';
+    return 'debug';
   },
 });
 
-export default function () {
+export default function handler() {
   return async function cb(ctx: Context, next: Next) {
     httpLogger(ctx.req, ctx.res);
     return next();

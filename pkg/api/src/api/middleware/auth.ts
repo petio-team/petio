@@ -2,11 +2,12 @@ import * as HttpStatus from 'http-status-codes';
 import jwt from 'jsonwebtoken';
 import { Context, Next } from 'koa';
 
-import logger from '@/loaders/logger';
+import loggerMain from '@/loaders/logger';
 import { UserModel } from '@/models/user';
 
+const logger = loggerMain.core.child({ label: 'middleware.auth' });
+
 function removeCookie(ctx: Context) {
-  logger.debug("removing invalid cookie")
   ctx.cookies.set("petio-jwt", null, { expires: new Date(Date.now() - 2000) });
 }
 
@@ -20,7 +21,7 @@ export async function authenticate(ctx: Context) {
   } else if (cookie) {
     petioJwt = cookie;
   } else if (bearerToken) {
-    petioJwt = bearerToken
+    petioJwt = bearerToken;
   } else {
     throw new Error(`AUTH: No auth token provided - route ${ctx.path}`);
   }
@@ -43,7 +44,7 @@ export async function authenticate(ctx: Context) {
     }
     userData = resp.toJSON();
   } catch (error) {
-    logger.error(error);
+    logger.debug('user not found in db', error);
     throw new Error(`AUTH: User not found in DB - route ${ctx.path}`);
   }
 
@@ -51,11 +52,11 @@ export async function authenticate(ctx: Context) {
 }
 
 export const adminRequired = async (ctx: Context, next: Next) => {
-  const {user} = ctx.state;
+  const { user } = ctx.state;
   if (user && user.admin) {
     await next();
   } else {
     ctx.status = HttpStatus.StatusCodes.FORBIDDEN;
-    logger.warn(`AUTH: User not admin`, { label: 'middleware.auth' });
+    logger.warn(`AUTH: User not admin`);
   }
 };

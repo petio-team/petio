@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 import { config } from '@/config/index';
-import logger from '@/loaders/logger';
+import loggerMain from '@/loaders/logger';
+
+const logger = loggerMain.core.child({ label: 'notifications.discord' });
 
 export default class Discord {
   webhook: any;
@@ -49,28 +51,24 @@ export default class Discord {
 
   async test() {
     if (!this.check()) {
-      logger.debug('DSCRD: No Webhook defined', {
-        label: 'notifications.discord',
-      });
+      logger.debug('DSCRD: No Webhook defined');
       return {
         result: false,
         error: 'No webhook found',
       };
     }
-    logger.debug('DSCRD: Sending test webhook', {
-      label: 'notifications.discord',
-    });
+    logger.debug('DSCRD: Sending test webhook');
     const defaultText: any = 'Petio Test';
     const body = this.buildBody(defaultText);
     const test = await this.postHook(this.webhook, body);
     if (!test) {
-      logger.debug('DSCRD: Test Failed', { label: 'notifications.discord' });
+      logger.debug('DSCRD: Test Failed');
       return {
         result: false,
         error: 'Failed to send webhook',
       };
     }
-    logger.debug('DSCRD: Test passed', { label: 'notifications.discord' });
+    logger.debug('DSCRD: Test passed');
     return {
       result: true,
       error: false,
@@ -79,17 +77,13 @@ export default class Discord {
 
   send(title = null, content = null, username = null, image = null) {
     if (!this.check()) {
-      logger.debug('DSCRD: No Webhook defined', {
-        label: 'notifications.discord',
-      });
+      logger.debug('DSCRD: No Webhook defined');
       return {
         result: false,
         error: 'No webhook found',
       };
     }
-    logger.debug(`DSCRD: Sending webhook - ${content}`, {
-      label: 'notifications.discord',
-    });
+    logger.debug(`DSCRD: Sending webhook - ${content}`);
     const body = this.buildBody(null, {
       title,
       content,
@@ -102,15 +96,10 @@ export default class Discord {
   async postHook(url, body) {
     try {
       await axios({ method: 'post', url, data: body });
-      logger.debug('DSCRD: Webhook fired', {
-        label: 'notifications.discord',
-      });
+      logger.debug('DSCRD: Webhook fired');
       return true;
     } catch (err) {
-      logger.error(err, { label: 'notifications.discord' });
-      logger.debug('DSCRD: Failed to send webhook', {
-        label: 'notifications.discord',
-      });
+      logger.error(`DSCRD: Failed to send webhook`, err);
       return false;
     }
   }

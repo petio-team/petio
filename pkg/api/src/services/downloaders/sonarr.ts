@@ -1,12 +1,15 @@
+/* eslint-disable no-restricted-syntax */
 import SonarrAPI from '@/infra/arr/sonarr';
 import { Series } from '@/infra/arr/sonarr/series';
-import logger from '@/loaders/logger';
+import loggerMain from '@/loaders/logger';
 import {
   DownloaderType,
   GetAllDownloaders,
   IDownloader,
 } from '@/models/downloaders';
 import Request from '@/models/request';
+
+const logger = loggerMain.core.child({ label: 'downloaders.sonarr' });
 
 export default class Sonarr {
   instance: IDownloader;
@@ -59,10 +62,7 @@ export default class Sonarr {
   async addShow(request, filter: any = false) {
     let sonarrId = -1;
     if (!request.tvdb_id) {
-      logger.debug(
-        `SERVICE - SONARR: TVDB ID not found for ${request.title}`,
-        { label: 'downloaders.sonarr' },
-      );
+      logger.debug(`SERVICE - SONARR: TVDB ID not found for ${request.title}`);
       return;
     }
 
@@ -82,63 +82,38 @@ export default class Sonarr {
       }
     }
 
-    result.qualityProfileId = parseInt(
-      filter && filter.profile ? filter.profile : this.instance.profile.id,
-    );
+    result.qualityProfileId = parseInt(filter && filter.profile ? filter.profile : this.instance.profile.id, 10);
 
     result.seasonFolder = true;
-    result.rootFolderPath = `${filter && filter.path ? filter.path : this.instance.path.location
-      }`;
+    result.rootFolderPath = `${filter && filter.path ? filter.path : this.instance.path.location}`;
     result.addOptions = {
       searchForMissingEpisodes: true,
     };
-    result.languageProfileId = parseInt(
-      filter && filter.language ? filter.language : this.instance.language.id,
-    );
+    result.languageProfileId = parseInt(filter && filter.language ? filter.language : this.instance.language.id, 10);
     if (filter && filter.type) result.seriesType = filter.type;
-    if (filter && filter.tag) result.tags = [parseInt(filter.tag)];
+    if (filter && filter.tag) result.tags = [parseInt(filter.tag, 10)];
 
     if (result.id) {
       sonarrId = result.id;
-      logger.debug(
-        `SERVICE - SONARR: Request exists - Updating ${request.title}`,
-        { label: 'downloaders.sonarr' },
-      );
+      logger.debug(`SERVICE - SONARR: Request exists - Updating ${request.title}`);
       try {
         await this.client.UpdateSeriesById(result.id, result);
-        logger.debug(
-          `SERVICE - SONARR: [${this.instance.name}] Sonnar job updated for ${request.title}`,
-          { label: 'downloaders.sonarr' },
-        );
+        logger.debug(`SERVICE - SONARR: [${this.instance.name}] Sonnar job updated for ${request.title}`);
       } catch (err) {
-        logger.error(
-          `SERVICE - SONARR: [${this.instance.name}] Unable to update series`,
-          { label: 'downloaders.sonarr' },
-        );
-        logger.error(err, { label: 'downloaders.sonarr' });
-        return false;
+        logger.error(`SERVICE - SONARR: [${this.instance.name}] Unable to update series`, err);
+        return;
       }
     } else {
       try {
         const add = await this.client.CreateSeries(result);
         if (!add.added) {
-          logger.error(
-            `failed to add series (${result.id}) to sonarr instance (${this.instance.name})`,
-          );
+          logger.error(`failed to add series (${result.id}) to sonarr instance (${this.instance.name})`);
         }
-
-        logger.debug(
-          `SERVICE - SONARR: [${this.instance.name}] Sonnar job added for ${request.title}`,
-          { label: 'downloaders.sonarr' },
-        );
+        logger.debug(`SERVICE - SONARR: [${this.instance.name}] Sonnar job added for ${request.title}`);
         sonarrId = add.id;
       } catch (err) {
-        logger.error(
-          `SERVICE - SONARR: [${this.instance.name}] Unable to add series`,
-          { label: 'downloaders.sonarr' },
-        );
-        logger.error(err, { label: 'downloaders.sonarr' });
-        return false;
+        logger.error(`SERVICE - SONARR: [${this.instance.name}] Unable to add series`, err);
+        return;
       }
     }
     try {
@@ -146,10 +121,7 @@ export default class Sonarr {
         requestId: request.id,
       }).exec();
       if (!dbRequest) {
-        logger.debug(
-          `SERVICE - SONARR: [${this.instance.name}] No request found with id ${request.id}`,
-          { label: 'downloaders.sonarr' },
-        );
+        logger.debug(`SERVICE - SONARR: [${this.instance.name}] No request found with id ${request.id}`);
         return;
       }
 
@@ -166,25 +138,17 @@ export default class Sonarr {
         });
       await dbRequest.save();
     } catch (err) {
-      logger.error(err.stack, { label: 'downloaders.sonarr' });
-      logger.error(`SERVICE - SONARR: Can't update request in Db`, {
-        label: 'downloaders.sonarr',
-      });
-      logger.error(err, { label: 'downloaders.sonarr' });
+      logger.error(`SERVICE - SONARR: Can't update request in Db`, err);
     }
   }
 
-  async remove(id) {
-    const active = await this.client.TestConnection();
-    if (!active) {
-      return false;
-    }
+  async remove(id: number) {
     try {
-      return await this.client.DeleteSeries(id);
-    } catch {
-      logger.warn('SONARR: Unable to remove job, likely already removed', {
-        label: 'downloaders.sonarr',
-      });
+      await this.client.DeleteSeries(id);
+      return true;
+    } catch (err) {
+      logger.error('SONARR: Unable to remove job, likely already removed', err);
     }
+    return false;
   }
 }

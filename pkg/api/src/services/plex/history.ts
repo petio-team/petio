@@ -1,11 +1,13 @@
 import request from 'xhr-request';
 
 import cache from "../cache/cache";
-import logger from '@/loaders/logger';
+import loggerMain from '@/loaders/logger';
 import plexLookup from '@/services/plex/lookup';
 import MakePlexURL from '@/services/plex/util';
 import { movieLookup } from '@/services/tmdb/movie';
 import { showLookup } from '@/services/tmdb/show';
+
+const logger = loggerMain.core.child({ label: "plex.history" });
 
 export default async (id, type) => {
   let data: any = false;
@@ -14,17 +16,14 @@ export default async (id, type) => {
       getHistoryData(id, type),
     );
   } catch (err) {
-    logger.warn(`Error getting history data - ${id}`, {
-      label: 'plex.history',
-    });
-    logger.error(err, { label: 'plex.history' });
+    logger.error(`Error getting history data - ${id}`, err);
     return [];
   }
   return data;
 };
 
 function getHistoryData(id, type) {
-  logger.debug('History returned from source', { label: 'plex.history' });
+  logger.debug('History returned from source');
   return new Promise((resolve, reject) => {
     const d = new Date();
     d.setMonth(d.getMonth() - 1);

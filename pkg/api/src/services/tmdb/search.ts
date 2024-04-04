@@ -5,15 +5,17 @@ import sanitize from 'sanitize-filename';
 
 import externalConfig from "@/config/env/external";
 import { config } from '@/config/index';
-import logger from '@/loaders/logger';
+import loggerMain from '@/loaders/logger';
 import onServer from '@/services/plex/server';
 import { movieLookup } from '@/services/tmdb/movie';
 import { showLookup } from '@/services/tmdb/show';
 
 const agent = new http.Agent({ family: 4 });
 
+const logger = loggerMain.core.child({ label: 'tmdb.search' });
+
 async function search(term) {
-  logger.debug(`TMDB Search ${term}`, { label: 'tmdb.search' });
+  logger.debug(`TMDB Search ${term}`);
 
   const [movies, shows, people, companies] = await Promise.all([
     searchMovies(sanitize(term)),
@@ -58,9 +60,7 @@ async function searchMovies(term) {
     const res = await axios.get(url, { httpAgent: agent });
     return res.data;
   } catch (err) {
-    logger.error('Error searching for movies', {
-      label: 'tmdb.search',
-    });
+    logger.error('Error searching for movies', err);
     return {
       results: [],
     };
@@ -74,9 +74,7 @@ async function searchShows(term) {
     const res = await axios.get(url, { httpAgent: agent });
     return res.data;
   } catch (err) {
-    logger.error('Error searching for shows', {
-      label: 'tmdb.search',
-    });
+    logger.error('Error searching for shows', err);
     return {
       results: [],
     };
@@ -90,9 +88,7 @@ async function searchPeople(term) {
     const res = await axios.get(url, { httpAgent: agent });
     return res.data;
   } catch (err) {
-    logger.error('Error searching for people', {
-      label: 'tmdb.search',
-    });
+    logger.error('Error searching for people', err);
     return {
       results: [],
     };
@@ -106,9 +102,7 @@ async function searchCompanies(term) {
     const res = await axios.get(url, { httpAgent: agent });
     return res.data;
   } catch (err) {
-    logger.error('Error searching for companies', {
-      label: 'tmdb.search',
-    });
+    logger.error('Error searching for companies', err);
     return {
       results: [],
     };

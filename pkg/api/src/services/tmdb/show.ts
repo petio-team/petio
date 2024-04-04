@@ -6,7 +6,7 @@ import axios from 'axios';
 import cache from "../cache/cache";
 import externalConfig from "@/config/env/external";
 import { TMDBAPI } from '@/infra/tmdb/tmdb';
-import logger from '@/loaders/logger';
+import loggerMain from '@/loaders/logger';
 import fanartLookup from '@/services/fanart';
 import { lookup as imdb } from '@/services/meta/imdb';
 import onServer from '@/services/plex/server';
@@ -14,13 +14,13 @@ import getLanguage from '@/services/tmdb/languages';
 
 const agent = new http.Agent({ family: 4 });
 
+const logger = loggerMain.core.child({ label: 'tmdb.show' });
+
 export async function showLookup(id, minified = false) {
   if (!id || id === 'false') {
     return 'No ID';
   }
-  logger.debug(`TMDB Show Lookup ${id}`, {
-    label: 'tmdb.show',
-  });
+  logger.debug(`TMDB Show Lookup ${id}`);
   const external: any = await externalId(id);
   let show: any = false;
   let data: any;
@@ -173,10 +173,7 @@ export async function showLookup(id, minified = false) {
 
       return show;
     } catch (err) {
-      logger.warn(`Error processing show data - ${id}`, {
-        label: 'tmdb.show',
-      });
-      logger.error(err, { label: 'tmdb.show' });
+      logger.warn(`Error processing show data - ${id}`, err);
       return { error: 'not found' };
     }
   }
@@ -227,7 +224,7 @@ export const getShowDetails = async (id: number) => {
         : [],
     };
   } catch (e) {
-    logger.error(e);
+    logger.error(`failed to get show details with id ${id}`, e);
     return {};
   }
 };
@@ -263,17 +260,18 @@ export const getMovieDetails = async (id: number) => {
         ? {
           results: [
             ...details.videos.results.filter(
-              (obj) => obj.type == 'Teaser' && obj.site == 'YouTube',
+              (obj) => obj.type === 'Teaser' && obj.site === 'YouTube',
             ),
             ...details.videos.results.filter(
-              (obj) => obj.type == 'Trailer' && obj.site == 'YouTube',
+              (obj) => obj.type === 'Trailer' && obj.site === 'YouTube',
             ),
           ],
         }
         : [],
     };
   } catch (e) {
-    logger.error(e);
+    logger.error(`failed to get movie details with id ${id}`, e);
+    return {};
   }
 };
 
@@ -282,10 +280,7 @@ async function getShowData(id) {
   try {
     data = await cache.wrap(id, async () => tmdbData(id));
   } catch (err) {
-    logger.warn(`Error getting show data - ${id}`, {
-      label: 'tmdb.show',
-    });
-    logger.error(err, { label: 'tmdb.show' });
+    logger.warn(`Error getting show data - ${id}`, err);
   }
   return data;
 }
@@ -295,10 +290,7 @@ async function externalId(id) {
   try {
     data = await cache.wrap(`ext_${id}`, async () => idLookup(id));
   } catch (err) {
-    logger.debug(`Error getting external ID - ${id}`, {
-      label: 'tmdb.show',
-    });
-    logger.debug(err, { label: 'tmdb.show' });
+    logger.debug(`Error getting external ID - ${id}`, err);
   }
   return data;
 }
@@ -308,10 +300,7 @@ export async function getRecommendations(id, page = 1) {
   try {
     data = await cache.wrap(`rec_${id}__${page}`, async () => recommendationData(id, page));
   } catch (err) {
-    logger.warn(`Error getting recommendation data - ${id}`, {
-      label: 'tmdb.show',
-    });
-    logger.error(err, { label: 'tmdb.show' });
+    logger.warn(`Error getting recommendation data - ${id}`, err);
   }
   return data;
 }
@@ -321,10 +310,7 @@ export async function getSimilar(id, page = 1) {
   try {
     data = await cache.wrap(`similar_${id}__${page}`, async () => similarData(id, page));
   } catch (err) {
-    logger.warn(`Error getting similar data - ${id}`, {
-      label: 'tmdb.show',
-    });
-    logger.error(err, { label: 'tmdb.show' });
+    logger.warn(`Error getting similar data - ${id}`, err);
   }
   return data;
 }
@@ -334,10 +320,7 @@ async function getReviews(id) {
   try {
     data = await cache.wrap(`rev_${id}`, async () => reviewsData(id));
   } catch (err) {
-    logger.warn(`Error getting review data - ${id}`, {
-      label: 'tmdb.show',
-    });
-    logger.error(err, { label: 'tmdb.show' });
+    logger.warn(`Error getting review data - ${id}`, err);
   }
   return data;
 }
@@ -347,10 +330,7 @@ async function getSeasons(seasons, id) {
   try {
     data = await cache.wrap(`seasons_${id}`, async () => seasonsData(seasons, id));
   } catch (err) {
-    logger.warn(`Error getting season data - ${id}`, {
-      label: 'tmdb.show',
-    });
-    logger.error(err, { label: 'tmdb.show' });
+    logger.warn(`Error getting season data - ${id}`, err);
   }
   return data;
 }
@@ -461,8 +441,7 @@ async function idLookup(id) {
     const res = await axios.get(url, { httpAgent: agent });
     return res.data;
   } catch (err) {
-    logger.error(`failed to look up show ${id}`, { label: 'tmdb.show' });
-    logger.error(err, { label: 'tmdb.show' });
+    logger.error(`failed to look up show ${id}`, err);
     throw err;
   }
 }

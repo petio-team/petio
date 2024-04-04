@@ -7,7 +7,7 @@ import('dotenv/config');
 //
 (async () => {
   (await import('./loaders')).default().catch((error) => {
-    console.log('something unexpected went wrong');
-    console.log(error);
+    console.error('something unexpected went wrong');
+    console.error(error);
   });
 })();

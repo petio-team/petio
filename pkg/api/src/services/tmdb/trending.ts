@@ -124,7 +124,7 @@ const Networks = [
 ];
 
 async function trending() {
-  logger.debug(`TMDB Trending lookup`, { label: 'tmdb.trending' });
+  logger.debug(`TMDB Trending lookup`);
 
   const [people, movies, shows]: any = await Promise.all([
     getPerson(),
@@ -156,10 +156,7 @@ async function getPerson() {
       }));
     });
   } catch (err) {
-    logger.warn(`Error getting trending people`, {
-      label: 'tmdb.trending',
-    });
-    logger.error(err, { label: 'tmdb.trending' });
+    logger.warn(`Error getting trending people`, err);
   }
   return data;
 }
@@ -172,10 +169,7 @@ async function getMovies() {
       return bluebird.map(movies, async (movie) => getMovieDetails(movie.id));
     });
   } catch (err) {
-    logger.warn(`Error getting trending movies`, {
-      label: 'tmdb.trending',
-    });
-    logger.error(err, { label: 'tmdb.trending' });
+    logger.warn(`Error getting trending movies`, err);
   }
   return data;
 }
@@ -188,10 +182,7 @@ async function getShows() {
       return bluebird.map(shows, (show) => getShowDetails(show.id));
     });
   } catch (err) {
-    logger.warn(`Error getting trending shows`, {
-      label: 'tmdb.trending',
-    });
-    logger.error(err, { label: 'tmdb.trending' });
+    logger.warn(`Error getting trending shows`, err);
   }
   return data;
 }

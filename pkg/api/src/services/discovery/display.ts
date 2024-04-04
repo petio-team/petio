@@ -703,8 +703,8 @@ async function comingSoon(type: string) {
       { concurrency: config.get('general.concurrency') },
     );
     return data;
-  } catch (e) {
-    logger.error(e, { label: 'discovery.build' });
+  } catch (error) {
+    logger.error(`failed to get coming soon data`, error);
     return [];
   }
 }

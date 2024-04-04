@@ -9,10 +9,12 @@ import xmlParser from 'xml-js';
 
 import { authenticate } from '@/api/middleware/auth';
 import { config } from '@/config/index';
-import logger from '@/loaders/logger';
+import loggerMain from '@/loaders/logger';
 import { GetUserByPlexID, UserModel, UserRole } from '@/models/user';
 
-function success(ctx, user, isAdmin = false) {
+const logger = loggerMain.core.child({ label: 'routes.login' });
+
+function success(ctx: Context, user: any, isAdmin = false): void {
   const token = jwt.sign(
     { id: user.id, admin: isAdmin },
     ctx.app.keys[0],
@@ -34,18 +36,17 @@ function success(ctx, user, isAdmin = false) {
   };
 }
 
-async function plexOauth(token): Promise<any> {
-  const plex = await axios.get(
-    `https://plex.tv/users/account?X-Plex-Token=${token}`,
-  );
+async function plexOauth(token: any): Promise<any> {
   try {
+    const plex = await axios.get(
+      `https://plex.tv/users/account?X-Plex-Token=${token}`,
+    );
     const data = JSON.parse(xmlParser.xml2json(plex.data, { compact: false }));
     const user = data.elements[0].attributes;
     return user.id;
   } catch (err) {
-    logger.error(err, { label: 'routes.login' });
+    logger.error(`failed to get plex oauth`, err);
   }
-
   return undefined;
 }
 
@@ -62,8 +63,7 @@ async function saveRequestIp(user, request_ip) {
       },
     ).exec();
   } catch (err) {
-    logger.error('LOGIN: Update IP failed', { label: 'routes.login' });
-    logger.error(err, { label: 'routes.login' });
+    logger.error('LOGIN: Update IP failed', err);
   }
 }
 
@@ -75,14 +75,20 @@ const attemptPlexAuth = async (ctx: Context) => {
     const dbUser = await GetUserByPlexID(userId);
 
     if (!dbUser) {
-      ctx.status = StatusCodes.UNAUTHORIZED;
-      ctx.body = { error: 'user not found' };
+      ctx.error({
+        statusCode: StatusCodes.FORBIDDEN,
+        code: 'USER_NOT_FOUND',
+        message: 'user not found'
+      });
       return;
     }
 
     if (dbUser.disabled) {
-      ctx.status = StatusCodes.UNAUTHORIZED;
-      ctx.body = { error: 'user is disabled' };
+      ctx.error({
+        statusCode: StatusCodes.FORBIDDEN,
+        code: 'USER_DISABLED',
+        message: 'user is disabled'
+      });
       return;
     }
 
@@ -90,17 +96,17 @@ const attemptPlexAuth = async (ctx: Context) => {
     success(ctx, dbUser, isAdmin);
     saveRequestIp(dbUser, requestIp);
   } catch (err) {
-    logger.error(err, { label: 'routes.login' });
-
-    ctx.status = StatusCodes.UNAUTHORIZED;
-    ctx.body = { loggedIn: false, user: null, admin: false, token: null };
+    logger.debug(`failed to login user via plex`, err);
+    ctx.error({
+      statusCode: StatusCodes.FORBIDDEN,
+      code: 'PLEX_AUTH_FAILED',
+      message: 'failed to login user via plex'
+    });
   }
 };
 
-function plexAuth(username, password) {
-  logger.info(`LOGIN: Using Plex Auth for ${username}`, {
-    label: 'routes.login',
-  });
+function plexAuth(username: string, password: string) {
+  logger.info(`LOGIN: Using Plex Auth for ${username}`);
   return new Promise((resolve, reject) => {
     request(
       'https://plex.tv/users/sign_in.json',
@@ -117,27 +123,19 @@ function plexAuth(username, password) {
             `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`,
         },
       },
-      (err, data) => {
+      (err: any, data: any) => {
         if (err) {
-          logger.warn(`LOGIN: Plex auth failed for ${username}`, {
-            label: 'routes.login',
-          });
+          logger.warn(`LOGIN: Plex auth failed for ${username}`);
           reject();
         }
         if (!data) {
-          logger.warn(`LOGIN: Plex auth error ${username}`, {
-            label: 'routes.login',
-          });
+          logger.warn(`LOGIN: Plex auth error ${username}`);
           reject(new Error('LOGIN: Failed Plex Auth'));
         } else if (data.error) {
-          logger.warn(`LOGIN: Plex auth error ${username}`, {
-            label: 'routes.login',
-          });
+          logger.warn(`LOGIN: Plex auth error ${username}`);
           reject(new Error('LOGIN: Failed Plex Auth'));
         } else {
-          logger.info(`LOGIN: Plex auth passed ${username}`, {
-            label: 'routes.login',
-          });
+          logger.info(`LOGIN: Plex auth passed ${username}`);
           resolve(data);
         }
       },
@@ -155,37 +153,32 @@ const attemptAuth = async (ctx: Context) => {
     config.set('auth.type', 1);
   }
 
-  logger.debug(`LOGIN: New login attempted`, { label: 'routes.login' });
-  logger.debug(`LOGIN: Request IP: ${requestIp}`, {
-    label: 'routes.login',
-  });
+  logger.debug(`LOGIN: New login attempted from ip ${requestIp}`);
 
   // check for existing jwt (skip if performing admin auth)
-  if (!password)
+  if (!password) {
     try {
       const user = await authenticate(ctx);
       if (!user) {
-        ctx.status = StatusCodes.UNAUTHORIZED;
-        ctx.body = 'invalid user';
+        ctx.error({
+          statusCode: StatusCodes.UNAUTHORIZED,
+          code: '',
+          message: 'invalid user'
+        });
         return;
       }
 
       success(ctx, user, user.owner);
-      logger.debug(`LOGIN: Request User: ${user.username}`, {
-        label: 'routes.login',
-      });
+      logger.debug(`LOGIN: Request User: ${user.username}`);
       return;
-    } catch (e) {
+    } catch (err) {
       // if existing jwt failed, continue onto normal login flow
-      logger.debug(`LOGIN: No JWT: ${requestIp}`, {
-        label: 'routes.login',
-      });
-      logger.error(e);
+      logger.debug(`LOGIN: No JWT: ${requestIp}`, err);
+      return;
     }
+  }
 
-  logger.debug(`LOGIN: Request User: ${username}`, {
-    label: 'routes.login',
-  });
+  logger.debug(`LOGIN: Request User: ${username}`);
 
   try {
     // Find user in db
@@ -194,21 +187,21 @@ const attemptAuth = async (ctx: Context) => {
     }).exec();
 
     if (!dbUser) {
-      ctx.status = StatusCodes.UNAUTHORIZED;
-      ctx.body = {
-        error: 'User not found',
-      };
-      logger.warn(`LOGIN: User not found ${username} - ${requestIp}`, {
-        label: 'routes.login',
+      ctx.error({
+        statusCode: StatusCodes.FORBIDDEN,
+        code: 'USER_NOT_FOUND',
+        message: 'user not found'
       });
+      logger.debug(`LOGIN: User not found ${username} - ${requestIp}`);
       return;
     }
 
     if (dbUser.disabled) {
-      ctx.status = StatusCodes.UNAUTHORIZED;
-      ctx.body = {
-        error: 'User is disabled',
-      };
+      ctx.error({
+        statusCode: StatusCodes.FORBIDDEN,
+        code: 'USER_DISABLED',
+        message: 'user is disabled'
+      });
       return;
     }
 
@@ -217,8 +210,11 @@ const attemptAuth = async (ctx: Context) => {
     if (config.get('auth.type') === 1 || password) {
       if (dbUser.password) {
         if (!bcrypt.compareSync(password, dbUser.password)) {
-          ctx.status = StatusCodes.UNAUTHORIZED;
-          ctx.body = { error: 'password is incorrect' };
+          ctx.error({
+            statusCode: StatusCodes.FORBIDDEN,
+            code: 'INVALID_CREDENTIALS',
+            message: 'users credentials are invalid'
+          });
           return;
         }
       } else {
@@ -232,13 +228,14 @@ const attemptAuth = async (ctx: Context) => {
     }
     saveRequestIp(dbUser, requestIp);
   } catch (err) {
-    logger.error(err, { label: 'routes.login' });
-
-    ctx.status = StatusCodes.UNAUTHORIZED;
-    ctx.body = { loggedIn: false, user: null, admin: false, token: null };
+    logger.debug(`failed to authenticate user`, err);
+    ctx.error({
+      statusCode: StatusCodes.FORBIDDEN,
+      code: 'AUTH_FAILED',
+      message: 'failed to authenticate user'
+    });
   }
 };
-
 
 const route = new Router({ prefix: '/login' });
 export default (app: Router) => {

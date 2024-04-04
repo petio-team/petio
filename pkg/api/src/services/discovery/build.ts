@@ -1,23 +1,24 @@
+/* eslint-disable no-restricted-syntax */
 import Promise from 'bluebird';
 import request from 'xhr-request';
 
 import { config } from '@/config/index';
-import logger from '@/loaders/logger';
+import loggerMain from '@/loaders/logger';
 import Discovery from '@/models/discovery';
 import Movie from '@/models/movie';
 import Show from '@/models/show';
 import { GetAllUsers, User } from '@/models/user';
 import MakePlexURL from '@/services/plex/util';
 
+const logger = loggerMain.core.child({ label: 'discovery.build' });
+
 export default async () => {
-  logger.debug('DISC: Started building discovery profiles', {
-    label: 'discovery.build',
-  });
+  logger.debug('DISC: Started building discovery profiles');
 
   try {
     const users = await GetAllUsers();
     if (users.length === 0) {
-      logger.debug('DISC: No Users', { label: 'discovery.build' });
+      logger.debug('DISC: No Users');
       return;
     }
     const userIds = users.map((user: User) => {
@@ -27,6 +28,7 @@ export default async () => {
       if (!user.custom) {
         return user.plexId;
       }
+
     });
 
     await Promise.map(
@@ -36,11 +38,9 @@ export default async () => {
       },
       { concurrency: config.get('general.concurrency') },
     );
-    logger.debug('DISC: Finished building discovery profiles', {
-      label: 'discovery.build',
-    });
-  } catch (e) {
-    logger.error(e);
+    logger.debug('DISC: Finished building discovery profiles');
+  } catch (error) {
+    logger.error(`failed to create new discovery profiles for users`, error);
   }
 };
 
@@ -105,9 +105,7 @@ async function build(id) {
   };
   const data: any = await getHistory(id);
   if (data.MediaContainer.size === 0) {
-    logger.debug(`DISC: No history for user - ${id}`, {
-      label: 'discovery.build',
-    });
+    logger.debug(`DISC: No history for user - ${id}`);
     return {
       movie,
       series,
@@ -180,6 +178,7 @@ async function build(id) {
         if (dbItem) {
           if (dbItem.tmdb_id) series.history[dbItem.tmdb_id] = dbItem.tmdb_id;
           if (dbItem.Genre) {
+            // eslint-disable-next-line no-restricted-syntax
             for (const genre of dbItem.Genre) {
               const cr = cert(dbItem.contentRating, 'show');
               if (!series.genres[genre.tag]) {
@@ -215,6 +214,7 @@ async function build(id) {
           }
 
           if (dbItem.Role) {
+            // eslint-disable-next-line no-restricted-syntax
             for (const role of dbItem.Role) {
               const actor = role.tag;
               series.actors[actor] = series.actors[actor]
@@ -324,7 +324,7 @@ function getHistory(id, library = false) {
         method: 'GET',
         json: true,
       },
-      (err, data) => {
+      (err: any, data: unknown) => {
         if (err) {
           reject(err);
         }

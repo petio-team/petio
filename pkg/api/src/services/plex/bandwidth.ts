@@ -1,7 +1,9 @@
 import axios from 'axios';
 
-import logger from '@/loaders/logger';
+import loggerMain from '@/loaders/logger';
 import MakePlexURL from '@/services/plex/util';
+
+const logger = loggerMain.core.child({ label: 'plex.bandwidth' });
 
 function timeDifference(previous) {
   const now = new Date();
@@ -13,15 +15,15 @@ function timeDifference(previous) {
   const elapsed = current - previous;
 
   if (elapsed < msPerMinute) {
-    return `${Math.round(elapsed)  }s`;
+    return `${Math.round(elapsed)}s`;
   } if (elapsed < msPerHour) {
     const minutes = Math.floor(elapsed / msPerMinute);
     const seconds = elapsed - minutes * 60;
     if (minutes === 2 && seconds > 1) return false;
     return `${minutes}m${seconds}s`;
-  } 
-    return current;
-  
+  }
+  return current;
+
 }
 
 export default async () => {
@@ -56,8 +58,7 @@ export default async () => {
     if (bWidth.length > 30) bWidth.length = 30;
     bWidth.reverse();
     return bWidth;
-  } catch (e) {
-    logger.error(e.stack, { label: 'plex.bandwidth' });
-    // Do nothing
+  } catch (err) {
+    logger.error(`failed to get plex bandwith statistics`, err);
   }
 };

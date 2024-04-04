@@ -1,4 +1,4 @@
-import logger from '@/loaders/logger';
+import loggerMain from '@/loaders/logger';
 import Archive from '@/models/archive';
 import { DownloaderType, GetAllDownloaders } from '@/models/downloaders';
 import Profile from '@/models/profile';
@@ -11,6 +11,8 @@ import Discord from '@/services/notifications/discord';
 import Telegram from '@/services/notifications/telegram';
 import filter from '@/services/requests/filter';
 import { showLookup } from '@/services/tmdb/show';
+
+const logger = loggerMain.core.child({ label: 'requests.process' });
 
 export default class ProcessRequest {
   request: any;
@@ -53,8 +55,7 @@ export default class ProcessRequest {
         this.mailRequest();
         this.discordNotify();
       } catch (err) {
-        logger.error('REQ: Error', { label: 'requests.process' });
-        logger.error(err, { label: 'requests.process' });
+        logger.error('REQ: Error', err);
         out = {
           message: 'failed',
           error: true,
@@ -172,16 +173,11 @@ export default class ProcessRequest {
       if (autoApprove) {
         this.sendToDvr(profile);
       } else {
-        logger.info('REQ: Request requires approval, waiting', {
-          label: 'requests.process',
-        });
+        logger.info('REQ: Request requires approval, waiting');
         this.pendingDefaults(profile);
       }
     } catch (err) {
-      logger.error(`REQ: Unable to save request`, {
-        label: 'requests.process',
-      });
-      logger.error(err, { label: 'requests.process' });
+      logger.error(`REQ: Unable to save request`, err);
       return {
         message: 'failed',
         error: true,
@@ -201,10 +197,7 @@ export default class ProcessRequest {
     const pending: any = {};
     const filterMatch: any = await filter(this.request);
     if (filterMatch) {
-      logger.info(
-        'REQ: Pending Request Matched on custom filter, setting default',
-        { label: 'requests.process' },
-      );
+      logger.info('REQ: Pending Request Matched on custom filter, setting default');
       // eslint-disable-next-line no-restricted-syntax
       for (const [k, _v] of filterMatch) {
         const matchedFilter = filterMatch[k];
@@ -251,13 +244,9 @@ export default class ProcessRequest {
         { $set: { pendingDefault: pending } },
       ).exec();
 
-      logger.debug('REQ: Pending Defaults set for later', {
-        label: 'requests.process',
-      });
+      logger.debug('REQ: Pending Defaults set for later');
     } else {
-      logger.debug('REQ: No Pending Defaults to Set', {
-        label: 'requests.process',
-      });
+      logger.debug('REQ: No Pending Defaults to Set');
     }
   }
 
@@ -266,11 +255,8 @@ export default class ProcessRequest {
     let filterMatch: any = await filter(this.request);
     if (filterMatch) {
       if (!Array.isArray(filterMatch)) filterMatch = [filterMatch];
-      logger.info(
-        'REQ: Matched on custom filter, sending to specified server',
-        { label: 'requests.process' },
-      );
-      logger.debug('REQ: Sending to DVR', { label: 'requests.process' });
+      logger.info('REQ: Matched on custom filter, sending to specified server');
+      logger.debug('REQ: Sending to DVR');
       if (this.request.type === 'movie') {
         // eslint-disable-next-line no-restricted-syntax
         for (const match of filterMatch) {
@@ -294,7 +280,7 @@ export default class ProcessRequest {
       }
       return;
     }
-    logger.debug('REQ: Sending to DVR', { label: 'requests.process' });
+    logger.debug('REQ: Sending to DVR');
     // If profile is set use arrs from profile
     if (profile) {
       if (profile.radarr && this.request.type === 'movie') {
@@ -325,7 +311,7 @@ export default class ProcessRequest {
       }
     } else {
       // No profile set send to all arrs
-      logger.debug('REQ: No profile for DVR', { label: 'requests.process' });
+      logger.debug('REQ: No profile for DVR');
       if (this.request.type === 'tv') {
         const sonarrs = instances.filter(
           (i) => i.type === DownloaderType.Sonarr,
@@ -364,15 +350,9 @@ export default class ProcessRequest {
           const server = new Radarr(instance);
           try {
             await server.getClient().DeleteMovie(rId);
-            logger.info(
-              `REQ: ${this.request.title} removed from Radarr server - ${serverUuid}`,
-              { label: 'requests.process' },
-            );
+            logger.info(`REQ: ${this.request.title} removed from Radarr server - ${serverUuid}`);
           } catch (err) {
-            logger.error(`REQ: Error unable to remove from Radarr`, {
-              label: 'requests.process',
-            });
-            logger.error(err, { label: 'requests.process' });
+            logger.error(`REQ: Error unable to remove from Radarr`, err);
           }
         }
       }
@@ -389,15 +369,9 @@ export default class ProcessRequest {
 
           try {
             await new Sonarr(instance).remove(sId);
-            logger.info(
-              `REQ: ${this.request.title} removed from Sonarr server - ${serverUuid}`,
-              { label: 'requests.process' },
-            );
+            logger.info(`REQ: ${this.request.title} removed from Sonarr server - ${serverUuid}`);
           } catch (err) {
-            logger.error(`REQ: Error unable to remove from Sonarr`, {
-              label: 'requests.process',
-            });
-            logger.error(err, { label: 'requests.process' });
+            logger.error(`REQ: Error unable to remove from Sonarr`, err);
           }
         }
       }
@@ -423,7 +397,7 @@ export default class ProcessRequest {
   async mailRequest() {
     const userData: any = this.user;
     if (!userData.email) {
-      logger.warn('MAILER: No user email', { label: 'requests.process' });
+      logger.warn('MAILER: No user email');
       return;
     }
     const requestData: any = this.request;
@@ -494,13 +468,10 @@ export default class ProcessRequest {
     )
       .exec()
       .then(() => {
-        logger.debug(`REQ: Request ${oldReq.title} Archived!`, {
-          label: 'requests.process',
-        });
+        logger.debug(`REQ: Request ${oldReq.title} Archived!`);
       })
       .catch((err) => {
-        logger.error(`REQ: Archive Error`, { label: 'requests.process' });
-        logger.error(err.message, { label: 'requests.process' });
+        logger.error(`REQ: Archive Error`, err);
       });
   }
 }

@@ -1,12 +1,15 @@
+/* eslint-disable no-restricted-syntax */
 import RadarrAPI from '@/infra/arr/radarr';
 import { Movie } from '@/infra/arr/radarr/movie';
-import logger from '@/loaders/logger';
+import loggerMain from '@/loaders/logger';
 import {
   DownloaderType,
   GetAllDownloaders,
   IDownloader,
 } from '@/models/downloaders';
 import Request from '@/models/request';
+
+const logger = loggerMain.core.child({ label: 'downloaders.radarr' });
 
 export default class Radarr {
   instance: IDownloader;
@@ -59,7 +62,7 @@ export default class Radarr {
       searchForMovie: true,
     };
     movieData.monitored = true;
-    if (tag) movieData.tags = [parseInt(tag)];
+    if (tag) movieData.tags = [parseInt(tag, 10)];
 
     try {
       const add = await this.client.CreateMovie(movieData);
@@ -69,11 +72,7 @@ export default class Radarr {
       }
       return add.id;
     } catch (err) {
-      logger.warn(
-        `SERVICE - RADARR: [${this.instance.name}] Unable to add movie`,
-        { label: 'downloaders.radarr' },
-      );
-      logger.log(err, { label: 'downloaders.radarr' });
+      logger.error(`SERVICE - RADARR: [${this.instance.name}] Unable to add movie`, err);
       throw err;
     }
   }
@@ -86,17 +85,11 @@ export default class Radarr {
           const radarrData = await this.client.LookupMovie(job.tmdb_id);
           let radarrId = -1;
           if (radarrData[0].id) {
-            logger.debug(
-              `SERVICE - RADARR: [${this.instance.name}] Job skipped already found for ${job.title}`,
-              { label: 'downloaders.radarr' },
-            );
+            logger.debug(`SERVICE - RADARR: [${this.instance.name}] Job skipped already found for ${job.title}`);
             radarrId = radarrData[0].id;
           } else {
             radarrId = await this.add(radarrData[0]);
-            logger.debug(
-              `SERVICE - RADARR: [${this.instance.name}] Radarr job added for ${job.title}`,
-              { label: 'downloaders.radarr' },
-            );
+            logger.debug(`SERVICE - RADARR: [${this.instance.name}] Radarr job added for ${job.title}`);
           }
           if (!this.instance.id) {
             return;
@@ -109,21 +102,15 @@ export default class Radarr {
             { useFindAndModify: false },
           ).exec();
         } catch (err) {
-          logger.error(
-            `SERVICE - RADARR: [${this.instance.name}] Unable to add movie ${job.title}`,
-            { label: 'downloaders.radarr' },
-          );
-          logger.error(err, { label: 'downloaders.radarr' });
+          logger.error(`SERVICE - RADARR: [${this.instance.name}] Unable to add movie ${job.title}`, err);
         }
       } else {
         // Loop for all servers default
         const instances = await GetAllDownloaders(DownloaderType.Radarr);
+        // eslint-disable-next-line no-restricted-syntax
         for (const instance of instances) {
           if (!instance.enabled) {
-            logger.debug(
-              `SERVICE - RADARR: [${instance.name}] Server not active`,
-              { label: 'downloaders.radarr' },
-            );
+            logger.debug(`SERVICE - RADARR: [${instance.name}] Server not active`);
             return;
           }
 
@@ -134,17 +121,11 @@ export default class Radarr {
             const radarrData = await api.LookupMovie(job.tmdb_id);
             let radarrId = -1;
             if (radarrData[0].id) {
-              logger.debug(
-                `SERVICE - RADARR: [${instance.name}] Job skipped already found for ${job.title}`,
-                { label: 'downloaders.radarr' },
-              );
+              logger.debug(`SERVICE - RADARR: [${instance.name}] Job skipped already found for ${job.title}`,);
               radarrId = radarrData[0].id;
             } else {
               radarrId = await this.add(radarrData[0]);
-              logger.debug(
-                `SERVICE - RADARR: [${instance.name}] Radarr job added for ${job.title}`,
-                { label: 'downloaders.radarr' },
-              );
+              logger.debug(`SERVICE - RADARR: [${instance.name}] Radarr job added for ${job.title}`);
             }
             if (!instance.id) {
               continue;
@@ -158,11 +139,7 @@ export default class Radarr {
               { useFindAndModify: false },
             ).exec();
           } catch (err) {
-            logger.error(
-              `SERVICE - RADARR: [${this.instance.name}] Unable to add movie ${job.title}`,
-              { label: 'downloaders.radarr' },
-            );
-            logger.log(err, { label: 'downloaders.radarr' });
+            logger.error(`SERVICE - RADARR: [${this.instance.name}] Unable to add movie ${job.title}`);
           }
         }
       }
@@ -174,10 +151,7 @@ export default class Radarr {
       const radarrData = await this.client.LookupMovie(job.id);
       let radarrId = -1;
       if (radarrData[0] && radarrData[0].id) {
-        logger.debug(
-          `SERVICE - RADARR: [${this.instance.name}] Job skipped already found for ${job.title}`,
-          { label: 'downloaders.radarr' },
-        );
+        logger.debug(`SERVICE - RADARR: [${this.instance.name}] Job skipped already found for ${job.title}`);
         radarrId = radarrData[0].id;
       } else {
         radarrId = await this.add(
@@ -186,10 +160,7 @@ export default class Radarr {
           manual.profile,
           manual.tag,
         );
-        logger.debug(
-          `SERVICE - RADARR: [${this.instance.name}] Radarr job added for ${job.title}`,
-          { label: 'downloaders.radarr' },
-        );
+        logger.debug(`SERVICE - RADARR: [${this.instance.name}] Radarr job added for ${job.title}`);
       }
       if (!this.instance.id) {
         return;
@@ -202,41 +173,26 @@ export default class Radarr {
         { useFindAndModify: false },
       ).exec();
     } catch (err) {
-      logger.error(
-        `SERVICE - RADARR: [${this.instance.name}] Unable to add movie ${job.title}`,
-        { label: 'downloaders.radarr' },
-      );
-      logger.log(err, { label: 'downloaders.radarr' });
+      logger.error(`SERVICE - RADARR: [${this.instance.name}] Unable to add movie ${job.title}`, err);
     }
   }
 
   async processRequest(id) {
-    logger.debug(`SERVICE - RADARR: Processing request`, {
-      label: 'downloaders.radarr',
-    });
+    logger.debug(`SERVICE - RADARR: Processing request`);
     const req = await Request.findOne({ requestId: id }).exec();
     if (!req) {
-      logger.debug(`SERVICE - RADARR: no request found`, {
-        label: 'downloaders.radarr',
-      });
+      logger.debug(`SERVICE - RADARR: no request found`);
       return;
     }
 
     if (req.type === 'movie') {
       if (!req.tmdb_id) {
-        logger.debug(`SERVICE - RADARR: TMDB ID not found for ${req.title}`, {
-          label: 'downloaders.radarr',
-        });
+        logger.debug(`SERVICE - RADARR: TMDB ID not found for ${req.title}`);
       } else if (req.radarrId.length === 0) {
         if (!req.approved) {
-          logger.debug(
-            `SERVICE - RADARR: Request requires approval - ${req.title}`,
-            { label: 'downloaders.radarr' },
-          );
+          logger.debug(`SERVICE - RADARR: Request requires approval - ${req.title}`);
         } else {
-          logger.debug('SERVICE - RADARR: Request passed to queue', {
-            label: 'downloaders.radarr',
-          });
+          logger.debug('SERVICE - RADARR: Request passed to queue');
           this.processJobs([req]);
         }
       }
