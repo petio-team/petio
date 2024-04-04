@@ -6,6 +6,7 @@
   --black: #111;
   --white: #fff;
   --grey: #202020;
+  --grey-rgb: 32, 32, 32;
   --grey-light-10: color-mix(in srgb, var(--grey), #fff 10%);
   --grey-light-20: color-mix(in srgb, var(--grey), #fff 20%);
   --grey-light-30: color-mix(in srgb, var(--grey), #fff 30%);
@@ -16,6 +17,7 @@
   --orange: #ff8300;
   --orange-dark-10: color-mix(in srgb, var(--orange), #000 10%);
   --orange-dark-30: color-mix(in srgb, var(--orange), #000 30%);
+  --orange-dark-30-rgb: 178, 91, 0;
   --green: #98dd32;
   --green-dark-30: color-mix(in srgb, var(--green), #000 30%);
   --green-dark: #2e8321;
@@ -160,7 +162,7 @@ hr {
     color: white;
 
     @media (max-width: $lg) {
-      background: rgba(var(--grey), 0.8);
+      background: rgba(var(--grey-rgb), 0.8);
       backdrop-filter: blur(20px);
       margin-top: 5px;
       border-radius: 5px !important;

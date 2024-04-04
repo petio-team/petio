@@ -10,7 +10,7 @@
   z-index: 500;
   backdrop-filter: blur(20px);
   border-bottom: solid 1px rgba(#fff, 0.2);
-  background: rgba(#000, 0.6);
+  background: rgba(var(--grey-rgb), 0.6);
   // height: 51px;
 
   @media (min-width: $lg) {
@@ -227,7 +227,7 @@
   height: calc(60px + env(safe-area-inset-bottom));
   backdrop-filter: blur(20px);
   border-top: solid 1px rgba(#fff, 0.2);
-  background: rgba(var(--grey), 0.6);
+  background: rgba(var(--grey-rgb), 0.6);
   z-index: 500;
   padding: 0 20px;
   padding-bottom: env(safe-area-inset-bottom);
