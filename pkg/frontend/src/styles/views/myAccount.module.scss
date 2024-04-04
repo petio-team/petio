@@ -1,4 +1,4 @@
-@import '../global/variables.module.scss';
+@import '../global/breakpoints.module.scss';
 
 .wrap {
   margin-top: 40px;
@@ -13,13 +13,13 @@
 }
 
 .signOut {
-  color: $orange;
+  color: var(--orange);
   cursor: pointer;
 }
 
 .block {
   padding: 20px;
-  background: $grey;
+  background: var(--grey);
   margin: 50px 0;
 
   &__title {
@@ -54,7 +54,7 @@
   appearance: none;
   border: none;
   background: none;
-  color: $orange;
+  color: var(--orange);
   cursor: pointer;
   padding: 0;
   margin: 0;
@@ -121,7 +121,7 @@
     }
 
     &__inner {
-      background: $grey;
+      background: var(--grey);
       border-radius: 4px;
       overflow: hidden;
     }
@@ -216,28 +216,28 @@
   &__btn {
     position: relative;
     z-index: 10;
-    // margin: 0 #{$spacing * 2} 0 0;
+    // margin: 0 calc(var(--gutter) * 2) 0 0;
 
     // @media (min-width: $lg) {
     //   margin-left: 0;
-    //   margin-right: #{$spacing * 2};
+    //   margin-right: calc(var(--gutter) * 2);
     // }
 
     &__up {
       opacity: 1;
-      border-color: $green;
+      border-color: var(--green);
 
       svg path {
-        fill: $green;
+        fill: var(--green);
       }
     }
 
     &__down {
       opacity: 1;
-      border-color: $red;
+      border-color: var(--red);
 
       svg path {
-        fill: $red;
+        fill: var(--red);
       }
     }
 

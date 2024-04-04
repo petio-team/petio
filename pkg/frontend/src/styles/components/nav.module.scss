@@ -1,4 +1,4 @@
-@import '../global/variables.module.scss';
+@import '../global/breakpoints.module.scss';
 
 .nav {
   padding: 15px 0;
@@ -9,8 +9,8 @@
   width: 100%;
   z-index: 500;
   backdrop-filter: blur(20px);
-  border-bottom: solid 1px rgba($white, 0.2);
-  background: rgba($grey, 0.6);
+  border-bottom: solid 1px rgba(#fff, 0.2);
+  background: rgba(#000, 0.6);
   // height: 51px;
 
   @media (min-width: $lg) {
@@ -100,7 +100,7 @@
     width: 35px;
     height: 35px;
     min-width: 24px;
-    background: $white;
+    background: var(--white);
     border-radius: 50%;
     overflow: hidden;
     position: absolute;
@@ -164,7 +164,7 @@
         transition: color 0.3s ease;
 
         &:hover {
-          color: $orange;
+          color: var(--orange);
         }
       }
     }
@@ -201,7 +201,7 @@
     transition: max-width 0.3s ease;
 
     input {
-      border: solid 2px $white;
+      border: solid 2px var(--white);
     }
   }
 
@@ -226,8 +226,8 @@
   height: 60px;
   height: calc(60px + env(safe-area-inset-bottom));
   backdrop-filter: blur(20px);
-  border-top: solid 1px rgba($white, 0.2);
-  background: rgba($grey, 0.6);
+  border-top: solid 1px rgba(#fff, 0.2);
+  background: rgba(var(--grey), 0.6);
   z-index: 500;
   padding: 0 20px;
   padding-bottom: env(safe-area-inset-bottom);
@@ -245,25 +245,25 @@
       display: block;
 
       svg {
-        fill: $white;
+        fill: var(--white);
 
         height: 20px;
         width: auto;
 
         path {
-          fill: $white;
+          fill: var(--white);
         }
       }
     }
 
     &__active {
-      color: $orange;
+      color: var(--orange);
 
       span svg {
-        fill: $orange;
+        fill: var(--orange);
 
         path {
-          fill: $orange;
+          fill: var(--orange);
         }
       }
     }
@@ -285,7 +285,7 @@
   span {
     display: flex;
     svg {
-      fill: $white;
+      fill: var(--white);
       width: 15px;
     }
   }

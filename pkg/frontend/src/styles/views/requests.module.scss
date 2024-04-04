@@ -1,4 +1,4 @@
-@import '../global/variables.module.scss';
+@import '../global/breakpoints.module.scss';
 
 .wrap {
   padding-top: 40px;
@@ -28,7 +28,7 @@
   }
 
   &__wrap {
-    background: $grey;
+    background: var(--grey);
     min-height: 200px;
     height: 100%;
     overflow: hidden;
@@ -172,13 +172,13 @@
 
     &__active {
       opacity: 1;
-      color: $orange;
+      color: var(--orange);
 
       span {
-        border-color: $orange;
+        border-color: var(--orange);
 
         svg path {
-          fill: $orange;
+          fill: var(--orange);
         }
       }
     }

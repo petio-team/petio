@@ -1,4 +1,4 @@
-@import '../global/variables.module.scss';
+@import '../global/breakpoints.module.scss';
 
 $btnWidth: 1.5px;
 
@@ -48,43 +48,43 @@ $btnWidth: 1.5px;
 // Orange
 .primary {
   @extend .base;
-  background: $orange;
-  border: solid $btnWidth $orange;
-  color: $black;
+  background: var(--orange);
+  border: solid $btnWidth var(--orange);
+  color: var(--black);
 
   @media (min-width: $lg) {
     &:hover:not(.disabled) {
-      background: darken($orange, 10);
-      border-color: darken($orange, 10);
+      background: var(--orange-dark-10);
+      border-color: var(--orange-dark-10);
     }
   }
 
   &__blue {
     @extend .primary;
-    background: $blue;
-    color: $white;
-    border: solid $btnWidth $blue;
+    background: var(--blue);
+    color: var(--white);
+    border: solid $btnWidth var(--blue);
     opacity: 1 !important;
 
     @media (min-width: $lg) {
       &:hover:not(.disabled) {
-        background: darken($blue, 10);
-        border-color: darken($blue, 10);
+        background: var(--blue-dark-10);
+        border-color: var(--blue-dark-10);
       }
     }
   }
 
   &__red {
     @extend .primary;
-    background: $red;
-    color: $white;
-    border: solid $btnWidth $red;
+    background: var(--red);
+    color: var(--white);
+    border: solid $btnWidth var(--red);
     opacity: 1 !important;
 
     @media (min-width: $lg) {
       &:hover:not(.disabled) {
-        background: darken($red, 10);
-        border-color: darken($red, 10);
+        background: var(--red-dark-10);
+        border-color: var(--red-dark-10);
       }
     }
   }
@@ -93,27 +93,27 @@ $btnWidth: 1.5px;
 .secondary {
   @extend .base;
   background: none;
-  border: solid $btnWidth $orange;
-  color: $orange;
+  border: solid $btnWidth var(--orange);
+  color: var(--orange);
 
   @media (min-width: $lg) {
     &:hover {
-      background: $orange;
-      border-color: $orange;
-      color: $black;
+      background: var(--orange);
+      border-color: var(--orange);
+      color: var(--black);
     }
   }
 
   &__red {
     @extend .secondary;
-    border: solid $btnWidth $red;
-    color: $red;
+    border: solid $btnWidth var(--red);
+    color: var(--red);
 
     @media (min-width: $lg) {
       &:hover {
-        background: $red;
-        border-color: $red;
-        color: $white;
+        background: var(--red);
+        border-color: var(--red);
+        color: var(--white);
       }
     }
   }
@@ -138,7 +138,7 @@ $btnWidth: 1.5px;
 
   border-radius: 50%;
   width: 35px;
-  border: solid $btnWidth $white;
+  border: solid $btnWidth var(--white);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -152,7 +152,7 @@ $btnWidth: 1.5px;
     // object-fit: contain;
 
     path {
-      fill: $white;
+      fill: var(--white);
     }
   }
 
@@ -182,9 +182,9 @@ $btnWidth: 1.5px;
   align-items: center;
   margin-left: -55px;
   border-radius: 50%;
-  background: $blue;
-  color: $white;
-  border-color: $blue;
+  background: var(--blue);
+  color: var(--white);
+  border-color: var(--blue);
   padding: 0;
   // transition: margin 0.3s ease;
   animation: forwards counter-in-mob 0.3s linear 1s;

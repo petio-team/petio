@@ -1,12 +1,12 @@
-@import '../global/variables.module.scss';
+@import '../global/breakpoints.module.scss';
 
 .wrap {
   position: relative;
   z-index: 2;
-  margin: #{$spacing * 2} 0;
+  margin: calc(var(--spacing) * 2) 0;
 
   @media (min-width: $lg) {
-    margin: #{$spacing * 10} 0;
+    margin: calc(var(--spacing) * 10) 0;
   }
 
   &__nospacing {
@@ -25,13 +25,13 @@
   -ms-overflow-style: none;
 
   @media (min-width: $lg) {
-    padding: 100px $containerGutterSm;
-    margin: -90px -#{$containerGutterSm} -100px;
+    padding: 100px var(--gutter);
+    margin: -90px calc(var(--gutter) * -1) -100px;
   }
 
   @media (min-width: $xl) {
-    padding: 100px $containerGutter;
-    margin: -90px -#{$containerGutter} -100px;
+    padding: 100px var(--gutter);
+    margin: -90px calc(var(--gutter) * -1) -100px;
   }
 
   &__nospacing {
@@ -39,13 +39,13 @@
     padding: 2px 20px;
 
     @media (min-width: $lg) {
-      padding: 2px $containerGutterSm;
-      margin: 8px -#{$containerGutterSm} -2px;
+      padding: 2px var(--gutter);
+      margin: 8px calc(var(--gutter) * -1) -2px;
     }
 
     @media (min-width: $xl) {
-      padding: 2px $containerGutter;
-      margin: 8px -#{$containerGutter} -2px;
+      padding: 2px var(--gutter);
+      margin: 8px calc(var(--gutter) * -1) -2px;
     }
   }
 
@@ -83,7 +83,7 @@
       }
 
       path {
-        fill: $orange;
+        fill: var(--orange);
         transition: fill 0.3s ease;
       }
     }
@@ -91,7 +91,7 @@
     &:hover {
       svg {
         path {
-          fill: darken($orange, 10);
+          fill: var(--orange-dark-10);
         }
       }
     }

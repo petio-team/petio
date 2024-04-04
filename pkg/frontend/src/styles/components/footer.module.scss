@@ -1,4 +1,4 @@
-@import '../global/variables.module.scss';
+@import '../global/breakpoints.module.scss';
 
 .footer {
   margin-top: auto;
@@ -14,7 +14,7 @@
 
   @media (min-width: $lg) {
     display: block;
-    border-top: solid 1px $orange;
+    border-top: solid 1px var(--orange);
 
     &__content {
       display: flex;
@@ -48,7 +48,7 @@
       transition: color 0.3s ease;
 
       &:hover {
-        color: $orange;
+        color: var(--orange);
       }
     }
   }

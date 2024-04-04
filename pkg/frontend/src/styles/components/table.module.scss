@@ -1,4 +1,3 @@
-@import '../global/variables.module.scss';
 @import '../components/typography.module.scss';
 
 .base {
@@ -26,11 +25,11 @@
   }
 
   th {
-    border-bottom: solid 4px $black;
+    border-bottom: solid 4px var(--black);
   }
 
   td {
-    border-bottom: solid 2px $black;
+    border-bottom: solid 2px var(--black);
   }
 
   tr {

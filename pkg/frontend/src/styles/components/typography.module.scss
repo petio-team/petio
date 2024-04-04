@@ -1,4 +1,4 @@
-@import '../global/variables.module.scss';
+@import '../global/breakpoints.module.scss';
 
 .xltitle {
   font-size: 40px;
@@ -114,17 +114,17 @@
     }
 
     &:hover {
-      color: $orange;
+      color: var(--orange);
 
       .carousel_title__icon {
-        border-color: $orange;
+        border-color: var(--orange);
       }
     }
   }
 
   &__icon {
-    border-top: solid 2px $white;
-    border-right: solid 2px $white;
+    border-top: solid 2px var(--white);
+    border-right: solid 2px var(--white);
     transform: rotate(45deg);
 
     width: 6px;
@@ -154,31 +154,31 @@
 }
 
 .orange {
-  color: $orange;
+  color: var(--orange);
 }
 
 .red {
-  color: $red;
+  color: var(--red);
 }
 
 .vertical_spacer {
-  margin: 0 $spacing;
+  margin: 0 var(--spacing);
   height: 8px;
   width: 1px;
-  background: $white;
+  background: var(--white);
   display: inline-block;
 }
 
 code {
   font-size: inherit;
   line-height: inherit;
-  background: $black;
+  background: var(--black);
   font-size: 0.6rem;
   padding: 0.25rem;
 }
 
 .link {
-  color: $orange;
+  color: var(--orange);
   text-decoration: underline;
 }
 

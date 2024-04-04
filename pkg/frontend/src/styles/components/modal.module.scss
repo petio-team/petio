@@ -1,12 +1,10 @@
-@import '../global/variables.module.scss';
-
 .main {
   position: relative;
   z-index: 2;
   width: 500px;
   min-height: 500px;
   max-height: 80%;
-  background: $grey;
+  background: var(--grey);
   border-radius: 5px;
   overflow: hidden;
   display: flex;
@@ -19,17 +17,17 @@
 
   /* Track */
   ::-webkit-scrollbar-track {
-    background: lighten($grey, 5);
+    background: var(--grey-light-10);
   }
 
   /* Handle */
   ::-webkit-scrollbar-thumb {
-    background: lighten($grey, 20);
+    background: var(--grey-light-20);
   }
 
   /* Handle on hover */
   ::-webkit-scrollbar-thumb:hover {
-    background: lighten($grey, 30);
+    background: var(--grey-light-30);
   }
 }
 
@@ -40,7 +38,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba($black, 0.8);
+  background: rgba(#000, 0.8);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -56,7 +54,7 @@
 
 .title {
   padding: 10px 20px;
-  border-bottom: solid 1px rgba($white, 0.2);
+  border-bottom: solid 1px rgba(#fff, 0.2);
 
   p {
     max-width: 80%;

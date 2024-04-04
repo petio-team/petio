@@ -1,3 +1,5 @@
+@import '../global/breakpoints.module.scss';
+
 .wrap {
   min-height: calc(
     100vh - (env(safe-area-inset-top) + env(safe-area-inset-bottom))
@@ -6,7 +8,7 @@
   flex-direction: column;
   overflow-x: hidden;
 
-  @media (max-width: 768px) {
+  @media (max-width: $md) {
     padding-top: 66px;
   }
 }

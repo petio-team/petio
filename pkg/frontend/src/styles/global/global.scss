@@ -1,28 +1,52 @@
+@import './breakpoints.module.scss';
+
+// global variables
+
 :root {
-  --primary: #d79b23;
-  --primary-dark: #c78c0d;
-  --black: #101010;
-  --grey: #f2f2f2;
-  --grey-light: #e0e3e6;
-  --grey-medium: #868c96;
+  --black: #111;
+  --white: #fff;
+  --grey: #202020;
+  --grey-light-10: color-mix(in srgb, var(--grey), #fff 10%);
+  --grey-light-20: color-mix(in srgb, var(--grey), #fff 20%);
+  --grey-light-30: color-mix(in srgb, var(--grey), #fff 30%);
   --grey-dark: #343536;
-  --red: #e95151;
-  --orange: var(--primary);
+  --red: #db5461;
+  --red-dark-10: color-mix(in srgb, var(--green), #000 10%);
+  --red-dark-30: color-mix(in srgb, var(--red), #000 30%);
+  --orange: #ff8300;
+  --orange-dark-10: color-mix(in srgb, var(--orange), #000 10%);
+  --orange-dark-30: color-mix(in srgb, var(--orange), #000 30%);
   --green: #98dd32;
-  --blue: #3d85b8;
-  --purple: #6810af;
-  --teal: #1f7979;
-  --good: var(--green);
-  --bad: var(--red);
+  --green-dark-30: color-mix(in srgb, var(--green), #000 30%);
+  --green-dark: #2e8321;
+  --blue: #006992;
+  --blue-dark-10: color-mix(in srgb, var(--blue), #000 10%);
+  --blue-dark-30: color-mix(in srgb, var(--blue), #000 30%);
+  --purple: #8700c5;
+  --purple-dark-30: color-mix(in srgb, var(--purple), #000 30%);
+  --font: 'Montserrat', sans-serif;
+  --spacing: 10px;
+  --gutter: 10px;
+  --xs: #{$xs};
+  --sm: #{$sm};
+  --md: #{$md};
+  --lg: #{$lg};
+  --xl: #{$xl};
+  --xxl: #{$xxl};
+  --xxxl: #{$xxxl};
+
+  @media (min-width: $lg) {
+    --gutter: 140px;
+  }
 }
 
 html,
 body {
   padding: 0;
   margin: 0;
-  background: $black;
-  color: $white;
-  font-family: $font;
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--font);
   -webkit-tap-highlight-color: transparent;
   width: 100vw;
   max-width: 100vw;
@@ -72,11 +96,11 @@ p {
 hr {
   margin: 0;
   height: 1px;
-  background: $grey;
+  background: var(--grey);
   border: none;
 
   &.spaced {
-    margin: $spacing 0;
+    margin: var(--spacing) 0;
   }
 }
 
@@ -86,8 +110,8 @@ hr {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba($black, 0.5);
-  color: $white;
+  background: rgba(#000, 0.5);
+  color: var(--white);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -108,7 +132,7 @@ hr {
 .score {
   &-bg {
     fill: none;
-    stroke: darken($orange, 30);
+    stroke: var(--orange-dark-30);
     stroke-width: 4;
   }
 
@@ -117,7 +141,7 @@ hr {
     stroke-width: 4;
     stroke-linecap: square;
     animation: progress 3s ease-out forwards;
-    stroke: $orange;
+    stroke: var(--orange);
   }
 }
 
@@ -132,11 +156,11 @@ hr {
   z-index: 500;
 
   &__toast {
-    background: $grey;
+    background: var(--grey);
     color: white;
 
     @media (max-width: $lg) {
-      background: rgba($grey, 0.8);
+      background: rgba(var(--grey), 0.8);
       backdrop-filter: blur(20px);
       margin-top: 5px;
       border-radius: 5px !important;
@@ -170,15 +194,15 @@ hr {
   align-items: flex-start;
 
   h1 {
-    color: $orange;
+    color: var(--orange);
   }
 }
 
 .recharts-active-dot .recharts-dot {
-  fill: $white;
-  stroke: $white;
+  fill: var(--white);
+  stroke: var(--white);
 }
 
 .recharts-tooltip-cursor {
-  stroke: rgba($white, 0.2);
+  stroke: rgba(#fff, 0.2);
 }

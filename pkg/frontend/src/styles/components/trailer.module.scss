@@ -1,4 +1,4 @@
-@import '../global/variables.module.scss';
+@import '../global/breakpoints.module.scss';
 
 .wrap {
   position: fixed;
@@ -6,7 +6,7 @@
   left: 0;
   bottom: 0;
   right: 0;
-  background: rgba($black, 0.7);
+  background: rgba(#000, 0.7);
   z-index: 1000;
   padding: 20px;
   display: flex;
@@ -25,7 +25,7 @@
   overflow: hidden;
   position: relative;
   max-height: 100%;
-  background: $black;
+  background: var(--black);
   width: 100%;
 
   &:after {
@@ -75,7 +75,7 @@
   width: 30px;
   height: 30px;
   z-index: 10;
-  background: rgba($black, 0.3);
+  background: rgba(#000, 0.3);
   backdrop-filter: blur(20px);
   padding: 4px;
   display: flex;
@@ -96,7 +96,7 @@
     height: 100%;
 
     path {
-      fill: $orange;
+      fill: var(--orange);
     }
   }
 }
@@ -108,7 +108,7 @@
   right: 20px;
   height: 30px;
   z-index: 3;
-  background: rgba($black, 0.3);
+  background: rgba(#000, 0.3);
   backdrop-filter: blur(20px);
   border-radius: 5px;
   display: flex;
@@ -149,7 +149,7 @@
       height: 100%;
 
       path {
-        fill: $orange;
+        fill: var(--orange);
       }
     }
   }
@@ -159,13 +159,13 @@
     height: 4px;
     position: relative;
     margin: 10px 20px;
-    background: rgba($white, 0.2);
+    background: rgba(#fff, 0.2);
     cursor: pointer;
 
     &__buffer {
       height: 100%;
       width: 25%;
-      background: rgba(darken($orange, 30), 0.5);
+      background: rgba(var(--orange-dark-30), 0.5);
       position: absolute;
       top: 0;
       left: 0;
@@ -176,7 +176,7 @@
     &__pos {
       height: 100%;
       width: 20%;
-      background: $orange;
+      background: var(--orange);
       position: absolute;
       top: 0;
       left: 0;
@@ -198,10 +198,10 @@
       &::-webkit-slider-thumb {
         appearance: none;
         opacity: 0;
-        border: solid 1px $black;
+        border: solid 1px var(--black);
         width: 15px;
         height: 15px;
-        background: $orange;
+        background: var(--orange);
         border-radius: 50%;
       }
 

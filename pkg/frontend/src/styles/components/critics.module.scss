@@ -1,22 +1,22 @@
-@import '../global/variables.module.scss';
+@import '../global/breakpoints.module.scss';
 
 .critics {
   display: flex;
   align-items: center;
-  margin-top: $spacing;
+  margin-top: var(--spacing);
 
   @media (min-width: $lg) {
     margin-top: 0;
-    margin-left: #{$spacing * 2};
+    margin-left: calc(var(--gutter) * 2);
   }
 
   &__item {
     display: flex;
     align-items: center;
-    margin-right: #{$spacing * 2};
+    margin-right: calc(var(--gutter) * 2);
 
     p {
-      margin-left: $spacing;
+      margin-left: var(--spacing);
     }
 
     svg {

@@ -1,5 +1,5 @@
-@import '../global/variables.module.scss';
 @import '../components/typography.module.scss';
+@import '../global/breakpoints.module.scss';
 
 .wrap {
   margin-top: 120px;
@@ -45,7 +45,7 @@
     &__img {
       width: 30vw;
       height: 45vw;
-      background: $grey;
+      background: var(--grey);
       position: relative;
       border-radius: 2px;
       overflow: hidden;
@@ -78,7 +78,7 @@
 
     &__showmore {
       margin-top: 10px;
-      color: $orange;
+      color: var(--orange);
       cursor: pointer;
     }
   }

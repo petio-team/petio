@@ -1,4 +1,4 @@
-@import '../global/variables.module.scss';
+@import '../global/breakpoints.module.scss';
 
 .inner {
   display: flex;
@@ -11,7 +11,7 @@
 }
 
 .sidebar {
-  background: $grey;
+  background: var(--grey);
   width: 100%;
   margin-right: 40px;
   border-radius: 5px;
@@ -30,8 +30,8 @@
 
     &__active,
     &:hover {
-      background: $orange;
-      color: $grey;
+      background: var(--orange);
+      color: var(--grey);
     }
   }
 }
@@ -47,14 +47,14 @@
   }
 
   &__item {
-    background: $grey;
+    background: var(--grey);
     overflow: hidden;
     border-radius: 5px;
 
     &__title {
-      background: rgba($white, 0.1);
+      background: rgba(#fff, 0.1);
       padding: 10px 20px;
-      border-bottom: solid 1px rgba($white, 0.2);
+      border-bottom: solid 1px rgba(#fff, 0.2);
     }
 
     &__content {
@@ -69,7 +69,7 @@
   }
 
   &__add {
-    background: $grey;
+    background: var(--grey);
     padding: 20px;
     border-radius: 5px;
     overflow: hidden;
@@ -78,7 +78,7 @@
     cursor: pointer;
 
     &:hover {
-      outline: solid 1px $white;
+      outline: solid 1px var(--white);
     }
   }
 
@@ -86,18 +86,18 @@
     @extend .arr__add;
 
     &__active {
-      background: darken($green, 20);
+      background: var(--green-dark-30);
 
       &:hover {
-        outline: solid 2px $green;
+        outline: solid 2px var(--green);
       }
     }
 
     &__disabled {
-      background: darken($red, 20);
+      background: var(--red-dark-30);
 
       &:hover {
-        outline: solid 2px $red;
+        outline: solid 2px var(--red);
       }
     }
 
@@ -123,7 +123,7 @@
     width: 500px;
     min-height: 500px;
     max-height: 80%;
-    background: $grey;
+    background: var(--grey);
     border-radius: 5px;
     overflow: hidden;
     display: flex;
@@ -136,17 +136,17 @@
 
     /* Track */
     ::-webkit-scrollbar-track {
-      background: lighten($grey, 5);
+      background: var(--grey-light-10);
     }
 
     /* Handle */
     ::-webkit-scrollbar-thumb {
-      background: lighten($grey, 20);
+      background: var(--grey-light-20);
     }
 
     /* Handle on hover */
     ::-webkit-scrollbar-thumb:hover {
-      background: lighten($grey, 30);
+      background: var(--grey-light-30);
     }
 
     &__wrap {
@@ -156,7 +156,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba($black, 0.8);
+      background: rgba(#000, 0.8);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -172,7 +172,7 @@
 
     &__title {
       padding: 10px 20px;
-      border-bottom: solid 1px rgba($white, 0.2);
+      border-bottom: solid 1px rgba(#fff, 0.2);
     }
 
     &__content {
@@ -208,14 +208,14 @@
     }
 
     &__add {
-      background: $grey;
+      background: var(--grey);
       padding: 10px;
       border-radius: 5px;
       margin-top: 10px;
     }
 
     &__item {
-      background: $grey;
+      background: var(--grey);
       padding: 10px;
       border-radius: 5px;
       margin-top: 10px;
@@ -226,18 +226,18 @@
         position: absolute;
         top: 10px;
         right: 10px;
-        color: $orange;
+        color: var(--orange);
       }
 
       &__section {
-        background: rgba($white, 0.1);
+        background: rgba(#fff, 0.1);
         padding: 10px;
         border-radius: 5px;
         margin-top: 10px;
 
         &__action {
-          background: rgba($white, 0.1);
-          border: solid 1.5px $orange;
+          background: rgba(#fff, 0.1);
+          border: solid 1.5px var(--orange);
           padding: 10px;
           border-radius: 5px;
           margin-top: 10px;
@@ -251,7 +251,7 @@
         &__overview {
           b {
             font-weight: 500;
-            color: $orange;
+            color: var(--orange);
           }
         }
       }
@@ -263,7 +263,7 @@
   }
 
   &__row {
-    background: rgba($white, 0.1);
+    background: rgba(#fff, 0.1);
     padding: 10px;
     border-radius: 5px;
     margin-top: 10px;

@@ -1,4 +1,4 @@
-@import '../global/variables.module.scss';
+@import '../global/breakpoints.module.scss';
 
 .wrap {
   margin-top: 40px;
@@ -12,7 +12,7 @@
   display: flex;
   width: 100%;
   padding-bottom: 10px;
-  border-bottom: solid 1px $orange;
+  border-bottom: solid 1px var(--orange);
   margin-top: 50px;
 
   &__item {
@@ -22,7 +22,7 @@
       transition: color 0.3s ease;
 
       &:hover {
-        color: $orange;
+        color: var(--orange);
       }
     }
   }
@@ -45,7 +45,7 @@
   }
 
   &__module {
-    background: $grey;
+    background: var(--grey);
     padding: 10px;
     border-radius: 5px;
   }
@@ -119,14 +119,14 @@
 
         path {
           &[name='Remote'] {
-            stroke: $orange;
+            stroke: var(--orange);
 
             circle {
-              fill: darken($orange, 10);
+              fill: var(--orange-dark-10);
             }
           }
           &[name='Local'] {
-            stroke: $blue;
+            stroke: var(--blue);
           }
         }
       }
@@ -140,7 +140,7 @@
 
       &__tooltip {
         &__remote {
-          background: $orange;
+          background: var(--orange);
           padding: 5px;
           border-radius: 5px;
           margin-bottom: 5px;
@@ -149,22 +149,22 @@
         &__local {
           padding: 5px;
           border-radius: 5px;
-          background: $blue;
+          background: var(--blue);
         }
       }
 
       path {
         &[name='Plex'] {
-          fill: $orange;
+          fill: var(--orange);
           stroke: none;
         }
         &[name='System'] {
-          fill: $blue;
+          fill: var(--blue);
           stroke: none;
         }
 
         &[name='Free'] {
-          fill: rgba($white, 0.1);
+          fill: rgba(#fff, 0.1);
           stroke: none;
         }
       }
@@ -206,7 +206,7 @@
   &__issue {
     padding: 10px;
     border-radius: 5px;
-    background: rgba($white, 0.1);
+    background: rgba(#fff, 0.1);
     margin-bottom: 10px;
 
     &:last-child {
@@ -218,7 +218,7 @@
 .session {
   border-radius: 5px;
   overflow: hidden;
-  background: $grey;
+  background: var(--grey);
   display: block;
 
   &__card {
@@ -235,7 +235,7 @@
 
     &:after {
       content: '';
-      background: rgba($black, 0.2);
+      background: rgba(#000, 0.2);
       position: absolute;
       top: -5px;
       left: -5px;
@@ -302,7 +302,7 @@
       bottom: 0;
       left: 0;
       height: 5px;
-      background: $orange;
+      background: var(--orange);
 
       &__wrap {
         position: absolute;
@@ -310,14 +310,14 @@
         left: 0;
         height: 5px;
         width: 100%;
-        background: rgba($white, 0.4);
+        background: rgba(#fff, 0.4);
         z-index: 4;
       }
     }
 
     &__content {
       padding: 5px 10px;
-      background: rgba($white, 0.025);
+      background: rgba(#fff, 0.025);
 
       &__title,
       &__episode {
@@ -328,12 +328,12 @@
     }
 
     &__detail {
-      background: rgba($white, 0.05);
+      background: rgba(#fff, 0.05);
       padding: 5px 10px;
     }
 
     &__user {
-      background: rgba($white, 0.1);
+      background: rgba(#fff, 0.1);
       padding: 5px 10px;
     }
 
@@ -342,7 +342,7 @@
       bottom: 5px;
       left: 0;
       height: 25px;
-      background: rgba($black, 0.4);
+      background: rgba(#000, 0.4);
       z-index: 3;
       padding: 5px;
       display: flex;
@@ -355,10 +355,10 @@
         object-position: center;
         object-fit: contain;
         margin-right: 5px;
-        fill: $orange;
+        fill: var(--orange);
 
         path {
-          fill: $orange;
+          fill: var(--orange);
         }
       }
     }
@@ -367,7 +367,7 @@
 
 .requests {
   &__title {
-    margin-bottom: #{$spacing * 6};
+    margin-bottom: calc(var(--gutter) * 6);
   }
 
   &__table {
@@ -380,7 +380,7 @@
     &__tr {
       display: flex;
       width: 100%;
-      margin-bottom: #{$spacing * 1};
+      margin-bottom: var(--spacing);
       flex-wrap: wrap;
       border-radius: 5px;
       overflow: hidden;
@@ -392,7 +392,7 @@
       &__header {
         display: flex;
         width: 100%;
-        margin-bottom: #{$spacing * 3};
+        margin-bottom: calc(var(--gutter) * 3);
         border-radius: 5px;
         overflow: hidden;
       }
@@ -404,7 +404,7 @@
     // }
 
     &__th {
-      background: $grey;
+      background: var(--grey);
       padding: 10px;
       text-align: left;
       height: 50px;
@@ -454,7 +454,7 @@
 
     &__td {
       overflow: hidden;
-      background: $grey;
+      background: var(--grey);
       padding: 20px 10px;
       min-height: 100px;
       display: flex;
@@ -505,7 +505,7 @@
         top: 0;
         left: 0;
         width: 100%;
-        height: calc(100% - $spacing);
+        height: calc(100% - var(--spacing));
         display: flex;
         justify-content: center;
         align-items: center;
@@ -535,7 +535,7 @@
       height: 100%;
       overflow: hidden;
       position: relative;
-      background: rgba($white, 0.1);
+      background: rgba(#fff, 0.1);
 
       &__warning {
         position: absolute;
@@ -547,7 +547,7 @@
         cursor: help;
 
         path {
-          fill: $red;
+          fill: var(--red);
         }
       }
 
@@ -570,7 +570,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba($black, 0.3);
+        background: rgba(#000, 0.3);
         z-index: 2;
       }
 
@@ -608,7 +608,7 @@
       overflow: hidden;
       position: relative;
       margin: 0 10px 10px 0;
-      background: rgba($white, 0.2);
+      background: rgba(#fff, 0.2);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -640,7 +640,7 @@
         font-size: 12px;
         line-height: 1;
         font-weight: 700;
-        background: rgba($white, 0.3);
+        background: rgba(#fff, 0.3);
         border-radius: 5px;
         display: inline-flex;
         align-items: center;
@@ -653,34 +653,34 @@
         }
 
         &__good {
-          background: $green;
-          color: darken($green, 30);
+          background: var(--green);
+          color: var(--green-dark-30);
         }
 
         &__bad {
-          background: $red;
-          color: darken($red, 30);
+          background: var(--red);
+          color: var(--red-dark-10);
         }
 
         &__sonarr,
         &__blue {
-          background: $blue;
-          color: darken($blue, 30);
+          background: var(--blue);
+          color: var(--blue-dark-30);
         }
 
         &__radarr {
-          background: $black;
-          color: $orange;
+          background: var(--black);
+          color: var(--orange);
         }
 
         &__orange {
-          background: $orange;
-          color: darken($orange, 30);
+          background: var(--orange);
+          color: var(--orange-dark-30);
         }
 
         &__cinema {
-          background: $purple;
-          color: darken($purple, 30);
+          background: var(--purple);
+          color: var(--purple-dark-30);
         }
       }
     }
@@ -697,13 +697,13 @@
       border-radius: 100%;
 
       &__yes {
-        background: $green;
-        color: darken($green, 30);
+        background: var(--green);
+        color: var(--green-dark-30);
       }
 
       &__no {
-        background: $red;
-        color: darken($red, 30);
+        background: var(--red);
+        color: var(--red-dark-10);
       }
     }
 
@@ -711,7 +711,7 @@
       appearance: none;
       border: none;
       background: none;
-      color: $orange;
+      color: var(--orange);
       text-decoration: underline;
       cursor: pointer;
     }
@@ -720,15 +720,15 @@
       appearance: none;
       border: none;
       background: none;
-      color: $red;
+      color: var(--red);
       text-decoration: underline;
       cursor: pointer;
     }
 
     &__child {
-      margin-top: #{$spacing * -0.5};
-      background: lighten($grey, 5);
-      margin-bottom: #{$spacing * 2};
+      margin-top: calc(var(--spacing) * -0.5);
+      background: var(--grey-light-10);
+      margin-bottom: calc(var(--gutter) * 2);
       border-radius: 5px;
       padding: 10px 10px 0 10px;
       display: flex;
@@ -761,7 +761,7 @@
           max-width: 100%;
           height: 5px;
           border-radius: 2.5px;
-          background: lighten($grey, 10);
+          background: var(--grey-light-10);
           position: relative;
         }
 
@@ -772,15 +772,15 @@
             top: 0;
             left: 0;
             height: 100%;
-            background: $orange;
+            background: var(--orange);
             transition: width 0.3s ease, background 1s ease;
             border-radius: 5px;
             background: repeating-linear-gradient(
               45deg,
-              $orange,
-              $orange 5px,
-              darken($orange, 12) 5px,
-              darken($orange, 12) 10px
+              var(--orange),
+              var(--orange) 5px,
+              var(--orange-dark-10) 5px,
+              var(--orange-dark-10) 10px
             );
             background-size: 57px 100%;
             animation: progress 1s linear infinite;
@@ -793,13 +793,13 @@
             height: 100%;
             transition: width 0.3s ease, background 1s ease;
             border-radius: 5px;
-            background: $blue;
+            background: var(--blue);
             background: repeating-linear-gradient(
               45deg,
-              $blue,
-              $blue 5px,
-              darken($blue, 12) 5px,
-              darken($blue, 12) 10px
+              var(--blue),
+              var(--blue) 5px,
+              var(--blue-dark-10) 5px,
+              var(--blue-dark-10) 10px
             );
             background-size: 57px 100%;
           }
@@ -812,7 +812,7 @@
             height: 100%;
             transition: width 0.3s ease, background 1s ease;
             border-radius: 5px;
-            background: $green;
+            background: var(--green);
           }
         }
       }
@@ -823,7 +823,7 @@
 .warningText {
   display: flex;
   align-items: center;
-  margin-bottom: $spacing;
+  margin-bottom: var(--spacing);
 
   svg {
     height: 15px;
@@ -831,41 +831,41 @@
     margin-right: 10px;
 
     path {
-      fill: $red;
+      fill: var(--red);
     }
   }
 }
 
 .requestEdit {
   &__title {
-    margin-bottom: #{$spacing * 2};
+    margin-bottom: calc(var(--gutter) * 2);
   }
 
   &__wrap {
-    padding-bottom: $spacing;
-    margin-bottom: $spacing;
-    border-bottom: solid 1px $orange;
+    padding-bottom: var(--spacing);
+    margin-bottom: var(--spacing);
+    border-bottom: solid 1px var(--orange);
   }
 
   &__server {
-    margin-bottom: $spacing;
+    margin-bottom: var(--spacing);
 
     &__wrap {
-      margin-bottom: #{$spacing * 2};
+      margin-bottom: calc(var(--gutter) * 2);
     }
   }
 
   &__label {
-    margin-top: $spacing;
-    margin-bottom: $spacing;
+    margin-top: var(--spacing);
+    margin-bottom: var(--spacing);
   }
 
   &__under {
-    margin-bottom: $spacing;
+    margin-bottom: var(--spacing);
   }
 
   &__btn {
-    margin-top: #{$spacing * 2};
+    margin-top: calc(var(--gutter) * 2);
   }
 }
 

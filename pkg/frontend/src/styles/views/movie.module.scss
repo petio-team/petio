@@ -1,4 +1,4 @@
-@import '../global/variables.module.scss';
+@import '../global/breakpoints.module.scss';
 
 .overview {
   position: relative;
@@ -11,7 +11,7 @@
 
   &__logo {
     height: 176px;
-    margin-bottom: $spacing;
+    margin-bottom: var(--spacing);
     display: flex;
     align-items: center;
     width: 100%;
@@ -51,8 +51,8 @@
   }
 
   &__content {
-    margin-top: $spacing;
-    margin-bottom: #{$spacing * 2};
+    margin-top: var(--spacing);
+    margin-bottom: calc(var(--gutter) * 2);
     width: 100%;
     max-width: 550px;
 
@@ -62,8 +62,8 @@
 
     @media (min-width: $xxxl) {
       max-width: 1000px;
-      margin-top: #{$spacing * 2};
-      margin-bottom: #{$spacing * 4};
+      margin-top: calc(var(--gutter) * 2);
+      margin-bottom: calc(var(--gutter) * 4);
     }
   }
 
@@ -86,14 +86,14 @@
   &__credits {
     position: relative;
     z-index: 3;
-    padding-bottom: #{$spacing * 5};
-    margin-top: #{$spacing * 10};
+    padding-bottom: calc(var(--gutter) * 5);
+    margin-top: calc(var(--gutter) * 10);
     display: flex;
     justify-content: space-between;
 
     &__item {
-      padding-top: $spacing;
-      border-top: solid 1.5px $orange;
+      padding-top: var(--spacing);
+      border-top: solid 1.5px var(--orange);
       width: 235px;
 
       @media (min-width: $xxxl) {
@@ -103,7 +103,7 @@
   }
 
   &__genres {
-    margin-top: $spacing;
+    margin-top: var(--spacing);
     width: 100%;
     max-width: 550px;
 
@@ -112,13 +112,13 @@
     }
 
     span {
-      margin-right: #{$spacing * 2};
+      margin-right: calc(var(--gutter) * 2);
 
       a {
         transition: color 0.3s ease;
 
         &:hover {
-          color: $orange;
+          color: var(--orange);
         }
       }
     }
@@ -126,10 +126,10 @@
 
   &__wrap {
     background: var(--black);
-    padding: #{$spacing * 2};
+    padding: calc(var(--gutter) * 2);
     // backdrop-filter: blur(20px);
     border-radius: 5px;
-    margin: 0 -20px;
+    margin: 0 calc(var(--gutter) * -2);
 
     @media (min-width: $lg) {
       margin: 0;
@@ -148,12 +148,12 @@
 
   &__request {
     display: flex;
-    margin-bottom: #{$spacing * 2};
+    margin-bottom: calc(var(--gutter) * 2);
     width: 100%;
 
     @media (min-width: $md) {
       margin-bottom: 0;
-      margin-right: #{$spacing * 4};
+      margin-right: calc(var(--gutter) * 4);
       width: auto;
     }
 
@@ -193,13 +193,13 @@
         }
 
         &__open {
-          background: $orange;
-          color: $black;
+          background: var(--orange);
+          color: var(--black);
 
           .actions__request__dropdown__arrow {
             &:after {
-              border-bottom: solid 2px $black;
-              border-right: solid 2px $black;
+              border-bottom: solid 2px var(--black);
+              border-right: solid 2px var(--black);
               transform: rotate(-135deg);
               margin-top: 4px;
             }
@@ -210,8 +210,8 @@
           &:hover {
             .actions__request__dropdown__arrow {
               &:after {
-                border-bottom: solid 2px $black;
-                border-right: solid 2px $black;
+                border-bottom: solid 2px var(--black);
+                border-right: solid 2px var(--black);
               }
             }
           }
@@ -227,15 +227,15 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        border-left: solid 1.5px $orange;
+        border-left: solid 1.5px var(--orange);
 
         &:after {
           content: '';
           display: block;
           height: 10px;
           width: 10px;
-          border-bottom: solid 2px $orange;
-          border-right: solid 2px $orange;
+          border-bottom: solid 2px var(--orange);
+          border-right: solid 2px var(--orange);
           transform: rotate(45deg);
           margin-top: -4px;
           transition: border-color 0.3s ease;
@@ -246,7 +246,7 @@
         margin-top: 5px;
         display: flex;
         flex-direction: column;
-        background: rgba($white, 0.3);
+        background: rgba(#fff, 0.3);
         backdrop-filter: blur(10px);
         border-radius: 5px;
         padding: 0;
@@ -265,7 +265,7 @@
 
       &__option {
         padding: 10px;
-        border-bottom: solid 1px rgba($grey, 0.5);
+        border-bottom: solid 1px rgba(var(--grey), 0.5);
         cursor: pointer;
 
         &:last-child {
@@ -274,7 +274,7 @@
 
         @media (min-width: $lg) {
           &:hover {
-            background: rgba($white, 0.3);
+            background: rgba(#fff, 0.3);
           }
         }
       }
@@ -282,28 +282,28 @@
   }
 
   &__btn {
-    margin: 0 #{$spacing * 2} 0 0;
+    margin: 0 calc(var(--gutter) * 2) 0 0;
 
     @media (min-width: $lg) {
       margin-left: 0;
-      margin-right: #{$spacing * 2};
+      margin-right: calc(var(--gutter) * 2);
     }
 
     &__up {
       opacity: 1;
-      border-color: $green;
+      border-color: var(--green);
 
       svg path {
-        fill: $green;
+        fill: var(--green);
       }
     }
 
     &__down {
       opacity: 1;
-      border-color: $red;
+      border-color: var(--red);
 
       svg path {
-        fill: $red;
+        fill: var(--red);
       }
     }
 
@@ -315,16 +315,16 @@
 }
 
 .details {
-  margin: #{$spacing * 2} 0;
+  margin: calc(var(--gutter) * 2) 0;
 
   @media (min-width: $lg) {
-    margin: #{$spacing * 10} 0;
+    margin: calc(var(--gutter) * 10) 0;
   }
 
   &__content {
-    border-top: solid 1px $orange;
-    padding-top: $spacing;
-    margin-top: $spacing;
+    border-top: solid 1px var(--orange);
+    padding-top: var(--spacing);
+    margin-top: var(--spacing);
 
     &__inner {
       display: flex;
@@ -338,19 +338,19 @@
 
     &__item {
       width: 50%;
-      margin-bottom: $spacing;
+      margin-bottom: var(--spacing);
       // display: flex;
 
       a {
         transition: color 0.3s ease;
 
         &:hover {
-          color: $orange;
+          color: var(--orange);
         }
       }
 
       &__title {
-        margin-right: #{$spacing * 2};
+        margin-right: calc(var(--gutter) * 2);
       }
 
       @media (min-width: $md) {

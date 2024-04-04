@@ -1,4 +1,4 @@
-@import '../global/variables.module.scss';
+@import '../global/breakpoints.module.scss';
 
 .base {
   appearance: none;
@@ -8,14 +8,14 @@
   height: 35px;
   font-size: 13px;
   padding: 0 10px;
-  background: $grey;
-  // border: solid 1px $darkGrey;
+  background: var(--grey);
+  // border: solid 1px var(--grey-dark);
   font-weight: 500;
-  color: $white;
+  color: var(--white);
   display: block;
 
   &::placeholder {
-    color: rgba($white, 0.6);
+    color: rgba(#fff, 0.6);
     font-weight: normal;
   }
 
@@ -37,7 +37,7 @@
 
   &__light {
     @extend .base;
-    background: lighten($grey, 10);
+    background: var(--grey-light-10);
   }
 
   &.disabled,
@@ -61,14 +61,14 @@
 
   &__light {
     @extend .textarea;
-    background: lighten($grey, 10);
+    background: var(--grey-light-10);
   }
 }
 
 .prefix {
   height: 35px;
   padding: 0 10px;
-  background: rgba($white, 0.2);
+  background: rgba(#fff, 0.2);
   font-size: 13px;
   font-weight: 700;
   display: inline-flex;
@@ -87,24 +87,24 @@
 .search {
   padding-right: 30px;
   padding-left: 15px;
-  background: rgba($white, 0.1);
+  background: rgba(#fff, 0.1);
   border-radius: 10px;
   // font-size: 16px;
-  // color: $black;
+  // color: var(--black);
 
   // &::placeholder {
-  // 	color: $black;
+  // 	color: var(--black);
   // }
 
   @media (min-width: $lg) {
-    background: $grey;
-    color: $white;
+    background: var(--grey);
+    color: var(--white);
     padding: 0 10px;
     font-size: 13px;
     border-radius: 0;
 
     &::placeholder {
-      color: $white;
+      color: var(--white);
     }
   }
 
@@ -130,7 +130,7 @@
     content: '';
     width: 14px;
     height: 1px;
-    background: $white;
+    background: var(--white);
     transform: rotate(45deg);
     position: absolute;
     top: calc(50% - 0.5px);
@@ -141,7 +141,7 @@
     content: '';
     width: 14px;
     height: 1px;
-    background: $white;
+    background: var(--white);
     transform: rotate(-45deg);
     position: absolute;
     top: calc(50% - 0.5px);
@@ -163,7 +163,7 @@
 
   &__light {
     @extend .base;
-    background: lighten($grey, 10);
+    background: var(--grey-light-10);
   }
 }
 
@@ -175,7 +175,7 @@
     input {
       appearance: none;
       background: none;
-      border: solid 1px $orange;
+      border: solid 1px var(--orange);
       width: 15px;
       height: 15px;
       min-width: 15px;
@@ -183,7 +183,7 @@
       cursor: pointer;
 
       &:checked {
-        background: $orange;
+        background: var(--orange);
       }
 
       &[disabled],

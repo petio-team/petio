@@ -1,12 +1,10 @@
-@import '../global/variables.module.scss';
-
 .wrap {
   position: fixed;
   top: 0;
   left: 0;
   bottom: 0;
   right: 0;
-  background: rgba($black, 0.6);
+  background: rgba(#000, 0.6);
 
   z-index: 5000;
 }
@@ -18,7 +16,7 @@
   bottom: 50px;
   left: 30px;
   right: 30px;
-  color: $black;
+  color: var(--black);
   z-index: 1;
 }
 

@@ -1,4 +1,5 @@
-@import '../global/variables.module.scss';
+@import '../global/breakpoints.module.scss';
+
 .wrap {
   margin-top: 40px;
 
@@ -7,15 +8,15 @@
   }
 
   p {
-    margin-top: #{$spacing * 2};
+    margin-top: calc(var(--gutter) * 2);
   }
 }
 
 .errorBlock {
-  margin-top: $spacing;
-  background: $grey;
+  margin-top: var(--spacing);
+  background: var(--grey);
   padding: 20px;
-  margin-top: #{$spacing * 4};
+  margin-top: calc(var(--gutter) * 4);
 
   code {
     color: red;

@@ -1,4 +1,3 @@
-@import '../global/variables.module.scss';
 @import '../components/typography.module.scss';
 
 .discovery {
@@ -11,7 +10,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: $grey;
+    background: var(--grey);
     // min-height: 100vh;
 
     @media (min-width: $lg) {
@@ -20,7 +19,7 @@
 
     &:before {
       content: '';
-      background: rgba($grey, 0.2);
+      background: rgba(var(--grey), 0.2);
       top: 0;
       left: 0;
       width: 100%;
@@ -46,8 +45,8 @@
       content: '';
       background: linear-gradient(
         0deg,
-        rgba($black, 1) 0%,
-        rgba($black, 1) 20%,
+        rgba(#000, 1) 0%,
+        rgba(#000, 1) 20%,
         rgba(0, 0, 0, 0) 100%
       );
       position: absolute;
@@ -157,7 +156,7 @@
     }
 
     &:after {
-      background: rgba($black, 0.4);
+      background: rgba(#000, 0.4);
       height: 100%;
     }
   }
