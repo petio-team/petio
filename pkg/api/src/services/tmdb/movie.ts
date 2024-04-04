@@ -4,7 +4,7 @@ import axios, { AxiosResponse } from 'axios';
 
 import cache from "../cache/cache";
 import externalConfig from "@/config/env/external";
-import logger from '@/loaders/logger';
+import loggerMain from '@/loaders/logger';
 import fanartLookup from '@/services/fanart';
 import { lookup } from '@/services/meta/imdb';
 import onServer from '@/services/plex/server';
@@ -12,12 +12,19 @@ import getLanguage from '@/services/tmdb/languages';
 
 const agent = new http.Agent({ family: 4 });
 
+const logger = loggerMain.core.child({ label: 'tmdb.movie' });
+
 export async function movieLookup(id, minified = false) {
-  logger.debug(`TMDB Movie Lookup ${id}`, { label: 'tmdb.movie' });
+  logger.debug(`TMDB Movie Lookup ${id}`);
   if (!id || id === 'false') {
     return 'No ID';
   }
-  const fanart: any = minified ? false : await fanartLookup(id, 'movies');
+  let fanart: any;
+  try {
+    fanart = minified ? false : await fanartLookup(id, 'movies');
+  } catch (err) {
+    logger.error(`failed getting fanart data - ${id}`, err);
+  }
   let movie: any = false;
   let data: any;
   try {
@@ -154,10 +161,7 @@ export async function movieLookup(id, minified = false) {
 
       return movie;
     } catch (err) {
-      logger.warn(`Error processing movie data - ${id}`, {
-        label: 'tmdb.movie',
-      });
-      logger.error(err, { label: 'tmdb.movie' });
+      logger.error(`Error processing movie data - ${id}`, err);
       return { error: 'not found' };
     }
   }
@@ -203,34 +207,27 @@ async function getMovieData(id: number): Promise<MovieData | false> {
   try {
     data = await cache.wrap<MovieData | false>(`movie_data_${id}`, async () => tmdbData(id));
   } catch (err) {
-    logger.warn(`Error getting movie data - ${id}`, { label: 'tmdb.movie' });
-    logger.error(err, { label: 'tmdb.movie' });
+    logger.error(`failed getting movie data - ${id}`, err);
   }
   return data;
 }
 
-export async function getRecommendations(id, page = 1) {
+export async function getRecommendations(id: number, page = 1) {
   let data = false;
   try {
     data = await cache.wrap(`rec_${id}_${page}`, async () => recommendationData(id, page));
   } catch (err) {
-    logger.warn(`Error getting movie recommendations - ${id}`, {
-      label: 'tmdb.movie',
-    });
-    logger.error(err, { label: 'tmdb.movie' });
+    logger.error(`failed getting movie recommendations - ${id}`, err);
   }
   return data;
 }
 
-export async function getSimilar(id, page = 1) {
+export async function getSimilar(id: number, page = 1) {
   let data = false;
   try {
     data = await cache.wrap(`similar_${id}_${page}`, async () => similarData(id, page));
   } catch (err) {
-    logger.warn(`Error getting movie recommendations - ${id}`, {
-      label: 'tmdb.movie',
-    });
-    logger.error(err, { label: 'tmdb.movie' });
+    logger.error(`failed getting movie similar - ${id}`, err);
   }
   return data;
 }
@@ -240,8 +237,7 @@ async function getReviews(id: number): Promise<any> {
   try {
     data = await cache.wrap(`rev_${id}`, async () => reviewsData(id));
   } catch (err) {
-    logger.warn(`Error getting movie reviews - ${id}`, { label: 'tmdb.movie' });
-    logger.error(err, { label: 'tmdb.movie' });
+    logger.error(`failed getting movie reviews - ${id}`, err);
   }
   return data;
 }
@@ -251,10 +247,7 @@ async function getCollection(id: number): Promise<any> {
   try {
     data = await cache.wrap(`col_${id}`, async () => getCollectionData(id));
   } catch (err) {
-    logger.warn(`Error getting movie collections - ${id}`, {
-      label: 'tmdb.movie',
-    });
-    logger.error(err, { label: 'tmdb.movie' });
+    logger.error(`failed getting movie collections - ${id}`, err);
   }
   return data;
 }

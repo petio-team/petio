@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable no-restricted-syntax */
 import http from 'http';
 import axios from 'axios';
 
@@ -13,7 +15,7 @@ import getLanguage from '@/services/tmdb/languages';
 const agent = new http.Agent({ family: 4 });
 
 export async function showLookup(id, minified = false) {
-  if (!id || id == 'false') {
+  if (!id || id === 'false') {
     return 'No ID';
   }
   logger.debug(`TMDB Show Lookup ${id}`, {
@@ -38,12 +40,18 @@ export async function showLookup(id, minified = false) {
 
     try {
       let [
-        imdb_data,
+        // eslint-disable-next-line prefer-const
+        imdbData,
+        // eslint-disable-next-line prefer-const
         fanart,
         recommendations,
+        // eslint-disable-next-line prefer-const
         similar,
+        // eslint-disable-next-line prefer-const
         seasonsLookup,
+        // eslint-disable-next-line prefer-const
         reviews,
+        // eslint-disable-next-line prefer-const
         onPlex,
       ]: any = await Promise.all([
         !minified && external.imdb_id ? imdb(external.imdb_id) : false,
@@ -64,17 +72,17 @@ export async function showLookup(id, minified = false) {
         }
       }
 
-      show.imdb_data = imdb_data;
+      show.imdb_data = imdbData;
       show.imdb_id = external.imdb_id;
       show.tvdb_id = external.tvdb_id;
       show.on_server = onPlex.exists;
       show.videos = {
         results: [
           ...show.videos.results.filter(
-            (obj) => obj.type == 'Trailer' && obj.site == 'YouTube',
+            (obj: { type: string; site: string; }) => obj.type === 'Trailer' && obj.site === 'YouTube',
           ),
           ...show.videos.results.filter(
-            (obj) => obj.type == 'Teaser' && obj.site == 'YouTube',
+            (obj: { type: string; site: string; }) => obj.type === 'Teaser' && obj.site === 'YouTube',
           ),
         ],
       };
@@ -115,14 +123,14 @@ export async function showLookup(id, minified = false) {
         if (recommendations)
           Object.keys(recommendations.results).forEach((key) => {
             const recommendation = recommendations.results[key];
-            if (recommendation.id !== parseInt(id))
+            if (recommendation.id !== parseInt(id, 10))
               recommendationsData.push(recommendation.id);
           });
         if (similar)
           Object.keys(similar.results).forEach((key) => {
             const recommendation = similar.results[key];
             if (
-              recommendation.id !== parseInt(id) &&
+              recommendation.id !== parseInt(id, 10) &&
               !recommendationsData.includes(recommendation.id)
             )
               recommendationsData.push(recommendation.id);
@@ -172,6 +180,7 @@ export async function showLookup(id, minified = false) {
       return { error: 'not found' };
     }
   }
+  return { error: 'not found' };
 }
 export default showLookup;
 
@@ -208,10 +217,10 @@ export const getShowDetails = async (id: number) => {
         ? {
           results: [
             ...details.videos.results.filter(
-              (obj) => obj.type == 'Teaser' && obj.site == 'YouTube',
+              (obj) => obj.type === 'Teaser' && obj.site === 'YouTube',
             ),
             ...details.videos.results.filter(
-              (obj) => obj.type == 'Trailer' && obj.site == 'YouTube',
+              (obj) => obj.type === 'Trailer' && obj.site === 'YouTube',
             ),
           ],
         }
@@ -219,6 +228,7 @@ export const getShowDetails = async (id: number) => {
     };
   } catch (e) {
     logger.error(e);
+    return {};
   }
 };
 
