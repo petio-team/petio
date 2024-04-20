@@ -18,12 +18,14 @@ import inp from '../styles/components/input.module.scss';
 // import { useRouter } from 'next/router';
 import styles from '../styles/components/nav.module.scss';
 import typo from '../styles/components/typography.module.scss';
+import NavGenres from './navGenres';
 
 export default function Nav(props) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [mobile, setMobile] = useState(false);
   const [darken, setDarken] = useState(false);
+  const [genresOpen, setGenresOpen] = useState(false);
 
   const history = useHistory();
   const inputRef = useRef();
@@ -48,6 +50,10 @@ export default function Nav(props) {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  useEffect(() => {
+    setGenresOpen(false);
+  }, [history.location]);
 
   function updateSearch(e) {
     const val = e.target.value;
@@ -88,7 +94,9 @@ export default function Nav(props) {
       <div
         className={`${styles.nav} ${
           showSearch ? styles.nav__search_open : ''
-        } ${darken ? styles.nav__darken : ''}`}
+        } ${darken ? styles.nav__darken : ''} ${
+          genresOpen ? styles.nav__block : ''
+        }`}
       >
         <div className="container">
           <div className={styles.nav__inner}>
@@ -109,20 +117,36 @@ export default function Nav(props) {
                 <Link
                   to="/"
                   onClick={() => resetScrollPos('/')}
-                  className={`${typo.body} ${typo.bold}`}
+                  className={`${typo.body} ${typo.bold} ${styles.nav__item}`}
                 >
                   Movies &amp; TV
                 </Link>
-                <button className={`${typo.body} ${typo.bold}`}>Genres</button>
-                <Link to="/requests" className={`${typo.body} ${typo.bold}`}>
+                <button
+                  className={`${typo.body} ${typo.bold} ${styles.nav__item} ${
+                    genresOpen ? styles.nav__item__active : ''
+                  }`}
+                  onClick={() => setGenresOpen(!genresOpen)}
+                >
+                  Genres
+                </button>
+                <Link
+                  to="/requests"
+                  className={`${typo.body} ${typo.bold} ${styles.nav__item}`}
+                >
                   Requests
                 </Link>
-                <Link to="/my-account" className={`${typo.body} ${typo.bold}`}>
+                <Link
+                  to="/my-account"
+                  className={`${typo.body} ${typo.bold} ${styles.nav__item}`}
+                >
                   My Account
                 </Link>
                 {props.currentUser.role === 'admin' ||
                 props.currentUser.role === 'moderator' ? (
-                  <Link to="/admin" className={`${typo.body} ${typo.bold}`}>
+                  <Link
+                    to="/admin"
+                    className={`${typo.body} ${typo.bold} ${styles.nav__item}`}
+                  >
                     Admin
                   </Link>
                 ) : null}
@@ -169,7 +193,7 @@ export default function Nav(props) {
             to="/"
             onClick={() => resetScrollPos('/')}
             className={`${typo.xsmall} ${styles.mobile_nav__item} ${
-              history.location.pathname === '/'
+              history.location.pathname === '/' && !genresOpen
                 ? styles.mobile_nav__item__active
                 : ''
             }`}
@@ -179,7 +203,12 @@ export default function Nav(props) {
             </span>
             Movies &amp; TV
           </Link>
-          <button className={`${typo.xsmall} ${styles.mobile_nav__item}`}>
+          <button
+            className={`${typo.xsmall} ${styles.mobile_nav__item} ${
+              genresOpen ? styles.mobile_nav__item__active : ''
+            }`}
+            onClick={() => setGenresOpen(!genresOpen)}
+          >
             <span>
               <GenreIcon />
             </span>
@@ -188,7 +217,7 @@ export default function Nav(props) {
           <Link
             to="/requests"
             className={`${typo.xsmall} ${styles.mobile_nav__item} ${
-              history.location.pathname === '/requests'
+              history.location.pathname === '/requests' && !genresOpen
                 ? styles.mobile_nav__item__active
                 : ''
             }`}
@@ -201,7 +230,7 @@ export default function Nav(props) {
           <Link
             to="/my-account"
             className={`${typo.xsmall} ${styles.mobile_nav__item} ${
-              history.location.pathname === '/my-account'
+              history.location.pathname === '/my-account' && !genresOpen
                 ? styles.mobile_nav__item__active
                 : ''
             }`}
@@ -216,7 +245,7 @@ export default function Nav(props) {
             <Link
               to="/admin"
               className={`${typo.xsmall} ${styles.mobile_nav__item} ${
-                history.location.pathname === '/admin'
+                history.location.pathname === '/admin' && !genresOpen
                   ? styles.mobile_nav__item__active
                   : ''
               }`}
@@ -229,6 +258,7 @@ export default function Nav(props) {
           ) : null}
         </div>
       ) : null}
+      <NavGenres open={genresOpen} />
     </>
   );
 }

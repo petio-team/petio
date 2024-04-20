@@ -48,6 +48,17 @@
         opacity: 1;
       }
     }
+
+    @media (min-width: $lg) {
+      &__block {
+        background: var(--grey);
+
+        &:after {
+          transition: none;
+          opacity: 0;
+        }
+      }
+    }
   }
 
   @media (min-width: $xxxl) {
@@ -169,16 +180,19 @@
         outline: none !important;
         cursor: pointer;
       }
+    }
+  }
 
-      a,
-      button {
-        margin-right: 60px;
-        transition: color 0.3s ease;
+  &__item {
+    margin-right: 60px;
+    transition: color 0.3s ease;
 
-        &:hover {
-          color: var(--orange);
-        }
-      }
+    &:hover {
+      color: var(--orange);
+    }
+
+    &__active {
+      color: var(--orange) !important;
     }
   }
 
@@ -282,7 +296,7 @@
     }
 
     &__active {
-      color: var(--orange);
+      color: var(--orange) !important;
 
       span svg {
         fill: var(--orange);
@@ -312,6 +326,79 @@
     svg {
       fill: var(--white);
       width: 15px;
+    }
+  }
+}
+
+.genre_menu {
+  position: fixed;
+  bottom: 59px;
+  left: 0;
+  width: 100%;
+  z-index: 500;
+  pointer-events: none;
+  height: calc(100svh - 59px - 66px);
+  overflow-y: auto;
+
+  @media (min-width: $lg) {
+    padding-top: 91px;
+    top: 0;
+    bottom: initial;
+    border-bottom: solid 1px var(--grey-light-20);
+    height: auto;
+    overflow: initial;
+  }
+
+  @media (min-width: $xxxl) {
+    padding-top: 130px;
+  }
+
+  &__inner {
+    position: relative;
+    border-top: solid 1px var(--grey-light-20);
+    background: var(--grey);
+    pointer-events: all;
+  }
+
+  &__content {
+    // position: absolute;
+    // top: 0;
+    // left: 200px;
+    // width: calc(100% - 400px);
+    width: 100%;
+    padding: calc(var(--spacing) * 2) 0 calc(var(--spacing) * 4);
+    border-radius: 10px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: calc(var(--spacing) * 2);
+
+    @media (min-width: $lg) {
+      grid-template-columns: 1fr 1fr;
+      gap: calc(var(--spacing) * 2);
+    }
+  }
+
+  &__col {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: calc(var(--spacing) * 2);
+  }
+
+  &__links {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: calc(var(--spacing) * 1);
+
+    @media (min-width: $lg) {
+      grid-template-columns: 1fr 1fr 1fr;
+
+      a {
+        transition: color 0.3s ease;
+
+        &:hover {
+          color: var(--orange);
+        }
+      }
     }
   }
 }

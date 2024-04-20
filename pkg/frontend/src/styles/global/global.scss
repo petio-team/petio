@@ -25,6 +25,8 @@
   --blue: #006992;
   --blue-dark-10: color-mix(in srgb, var(--blue), #000 10%);
   --blue-dark-30: color-mix(in srgb, var(--blue), #000 30%);
+  --blue-light-10: color-mix(in srgb, var(--blue), #fff 10%);
+  --blue-light-30: color-mix(in srgb, var(--blue), #fff 30%);
   --purple: #8700c5;
   --purple-dark-30: color-mix(in srgb, var(--purple), #000 30%);
   --font: 'Montserrat', sans-serif;
@@ -94,6 +96,11 @@ h5,
 h6,
 p {
   margin: 0;
+  user-select: none;
+}
+
+img {
+  user-select: none;
 }
 
 hr {

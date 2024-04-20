@@ -10,7 +10,8 @@ import { Loading } from '../components/loading';
 import Meta from '../components/meta';
 import media from '../services/media.service';
 import hero from '../styles/components/hero.module.scss';
-import typo from '../styles/components/typography.module.scss';
+
+// import typo from '../styles/components/typography.module.scss';
 
 const mapStateToProps = (state) => {
   return {
@@ -93,9 +94,9 @@ function Home({
         <div className={hero.discovery}>
           <div className="container">
             <div className={hero.discovery__content}>
-              {redux_featured ? (
+              {/* {redux_featured ? (
                 <p className={typo.featured_title}>Featured Movie</p>
-              ) : null}
+              ) : null} */}
               {redux_featured ? (
                 <Link
                   to={`/movie/${redux_featured.id}`}
