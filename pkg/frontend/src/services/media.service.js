@@ -156,6 +156,38 @@ function getNetwork(id) {
   return get(`/show/network/${id}`);
 }
 
+async function genreLookup(type, page, params = {}, id) {
+  try {
+    const data = await post(`/${type}/discover`, { page, params });
+    if (type === 'movie') {
+      let movies = {};
+      data.results.forEach((movie) => {
+        if (movie.id) {
+          movies[movie.id] = movie;
+          movies[movie.id].ready = true;
+        }
+      });
+      updateStore({ type: 'media/store-movies', movies: movies });
+      updateStore({ type: 'media/store-genre-data', id: id, data: data });
+      return data;
+    } else if (type === 'show') {
+      let shows = {};
+      data.results.forEach((show) => {
+        if (show.id) {
+          shows[show.id] = show;
+          shows[show.id].ready = true;
+        }
+      });
+      updateStore({ type: 'media/store-shows', shows: shows });
+      updateStore({ type: 'media/store-genre-data', id: id, data: data });
+      return data;
+    }
+  } catch (e) {
+    console.log(e);
+    throw `Error getting ${type === 'movies' ? 'Movies' : 'Shows'}`;
+  }
+}
+
 async function lookup(type, page, params = {}) {
   try {
     // return post(`/${type}/discover`, { page, params });
@@ -321,6 +353,7 @@ export default {
   getDiscovery,
   getCompany,
   getNetwork,
+  genreLookup,
   lookup,
   searchUpdate,
   search,

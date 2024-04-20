@@ -31,15 +31,14 @@ import Admin from './admin/index';
 // Pages
 import Home from './index';
 import Movie from './movie/[pid]';
-import MovieGenre from './movie/genre/[pid]';
 import Studio from './movie/studio/[pid]';
+import Genre from './multi/genre/[pid]';
 import MyAccount from './myAccount';
 import People from './people/[pid]';
 import Requests from './requests';
 import Search from './search';
 import Setup from './setup';
 import Show from './tv/[pid]';
-import ShowGenre from './tv/genre/[pid]';
 import Network from './tv/network/[pid]';
 
 const mapStateToProps = (state) => {
@@ -333,7 +332,8 @@ function Petio({ redux_pos }) {
               />
             </Route>
             <Route exact path="/movie/genre/:pid">
-              <MovieGenre
+              <Genre
+                type="movie"
                 currentUser={currentUser}
                 config={globalConfig}
                 newNotification={newNotification}
@@ -362,7 +362,8 @@ function Petio({ redux_pos }) {
               />
             </Route>
             <Route exact path="/tv/genre/:pid">
-              <ShowGenre
+              <Genre
+                type="tv"
                 currentUser={currentUser}
                 config={globalConfig}
                 newNotification={newNotification}

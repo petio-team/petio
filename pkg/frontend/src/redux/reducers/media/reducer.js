@@ -8,6 +8,7 @@ export default function (
       movies: [],
       tv: [],
     },
+    genreData: {},
     searchQuery: '',
     searchResults: false,
     featured: false,
@@ -91,6 +92,21 @@ export default function (
       return {
         ...state,
         searchResults: action.data,
+      };
+    case 'media/store-genre-data':
+      return {
+        ...state,
+        genreData: {
+          ...state.genreData,
+          [action.id]: {
+            ...state.genreData[action.id],
+            page: action.data.page,
+            totalPages: action.data.total_pages,
+            results: state.genreData[action.id]
+              ? [...state.genreData[action.id].results, ...action.data.results]
+              : action.data.results,
+          },
+        },
       };
     default:
       return state;

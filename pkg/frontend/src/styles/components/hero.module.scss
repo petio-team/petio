@@ -45,8 +45,8 @@
       content: '';
       background: linear-gradient(
         0deg,
-        rgba(#000, 1) 0%,
-        rgba(#000, 1) 20%,
+        var(--black) 0%,
+        var(--black) 20%,
         rgba(0, 0, 0, 0) 100%
       );
       position: absolute;

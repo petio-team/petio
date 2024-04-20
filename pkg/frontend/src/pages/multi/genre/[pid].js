@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { connect } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
 import NotFound from '../../404';
@@ -11,27 +12,46 @@ import hero from '../../../styles/components/hero.module.scss';
 import typo from '../../../styles/components/typography.module.scss';
 import styles from '../../../styles/views/genre.module.scss';
 
-export default function Genre({ newNotification }) {
+const mapStateToProps = (state) => {
+  return {
+    redux_genreData: state.media.genreData,
+  };
+};
+
+function Genre({ type, newNotification, redux_genreData }) {
   const [genreName, setGenreName] = useState('');
-  const [shows, setShows] = useState(false);
+  // const [movies, setMovies] = useState(false);
   const [total, setTotal] = useState(1);
-  const [featuredShow, setfeaturedShow] = useState(false);
+  const [featuredMovie, setFeaturedMovie] = useState(false);
   const { pid } = useParams();
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [query, setQuery] = useState(null);
+  const genreData = redux_genreData[pid] || null;
+
+  console.log(genreData);
+
+  useEffect(() => {
+    if (genreData) {
+      if (genreData.results) setFeaturedMovie(genreData.results[0]);
+      setPage(genreData.page);
+      setTotal(genreData.total_pages);
+    }
+  }, [genreData]);
 
   useEffect(() => {
     async function getGenreDetails() {
       try {
-        const genreMatch = matchGenre('tv', pid);
+        const genreMatch = matchGenre(type, pid);
         if (!genreMatch || !genreMatch.query) throw 'not found';
         setGenreName(genreMatch.name);
         setQuery(genreMatch.query);
-        const showsLookup = await media.lookup('show', 1, genreMatch.query);
-        setShows(showsLookup.results);
-        setTotal(showsLookup.totalPages);
-        setfeaturedShow(showsLookup.results[0]);
+        await media.genreLookup(
+          type === 'tv' ? 'show' : type,
+          1,
+          genreMatch.query,
+          pid,
+        );
       } catch (e) {
         console.log(e);
         setGenreName('error');
@@ -39,15 +59,18 @@ export default function Genre({ newNotification }) {
     }
 
     getGenreDetails();
-  }, [pid]);
+  }, [pid, type]);
 
   useEffect(() => {
     async function loadMore() {
       if (loadingMore || !query || page === total) return;
       setLoadingMore(true);
-      const showsLookup = await media.lookup('show', page + 1, query);
-      setShows([...shows, ...showsLookup.results]);
-      setPage(page + 1);
+      await media.genreLookup(
+        type === 'tv' ? 'show' : type,
+        page + 1,
+        query,
+        pid,
+      );
       setLoadingMore(false);
     }
 
@@ -66,13 +89,13 @@ export default function Genre({ newNotification }) {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [loadingMore, query, page, total, shows]);
+  }, [loadingMore, query, page, total, pid, type]);
 
   if (genreName === 'error') return <NotFound />;
 
   return (
-    <div className={styles.wrap} key={`genre_single_show_${pid}`}>
-      {!genreName ? (
+    <div className={styles.wrap} key={`genre_single_${pid}`}>
+      {!genreData ? (
         <>
           <Meta title="Loading" />
           <div className={`${hero.discovery} ${hero.genre}`}>
@@ -81,11 +104,26 @@ export default function Genre({ newNotification }) {
                 className={`${hero.discovery__content} ${hero.genre__content}`}
               >
                 <div className={hero.genre__title}>
-                  <p className={`${typo.xltitle} ${typo.bold}`}>Loading</p>
+                  <p className={`${typo.xltitle} ${typo.bold}`}>
+                    {genreName
+                      ? `${genreName} ${type === 'movie' ? 'Movies' : 'Shows'}`
+                      : ' '}
+                  </p>
                 </div>
               </div>
             </div>
           </div>
+          <Grid
+            title={
+              genreName
+                ? `${genreName} ${type === 'movie' ? 'Movies' : 'Shows'}`
+                : ' '
+            }
+            type="movie"
+            key={`genre_${pid}_${type}`}
+            id={`genre_${pid}_${type}`}
+            newNotification={newNotification}
+          />
         </>
       ) : (
         <>
@@ -97,26 +135,26 @@ export default function Genre({ newNotification }) {
               >
                 <div className={hero.genre__title}>
                   <p className={`${typo.xltitle} ${typo.bold}`}>
-                    {genreName} TV
+                    {genreName} {type === 'movie' ? 'Movies' : 'Shows'}
                   </p>
                 </div>
               </div>
             </div>
             <div className={hero.genre__background}>
-              {featuredShow ? (
+              {featuredMovie ? (
                 <Hero
                   className={hero.discovery__image}
-                  image={featuredShow.backdrop_path}
+                  image={featuredMovie.backdrop_path}
                 />
               ) : null}
             </div>
           </div>
           <Grid
-            title={`${genreName} Shows`}
-            data={shows}
-            type="tv"
-            key={`genre_${pid}_shows`}
-            id={`genre_${pid}_shows`}
+            title={`${genreName} ${type === 'movie' ? 'Movies' : 'Shows'}`}
+            data={genreData.results}
+            type={type}
+            key={`genre_${pid}_${type}`}
+            id={`genre_${pid}_${type}`}
             newNotification={newNotification}
           />
         </>
@@ -124,3 +162,5 @@ export default function Genre({ newNotification }) {
     </div>
   );
 }
+
+export default connect(mapStateToProps)(Genre);
