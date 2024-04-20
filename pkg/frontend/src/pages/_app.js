@@ -31,7 +31,7 @@ import Admin from './admin/index';
 // Pages
 import Home from './index';
 import Movie from './movie/[pid]';
-import Studio from './movie/studio/[pid]';
+import Company from './multi/company/[pid]';
 import Genre from './multi/genre/[pid]';
 import MyAccount from './myAccount';
 import People from './people/[pid]';
@@ -39,7 +39,6 @@ import Requests from './requests';
 import Search from './search';
 import Setup from './setup';
 import Show from './tv/[pid]';
-import Network from './tv/network/[pid]';
 
 const mapStateToProps = (state) => {
   return {
@@ -340,10 +339,11 @@ function Petio({ redux_pos }) {
               />
             </Route>
             <Route exact path="/movie/studio/:pid">
-              <Studio
+              <Company
                 currentUser={currentUser}
                 config={globalConfig}
                 newNotification={newNotification}
+                type="studio"
               />
             </Route>
             <Route exact path="/people/:pid">
@@ -370,10 +370,11 @@ function Petio({ redux_pos }) {
               />
             </Route>
             <Route exact path="/tv/network/:pid">
-              <Network
+              <Company
                 currentUser={currentUser}
                 config={globalConfig}
                 newNotification={newNotification}
+                type="network"
               />
             </Route>
             <Route exact path="/search">

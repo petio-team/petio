@@ -25,7 +25,7 @@ export default function ReviewButtons({
   }
 
   function isReviewed() {
-    if (redux_reviews && redux_reviews.length > 0 && currentUser) {
+    if (data && redux_reviews && redux_reviews.length > 0 && currentUser) {
       const review = redux_reviews.filter((r) => {
         return r.tmdb_id === data.id.toString() && r.user === currentUser.id;
       });

@@ -48,6 +48,7 @@ function Movie({
   const { pid } = useParams();
   const movieData = redux_movies[pid];
   const [collection, setCollection] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     function handleResize() {
@@ -89,9 +90,10 @@ function Movie({
   useEffect(() => {
     async function getMovieDetails() {
       try {
-        media.getMovie(pid);
+        await media.getMovie(pid);
         getReviews();
       } catch (e) {
+        setError(true);
         console.log(e);
       }
     }
@@ -205,7 +207,7 @@ function Movie({
     }
   }
 
-  if (movieData === 'error') {
+  if (error) {
     return <NotFound />;
   }
 

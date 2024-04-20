@@ -45,6 +45,7 @@ function Tv({
   const [mobile, setMobile] = useState(false);
   const [trailer, setTrailer] = useState(false);
   const [issuesOpen, setIssuesOpen] = useState(false);
+  const [error, setError] = useState(false);
   const { pid } = useParams();
   const tvData = redux_tv[pid];
 
@@ -61,8 +62,9 @@ function Tv({
   useEffect(() => {
     async function getTvDetails() {
       try {
-        media.getTv(pid);
+        await media.getTv(pid);
       } catch (e) {
+        setError(true);
         console.log(e);
       }
     }
@@ -182,7 +184,7 @@ function Tv({
     }
   }
 
-  if (tvData === 'error') {
+  if (error) {
     return <NotFound />;
   }
 

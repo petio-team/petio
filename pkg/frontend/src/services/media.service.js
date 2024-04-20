@@ -73,7 +73,7 @@ async function getMovie(id, minified = false, noextras = false) {
     return data;
   } catch (e) {
     updateStore({
-      type: 'media/store-shows',
+      type: 'media/store-movies',
       shows: { [id]: 'error' },
     });
     throw e;
@@ -146,14 +146,18 @@ async function getPerson(id) {
   }
 }
 
-function getCompany(id) {
+async function getStudio(id) {
   if (!id) throw 'No ID';
-  return get(`/movie/company/${id}`);
+  const data = await get(`/movie/studio/${id}`);
+  updateStore({ type: 'media/store-studio', data: data, id: id });
+  return data;
 }
 
-function getNetwork(id) {
+async function getNetwork(id) {
   if (!id) throw 'No ID';
-  return get(`/show/network/${id}`);
+  const data = await get(`/show/network/${id}`);
+  updateStore({ type: 'media/store-network', data: data, id: id });
+  return data;
 }
 
 async function genreLookup(type, page, params = {}, id) {
@@ -168,7 +172,12 @@ async function genreLookup(type, page, params = {}, id) {
         }
       });
       updateStore({ type: 'media/store-movies', movies: movies });
-      updateStore({ type: 'media/store-genre-data', id: id, data: data });
+      updateStore({
+        type: 'media/store-genre-data',
+        id: id,
+        data: data,
+        mediaType: 'movies',
+      });
       return data;
     } else if (type === 'show') {
       let shows = {};
@@ -179,11 +188,58 @@ async function genreLookup(type, page, params = {}, id) {
         }
       });
       updateStore({ type: 'media/store-shows', shows: shows });
-      updateStore({ type: 'media/store-genre-data', id: id, data: data });
+      updateStore({
+        type: 'media/store-genre-data',
+        id: id,
+        data: data,
+        mediaType: 'tv',
+      });
       return data;
     }
   } catch (e) {
     console.log(e);
+    throw `Error getting ${type === 'movies' ? 'Movies' : 'Shows'}`;
+  }
+}
+
+async function companyLookup(type, page, id) {
+  try {
+    if (type === 'studio') {
+      const data = await post(`/movie/discover`, {
+        page,
+        params: {
+          with_companies: id,
+        },
+      });
+      let movies = {};
+      data.results.forEach((movie) => {
+        if (movie.id) {
+          movies[movie.id] = movie;
+          movies[movie.id].ready = true;
+        }
+      });
+      updateStore({ type: 'media/store-movies', movies: movies });
+      updateStore({ type: 'media/store-studio-results', id: id, data: data });
+      return data;
+    } else if (type === 'network') {
+      const data = await post(`/show/discover`, {
+        page,
+        params: {
+          with_networks: id,
+        },
+      });
+      let shows = {};
+      data.results.forEach((show) => {
+        if (show.id) {
+          shows[show.id] = show;
+          shows[show.id].ready = true;
+        }
+      });
+      updateStore({ type: 'media/store-shows', shows: shows });
+      updateStore({ type: 'media/store-network-results', id: id, data: data });
+      return data;
+    }
+  } catch (e) {
     throw `Error getting ${type === 'movies' ? 'Movies' : 'Shows'}`;
   }
 }
@@ -351,9 +407,10 @@ export default {
   getTv,
   getPerson,
   getDiscovery,
-  getCompany,
+  getStudio,
   getNetwork,
   genreLookup,
+  companyLookup,
   lookup,
   searchUpdate,
   search,

@@ -8,7 +8,14 @@ export default function (
       movies: [],
       tv: [],
     },
-    genreData: {},
+    genreData: {
+      movies: {},
+      tv: {},
+    },
+    studios: {},
+    studioData: {},
+    networks: {},
+    networkData: {},
     searchQuery: '',
     searchResults: false,
     featured: false,
@@ -98,12 +105,67 @@ export default function (
         ...state,
         genreData: {
           ...state.genreData,
+          [action.mediaType]: {
+            ...state.genreData[action.type],
+            [action.id]: {
+              ...state.genreData[action.mediaType][action.id],
+              page: action.data.page,
+              totalPages: action.data.total_pages,
+              results: state.genreData[action.mediaType][action.id]
+                ? [
+                    ...state.genreData[action.mediaType][action.id].results,
+                    ...action.data.results,
+                  ]
+                : action.data.results,
+            },
+          },
+        },
+      };
+    case 'media/store-studio':
+      return {
+        ...state,
+        studios: {
+          ...state.studios,
+          [action.id]: action.data,
+        },
+      };
+    case 'media/store-network':
+      return {
+        ...state,
+        networks: {
+          ...state.networks,
+          [action.id]: action.data,
+        },
+      };
+    case 'media/store-studio-results':
+      return {
+        ...state,
+        studioData: {
+          ...state.studioData,
           [action.id]: {
-            ...state.genreData[action.id],
+            ...state.studioData[action.id],
             page: action.data.page,
             totalPages: action.data.total_pages,
-            results: state.genreData[action.id]
-              ? [...state.genreData[action.id].results, ...action.data.results]
+            results: state.studioData[action.id]
+              ? [...state.studioData[action.id].results, ...action.data.results]
+              : action.data.results,
+          },
+        },
+      };
+    case 'media/store-network-results':
+      return {
+        ...state,
+        networkData: {
+          ...state.networkData,
+          [action.id]: {
+            ...state.networkData[action.id],
+            page: action.data.page,
+            totalPages: action.data.total_pages,
+            results: state.networkData[action.id]
+              ? [
+                  ...state.networkData[action.id].results,
+                  ...action.data.results,
+                ]
               : action.data.results,
           },
         },

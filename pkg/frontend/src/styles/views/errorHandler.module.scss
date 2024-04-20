@@ -8,7 +8,7 @@
   }
 
   p {
-    margin-top: calc(var(--gutter) * 2);
+    margin-top: calc(var(--spacing) * 2);
   }
 }
 
@@ -16,7 +16,7 @@
   margin-top: var(--spacing);
   background: var(--grey);
   padding: 20px;
-  margin-top: calc(var(--gutter) * 4);
+  margin-top: calc(var(--spacing) * 4);
 
   code {
     color: red;

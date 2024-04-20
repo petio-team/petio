@@ -26,9 +26,14 @@ export default function Network({ newNotification }) {
     async function getCoDetails() {
       try {
         const showData = await media.getNetwork(pid);
-        const tvLookup = await media.lookup('show', 1, {
-          with_networks: pid,
-        });
+        const tvLookup = await media.companyLookup(
+          'show',
+          1,
+          {
+            with_networks: pid,
+          },
+          pid,
+        );
         setCoData(showData);
         setShows(tvLookup.results);
         setTotal(tvLookup.totalPages);
@@ -49,7 +54,12 @@ export default function Network({ newNotification }) {
     async function loadMore() {
       if (loadingMore || !query || page === total) return;
       setLoadingMore(true);
-      const showsLookup = await media.lookup('show', page + 1, query);
+      const showsLookup = await media.companyLookup(
+        'show',
+        page + 1,
+        query,
+        pid,
+      );
       setShows([...shows, ...showsLookup.results]);
       setPage(page + 1);
       setLoadingMore(false);
@@ -70,7 +80,7 @@ export default function Network({ newNotification }) {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [loadingMore, query, page, total, shows]);
+  }, [loadingMore, query, page, total, shows, pid]);
 
   if (!coData) return <Loading />;
 

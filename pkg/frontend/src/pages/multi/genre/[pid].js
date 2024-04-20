@@ -22,16 +22,17 @@ function Genre({ type, newNotification, redux_genreData }) {
   const [genreName, setGenreName] = useState('');
   // const [movies, setMovies] = useState(false);
   const [total, setTotal] = useState(1);
-  const [featuredMovie, setFeaturedMovie] = useState(false);
+  const [featured, setFeatured] = useState(false);
   const { pid } = useParams();
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [query, setQuery] = useState(null);
-  const genreData = redux_genreData[pid] || null;
+  const mediaType = type === 'movie' ? 'movies' : 'tv';
+  const genreData = redux_genreData[mediaType][pid] || null;
 
   useEffect(() => {
     if (genreData) {
-      if (genreData.results) setFeaturedMovie(genreData.results[0]);
+      if (genreData.results) setFeatured(genreData.results[0]);
       setPage(genreData.page);
       setTotal(genreData.total_pages);
     }
@@ -139,10 +140,10 @@ function Genre({ type, newNotification, redux_genreData }) {
               </div>
             </div>
             <div className={hero.genre__background}>
-              {featuredMovie ? (
+              {featured ? (
                 <Hero
                   className={hero.discovery__image}
-                  image={featuredMovie.backdrop_path}
+                  image={featured.backdrop_path}
                 />
               ) : null}
             </div>
