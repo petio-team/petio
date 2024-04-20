@@ -52,7 +52,7 @@
 
   &__content {
     margin-top: var(--spacing);
-    margin-bottom: calc(var(--gutter) * 2);
+    margin-bottom: calc(var(--spacing) * 2);
     width: 100%;
     max-width: 550px;
 
@@ -62,8 +62,8 @@
 
     @media (min-width: $xxxl) {
       max-width: 1000px;
-      margin-top: calc(var(--gutter) * 2);
-      margin-bottom: calc(var(--gutter) * 4);
+      margin-top: calc(var(--spacing) * 2);
+      margin-bottom: calc(var(--spacing) * 4);
     }
   }
 
@@ -86,8 +86,8 @@
   &__credits {
     position: relative;
     z-index: 3;
-    padding-bottom: calc(var(--gutter) * 5);
-    margin-top: calc(var(--gutter) * 10);
+    padding-bottom: calc(var(--spacing) * 5);
+    margin-top: calc(var(--spacing) * 10);
     display: flex;
     justify-content: space-between;
 
@@ -112,7 +112,7 @@
     }
 
     span {
-      margin-right: calc(var(--gutter) * 2);
+      margin-right: calc(var(--spacing) * 2);
 
       a {
         transition: color 0.3s ease;
@@ -148,12 +148,12 @@
 
   &__request {
     display: flex;
-    margin-bottom: calc(var(--gutter) * 2);
+    margin-bottom: calc(var(--spacing) * 2);
     width: 100%;
 
     @media (min-width: $md) {
       margin-bottom: 0;
-      margin-right: calc(var(--gutter) * 4);
+      margin-right: calc(var(--spacing) * 4);
       width: auto;
     }
 
@@ -282,11 +282,11 @@
   }
 
   &__btn {
-    margin: 0 calc(var(--gutter) * 2) 0 0;
+    margin: 0 calc(var(--spacing) * 2) 0 0;
 
     @media (min-width: $lg) {
       margin-left: 0;
-      margin-right: calc(var(--gutter) * 2);
+      margin-right: calc(var(--spacing) * 2);
     }
 
     &__up {
@@ -315,10 +315,10 @@
 }
 
 .details {
-  margin: calc(var(--gutter) * 2) 0;
+  margin: calc(var(--spacing) * 2) 0;
 
   @media (min-width: $lg) {
-    margin: calc(var(--gutter) * 10) 0;
+    margin: calc(var(--spacing) * 10) 0;
   }
 
   &__content {
@@ -350,7 +350,7 @@
       }
 
       &__title {
-        margin-right: calc(var(--gutter) * 2);
+        margin-right: calc(var(--spacing) * 2);
       }
 
       @media (min-width: $md) {

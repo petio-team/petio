@@ -7,13 +7,13 @@
 
   @media (min-width: $lg) {
     margin-top: 0;
-    margin-left: calc(var(--gutter) * 2);
+    margin-left: calc(var(--spacing) * 2);
   }
 
   &__item {
     display: flex;
     align-items: center;
-    margin-right: calc(var(--gutter) * 2);
+    margin-right: calc(var(--spacing) * 2);
 
     p {
       margin-left: var(--spacing);
