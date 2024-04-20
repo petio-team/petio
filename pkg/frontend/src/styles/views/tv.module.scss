@@ -55,7 +55,7 @@
     &__inner {
       max-height: 50vh;
       overflow-y: auto;
-      padding: var(--spacing) calc(var(--gutter) * 2);
+      padding: var(--spacing) calc(var(--spacing) * 2);
     }
 
     &:before {
@@ -64,7 +64,7 @@
       height: 10px;
       position: absolute;
       top: -5px;
-      left: calc(var(--gutter) * 2);
+      left: calc(var(--spacing) * 2);
       transform: rotate(45deg);
       background: var(--grey);
       z-index: -1;
@@ -108,7 +108,7 @@
 
 .episode {
   width: calc(100% / 2);
-  padding: 0 var(--spacing) calc(var(--gutter) * 2) var(--spacing);
+  padding: 0 var(--spacing) calc(var(--spacing) * 2) var(--spacing);
 
   @media (min-width: $lg) {
     width: calc(100% / 3);
@@ -148,6 +148,7 @@
     border-radius: 2px;
     margin-bottom: var(--spacing);
     width: 100%;
+    background: var(--grey);
 
     img {
       position: absolute;
@@ -245,7 +246,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: calc(var(--gutter) * 2);
+  padding: calc(var(--spacing) * 2);
   white-space: initial !important;
   color: var(--orange);
   word-break: break-word;
