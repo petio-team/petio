@@ -2,15 +2,16 @@ import { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
-import { ReactComponent as AdminIcon } from '../assets/svg/admin.svg';
 import { ReactComponent as BackIcon } from '../assets/svg/back.svg';
 // import Image from 'next/image';
 // import Router from 'next/router';
 import { ReactComponent as Logo } from '../assets/svg/logo.svg';
-import { ReactComponent as MovieIcon } from '../assets/svg/movie.svg';
-import { ReactComponent as RequestIcon } from '../assets/svg/request.svg';
 import { ReactComponent as SearchIcon } from '../assets/svg/search.svg';
-import { ReactComponent as UserIcon } from '../assets/svg/user.svg';
+import { ReactComponent as UserIcon } from '../assets/svg/v1/account.svg';
+import { ReactComponent as AdminIcon } from '../assets/svg/v1/admin.svg';
+import { ReactComponent as GenreIcon } from '../assets/svg/v1/genres.svg';
+import { ReactComponent as MovieIcon } from '../assets/svg/v1/movie-tv.svg';
+import { ReactComponent as RequestIcon } from '../assets/svg/v1/requests.svg';
 import media from '../services/media.service';
 import { resetScrollPosition } from '../services/position.service';
 import inp from '../styles/components/input.module.scss';
@@ -112,6 +113,7 @@ export default function Nav(props) {
                 >
                   Movies &amp; TV
                 </Link>
+                <button className={`${typo.body} ${typo.bold}`}>Genres</button>
                 <Link to="/requests" className={`${typo.body} ${typo.bold}`}>
                   Requests
                 </Link>
@@ -177,6 +179,12 @@ export default function Nav(props) {
             </span>
             Movies &amp; TV
           </Link>
+          <button className={`${typo.xsmall} ${styles.mobile_nav__item}`}>
+            <span>
+              <GenreIcon />
+            </span>
+            Genres
+          </button>
           <Link
             to="/requests"
             className={`${typo.xsmall} ${styles.mobile_nav__item} ${

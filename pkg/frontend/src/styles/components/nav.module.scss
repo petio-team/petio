@@ -158,8 +158,20 @@
     display: none;
 
     @media (min-width: $lg) {
-      display: block;
-      a {
+      display: flex;
+
+      button {
+        appearance: none;
+        color: var(--white);
+        background: none;
+        padding: none;
+        border: none;
+        outline: none !important;
+        cursor: pointer;
+      }
+
+      a,
+      button {
         margin-right: 60px;
         transition: color 0.3s ease;
 
@@ -235,6 +247,16 @@
   justify-content: space-between;
   align-items: center;
 
+  button {
+    appearance: none;
+    padding: 0;
+    background: none;
+    border: none;
+    outline: none !important;
+    cursor: pointer;
+    color: var(--white);
+  }
+
   &__item {
     display: flex;
     justify-content: center;
@@ -242,13 +264,16 @@
     flex-direction: column;
 
     span {
-      display: block;
+      display: flex;
+      width: 30px;
+      height: 30px;
 
       svg {
         fill: var(--white);
-
-        height: 20px;
-        width: auto;
+        height: 100%;
+        width: 100%;
+        object-fit: contain;
+        object-position: center;
 
         path {
           fill: var(--white);

@@ -29,8 +29,6 @@ function Genre({ type, newNotification, redux_genreData }) {
   const [query, setQuery] = useState(null);
   const genreData = redux_genreData[pid] || null;
 
-  console.log(genreData);
-
   useEffect(() => {
     if (genreData) {
       if (genreData.results) setFeaturedMovie(genreData.results[0]);

@@ -6,7 +6,7 @@ import { Link, useParams } from 'react-router-dom';
 
 import NotFound from '../404';
 import { ReactComponent as IssueIcon } from '../../assets/svg/issue.svg';
-import { ReactComponent as TrailerIcon } from '../../assets/svg/trailer.svg';
+import { ReactComponent as TrailerIcon } from '../../assets/svg/v1/trailer.svg';
 import { ReactComponent as WatchlistIcon } from '../../assets/svg/watchlist.svg';
 import Carousel from '../../components/carousel';
 import Critics from '../../components/critics';
@@ -349,7 +349,7 @@ function Movie({
                       }`}
                       onClick={() => setTrailer(true)}
                     >
-                      <TrailerIcon viewBox="0 0 24 24" />
+                      <TrailerIcon />
                     </button>
                     <button
                       className={`${buttons.icon} ${styles.actions__btn} ${styles.actions__btn__disabled}`}
