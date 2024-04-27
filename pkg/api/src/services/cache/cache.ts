@@ -1,8 +1,14 @@
-import { caching, multiCaching, MemoryCache, Cache, MultiCache } from 'cache-manager';
-import MongooseStore from "../store/mongoose";
+import {
+  Cache,
+  MemoryCache,
+  MultiCache,
+  caching,
+  multiCaching,
+} from 'cache-manager';
 
-class CacheManager
-{
+import MongooseStore from '../store/mongoose';
+
+class CacheManager {
   // memoryCache represents an in memory cache store
   private memoryCache: Promise<MemoryCache>;
 
@@ -14,9 +20,7 @@ class CacheManager
       max: 1000,
       ttl: 3600,
     });
-    this.mongooseCache = caching(
-      new MongooseStore({}),
-    );
+    this.mongooseCache = caching(new MongooseStore({}));
   }
 
   private async cache(): Promise<MultiCache> {
@@ -30,23 +34,27 @@ class CacheManager
 
   public async set(key: string, value: unknown, ttl?: number): Promise<void> {
     const cache = await this.cache();
-    cache.set(key, value, ttl);
+    return cache.set(key, value, ttl);
   }
 
-  public async wrap<T>(key: string, fn: () => Promise<T>, ttl?: number): Promise<T> {
+  public async wrap<T>(
+    key: string,
+    fn: () => Promise<T>,
+    ttl?: number,
+  ): Promise<T> {
     const cache = await this.cache();
     return cache.wrap(key, fn, ttl);
   }
 
   public async reset(): Promise<void> {
     const cache = await this.cache();
-    cache.reset();
+    return cache.reset();
   }
 
   public async del(key: string): Promise<void> {
     const cache = await this.cache();
-    cache.del(key);
+    return cache.del(key);
   }
 }
 
-export default new CacheManager;
+export default new CacheManager();
