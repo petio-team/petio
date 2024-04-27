@@ -1,6 +1,5 @@
 import axios from 'axios';
-import Promise from 'bluebird';
-import { ObjectId } from 'mongodb';
+import Bluebird from 'bluebird';
 import xmlParser from 'xml-js';
 
 import externalConfig from '@/config/env/external';
@@ -52,7 +51,7 @@ export default class LibraryUpdate {
     }
     const matched = {};
 
-    await Promise.map(
+    await Bluebird.map(
       Object.keys(recent.Metadata),
       async (i) => {
         const obj = recent.Metadata[i];
@@ -670,6 +669,7 @@ export default class LibraryUpdate {
     } catch (err) {
       logger.error('CRON: Unable to get friends', err);
     }
+    return {};
   }
 
   async saveFriend(obj) {
@@ -688,9 +688,8 @@ export default class LibraryUpdate {
           obj.email && obj.email !== '' ? obj.email.toLowerCase() : undefined,
         thumbnail: obj.thumb ?? '',
         plexId: obj.id,
-        profileId: defaultProfile
-          ? new ObjectId(defaultProfile._id.toString())
-          : undefined,
+        // eslint-disable-next-line no-underscore-dangle
+        profileId: defaultProfile ? defaultProfile._id.toString() : undefined,
         role: UserRole.User,
         owner: false,
         custom: false,
@@ -700,8 +699,8 @@ export default class LibraryUpdate {
 
       const newUser = await CreateOrUpdateUser(user);
       logger.debug(`synced friend ${newUser.username}`);
-    } catch (e) {
-      logger.error('failed to save friend', err);
+    } catch (err) {
+      logger.error(err, 'failed to save friend');
     }
   }
 
@@ -850,31 +849,31 @@ export default class LibraryUpdate {
   }
 
   async deleteOld() {
-    const deleteMovies = await MovieModel.find({
-      petioTimestamp: { $ne: this.timestamp },
-    }).exec();
-    for (const i in deleteMovies) {
-      const deleteMovie = deleteMovies[i];
-      logger.warn(
-        `CRON: Deleting Movie - ${deleteMovie.title} - no longer found in Plex`,
-      );
-      await MovieModel.findOneAndRemove(
-        { _id: deleteMovie._id },
-        { useFindAndModify: false },
-      ).exec();
-    }
-    const deleteShows = await ShowModel.find({
-      petioTimestamp: { $ne: this.timestamp },
-    }).exec();
-    for (const i in deleteShows) {
-      const deleteShow = deleteShows[i];
-      logger.warn(
-        `CRON: Deleting TV Show - ${deleteShow.title} - no longer found in Plex`,
-      );
-      await ShowModel.findOneAndRemove(
-        { _id: deleteShow._id },
-        { useFindAndModify: false },
-      ).exec();
-    }
+    const [movies, shows] = await Bluebird.all([
+      MovieModel.find({
+        petioTimestamp: { $ne: this.timestamp },
+      }).exec(),
+      ShowModel.find({
+        petioTimestamp: { $ne: this.timestamp },
+      }).exec(),
+    ]);
+    await Bluebird.all([
+      Bluebird.map(movies, async (movie) => {
+        logger.warn(`deleting movie no longer found in plex: ${movie.title}`);
+        await MovieModel.findOneAndRemove(
+          // eslint-disable-next-line no-underscore-dangle
+          { _id: movie._id },
+          { useFindAndModify: false },
+        ).exec();
+      }),
+      Bluebird.map(shows, async (show) => {
+        logger.warn(`deleting show no longer found in plex: ${show.title}`);
+        await ShowModel.findOneAndRemove(
+          // eslint-disable-next-line no-underscore-dangle
+          { _id: show._id },
+          { useFindAndModify: false },
+        ).exec();
+      }),
+    ]);
   }
 }
