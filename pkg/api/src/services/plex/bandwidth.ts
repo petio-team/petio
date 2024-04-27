@@ -3,7 +3,7 @@ import axios from 'axios';
 import loggerMain from '@/loaders/logger';
 import MakePlexURL from '@/services/plex/util';
 
-const logger = loggerMain.core.child({ label: 'plex.bandwidth' });
+const logger = loggerMain.child({ label: 'plex.bandwidth' });
 
 function timeDifference(previous) {
   const now = new Date();
@@ -16,14 +16,14 @@ function timeDifference(previous) {
 
   if (elapsed < msPerMinute) {
     return `${Math.round(elapsed)}s`;
-  } if (elapsed < msPerHour) {
+  }
+  if (elapsed < msPerHour) {
     const minutes = Math.floor(elapsed / msPerMinute);
     const seconds = elapsed - minutes * 60;
     if (minutes === 2 && seconds > 1) return false;
     return `${minutes}m${seconds}s`;
   }
   return current;
-
 }
 
 export default async () => {

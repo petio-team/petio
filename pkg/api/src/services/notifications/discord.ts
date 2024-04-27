@@ -3,7 +3,7 @@ import axios from 'axios';
 import { config } from '@/config/index';
 import loggerMain from '@/loaders/logger';
 
-const logger = loggerMain.core.child({ label: 'notifications.discord' });
+const logger = loggerMain.child({ label: 'notifications.discord' });
 
 export default class Discord {
   webhook: any;

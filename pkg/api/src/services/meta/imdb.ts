@@ -1,14 +1,14 @@
+import axios from 'axios';
 import fs from 'fs';
+import lineReader from 'line-reader';
 import path from 'path';
 import zlib from 'zlib';
-import axios from 'axios';
-import lineReader from 'line-reader';
 
-import pathsConfig from "@/config/env/paths";
+import pathsConfig from '@/config/env/paths';
 import loggerMain from '@/loaders/logger';
 import Imdb from '@/models/imdb';
 
-const logger = loggerMain.core.child({ label: 'meta.imdb' });
+const logger = loggerMain.child({ label: 'meta.imdb' });
 
 export async function lookup(imdb_id) {
   if (!imdb_id) {

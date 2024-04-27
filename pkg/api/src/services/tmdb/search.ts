@@ -1,9 +1,9 @@
-import http from 'http';
 import axios from 'axios';
 import Promise from 'bluebird';
+import http from 'http';
 import sanitize from 'sanitize-filename';
 
-import externalConfig from "@/config/env/external";
+import externalConfig from '@/config/env/external';
 import { config } from '@/config/index';
 import loggerMain from '@/loaders/logger';
 import onServer from '@/services/plex/server';
@@ -12,7 +12,7 @@ import { showLookup } from '@/services/tmdb/show';
 
 const agent = new http.Agent({ family: 4 });
 
-const logger = loggerMain.core.child({ label: 'tmdb.search' });
+const logger = loggerMain.child({ label: 'tmdb.search' });
 
 async function search(term) {
   logger.debug(`TMDB Search ${term}`);

@@ -1,18 +1,19 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import http from 'http';
 import axios, { AxiosResponse } from 'axios';
+import http from 'http';
 
-import cache from "../cache/cache";
-import externalConfig from "@/config/env/external";
+import externalConfig from '@/config/env/external';
 import loggerMain from '@/loaders/logger';
 import fanartLookup from '@/services/fanart';
 import { lookup } from '@/services/meta/imdb';
 import onServer from '@/services/plex/server';
 import getLanguage from '@/services/tmdb/languages';
 
+import cache from '../cache/cache';
+
 const agent = new http.Agent({ family: 4 });
 
-const logger = loggerMain.core.child({ label: 'tmdb.movie' });
+const logger = loggerMain.child({ label: 'tmdb.movie' });
 
 export async function movieLookup(id, minified = false) {
   logger.debug(`TMDB Movie Lookup ${id}`);
@@ -120,18 +121,18 @@ export async function movieLookup(id, minified = false) {
       movie.keywords = movie.keywords.keywords;
       movie.videos = {
         results: [
-          ...(movie.videos.results as Array<{
-            type: string;
-            site: string;
-          }>).filter(
-            (obj) => obj.type === 'Trailer' && obj.site === 'YouTube',
-          ),
-          ...(movie.videos.results as Array<{
-            type: string;
-            site: string;
-          }>).filter(
-            (obj) => obj.type === 'Teaser' && obj.site === 'YouTube',
-          ),
+          ...(
+            movie.videos.results as Array<{
+              type: string;
+              site: string;
+            }>
+          ).filter((obj) => obj.type === 'Trailer' && obj.site === 'YouTube'),
+          ...(
+            movie.videos.results as Array<{
+              type: string;
+              site: string;
+            }>
+          ).filter((obj) => obj.type === 'Teaser' && obj.site === 'YouTube'),
         ],
       };
       delete movie.production_countries;
@@ -205,7 +206,9 @@ interface MovieData {
 async function getMovieData(id: number): Promise<MovieData | false> {
   let data: MovieData | false = false;
   try {
-    data = await cache.wrap<MovieData | false>(`movie_data_${id}`, async () => tmdbData(id));
+    data = await cache.wrap<MovieData | false>(`movie_data_${id}`, async () =>
+      tmdbData(id),
+    );
   } catch (err) {
     logger.error(`failed getting movie data - ${id}`, err);
   }
@@ -215,7 +218,9 @@ async function getMovieData(id: number): Promise<MovieData | false> {
 export async function getRecommendations(id: number, page = 1) {
   let data = false;
   try {
-    data = await cache.wrap(`rec_${id}_${page}`, async () => recommendationData(id, page));
+    data = await cache.wrap(`rec_${id}_${page}`, async () =>
+      recommendationData(id, page),
+    );
   } catch (err) {
     logger.error(`failed getting movie recommendations - ${id}`, err);
   }
@@ -225,7 +230,9 @@ export async function getRecommendations(id: number, page = 1) {
 export async function getSimilar(id: number, page = 1) {
   let data = false;
   try {
-    data = await cache.wrap(`similar_${id}_${page}`, async () => similarData(id, page));
+    data = await cache.wrap(`similar_${id}_${page}`, async () =>
+      similarData(id, page),
+    );
   } catch (err) {
     logger.error(`failed getting movie similar - ${id}`, err);
   }
@@ -296,7 +303,7 @@ async function reviewsData(id: number): Promise<any> {
 }
 
 // Lets i18n this soon
-function findEnLogo(logos: { lang: string; url: string; }[]): string | false {
+function findEnLogo(logos: { lang: string; url: string }[]): string | false {
   let logoUrl: string | false = false;
   logos.forEach((logo) => {
     // For some reason fanart defaults to this obscure logo sometimes so lets exclude it
@@ -304,9 +311,9 @@ function findEnLogo(logos: { lang: string; url: string; }[]): string | false {
       logo.lang === 'en' &&
       !logoUrl &&
       logo.url !==
-      'https://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png' &&
+        'https://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png' &&
       logo.url !==
-      'http://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png'
+        'http://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png'
     ) {
       logoUrl = logo.url;
     }
@@ -316,7 +323,9 @@ function findEnLogo(logos: { lang: string; url: string; }[]): string | false {
 }
 
 // Lets i18n this soon
-function findEnRating(data: { iso_3166_1: string; release_dates: { certification: string; }[]; }[]): string | false {
+function findEnRating(
+  data: { iso_3166_1: string; release_dates: { certification: string }[] }[],
+): string | false {
   let rating: string | false = false;
   data.forEach((item) => {
     if (item.iso_3166_1 === 'US') {
@@ -353,6 +362,8 @@ interface CompanyData {
 export async function company(id: number): Promise<CompanyData> {
   const tmdb = 'https://api.themoviedb.org/3/';
   const url = `${tmdb}company/${id}?api_key=${externalConfig.tmdbApiKey}`;
-  const res: AxiosResponse<CompanyData> = await axios.get(url, { httpAgent: agent });
+  const res: AxiosResponse<CompanyData> = await axios.get(url, {
+    httpAgent: agent,
+  });
   return res.data;
 }

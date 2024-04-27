@@ -1,18 +1,21 @@
-import cache from "../cache/cache";
 import { FanartAPI } from '@/infra/fanart/api';
 import loggerMain from '@/loaders/logger';
 
-const logger = loggerMain.core.child({ label: 'fanart.index' });
+import cache from '../cache/cache';
+
+const logger = loggerMain.child({ label: 'fanart.index' });
 
 export default async (id: string, type: any) => {
   let data: any = {};
   try {
-    data = cache.wrap(id, async () => FanartAPI.get('/:type/:id', {
-      params: {
-        id,
-        type,
-      },
-    }));
+    data = cache.wrap(id, async () =>
+      FanartAPI.get('/:type/:id', {
+        params: {
+          id,
+          type,
+        },
+      }),
+    );
   } catch (err) {
     logger.error(`failed to get fanart for ${id} (${type})`, err);
   }

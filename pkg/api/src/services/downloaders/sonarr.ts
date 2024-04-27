@@ -9,7 +9,7 @@ import {
 } from '@/models/downloaders';
 import Request from '@/models/request';
 
-const logger = loggerMain.core.child({ label: 'downloaders.sonarr' });
+const logger = loggerMain.child({ label: 'downloaders.sonarr' });
 
 export default class Sonarr {
   instance: IDownloader;
@@ -82,37 +82,59 @@ export default class Sonarr {
       }
     }
 
-    result.qualityProfileId = parseInt(filter && filter.profile ? filter.profile : this.instance.profile.id, 10);
+    result.qualityProfileId = parseInt(
+      filter && filter.profile ? filter.profile : this.instance.profile.id,
+      10,
+    );
 
     result.seasonFolder = true;
-    result.rootFolderPath = `${filter && filter.path ? filter.path : this.instance.path.location}`;
+    result.rootFolderPath = `${
+      filter && filter.path ? filter.path : this.instance.path.location
+    }`;
     result.addOptions = {
       searchForMissingEpisodes: true,
     };
-    result.languageProfileId = parseInt(filter && filter.language ? filter.language : this.instance.language.id, 10);
+    result.languageProfileId = parseInt(
+      filter && filter.language ? filter.language : this.instance.language.id,
+      10,
+    );
     if (filter && filter.type) result.seriesType = filter.type;
     if (filter && filter.tag) result.tags = [parseInt(filter.tag, 10)];
 
     if (result.id) {
       sonarrId = result.id;
-      logger.debug(`SERVICE - SONARR: Request exists - Updating ${request.title}`);
+      logger.debug(
+        `SERVICE - SONARR: Request exists - Updating ${request.title}`,
+      );
       try {
         await this.client.UpdateSeriesById(result.id, result);
-        logger.debug(`SERVICE - SONARR: [${this.instance.name}] Sonnar job updated for ${request.title}`);
+        logger.debug(
+          `SERVICE - SONARR: [${this.instance.name}] Sonnar job updated for ${request.title}`,
+        );
       } catch (err) {
-        logger.error(`SERVICE - SONARR: [${this.instance.name}] Unable to update series`, err);
+        logger.error(
+          `SERVICE - SONARR: [${this.instance.name}] Unable to update series`,
+          err,
+        );
         return;
       }
     } else {
       try {
         const add = await this.client.CreateSeries(result);
         if (!add.added) {
-          logger.error(`failed to add series (${result.id}) to sonarr instance (${this.instance.name})`);
+          logger.error(
+            `failed to add series (${result.id}) to sonarr instance (${this.instance.name})`,
+          );
         }
-        logger.debug(`SERVICE - SONARR: [${this.instance.name}] Sonnar job added for ${request.title}`);
+        logger.debug(
+          `SERVICE - SONARR: [${this.instance.name}] Sonnar job added for ${request.title}`,
+        );
         sonarrId = add.id;
       } catch (err) {
-        logger.error(`SERVICE - SONARR: [${this.instance.name}] Unable to add series`, err);
+        logger.error(
+          `SERVICE - SONARR: [${this.instance.name}] Unable to add series`,
+          err,
+        );
         return;
       }
     }
@@ -121,7 +143,9 @@ export default class Sonarr {
         requestId: request.id,
       }).exec();
       if (!dbRequest) {
-        logger.debug(`SERVICE - SONARR: [${this.instance.name}] No request found with id ${request.id}`);
+        logger.debug(
+          `SERVICE - SONARR: [${this.instance.name}] No request found with id ${request.id}`,
+        );
         return;
       }
 

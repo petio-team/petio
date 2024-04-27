@@ -12,7 +12,7 @@ import Telegram from '@/services/notifications/telegram';
 import filter from '@/services/requests/filter';
 import { showLookup } from '@/services/tmdb/show';
 
-const logger = loggerMain.core.child({ label: 'requests.process' });
+const logger = loggerMain.child({ label: 'requests.process' });
 
 export default class ProcessRequest {
   request: any;
@@ -74,7 +74,9 @@ export default class ProcessRequest {
     return out;
   }
 
-  async existing(): Promise<{ message: string; user: string; request: any; } | undefined> {
+  async existing(): Promise<
+    { message: string; user: string; request: any } | undefined
+  > {
     if (!this.user) {
       throw new Error('user required');
     }
@@ -197,7 +199,9 @@ export default class ProcessRequest {
     const pending: any = {};
     const filterMatch: any = await filter(this.request);
     if (filterMatch) {
-      logger.info('REQ: Pending Request Matched on custom filter, setting default');
+      logger.info(
+        'REQ: Pending Request Matched on custom filter, setting default',
+      );
       // eslint-disable-next-line no-restricted-syntax
       for (const [k, _v] of filterMatch) {
         const matchedFilter = filterMatch[k];
@@ -350,7 +354,9 @@ export default class ProcessRequest {
           const server = new Radarr(instance);
           try {
             await server.getClient().DeleteMovie(rId);
-            logger.info(`REQ: ${this.request.title} removed from Radarr server - ${serverUuid}`);
+            logger.info(
+              `REQ: ${this.request.title} removed from Radarr server - ${serverUuid}`,
+            );
           } catch (err) {
             logger.error(`REQ: Error unable to remove from Radarr`, err);
           }
@@ -369,7 +375,9 @@ export default class ProcessRequest {
 
           try {
             await new Sonarr(instance).remove(sId);
-            logger.info(`REQ: ${this.request.title} removed from Sonarr server - ${serverUuid}`);
+            logger.info(
+              `REQ: ${this.request.title} removed from Sonarr server - ${serverUuid}`,
+            );
           } catch (err) {
             logger.error(`REQ: Error unable to remove from Sonarr`, err);
           }

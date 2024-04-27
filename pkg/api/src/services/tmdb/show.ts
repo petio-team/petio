@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-/* eslint-disable no-restricted-syntax */
-import http from 'http';
-import axios from 'axios';
 
-import cache from "../cache/cache";
-import externalConfig from "@/config/env/external";
+/* eslint-disable no-restricted-syntax */
+import axios from 'axios';
+import http from 'http';
+
+import externalConfig from '@/config/env/external';
 import { TMDBAPI } from '@/infra/tmdb/tmdb';
 import loggerMain from '@/loaders/logger';
 import fanartLookup from '@/services/fanart';
@@ -12,9 +12,11 @@ import { lookup as imdb } from '@/services/meta/imdb';
 import onServer from '@/services/plex/server';
 import getLanguage from '@/services/tmdb/languages';
 
+import cache from '../cache/cache';
+
 const agent = new http.Agent({ family: 4 });
 
-const logger = loggerMain.core.child({ label: 'tmdb.show' });
+const logger = loggerMain.child({ label: 'tmdb.show' });
 
 export async function showLookup(id, minified = false) {
   if (!id || id === 'false') {
@@ -79,10 +81,12 @@ export async function showLookup(id, minified = false) {
       show.videos = {
         results: [
           ...show.videos.results.filter(
-            (obj: { type: string; site: string; }) => obj.type === 'Trailer' && obj.site === 'YouTube',
+            (obj: { type: string; site: string }) =>
+              obj.type === 'Trailer' && obj.site === 'YouTube',
           ),
           ...show.videos.results.filter(
-            (obj: { type: string; site: string; }) => obj.type === 'Teaser' && obj.site === 'YouTube',
+            (obj: { type: string; site: string }) =>
+              obj.type === 'Teaser' && obj.site === 'YouTube',
           ),
         ],
       };
@@ -212,15 +216,15 @@ export const getShowDetails = async (id: number) => {
       backdrop_path: details.backdrop_path,
       videos: details.videos
         ? {
-          results: [
-            ...details.videos.results.filter(
-              (obj) => obj.type === 'Teaser' && obj.site === 'YouTube',
-            ),
-            ...details.videos.results.filter(
-              (obj) => obj.type === 'Trailer' && obj.site === 'YouTube',
-            ),
-          ],
-        }
+            results: [
+              ...details.videos.results.filter(
+                (obj) => obj.type === 'Teaser' && obj.site === 'YouTube',
+              ),
+              ...details.videos.results.filter(
+                (obj) => obj.type === 'Trailer' && obj.site === 'YouTube',
+              ),
+            ],
+          }
         : [],
     };
   } catch (e) {
@@ -258,15 +262,15 @@ export const getMovieDetails = async (id: number) => {
       backdrop_path: details.backdrop_path,
       videos: details.videos
         ? {
-          results: [
-            ...details.videos.results.filter(
-              (obj) => obj.type === 'Teaser' && obj.site === 'YouTube',
-            ),
-            ...details.videos.results.filter(
-              (obj) => obj.type === 'Trailer' && obj.site === 'YouTube',
-            ),
-          ],
-        }
+            results: [
+              ...details.videos.results.filter(
+                (obj) => obj.type === 'Teaser' && obj.site === 'YouTube',
+              ),
+              ...details.videos.results.filter(
+                (obj) => obj.type === 'Trailer' && obj.site === 'YouTube',
+              ),
+            ],
+          }
         : [],
     };
   } catch (e) {
@@ -298,7 +302,9 @@ async function externalId(id) {
 export async function getRecommendations(id, page = 1) {
   let data = false;
   try {
-    data = await cache.wrap(`rec_${id}__${page}`, async () => recommendationData(id, page));
+    data = await cache.wrap(`rec_${id}__${page}`, async () =>
+      recommendationData(id, page),
+    );
   } catch (err) {
     logger.warn(`Error getting recommendation data - ${id}`, err);
   }
@@ -308,7 +314,9 @@ export async function getRecommendations(id, page = 1) {
 export async function getSimilar(id, page = 1) {
   let data = false;
   try {
-    data = await cache.wrap(`similar_${id}__${page}`, async () => similarData(id, page));
+    data = await cache.wrap(`similar_${id}__${page}`, async () =>
+      similarData(id, page),
+    );
   } catch (err) {
     logger.warn(`Error getting similar data - ${id}`, err);
   }
@@ -328,7 +336,9 @@ async function getReviews(id) {
 async function getSeasons(seasons, id) {
   let data: any = false;
   try {
-    data = await cache.wrap(`seasons_${id}`, async () => seasonsData(seasons, id));
+    data = await cache.wrap(`seasons_${id}`, async () =>
+      seasonsData(seasons, id),
+    );
   } catch (err) {
     logger.warn(`Error getting season data - ${id}`, err);
   }
@@ -413,9 +423,9 @@ function findEnLogo(logos) {
       logo.lang === 'en' &&
       !logoUrl &&
       logo.url !==
-      'https://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png' &&
+        'https://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png' &&
       logo.url !==
-      'http://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png'
+        'http://assets.fanart.tv/fanart/tv/0/hdtvlogo/-60a02798b7eea.png'
     ) {
       logoUrl = logo.url;
     }
