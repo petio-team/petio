@@ -1,7 +1,8 @@
-import { asParameters } from '@zodios/core';
+import { makeParameters } from '@zodios/core';
 import { z } from 'zod';
 
-export const VideosParams = asParameters([
+// eslint-disable-next-line import/prefer-default-export
+export const VideosParams = makeParameters([
   {
     name: 'language',
     type: 'Query',

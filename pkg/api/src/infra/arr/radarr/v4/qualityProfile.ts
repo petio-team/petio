@@ -1,4 +1,4 @@
-import { asApi } from '@zodios/core';
+import { makeApi } from '@zodios/core';
 import { z } from 'zod';
 
 export const QualityProfileSchema = z.object({
@@ -38,7 +38,7 @@ export const QualityProfilesSchema = z.array(QualityProfileSchema);
 export type QualityProfile = z.infer<typeof QualityProfileSchema>;
 export type QualityProfiles = z.infer<typeof QualityProfilesSchema>;
 
-export const QualityProfileEndpoint = asApi([
+export const QualityProfileEndpoint = makeApi([
   {
     method: 'get',
     path: '/api/v3/qualityprofile',

@@ -1,32 +1,35 @@
-import { Context, Next } from "koa";
-import PinoHttp from "pino-http";
-import logger from "@/loaders/logger";
+import { Context, Next } from 'koa';
+import PinoHttp from 'pino-http';
+
+import logger from '@/loaders/logger';
 
 const httpLogger = PinoHttp({
-  logger: logger.core,
+  logger: logger.core(),
   quietReqLogger: true,
   transport: {
     target: 'pino-http-print',
     options: {
       destination: 1,
       all: false,
-      translateTime: true
-    }
+      translateTime: true,
+    },
   },
   serializers: {
     req: (req) => ({
       id: req.id,
       method: req.method,
-      url: req.url
-    })
+      url: req.url,
+    }),
   },
   wrapSerializers: true,
   customLogLevel(req, res, err) {
     if (res.statusCode >= 400 && res.statusCode < 500) {
       return 'warn';
-    } if (res.statusCode >= 500 || err) {
+    }
+    if (res.statusCode >= 500 || err) {
       return 'error';
-    } if (res.statusCode >= 300 && res.statusCode < 400) {
+    }
+    if (res.statusCode >= 300 && res.statusCode < 400) {
       return 'silent';
     }
     return 'debug';

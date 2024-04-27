@@ -1,6 +1,6 @@
-import URL from 'url';
-import { asApi, Zodios } from '@zodios/core';
+import { Zodios, makeApi } from '@zodios/core';
 import { pluginHeader } from '@zodios/plugins';
+import URL from 'url';
 
 import { CalendarEndpoint } from './calendar';
 import { LanguageEndpoint } from './language';
@@ -12,7 +12,7 @@ import { SeriesEndpoint } from './series';
 import { SystemStatusEndpoint } from './status';
 import { TagEndpoint } from './tag';
 
-export const endpoints = asApi([
+export const endpoints = makeApi([
   ...SystemStatusEndpoint,
   ...LanguageProfileEndpoint,
   ...LanguageEndpoint,
@@ -29,4 +29,3 @@ export default (url: URL, token: string) => {
   client.use(pluginHeader('x-api-key', async () => token));
   return client;
 };
-

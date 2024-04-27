@@ -1,4 +1,4 @@
-import { asApi } from '@zodios/core';
+import { makeApi } from '@zodios/core';
 import * as z from 'zod';
 
 export const MovieDetailsSchema = z.object({
@@ -71,7 +71,7 @@ export const MovieDetailsSchema = z.object({
 });
 export type MovieDetails = z.infer<typeof MovieDetailsSchema>;
 
-export const MovieDetailsAPI = asApi([
+export const MovieDetailsAPI = makeApi([
   {
     method: 'get',
     path: '/movie/:id',

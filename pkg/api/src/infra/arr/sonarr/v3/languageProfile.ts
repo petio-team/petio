@@ -1,4 +1,4 @@
-import { asApi } from '@zodios/core';
+import { makeApi } from '@zodios/core';
 import { z } from 'zod';
 
 const LanguageProfileSchema = z.object({
@@ -15,7 +15,7 @@ const LanguageProfileSchema = z.object({
 });
 export type LanguageProfile = z.infer<typeof LanguageProfileSchema>;
 
-export const LanguageProfileEndpoint = asApi([
+export const LanguageProfileEndpoint = makeApi([
   {
     method: 'get',
     path: '/api/v3/languageprofile',

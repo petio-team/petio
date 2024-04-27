@@ -1,4 +1,4 @@
-import { asApi } from '@zodios/core';
+import { makeApi } from '@zodios/core';
 import { z } from 'zod';
 
 export const RootFolderSchema = z.object({
@@ -14,7 +14,7 @@ export const RootFolderSchema = z.object({
 });
 export type RootFolder = z.infer<typeof RootFolderSchema>;
 
-export const RootFolderEndpoint = asApi([
+export const RootFolderEndpoint = makeApi([
   {
     method: 'get',
     path: '/api/v3/rootfolder',

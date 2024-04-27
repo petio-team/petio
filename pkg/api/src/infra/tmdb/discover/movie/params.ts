@@ -1,10 +1,11 @@
-import { asParameters } from '@zodios/core';
+import { makeParameters } from '@zodios/core';
 import { z } from 'zod';
 
 import { WatchMonetizationType } from '../types';
 import { SortByType } from './types';
 
-export const Parameters = asParameters([
+// eslint-disable-next-line import/prefer-default-export
+export const Parameters = makeParameters([
   {
     name: 'language',
     type: 'Query',

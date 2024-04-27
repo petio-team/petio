@@ -1,4 +1,4 @@
-import { asApi } from '@zodios/core';
+import { makeApi } from '@zodios/core';
 import { z } from 'zod';
 
 export const CalendarSchema = z.array(
@@ -60,141 +60,155 @@ export const CalendarSchema = z.array(
     genres: z.array(z.string()),
     tags: z.array(z.number()),
     added: z.string(),
-    addOptions: z.object({
-      ignoreEpisodesWithFiles: z.boolean(),
-      ignoreEpisodesWithoutFiles: z.boolean(),
-      searchForMovie: z.boolean(),
-    }).optional(),
+    addOptions: z
+      .object({
+        ignoreEpisodesWithFiles: z.boolean(),
+        ignoreEpisodesWithoutFiles: z.boolean(),
+        searchForMovie: z.boolean(),
+      })
+      .optional(),
     ratings: z.object({
-      imdb: z.object({
-        votes: z.number(),
-        value: z.number(),
-        type: z.string(),
-      }).optional(),
+      imdb: z
+        .object({
+          votes: z.number(),
+          value: z.number(),
+          type: z.string(),
+        })
+        .optional(),
       tmdb: z.object({
         votes: z.number(),
         value: z.number(),
         type: z.string(),
       }),
-      metacritic: z.object({
-        votes: z.number(),
-        value: z.number(),
-        type: z.string(),
-      }).optional(),
-      rottenTomatoes: z.object({
-        votes: z.number(),
-        value: z.number(),
-        type: z.string(),
-      }).optional(),
+      metacritic: z
+        .object({
+          votes: z.number(),
+          value: z.number(),
+          type: z.string(),
+        })
+        .optional(),
+      rottenTomatoes: z
+        .object({
+          votes: z.number(),
+          value: z.number(),
+          type: z.string(),
+        })
+        .optional(),
     }),
-    movieFile: z.object({
-      id: z.number(),
-      movieId: z.number(),
-      relativePath: z.string(),
-      path: z.string(),
-      size: z.number(),
-      dateAdded: z.string(),
-      sceneName: z.string().optional(),
-      indexerFlags: z.number(),
-      quality: z.object({
+    movieFile: z
+      .object({
+        id: z.number(),
+        movieId: z.number(),
+        relativePath: z.string(),
+        path: z.string(),
+        size: z.number(),
+        dateAdded: z.string(),
+        sceneName: z.string().optional(),
+        indexerFlags: z.number(),
         quality: z.object({
-          id: z.number(),
-          name: z.string(),
-          source: z.string(),
-          resolution: z.number(),
-          modifier: z.string(),
+          quality: z.object({
+            id: z.number(),
+            name: z.string(),
+            source: z.string(),
+            resolution: z.number(),
+            modifier: z.string(),
+          }),
+          revision: z.object({
+            version: z.number(),
+            real: z.number(),
+            isRepack: z.boolean(),
+          }),
+          hardcodedSubs: z.string().optional(),
         }),
-        revision: z.object({
-          version: z.number(),
-          real: z.number(),
-          isRepack: z.boolean(),
-        }),
-        hardcodedSubs: z.string().optional(),
-      }),
-      customFormats: z.array(
-        z.object({
-          id: z.number(),
-          name: z.string(),
-          includeCustomFormatWhenRenaming: z.boolean(),
-          specifications: z.array(
+        customFormats: z
+          .array(
             z.object({
               id: z.number(),
               name: z.string(),
-              implementation: z.string(),
-              implementationName: z.string(),
-              infoLink: z.string(),
-              negate: z.boolean(),
-              required: z.boolean(),
-              fields: z.array(
+              includeCustomFormatWhenRenaming: z.boolean(),
+              specifications: z.array(
                 z.object({
-                  order: z.number(),
+                  id: z.number(),
                   name: z.string(),
-                  label: z.string(),
-                  unit: z.string(),
-                  helpText: z.string(),
-                  helpLink: z.string(),
-                  type: z.string(),
-                  advanced: z.boolean(),
-                  selectOptions: z.array(
+                  implementation: z.string(),
+                  implementationName: z.string(),
+                  infoLink: z.string(),
+                  negate: z.boolean(),
+                  required: z.boolean(),
+                  fields: z.array(
                     z.object({
-                      value: z.number(),
-                      name: z.string(),
                       order: z.number(),
-                      hint: z.string(),
-                      dividerAfter: z.boolean(),
+                      name: z.string(),
+                      label: z.string(),
+                      unit: z.string(),
+                      helpText: z.string(),
+                      helpLink: z.string(),
+                      type: z.string(),
+                      advanced: z.boolean(),
+                      selectOptions: z.array(
+                        z.object({
+                          value: z.number(),
+                          name: z.string(),
+                          order: z.number(),
+                          hint: z.string(),
+                          dividerAfter: z.boolean(),
+                        }),
+                      ),
+                      selectOptionsProviderAction: z.string(),
+                      section: z.string(),
+                      hidden: z.string(),
+                      placeholder: z.string(),
                     }),
                   ),
-                  selectOptionsProviderAction: z.string(),
-                  section: z.string(),
-                  hidden: z.string(),
-                  placeholder: z.string(),
+                  presets: z.array(z.null()),
                 }),
               ),
-              presets: z.array(z.null()),
             }),
-          ),
+          )
+          .optional(),
+        mediaInfo: z.object({
+          id: z.number().optional(),
+          audioBitrate: z.number(),
+          audioChannels: z.number(),
+          audioCodec: z.string(),
+          audioLanguages: z.string(),
+          audioStreamCount: z.number(),
+          videoBitDepth: z.number(),
+          videoBitrate: z.number(),
+          videoCodec: z.string(),
+          videoDynamicRangeType: z.string(),
+          videoFps: z.number(),
+          resolution: z.string(),
+          runTime: z.string(),
+          scanType: z.string(),
+          subtitles: z.string(),
         }),
-      ).optional(),
-      mediaInfo: z.object({
-        id: z.number().optional(),
-        audioBitrate: z.number(),
-        audioChannels: z.number(),
-        audioCodec: z.string(),
-        audioLanguages: z.string(),
-        audioStreamCount: z.number(),
-        videoBitDepth: z.number(),
-        videoBitrate: z.number(),
-        videoCodec: z.string(),
-        videoDynamicRangeType: z.string(),
-        videoFps: z.number(),
-        resolution: z.string(),
-        runTime: z.string(),
-        scanType: z.string(),
-        subtitles: z.string(),
-      }),
-      originalFilePath: z.string().optional(),
-      qualityCutoffNotMet: z.boolean(),
-      languages: z.array(z.object({ id: z.number(), name: z.string() })),
-      releaseGroup: z.string(),
-      edition: z.string(),
-    }).optional(),
-    collection: z.object({
-      name: z.string().optional(),
-      tmdbId: z.number(),
-      images: z.array(
-        z.object({
-          coverType: z.string(),
-          url: z.string(),
-          remoteUrl: z.string(),
-        }),
-      ),
-    }).optional(),
+        originalFilePath: z.string().optional(),
+        qualityCutoffNotMet: z.boolean(),
+        languages: z.array(z.object({ id: z.number(), name: z.string() })),
+        releaseGroup: z.string(),
+        edition: z.string(),
+      })
+      .optional(),
+    collection: z
+      .object({
+        name: z.string().optional(),
+        tmdbId: z.number(),
+        images: z.array(
+          z.object({
+            coverType: z.string(),
+            url: z.string(),
+            remoteUrl: z.string(),
+          }),
+        ),
+      })
+      .optional(),
     popularity: z.number(),
   }),
 );
 export type Calendar = z.infer<typeof CalendarSchema>;
 
-export const CalendarEndpoint = asApi([
+export const CalendarEndpoint = makeApi([
   {
     method: 'get',
     path: '/api/v3/calendar',

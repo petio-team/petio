@@ -1,6 +1,7 @@
-import { asApi } from '@zodios/core';
+import { makeApi } from '@zodios/core';
 
 import { TvDetailsAPI } from './details/api';
 import { VideosAPI } from './videos/api';
 
-export const TVAPI = asApi([...TvDetailsAPI, ...VideosAPI]);
+// eslint-disable-next-line import/prefer-default-export
+export const TVAPI = makeApi([...TvDetailsAPI, ...VideosAPI]);

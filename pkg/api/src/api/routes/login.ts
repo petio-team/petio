@@ -12,13 +12,10 @@ import { config } from '@/config/index';
 import loggerMain from '@/loaders/logger';
 import { GetUserByPlexID, UserModel, UserRole } from '@/models/user';
 
-const logger = loggerMain.core.child({ label: 'routes.login' });
+const logger = loggerMain.child({ label: 'routes.login' });
 
 function success(ctx: Context, user: any, isAdmin = false): void {
-  const token = jwt.sign(
-    { id: user.id, admin: isAdmin },
-    ctx.app.keys[0],
-  );
+  const token = jwt.sign({ id: user.id, admin: isAdmin }, ctx.app.keys[0]);
 
   ctx.cookies.set('petio_jwt', token, {
     httpOnly: false,
@@ -78,7 +75,7 @@ const attemptPlexAuth = async (ctx: Context) => {
       ctx.error({
         statusCode: StatusCodes.FORBIDDEN,
         code: 'USER_NOT_FOUND',
-        message: 'user not found'
+        message: 'user not found',
       });
       return;
     }
@@ -87,7 +84,7 @@ const attemptPlexAuth = async (ctx: Context) => {
       ctx.error({
         statusCode: StatusCodes.FORBIDDEN,
         code: 'USER_DISABLED',
-        message: 'user is disabled'
+        message: 'user is disabled',
       });
       return;
     }
@@ -100,7 +97,7 @@ const attemptPlexAuth = async (ctx: Context) => {
     ctx.error({
       statusCode: StatusCodes.FORBIDDEN,
       code: 'PLEX_AUTH_FAILED',
-      message: 'failed to login user via plex'
+      message: 'failed to login user via plex',
     });
   }
 };
@@ -119,8 +116,9 @@ function plexAuth(username: string, password: string) {
           'X-Plex-Device-Name': 'Petio API',
           'X-Plex-Version': '1.0',
           'X-Plex-Client-Identifier': `petio_${config.get('petio.identifier')}`,
-          Authorization:
-            `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`,
+          Authorization: `Basic ${Buffer.from(
+            `${username}:${password}`,
+          ).toString('base64')}`,
         },
       },
       (err: any, data: any) => {
@@ -163,7 +161,7 @@ const attemptAuth = async (ctx: Context) => {
         ctx.error({
           statusCode: StatusCodes.UNAUTHORIZED,
           code: '',
-          message: 'invalid user'
+          message: 'invalid user',
         });
         return;
       }
@@ -190,7 +188,7 @@ const attemptAuth = async (ctx: Context) => {
       ctx.error({
         statusCode: StatusCodes.FORBIDDEN,
         code: 'USER_NOT_FOUND',
-        message: 'user not found'
+        message: 'user not found',
       });
       logger.debug(`LOGIN: User not found ${username} - ${requestIp}`);
       return;
@@ -200,7 +198,7 @@ const attemptAuth = async (ctx: Context) => {
       ctx.error({
         statusCode: StatusCodes.FORBIDDEN,
         code: 'USER_DISABLED',
-        message: 'user is disabled'
+        message: 'user is disabled',
       });
       return;
     }
@@ -213,7 +211,7 @@ const attemptAuth = async (ctx: Context) => {
           ctx.error({
             statusCode: StatusCodes.FORBIDDEN,
             code: 'INVALID_CREDENTIALS',
-            message: 'users credentials are invalid'
+            message: 'users credentials are invalid',
           });
           return;
         }
@@ -232,7 +230,7 @@ const attemptAuth = async (ctx: Context) => {
     ctx.error({
       statusCode: StatusCodes.FORBIDDEN,
       code: 'AUTH_FAILED',
-      message: 'failed to authenticate user'
+      message: 'failed to authenticate user',
     });
   }
 };

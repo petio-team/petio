@@ -1,4 +1,4 @@
-import { asApi } from '@zodios/core';
+import { makeApi } from '@zodios/core';
 import * as z from 'zod';
 
 export enum MediaType {
@@ -91,7 +91,7 @@ export const TrendingSchema = z.object({
 });
 export type Trending = z.infer<typeof TrendingSchema>;
 
-export const TrendingAPI = asApi([
+export const TrendingAPI = makeApi([
   {
     method: 'get',
     path: '/trending/:media_type/:time_window',

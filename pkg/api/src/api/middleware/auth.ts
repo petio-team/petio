@@ -5,10 +5,10 @@ import { Context, Next } from 'koa';
 import loggerMain from '@/loaders/logger';
 import { UserModel } from '@/models/user';
 
-const logger = loggerMain.core.child({ label: 'middleware.auth' });
+const logger = loggerMain.child({ label: 'middleware.auth' });
 
 function removeCookie(ctx: Context) {
-  ctx.cookies.set("petio-jwt", null, { expires: new Date(Date.now() - 2000) });
+  ctx.cookies.set('petio-jwt', null, { expires: new Date(Date.now() - 2000) });
 }
 
 export async function authenticate(ctx: Context) {

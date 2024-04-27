@@ -11,12 +11,15 @@ import Radarr from '@/services/downloaders/radarr';
 import Sonarr from '@/services/downloaders/sonarr';
 import Mailer from '@/services/mail/mailer';
 import { getArchive } from '@/services/requests/archive';
-import { getAllUserRequests, getRequests } from '@/services/requests/display';
+import {
+  getAllRequests,
+  getAllUserRequests,
+} from '@/services/requests/display';
 import ProcessRequest from '@/services/requests/process';
 
 const listRequests = async (ctx: Context) => {
   ctx.status = StatusCodes.OK;
-  ctx.body = await getRequests(false, true);
+  ctx.body = await getAllRequests();
 };
 
 const getUserRequests = async (ctx: Context) => {
@@ -136,11 +139,14 @@ const removeRequest = async (ctx: Context) => {
     }),
   );
   new Mailer().mail(
-    `Your request was ${request.approved ? 'removed' : 'denied'} for ${request.title
+    `Your request was ${request.approved ? 'removed' : 'denied'} for ${
+      request.title
     }`,
-    `Your request was ${request.approved ? 'removed' : 'denied'} for ${request.title
+    `Your request was ${request.approved ? 'removed' : 'denied'} for ${
+      request.title
     }`,
-    `Unfortunately your request could not be processed.${reason ? ` This is because - ${reason}.` : ''
+    `Unfortunately your request could not be processed.${
+      reason ? ` This is because - ${reason}.` : ''
     } Thanks for your request anyway!`,
     `https://image.tmdb.org/t/p/w500${request.thumb}`,
     emails,

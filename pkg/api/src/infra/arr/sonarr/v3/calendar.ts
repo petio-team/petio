@@ -1,4 +1,4 @@
-import { asApi } from '@zodios/core';
+import { makeApi } from '@zodios/core';
 import { z } from 'zod';
 
 const CalendarSchema = z.object({
@@ -21,7 +21,7 @@ const CalendarSchema = z.object({
 });
 export type Calendar = z.infer<typeof CalendarSchema>;
 
-export const CalendarEndpoint = asApi([
+export const CalendarEndpoint = makeApi([
   {
     method: 'get',
     path: '/api/v3/calendar',

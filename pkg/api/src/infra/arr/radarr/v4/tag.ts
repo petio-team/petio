@@ -1,4 +1,4 @@
-import { asApi } from '@zodios/core';
+import { makeApi } from '@zodios/core';
 import { z } from 'zod';
 
 export const TagSchema = z.object({
@@ -7,7 +7,7 @@ export const TagSchema = z.object({
 });
 export type Tag = z.infer<typeof TagSchema>;
 
-export const TagEndpoint = asApi([
+export const TagEndpoint = makeApi([
   {
     method: 'get',
     path: '/api/v3/tag',

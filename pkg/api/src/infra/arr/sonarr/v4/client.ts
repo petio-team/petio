@@ -1,12 +1,10 @@
-import { asApi, Zodios } from "@zodios/core";
-import { pluginHeader } from "@zodios/plugins";
-import { LanguageEndpoint } from "./language";
-import { QueueEndpoint } from "./queue";
+import { Zodios, makeApi } from '@zodios/core';
+import { pluginHeader } from '@zodios/plugins';
 
-const endpoints = asApi([
-  ...LanguageEndpoint,
-  ...QueueEndpoint,
-]);
+import { LanguageEndpoint } from './language';
+import { QueueEndpoint } from './queue';
+
+const endpoints = makeApi([...LanguageEndpoint, ...QueueEndpoint]);
 
 export default (url: URL, token: string) => {
   const client = new Zodios(url.toString(), endpoints);

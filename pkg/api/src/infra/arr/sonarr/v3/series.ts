@@ -1,4 +1,4 @@
-import { asApi } from '@zodios/core';
+import { makeApi } from '@zodios/core';
 import { z } from 'zod';
 
 export const SeriesSchema = z.object({
@@ -19,9 +19,9 @@ export const SeriesSchema = z.object({
     }),
   ),
   remotePoster: z.string().optional(),
-  seasons: z.array(
-    z
-      .object({
+  seasons: z
+    .array(
+      z.object({
         seasonNumber: z.number(),
         monitored: z.boolean(),
         statistics: z.object({
@@ -34,7 +34,8 @@ export const SeriesSchema = z.object({
           percentOfEpisodes: z.number(),
         }),
       }),
-  ).optional(),
+    )
+    .optional(),
   year: z.number(),
   path: z.string(),
   qualityProfileId: z.number(),
@@ -81,7 +82,7 @@ export const SeriesSchema = z.object({
 });
 export type Series = z.infer<typeof SeriesSchema>;
 
-export const SeriesEndpoint = asApi([
+export const SeriesEndpoint = makeApi([
   {
     method: 'get',
     path: '/api/v3/series/:id',

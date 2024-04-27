@@ -1,11 +1,11 @@
-import { StatusCodes } from "http-status-codes";
-import { DefaultContext } from "koa";
+import { StatusCodes } from 'http-status-codes';
+import { DefaultContext } from 'koa';
 
 export default () => async (ctx: DefaultContext, next: () => Promise<any>) => {
   ctx.success = ({ statusCode, data = undefined }: any) => {
     const status = 'success';
 
-    if (!!statusCode && (statusCode < StatusCodes.BAD_REQUEST))
+    if (!!statusCode && statusCode < StatusCodes.BAD_REQUEST)
       ctx.status = statusCode;
     else if (!(ctx.status < StatusCodes.BAD_REQUEST))
       ctx.status = StatusCodes.OK;
@@ -16,9 +16,15 @@ export default () => async (ctx: DefaultContext, next: () => Promise<any>) => {
   ctx.error = ({ statusCode, code, message = undefined }: any) => {
     const status = 'error';
 
-    if (!!statusCode && (statusCode >= StatusCodes.BAD_REQUEST && statusCode < 600))
+    if (
+      !!statusCode &&
+      statusCode >= StatusCodes.BAD_REQUEST &&
+      statusCode < 600
+    )
       ctx.status = statusCode;
-    else if (!(ctx.status >= StatusCodes.INTERNAL_SERVER_ERROR && ctx.status < 600))
+    else if (
+      !(ctx.status >= StatusCodes.INTERNAL_SERVER_ERROR && ctx.status < 600)
+    )
       ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
 
     ctx.body = { status, code, message };

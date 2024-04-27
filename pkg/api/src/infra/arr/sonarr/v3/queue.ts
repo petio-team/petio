@@ -1,4 +1,4 @@
-import { asApi } from '@zodios/core';
+import { makeApi } from '@zodios/core';
 import { z } from 'zod';
 
 export const QueueSchema = z.object({
@@ -43,7 +43,7 @@ export const QueueSchema = z.object({
 });
 export type Queue = z.infer<typeof QueueSchema>;
 
-export const QueueEndpoint = asApi([
+export const QueueEndpoint = makeApi([
   {
     method: 'get',
     path: '/api/v3/queue',

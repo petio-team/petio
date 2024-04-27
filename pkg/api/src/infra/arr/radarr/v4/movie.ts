@@ -1,4 +1,4 @@
-import { asApi } from '@zodios/core';
+import { makeApi } from '@zodios/core';
 import { z } from 'zod';
 
 export const MovieSchema = z.object({
@@ -194,7 +194,7 @@ export const MovieSchema = z.object({
 });
 export type Movie = z.infer<typeof MovieSchema>;
 
-export const MovieEndpoint = asApi([
+export const MovieEndpoint = makeApi([
   {
     method: 'get',
     path: '/api/v3/movie',

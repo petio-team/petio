@@ -1,4 +1,4 @@
-import { asApi } from '@zodios/core';
+import { makeApi } from '@zodios/core';
 import { z } from 'zod';
 
 export const LanguageSchema = z.array(
@@ -6,7 +6,7 @@ export const LanguageSchema = z.array(
 );
 export type Language = z.infer<typeof LanguageSchema>;
 
-export const LanguageEndpoint = asApi([
+export const LanguageEndpoint = makeApi([
   {
     method: 'get',
     path: '/api/v3/language',

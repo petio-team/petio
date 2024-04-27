@@ -1,4 +1,4 @@
-import { asApi } from '@zodios/core';
+import { makeApi } from '@zodios/core';
 import * as z from 'zod';
 
 export const TvDetailsSchema = z.object({
@@ -271,7 +271,7 @@ export const TvDetailsSchema = z.object({
 });
 export type TvDetails = z.infer<typeof TvDetailsSchema>;
 
-export const TvDetailsAPI = asApi([
+export const TvDetailsAPI = makeApi([
   {
     method: 'get',
     path: '/tv/:id',
