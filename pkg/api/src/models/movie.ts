@@ -1,5 +1,39 @@
 import mongoose from 'mongoose';
 
+export type Movie = mongoose.Document & {
+  title: string;
+  ratingKey: number;
+  key: string;
+  guid: string;
+  studio: string;
+  type: string;
+  titleSort: string;
+  contentRating: string;
+  summary: string;
+  rating: number;
+  year: number;
+  tagline: string;
+  thumb: string;
+  art: string;
+  duration: number;
+  originallyAvailableAt: string;
+  addedAt: number;
+  updatedAt: number;
+  primaryExtraKey: string;
+  ratingImage: string;
+  Media: any[];
+  Genre: any[];
+  Director: any[];
+  Writer: any[];
+  Country: any[];
+  Role: any[];
+  idSource: string;
+  externalId: string;
+  imdb_id: string;
+  tmdb_id: string;
+  petioTimestamp: Date;
+};
+
 const MovieSchema = new mongoose.Schema({
   title: String,
   ratingKey: Number,
@@ -34,4 +68,5 @@ const MovieSchema = new mongoose.Schema({
   petioTimestamp: Date,
 });
 
-export default mongoose.model('Movie', MovieSchema);
+const MovieModel = mongoose.model<Movie>('Movie', MovieSchema);
+export default MovieModel;

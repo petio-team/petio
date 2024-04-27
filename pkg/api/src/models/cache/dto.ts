@@ -1,7 +1,7 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const CacheDTO = z.object({
-  key: z.any(),
+  key: z.string(),
   value: z.any(),
   expiry: z.date(),
 });
