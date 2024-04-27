@@ -1,9 +1,9 @@
 import { randomUUID } from 'crypto';
 
+import { generateKeys } from '@/utils/security';
 
 import blueconfig from '../infra/blueconfig';
 import sourceArray from '../infra/blueconfig/format/source-array';
-import { generateKeys } from '@/utils/security';
 
 // MAX SECURTIY KEYS
 const MAX_SECURITY_KEYS = 10;
@@ -104,6 +104,11 @@ export default blueconfig({
         format: String,
         default: '10 minutes',
       },
+    },
+    discovery: {
+      doc: 'The interval time for performing a discovery scan',
+      format: String,
+      default: '1 day',
     },
     quotas: {
       doc: 'The interval time for performing a reset of user quotas',

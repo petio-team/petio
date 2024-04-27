@@ -86,7 +86,7 @@ export default class Mailer {
   }
 
   // Build email and send to transport
-  mail(subject, title, text, img, to = [], name = []) {
+  mail(subject, title, text, img, to: string[] = [], name: string[] = []) {
     if (!config.get('email.enabled')) {
       logger.debug('MAILER: Email disabled, skipping sending emails');
       return;
