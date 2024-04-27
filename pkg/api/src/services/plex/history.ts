@@ -1,20 +1,26 @@
-import request from 'xhr-request';
+/* eslint-disable import/order */
 
-import cache from "../cache/cache";
+/* eslint-disable @typescript-eslint/no-use-before-define */
+import { isErrorFromPath } from '@zodios/core';
+
+import { config } from '@/config';
+import { PlexAPIClient, PlexApiEndpoints } from '@/infra/plex/plex';
 import loggerMain from '@/loaders/logger';
 import plexLookup from '@/services/plex/lookup';
-import MakePlexURL from '@/services/plex/util';
 import { movieLookup } from '@/services/tmdb/movie';
 import { showLookup } from '@/services/tmdb/show';
 
-const logger = loggerMain.core.child({ label: "plex.history" });
+import cache from '../cache/cache';
+
+const logger = loggerMain.child({ label: 'plex.history' });
 
 export default async (id, type) => {
   let data: any = false;
   try {
-    data = await cache.wrap(`hist__${id}__${type}`, () =>
-      getHistoryData(id, type),
-    );
+    data = await cache.wrap(`hist__${id}__${type}`, async () => {
+      const history = await getHistory(id);
+      return parseHistory(history, type);
+    });
   } catch (err) {
     logger.error(`Error getting history data - ${id}`, err);
     return [];
@@ -22,40 +28,40 @@ export default async (id, type) => {
   return data;
 };
 
-function getHistoryData(id, type) {
-  logger.debug('History returned from source');
-  return new Promise((resolve, reject) => {
-    const d = new Date();
-    d.setMonth(d.getMonth() - 1);
-    d.setHours(0, 0, 0);
-    d.setMilliseconds(0);
+async function getHistory(id: string, library?: number) {
+  const baseurl = `${config.get('plex.protocol')}://${config.get(
+    'plex.host',
+  )}:${config.get('plex.port')}`;
+  const client = PlexAPIClient(baseurl, config.get('plex.token'));
+  try {
+    // const d = new Date();
+    // d.setDate(0);
+    // d.setMonth(d.getMonth() - 6);
+    // const time = d.getTime();
+    // console.log(`history time: ${d.toISOString()}`);
 
-    const url = MakePlexURL('status/sessions/history/all', {
-      sort: 'viewedAt:desc',
-      accountID: id,
-      'viewedAt>=': '0',
-      'X-Plex-Container-Start': 0,
-      'X-Plex-Container-Size': 100,
-    }).toString();
-
-    request(
-      url,
-      {
-        method: 'GET',
-        json: true,
+    const content = await client.get('/status/sessions/history/all', {
+      queries: {
+        accountID: id,
+        sort: 'viewedAt:desc',
+        // 'viewedAt>': time,
+        librarySectionID: library,
       },
-      (err, data) => {
-        if (err) {
-          reject(err);
-        }
-        if (!data) {
-          resolve({});
-        } else {
-          resolve(parseHistory(data, type));
-        }
-      },
-    );
-  });
+    });
+    return content;
+  } catch (err) {
+    if (
+      !isErrorFromPath(
+        PlexApiEndpoints,
+        'get',
+        '/status/sessions/history/all',
+        err,
+      )
+    ) {
+      logger.error(`Failed to get history from Plex`, err);
+    }
+    return null;
+  }
 }
 
 async function parseHistory(data, type) {
