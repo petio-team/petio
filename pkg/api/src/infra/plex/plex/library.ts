@@ -1,4 +1,4 @@
-import { asApi } from '@zodios/core';
+import { makeApi } from '@zodios/core';
 import { z } from 'zod';
 
 export const DirectorySchema = z.object({
@@ -32,10 +32,10 @@ export const DirectorySchema = z.object({
 export type Directory = z.infer<typeof DirectorySchema>;
 
 export const MetadataSchema = z.object({
-  allowSync: z.boolean(),
+  allowSync: z.boolean().optional(),
   librarySectionID: z.number(),
   librarySectionTitle: z.string(),
-  librarySectionUUID: z.string(),
+  librarySectionUUID: z.string().optional(),
   ratingKey: z.string(),
   key: z.string(),
   parentRatingKey: z.string().optional(),
@@ -184,7 +184,7 @@ export const MediaContainerSchema = z.object({
 });
 export type MediaContainer = z.infer<typeof MediaContainerSchema>;
 
-export const LibraryEndpoint = asApi([
+export const LibraryEndpoint = makeApi([
   {
     description: 'gets the recently added media',
     method: 'get',
@@ -289,6 +289,32 @@ export const LibraryEndpoint = asApi([
     method: 'get',
     path: '/library/metadata/:id/children',
     parameters: [],
+    response: MediaContainerSchema,
+  },
+  {
+    description: 'gets all top media metadata from libraries',
+    method: 'get',
+    path: '/library/all/top',
+    parameters: [
+      {
+        description: 'the type of media [1 - movies, 2 - shows, 3 - music?]',
+        name: 'type',
+        type: 'Query',
+        schema: z.number().positive(),
+      },
+      {
+        description: 'the start point of where to return data from',
+        name: 'limit',
+        type: 'Query',
+        schema: z.number().positive().optional(),
+      },
+      {
+        description: 'the time to start from when returning results',
+        name: 'viewedAt>',
+        type: 'Query',
+        schema: z.number().positive().optional(),
+      },
+    ],
     response: MediaContainerSchema,
   },
 ]);

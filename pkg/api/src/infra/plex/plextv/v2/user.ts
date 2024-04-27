@@ -1,4 +1,4 @@
-import { asApi } from '@zodios/core';
+import { makeApi } from '@zodios/core';
 import { z } from 'zod';
 
 export const UserSchema = z.object({
@@ -79,9 +79,9 @@ export const UserSchema = z.object({
 });
 export type User = z.infer<typeof UserSchema>;
 
-export const UserEndpoint = asApi([
+export const UserEndpoint = makeApi([
   {
-    description: 'gets a list of users associated with a plex server',
+    description: 'gets the user information',
     method: 'get',
     path: '/api/v2/user',
     parameters: [

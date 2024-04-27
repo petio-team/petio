@@ -1,4 +1,4 @@
-import { asApi } from '@zodios/core';
+import { makeApi } from '@zodios/core';
 import { z } from 'zod';
 
 export const SystemStatusSchema = z.object({
@@ -64,7 +64,7 @@ export const SystemStatusSchema = z.object({
 });
 export type SystemStatus = z.infer<typeof SystemStatusSchema>;
 
-export const SystemStatusEndpoint = asApi([
+export const SystemStatusEndpoint = makeApi([
   {
     description: 'gets the plex system data',
     method: 'get',

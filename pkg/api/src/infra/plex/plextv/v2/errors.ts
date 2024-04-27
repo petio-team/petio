@@ -1,3 +1,4 @@
+import { makeErrors } from '@zodios/core';
 import { z } from 'zod';
 
 export const ErrorSchema = z.object({
@@ -15,3 +16,11 @@ export const ErrorsSchema = z.object({
     }),
   ),
 });
+
+export const APIError = makeErrors([
+  {
+    status: 400,
+    description: 'Bad Request',
+    schema: ErrorsSchema,
+  }
+]);

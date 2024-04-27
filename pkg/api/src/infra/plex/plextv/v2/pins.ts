@@ -1,11 +1,13 @@
-import { asApi } from '@zodios/core';
+import { makeApi } from '@zodios/core';
 import { z } from 'zod';
+import { APIError } from './errors';
 
 export const PinsSchema = z.object({
   id: z.number(),
   code: z.string(),
   product: z.string(),
   trusted: z.boolean(),
+  qr: z.string(),
   clientIdentifier: z.string(),
   location: z.object({
     code: z.string(),
@@ -27,7 +29,7 @@ export const PinsSchema = z.object({
 });
 export type Pins = z.infer<typeof PinsSchema>;
 
-export const PinsEndpoint = asApi([
+export const PinsEndpoint = makeApi([
   {
     description: 'makes a request to generate a new pin',
     method: 'post',
@@ -47,12 +49,21 @@ export const PinsEndpoint = asApi([
       },
     ],
     response: PinsSchema,
+    err: APIError,
   },
   {
-    description: 'checks a pin',
+    description: 'get the access token by pin id',
     method: 'get',
     path: '/api/v2/pins/:id',
-    parameters: [],
+    parameters: [
+      {
+        description: 'plex client id',
+        name: 'x-plex-client-identifier',
+        type: 'Header',
+        schema: z.string().uuid().min(1),
+      },
+    ],
     response: PinsSchema,
+    err: APIError,
   },
 ]);

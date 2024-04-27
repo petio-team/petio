@@ -1,4 +1,4 @@
-import { asApi } from '@zodios/core';
+import { makeApi } from '@zodios/core';
 import { z } from 'zod';
 
 export const ResourcesSchema = z.array(
@@ -111,7 +111,7 @@ export const ResourcesSchema = z.array(
 );
 export type Resources = z.infer<typeof ResourcesSchema>;
 
-export const ResourcesEndpoint = asApi([
+export const ResourcesEndpoint = makeApi([
   {
     description: 'gets a list of devices associated with a plex server',
     method: 'get',

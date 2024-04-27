@@ -1,4 +1,4 @@
-import { asApi } from '@zodios/core';
+import { makeApi } from '@zodios/core';
 import { z } from 'zod';
 
 export const FriendsSchema = z.object({
@@ -27,7 +27,7 @@ export const FriendsSchema = z.object({
 });
 export type Friends = z.infer<typeof FriendsSchema>;
 
-export const FriendsEndpoint = asApi([
+export const FriendsEndpoint = makeApi([
   {
     description: 'Gets a list of users associated with a plex server',
     method: 'get',
