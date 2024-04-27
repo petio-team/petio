@@ -1,250 +1,258 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
+
 /* eslint-disable no-restricted-syntax */
-import Promise from 'bluebird';
-import request from 'xhr-request';
+import { isErrorFromPath } from '@zodios/core';
+import Bluebird from 'bluebird';
 
-import { config } from '@/config/index';
+import { config } from '@/config';
+import { PlexAPIClient, PlexApiEndpoints } from '@/infra/plex/plex';
 import loggerMain from '@/loaders/logger';
-import Discovery from '@/models/discovery';
-import Movie from '@/models/movie';
-import Show from '@/models/show';
-import { GetAllUsers, User } from '@/models/user';
-import MakePlexURL from '@/services/plex/util';
+import DiscoveryModel from '@/models/discovery';
+import MovieModel, { Movie } from '@/models/movie';
+import ShowModel, { Show } from '@/models/show';
+import is from '@/utils/is';
 
-const logger = loggerMain.core.child({ label: 'discovery.build' });
-
-export default async () => {
-  logger.debug('DISC: Started building discovery profiles');
-
-  try {
-    const users = await GetAllUsers();
-    if (users.length === 0) {
-      logger.debug('DISC: No Users');
-      return;
-    }
-    const userIds = users.map((user: User) => {
-      if (user.altId) {
-        return user.altId;
-      }
-      if (!user.custom) {
-        return user.plexId;
-      }
-
-    });
-
-    await Promise.map(
-      userIds,
-      async (i) => {
-        await create(i);
-      },
-      { concurrency: config.get('general.concurrency') },
-    );
-    logger.debug('DISC: Finished building discovery profiles');
-  } catch (error) {
-    logger.error(`failed to create new discovery profiles for users`, error);
-  }
+type MovieBuild = {
+  history: Record<string, string>;
+  genres: Record<string, any>;
+  actors: Record<string, number>;
+  directors: Record<string, number>;
 };
 
-async function create(id) {
+type ShowBuild = {
+  history: Record<string, string>;
+  genres: Record<string, any>;
+  actors: Record<string, number>;
+};
+
+const logger = loggerMain.child({ label: 'discovery.build' });
+
+export default async (id: string) => {
   try {
-    const data: any = await build(id);
-    const existing: any = await Discovery.findOne({ id }).exec();
+    const [data, existing] = await Bluebird.all([
+      build(id),
+      DiscoveryModel.findOne({ id }).exec(),
+    ]);
+    if (!is.truthy(data)) {
+      logger.debug(`no data for user - ${id}`);
+      return;
+    }
     if (existing) {
       existing.id = id;
       existing.movie = {
-        genres: data.movie.genres,
+        genres: data.movies.genres,
         people: {
-          cast: data.movie.actors,
-          director: data.movie.directors,
+          cast: data.movies.actors,
+          director: data.movies.directors,
         },
-        history: data.movie.history,
+        history: data.movies.history,
       };
       existing.series = {
-        genres: data.series.genres,
-        history: data.series.history,
+        genres: data.shows.genres,
+        history: data.shows.history,
         people: {
-          cast: data.series.actors,
+          cast: data.shows.actors,
+          director: {},
         },
       };
-      existing.save();
+      await existing.save();
     } else {
-      const newDiscover = new Discovery({
+      const newDiscover = new DiscoveryModel({
         id,
         movie: {
-          genres: data.movie.genres,
+          genres: data.movies.genres,
           people: {
-            cast: data.movie.actors,
-            director: data.movie.directors,
+            cast: data.movies.actors,
+            director: data.movies.directors,
           },
-          history: data.movie.history,
+          history: data.movies.history,
         },
         series: {
-          genres: data.series.genres,
-          history: data.series.history,
+          genres: data.shows.genres,
+          history: data.shows.history,
           people: {
-            cast: data.series.actors,
+            cast: data.shows.actors,
+            director: {},
           },
         },
       });
-      newDiscover.save();
+      await newDiscover.save();
     }
   } catch (e) {
     logger.error(e);
   }
-}
+};
 
-async function build(id) {
-  const movie: any = {
-    history: {},
-    genres: {},
-    actors: {},
-    directors: {},
-  };
-  const series: any = {
-    history: {},
-    genres: {},
-  };
-  const data: any = await getHistory(id);
-  if (data.MediaContainer.size === 0) {
-    logger.debug(`DISC: No history for user - ${id}`);
-    return {
-      movie,
-      series,
-    };
-  }
-  const items = data.MediaContainer.Metadata;
-  for (const element of items) {
-    const listItem = element;
-    if (listItem.type === 'movie') {
-      const dbItem = await Movie.findOne({
-        ratingKey: listItem.ratingKey,
-      }).exec();
-      if (dbItem) {
-        if (dbItem.tmdb_id) movie.history[dbItem.tmdb_id] = dbItem.tmdb_id;
-        if (dbItem.Genre) {
-          for (const genre of dbItem.Genre) {
-            const cr = cert(dbItem.contentRating, 'movie');
-            if (!movie.genres[genre.tag]) {
-              movie.genres[genre.tag] = {
-                count: 1,
-                name: genre.tag,
-                cert: {},
-                lowestRating: dbItem.rating ? dbItem.rating : 0,
-                highestRating: dbItem.rating ? dbItem.rating : 10,
-              };
-              if (cr) movie.genres[genre.tag].cert[cr] = 1;
-            } else {
-              movie.genres[genre.tag].count = movie.genres[genre.tag].count + 1;
-              if (cr) {
-                const certCount = movie.genres[genre.tag].cert[cr] || 0;
-                movie.genres[genre.tag].cert[cr] = certCount + 1;
-              }
-              if (
-                dbItem.rating &&
-                movie.genres[genre.tag].lowestRating > dbItem.rating
-              ) {
-                movie.genres[genre.tag].lowestRating = dbItem.rating;
-              }
-              if (
-                dbItem.rating &&
-                movie.genres[genre.tag].highestRating < dbItem.rating
-              ) {
-                movie.genres[genre.tag].highestRating = dbItem.rating;
-              }
-            }
-          }
-        }
-        if (dbItem.Role) {
-          for (const role of dbItem.Role) {
-            const actor = role.tag.replace(/[^a-zA-Z0-9 ]/g, '');
-            movie.actors[actor] = movie.actors[actor]
-              ? movie.actors[actor] + 1
-              : 1;
-          }
-        }
-
-        if (dbItem.Director) {
-          for (const director of dbItem.Director) {
-            const directorTag = director.tag.replace(/[^a-zA-Z0-9 ]/g, '');
-            movie.directors[directorTag] = movie.directors[directorTag]
-              ? movie.directors[directorTag] + 1
-              : 1;
-          }
-        }
+function buildMovieGenres(movie: Movie, currentGenres: Record<string, any>) {
+  const genres: Record<string, any> = currentGenres;
+  const cr = buildCertification(movie.contentRating, 'movie');
+  for (const genre of movie.Genre) {
+    if (!genres[genre.tag]) {
+      genres[genre.tag] = {
+        count: 1,
+        name: genre.tag,
+        cert: {},
+        lowestRating: movie.rating ? movie.rating : 0,
+        highestRating: movie.rating ? movie.rating : 10,
+      };
+      if (cr) {
+        genres[genre.tag].cert[cr] = 1;
       }
-    } else if (listItem.type === 'episode') {
-      if (listItem.grandparentKey) {
-        const key = listItem.grandparentKey.replace('/library/metadata/', '');
-        const dbItem: any = await Show.findOne({ ratingKey: key }).exec();
-        if (dbItem) {
-          if (dbItem.tmdb_id) series.history[dbItem.tmdb_id] = dbItem.tmdb_id;
-          if (dbItem.Genre) {
-            // eslint-disable-next-line no-restricted-syntax
-            for (const genre of dbItem.Genre) {
-              const cr = cert(dbItem.contentRating, 'show');
-              if (!series.genres[genre.tag]) {
-                series.genres[genre.tag] = {
-                  count: 1,
-                  name: genre.tag,
-                  cert: {},
-                  lowestRating: dbItem.rating ? dbItem.rating : 0,
-                  highestRating: dbItem.rating ? dbItem.rating : 10,
-                };
-                if (cr) series.genres[genre.tag].cert[cr] = 1;
-              } else {
-                series.genres[genre.tag].count =
-                  series.genres[genre.tag].count + 1;
-                if (cr) {
-                  const certCount = series.genres[genre.tag].cert[cr] || 0;
-                  series.genres[genre.tag].cert[cr] = certCount + 1;
-                }
-                if (
-                  dbItem.rating &&
-                  series.genres[genre.tag].lowestRating > dbItem.rating
-                ) {
-                  series.genres[genre.tag].lowestRating = dbItem.rating;
-                }
-                if (
-                  dbItem.rating &&
-                  series.genres[genre.tag].highestRating < dbItem.rating
-                ) {
-                  series.genres[genre.tag].highestRating = dbItem.rating;
-                }
-              }
-            }
-          }
-
-          if (dbItem.Role) {
-            // eslint-disable-next-line no-restricted-syntax
-            for (const role of dbItem.Role) {
-              const actor = role.tag;
-              series.actors[actor] = series.actors[actor]
-                ? series.actors[actor] + 1
-                : 1;
-            }
-          }
-        }
+    } else {
+      genres[genre.tag].count += 1;
+      if (cr) {
+        const certCount = genres[genre.tag].cert[cr] || 0;
+        genres[genre.tag].cert[cr] = certCount + 1;
+      }
+      if (movie.rating && genres[genre.tag].lowestRating > movie.rating) {
+        genres[genre.tag].lowestRating = movie.rating;
+      }
+      if (movie.rating && genres[genre.tag].highestRating < movie.rating) {
+        genres[genre.tag].highestRating = movie.rating;
       }
     }
   }
-  Object.keys(movie.actors).forEach((key) => {
-    if (movie.actors[key] < 2) {
-      delete movie.actors[key];
-    }
-  });
-  Object.keys(movie.directors).forEach((key) => {
-    if (movie.directors[key] < 2) {
-      delete movie.directors[key];
-    }
-  });
-  return {
-    movie,
-    series,
-  };
+  return genres;
 }
 
-function cert(cert, type) {
+function buildShowGenres(show: Show, currentGenres: Record<string, any>) {
+  const genres: Record<string, any> = currentGenres;
+  for (const genre of show.Genre) {
+    const cr = buildCertification(show.contentRating, 'show');
+    if (!genres[genre.tag]) {
+      genres[genre.tag] = {
+        count: 1,
+        name: genre.tag,
+        cert: {},
+        lowestRating: show.rating ? show.rating : 0,
+        highestRating: show.rating ? show.rating : 10,
+      };
+      if (cr) {
+        genres[genre.tag].cert[cr] = 1;
+      }
+    } else {
+      genres[genre.tag].count += 1;
+      if (cr) {
+        const certCount = genres[genre.tag].cert[cr] || 0;
+        genres[genre.tag].cert[cr] = certCount + 1;
+      }
+      if (show.rating && genres[genre.tag].lowestRating > show.rating) {
+        genres[genre.tag].lowestRating = show.rating;
+      }
+      if (show.rating && genres[genre.tag].highestRating < show.rating) {
+        genres[genre.tag].highestRating = show.rating;
+      }
+    }
+  }
+  return genres;
+}
+
+type BuildOutput = {
+  movies: MovieBuild;
+  shows: ShowBuild;
+};
+
+async function build(id: string) {
+  const output: BuildOutput = {
+    movies: {
+      history: {},
+      genres: {},
+      actors: {},
+      directors: {},
+    },
+    shows: {
+      history: {},
+      genres: {},
+      actors: {},
+    },
+  };
+  try {
+    const data = await getHistory(id);
+    if (!is.truthy(data) || !is.truthy(data.MediaContainer.Metadata)) {
+      logger.debug(`no history for user - ${id}`);
+      return null;
+    }
+    const items = data.MediaContainer.Metadata;
+    const [movieResults, showResults] = await Bluebird.all([
+      Bluebird.filter(items, (i) => i.type === 'movie').map(async (i) =>
+        MovieModel.findOne({ ratingKey: i.ratingKey }).exec(),
+      ),
+      Bluebird.filter(
+        items,
+        (i) => i.type === 'episode' && is.truthy(i.grandparentKey),
+      ).map(async (i) =>
+        ShowModel.findOne({
+          ratingKey: i.grandparentKey!.replace('/library/metadata/', ''),
+        }).exec(),
+      ),
+    ]);
+    const movieResultsFiltered = movieResults.filter(is.truthy);
+    const showResultsFiltered = showResults.filter(is.truthy);
+
+    for (const movie of movieResultsFiltered) {
+      if (movie.tmdb_id) {
+        output.movies.history[movie.tmdb_id] = movie.tmdb_id;
+      }
+
+      if (movie.Genre) {
+        output.movies.genres = buildMovieGenres(movie, output.movies.genres);
+      }
+
+      if (movie.Role) {
+        for (const role of movie.Role) {
+          const actor = role.tag.replace(/[^a-zA-Z0-9 ]/g, '');
+          output.movies.actors[actor] = output.movies.actors[actor]
+            ? output.movies.actors[actor] + 1
+            : 1;
+        }
+      }
+
+      if (movie.Director) {
+        for (const director of movie.Director) {
+          const directorTag = director.tag.replace(/[^a-zA-Z0-9 ]/g, '');
+          output.movies.directors[directorTag] = output.movies.directors[
+            directorTag
+          ]
+            ? output.movies.directors[directorTag] + 1
+            : 1;
+        }
+      }
+    }
+
+    for (const show of showResultsFiltered) {
+      if (show.tmdb_id) {
+        output.shows.history[show.tmdb_id] = show.tmdb_id;
+      }
+
+      if (show.Genre) {
+        output.shows.genres = buildShowGenres(show, output.shows.genres);
+      }
+    }
+
+    Object.keys(output.movies.actors).forEach((key) => {
+      if (output.movies.actors[key] < 2) {
+        delete output.movies.actors[key];
+      }
+    });
+
+    Object.keys(output.movies.directors).forEach((key) => {
+      if (output.movies.directors[key] < 2) {
+        delete output.movies.directors[key];
+      }
+    });
+    return output;
+  } catch (err) {
+    logger.error(err, `failed to build discover for user - ${id}`);
+  }
+  return null;
+}
+
+function buildCertification(certification: string, type: string) {
+  let cert = certification;
   if (!cert) return false;
-  if (cert.includes('/')) cert = cert.split('/')[1];
+  if (cert.includes('/')) {
+    [, cert] = cert.split('/');
+  }
   cert = cert.toLowerCase();
   switch (cert) {
     case 'u':
@@ -280,6 +288,7 @@ function cert(cert, type) {
 
     case '15':
     case '16':
+    case '16+':
     case '17':
     case 'r':
       if (type === 'movie') return 'R';
@@ -297,39 +306,39 @@ function cert(cert, type) {
       return false;
 
     default:
-      logger.debug(`DISC: Unmapped Cert Rating - ${cert}`, {
+      logger.debug(`Unmapped Cert Rating - ${cert}`, {
         label: 'discovery.build',
       });
       return false;
   }
 }
-function getHistory(id, library = false) {
-  return new Promise((resolve, reject) => {
-    const params: any = {
-      sort: 'viewedAt:desc',
-      accountID: id,
-      'viewedAt>=': '0',
-      'X-Plex-Container-Start': 0,
-      'X-Plex-Container-Size': 500,
-    };
 
-    if (library) {
-      params.librarySectionID = library;
+async function getHistory(id: string, library?: number) {
+  const baseurl = `${config.get('plex.protocol')}://${config.get(
+    'plex.host',
+  )}:${config.get('plex.port')}`;
+  const client = PlexAPIClient(baseurl, config.get('plex.token'));
+  try {
+    const content = await client.get('/status/sessions/history/all', {
+      queries: {
+        accountID: id,
+        sort: 'viewedAt:desc',
+        'viewedAt>': 0,
+        librarySectionID: library,
+      },
+    });
+    return content;
+  } catch (err) {
+    if (
+      !isErrorFromPath(
+        PlexApiEndpoints,
+        'get',
+        '/status/sessions/history/all',
+        err,
+      )
+    ) {
+      logger.error(err.message, `Failed to get history from Plex`);
     }
-
-    const url = MakePlexURL('/status/sessions/history/all', params);
-    request(
-      url.toString(),
-      {
-        method: 'GET',
-        json: true,
-      },
-      (err: any, data: unknown) => {
-        if (err) {
-          reject(err);
-        }
-        resolve(data);
-      },
-    );
-  });
+    return null;
+  }
 }
