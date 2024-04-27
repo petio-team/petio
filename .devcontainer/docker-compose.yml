@@ -18,6 +18,8 @@ services:
       - ~/.gitconfig:/root/.gitconfig:z
       # SSH Agent
       - ${SSH_AUTH_SOCK:-/dev/null}:/ssh-agent
+    security_opt:
+      - 'label:disable'
     environment:
       - TZ=Europe\London
       - DB_URL=mongodb://mongo:27017/petio
@@ -31,6 +33,6 @@ services:
     container_name: 'petio-mongo-${MONGO_CONTAINER_ID:-local}'
     hostname: mongo
     ports:
-      - "${MONGO_EXPOSED_PORT:-27017}:27017"
+      - '${MONGO_EXPOSED_PORT:-27017}:27017'
     volumes:
       - ./data/db:/data/db
