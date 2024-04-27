@@ -1,22 +1,16 @@
-import { connect, Connection } from 'mongoose';
-import { container } from 'tsyringe';
-import { Logger } from 'winston';
+import { Connection, connect } from 'mongoose';
 
 import { config } from '@/config/index';
 
-export type DB = Connection["db"];
+import logger from './logger';
 
-export default async (): Promise<DB | null> => {
+export default async (): Promise<Connection['db']> => {
   const connection = await connect(config.get('db.url'), {
     autoCreate: true,
     autoIndex: true,
   }).catch((error) => {
-    container.resolve<Logger>('Logger').error(error);
+    logger.error('MongoDB connection failed', error);
     process.exit(1);
   });
-  if (!connection) {
-    return null;
-  }
-
   return connection.connection.db;
 };

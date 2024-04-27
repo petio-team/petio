@@ -1,5 +1,6 @@
 import { Agenda } from '@hokify/agenda';
-import { Connection } from 'mongoose';
+
+import { config } from '@/config';
 
 import discovery from '../discovery';
 import LibraryUpdate from '../plex/library';
@@ -8,7 +9,7 @@ import trending from '../tmdb/trending';
 import { AgendaCronService } from './agenda-cron';
 import { JobCronName } from './types';
 
-export async function runCron(dbConn: Connection['db']) {
+export async function runCron() {
   const cronService = new AgendaCronService(
     [
       JobCronName.FULL_LIBRARY_SCAN,
@@ -20,8 +21,7 @@ export async function runCron(dbConn: Connection['db']) {
       JobCronName.IMDB_CACHE,
     ],
     new Agenda({
-      mongo: dbConn,
-      db: { collection: 'jobs' },
+      db: { address: config.get('db.url'), collection: 'jobs' },
       processEvery: '2 minutes',
       maxConcurrency: 1,
       defaultConcurrency: 1,
@@ -46,7 +46,7 @@ export async function runCron(dbConn: Connection['db']) {
     ),
     cronService.add(
       JobCronName.USERS_SCAN,
-      async () => new LibraryUpdate().scan(),
+      async () => new LibraryUpdate().getFriends(),
       '30 minutes',
       {},
     ),
