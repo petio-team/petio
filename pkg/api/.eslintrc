@@ -30,19 +30,12 @@
     "prettier"
   ],
   "rules": {
+    "import/prefer-default-export": "off",
+    "class-methods-use-this": "off",
     "import/no-unresolved": "error",
     "import/named": 2,
     "import/namespace": 2,
     "import/default": 2,
-    "import/export": 2,
-    "import/order": [
-      "ERROR",
-      {
-        "alphabetize": {
-          "order": "asc",
-          "caseInsensitive": true
-        }
-      }
-    ]
+    "import/export": 2
   }
 }
