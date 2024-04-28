@@ -33,7 +33,7 @@ export default class Telegram {
   async test() {
     if (!this.check()) {
       logger.debug('Telegram: Chat id or bot token missing', {
-        label: 'notifications.telegram',
+        module: 'notifications.telegram',
       });
       return {
         result: false,
@@ -41,14 +41,14 @@ export default class Telegram {
       };
     }
     logger.debug('Telegram: Sending test message', {
-      label: 'notifications.telegram',
+      module: 'notifications.telegram',
     });
     const defaultText: any = 'Petio Test';
     const text = this.buildText(defaultText);
     const test = await this.postMessage(text);
     if (!test) {
       logger.debug('Telegram: Test Failed', {
-        label: 'notifications.telegram',
+        module: 'notifications.telegram',
       });
       return {
         result: false,
@@ -56,7 +56,7 @@ export default class Telegram {
       };
     }
     logger.debug('Telegram: Test passed', {
-      label: 'notifications.telegram',
+      module: 'notifications.telegram',
     });
     return {
       result: true,
@@ -67,7 +67,7 @@ export default class Telegram {
   send(title = null, content = null, username = null, image = null) {
     if (!this.check()) {
       logger.debug('Telegram: No config defined', {
-        label: 'notifications.telegram',
+        module: 'notifications.telegram',
       });
       return {
         result: false,
@@ -75,7 +75,7 @@ export default class Telegram {
       };
     }
     logger.debug(`Telegram: Sending message - ${content}`, {
-      label: 'notifications.telegram',
+      module: 'notifications.telegram',
     });
     const text = this.buildText(null, {
       title,
@@ -103,12 +103,12 @@ export default class Telegram {
         },
       );
       logger.debug('Telegram: message sent', {
-        label: 'notifications.telegram',
+        module: 'notifications.telegram',
       });
       return true;
     } catch (err) {
       logger.debug('Telegram: Failed to send message', {
-        label: 'notifications.telegram',
+        module: 'notifications.telegram',
       });
       return false;
     }

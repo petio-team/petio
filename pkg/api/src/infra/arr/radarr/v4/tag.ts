@@ -2,7 +2,7 @@ import { makeApi } from '@zodios/core';
 import { z } from 'zod';
 
 export const TagSchema = z.object({
-  label: z.string(),
+  module: z.string(),
   id: z.number(),
 });
 export type Tag = z.infer<typeof TagSchema>;

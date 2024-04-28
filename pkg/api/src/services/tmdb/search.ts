@@ -12,7 +12,7 @@ import { showLookup } from '@/services/tmdb/show';
 
 const agent = new http.Agent({ family: 4 });
 
-const logger = loggerMain.child({ label: 'tmdb.search' });
+const logger = loggerMain.child({ module: 'tmdb.search' });
 
 async function search(term) {
   logger.debug(`TMDB Search ${term}`);

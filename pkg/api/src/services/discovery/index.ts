@@ -9,7 +9,7 @@ import cache from '../cache/cache';
 import build from './build';
 import display from './display';
 
-const logger = loggerMain.child({ label: 'services.discovery' });
+const logger = loggerMain.child({ module: 'services.discovery' });
 
 export default async () => {
   logger.debug('started building discovery profiles');

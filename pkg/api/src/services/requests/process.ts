@@ -12,7 +12,7 @@ import Telegram from '@/services/notifications/telegram';
 import filter from '@/services/requests/filter';
 import { showLookup } from '@/services/tmdb/show';
 
-const logger = loggerMain.child({ label: 'requests.process' });
+const logger = loggerMain.child({ module: 'requests.process' });
 
 export default class ProcessRequest {
   request: any;

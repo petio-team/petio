@@ -56,7 +56,7 @@ export default async (item) => {
       (optionalMatch > 0 || f.rows.length === 1)
     ) {
       logger.info(`FILT: Match on filter ${i + 1}`, {
-        label: 'requests.filter',
+        module: 'requests.filter',
       });
       action = f.action;
     }

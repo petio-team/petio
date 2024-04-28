@@ -25,7 +25,7 @@ type ShowBuild = {
   actors: Record<string, number>;
 };
 
-const logger = loggerMain.child({ label: 'discovery.build' });
+const logger = loggerMain.child({ module: 'discovery.build' });
 
 export default async (id: string) => {
   try {
@@ -307,7 +307,7 @@ function buildCertification(certification: string, type: string) {
 
     default:
       logger.debug(`Unmapped Cert Rating - ${cert}`, {
-        label: 'discovery.build',
+        module: 'discovery.build',
       });
       return false;
   }

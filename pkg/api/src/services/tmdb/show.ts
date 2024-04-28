@@ -16,7 +16,7 @@ import cache from '../cache/cache';
 
 const agent = new http.Agent({ family: 4 });
 
-const logger = loggerMain.child({ label: 'tmdb.show' });
+const logger = loggerMain.child({ module: 'tmdb.show' });
 
 export async function showLookup(id, minified = false) {
   if (!id || id === 'false') {

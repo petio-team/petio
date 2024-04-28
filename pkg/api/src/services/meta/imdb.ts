@@ -8,7 +8,7 @@ import pathsConfig from '@/config/env/paths';
 import loggerMain from '@/loaders/logger';
 import Imdb from '@/models/imdb';
 
-const logger = loggerMain.child({ label: 'meta.imdb' });
+const logger = loggerMain.child({ module: 'meta.imdb' });
 
 export async function lookup(imdb_id) {
   if (!imdb_id) {
@@ -36,7 +36,7 @@ export async function storeCache(firstTime = false) {
   logger.debug('IMDB: Rebuilding Cache');
   try {
     logger.debug('IMDB: Cache Downloading latest cache', {
-      label: 'meta.imdb',
+      module: 'meta.imdb',
     });
     const res = await axios({
       url: 'https://datasets.imdbws.com/title.ratings.tsv.gz',

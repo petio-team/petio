@@ -35,7 +35,7 @@ export const getNotificationProvider = (
 export class BaseNotification<T extends INotification> {
   protected config: T;
 
-  public logger = logger.child({ label: 'notification.service' });
+  public logger = logger.child({ module: 'notification.service' });
 
   constructor(config: T) {
     this.config = config;

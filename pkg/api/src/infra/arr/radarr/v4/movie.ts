@@ -130,7 +130,7 @@ export const MovieSchema = z.object({
               z.object({
                 order: z.number(),
                 name: z.string(),
-                label: z.string(),
+                module: z.string(),
                 unit: z.string(),
                 helpText: z.string(),
                 helpLink: z.string(),

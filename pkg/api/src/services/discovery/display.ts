@@ -26,7 +26,7 @@ import is from '@/utils/is';
 // eslint-disable-next-line import/order
 import cache from '../cache/cache';
 
-const logger = loggerMain.child({ label: 'discovery.display' });
+const logger = loggerMain.child({ module: 'discovery.display' });
 
 export type DiscoveryResult = {
   popular: {
@@ -559,7 +559,7 @@ function genreID(genreName: any, type: string) {
 
       default:
         logger.debug(`DISC: Genre not mapped ${genreName}`, {
-          label: 'discovery.build',
+          module: 'discovery.build',
         });
         return false;
     }
@@ -613,7 +613,7 @@ function genreID(genreName: any, type: string) {
         return 37;
       default:
         logger.debug(`DISC: Genre not mapped ${genreName}`, {
-          label: 'discovery.build',
+          module: 'discovery.build',
         });
         return false;
     }

@@ -5,7 +5,7 @@ import { Context, Next } from 'koa';
 import loggerMain from '@/loaders/logger';
 import { UserModel } from '@/models/user';
 
-const logger = loggerMain.child({ label: 'middleware.auth' });
+const logger = loggerMain.child({ module: 'middleware.auth' });
 
 function removeCookie(ctx: Context) {
   ctx.cookies.set('petio-jwt', null, { expires: new Date(Date.now() - 2000) });

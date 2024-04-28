@@ -3,7 +3,7 @@ import loggerMain from '@/loaders/logger';
 
 import cache from '../cache/cache';
 
-const logger = loggerMain.child({ label: 'fanart.index' });
+const logger = loggerMain.child({ module: 'fanart.index' });
 
 export default async (id: string, type: any) => {
   let data: any = {};

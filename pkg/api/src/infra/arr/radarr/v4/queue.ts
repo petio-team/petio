@@ -149,7 +149,7 @@ export const QueueSchema = z.object({
                       z.object({
                         order: z.number(),
                         name: z.string(),
-                        label: z.string(),
+                        module: z.string(),
                         unit: z.string(),
                         helpText: z.string(),
                         helpLink: z.string(),
@@ -344,7 +344,7 @@ export const QueueSchema = z.object({
                 z.object({
                   order: z.number(),
                   name: z.string(),
-                  label: z.string(),
+                  module: z.string(),
                   unit: z.string().optional(),
                   helpText: z.string().optional(),
                   helpLink: z.string().optional(),

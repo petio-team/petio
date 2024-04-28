@@ -13,7 +13,7 @@ import cache from '../cache/cache';
 
 const agent = new http.Agent({ family: 4 });
 
-const logger = loggerMain.child({ label: 'tmdb.movie' });
+const logger = loggerMain.child({ module: 'tmdb.movie' });
 
 export async function movieLookup(id, minified = false) {
   logger.debug(`TMDB Movie Lookup ${id}`);

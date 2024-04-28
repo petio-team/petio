@@ -9,7 +9,7 @@ import {
 } from '@/models/downloaders';
 import Request from '@/models/request';
 
-const logger = loggerMain.child({ label: 'downloaders.sonarr' });
+const logger = loggerMain.child({ module: 'downloaders.sonarr' });
 
 export default class Sonarr {
   instance: IDownloader;

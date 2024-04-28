@@ -12,7 +12,7 @@ import { showLookup } from '@/services/tmdb/show';
 
 import cache from '../cache/cache';
 
-const logger = loggerMain.child({ label: 'plex.history' });
+const logger = loggerMain.child({ module: 'plex.history' });
 
 export default async (id, type) => {
   let data: any = false;

@@ -17,7 +17,7 @@ import Telegram from '@/services/notifications/telegram';
 import ProcessRequest from '@/services/requests/process';
 import { showLookup } from '@/services/tmdb/show';
 
-const logger = loggerMain.child({ label: 'plex.library' });
+const logger = loggerMain.child({ module: 'plex.library' });
 
 export default class LibraryUpdate {
   full: any;
@@ -260,7 +260,7 @@ export default class LibraryUpdate {
         const libContent = await this.getLibrary(lib.key);
         if (!libContent || !libContent.Metadata) {
           logger.warn(`CRON: No content in library skipping - ${lib.title}`, {
-            label: 'plex.library',
+            module: 'plex.library',
           });
           return;
         }

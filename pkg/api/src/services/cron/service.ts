@@ -12,7 +12,7 @@ import {
  * Represents a base class for a cron service.
  */
 export abstract class CronService {
-  private logger = Logger.getInstance().child({ label: 'services.cron' });
+  private logger = Logger.getInstance().child({ module: 'services.cron' });
 
   constructor(private activeJobs: JobCronName[]) {}
 

@@ -3,7 +3,7 @@ import nodemailer from 'nodemailer';
 import { config } from '@/config/index';
 import loggerMain from '@/loaders/logger';
 
-const logger = loggerMain.child({ label: 'mail.mailer' });
+const logger = loggerMain.child({ module: 'mail.mailer' });
 
 export default class Mailer {
   transport: any;

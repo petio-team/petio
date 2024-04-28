@@ -9,7 +9,7 @@ import {
 } from '@/models/downloaders';
 import Request from '@/models/request';
 
-const logger = loggerMain.child({ label: 'downloaders.radarr' });
+const logger = loggerMain.child({ module: 'downloaders.radarr' });
 
 export default class Radarr {
   instance: IDownloader;

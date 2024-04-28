@@ -3,7 +3,7 @@ import axios from 'axios';
 import loggerMain from '@/loaders/logger';
 import MakePlexURL from '@/services/plex/util';
 
-const logger = loggerMain.child({ label: 'plex.bandwidth' });
+const logger = loggerMain.child({ module: 'plex.bandwidth' });
 
 function timeDifference(previous) {
   const now = new Date();

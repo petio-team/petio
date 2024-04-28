@@ -8,7 +8,7 @@ const agent = new http.Agent({ family: 4 });
 
 async function personLookup(id) {
   logger.debug(`TMDB Person Lookup ${id}`, {
-    label: 'tmdb.person',
+    module: 'tmdb.person',
   });
   const info = await getPersonInfo(id);
   const movies = await getPersonMovies(id);

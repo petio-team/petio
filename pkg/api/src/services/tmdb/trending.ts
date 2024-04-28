@@ -191,7 +191,7 @@ async function getShows() {
 
 async function personData(): Promise<TrendingPeople[]> {
   logger.debug('Person from source not cache', {
-    label: 'tmdb.trending',
+    module: 'tmdb.trending',
   });
   const data = await TMDBAPI.get('/trending/:media_type/:time_window', {
     params: {
@@ -204,7 +204,7 @@ async function personData(): Promise<TrendingPeople[]> {
 
 async function moviesData(): Promise<TrendingMovie[]> {
   logger.debug('Movies from source not cache', {
-    label: 'tmdb.trending',
+    module: 'tmdb.trending',
   });
   const data = await TMDBAPI.get('/trending/:media_type/:time_window', {
     params: {
@@ -217,7 +217,7 @@ async function moviesData(): Promise<TrendingMovie[]> {
 
 async function showsData(): Promise<TrendingTv[]> {
   logger.debug('Shows from source not cache', {
-    label: 'tmdb.trending',
+    module: 'tmdb.trending',
   });
   const data = await TMDBAPI.get('/trending/:media_type/:time_window', {
     params: {

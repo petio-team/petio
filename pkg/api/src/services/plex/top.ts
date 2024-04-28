@@ -13,7 +13,7 @@ import is from '@/utils/is';
 // eslint-disable-next-line import/order
 import cache from '../cache/cache';
 
-const logger = loggerMain.child({ label: 'plex.top' });
+const logger = loggerMain.child({ module: 'plex.top' });
 export default async (type: 1 | 2) => {
   try {
     return await cache.wrap(`popular__${type}`, async () => getTopData(type));

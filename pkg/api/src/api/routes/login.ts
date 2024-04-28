@@ -12,7 +12,7 @@ import { config } from '@/config/index';
 import loggerMain from '@/loaders/logger';
 import { GetUserByPlexID, UserModel, UserRole } from '@/models/user';
 
-const logger = loggerMain.child({ label: 'routes.login' });
+const logger = loggerMain.child({ module: 'routes.login' });
 
 function success(ctx: Context, user: any, isAdmin = false): void {
   const token = jwt.sign({ id: user.id, admin: isAdmin }, ctx.app.keys[0]);
