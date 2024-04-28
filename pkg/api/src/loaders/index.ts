@@ -30,7 +30,7 @@ async function doPrimary() {
   }
 
   // run workers
-  Master
+  await Master
     .getInstance()
     .runWorkers();
 }
