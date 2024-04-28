@@ -72,7 +72,7 @@ class Settings extends React.Component {
             <div className="icon">
               <img
                 className=""
-                src="https://raw.githubusercontent.com/Sonarr/Sonarr/phantom-develop/Logo/256.png"
+                src="https://raw.githubusercontent.com/Sonarr/Sonarr/master/Logo/256.png"
               />
             </div>
           </Link>
