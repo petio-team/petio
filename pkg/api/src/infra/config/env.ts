@@ -1,6 +1,15 @@
-import path from "path";
-import { parseEnv, port } from "znv";
+import path from 'path';
+import { parseEnv, port } from 'znv';
 import { z } from 'zod';
+
+// Used to extend the NodeJS Process interface to include the pkg property (vercel pkg)
+declare global {
+  namespace NodeJS {
+    interface Process {
+      pkg?: any;
+    }
+  }
+}
 
 export const {
   NODE_ENV,
@@ -23,7 +32,9 @@ export const {
     },
   },
   LOG_LEVEL: {
-    schema: z.enum(["trace", "debug", "info", "warn", "error", "fatal"]).default("info"),
+    schema: z
+      .enum(['trace', 'debug', 'info', 'warn', 'error', 'fatal'])
+      .default('info'),
     description: 'The log level to use.',
   },
   HTTP_ADDR: {
@@ -39,7 +50,10 @@ export const {
     description: 'The base path to use for the HTTP server.',
   },
   HTTP_TRUSTED_PROXIES: {
-    schema: z.string().transform((value) => value.split(',')).default(""),
+    schema: z
+      .string()
+      .transform((value) => value.split(','))
+      .default(''),
     description: 'The trusted proxies to use.',
   },
   HTTP_CORS_DOMAINS: {
@@ -48,10 +62,10 @@ export const {
     defaults: {
       development: 'http://localhost:3000',
       _: 'http://localhost:7777',
-    }
+    },
   },
   DATA_DIR: {
-    schema: z.string().min(1).default(path.join(process.cwd(), "./data")),
+    schema: z.string().min(1).default(path.join(process.cwd(), './data')),
     description: 'The directory to store data in.',
   },
   TMDB_API_KEY: {
