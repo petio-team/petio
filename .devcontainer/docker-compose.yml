@@ -11,19 +11,16 @@ services:
       # On Linux and OSX, a symlink /mnt/ssh <-> ~/.ssh is
       # created in the container. On Windows, files are copied
       # from /mnt/ssh to ~/.ssh to fix permissions.
-      - ~/.ssh:/mnt/ssh
+      #- ~/.ssh:/mnt/ssh
       # Shell history persistence
       - ~/.zsh_history:/root/.zsh_history:z
       # Git config
       - ~/.gitconfig:/root/.gitconfig:z
-      # SSH Agent
-      - ${SSH_AUTH_SOCK:-/dev/null}:/ssh-agent
     security_opt:
       - 'label:disable'
     environment:
       - TZ=Europe\London
       - DB_URL=mongodb://mongo:27017/petio
-      - SSH_AUTH_SOCK=/ssh-agent
       - NODE_ENV=development
     entrypoint: ['zsh', '-c', 'while sleep 1000; do :; done']
 
