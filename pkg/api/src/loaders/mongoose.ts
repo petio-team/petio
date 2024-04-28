@@ -1,8 +1,7 @@
 import { Connection, connect } from 'mongoose';
 
 import { config } from '@/config/index';
-
-import logger from './logger';
+import logger from '@/infra/logger/logger';
 
 export default async (): Promise<Connection['db']> => {
   const connection = await connect(config.get('db.url'), {

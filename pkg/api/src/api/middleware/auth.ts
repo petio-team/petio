@@ -2,7 +2,7 @@ import * as HttpStatus from 'http-status-codes';
 import jwt from 'jsonwebtoken';
 import { Context, Next } from 'koa';
 
-import loggerMain from '@/loaders/logger';
+import loggerMain from '@/infra/logger/logger';
 import { UserModel } from '@/models/user';
 
 const logger = loggerMain.child({ module: 'middleware.auth' });

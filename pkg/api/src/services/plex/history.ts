@@ -4,8 +4,8 @@
 import { isErrorFromPath } from '@zodios/core';
 
 import { config } from '@/config';
+import loggerMain from '@/infra/logger/logger';
 import { PlexAPIClient, PlexApiEndpoints } from '@/infra/plex/plex';
-import loggerMain from '@/loaders/logger';
 import plexLookup from '@/services/plex/lookup';
 import { movieLookup } from '@/services/tmdb/movie';
 import { showLookup } from '@/services/tmdb/show';

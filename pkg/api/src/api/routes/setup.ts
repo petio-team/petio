@@ -1,3 +1,4 @@
+import { SharedCache } from '@david.uhlir/shared-cache';
 import Router from '@koa/router';
 import bcrypt from 'bcryptjs';
 import { StatusCodes } from 'http-status-codes';
@@ -6,12 +7,11 @@ import mongoose from 'mongoose';
 
 import { validateRequest } from '@/api/middleware/validation';
 import { WriteConfig, config } from '@/config/index';
-import logger from '@/loaders/logger';
+import logger from '@/infra/logger/logger';
+import { Worker } from '@/infra/worker/worker';
 import { CreateOrUpdateUser, UserRole } from '@/models/user';
 import { SetupTestInput, SetupTestInputSchema } from '@/schemas/setup';
 import testConnection from '@/services/plex/connection';
-import { Worker } from '@/infra/worker/worker';
-import { SharedCache } from '@david.uhlir/shared-cache';
 
 const testServer = async (ctx: Context) => {
   const body = ctx.request.body as SetupTestInput;

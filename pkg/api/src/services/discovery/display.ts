@@ -6,9 +6,10 @@
 import Bluebird from 'bluebird';
 import request from 'xhr-request';
 
-import externalConfig from '@/config/env/external';
 import { config } from '@/config/index';
-import loggerMain from '@/loaders/logger';
+// eslint-disable-next-line import/order
+import { TMDB_API_KEY } from '@/infra/config/env';
+import loggerMain from '@/infra/logger/logger';
 import DiscoveryModel from '@/models/discovery';
 import getHistory from '@/services/plex/history';
 import onServer from '@/services/plex/server';
@@ -23,7 +24,6 @@ import {
 } from '@/services/tmdb/show';
 import is from '@/utils/is';
 
-// eslint-disable-next-line import/order
 import cache from '../cache/cache';
 
 const logger = loggerMain.child({ module: 'discovery.display' });
@@ -626,7 +626,7 @@ function discoverMovie(page = 1, params = {}) {
   Object.keys(params).forEach((i) => {
     par += `&${i}=${params[i]}`;
   });
-  const url = `${tmdb}discover/movie?api_key=${externalConfig.tmdbApiKey}${par}&page=${page}&append_to_response=videos`;
+  const url = `${tmdb}discover/movie?api_key=${TMDB_API_KEY}${par}&page=${page}&append_to_response=videos`;
   return new Promise((resolve, reject) => {
     request(
       url,
@@ -651,7 +651,7 @@ function discoverShow(page = 1, params = {}) {
   Object.keys(params).forEach((i) => {
     par += `&${i}=${params[i]}`;
   });
-  const url = `${tmdb}discover/tv?api_key=${externalConfig.tmdbApiKey}${par}&page=${page}&append_to_response=videos`;
+  const url = `${tmdb}discover/tv?api_key=${TMDB_API_KEY}${par}&page=${page}&append_to_response=videos`;
   return new Promise((resolve, reject) => {
     request(
       url,
@@ -672,7 +672,7 @@ function discoverShow(page = 1, params = {}) {
 
 function searchPeople(term: any) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  const url = `${tmdb}search/person?query=${term}&include_adult=false&api_key=${externalConfig.tmdbApiKey}`;
+  const url = `${tmdb}search/person?query=${term}&include_adult=false&api_key=${TMDB_API_KEY}`;
   return new Promise((resolve, reject) => {
     request(
       url,

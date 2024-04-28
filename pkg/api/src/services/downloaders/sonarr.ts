@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import SonarrAPI from '@/infra/arr/sonarr';
 import { Series } from '@/infra/arr/sonarr/series';
-import loggerMain from '@/loaders/logger';
+import loggerMain from '@/infra/logger/logger';
 import {
   DownloaderType,
   GetAllDownloaders,

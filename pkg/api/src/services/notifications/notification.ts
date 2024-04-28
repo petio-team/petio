@@ -1,6 +1,7 @@
 import { container } from 'tsyringe';
 
-import logger from '@/loaders/logger';
+import logger from '@/infra/logger/logger';
+
 import { INotify } from './notify';
 import {
   DiscordProvider,

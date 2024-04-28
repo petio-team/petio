@@ -1,14 +1,14 @@
+import { SharedCache } from '@david.uhlir/shared-cache';
 import cluster from 'cluster';
 
 import api from '@/api';
+import { HasConfig, config, toObject } from '@/config';
+import logger from '@/infra/logger/logger';
+import { Master } from '@/infra/worker/master';
 import ConfigLoader from '@/loaders/config';
 import mongoose from '@/loaders/mongoose';
 import { runCron } from '@/services/cron';
 import startupMessage from '@/utils/startupMessage';
-import { SharedCache } from '@david.uhlir/shared-cache';
-import { HasConfig, config, toObject } from '@/config';
-import { Master } from '@/infra/worker/master';
-import logger from './logger';
 
 /**
  * Checks if the application has a valid configuration.
@@ -43,9 +43,7 @@ async function doPrimary() {
   }
 
   // run workers
-  await Master
-    .getInstance()
-    .runWorkers();
+  await Master.getInstance().runWorkers();
 }
 
 /**
@@ -86,4 +84,4 @@ export default async () => {
   } else if (cluster.isWorker) {
     await doWorker();
   }
-}
+};

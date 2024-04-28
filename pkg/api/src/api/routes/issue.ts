@@ -2,7 +2,7 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import logger from '@/loaders/logger';
+import logger from '@/infra/logger/logger';
 import Issue from '@/models/issue';
 import { UserModel } from '@/models/user';
 import Mailer from '@/services/mail/mailer';
@@ -13,7 +13,6 @@ const listAllIssues = async (ctx: Context) => {
   ctx.status = StatusCodes.OK;
   ctx.body = await Issue.find();
 };
-
 
 async function mailIssue(user_id, media_id, type, title) {
   const userData = await UserModel.findOne({ id: user_id });
@@ -80,7 +79,7 @@ async function mailIssueResolve(user_id, media_id, type, title, message) {
 const deleteIssues = async (ctx: Context) => {
   const body = ctx.request.body as any;
   const issueId = body.id;
-  const {message} = body;
+  const { message } = body;
 
   try {
     const issue = await Issue.findById(issueId);

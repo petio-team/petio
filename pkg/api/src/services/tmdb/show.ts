@@ -4,9 +4,9 @@
 import axios from 'axios';
 import http from 'http';
 
-import externalConfig from '@/config/env/external';
+import { TMDB_API_KEY } from '@/infra/config/env';
+import loggerMain from '@/infra/logger/logger';
 import { TMDBAPI } from '@/infra/tmdb/tmdb';
-import loggerMain from '@/loaders/logger';
 import fanartLookup from '@/services/fanart';
 import { lookup as imdb } from '@/services/meta/imdb';
 import onServer from '@/services/plex/server';
@@ -349,7 +349,7 @@ async function getSeasons(seasons, id) {
 
 async function tmdbData(id) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  const url = `${tmdb}tv/${id}?api_key=${externalConfig.tmdbApiKey}&append_to_response=aggregate_credits,videos,keywords,content_ratings,credits`;
+  const url = `${tmdb}tv/${id}?api_key=${TMDB_API_KEY}&append_to_response=aggregate_credits,videos,keywords,content_ratings,credits`;
   const res = await axios.get(url, { httpAgent: agent });
   const { data } = res;
   if (data.aggregate_credits) {
@@ -376,14 +376,14 @@ async function tmdbData(id) {
 
 async function recommendationData(id, page = 1) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  const url = `${tmdb}tv/${id}/recommendations?api_key=${externalConfig.tmdbApiKey}&page=${page}`;
+  const url = `${tmdb}tv/${id}/recommendations?api_key=${TMDB_API_KEY}&page=${page}`;
   const res = await axios.get(url, { httpAgent: agent });
   return res.data;
 }
 
 async function similarData(id, page = 1) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  const url = `${tmdb}tv/${id}/similar?api_key=${externalConfig.tmdbApiKey}&page=${page}`;
+  const url = `${tmdb}tv/${id}/similar?api_key=${TMDB_API_KEY}&page=${page}`;
   const res = await axios.get(url, { httpAgent: agent });
   return res.data;
 }
@@ -402,14 +402,14 @@ async function seasonsAsync(seasonList, id) {
 
 async function getSeason(id, season) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  const url = `${tmdb}tv/${id}/season/${season}?api_key=${externalConfig.tmdbApiKey}`;
+  const url = `${tmdb}tv/${id}/season/${season}?api_key=${TMDB_API_KEY}`;
   const res = await axios.get(url, { httpAgent: agent });
   return res.data;
 }
 
 async function reviewsData(id) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  const url = `${tmdb}tv/${id}/reviews?api_key=${externalConfig.tmdbApiKey}`;
+  const url = `${tmdb}tv/${id}/reviews?api_key=${TMDB_API_KEY}`;
   const res = await axios.get(url, { httpAgent: agent });
   return res.data;
 }
@@ -446,7 +446,7 @@ function findEnRating(data) {
 
 async function idLookup(id) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  const url = `${tmdb}tv/${id}/external_ids?api_key=${externalConfig.tmdbApiKey}`;
+  const url = `${tmdb}tv/${id}/external_ids?api_key=${TMDB_API_KEY}`;
   try {
     const res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -462,7 +462,7 @@ export async function discoverSeries(page = 1, params = {}) {
   Object.keys(params).forEach((i) => {
     par += `&${i}=${params[i]}`;
   });
-  const url = `${tmdb}discover/tv?api_key=${externalConfig.tmdbApiKey}${par}&page=${page}`;
+  const url = `${tmdb}discover/tv?api_key=${TMDB_API_KEY}${par}&page=${page}`;
   const res = await axios.get(url, { httpAgent: agent });
   if (res.data && res.data.results.length > 0) {
     await Promise.all(
@@ -477,7 +477,7 @@ export async function discoverSeries(page = 1, params = {}) {
 
 export async function network(id) {
   const tmdb = 'https://api.themoviedb.org/3/';
-  const url = `${tmdb}network/${id}?api_key=${externalConfig.tmdbApiKey}`;
+  const url = `${tmdb}network/${id}?api_key=${TMDB_API_KEY}`;
   const res = await axios.get(url, { httpAgent: agent });
   return res.data;
 }

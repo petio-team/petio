@@ -1,4 +1,3 @@
-import path from 'path';
 import multer from '@koa/multer';
 import Router from '@koa/router';
 import axios from 'axios';
@@ -6,14 +5,16 @@ import bcrypt from 'bcryptjs';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 import send from 'koa-send';
+import path from 'path';
 
-import pathsConfig from '@/config/env/paths';
-import logger from '@/loaders/logger';
+import { DATA_DIR } from '@/infra/config/env';
+import logger from '@/infra/logger/logger';
 import Profile from '@/models/profile';
 import { UserModel, UserRole } from '@/models/user';
-import { adminRequired } from "../middleware/auth";
 
-const UPLOAD_DIR = path.join(pathsConfig.dataDir, './uploads');
+import { adminRequired } from '../middleware/auth';
+
+const UPLOAD_DIR = path.join(DATA_DIR, './uploads');
 
 const storage = multer.diskStorage({
   destination(_req, _file, cb) {
@@ -178,7 +179,7 @@ const editUser = async (ctx: Context) => {
       message: 'User edited',
     };
   } catch (err) {
-    logger.error("failed to get user to edit", err);
+    logger.error('failed to get user to edit', err);
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = {
       error: 'Error editing user',
@@ -293,7 +294,7 @@ const updateUserThumbnail = async (ctx: Context) => {
     ctx.status = StatusCodes.OK;
     ctx.body = {};
   } catch (err) {
-    logger.error("failed to update user", err);
+    logger.error('failed to update user', err);
     logger.warn('ROUTE: Failed to update user thumb in db');
 
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;

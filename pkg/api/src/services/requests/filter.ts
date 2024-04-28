@@ -1,4 +1,4 @@
-import logger from '@/loaders/logger';
+import logger from '@/infra/logger/logger';
 import Filter from '@/models/filter';
 import { movieLookup } from '@/services/tmdb/movie';
 import { showLookup } from '@/services/tmdb/show';

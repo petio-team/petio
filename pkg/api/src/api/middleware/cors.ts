@@ -1,26 +1,18 @@
 import Cors from '@koa/cors';
 import Koa from 'koa';
 
-import httpConfig from "@/config/env/http";
-import envConfig from "@/config/env/node";
+import { HTTP_CORS_DOMAINS } from '@/infra/config/env';
 
 export default () => {
-  // Enable cors
-  const whitelist = httpConfig.corsDomains;
-  if (envConfig.isDevelopment) {
-    // add local react dev
-    whitelist.push('http://localhost:3000'); // frontend
-  }
-
   const corsOptions = {
     origin: async (ctx: Koa.Context): Promise<string> => {
       if (
         ctx.request.header.origin &&
-        whitelist.indexOf(ctx.request.header.origin) !== -1
+        HTTP_CORS_DOMAINS.indexOf(ctx.request.header.origin) !== -1
       ) {
         return ctx.request.header.origin;
       }
-        return 'http://localhost:7777';
+      return 'http://localhost:7777';
     },
     credentials: true,
   };

@@ -8,12 +8,13 @@ import errorHandler from '@/api/middleware/errorHandling';
 import api from '@/api/routes/api';
 import web from '@/api/routes/web';
 import { config } from '@/config/index';
-import logger from "@/loaders/logger";
+import logger from '@/infra/logger/logger';
 import listen from '@/utils/http';
 import { removeSlashes } from '@/utils/urls';
-import responseHandler from "./http/responseHandler";
-import options from "./middleware/options";
+
+import responseHandler from './http/responseHandler';
 import logging from './middleware/logging';
+import options from './middleware/options';
 
 const routes = (subpath: string): Koa => {
   const app = new Koa();

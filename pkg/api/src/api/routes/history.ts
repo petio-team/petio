@@ -2,13 +2,13 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import logger from '@/loaders/logger';
+import logger from '@/infra/logger/logger';
 import getBandwidth from '@/services/plex/bandwidth';
 import getHistory from '@/services/plex/history';
 import getServerInfo from '@/services/plex/serverInfo';
 
 const listHistory = async (ctx: Context) => {
-  let {id} = ctx.request.body;
+  let { id } = ctx.request.body;
   if (id === 'admin') id = 1;
   try {
     const data = await getHistory(id, ctx.request.body.type);

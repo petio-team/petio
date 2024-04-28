@@ -1,12 +1,12 @@
 import { Zodios } from '@zodios/core';
 
+import { pluginQuery } from '@/utils/zodios';
 
+import { TMDB_API_KEY } from '../config/env';
 import { DiscoverAPI } from './discover/discover';
 import { MovieAPI } from './movie/movies';
 import { TrendingAPI } from './trending/trending';
 import { TVAPI } from './tv/tv';
-import externalConfig from "@/config/env/external";
-import { pluginQuery } from '@/utils/zodios';
 
 export const TMDBAPI = new Zodios('https://api.themoviedb.org/3', [
   ...DiscoverAPI,
@@ -14,4 +14,4 @@ export const TMDBAPI = new Zodios('https://api.themoviedb.org/3', [
   ...TVAPI,
   ...TrendingAPI,
 ]);
-TMDBAPI.use(pluginQuery('api_key', async () => externalConfig.tmdbApiKey));
+TMDBAPI.use(pluginQuery('api_key', async () => TMDB_API_KEY));

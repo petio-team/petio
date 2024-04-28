@@ -2,7 +2,7 @@
 import Router from '@koa/router';
 import { Context } from 'koa';
 
-import logger from '@/loaders/logger';
+import logger from '@/infra/logger/logger';
 import { UserModel } from '@/models/user';
 import cache from '@/services/cache/cache';
 import { DiscoveryResult } from '@/services/discovery/display';

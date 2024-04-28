@@ -5,14 +5,14 @@ import { Context } from 'koa';
 
 import { WriteConfig } from '@/config/config';
 import { config } from '@/config/index';
-import logger from '@/loaders/logger';
+import logger from '@/infra/logger/logger';
 import { UserModel } from '@/models/user';
 import plexLookup from '@/services/plex/lookup';
 import MakePlexURL from '@/services/plex/util';
 
 const lookupByIdAndType = async (ctx: Context) => {
-  const {type} = ctx.params;
-  const {id} = ctx.params;
+  const { type } = ctx.params;
+  const { id } = ctx.params;
   if (!type || !id || type === 'undefined' || type === 'undefined') {
     ctx.status = StatusCodes.BAD_REQUEST;
     ctx.body = { error: 'invalid fields provided' };
@@ -63,13 +63,12 @@ const testPlexConnection = async (ctx: Context) => {
       };
       return;
     }
-      ctx.status = StatusCodes.OK;
-      ctx.body = {
-        connection: false,
-        error: 'You are not the owner of this server',
-      };
-      return;
-
+    ctx.status = StatusCodes.OK;
+    ctx.body = {
+      connection: false,
+      error: 'You are not the owner of this server',
+    };
+    return;
   } catch (err) {
     logger.log({ level: 'error', message: err });
 

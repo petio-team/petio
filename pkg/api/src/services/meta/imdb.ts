@@ -4,8 +4,8 @@ import lineReader from 'line-reader';
 import path from 'path';
 import zlib from 'zlib';
 
-import pathsConfig from '@/config/env/paths';
-import loggerMain from '@/loaders/logger';
+import { DATA_DIR } from '@/infra/config/env';
+import loggerMain from '@/infra/logger/logger';
 import Imdb from '@/models/imdb';
 
 const logger = loggerMain.child({ module: 'meta.imdb' });
@@ -32,7 +32,7 @@ export async function storeCache(firstTime = false) {
     }
   }
   const unzip = zlib.createGunzip();
-  const tempFile = path.join(pathsConfig.dataDir, './imdb_dump.txt');
+  const tempFile = path.join(DATA_DIR, './imdb_dump.txt');
   logger.debug('IMDB: Rebuilding Cache');
   try {
     logger.debug('IMDB: Cache Downloading latest cache', {

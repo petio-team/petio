@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import RadarrAPI from '@/infra/arr/radarr';
 import { Movie } from '@/infra/arr/radarr/movie';
-import loggerMain from '@/loaders/logger';
+import loggerMain from '@/infra/logger/logger';
 import {
   DownloaderType,
   GetAllDownloaders,

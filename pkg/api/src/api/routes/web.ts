@@ -5,7 +5,7 @@ import addTrailingSlashes from 'koa-add-trailing-slashes';
 import mount from 'koa-mount';
 import serve from 'koa-static';
 
-import viewsConfig from "@/config/env/views";
+import { NODE_ENV } from '@/infra/config/env';
 
 const pathExists = async (file: string): Promise<boolean> => {
   try {
@@ -24,7 +24,12 @@ function serveReact(app: Koa, dir: string, urlPath: string) {
 }
 
 export default async (app: Koa) => {
-  let frontendPath = viewsConfig.frontend;
+  const viewsPath =
+    NODE_ENV === 'production' ?
+      path.join(__dirname, './pkg/frontend/build') :
+      path.join(__dirname, '../../../../frontend/build');
+
+  let frontendPath = viewsPath;
   if (!(await pathExists(path.join(frontendPath, 'index.html')))) {
     const frontendBuildPath = path.join(frontendPath, './build');
     if (!(await pathExists(path.join(frontendBuildPath, './index.html')))) {

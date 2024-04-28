@@ -9,7 +9,7 @@ import xmlParser from 'xml-js';
 
 import { authenticate } from '@/api/middleware/auth';
 import { config } from '@/config/index';
-import loggerMain from '@/loaders/logger';
+import loggerMain from '@/infra/logger/logger';
 import { GetUserByPlexID, UserModel, UserRole } from '@/models/user';
 
 const logger = loggerMain.child({ module: 'routes.login' });
@@ -70,7 +70,6 @@ const attemptPlexAuth = async (ctx: Context) => {
   try {
     const userId = await plexOauth(token);
     const dbUser = await GetUserByPlexID(userId);
-
 
     if (!dbUser) {
       ctx.error({

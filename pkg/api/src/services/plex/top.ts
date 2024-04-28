@@ -2,9 +2,9 @@
 import { fromError, isValidationError } from 'zod-validation-error';
 
 import { config } from '@/config';
+import loggerMain from '@/infra/logger/logger';
 import { PlexAPIClient } from '@/infra/plex/plex';
 import { MediaContainer } from '@/infra/plex/plex/library';
-import loggerMain from '@/loaders/logger';
 import plexLookup from '@/services/plex/lookup';
 import { movieLookup } from '@/services/tmdb/movie';
 import { showLookup } from '@/services/tmdb/show';

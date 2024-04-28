@@ -1,9 +1,11 @@
 /* eslint-disable no-param-reassign */
+
 /* eslint-disable no-underscore-dangle */
-import logger from '@/loaders/logger';
 import { ObjectId } from 'bson';
 import { Schema, model } from 'mongoose';
 import * as z from 'zod';
+
+import logger from '@/infra/logger/logger';
 
 export enum UserRole {
   User = 'user',
@@ -86,7 +88,7 @@ const UserModelSchema = new Schema<User>(
   {
     timestamps: true,
     toObject: {
-      transform (_doc, ret) {
+      transform(_doc, ret) {
         ret.id = ret._id;
         delete ret.password;
         delete ret._id;
@@ -95,7 +97,7 @@ const UserModelSchema = new Schema<User>(
       },
     },
     toJSON: {
-      transform (_doc, ret) {
+      transform(_doc, ret) {
         ret.id = ret._id;
         delete ret.password;
         delete ret._id;
@@ -131,7 +133,7 @@ export const GetUserByEmail = async (email: string): Promise<User> => {
 
   const parsed = await UserSchema.safeParseAsync(data.toObject());
   if (!parsed.success) {
-    throw new Error(`failed to parse and validate data: ${  parsed.error}`);
+    throw new Error(`failed to parse and validate data: ${parsed.error}`);
   }
 
   parsed.data.id = data.id;

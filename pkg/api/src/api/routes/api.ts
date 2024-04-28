@@ -10,7 +10,6 @@ import filter from '@/api/routes/filter';
 import health from '@/api/routes/health';
 import history from '@/api/routes/history';
 import issue from '@/api/routes/issue';
-import log from '@/api/routes/log';
 import login from '@/api/routes/login';
 import mail from '@/api/routes/mail';
 import movie from '@/api/routes/movie';
@@ -67,7 +66,6 @@ export default (app: Koa, subpath: string) => {
   filter(api);
   history(api);
   issue(api);
-  log(api);
   login(api);
   mail(api);
   movie(api);

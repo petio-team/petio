@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { validateRequest } from '@/api/middleware/validation';
 import { WriteConfig } from '@/config/config';
 import { config } from '@/config/index';
-import logger from '@/loaders/logger';
+import logger from '@/infra/logger/logger';
 import Mailer from '@/services/mail/mailer';
 
 const createMail = async (ctx: Context) => {

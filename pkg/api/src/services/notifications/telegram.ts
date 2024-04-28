@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import { config } from '@/config/index';
-import logger from '@/loaders/logger';
+import logger from '@/infra/logger/logger';
 
 export default class Telegram {
   botToken: any;

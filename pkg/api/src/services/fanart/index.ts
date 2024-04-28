@@ -1,5 +1,5 @@
 import { FanartAPI } from '@/infra/fanart/api';
-import loggerMain from '@/loaders/logger';
+import loggerMain from '@/infra/logger/logger';
 
 import cache from '../cache/cache';
 

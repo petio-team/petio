@@ -2,9 +2,9 @@ import fs from 'fs/promises';
 import path from 'path';
 
 import configSchema from '@/config/schema';
-import logger from '@/loaders/logger';
+import { DATA_DIR } from '@/infra/config/env';
+import logger from '@/infra/logger/logger';
 import { fileExists } from '@/utils/file';
-import pathsConfig from "./env/paths";
 
 /**
  * The name of the config file to use
@@ -15,13 +15,14 @@ const PETIO_CONFIG_FILE = 'petio.json';
  * Gets the path of the config file
  * @returns the path of the config file
  */
-export const getConfigPath = (): string => path.join(pathsConfig.dataDir, PETIO_CONFIG_FILE);
+export const getConfigPath = (): string =>
+  path.join(DATA_DIR, PETIO_CONFIG_FILE);
 
 /**
  * Attempts to write the config data to the config file
  * @returns true if the config was written and false if it failed
  */
- export const WriteConfig = async (): Promise<Object | null> => {
+export const WriteConfig = async (): Promise<Object | null> => {
   try {
     const properties = configSchema.getProperties();
     const data = JSON.stringify(properties, null, 2);
@@ -67,7 +68,8 @@ export const LoadConfig = async (): Promise<boolean> => {
  * Checks if the config has been loaded
  * @returns true if config had been loaded else false
  */
-export const HasConfig = async (): Promise<boolean> => fileExists(getConfigPath());
+export const HasConfig = async (): Promise<boolean> =>
+  fileExists(getConfigPath());
 
 /**
  * Get the properties of the config

@@ -1,4 +1,4 @@
-import { Logger } from '@/loaders/logger';
+import { Logger } from '@/infra/logger/logger';
 
 import { DefaultCronOptions } from './constants';
 import {

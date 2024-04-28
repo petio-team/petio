@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import loggerMain from '@/loaders/logger';
+import loggerMain from '@/infra/logger/logger';
 import MakePlexURL from '@/services/plex/util';
 
 const logger = loggerMain.child({ module: 'plex.bandwidth' });

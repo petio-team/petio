@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import { config } from '@/config/index';
-import loggerMain from '@/loaders/logger';
+import loggerMain from '@/infra/logger/logger';
 
 const logger = loggerMain.child({ module: 'notifications.discord' });
 

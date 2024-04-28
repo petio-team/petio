@@ -5,8 +5,8 @@ import { isErrorFromPath } from '@zodios/core';
 import Bluebird from 'bluebird';
 
 import { config } from '@/config';
+import loggerMain from '@/infra/logger/logger';
 import { PlexAPIClient, PlexApiEndpoints } from '@/infra/plex/plex';
-import loggerMain from '@/loaders/logger';
 import DiscoveryModel from '@/models/discovery';
 import MovieModel, { Movie } from '@/models/movie';
 import ShowModel, { Show } from '@/models/show';

@@ -2,7 +2,7 @@
 import Bluebird from 'bluebird';
 import _ from 'lodash';
 
-import loggerMain from '@/loaders/logger';
+import loggerMain from '@/infra/logger/logger';
 import { GetAllUsers } from '@/models/user';
 
 import cache from '../cache/cache';

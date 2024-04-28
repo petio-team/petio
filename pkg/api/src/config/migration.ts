@@ -2,9 +2,9 @@ import fs from 'fs/promises';
 import path from 'path';
 import * as z from 'zod';
 
-import pathsConfig from "./env/paths";
 import config from '@/config/schema';
-import logger from '@/loaders/logger';
+import { DATA_DIR } from '@/infra/config/env';
+import logger from '@/infra/logger/logger';
 import { fileExists } from '@/utils/file';
 
 const MainConfigSchema = z.object({
@@ -79,7 +79,6 @@ const configFiles: ConfigParse[] = [
     schema: z.array(ArrConfigSchema),
   },
 ];
-
 
 const transformMainConfig = (data: any): void => {
   const output = data as MainConfig;
@@ -182,13 +181,13 @@ const findParseAndMergeConfigs = async (): Promise<boolean> => {
   let isModified = false;
 
   Object.values(configFiles).forEach(async (cfg) => {
-    const file = path.join(pathsConfig.dataDir, `${config.file}.json`);
+    const file = path.join(DATA_DIR, `${config.file}.json`);
     const exists = await fileExists(file);
     if (exists) {
       const content = await fs.readFile(file);
       const parsed = await config.schema.safeParseAsync(content);
       if (!parsed.success) {
-        logger.error(`failed to parse config '${  config.file  }.json`);
+        logger.error(`failed to parse config '${config.file}.json`);
         return;
       }
 

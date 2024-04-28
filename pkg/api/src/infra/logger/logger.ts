@@ -4,7 +4,7 @@ import path from 'path';
 import pino, { Logger as PinoLogger } from 'pino';
 import PinoPretty from 'pino-pretty';
 
-import pathsConfig from '@/config/env/paths';
+import { DATA_DIR, LOG_LEVEL } from '../config/env';
 
 /**
  * The Logger class provides logging functionality for the application.
@@ -15,9 +15,8 @@ export class Logger {
   private logger: PinoLogger;
 
   private constructor() {
-    const level = process.env.LOG_LEVEL || 'info';
     this.logger = this.createLogger(
-      process.env.NODE_ENV === 'development' ? 'debug' : level,
+      process.env.NODE_ENV === 'development' ? 'debug' : LOG_LEVEL,
     );
   }
 
@@ -27,7 +26,7 @@ export class Logger {
    * @returns The created logger instance.
    */
   private createLogger(level: string): PinoLogger<string> {
-    const logsFolder = path.join(pathsConfig.dataDir, './logs');
+    const logsFolder = path.join(DATA_DIR, './logs');
     return pino(
       {
         level,

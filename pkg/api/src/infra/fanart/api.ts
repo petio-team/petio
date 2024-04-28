@@ -1,9 +1,9 @@
 import { Zodios } from '@zodios/core';
 import * as z from 'zod';
 
-import externalConfig from "@/config/env/external";
 import { pluginQuery } from '@/utils/zodios';
 
+import { FANART_API_KEY } from '../config/env';
 
 export enum FanartTypes {
   Movies = 'movies',
@@ -208,4 +208,4 @@ export const FanartAPI = new Zodios('https://webservice.fanart.tv/v3', [
     response: FanartSchema,
   },
 ]);
-FanartAPI.use(pluginQuery('api_key', async () => externalConfig.fanartApiKey));
+FanartAPI.use(pluginQuery('api_key', async () => FANART_API_KEY));

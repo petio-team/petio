@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
 import { adminRequired } from '@/api/middleware/auth';
-import logger from '@/loaders/logger';
+import logger from '@/infra/logger/logger';
 import Profile from '@/models/profile';
 import { UserModel } from '@/models/user';
 
@@ -22,7 +22,6 @@ const listProfiles = async (ctx: Context) => {
   } catch (err) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = { error: err };
-
   }
 };
 

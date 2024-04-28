@@ -1,7 +1,6 @@
 import bluebird from 'bluebird';
 
-import cache from "../cache/cache";
-import { getMovieDetails, getShowDetails } from './show';
+import logger from '@/infra/logger/logger';
 import { TMDBAPI } from '@/infra/tmdb/tmdb';
 import {
   MediaType,
@@ -10,7 +9,9 @@ import {
   TrendingPeople,
   TrendingTv,
 } from '@/infra/tmdb/trending/trending';
-import logger from '@/loaders/logger';
+
+import cache from '../cache/cache';
+import { getMovieDetails, getShowDetails } from './show';
 
 const Companies = [
   {

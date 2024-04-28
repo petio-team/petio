@@ -1,7 +1,9 @@
-import { IpcMethodHandler } from "@david.uhlir/ipc-method";
-import cluster from "cluster";
-import logger from "@/loaders/logger";
-import { masterReciever, workerReciever } from "./recievers";
+import { IpcMethodHandler } from '@david.uhlir/ipc-method';
+import cluster from 'cluster';
+
+import logger from '@/infra/logger/logger';
+
+import { masterReciever, workerReciever } from './recievers';
 
 export class Master {
   private static instance: Master;
@@ -10,7 +12,9 @@ export class Master {
 
   private constructor() {
     if (!cluster.isPrimary) {
-      throw new Error("Master class should be instantiated in the primary cluster");
+      throw new Error(
+        'Master class should be instantiated in the primary cluster',
+      );
     }
     this.handler = new IpcMethodHandler(['worker-com'], masterReciever);
   }
@@ -27,10 +31,7 @@ export class Master {
   }
 
   async runWorkers() {
-    return Promise.all(
-      ["job", "web"]
-        .map(async (w) => this.createWorker(w)),
-    );
+    return Promise.all(['job', 'web'].map(async (w) => this.createWorker(w)));
   }
 
   private async createWorker(type: string) {
@@ -47,7 +48,9 @@ export class Master {
         reject(error);
       });
       worker.on('exit', (code, signal) => {
-        logger.debug(`Worker ${worker.process.pid} has exited with code ${code} and signal ${signal}`);
+        logger.debug(
+          `Worker ${worker.process.pid} has exited with code ${code} and signal ${signal}`,
+        );
         if (!worker.exitedAfterDisconnect) {
           this.createWorker(type);
         }

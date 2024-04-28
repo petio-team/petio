@@ -2,8 +2,8 @@
 import axios, { AxiosResponse } from 'axios';
 import http from 'http';
 
-import externalConfig from '@/config/env/external';
-import loggerMain from '@/loaders/logger';
+import { TMDB_API_KEY } from '@/infra/config/env';
+import loggerMain from '@/infra/logger/logger';
 import fanartLookup from '@/services/fanart';
 import { lookup } from '@/services/meta/imdb';
 import onServer from '@/services/plex/server';
@@ -341,7 +341,7 @@ export async function discoverMovie(page = 1, params = {}) {
   Object.keys(params).forEach((i) => {
     par += `&${i}=${params[i]}`;
   });
-  const url = `${tmdb}discover/movie?api_key=${externalConfig.tmdbApiKey}${par}&page=${page}&append_to_response=videos`;
+  const url = `${tmdb}discover/movie?api_key=${TMDB_API_KEY}${par}&page=${page}&append_to_response=videos`;
   const res = await axios.get(url, { httpAgent: agent });
   if (res.data && res.data.results.length > 0) {
     await Promise.all(
@@ -361,7 +361,7 @@ interface CompanyData {
 
 export async function company(id: number): Promise<CompanyData> {
   const tmdb = 'https://api.themoviedb.org/3/';
-  const url = `${tmdb}company/${id}?api_key=${externalConfig.tmdbApiKey}`;
+  const url = `${tmdb}company/${id}?api_key=${TMDB_API_KEY}`;
   const res: AxiosResponse<CompanyData> = await axios.get(url, {
     httpAgent: agent,
   });

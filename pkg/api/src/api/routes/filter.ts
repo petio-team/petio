@@ -2,7 +2,7 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import logger from '@/loaders/logger';
+import logger from '@/infra/logger/logger';
 import Filter from '@/models/filter';
 
 const getFilters = async (ctx: Context) => {

@@ -1,4 +1,4 @@
-import logger from '@/loaders/logger';
+import logger from '@/infra/logger/logger';
 import Movie from '@/models/movie';
 import Show from '@/models/show';
 import { UserModel } from '@/models/user';
@@ -15,12 +15,11 @@ export default async () => {
         ready: true,
         error: false,
       };
-    } 
-      return {
-        ready: false,
-        error: false,
-      };
-    
+    }
+    return {
+      ready: false,
+      error: false,
+    };
   } catch (e) {
     logger.error('setup ready check failed to get ready');
     logger.error(e);

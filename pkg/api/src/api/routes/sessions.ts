@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
 import { adminRequired } from '@/api/middleware/auth';
-import logger from '@/loaders/logger';
+import logger from '@/infra/logger/logger';
 import getSessions from '@/services/plex/sessions';
 
 const getSessionsData = async (ctx: Context) => {

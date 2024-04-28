@@ -3,7 +3,7 @@ import Bluebird from 'bluebird';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import logger from '@/loaders/logger';
+import logger from '@/infra/logger/logger';
 import { GetAllDownloaders, IDownloader } from '@/models/downloaders';
 import Request from '@/models/request';
 import { UserModel } from '@/models/user';

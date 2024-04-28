@@ -1,4 +1,4 @@
-import logger from '@/loaders/logger';
+import logger from '@/infra/logger/logger';
 import { UserModel } from '@/models/user';
 
 export default class QuotaSystem {

@@ -1,4 +1,4 @@
-import loggerMain from '@/loaders/logger';
+import loggerMain from '@/infra/logger/logger';
 import Archive from '@/models/archive';
 import { DownloaderType, GetAllDownloaders } from '@/models/downloaders';
 import Profile from '@/models/profile';

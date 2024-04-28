@@ -2,9 +2,9 @@ import axios from 'axios';
 import Bluebird from 'bluebird';
 import xmlParser from 'xml-js';
 
-import externalConfig from '@/config/env/external';
 import { config } from '@/config/index';
-import loggerMain from '@/loaders/logger';
+import { TMDB_API_KEY } from '@/infra/config/env';
+import loggerMain from '@/infra/logger/logger';
 import Library from '@/models/library';
 import MovieModel from '@/models/movie';
 import Profile from '@/models/profile';
@@ -761,19 +761,19 @@ export default class LibraryUpdate {
   }
 
   async externalIdTv(id, type) {
-    const url = `${this.tmdb}find/${id}?api_key=${externalConfig.tmdbApiKey}&language=en-US&external_source=${type}_id`;
+    const url = `${this.tmdb}find/${id}?api_key=${TMDB_API_KEY}&language=en-US&external_source=${type}_id`;
     const res = await axios.get(url);
     return res.data.tv_results[0].id;
   }
 
   async tmdbExternalIds(id) {
-    const url = `${this.tmdb}tv/${id}/external_ids?api_key=${externalConfig.tmdbApiKey}`;
+    const url = `${this.tmdb}tv/${id}/external_ids?api_key=${TMDB_API_KEY}`;
     const res = await axios.get(url);
     return res.data;
   }
 
   async externalIdMovie(id, type) {
-    const url = `${this.tmdb}find/${id}?api_key=${externalConfig.tmdbApiKey}&language=en-US&external_source=${type}_id`;
+    const url = `${this.tmdb}find/${id}?api_key=${TMDB_API_KEY}&language=en-US&external_source=${type}_id`;
     const res = await axios.get(url);
     return res.data.movie_results[0].id;
   }

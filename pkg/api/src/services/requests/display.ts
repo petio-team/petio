@@ -1,18 +1,30 @@
 /* eslint-disable no-restricted-syntax */
+
 /* eslint-disable import/prefer-default-export */
 import Bluebird from 'bluebird';
 
-import { RequestChildren, RequestOutput, RequestState, isDownloaderSeries, isDownloaderMovie } from './types';
-import { calcDate, cinemaWindow } from "./utils";
-import { Movie } from "@/infra/arr/radarr/v4/movie";
-import { Series } from "@/infra/arr/sonarr/v3/series";
-import logger from '@/loaders/logger';
-import { DownloaderType, GetAllDownloaders, IDownloader } from '@/models/downloaders';
+import { Movie } from '@/infra/arr/radarr/v4/movie';
+import { Series } from '@/infra/arr/sonarr/v3/series';
+import logger from '@/infra/logger/logger';
+import {
+  DownloaderType,
+  GetAllDownloaders,
+  IDownloader,
+} from '@/models/downloaders';
 import Request, { IRequest } from '@/models/request';
 import Radarr from '@/services/downloaders/radarr';
 import Sonarr from '@/services/downloaders/sonarr';
 import { movieLookup } from '@/services/tmdb/movie';
 import { showLookup } from '@/services/tmdb/show';
+
+import {
+  RequestChildren,
+  RequestOutput,
+  RequestState,
+  isDownloaderMovie,
+  isDownloaderSeries,
+} from './types';
+import { calcDate, cinemaWindow } from './utils';
 
 function reqState(req: IRequest, children: RequestChildren[]): RequestState {
   let diff: number;
@@ -114,7 +126,7 @@ function reqState(req: IRequest, children: RequestChildren[]): RequestState {
             if (data.inCinemas) {
               diff = Math.ceil(
                 new Date(element.info.inCinemas).getTime() -
-                new Date().getTime(),
+                  new Date().getTime(),
               );
               if (diff > 0) {
                 return {
@@ -135,8 +147,7 @@ function reqState(req: IRequest, children: RequestChildren[]): RequestState {
               }
             } else if (data.inCinemas) {
               diff = Math.ceil(
-                new Date().getTime() -
-                new Date(data.inCinemas).getTime(),
+                new Date().getTime() - new Date(data.inCinemas).getTime(),
               );
               if (cinemaWindow(diff)) {
                 return {
@@ -225,11 +236,14 @@ function makeOutput(request: IRequest): RequestOutput {
       process_stage: reqState(request, []),
       defaults: request.pendingDefault,
       seasons: request.type === 'tv' ? request.seasons : undefined,
-    }
+    },
   };
 }
 
-async function getRequestsForMovies(radarrs: IDownloader[], requests: IRequest[]) {
+async function getRequestsForMovies(
+  radarrs: IDownloader[],
+  requests: IRequest[],
+) {
   const results = await Bluebird.map(requests, async (request) => {
     const output = makeOutput(request);
     try {
@@ -245,8 +259,7 @@ async function getRequestsForMovies(radarrs: IDownloader[], requests: IRequest[]
             client.GetQueue(),
           ]);
 
-          const status = queue.items
-            .filter((q) => q.id === movieId);
+          const status = queue.items.filter((q) => q.id === movieId);
 
           output[request.requestId].children.push({
             id: movieId,
@@ -256,9 +269,15 @@ async function getRequestsForMovies(radarrs: IDownloader[], requests: IRequest[]
             },
             status,
           });
-          output[request.requestId].process_stage = reqState(request, output[request.requestId].children);
+          output[request.requestId].process_stage = reqState(
+            request,
+            output[request.requestId].children,
+          );
         } catch (error) {
-          logger.error(`failed to get movie ${request.radarrId[0]} from ${instance.name}`, error);
+          logger.error(
+            `failed to get movie ${request.radarrId[0]} from ${instance.name}`,
+            error,
+          );
           output[request.requestId].children.push({
             id: -1,
             info: {
@@ -281,7 +300,10 @@ async function getRequestsForMovies(radarrs: IDownloader[], requests: IRequest[]
   return results;
 }
 
-async function getRequestsForShows(sonarrs: IDownloader[], requests: IRequest[]) {
+async function getRequestsForShows(
+  sonarrs: IDownloader[],
+  requests: IRequest[],
+) {
   const results = await Bluebird.map(requests, async (request) => {
     const output = makeOutput(request);
     try {
@@ -297,8 +319,7 @@ async function getRequestsForShows(sonarrs: IDownloader[], requests: IRequest[])
             client.GetQueue(),
           ]);
 
-          const status = queue.items
-            .filter((q) => q.id === seriesId);
+          const status = queue.items.filter((q) => q.id === seriesId);
 
           output[request.requestId].children.push({
             id: seriesId,
@@ -308,9 +329,15 @@ async function getRequestsForShows(sonarrs: IDownloader[], requests: IRequest[])
             },
             status,
           });
-          output[request.requestId].process_stage = reqState(request, output[request.requestId].children);
+          output[request.requestId].process_stage = reqState(
+            request,
+            output[request.requestId].children,
+          );
         } catch (error) {
-          logger.error(`failed to get show ${request.sonarrId[0]} from ${instance.name}`, error);
+          logger.error(
+            `failed to get show ${request.sonarrId[0]} from ${instance.name}`,
+            error,
+          );
           output[request.requestId].children.push({
             id: -1,
             info: {
@@ -344,10 +371,16 @@ export async function getAllRequests() {
       return {};
     }
 
-    const sonarrs = instances.filter((instance) => instance.type === DownloaderType.Sonarr);
-    const radarrs = instances.filter((instance) => instance.type === DownloaderType.Radarr);
+    const sonarrs = instances.filter(
+      (instance) => instance.type === DownloaderType.Sonarr,
+    );
+    const radarrs = instances.filter(
+      (instance) => instance.type === DownloaderType.Radarr,
+    );
 
-    const movieRequests = requests.filter((request) => request.type === 'movie');
+    const movieRequests = requests.filter(
+      (request) => request.type === 'movie',
+    );
     const tvRequests = requests.filter((request) => request.type === 'tv');
 
     const [movieStatus, tvStatus] = await Promise.all([
@@ -355,7 +388,10 @@ export async function getAllRequests() {
       getRequestsForShows(sonarrs, tvRequests),
     ]);
 
-    if (Object.keys(movieStatus).length === 0 && Object.keys(tvStatus).length === 0) {
+    if (
+      Object.keys(movieStatus).length === 0 &&
+      Object.keys(tvStatus).length === 0
+    ) {
       return requests.map((request) => makeOutput(request));
     }
 
@@ -381,10 +417,16 @@ export async function getAllUserRequests(userId: string) {
       return {};
     }
 
-    const sonarrs = instances.filter((instance) => instance.type === DownloaderType.Sonarr);
-    const radarrs = instances.filter((instance) => instance.type === DownloaderType.Radarr);
+    const sonarrs = instances.filter(
+      (instance) => instance.type === DownloaderType.Sonarr,
+    );
+    const radarrs = instances.filter(
+      (instance) => instance.type === DownloaderType.Radarr,
+    );
 
-    const movieRequests = requests.filter((request) => request.type === 'movie');
+    const movieRequests = requests.filter(
+      (request) => request.type === 'movie',
+    );
     const tvRequests = requests.filter((request) => request.type === 'tv');
 
     const [movieStatus, tvStatus] = await Promise.all([
@@ -392,7 +434,10 @@ export async function getAllUserRequests(userId: string) {
       getRequestsForShows(sonarrs, tvRequests),
     ]);
 
-    if (Object.keys(movieStatus).length === 0 && Object.keys(tvStatus).length === 0) {
+    if (
+      Object.keys(movieStatus).length === 0 &&
+      Object.keys(tvStatus).length === 0
+    ) {
       return requests.map((request) => makeOutput(request));
     }
 

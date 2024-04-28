@@ -4,28 +4,31 @@ import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 import { z } from 'zod';
 
-import { StatusBadRequest, StatusInternalServerError } from '@/api/http/request';
+import {
+  StatusBadRequest,
+  StatusInternalServerError,
+} from '@/api/http/request';
 import { adminRequired } from '@/api/middleware/auth';
 import { validateRequest } from '@/api/middleware/validation';
 import { ArrError } from '@/infra/arr/error';
 import RadarrAPI, { GetRadarrInstanceFromDb } from '@/infra/arr/radarr';
 import SonarrAPI, { GetSonarrInstanceFromDb } from '@/infra/arr/sonarr';
-import logger from '@/loaders/logger';
+import logger from '@/infra/logger/logger';
 import {
   CreateOrUpdateDownloader,
   DeleteDownloaderById,
   DownloaderType,
   GetAllDownloaders,
 } from '@/models/downloaders';
-import { ArrInput, ArrInputSchema } from "@/schemas/downloaders";
+import { ArrInput, ArrInputSchema } from '@/schemas/downloaders';
 
 const getSonarrOptionsById = async (ctx: Context) => {
   const instance = await GetSonarrInstanceFromDb(ctx.params.id);
   if (!instance) {
     ctx.error({
       statusCode: StatusCodes.BAD_REQUEST,
-      code: "INVALID_INSTANCE",
-      message: `no instance was found with the id: ${ctx.params.id}`
+      code: 'INVALID_INSTANCE',
+      message: `no instance was found with the id: ${ctx.params.id}`,
     });
     return;
   }
@@ -44,7 +47,7 @@ const getSonarrOptionsById = async (ctx: Context) => {
       profiles,
       languages,
       tags,
-    }
+    },
   });
 };
 
@@ -213,13 +216,7 @@ const updateSonarrConfig = async (ctx: Context) => {
     }
 
     const url = new URL(
-      `${instance.protocol
-        }://${
-          instance.host
-        }:${
-          instance.port
-        }/${
-          instance.subpath}`,
+      `${instance.protocol}://${instance.host}:${instance.port}/${instance.subpath}`,
     );
 
     const api = new SonarrAPI(url, instance.token);
@@ -283,7 +280,7 @@ const deleteSonarrById = async (ctx: Context) => {
     const deleted = await DeleteDownloaderById(ctx.params.id);
     if (!deleted) {
       ctx.status = StatusCodes.NOT_FOUND;
-      ctx.body = `failed to delete instance with the id: ${  ctx.params.id}`;
+      ctx.body = `failed to delete instance with the id: ${ctx.params.id}`;
       return;
     }
 
@@ -526,61 +523,55 @@ const updateRadarrConfig = async (ctx: Context) => {
   const instance = ctx.request.body as ArrInput;
 
   try {
-      if (instance.subpath.startsWith('/')) {
-        instance.subpath = instance.subpath.substring(1);
-      }
+    if (instance.subpath.startsWith('/')) {
+      instance.subpath = instance.subpath.substring(1);
+    }
 
-      const url = new URL(
-        `${instance.protocol
-          }://${
-            instance.host
-          }:${
-            instance.port
-          }/${
-            instance.subpath}`,
-      );
+    const url = new URL(
+      `${instance.protocol}://${instance.host}:${instance.port}/${instance.subpath}`,
+    );
 
-      const api = new RadarrAPI(url, instance.token);
-      await api.TestConnection();
+    const api = new RadarrAPI(url, instance.token);
+    await api.TestConnection();
 
-      const newInstance = await CreateOrUpdateDownloader({
-        name: instance.name,
-        type: DownloaderType.Radarr,
-        url: url.toString(),
-        token: instance.token,
-        version: api.GetVersion().toString(),
-        path: instance.path,
-        profile: instance.profile,
-        language: instance.language,
-        availability: instance.availability,
-        enabled: instance.enabled,
-      });
+    const newInstance = await CreateOrUpdateDownloader({
+      name: instance.name,
+      type: DownloaderType.Radarr,
+      url: url.toString(),
+      token: instance.token,
+      version: api.GetVersion().toString(),
+      path: instance.path,
+      profile: instance.profile,
+      language: instance.language,
+      availability: instance.availability,
+      enabled: instance.enabled,
+    });
 
-      const [paths, profiles, languages, availabilities] = await Promise.all([
-        api.GetRootPaths(),
-        api.GetQualityProfiles(),
-        api.GetLanguages(),
-        api.GetMinimumAvailability(),
-      ]);
+    const [paths, profiles, languages, availabilities] = await Promise.all([
+      api.GetRootPaths(),
+      api.GetQualityProfiles(),
+      api.GetLanguages(),
+      api.GetMinimumAvailability(),
+    ]);
 
-      const result = {
-        id: newInstance.id,
-        name: instance.name,
-        protocol: instance.protocol,
-        host: instance.host,
-        port: instance.port,
-        subpath: instance.subpath === '' ? '/' : instance.subpath,
-        token: instance.token,
-        path: instance.path,
-        profile: instance.profile,
-        language: instance.language,
-        availability: instance.availability,
-        enabled: instance.enabled,
-        paths,
-        profiles,
-        languages,
-        availabilities,
-      };
+    const result = {
+      id: newInstance.id,
+      name: instance.name,
+      protocol: instance.protocol,
+      host: instance.host,
+      port: instance.port,
+      subpath: instance.subpath === '' ? '/' : instance.subpath,
+      token: instance.token,
+      path: instance.path,
+      profile: instance.profile,
+      language: instance.language,
+      availability: instance.availability,
+      enabled: instance.enabled,
+      paths,
+      profiles,
+      languages,
+      availabilities,
+    };
 
     ctx.status = StatusCodes.OK;
     ctx.body = result;
@@ -601,7 +592,7 @@ const deleteRadarrById = async (ctx: Context) => {
     const deleted = await DeleteDownloaderById(ctx.params.id);
     if (!deleted) {
       ctx.status = StatusCodes.NOT_FOUND;
-      ctx.body = `failed to delete instance with the id: ${  ctx.params.id}`;
+      ctx.body = `failed to delete instance with the id: ${ctx.params.id}`;
       return;
     }
 
@@ -617,7 +608,6 @@ const deleteRadarrById = async (ctx: Context) => {
     ctx.body = error.message;
   }
 };
-
 
 const route = new Router({ prefix: '/services' });
 export default (app: Router) => {
