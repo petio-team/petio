@@ -17,6 +17,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@david.uhlir/shared-cache": "^0.0.3",
     "@hokify/agenda": "^6.3.0",
     "@koa/cors": "^3.4.2",
     "@koa/multer": "^3.0.0",

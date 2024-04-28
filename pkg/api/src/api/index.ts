@@ -3,17 +3,17 @@ import koaBody from 'koa-body';
 import compress from 'koa-compress';
 import mount from 'koa-mount';
 
-import logging from './middleware/logging';
-import options from "./middleware/options";
-import responseHandler from "./http/responseHandler";
 import cors from '@/api/middleware/cors';
 import errorHandler from '@/api/middleware/errorHandling';
 import api from '@/api/routes/api';
 import web from '@/api/routes/web';
 import { config } from '@/config/index';
-import Logger from "@/loaders/logger";
+import logger from "@/loaders/logger";
 import listen from '@/utils/http';
 import { removeSlashes } from '@/utils/urls';
+import responseHandler from "./http/responseHandler";
+import options from "./middleware/options";
+import logging from './middleware/logging';
 
 const routes = (subpath: string): Koa => {
   const app = new Koa();
@@ -27,7 +27,7 @@ const routes = (subpath: string): Koa => {
   return app;
 };
 
-export default (reloadFn: () => Promise<void>) => {
+export default () => {
   // create new koa instance
   const app = new Koa();
 
@@ -61,7 +61,7 @@ export default (reloadFn: () => Promise<void>) => {
 
   // Add error handling
   app.use(errorHandler());
-  app.on('error', (err) => Logger.error(err));
+  app.on('error', (err) => logger.error(err));
 
   // get correctly formatted subpath
   const subpath = `/${removeSlashes(config.get('petio.subpath'))}`;
@@ -70,5 +70,5 @@ export default (reloadFn: () => Promise<void>) => {
   app.use(mount(subpath, routes(subpath)));
 
   // run server
-  listen({ httpApp: app, reloadFn });
+  listen({ httpApp: app });
 };

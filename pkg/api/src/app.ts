@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import logger from './loaders/logger';
 
 import('dotenv/config');
 
@@ -7,7 +8,7 @@ import('dotenv/config');
 //
 (async () => {
   (await import('./loaders')).default().catch((error) => {
-    console.error('something unexpected went wrong');
-    console.error(error);
+    logger.error('something unexpected went wrong', error);
   });
 })();
+

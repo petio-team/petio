@@ -2907,6 +2907,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@david.uhlir/ipc-method@npm:^1.0.15":
+  version: 1.0.17
+  resolution: "@david.uhlir/ipc-method@npm:1.0.17"
+  checksum: c338d7d927a49de3f75566913fee6bad5824f672e35b1a8bb65b411ac9f8a445ec6f12e077686d8c7439de6799711935f81b9046dc8b1c21ee51290988e1890f
+  languageName: node
+  linkType: hard
+
+"@david.uhlir/shared-cache@npm:^0.0.3":
+  version: 0.0.3
+  resolution: "@david.uhlir/shared-cache@npm:0.0.3"
+  dependencies:
+    "@david.uhlir/ipc-method": ^1.0.15
+  checksum: 13b0c03ba5cb968d6d3c624a255a438720a8dee6e6c632dce9147e5170e6a8171b399ee90e5a4f12775aff84d752b2e0e862c7cb0ce0087ec390eab11332010e
+  languageName: node
+  linkType: hard
+
 "@eslint/eslintrc@npm:^1.3.2":
   version: 1.3.2
   resolution: "@eslint/eslintrc@npm:1.3.2"
@@ -6148,6 +6164,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "api@workspace:pkg/api"
   dependencies:
+    "@david.uhlir/shared-cache": ^0.0.3
     "@hokify/agenda": ^6.3.0
     "@koa/cors": ^3.4.2
     "@koa/multer": ^3.0.0

@@ -7,11 +7,11 @@ import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 import send from 'koa-send';
 
-import { adminRequired } from "../middleware/auth";
 import pathsConfig from '@/config/env/paths';
 import logger from '@/loaders/logger';
 import Profile from '@/models/profile';
 import { UserModel, UserRole } from '@/models/user';
+import { adminRequired } from "../middleware/auth";
 
 const UPLOAD_DIR = path.join(pathsConfig.dataDir, './uploads');
 
@@ -116,8 +116,7 @@ const createCustomUser = async (ctx: Context) => {
       ctx.status = StatusCodes.OK;
       ctx.body = newUser;
     } catch (err) {
-      logger.log('error', 'ROUTE: Unable to create custom user');
-      logger.log({ level: 'error', message: err });
+      logger.error(err, 'ROUTE: Unable to create custom user');
       ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
       ctx.body = {
         error: 'Error creating user',
@@ -179,8 +178,7 @@ const editUser = async (ctx: Context) => {
       message: 'User edited',
     };
   } catch (err) {
-    logger.log({ level: 'error', message: err });
-
+    logger.error("failed to get user to edit", err);
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = {
       error: 'Error editing user',
@@ -295,7 +293,7 @@ const updateUserThumbnail = async (ctx: Context) => {
     ctx.status = StatusCodes.OK;
     ctx.body = {};
   } catch (err) {
-    logger.log({ level: 'error', message: err });
+    logger.error("failed to update user", err);
     logger.warn('ROUTE: Failed to update user thumb in db');
 
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;

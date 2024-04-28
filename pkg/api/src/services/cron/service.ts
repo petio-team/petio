@@ -61,7 +61,7 @@ export abstract class CronService {
 
     try {
       await this.initialise();
-      this.logger.info('cron service initialised');
+      this.logger.debug('cron service initialised');
     } catch (err) {
       this.logger.error(err, 'failed to initialise cron service');
     }

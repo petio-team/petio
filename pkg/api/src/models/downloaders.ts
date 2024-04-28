@@ -135,7 +135,7 @@ export const CreateDownloader = async (
 };
 
 export const CreateOrUpdateDownloader = async (
-  data: IDownloader,
+  data: Omit<IDownloader, "id"> & Partial<{ id: string }>,
 ): Promise<IDownloader> => {
   const downloader = await DownloaderModel.findOneAndUpdate(
     {

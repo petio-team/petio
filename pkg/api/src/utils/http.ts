@@ -2,7 +2,7 @@ import koa from 'koa';
 
 import config from '@/config/schema';
 
-export default ({ httpApp, reloadFn }: { httpApp: koa, reloadFn: () => Promise<void> }) => {
+export default ({ httpApp }: { httpApp: koa }) => {
   // run server
   const http = httpApp.listen(config.get('petio.port'), config.get('petio.host'));
   // eslint-disable-next-line no-param-reassign
@@ -10,6 +10,6 @@ export default ({ httpApp, reloadFn }: { httpApp: koa, reloadFn: () => Promise<v
     if (http != null) {
       http.close();
     }
-    await reloadFn();
+    httpApp.listen(config.get('petio.port'), config.get('petio.host'));
   };
 };

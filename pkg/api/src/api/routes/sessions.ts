@@ -13,8 +13,7 @@ const getSessionsData = async (ctx: Context) => {
     ctx.status = StatusCodes.OK;
     ctx.body = data.MediaContainer;
   } catch (err) {
-    logger.log('warn', 'ROUTE: Unable to get sessions');
-    logger.log({ level: 'error', message: err });
+    logger.error('ROUTE: Unable to get sessions', err);
 
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = {};

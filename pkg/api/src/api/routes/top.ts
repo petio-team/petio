@@ -4,16 +4,6 @@ import { Context } from 'koa';
 
 import getTop from '@/services/plex/top';
 
-// Cache for 1 day
-// const cacheMiddleware = new ExpressCache(
-//   cacheManager.caching({
-//     store: "memory",
-//     max: 100,
-//     ttl: 86400,
-//   })
-// );
-// cacheMiddleware.attach(route);
-
 const getMovies = async (ctx: Context) => {
   ctx.status = StatusCodes.OK;
   ctx.body = await getTop(1);

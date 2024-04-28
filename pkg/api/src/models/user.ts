@@ -1,7 +1,8 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-underscore-dangle */
+import logger from '@/loaders/logger';
 import { ObjectId } from 'bson';
 import { Schema, model } from 'mongoose';
-import { container } from 'tsyringe';
-import { Logger } from 'winston';
 import * as z from 'zod';
 
 export enum UserRole {
@@ -10,7 +11,7 @@ export enum UserRole {
 }
 
 export const UserSchema = z.object({
-  id: z.instanceof(ObjectId).optional(),
+  id: z.string().optional(),
   title: z.string().min(1),
   username: z.string().min(1),
   password: z.string().optional(),
@@ -85,7 +86,7 @@ const UserModelSchema = new Schema<User>(
   {
     timestamps: true,
     toObject: {
-      transform (_doc, ret, _options) {
+      transform (_doc, ret) {
         ret.id = ret._id;
         delete ret.password;
         delete ret._id;
@@ -94,7 +95,7 @@ const UserModelSchema = new Schema<User>(
       },
     },
     toJSON: {
-      transform (_doc, ret, _options) {
+      transform (_doc, ret) {
         ret.id = ret._id;
         delete ret.password;
         delete ret._id;
@@ -114,14 +115,8 @@ export const GetAllUsers = async (): Promise<User[]> => {
   if (!results) {
     return [];
   }
-
   const users = results.map((u) => u.toObject());
-  const parsed = await UserSchema.array().safeParseAsync(users);
-  if (!parsed.success) {
-    throw new Error(`failed to parse users data: ${  parsed.error}`);
-  }
-
-  return parsed.data;
+  return users;
 };
 
 // TODO: this should be it's own service with a repository ideally
@@ -167,9 +162,7 @@ export const GetUserByPlexID = async (id: string): Promise<User> => {
 export const CreateOrUpdateUser = async (user: User): Promise<User> => {
   const schema = await UserSchema.safeParseAsync(user);
   if (!schema.success) {
-    container
-      .resolve<Logger>('Logger')
-      .error('failed to parse user data: ', schema.error);
+    logger.error('failed to parse user data: ', schema.error);
     throw new Error('failed to parse user data');
   }
 
@@ -186,6 +179,6 @@ export const CreateOrUpdateUser = async (user: User): Promise<User> => {
     throw new Error('failed to create or update user');
   }
 
-  schema.data.id = data.upsertedId;
+  schema.data.id = data.upsertedId?.toString();
   return schema.data;
 };

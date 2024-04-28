@@ -268,8 +268,7 @@ const updateSonarrConfig = async (ctx: Context) => {
     ctx.body = result;
     return;
   } catch (error) {
-    logger.debug(`ROUTE: Error saving sonarr config`);
-    logger.debug({ message: error });
+    logger.debug(`ROUTE: Error saving sonarr config`, error);
 
     if (error instanceof ArrError) {
       StatusBadRequest(ctx, error.message);
@@ -587,8 +586,7 @@ const updateRadarrConfig = async (ctx: Context) => {
     ctx.body = result;
     return;
   } catch (error) {
-    logger.debug(`ROUTE: Error saving radarr config`);
-    logger.debug({ message: error });
+    logger.debug(`ROUTE: Error saving radarr config`, error);
 
     if (error instanceof ArrError) {
       StatusBadRequest(ctx, error.message);

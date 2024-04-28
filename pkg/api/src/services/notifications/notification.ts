@@ -1,6 +1,6 @@
 import { container } from 'tsyringe';
-import { Logger } from 'winston';
 
+import logger from '@/loaders/logger';
 import { INotify } from './notify';
 import {
   DiscordProvider,
@@ -35,10 +35,9 @@ export const getNotificationProvider = (
 export class BaseNotification<T extends INotification> {
   protected config: T;
 
-  public logger: Logger;
+  public logger = logger.child({ label: 'notification.service' });
 
   constructor(config: T) {
     this.config = config;
-    this.logger = container.resolve<Logger>('Logger');
   }
 }
