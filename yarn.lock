@@ -2907,7 +2907,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@david.uhlir/ipc-method@npm:^1.0.15":
+"@david.uhlir/ipc-method@npm:^1.0.15, @david.uhlir/ipc-method@npm:^1.0.17":
   version: 1.0.17
   resolution: "@david.uhlir/ipc-method@npm:1.0.17"
   checksum: c338d7d927a49de3f75566913fee6bad5824f672e35b1a8bb65b411ac9f8a445ec6f12e077686d8c7439de6799711935f81b9046dc8b1c21ee51290988e1890f
@@ -6164,6 +6164,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "api@workspace:pkg/api"
   dependencies:
+    "@david.uhlir/ipc-method": ^1.0.17
     "@david.uhlir/shared-cache": ^0.0.3
     "@hokify/agenda": ^6.3.0
     "@koa/cors": ^3.4.2

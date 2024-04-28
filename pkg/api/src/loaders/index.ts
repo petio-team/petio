@@ -5,9 +5,9 @@ import ConfigLoader from '@/loaders/config';
 import mongoose from '@/loaders/mongoose';
 import { runCron } from '@/services/cron';
 import startupMessage from '@/utils/startupMessage';
-import { Worker } from '@/infra/worker/worker';
 import { SharedCache } from '@david.uhlir/shared-cache';
 import { HasConfig, config, toObject } from '@/config';
+import { Master } from '@/infra/worker/master';
 import logger from './logger';
 
 async function hasValidConfig() {
@@ -29,11 +29,10 @@ async function doPrimary() {
     }
   }
 
-  const worker = new Worker();
-  await Promise.all([
-    ["job", "web"]
-      .map(async (w) => worker.createWorker(w)),
-  ]);
+  // run workers
+  Master
+    .getInstance()
+    .runWorkers();
 }
 
 async function doWorker() {

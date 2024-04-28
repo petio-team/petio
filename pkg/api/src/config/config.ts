@@ -1,12 +1,10 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { container } from 'tsyringe';
 
-import pathsConfig from "./env/paths";
 import configSchema from '@/config/schema';
-import { IPC } from '@/infra/clusters/ipc';
 import logger from '@/loaders/logger';
 import { fileExists } from '@/utils/file';
+import pathsConfig from "./env/paths";
 
 /**
  * The name of the config file to use
@@ -23,25 +21,15 @@ export const getConfigPath = (): string => path.join(pathsConfig.dataDir, PETIO_
  * Attempts to write the config data to the config file
  * @returns true if the config was written and false if it failed
  */
- export const WriteConfig = async (
-  updateClusters = true,
-): Promise<boolean> => {
+ export const WriteConfig = async (): Promise<Object | null> => {
   try {
     const properties = configSchema.getProperties();
     const data = JSON.stringify(properties, null, 2);
     await fs.writeFile(getConfigPath(), data);
-
-    if (updateClusters) {
-      // update other clusters with new config changes
-      container
-        .resolve(IPC)
-        .messageSiblings({ action: 'onConfigUpdate', data: properties });
-    }
-
-    return true;
+    return properties;
   } catch (error) {
     logger.error(error);
-    return false;
+    return null;
   }
 };
 
@@ -55,7 +43,7 @@ const loadAndValidateConfig = async (file: string): Promise<boolean> => {
   if (stat) {
     configSchema.loadFile(file).validate();
     // We call this here to make sure we write new values to config
-    WriteConfig(false);
+    WriteConfig();
     return true;
   }
 

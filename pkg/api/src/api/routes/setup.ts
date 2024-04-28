@@ -10,6 +10,8 @@ import logger from '@/loaders/logger';
 import { CreateOrUpdateUser, UserRole } from '@/models/user';
 import { SetupTestInput, SetupTestInputSchema } from '@/schemas/setup';
 import testConnection from '@/services/plex/connection';
+import { Worker } from '@/infra/worker/worker';
+import { SharedCache } from '@david.uhlir/shared-cache';
 
 const testServer = async (ctx: Context) => {
   const body = ctx.request.body as SetupTestInput;
@@ -146,10 +148,17 @@ const finishSetup = async (ctx: Context) => {
       quotaCount: 0,
     });
 
-    await WriteConfig(false);
+    const cfg = await WriteConfig();
+    if (!cfg) {
+      throw new Error('failed to write config');
+    }
+
     setTimeout(async () => {
       logger.info('restarting to apply new configurations');
-      return ctx.reload();
+      const reciever = Worker.getInstance().getReciever();
+      await SharedCache.setData('hasConfig', true);
+      await SharedCache.setData('config', cfg);
+      await reciever.restartWorkers();
     }, 1000);
 
     ctx.status = StatusCodes.OK;
