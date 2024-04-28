@@ -71,6 +71,7 @@ const attemptPlexAuth = async (ctx: Context) => {
     const userId = await plexOauth(token);
     const dbUser = await GetUserByPlexID(userId);
 
+
     if (!dbUser) {
       ctx.error({
         statusCode: StatusCodes.FORBIDDEN,
@@ -93,7 +94,7 @@ const attemptPlexAuth = async (ctx: Context) => {
     success(ctx, dbUser, isAdmin);
     saveRequestIp(dbUser, requestIp);
   } catch (err) {
-    logger.debug(`failed to login user via plex`, err);
+    logger.debug(err, `failed to login user via plex`);
     ctx.error({
       statusCode: StatusCodes.FORBIDDEN,
       code: 'PLEX_AUTH_FAILED',

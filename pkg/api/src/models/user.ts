@@ -146,15 +146,7 @@ export const GetUserByPlexID = async (id: string): Promise<User> => {
   if (!data) {
     throw new Error('failed to get user by plex id');
   }
-
-  const parsed = await UserSchema.safeParseAsync(data.toObject());
-  if (!parsed.success) {
-    throw new Error(`failed to parse and validate data: ${  parsed.error}`);
-  }
-
-  parsed.data.id = data.id;
-  delete parsed.data.password;
-  return parsed.data;
+  return data;
 };
 
 // TODO: this should be it's own service with a repository ideally
