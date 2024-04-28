@@ -10,6 +10,10 @@ import { HasConfig, config, toObject } from '@/config';
 import { Master } from '@/infra/worker/master';
 import logger from './logger';
 
+/**
+ * Checks if the application has a valid configuration.
+ * @returns A promise that resolves to a boolean indicating whether the configuration is valid.
+ */
 async function hasValidConfig() {
   try {
     return await SharedCache.getData<boolean>('hasConfig');
@@ -18,6 +22,15 @@ async function hasValidConfig() {
   }
 }
 
+/**
+ * Performs the primary loading process.
+ *
+ * @remarks
+ * This function checks if there is a configuration available, and if so, it loads it into the shared cache.
+ * It then runs the workers using the Master instance.
+ *
+ * @returns A promise that resolves when the primary loading process is complete.
+ */
 async function doPrimary() {
   // TODO: migrate config to db and remove it/rename it to prevent doing this
   const hasConfig = await HasConfig();
@@ -35,6 +48,12 @@ async function doPrimary() {
     .runWorkers();
 }
 
+/**
+ * Performs the necessary initialization and starts the worker based on the environment variables.
+ * If the configuration is valid, it loads the configuration, services, and starts the web worker.
+ * If the configuration is not valid, it displays a warning message to proceed with the initial setup.
+ * If the configuration is valid and the environment variable 'job' is set, it starts the job worker.
+ */
 async function doWorker() {
   const hasConfig = await hasValidConfig();
   if (hasConfig) {
