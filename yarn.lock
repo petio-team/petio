@@ -3594,13 +3594,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sindresorhus/is@npm:^6.3.0":
-  version: 6.3.0
-  resolution: "@sindresorhus/is@npm:6.3.0"
-  checksum: 80323261fecb34e54a231f177ac7bc56e9677825d37ab4183ee265f3e0d663a4770661e245d8dba0ad0a85bc55289ae886511b5255601fe3d7640da5675af5fe
-  languageName: node
-  linkType: hard
-
 "@sinonjs/commons@npm:^1.7.0":
   version: 1.8.3
   resolution: "@sinonjs/commons@npm:1.8.3"
@@ -6170,7 +6163,6 @@ __metadata:
     "@koa/cors": ^3.4.2
     "@koa/multer": ^3.0.0
     "@koa/router": ^12.0.0
-    "@sindresorhus/is": ^6.3.0
     "@swc/core": ^1.3.5
     "@swc/helpers": ^0.5.0
     "@typegoose/typegoose": ^11.0.0
@@ -6204,6 +6196,7 @@ __metadata:
     bson: ^5.0.1
     cache-manager: 5.2.0
     depcheck: ^1.4.3
+    diod: ^2.0.0
     dotenv: ^16.0.3
     eslint: ^8.23.1
     eslint-config-airbnb-base: ^15.0.0
@@ -6236,8 +6229,10 @@ __metadata:
     mocha: ^10.0.0
     mongoose: ^7.6.3
     multer: ^1.4.4
+    napi-nanoid: ^0.2.0
     nodemailer: ^6.8.0
     nodemon: ^2.0.20
+    oxide.ts: ^1.1.0
     pino: ^8.19.0
     pino-http: ^9.0.0
     pino-http-print: ^3.1.0
@@ -8726,6 +8721,13 @@ __metadata:
   version: 4.0.2
   resolution: "diff@npm:4.0.2"
   checksum: f2c09b0ce4e6b301c221addd83bf3f454c0bc00caa3dd837cf6c127d6edf7223aa2bbe3b688feea110b7f262adbfc845b757c44c8a9f8c0c5b15d8fa9ce9d20d
+  languageName: node
+  linkType: hard
+
+"diod@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "diod@npm:2.0.0"
+  checksum: dccc3624444a0a919b9d995710834eff905a4c61aad8edb42d5d0ff01631b1e259cf739f0f5c984ba49358895c7a0937b3058078d6376b5fe4b42d2dab919f1a
   languageName: node
   linkType: hard
 
@@ -14285,6 +14287,145 @@ __metadata:
   languageName: node
   linkType: hard
 
+"napi-nanoid-android-arm-eabi@npm:0.2.0":
+  version: 0.2.0
+  resolution: "napi-nanoid-android-arm-eabi@npm:0.2.0"
+  conditions: os=android & cpu=arm
+  languageName: node
+  linkType: hard
+
+"napi-nanoid-android-arm64@npm:0.2.0":
+  version: 0.2.0
+  resolution: "napi-nanoid-android-arm64@npm:0.2.0"
+  conditions: os=android & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"napi-nanoid-darwin-arm64@npm:0.2.0":
+  version: 0.2.0
+  resolution: "napi-nanoid-darwin-arm64@npm:0.2.0"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"napi-nanoid-darwin-x64@npm:0.2.0":
+  version: 0.2.0
+  resolution: "napi-nanoid-darwin-x64@npm:0.2.0"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
+"napi-nanoid-freebsd-x64@npm:0.2.0":
+  version: 0.2.0
+  resolution: "napi-nanoid-freebsd-x64@npm:0.2.0"
+  conditions: os=freebsd & cpu=x64
+  languageName: node
+  linkType: hard
+
+"napi-nanoid-linux-arm-gnueabihf@npm:0.2.0":
+  version: 0.2.0
+  resolution: "napi-nanoid-linux-arm-gnueabihf@npm:0.2.0"
+  conditions: os=linux & cpu=arm
+  languageName: node
+  linkType: hard
+
+"napi-nanoid-linux-arm64-gnu@npm:0.2.0":
+  version: 0.2.0
+  resolution: "napi-nanoid-linux-arm64-gnu@npm:0.2.0"
+  conditions: os=linux & cpu=arm64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"napi-nanoid-linux-arm64-musl@npm:0.2.0":
+  version: 0.2.0
+  resolution: "napi-nanoid-linux-arm64-musl@npm:0.2.0"
+  conditions: os=linux & cpu=arm64 & libc=musl
+  languageName: node
+  linkType: hard
+
+"napi-nanoid-linux-x64-gnu@npm:0.2.0":
+  version: 0.2.0
+  resolution: "napi-nanoid-linux-x64-gnu@npm:0.2.0"
+  conditions: os=linux & cpu=x64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"napi-nanoid-linux-x64-musl@npm:0.2.0":
+  version: 0.2.0
+  resolution: "napi-nanoid-linux-x64-musl@npm:0.2.0"
+  conditions: os=linux & cpu=x64 & libc=musl
+  languageName: node
+  linkType: hard
+
+"napi-nanoid-win32-arm64-msvc@npm:0.2.0":
+  version: 0.2.0
+  resolution: "napi-nanoid-win32-arm64-msvc@npm:0.2.0"
+  conditions: os=win32 & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"napi-nanoid-win32-ia32-msvc@npm:0.2.0":
+  version: 0.2.0
+  resolution: "napi-nanoid-win32-ia32-msvc@npm:0.2.0"
+  conditions: os=win32 & cpu=ia32
+  languageName: node
+  linkType: hard
+
+"napi-nanoid-win32-x64-msvc@npm:0.2.0":
+  version: 0.2.0
+  resolution: "napi-nanoid-win32-x64-msvc@npm:0.2.0"
+  conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
+"napi-nanoid@npm:^0.2.0":
+  version: 0.2.0
+  resolution: "napi-nanoid@npm:0.2.0"
+  dependencies:
+    napi-nanoid-android-arm-eabi: 0.2.0
+    napi-nanoid-android-arm64: 0.2.0
+    napi-nanoid-darwin-arm64: 0.2.0
+    napi-nanoid-darwin-x64: 0.2.0
+    napi-nanoid-freebsd-x64: 0.2.0
+    napi-nanoid-linux-arm-gnueabihf: 0.2.0
+    napi-nanoid-linux-arm64-gnu: 0.2.0
+    napi-nanoid-linux-arm64-musl: 0.2.0
+    napi-nanoid-linux-x64-gnu: 0.2.0
+    napi-nanoid-linux-x64-musl: 0.2.0
+    napi-nanoid-win32-arm64-msvc: 0.2.0
+    napi-nanoid-win32-ia32-msvc: 0.2.0
+    napi-nanoid-win32-x64-msvc: 0.2.0
+  dependenciesMeta:
+    napi-nanoid-android-arm-eabi:
+      optional: true
+    napi-nanoid-android-arm64:
+      optional: true
+    napi-nanoid-darwin-arm64:
+      optional: true
+    napi-nanoid-darwin-x64:
+      optional: true
+    napi-nanoid-freebsd-x64:
+      optional: true
+    napi-nanoid-linux-arm-gnueabihf:
+      optional: true
+    napi-nanoid-linux-arm64-gnu:
+      optional: true
+    napi-nanoid-linux-arm64-musl:
+      optional: true
+    napi-nanoid-linux-x64-gnu:
+      optional: true
+    napi-nanoid-linux-x64-musl:
+      optional: true
+    napi-nanoid-win32-arm64-msvc:
+      optional: true
+    napi-nanoid-win32-ia32-msvc:
+      optional: true
+    napi-nanoid-win32-x64-msvc:
+      optional: true
+  checksum: a9b073ac12b53d5e89437b53aa0f85a24e52d6251a28000cf7ee6d06affb7fe273ff6f59e1f859b86afd34b9a1a7dd8197333051bfb060319935beae24ab8ee3
+  languageName: node
+  linkType: hard
+
 "natural-compare@npm:^1.4.0":
   version: 1.4.0
   resolution: "natural-compare@npm:1.4.0"
@@ -14789,6 +14930,13 @@ __metadata:
     type-check: ^0.4.0
     word-wrap: ^1.2.3
   checksum: dbc6fa065604b24ea57d734261914e697bd73b69eff7f18e967e8912aa2a40a19a9f599a507fa805be6c13c24c4eae8c71306c239d517d42d4c041c942f508a0
+  languageName: node
+  linkType: hard
+
+"oxide.ts@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "oxide.ts@npm:1.1.0"
+  checksum: 365421872822c7cac244f0cbf6e5beba4a0d17c25535498c4942638af4a45f0f35af5795c21f3ae2a3e771caf633f5f8f62bcce026f13e0bc64665625643ded5
   languageName: node
   linkType: hard
 
