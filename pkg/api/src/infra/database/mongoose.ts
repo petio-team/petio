@@ -1,13 +1,14 @@
 import { Connection, connect } from 'mongoose';
 
 import { MongoDatabaseConnection } from './connection';
+import { DATABASE_URL } from '../config/env';
 
 type MongooseClient = typeof import('mongoose');
 
 export class MongooseDatabase implements MongoDatabaseConnection {
   private client?: MongooseClient;
 
-  constructor(private url: string) {}
+  constructor(private url: string = DATABASE_URL) {}
 
   private async getClient(): Promise<MongooseClient> {
     if (this.client) {
