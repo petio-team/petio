@@ -1,14 +1,23 @@
 import { SharedCache } from '@david.uhlir/shared-cache';
 import cluster from 'cluster';
 
-import api from '@/api';
+import { createKoaServer } from '@/api';
 import { HasConfig, config, toObject } from '@/config';
+import {
+  DATABASE_URL,
+  HTTP_ADDR,
+  HTTP_BASE_PATH,
+  HTTP_PORT,
+  PGID,
+  PUID,
+} from '@/infra/config/env';
+import { MongooseDatabase } from '@/infra/database/mongoose';
 import logger from '@/infra/logger/logger';
 import { Master } from '@/infra/worker/master';
 import ConfigLoader from '@/loaders/config';
-import mongoose from '@/loaders/mongoose';
 import { runCron } from '@/services/cron';
-import startupMessage from '@/utils/startupMessage';
+
+import appConfig from '../../package.json';
 
 /**
  * Checks if the application has a valid configuration.
@@ -32,6 +41,9 @@ async function hasValidConfig() {
  * @returns A promise that resolves when the primary loading process is complete.
  */
 async function doPrimary() {
+  // Validate db connection
+  await new MongooseDatabase(DATABASE_URL).getConnection();
+
   // TODO: migrate config to db and remove it/rename it to prevent doing this
   const hasConfig = await HasConfig();
   if (hasConfig) {
@@ -41,6 +53,12 @@ async function doPrimary() {
       await SharedCache.setData('config', toObject());
     }
   }
+
+  logger.info(
+    `Petio v${appConfig.version} [${
+      logger.core().level
+    }] [pid:${PUID},gid:${PGID}]`,
+  );
 
   // run workers
   await Master.getInstance().runWorkers();
@@ -58,22 +76,22 @@ async function doWorker() {
     const cfg = await SharedCache.getData('config');
     config.load(cfg);
     // load services
-    await mongoose();
+    await new MongooseDatabase(DATABASE_URL).getConnection();
   }
 
   if (process.env.web) {
-    logger.debug(`Web worker running on ${process.pid}`);
-    startupMessage();
+    logger.info(
+      `Serving Web UI on http://${HTTP_ADDR}:${HTTP_PORT}${HTTP_BASE_PATH}`,
+    );
     if (!hasConfig) {
       logger.warn(
         'Initial setup is required, please proceed to the Web UI to begin the setup',
       );
     }
-    api();
+    await createKoaServer();
   }
 
   if (hasConfig && process.env.job) {
-    logger.debug(`Job worker running on ${process.pid}`);
     await runCron();
   }
 }

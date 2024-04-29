@@ -40,16 +40,18 @@ export class Master {
         [type]: true,
       });
       worker.once('online', () => {
-        logger.debug(`Worker ${worker.process.pid} is ready!`);
+        logger.debug(`Worker (${type}) ${worker.process.pid} is ready!`);
         resolve(true);
       });
       worker.once('error', (error) => {
-        logger.error(`Worker ${worker.process.pid} has an error: ${error}`);
+        logger.error(
+          `Worker (${type}) ${worker.process.pid} has an error: ${error}`,
+        );
         reject(error);
       });
       worker.on('exit', (code, signal) => {
         logger.debug(
-          `Worker ${worker.process.pid} has exited with code ${code} and signal ${signal}`,
+          `Worker (${type}) ${worker.process.pid} has exited with code ${code} and signal ${signal}`,
         );
         if (!worker.exitedAfterDisconnect) {
           this.createWorker(type);

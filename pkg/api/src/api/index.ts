@@ -1,75 +1,93 @@
+import { Server } from 'http';
 import Koa from 'koa';
 import koaBody from 'koa-body';
 import compress from 'koa-compress';
 import mount from 'koa-mount';
+import { AddressInfo } from 'net';
+import { IncomingMessage, ServerResponse } from 'node:http';
+import { promisify } from 'util';
 
 import cors from '@/api/middleware/cors';
 import errorHandler from '@/api/middleware/errorHandling';
 import api from '@/api/routes/api';
 import web from '@/api/routes/web';
 import { config } from '@/config/index';
-import logger from '@/infra/logger/logger';
-import listen from '@/utils/http';
-import { removeSlashes } from '@/utils/urls';
+import {
+  HTTP_ADDR,
+  HTTP_BASE_PATH,
+  HTTP_PORT,
+  HTTP_TRUSTED_PROXIES,
+} from '@/infra/config/env';
 
 import responseHandler from './http/responseHandler';
 import logging from './middleware/logging';
 import options from './middleware/options';
 
-const routes = (subpath: string): Koa => {
+const routes = (): Koa => {
   const app = new Koa();
 
-  // web/frontend/react
+  // web/frontend/reac
   web(app);
 
   // setup old api
-  api(app, subpath);
+  api(app, HTTP_BASE_PATH);
 
   return app;
 };
 
-export default () => {
-  // create new koa instance
+export const createKoaServer = () => {
+  let server: Server<typeof IncomingMessage, typeof ServerResponse>;
+
   const app = new Koa();
 
   // Set security keys
   app.keys = config.get('petio.keys');
 
   // Enable trusted proxies
-  app.proxy = true;
+  if (HTTP_TRUSTED_PROXIES.length > 0) {
+    app.proxy = true;
+  }
 
-  // Add http logging using morgan
-  app.use(logging());
-
-  // Enable cors
-  app.use(cors());
-
-  // Enable compression
-  app.use(
-    compress({
-      threshold: 2048,
-    }),
-  );
-
-  // Enable body parsing
-  app.use(koaBody());
-
-  // use options
-  app.use(options());
-
-  // use response handler
-  app.use(responseHandler());
-
-  // Add error handling
-  app.use(errorHandler());
-  app.on('error', (err) => logger.error(err));
-
-  // get correctly formatted subpath
-  const subpath = `/${removeSlashes(config.get('petio.subpath'))}`;
+  // Add middleware
+  [
+    logging(),
+    cors(),
+    compress({ threshold: 2048 }),
+    koaBody(),
+    options(),
+    responseHandler(),
+    errorHandler(),
+  ].forEach((middleware) => app.use(middleware));
 
   // Mount endpoints
-  app.use(mount(subpath, routes(subpath)));
+  app.use(mount(HTTP_BASE_PATH, routes()));
 
-  // run server
-  listen({ httpApp: app });
+  let serverShuttingDown: any;
+
+  const stop = () => {
+    if (serverShuttingDown) {
+      return serverShuttingDown;
+    }
+    serverShuttingDown = promisify(server.close.bind(server));
+    return serverShuttingDown;
+  };
+
+  const getConnection = () => promisify(server.getConnections.bind(server))();
+
+  return new Promise((resolve, reject) => {
+    server = app.listen(HTTP_PORT, HTTP_ADDR, () => {
+      const { port } = server.address() as AddressInfo;
+      const url = `http://localhost:${port}`;
+
+      resolve({
+        stop,
+        getConnection,
+        port,
+        server,
+        url,
+      });
+    });
+
+    server.once('error', reject);
+  });
 };

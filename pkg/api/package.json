@@ -38,6 +38,7 @@
     "event-dispatch": "^0.4.1",
     "file-stream-rotator": "^1.0.0",
     "http-status-codes": "^2.2.0",
+    "http-terminator": "^3.2.0",
     "is-retry-allowed": "^3.0.0",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.13.4",

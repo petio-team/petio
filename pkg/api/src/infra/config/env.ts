@@ -2,6 +2,8 @@ import path from 'path';
 import { parseEnv, port } from 'znv';
 import { z } from 'zod';
 
+import { removeSlashes } from '@/utils/urls';
+
 // Used to extend the NodeJS Process interface to include the pkg property (vercel pkg)
 declare global {
   namespace NodeJS {
@@ -13,7 +15,10 @@ declare global {
 
 export const {
   NODE_ENV,
+  PGID,
+  PUID,
   LOG_LEVEL,
+  DATABASE_URL,
   HTTP_ADDR,
   HTTP_PORT,
   HTTP_BASE_PATH,
@@ -31,11 +36,27 @@ export const {
       _: 'production',
     },
   },
+  PGID: {
+    schema: z.coerce.number().default(1000),
+    description: 'The process GID to use.',
+  },
+  PUID: {
+    schema: z.coerce.number().default(1000),
+    description: 'The process UID to use.',
+  },
   LOG_LEVEL: {
     schema: z
       .enum(['trace', 'debug', 'info', 'warn', 'error', 'fatal'])
       .default('info'),
     description: 'The log level to use.',
+  },
+  DATABASE_URL: {
+    schema: z.string().min(1),
+    description: 'The URL to use for the database connection.',
+    defaults: {
+      development: 'mongodb://mongo:27017/petio',
+      _: 'mongodb://localhost:27017/petio',
+    },
   },
   HTTP_ADDR: {
     schema: z.string().min(1).default('127.0.0.1'),
@@ -46,7 +67,11 @@ export const {
     description: 'The port the HTTP server should listen on.',
   },
   HTTP_BASE_PATH: {
-    schema: z.string().min(1).default('/'),
+    schema: z
+      .string()
+      .min(1)
+      .transform((s) => `/${removeSlashes(s)}`)
+      .default('/'),
     description: 'The base path to use for the HTTP server.',
   },
   HTTP_TRUSTED_PROXIES: {

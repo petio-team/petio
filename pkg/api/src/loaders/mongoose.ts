@@ -1,10 +1,10 @@
 import { Connection, connect } from 'mongoose';
 
-import { config } from '@/config/index';
+import { DATABASE_URL } from '@/infra/config/env';
 import logger from '@/infra/logger/logger';
 
 export default async (): Promise<Connection['db']> => {
-  const connection = await connect(config.get('db.url'), {
+  const connection = await connect(DATABASE_URL, {
     autoCreate: true,
     autoIndex: true,
   }).catch((error) => {
