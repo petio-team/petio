@@ -1,7 +1,6 @@
 import { Agenda } from '@hokify/agenda';
 
-import { config } from '@/config';
-
+import { DATABASE_URL } from '@/infra/config/env';
 import discovery from '../discovery';
 import LibraryUpdate from '../plex/library';
 import QuotaSystem from '../requests/quotas';
@@ -21,7 +20,7 @@ export async function runCron() {
       JobCronName.IMDB_CACHE,
     ],
     new Agenda({
-      db: { address: config.get('db.url'), collection: 'jobs' },
+      db: { address: DATABASE_URL, collection: 'jobs' },
       processEvery: '2 minutes',
       maxConcurrency: 1,
       defaultConcurrency: 1,
@@ -47,7 +46,7 @@ export async function runCron() {
     cronService.add(
       JobCronName.USERS_SCAN,
       async () => new LibraryUpdate().getFriends(),
-      '30 minutes',
+      '10 minutes',
       {},
     ),
     cronService.add(

@@ -46,7 +46,7 @@ export default class LibraryUpdate {
     try {
       recent = await this.getRecent();
     } catch (err) {
-      logger.error(`CRON: Partial scan failed - unable to get recent`, err);
+      logger.error(err, `CRON: Partial scan failed - unable to get recent`);
       return;
     }
     const matched = {};
@@ -163,7 +163,7 @@ export default class LibraryUpdate {
       logger.debug('CRON: Recently Added received');
       return res.data.MediaContainer;
     } catch (err) {
-      logger.error('CRON: Recently added failed!', err);
+      logger.error(err, 'CRON: Recently added failed!');
       throw new Error('Recently added failed');
     }
   }
@@ -667,7 +667,7 @@ export default class LibraryUpdate {
       );
       return dataParse.elements[0].elements;
     } catch (err) {
-      logger.error('CRON: Unable to get friends', err);
+      logger.error(err, 'CRON: Unable to get friends');
     }
     return {};
   }
