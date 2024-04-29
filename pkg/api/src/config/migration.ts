@@ -27,7 +27,7 @@ const MainConfigSchema = z.object({
   adminThumb: z.string().min(1),
   adminDisplayName: z.string().min(1),
 });
-type MainConfig = z.infer<typeof MainConfigSchema>;
+export type MainConfig = z.infer<typeof MainConfigSchema>;
 
 const EmailConfigSchema = z.object({
   emailEnabled: z.boolean(),
@@ -38,7 +38,7 @@ const EmailConfigSchema = z.object({
   emailSecure: z.boolean(),
   emailFrom: z.string().min(1),
 });
-type EmailConfig = z.infer<typeof EmailConfigSchema>;
+export type EmailConfig = z.infer<typeof EmailConfigSchema>;
 
 const ArrConfigSchema = z.object({
   uuid: z.string().uuid().min(1),
@@ -54,7 +54,9 @@ const ArrConfigSchema = z.object({
   profile_title: z.string().min(1),
   enabled: z.boolean(),
 });
-type ArrConfig = z.infer<typeof ArrConfigSchema>;
+export type ArrConfig = z.infer<typeof ArrConfigSchema>;
+
+export type ConfigUnion = MainConfig & EmailConfig & ArrConfig;
 
 interface ConfigParse {
   file: string;
@@ -80,148 +82,35 @@ const configFiles: ConfigParse[] = [
   },
 ];
 
-const transformMainConfig = (data: any): void => {
-  const output = data as MainConfig;
-  config.set('db.url', output.DB_URL);
-  config.set('notifications.discord.url', output.discord_webhook);
-  config.set('notifications.telegram.id', output.telegram_bot_id);
-  config.set('notifications.telegram.token', output.telegram_bot_token);
-  config.set('notifications.telegram.silent', output.telegram_send_silent);
-  config.set('general.popular', output.plexPopular);
-  config.set('petio.subpath', output.base_path);
-  config.set('plex.protocol', output.plexProtocol);
-  config.set('plex.host', output.plexIp);
-  config.set('plex.port', output.plexPort);
-  config.set('plex.token', output.plexToken);
-  config.set('plex.client', output.plexClientID);
-  config.set('admin.id', output.adminId);
-  config.set('admin.username', output.adminUsername);
-  config.set('admin.email', output.adminEmail);
-  config.set('admin.password', output.adminPass);
-  config.set('admin.thumbnail', output.adminThumb);
-  config.set('admin.display', output.adminDisplayName);
-};
-
-const transformEmailConfig = (data: any): void => {
-  const output = data as EmailConfig;
-  config.set('email.host', output.emailServer);
-  config.set('email.port', output.emailPort);
-  config.set('email.username', output.emailUser);
-  config.set('email.password', output.emailPass);
-  config.set('email.from', output.emailFrom);
-  config.set('email.ssl', output.emailSecure);
-  config.set('email.enabled', output.emailEnabled);
-};
-
-const transformSonarrConfig = (data: any): void => {
-  const output = data as Array<ArrConfig>;
-  const sonarrs: any = [];
-
-  Object.values(output).forEach((instance) => {
-    sonarrs.push({
-      uuid: instance.uuid,
-      title: instance.title,
-      protocol: instance.protocol,
-      host: instance.hostname,
-      port: instance.port,
-      subpath: instance.urlBase,
-      key: instance.apiKey,
-      path: {
-        id: instance.path,
-        location: instance.path_title,
-      },
-      profile: {
-        id: instance.profile,
-        name: instance.profile_title,
-      },
-      language: {
-        id: 0,
-        name: 'English',
-      },
-      enabled: instance.enabled,
-    });
-  });
-
-  config.set('sonarr', sonarrs);
-};
-
-const transformRadarrConfig = (data: any): void => {
-  const output = data as Array<ArrConfig>;
-  const radarrs: any = [];
-
-  Object.values(output).forEach((instance) => {
-    radarrs.push({
-      uuid: instance.uuid,
-      title: instance.title,
-      protocol: instance.protocol,
-      host: instance.hostname,
-      port: instance.port,
-      subpath: instance.urlBase,
-      key: instance.apiKey,
-      path: {
-        id: instance.path,
-        location: instance.path_title,
-      },
-      profile: {
-        id: instance.profile,
-        name: instance.profile_title,
-      },
-      language: {
-        id: 0,
-        name: 'English',
-      },
-      enabled: instance.enabled,
-    });
-  });
-
-  config.set('radarr', radarrs);
-};
-
-const findParseAndMergeConfigs = async (): Promise<boolean> => {
-  let isModified = false;
-
-  Object.values(configFiles).forEach(async (cfg) => {
-    const file = path.join(DATA_DIR, `${config.file}.json`);
-    const exists = await fileExists(file);
-    if (exists) {
-      const content = await fs.readFile(file);
-      const parsed = await config.schema.safeParseAsync(content);
-      if (!parsed.success) {
-        logger.error(`failed to parse config '${config.file}.json`);
-        return;
+const findParseAndMergeConfigs = async (): Promise<ConfigUnion> => {
+  const results = await Promise.all(
+    Object.values(configFiles).map(async (cfg) => {
+      const file = path.join(DATA_DIR, `${cfg.file}.json`);
+      const exists = await fileExists(file);
+      if (exists) {
+        const content = await fs.readFile(file);
+        const parsed = await config.schema.safeParseAsync(content);
+        if (!parsed.success) {
+          logger.error(`failed to parse config '${config.file}.json`);
+          return {};
+        }
+        return parsed.data;
       }
-
-      const output = parsed.data.toString();
-
-      switch (cfg.file) {
-        case 'main':
-          transformMainConfig(output);
-          break;
-        case 'email':
-          transformEmailConfig(output);
-          break;
-        case 'radarr':
-          transformRadarrConfig(output);
-          break;
-        case 'sonarr':
-          transformSonarrConfig(output);
-          break;
-        default:
-          return;
-      }
-
-      isModified = true;
-    }
-  });
-
-  return isModified;
+      return {};
+    }),
+  );
+  const mergedResults = results.reduce(
+    (acc, curr) => ({ ...acc, ...curr }),
+    {},
+  );
+  return mergedResults;
 };
 
-export default async (): Promise<boolean> => {
+export default async (): Promise<ConfigUnion | null> => {
   try {
     return await findParseAndMergeConfigs();
   } catch (error) {
     logger.error(error);
   }
-  return false;
+  return null;
 };

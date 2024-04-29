@@ -1,10 +1,9 @@
-import fs from 'fs/promises';
 import path from 'path';
 
 import configSchema from '@/config/schema';
 import { DATA_DIR } from '@/infra/config/env';
 import logger from '@/infra/logger/logger';
-import { fileExists } from '@/utils/file';
+import { fileExists, writeFile } from '@/utils/file';
 
 /**
  * The name of the config file to use
@@ -26,10 +25,10 @@ export const WriteConfig = async (): Promise<Object | null> => {
   try {
     const properties = configSchema.getProperties();
     const data = JSON.stringify(properties, null, 2);
-    await fs.writeFile(getConfigPath(), data);
+    await writeFile(getConfigPath(), data);
     return properties;
   } catch (error) {
-    logger.error(error);
+    logger.error('failed to write config file', error);
     return null;
   }
 };
@@ -44,10 +43,9 @@ const loadAndValidateConfig = async (file: string): Promise<boolean> => {
   if (stat) {
     configSchema.loadFile(file).validate();
     // We call this here to make sure we write new values to config
-    WriteConfig();
+    await WriteConfig();
     return true;
   }
-
   return false;
 };
 
