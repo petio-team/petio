@@ -30,6 +30,7 @@
     "prettier"
   ],
   "rules": {
+    "max-classes-per-file": "off",
     "import/prefer-default-export": "off",
     "class-methods-use-this": "off",
     "import/no-unresolved": "error",
