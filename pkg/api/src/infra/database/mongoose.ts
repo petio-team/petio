@@ -1,28 +1,61 @@
-import { Connection, connect } from 'mongoose';
+import { ConnectOptions, Connection, createConnection } from 'mongoose';
 
-import { MongoDatabaseConnection } from './connection';
-import { DATABASE_URL } from '../config/env';
+import { Service } from 'diod';
+import { Logger } from '../logger/logger';
+import { MongooseDatabaseConnection } from './connection';
 
-type MongooseClient = typeof import('mongoose');
+function asPromise(c: any) {
+  return c && c.asPromise ? c.asPromise() : c;
+}
 
-export class MongooseDatabase implements MongoDatabaseConnection {
-  private client?: MongooseClient;
+@Service()
+export class MongooseDatabase implements MongooseDatabaseConnection {
+  readonly connections: Map<string, Connection> = new Map();
 
-  constructor(private url: string = DATABASE_URL) {}
+  private defaultConnection: string = 'default';
 
-  private async getClient(): Promise<MongooseClient> {
-    if (this.client) {
-      return this.client;
+  constructor(private logger: Logger) {}
+
+  async connect(
+    id: string,
+    url: string,
+    connectionOptions: ConnectOptions,
+    isDefault = false,
+  ): Promise<any> {
+    if (this.has(id)) {
+      return this.get(id);
     }
-    this.client = await connect(this.url, {
-      autoCreate: true,
-      autoIndex: true,
-      serverSelectionTimeoutMS: 2000,
-    });
-    return this.client;
+
+    try {
+      const connection = await asPromise(
+        createConnection(url, connectionOptions),
+      );
+      this.connections.set(id, connection);
+
+      if (id === 'default' || isDefault) {
+        this.defaultConnection = id;
+      }
+
+      return connection;
+    } catch (error) {
+      this.logger.error(`Failed to connect to database`, error);
+    }
+    return undefined;
   }
 
-  async getConnection(): Promise<Connection> {
-    return (await this.getClient()).connection;
+  get(id?: string): Connection | undefined {
+    return this.connections.get(id || this.defaultConnection);
+  }
+
+  getOrThrow(id?: string): Connection {
+    const connection = this.get(id);
+    if (!connection) {
+      throw new Error(`Connection ${id || 'default'} not found`);
+    }
+    return connection;
+  }
+
+  has(id?: string): boolean {
+    return this.connections.has(id || this.defaultConnection);
   }
 }
