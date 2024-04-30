@@ -1,10 +1,12 @@
 import { ContainerBuilder } from 'diod';
 
-import builder from '@/resources';
+import infra from '@/infra';
+import resources from '@/resources';
 
 export default () => {
   const containerBuilder = new ContainerBuilder();
-  builder(containerBuilder);
+  infra(containerBuilder);
+  resources(containerBuilder);
 
   return containerBuilder.build({ autowire: true });
 };
