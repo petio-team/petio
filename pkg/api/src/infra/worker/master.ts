@@ -6,24 +6,15 @@ import logger from '@/infra/logger/logger';
 import { masterReciever, workerReciever } from './recievers';
 
 export class Master {
-  private static instance: Master;
-
   private handler: IpcMethodHandler;
 
-  private constructor() {
+  constructor() {
     if (!cluster.isPrimary) {
       throw new Error(
         'Master class should be instantiated in the primary cluster',
       );
     }
     this.handler = new IpcMethodHandler(['worker-com'], masterReciever);
-  }
-
-  public static getInstance(): Master {
-    if (!Master.instance) {
-      Master.instance = new Master();
-    }
-    return Master.instance;
   }
 
   getReciever() {
