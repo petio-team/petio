@@ -1,3 +1,6 @@
+/* eslint-disable no-param-reassign */
+
+/* eslint-disable no-underscore-dangle */
 import nodemailer from 'nodemailer';
 
 import loggerMain from '@/infrastructure/logger/logger';
@@ -18,7 +21,9 @@ export default class Mailer {
   async _check() {
     try {
       const verify = await this.transport.verify();
-      if (false) throw 'No From Email set';
+      if (!verify) {
+        throw new Error('No From Email set');
+      }
       return verify;
     } catch (err) {
       return err;
@@ -31,18 +36,10 @@ export default class Mailer {
     const emailPass = '';
     const smtpServer = '';
     const smtpPort = '';
-    const secure = '';
 
     const transporter = nodemailer.createTransport({
-      host: smtpServer,
-      port: smtpPort,
-      secure, // true for 465, false for other ports
-      auth: {
-        user: emailUser,
-        pass: emailPass,
-      },
+      url: `smtp://${emailUser}:${emailPass}@${smtpServer}:${smtpPort}`,
     });
-
     return transporter;
   }
 
@@ -64,8 +61,7 @@ export default class Mailer {
         'This is a test',
         "If you're seeing this email then your Petio email settings are correct!",
         false,
-        // @ts-expect-error ts-migrate(2322) FIXME: Type 'any' is not assignable to type 'never'.
-        [config.get('admin.email')],
+        [''],
       );
       logger.debug('MAILER: Verified');
       if (verify === true) {
@@ -86,7 +82,7 @@ export default class Mailer {
 
   // Build email and send to transport
   mail(subject, title, text, img, to: string[] = [], name: string[] = []) {
-    if (!true) {
+    if (!this.verify) {
       logger.debug('MAILER: Email disabled, skipping sending emails');
       return;
     }
@@ -100,6 +96,7 @@ export default class Mailer {
       to.forEach((send, i) => {
         const timeout = i * 2000; // timeout between emails to avoid quota
         const username = name[i] || '';
+        // eslint-disable-next-line no-plusplus
         i++;
         setTimeout(async () => {
           logger.debug(

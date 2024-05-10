@@ -5,8 +5,8 @@ import _ from 'lodash';
 import { getFromContainer } from '@/infrastructure/container/container';
 import loggerMain from '@/infrastructure/logger/logger';
 import { UserRepository } from '@/resources/user/repository';
+import { CacheService } from '@/services/cache/cache';
 
-import cache from '../cache/cache';
 import build from './build';
 import display from './display';
 
@@ -41,8 +41,16 @@ export default async () => {
           display(userId, 'show'),
         ]);
         await Bluebird.all([
-          cache.set(`discovery.user.movie.${userId}`, displayMovies, ttl),
-          cache.set(`discovery.user.show.${userId}`, displayShows, ttl),
+          getFromContainer(CacheService).set(
+            `discovery.user.movie.${userId}`,
+            displayMovies,
+            ttl,
+          ),
+          getFromContainer(CacheService).set(
+            `discovery.user.show.${userId}`,
+            displayShows,
+            ttl,
+          ),
         ]);
       },
       {

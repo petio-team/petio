@@ -26,7 +26,10 @@ export class PlexScannerProvider implements ScannerProvider {
 
   async getLibraries(): Promise<MediaLibraryEntity[]> {
     const libraries = await this.client.library.getLibraries();
-    if (!is.truthy(libraries?.MediaContainer?.Directory)) {
+    if (
+      !is.truthy(libraries?.MediaContainer) ||
+      !is.truthy(libraries?.MediaContainer?.Directory)
+    ) {
       return [];
     }
     const filteredLibraries = libraries.MediaContainer.Directory.filter(

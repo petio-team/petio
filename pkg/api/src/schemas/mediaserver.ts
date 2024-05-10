@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { MediaServerType } from '@/models/mediaserver/dto';
+import { MediaServerType } from '@/resources/media-server/types';
 
 export const MediaServerInputSchema = z.object({
   name: z.string().min(1),

@@ -1,4 +1,4 @@
-import { Override } from '../../infra/utils/override';
+import { Override } from '@/infrastructure/utils/override';
 
 /**
  * Represents the type of downloader.

@@ -188,15 +188,18 @@ export default class LibraryUpdate {
   }
 
   async saveLibraries(libraries: GetLibrariesResponse) {
-    if (!is.truthy(libraries.MediaContainer?.Directory)) {
+    if (
+      !is.truthy(libraries.MediaContainer) ||
+      !is.truthy(libraries.MediaContainer.Directory)
+    ) {
       logger.warn('CRON: No directories found');
       return;
     }
     logger.debug(
-      `CRON: Found ${libraries.MediaContainer.Directory.length} libraries`,
+      `CRON: Found ${libraries.MediaContainer!.Directory.length} libraries`,
     );
     await Promise.all(
-      libraries.MediaContainer.Directory.map(async (lib) =>
+      libraries.MediaContainer!.Directory!.map(async (lib) =>
         this.saveLibrary(lib),
       ),
     );
@@ -265,7 +268,10 @@ export default class LibraryUpdate {
   }
 
   async updateLibraryContent(libraries: GetLibrariesResponse) {
-    if (!is.truthy(libraries.MediaContainer?.Directory)) {
+    if (
+      !is.truthy(libraries.MediaContainer) ||
+      !is.truthy(libraries.MediaContainer.Directory)
+    ) {
       logger.warn('CRON: No directories found');
       return;
     }

@@ -1,7 +1,9 @@
 import { z } from 'zod';
 
-import { Movie } from '@/infrastructure/arr/radarr/v4/movie';
-import { Series } from '@/infrastructure/arr/sonarr/v3/series';
+import { MovieResource } from '@/infrastructure/servarr/radarr';
+import { SeriesResource } from '@/infrastructure/servarr/sonarr';
+import { MovieEntity } from '@/resources/movie/entity';
+import { ShowEntity } from '@/resources/show/entity';
 
 // {
 //   '634492': {
@@ -88,8 +90,8 @@ export type Requests = z.infer<typeof RequestsSchema>;
 export type RequestChildren = {
   id: number;
   info:
-    | Movie
-    | (Series & {
+    | MovieEntity
+    | (ShowEntity & {
         serverName: string;
       })
     | {
@@ -126,10 +128,10 @@ export type RequestOutput = {
   };
 };
 
-export function isDownloaderMovie(data: any): data is Movie {
+export function isDownloaderMovie(data: any): data is MovieResource {
   return 'movieFile' in data;
 }
 
-export function isDownloaderSeries(data: any): data is Series {
+export function isDownloaderSeries(data: any): data is SeriesResource {
   return 'seasons' in data;
 }

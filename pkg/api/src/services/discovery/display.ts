@@ -4,16 +4,15 @@
 
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import Bluebird from 'bluebird';
-import request from 'xhr-request';
 
 // eslint-disable-next-line import/order
-import { TMDB_API_KEY } from '@/infrastructure/config/env';
 import { getFromContainer } from '@/infrastructure/container/container';
 import loggerMain from '@/infrastructure/logger/logger';
 import { TheMovieDatabaseClient } from '@/infrastructure/tmdb/client';
 import is from '@/infrastructure/utils/is';
 import { DiscoveryRepository } from '@/resources/discovery/repository';
 import { MediaServerRepository } from '@/resources/media-server/repository';
+import { CacheService } from '@/services/cache/cache';
 import getHistory from '@/services/plex/history';
 import onServer from '@/services/plex/server';
 import getTop from '@/services/plex/top';
@@ -26,7 +25,6 @@ import {
   showLookup,
 } from '@/services/tmdb/show';
 
-import cache from '../cache/cache';
 import { getPlexClient } from '../plex/client';
 
 const logger = loggerMain.child({ module: 'discovery.display' });
@@ -416,7 +414,7 @@ export default async (
 async function genreLookup(id: any, genre: any, type: string) {
   let data = false;
   try {
-    data = await cache.wrap(`gl__${id}__${type}`, () =>
+    data = await getFromContainer(CacheService).wrap(`gl__${id}__${type}`, () =>
       genreLookupData(id, genre, type),
     );
   } catch (err) {
@@ -428,8 +426,9 @@ async function genreLookup(id: any, genre: any, type: string) {
 async function actorLookup(match: { id: any }, type: string) {
   let data = false;
   try {
-    data = await cache.wrap(`al__${match.id}__${type}`, () =>
-      actorLookupData(match, type),
+    data = await getFromContainer(CacheService).wrap(
+      `al__${match.id}__${type}`,
+      () => actorLookupData(match, type),
     );
   } catch (err) {
     logger.error(`Error getting actor data`, err);

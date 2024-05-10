@@ -3,12 +3,14 @@ import Bluebird from 'bluebird';
 
 import { getFromContainer } from '@/infrastructure/container/container';
 import logger from '@/infrastructure/logger/logger';
+import { QueueResource as MovieQueueResource } from '@/infrastructure/servarr/radarr';
+import { QueueResource as ShowQueueResource } from '@/infrastructure/servarr/sonarr';
+import is from '@/infrastructure/utils/is';
 import { DownloaderEntity } from '@/resources/downloader/entity';
 import { DownloaderRepository } from '@/resources/downloader/repository';
 import { DownloaderType } from '@/resources/downloader/types';
 import { RequestEntity } from '@/resources/request/entity';
 import { RequestRepository } from '@/resources/request/repository';
-import { RequestProps } from '@/resources/request/types';
 import Radarr from '@/services/downloaders/radarr';
 import Sonarr from '@/services/downloaders/sonarr';
 import { movieLookup } from '@/services/tmdb/movie';
@@ -57,6 +59,8 @@ function reqState(
         if (req.type === 'tv' && isDownloaderSeries(element.info)) {
           const data = element.info;
           if (
+            is.truthy(data.statistics) &&
+            is.truthy(data.statistics.episodeCount) &&
             data.statistics.episodeCount === data.statistics.episodeFileCount &&
             data.statistics.episodeCount > 0
           ) {
@@ -79,7 +83,12 @@ function reqState(
               }
             }
 
-            if (!missing && data.statistics.totalEpisodeCount > 0) {
+            if (
+              !missing &&
+              is.truthy(data.statistics) &&
+              is.truthy(data.statistics?.totalEpisodeCount) &&
+              data.statistics.totalEpisodeCount > 0
+            ) {
               return {
                 status: 'good',
                 message: 'Downloaded',
@@ -103,7 +112,11 @@ function reqState(
                 step: 3,
               };
             }
-            if (data.statistics.episodeFileCount > 0) {
+            if (
+              is.truthy(data.statistics) &&
+              is.truthy(data.statistics?.episodeFileCount) &&
+              data.statistics.episodeFileCount > 0
+            ) {
               return {
                 status: 'blue',
                 message: 'Partially Downloaded',
@@ -123,7 +136,10 @@ function reqState(
             };
           }
           if (data.inCinemas || data.digitalRelease) {
-            if (data.inCinemas) {
+            if (
+              is.truthy(data.inCinemas) &&
+              is.truthy(element.info.inCinemas)
+            ) {
               diff = Math.ceil(
                 new Date(element.info.inCinemas).getTime() -
                   new Date().getTime(),
@@ -255,11 +271,16 @@ async function getRequestsForMovies(
           const movieId = parseInt(request.radarrs[0], 10);
 
           const [movie, queue] = await Promise.all([
-            client.GetMovie(movieId),
-            client.GetQueue(),
+            client.movie.getApiV3MovieById({
+              id: movieId,
+            }),
+            client.queue.getApiV3Queue(),
           ]);
 
-          const status = queue.items.filter((q) => q.id === movieId);
+          let status: MovieQueueResource[] = [];
+          if (is.truthy(queue.records)) {
+            status = queue.records.filter((q) => q.id === movieId);
+          }
 
           output[request.id].children.push({
             id: movieId,
@@ -315,11 +336,16 @@ async function getRequestsForShows(
           const seriesId = parseInt(request.sonarrs[0], 10);
 
           const [series, queue] = await Promise.all([
-            client.GetSeriesById(seriesId),
-            client.GetQueue(),
+            client.series.getApiV3SeriesById({
+              id: seriesId,
+            }),
+            client.queue.getApiV3Queue(),
           ]);
 
-          const status = queue.items.filter((q) => q.id === seriesId);
+          let status: ShowQueueResource[] = [];
+          if (is.truthy(queue.records)) {
+            status = queue.records.filter((q) => q.id === seriesId);
+          }
 
           output[request.id].children.push({
             id: seriesId,

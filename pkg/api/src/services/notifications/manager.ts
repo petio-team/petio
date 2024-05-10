@@ -1,17 +1,15 @@
 import { map } from 'bluebird';
-import { inject, injectable } from "tsyringe";
-import { Logger } from "winston";
-import { INotify, NotifyEvent, NotifyPayload } from "./notify";
-import { config } from '@/config/index';
+import { Service } from 'diod';
 
-@injectable()
+import { Logger } from '@/infrastructure/logger/logger';
+
+import { INotify, NotifyEvent, NotifyPayload } from './notify';
+
+@Service()
 export class NotificationManager {
   private notifications: INotify[];
 
-  constructor(
-    notifications: INotify[],
-    @inject("Logger") private logger?: Logger,
-  ) {
+  constructor(notifications: INotify[], private logger?: Logger) {
     this.notifications = notifications;
   }
 
@@ -26,9 +24,8 @@ export class NotificationManager {
         }
       },
       {
-        concurrency: config.get('general.concurrency'),
+        concurrency: 2,
       },
     );
   }
 }
-

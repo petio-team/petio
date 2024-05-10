@@ -1,21 +1,22 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
+import { getFromContainer } from '@/infrastructure/container/container';
 import loggerMain from '@/infrastructure/logger/logger';
 import { GetLibraryTopContentResponse } from '@/infrastructure/plex';
 import is from '@/infrastructure/utils/is';
 import { MediaServerEntity } from '@/resources/media-server/entity';
+import { CacheService } from '@/services/cache/cache';
 import { getPlexClient } from '@/services/plex/client';
 import plexLookup from '@/services/plex/lookup';
 import { movieLookup } from '@/services/tmdb/movie';
 import { showLookup } from '@/services/tmdb/show';
 
-import cache from '../cache/cache';
-
 const logger = loggerMain.child({ module: 'plex.top' });
 
 export default async (server: MediaServerEntity, type: 1 | 2) => {
   try {
-    return await cache.wrap(`popular__${type}`, async () =>
-      getTopData(server, type),
+    return await getFromContainer(CacheService).wrap(
+      `popular__${type}`,
+      async () => getTopData(server, type),
     );
   } catch (err) {
     logger.error(`Error getting top data - ${type}`, err);
