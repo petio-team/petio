@@ -20,7 +20,7 @@ export class JobUsersScan implements Jobber {
         const serverResult = await this.mediaServerRepo.findOne({});
         if (serverResult.isSome()) {
           const server = serverResult.unwrap();
-          new LibraryUpdate(server).scan();
+          await new LibraryUpdate(server).updateFriends();
         }
       },
       '10 minutes',
