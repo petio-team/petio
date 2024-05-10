@@ -1,14 +1,21 @@
 import { Agenda } from '@hokify/agenda';
 
+import { Service } from 'diod';
+import { Logger } from '@/infrastructure/logger/logger';
 import { CronService } from './service';
 import { CronJobProcessor, CronOptions, JobCronName } from './types';
 
 /**
  * Represents a service for managing cron jobs using the Agenda library.
  */
+@Service()
 export class AgendaCronService extends CronService {
-  constructor(activeJobs: JobCronName[], private agenda: Agenda) {
-    super(activeJobs);
+  constructor(
+    activeJobs: JobCronName[], 
+    private agenda: Agenda,
+    logger: Logger,
+  ) {
+    super(activeJobs, logger.child({ module: 'services.cron.agenda' }));
   }
 
   /**

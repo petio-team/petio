@@ -1,76 +1,56 @@
 import { Agenda } from '@hokify/agenda';
+import Bluebird from 'bluebird';
+import { ContainerBuilder } from 'diod';
 
 import { DATABASE_URL } from '@/infrastructure/config/env';
+import {
+  findTaggedServiceIdentifiers,
+  getFromContainer,
+} from '@/infrastructure/container/container';
+import { Logger } from '@/infrastructure/logger/logger';
+import { Jobber } from '@/services/cron/job';
+import { JobFullLibraryScan } from '@/services/cron/jobs/full_library_scan';
+import { JobPartialLibraryScan } from '@/services/cron/jobs/partial_library_scan';
 
-import discovery from '../discovery';
-import LibraryUpdate from '../plex/library';
-import QuotaSystem from '../requests/quotas';
-import trending from '../tmdb/trending';
 import { AgendaCronService } from './agenda-cron';
 import { JobCronName } from './types';
 
+export default (builder: ContainerBuilder) => {
+  builder.registerAndUse(JobFullLibraryScan).asSingleton().addTag('job');
+  builder.registerAndUse(JobPartialLibraryScan).asSingleton().addTag('job');
+
+  builder
+    .register(AgendaCronService)
+    .useFactory(
+      (c) =>
+        new AgendaCronService(
+          [
+            JobCronName.FULL_LIBRARY_SCAN,
+            JobCronName.PARTIAL_LIBRARY_SCAN,
+            JobCronName.DISCOVERY_SCAN,
+            JobCronName.USERS_SCAN,
+            JobCronName.QUOTA_RESET,
+            JobCronName.TMDB_CACHE,
+            JobCronName.IMDB_CACHE,
+          ],
+          new Agenda({
+            db: { address: DATABASE_URL, collection: 'jobs' },
+            processEvery: '2 minutes',
+            maxConcurrency: 1,
+            defaultConcurrency: 1,
+            defaultLockLifetime: 1000 * 60 * 10,
+            ensureIndex: true,
+          }),
+          c.get(Logger),
+        ),
+    )
+    .asSingleton();
+};
+
 export async function runCron() {
-  const cronService = new AgendaCronService(
-    [
-      JobCronName.FULL_LIBRARY_SCAN,
-      JobCronName.PARTIAL_LIBRARY_SCAN,
-      JobCronName.DISCOVERY_SCAN,
-      JobCronName.USERS_SCAN,
-      JobCronName.QUOTA_RESET,
-      JobCronName.TMDB_CACHE,
-      JobCronName.IMDB_CACHE,
-    ],
-    new Agenda({
-      db: { address: DATABASE_URL, collection: 'jobs' },
-      processEvery: '2 minutes',
-      maxConcurrency: 1,
-      defaultConcurrency: 1,
-      defaultLockLifetime: 1000 * 60 * 10,
-      ensureIndex: true,
-    }),
-  );
-  Promise.all([
-    cronService.add(
-      JobCronName.FULL_LIBRARY_SCAN,
-      async () => new LibraryUpdate().scan(),
-      '1 days',
-      {
-        lockLifetime: 1000 * 60 * 60 * 2,
-      },
-    ),
-    cronService.add(
-      JobCronName.PARTIAL_LIBRARY_SCAN,
-      async () => new LibraryUpdate().partial(),
-      '6 hours',
-      {},
-    ),
-    cronService.add(
-      JobCronName.USERS_SCAN,
-      async () => new LibraryUpdate().getFriends(),
-      '10 minutes',
-      {},
-    ),
-    cronService.add(
-      JobCronName.DISCOVERY_SCAN,
-      async () => discovery(),
-      '1 days',
-      {},
-    ),
-    cronService.add(
-      JobCronName.QUOTA_RESET,
-      async () => new QuotaSystem().reset(),
-      '1 days',
-      {},
-    ),
-    cronService.add(
-      JobCronName.TMDB_CACHE,
-      async () => {
-        await trending();
-      },
-      '1 days',
-      {},
-    ),
-    cronService.add(JobCronName.IMDB_CACHE, async () => {}, '1 days', {}),
-  ]);
-  await cronService.bootstrap();
+  const cronService = getFromContainer<AgendaCronService>(AgendaCronService);
+  const tags = findTaggedServiceIdentifiers<Jobber>('job');
+  const jobs = tags.map((tag) => getFromContainer<Jobber>(tag));
+  await Bluebird.map(jobs, async (job) => job.register());
+  return cronService.bootstrap();
 }

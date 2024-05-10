@@ -97,7 +97,7 @@ async function doWorker() {
     await createKoaServer();
   }
 
-  if (settings.initialCache && process.env.job) {
+  if (settings.initialSetup && process.env.job) {
     await runCron();
   }
 }

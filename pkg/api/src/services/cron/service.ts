@@ -1,4 +1,5 @@
-import { Logger } from '@/infrastructure/logger/logger';
+import { Service } from 'diod';
+import pino from 'pino';
 
 import { DefaultCronOptions } from './constants';
 import {
@@ -11,10 +12,12 @@ import {
 /**
  * Represents a base class for a cron service.
  */
+@Service()
 export abstract class CronService {
-  private logger = Logger.getInstance().child({ module: 'services.cron' });
-
-  constructor(private activeJobs: JobCronName[]) {}
+  constructor(
+    private activeJobs: JobCronName[],
+    private logger: pino.Logger<string>,
+  ) {}
 
   /**
    * Adds a job to the cron service.
