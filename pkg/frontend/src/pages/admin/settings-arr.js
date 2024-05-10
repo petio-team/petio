@@ -157,13 +157,13 @@ export default function SettingsArr(props) {
       });
       let responseData = null;
       if (type === 'radarr') {
-        responseData = await saveRadarrConfig(data);
+        responseData = await saveRadarrConfig(newServer);
       } else {
-        responseData = await saveSonarrConfig(data);
+        responseData = await saveSonarrConfig(newServer);
       }
       serverData = {
-        ...data[data.length - 1],
-        id: responseData[responseData.length - 1].id,
+        ...data,
+        id: responseData.id,
       };
       const test = await testServer(serverData.id);
       if (!test) {
@@ -331,9 +331,9 @@ export default function SettingsArr(props) {
       });
 
       if (type === 'radarr') {
-        await saveRadarrConfig(data);
+        await saveRadarrConfig(currentServer);
       } else {
-        await saveSonarrConfig(data);
+        await saveSonarrConfig(currentServer);
       }
       await getServers();
       props.newNotification({

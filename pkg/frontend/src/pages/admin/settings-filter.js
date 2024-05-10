@@ -176,10 +176,10 @@ export default function SettingsFilter(props) {
       let settingsRadarr = {};
       let settingsSonarr = {};
       radarr.forEach((item) => {
-        getSettings(item.uuid, 'radarr', settingsRadarr);
+        getSettings(item.id, 'radarr', settingsRadarr);
       });
       sonarr.forEach((item) => {
-        getSettings(item.uuid, 'sonarr', settingsSonarr);
+        getSettings(item.id, 'sonarr', settingsSonarr);
       });
     } catch (err) {
       console.log(err);
@@ -188,14 +188,14 @@ export default function SettingsFilter(props) {
     }
   }
 
-  async function getSettings(uuid, type = 'radarr' || 'sonarr', current) {
+  async function getSettings(id, type = 'radarr' || 'sonarr', current) {
     try {
       let settings =
         type === 'radarr'
-          ? await getRadarrOptions(uuid)
-          : await getSonarrOptions(uuid);
+          ? await getRadarrOptions(id)
+          : await getSonarrOptions(id);
 
-      current[uuid] = {
+      current[id] = {
         profiles:
           settings.profiles && settings.profiles.length > 0
             ? settings.profiles

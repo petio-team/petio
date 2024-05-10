@@ -2,8 +2,9 @@
 import Bluebird from 'bluebird';
 import _ from 'lodash';
 
+import { getFromContainer } from '@/infra/container/container';
 import loggerMain from '@/infra/logger/logger';
-import { GetAllUsers } from '@/models/user';
+import { UserRepository } from '@/resources/user/repository';
 
 import cache from '../cache/cache';
 import build from './build';
@@ -16,7 +17,7 @@ export default async () => {
   const ttl = 60 * 60 * 24 * 30; // 30 days
 
   try {
-    const users = await GetAllUsers();
+    const users = await getFromContainer(UserRepository).findAll();
     if (!users.length) {
       return;
     }

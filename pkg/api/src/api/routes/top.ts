@@ -2,16 +2,46 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
+import { getFromContainer } from '@/infra/container/container';
+import { MediaServerRepository } from '@/resources/media-server/repository';
 import getTop from '@/services/plex/top';
 
 const getMovies = async (ctx: Context) => {
-  ctx.status = StatusCodes.OK;
-  ctx.body = await getTop(1);
+  try {
+    const serverResult = await getFromContainer(MediaServerRepository).findOne(
+      {},
+    );
+    if (serverResult.isNone()) {
+      ctx.status = StatusCodes.BAD_REQUEST;
+      ctx.body = 'failed to find server';
+      return;
+    }
+    const server = serverResult.unwrap();
+    ctx.status = StatusCodes.OK;
+    ctx.body = await getTop(server, 1);
+  } catch (err) {
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = { error: err };
+  }
 };
 
 const getShows = async (ctx: Context) => {
-  ctx.status = StatusCodes.OK;
-  ctx.body = await getTop(2);
+  try {
+    const serverResult = await getFromContainer(MediaServerRepository).findOne(
+      {},
+    );
+    if (serverResult.isNone()) {
+      ctx.status = StatusCodes.BAD_REQUEST;
+      ctx.body = 'failed to find server';
+      return;
+    }
+    const server = serverResult.unwrap();
+    ctx.status = StatusCodes.OK;
+    ctx.body = await getTop(server, 2);
+  } catch (err) {
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = { error: err };
+  }
 };
 
 const route = new Router({ prefix: '/top' });

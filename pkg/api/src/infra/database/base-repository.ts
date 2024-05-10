@@ -1,6 +1,7 @@
 import { ClientSession, Model , Document , AnyObject , PipelineStage } from "mongoose";
 import { Option, Some, None } from 'oxide.ts';
 import { Service } from "diod";
+import { ObjectId } from 'bson';
 import { BaseEntity } from "../entity/entity";
 import { MongooseRepository } from "./repository";
 import { Mapper } from "../entity/mapper";
@@ -50,7 +51,7 @@ export abstract class MongooseBaseRepository<
     find?: Record<string, any>,
     options?: FindAllOptions<ClientSession>,
   ): Promise<Entity[]> {
-    const query = this.repository.find<EntityDocument>(find ?? {});
+    const query = this.repository.find<Entity>(find ?? {});
     const relationOptions: RelationOptions[] | undefined =
       typeof options?.relations === 'boolean'
         ? this.relations
@@ -91,7 +92,7 @@ export abstract class MongooseBaseRepository<
       query.session(options.session);
     }
 
-    const results = await query.lean().exec() as EntityDocument[];
+    const results = await query.lean().exec() as any[];
     // * hacky way to convert relations to entities
     return results.map((r) => {
       if (relationOptions) {
@@ -114,7 +115,7 @@ export abstract class MongooseBaseRepository<
     find?: Record<string, any>,
     options?: FindAllOptions<ClientSession>,
   ): Promise<Entity[]> {
-    const query = this.repository.distinct<EntityDocument>(fieldDistinct, find ?? {});
+    const query = this.repository.distinct<Entity>(fieldDistinct, find ?? {});
     const relationOptions: RelationOptions[] | undefined =
       typeof options?.relations === 'boolean'
         ? this.relations
@@ -155,7 +156,7 @@ export abstract class MongooseBaseRepository<
       query.session(options.session);
     }
 
-    const results = await query.lean().exec();
+    const results = await query.lean().exec() as any;
     // * hacky way to convert relations to entities
     return results.map((r) => {
       if (relationOptions) {
@@ -176,7 +177,7 @@ export abstract class MongooseBaseRepository<
     find: Record<string, any>,
     options?: FindOneOptions<ClientSession>
   ): Promise<Option<Entity>> {
-    const query = this.repository.findOne<EntityDocument>(find ?? {});
+    const query = this.repository.findOne<Entity>(find ?? {});
     const relationOptions: RelationOptions[] | undefined =
       typeof options?.relations === 'boolean'
         ? this.relations
@@ -211,7 +212,7 @@ export abstract class MongooseBaseRepository<
       query.session(options.session);
     }
 
-    const result = await query.exec();
+    const result = await query.exec() as any;
     if (result) {
       // * hacky way to convert relations to entities
       if (relationOptions) {
@@ -233,7 +234,7 @@ export abstract class MongooseBaseRepository<
     id: string,
     options?: FindOneOptions<ClientSession>,
   ): Promise<Option<Entity>> {
-    const query = this.repository.findById<EntityDocument>({ id });
+    const query = this.repository.findById<Entity>(new ObjectId(id));
     const relationOptions: RelationOptions[] | undefined =
       typeof options?.relations === 'boolean'
         ? this.relations
@@ -268,7 +269,7 @@ export abstract class MongooseBaseRepository<
       query.session(options.session);
     }
 
-    const result = await query.exec();
+    const result = await query.exec() as any;
     if (result) {
       // * hacky way to convert relations to entities
       if (relationOptions) {
@@ -763,11 +764,11 @@ export abstract class MongooseBaseRepository<
   }
 
   /**
-   * Gets the model for the repository.
+   * Gets the repository model.
    *
-   * @returns A promise that resolves to the model for the repository.
+   * @returns The repository model.
    */
-  async model(): Promise<Model<EntityDocument>> {
+  model(): Model<EntityDocument> {
     return this.repository;
   }
 }

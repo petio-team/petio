@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-import { config } from '@/config/index';
 import loggerMain from '@/infra/logger/logger';
 
 const logger = loggerMain.child({ module: 'notifications.discord' });
@@ -9,7 +8,7 @@ export default class Discord {
   webhook: any;
 
   constructor() {
-    this.webhook = config.get('notifications.discord.url') || false;
+    this.webhook = false;
   }
 
   check() {

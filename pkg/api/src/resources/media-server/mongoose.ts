@@ -27,8 +27,22 @@ export class MediaServerMongooseRepository
     const model = connection.getOrThrow().model(
       'MediaServer',
       MediaServerSchema,
-      'media-servers',
+      'media_servers'
     );
     super(model, mapper);
+  }
+
+  /**
+   * Finds a media server entity by the provided entity or creates a new one if it does not exist.
+   *
+   * @param entity - The media server entity to find or create.
+   * @returns A promise that resolves to the found or created media server entity.
+   */
+  async findOneOrCreate(entity: MediaServerEntity): Promise<MediaServerEntity> {
+    const found = await this.findOne({ url: entity.url });
+    if (found.isNone()) {
+      return this.create(entity);
+    }
+    return found.unwrap();
   }
 }

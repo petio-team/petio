@@ -1,17 +1,14 @@
 /* eslint-disable no-restricted-syntax */
-
-/* eslint-disable import/prefer-default-export */
 import Bluebird from 'bluebird';
 
-import { Movie } from '@/infra/arr/radarr/v4/movie';
-import { Series } from '@/infra/arr/sonarr/v3/series';
+import { getFromContainer } from '@/infra/container/container';
 import logger from '@/infra/logger/logger';
-import {
-  DownloaderType,
-  GetAllDownloaders,
-  IDownloader,
-} from '@/models/downloaders';
-import Request, { IRequest } from '@/models/request';
+import { DownloaderEntity } from '@/resources/downloader/entity';
+import { DownloaderRepository } from '@/resources/downloader/repository';
+import { DownloaderType } from '@/resources/downloader/types';
+import { RequestEntity } from '@/resources/request/entity';
+import { RequestRepository } from '@/resources/request/repository';
+import { RequestProps } from '@/resources/request/types';
 import Radarr from '@/services/downloaders/radarr';
 import Sonarr from '@/services/downloaders/sonarr';
 import { movieLookup } from '@/services/tmdb/movie';
@@ -26,7 +23,10 @@ import {
 } from './types';
 import { calcDate, cinemaWindow } from './utils';
 
-function reqState(req: IRequest, children: RequestChildren[]): RequestState {
+function reqState(
+  req: RequestEntity,
+  children: RequestChildren[],
+): RequestState {
   let diff: number;
   if (!req.approved) {
     return {
@@ -55,7 +55,7 @@ function reqState(req: IRequest, children: RequestChildren[]): RequestState {
         }
 
         if (req.type === 'tv' && isDownloaderSeries(element.info)) {
-          const data = element.info as Series;
+          const data = element.info;
           if (
             data.statistics.episodeCount === data.statistics.episodeFileCount &&
             data.statistics.episodeCount > 0
@@ -114,7 +114,7 @@ function reqState(req: IRequest, children: RequestChildren[]): RequestState {
         }
 
         if (req.type === 'movie' && isDownloaderMovie(element.info)) {
-          const data = element.info as Movie;
+          const data = element.info;
           if (data.hasFile) {
             return {
               status: 'good',
@@ -176,8 +176,8 @@ function reqState(req: IRequest, children: RequestChildren[]): RequestState {
     }
   }
 
-  if (req.manualStatus) {
-    switch (req.manualStatus) {
+  if (req.status) {
+    switch (req.status) {
       case 3: {
         return {
           status: 'orange',
@@ -216,43 +216,43 @@ function reqState(req: IRequest, children: RequestChildren[]): RequestState {
   };
 }
 
-function makeOutput(request: IRequest): RequestOutput {
+function makeOutput(request: RequestEntity): RequestOutput {
   return {
-    [request.requestId]: {
+    [request.id]: {
       title: request.title,
       children: [],
-      requestId: request.requestId,
+      requestId: request.id,
       type: request.type,
-      thumb: request.thumb,
-      imdb_id: request.imdb_id,
-      tmdb_id: request.tmdb_id,
-      tvdb_id: request.tvdb_id,
+      thumb: request.thumbnail,
+      imdb_id: request.imdbId,
+      tmdb_id: request.tmdbId,
+      tvdb_id: request.tvdbId,
       users: request.users,
-      sonarrId: request.sonarrId,
-      radarrId: request.radarrId,
+      sonarrId: request.sonarrs,
+      radarrId: request.radarrs,
       media: {},
       approved: request.approved,
-      manualStatus: request.manualStatus,
+      manualStatus: request.status,
       process_stage: reqState(request, []),
-      defaults: request.pendingDefault,
+      defaults: request.pending,
       seasons: request.type === 'tv' ? request.seasons : undefined,
     },
   };
 }
 
 async function getRequestsForMovies(
-  radarrs: IDownloader[],
-  requests: IRequest[],
+  radarrs: DownloaderEntity[],
+  requests: RequestEntity[],
 ) {
   const results = await Bluebird.map(requests, async (request) => {
     const output = makeOutput(request);
     try {
-      const lookup = await movieLookup(request.requestId, true);
-      const instance = radarrs.find((r) => request.radarrId.includes(r.id));
+      const lookup = await movieLookup(request.id, true);
+      const instance = radarrs.find((r) => request.radarrs.includes(r.id));
       if (instance) {
         try {
           const client = new Radarr(instance).getClient();
-          const movieId = parseInt(request.radarrId[0], 10);
+          const movieId = parseInt(request.radarrs[0], 10);
 
           const [movie, queue] = await Promise.all([
             client.GetMovie(movieId),
@@ -261,7 +261,7 @@ async function getRequestsForMovies(
 
           const status = queue.items.filter((q) => q.id === movieId);
 
-          output[request.requestId].children.push({
+          output[request.id].children.push({
             id: movieId,
             info: {
               ...movie,
@@ -269,16 +269,16 @@ async function getRequestsForMovies(
             },
             status,
           });
-          output[request.requestId].process_stage = reqState(
+          output[request.id].process_stage = reqState(
             request,
-            output[request.requestId].children,
+            output[request.id].children,
           );
         } catch (error) {
           logger.error(
-            `failed to get movie ${request.radarrId[0]} from ${instance.name}`,
+            `failed to get movie ${request.radarrs[0]} from ${instance.name}`,
             error,
           );
-          output[request.requestId].children.push({
+          output[request.id].children.push({
             id: -1,
             info: {
               message: 'Not Found',
@@ -287,10 +287,10 @@ async function getRequestsForMovies(
           });
         }
       }
-      output[request.requestId].media = lookup;
+      output[request.id].media = lookup;
       return output;
     } catch (error) {
-      logger.error(`failed to get movie ${request.requestId}`, error);
+      logger.error(`failed to get movie ${request.id}`, error);
       return output;
     }
   });
@@ -301,18 +301,18 @@ async function getRequestsForMovies(
 }
 
 async function getRequestsForShows(
-  sonarrs: IDownloader[],
-  requests: IRequest[],
+  sonarrs: DownloaderEntity[],
+  requests: RequestEntity[],
 ) {
   const results = await Bluebird.map(requests, async (request) => {
     const output = makeOutput(request);
     try {
-      const lookup = await showLookup(request.requestId, true);
-      const instance = sonarrs.find((s) => request.sonarrId.includes(s.id));
+      const lookup = await showLookup(request.id, true);
+      const instance = sonarrs.find((s) => request.sonarrs.includes(s.id));
       if (instance) {
         try {
           const client = new Sonarr(instance).getClient();
-          const seriesId = parseInt(request.sonarrId[0], 10);
+          const seriesId = parseInt(request.sonarrs[0], 10);
 
           const [series, queue] = await Promise.all([
             client.GetSeriesById(seriesId),
@@ -321,7 +321,7 @@ async function getRequestsForShows(
 
           const status = queue.items.filter((q) => q.id === seriesId);
 
-          output[request.requestId].children.push({
+          output[request.id].children.push({
             id: seriesId,
             info: {
               ...series,
@@ -329,16 +329,16 @@ async function getRequestsForShows(
             },
             status,
           });
-          output[request.requestId].process_stage = reqState(
+          output[request.id].process_stage = reqState(
             request,
-            output[request.requestId].children,
+            output[request.id].children,
           );
         } catch (error) {
           logger.error(
-            `failed to get show ${request.sonarrId[0]} from ${instance.name}`,
+            `failed to get show ${request.sonarrs[0]} from ${instance.name}`,
             error,
           );
-          output[request.requestId].children.push({
+          output[request.id].children.push({
             id: -1,
             info: {
               message: 'Not Found',
@@ -347,10 +347,10 @@ async function getRequestsForShows(
           });
         }
       }
-      output[request.requestId].media = lookup;
+      output[request.id].media = lookup;
       return output;
     } catch (error) {
-      logger.error(`failed to get show ${request.requestId}`, error);
+      logger.error(`failed to get show ${request.id}`, error);
       return output;
     }
   });
@@ -363,8 +363,8 @@ async function getRequestsForShows(
 export async function getAllRequests() {
   try {
     const [requests, instances] = await Promise.all([
-      Request.find({}),
-      GetAllDownloaders(),
+      getFromContainer(RequestRepository).findAll({}),
+      getFromContainer(DownloaderRepository).findAll({}),
     ]);
 
     if (requests.length === 0) {
@@ -372,10 +372,10 @@ export async function getAllRequests() {
     }
 
     const sonarrs = instances.filter(
-      (instance) => instance.type === DownloaderType.Sonarr,
+      (instance) => instance.type === DownloaderType.SONARR,
     );
     const radarrs = instances.filter(
-      (instance) => instance.type === DownloaderType.Radarr,
+      (instance) => instance.type === DownloaderType.RADARR,
     );
 
     const movieRequests = requests.filter(
@@ -405,12 +405,12 @@ export async function getAllRequests() {
 export async function getAllUserRequests(userId: string) {
   try {
     const [requests, instances] = await Promise.all([
-      Request.find({
+      getFromContainer(RequestRepository).findAll({
         users: {
           $in: [userId],
         },
       }),
-      GetAllDownloaders(),
+      getFromContainer(DownloaderRepository).findAll({}),
     ]);
 
     if (requests.length === 0) {
@@ -418,10 +418,10 @@ export async function getAllUserRequests(userId: string) {
     }
 
     const sonarrs = instances.filter(
-      (instance) => instance.type === DownloaderType.Sonarr,
+      (instance) => instance.type === DownloaderType.SONARR,
     );
     const radarrs = instances.filter(
-      (instance) => instance.type === DownloaderType.Radarr,
+      (instance) => instance.type === DownloaderType.RADARR,
     );
 
     const movieRequests = requests.filter(

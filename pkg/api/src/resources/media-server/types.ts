@@ -1,10 +1,10 @@
+import { Override } from '@/utils/override';
+
 /**
  * Represents the type of media server.
  */
 export enum MediaServerType {
   PLEX = 'plex',
-  JELLYFIN = 'jellyfin',
-  EMBY = 'emby',
 }
 
 /**
@@ -24,10 +24,10 @@ export type MediaServerProps = {
 /**
  * Represents the properties for creating a media server.
  */
-export type CreateMediaServerProps = Omit<
+export type CreateMediaServerProps = Override<
   MediaServerProps,
-  'libraries' | 'users'
-> & {
-  libraries?: string[];
-  users?: string[];
-};
+  {
+    libraries?: string[];
+    users?: string[];
+  }
+>;

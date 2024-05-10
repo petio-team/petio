@@ -1,3 +1,8 @@
+import { Override } from '../../utils/override';
+
+/**
+ * Represents the type of downloader.
+ */
 export enum DownloaderType {
   SONARR = 'sonarr',
   RADARR = 'radarr',
@@ -18,6 +23,9 @@ export type DownloaderProps = {
 /**
  * Represents the properties for creating a Downloader.
  */
-export type CreateDownloaderProps = DownloaderProps & {
-  // TODO: add additional fields
-};
+export type CreateDownloaderProps = Override<
+  DownloaderProps,
+  {
+    // TODO: add additional fields
+  }
+>;

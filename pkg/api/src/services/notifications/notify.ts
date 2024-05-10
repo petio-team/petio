@@ -1,5 +1,5 @@
-import { MakeRequest, Request } from '@/models/request/dto';
-import { User , MakeUser } from '@/models/user/dto';
+import { RequestEntity } from '@/resources/request/entity';
+import { UserEntity } from '@/resources/user/entity';
 
 export enum NotifyEvent {
   // Request
@@ -29,21 +29,8 @@ export type NotifyPayload = {
     image?: string;
     url?: string;
   };
-  request?: Request;
-  user?: User;
+  request?: RequestEntity;
+  user?: UserEntity;
   issue?: unknown;
   review?: unknown;
-};
-
-export const TestNotificationPayload: NotifyPayload = {
-  title: 'Test Notification',
-  content:
-    'This is a test notification to make sure this provider is working as expected for you',
-  media: {
-    image:
-      'https://image.tmdb.org/t/p/w533_and_h300_bestv2/5wQG7raxg1N6jBNU5nBFXUQVqnQ.jpg',
-    url: 'https://www.themoviedb.org/tv/99966',
-  },
-  request: MakeRequest({ title: 'Media 101 Requested' }),
-  user: MakeUser({ username: 'TestUser' }),
 };

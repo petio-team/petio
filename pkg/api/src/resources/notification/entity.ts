@@ -22,6 +22,46 @@ export class NotificationEntity extends BaseEntity<NotificationProps> {
   }
 
   /**
+   * Gets the name of the notification entity.
+   * @returns The name of the notification entity.
+   */
+  get name(): string {
+    return this.props.name;
+  }
+
+  /**
+   * Gets the URL of the notification.
+   * @returns The URL of the notification.
+   */
+  get url(): string {
+    return this.props.url;
+  }
+
+  /**
+   * Gets the type of the notification.
+   * @returns The type of the notification.
+   */
+  get type(): string {
+    return this.props.type;
+  }
+
+  /**
+   * Gets the metadata of the notification.
+   * @returns The metadata of the notification.
+   */
+  get metadata(): Record<string, unknown> {
+    return this.props.metadata;
+  }
+
+  /**
+   * Gets whether the notification is enabled.
+   * @returns Whether the notification is enabled.
+   */
+  get enabled(): boolean {
+    return this.props.enabled;
+  }
+
+  /**
    * Validates the Notification entity.
    */
   public validate(): void {}

@@ -19,6 +19,7 @@ export class SettingsMapper implements Mapper<SettingsEntity, SettingsSchemaProp
       id: copy.id,
       popularContent: copy.popularContent,
       authType: copy.authType,
+      appKeys: copy.appKeys,
       initialCache: copy.initialCache,
       initialSetup: copy.initialSetup,
       createdAt: copy.createdAt,
@@ -37,6 +38,7 @@ export class SettingsMapper implements Mapper<SettingsEntity, SettingsSchemaProp
       props: {
         popularContent: record.popularContent,
         authType: record.authType,
+        appKeys: record.appKeys,
         initialCache: record.initialCache,
         initialSetup: record.initialSetup,
       },
@@ -56,6 +58,7 @@ export class SettingsMapper implements Mapper<SettingsEntity, SettingsSchemaProp
       id: copy.id,
       popularContent: copy.popularContent,
       authType: copy.authType,
+      appKeys: copy.appKeys,
       initialCache: copy.initialCache,
       initialSetup: copy.initialSetup,
       createdAt: copy.createdAt,

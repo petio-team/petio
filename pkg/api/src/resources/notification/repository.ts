@@ -8,4 +8,6 @@ import { NotificationSchemaProps } from "./schema";
  * This class extends the `MongooseBaseRepository` class and provides specific functionality for the `NotificationEntity` and `NotificationSchema`.
  */
 @Service()
-export abstract class NotificationRepository extends MongooseRepository<NotificationEntity, NotificationSchemaProps> {}
+export abstract class NotificationRepository extends MongooseRepository<NotificationEntity, NotificationSchemaProps> {
+  abstract findOneOrCreate(entity: NotificationEntity): Promise<NotificationEntity>;
+}

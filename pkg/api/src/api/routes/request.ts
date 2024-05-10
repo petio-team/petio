@@ -3,10 +3,12 @@ import Bluebird from 'bluebird';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
+import { getFromContainer } from '@/infra/container/container';
 import logger from '@/infra/logger/logger';
-import { GetAllDownloaders, IDownloader } from '@/models/downloaders';
-import Request from '@/models/request';
-import { UserModel } from '@/models/user';
+import { DownloaderEntity } from '@/resources/downloader/entity';
+import { DownloaderRepository } from '@/resources/downloader/repository';
+import { RequestRepository } from '@/resources/request/repository';
+import { UserRepository } from '@/resources/user/repository';
 import Radarr from '@/services/downloaders/radarr';
 import Sonarr from '@/services/downloaders/sonarr';
 import Mailer from '@/services/mail/mailer';
@@ -16,6 +18,7 @@ import {
   getAllUserRequests,
 } from '@/services/requests/display';
 import ProcessRequest from '@/services/requests/process';
+import is from '@/utils/is';
 
 const listRequests = async (ctx: Context) => {
   ctx.status = StatusCodes.OK;
@@ -46,40 +49,41 @@ const getUserRequests = async (ctx: Context) => {
 };
 
 const getRequestMinified = async (ctx: Context) => {
-  const data = {};
   try {
-    const requests = await Request.find().exec();
-    if (!requests) {
-      ctx.status = StatusCodes.NOT_FOUND;
+    const requests = await getFromContainer(RequestRepository).findAll({});
+    if (requests.length === 0) {
+      ctx.status = StatusCodes.OK;
       ctx.body = {};
       return;
     }
 
+    const data = {};
     await Promise.all(
       requests.map(async (request) => {
-        if (!request.requestId) {
+        if (!request.id) {
           return;
         }
-
-        data[request.requestId] = {
+        data[request.id] = {
           title: request.title,
-          requestId: request.requestId,
+          requestId: request.id,
           type: request.type,
-          thumb: request.thumb,
-          imdb_id: request.imdb_id,
-          tmdb_id: request.tmdb_id,
-          tvdb_id: request.tvdb_id,
+          thumb: request.thumbnail,
+          imdb_id: request.imdbId,
+          tmdb_id: request.tmdbId,
+          tvdb_id: request.tvdbId,
           users: request.users,
-          sonarrId: request.sonarrId,
-          radarrId: request.radarrId,
+          sonarrId: request.sonarrs,
+          radarrId: request.radarrs,
           approved: request.approved,
-          defaults: request.pendingDefault,
+          defaults: request.pending,
         };
         if (request.type === 'tv') {
-          data[request.requestId].seasons = request.seasons;
+          data[request.id].seasons = request.seasons;
         }
       }),
     );
+    ctx.status = StatusCodes.OK;
+    ctx.body = data;
   } catch (err) {
     logger.error(`ROUTE: Error getting requests`, err);
     ctx.error({
@@ -89,9 +93,6 @@ const getRequestMinified = async (ctx: Context) => {
     });
     return;
   }
-
-  ctx.status = StatusCodes.OK;
-  ctx.body = data;
 };
 
 const addRequest = async (ctx: Context) => {
@@ -127,12 +128,15 @@ const removeRequest = async (ctx: Context) => {
 
   await Promise.all(
     request.users.map(async (user) => {
-      const userData = await UserModel.findOne({ id: user }).exec();
-      if (!userData) {
+      const userResult = await getFromContainer(UserRepository).findOne({
+        id: user,
+      });
+      if (userResult.isNone()) {
         ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
         ctx.body = { error: 'failed to find requests by user' };
         return;
       }
+      const userData = userResult.unwrap();
 
       emails.push(userData.email);
       titles.push(userData.title);
@@ -166,15 +170,14 @@ const updateRequest = async (ctx: Context) => {
   const { manualStatus } = body.request;
 
   if (manualStatus === '5') {
-    new ProcessRequest(request, ctx.state.user).archive(true, false, false);
+    new ProcessRequest(request, ctx.state.user).archive(true, false, '');
     ctx.status = StatusCodes.OK;
     ctx.body = {};
     return;
   }
 
   try {
-    const instances = await GetAllDownloaders();
-    await Request.findOneAndUpdate(
+    await getFromContainer(RequestRepository).updateMany(
       { requestId: request.requestId },
       {
         $set: {
@@ -182,27 +185,30 @@ const updateRequest = async (ctx: Context) => {
           manualStatus,
         },
       },
-      { new: true, useFindAndModify: false },
-    ).exec();
+    );
 
+    const instances = await getFromContainer(DownloaderRepository).findAll();
     if (servers && servers.length) {
-      const activeServers: IDownloader[] = servers.map((s) => {
-        if (s.active) {
-          const instance = instances.find((i) => i.id === s.id);
-          if (instance) {
-            return instance;
+      const activeServers: DownloaderEntity[] = servers
+        .map((s) => {
+          if (s.active) {
+            const instance = instances.find((i) => i.id === s.id);
+            if (instance) {
+              return instance;
+            }
+            return undefined;
           }
-        }
-        return undefined;
-      });
+          return undefined;
+        })
+        .filter(is.truthy);
 
       await Bluebird.map(activeServers, async (instance) => {
         if (request.type === 'movie') {
           await new Radarr(instance).processRequest(request.requestId);
         } else {
           await new Sonarr(instance).addShow(request, {
-            profile: instance.profile,
-            path: instance.path,
+            profile: instance.metadata.profile,
+            path: instance.metadata.path,
           });
         }
       });
@@ -213,10 +219,15 @@ const updateRequest = async (ctx: Context) => {
       const titles: any = [];
       await Promise.all(
         request.users.map(async (id) => {
-          const userData = await UserModel.findOne({ id }).exec();
-          if (!userData) return;
-          emails.push(userData.email);
-          titles.push(userData.title);
+          const userData = await getFromContainer(UserRepository).findOne({
+            id,
+          });
+          if (userData.isNone()) {
+            return;
+          }
+          const user = userData.unwrap();
+          emails.push(user.email);
+          titles.push(user.title);
         }),
       );
       const requestData = request;

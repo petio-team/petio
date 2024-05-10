@@ -1,33 +1,30 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { fromError, isValidationError } from 'zod-validation-error';
-
-import { config } from '@/config';
 import loggerMain from '@/infra/logger/logger';
-import { PlexAPIClient } from '@/infra/plex/plex';
-import { MediaContainer } from '@/infra/plex/plex/library';
+import { GetLibraryTopContentResponse } from '@/infra/plex';
+import { MediaServerEntity } from '@/resources/media-server/entity';
+import { getPlexClient } from '@/services/plex/client';
 import plexLookup from '@/services/plex/lookup';
 import { movieLookup } from '@/services/tmdb/movie';
 import { showLookup } from '@/services/tmdb/show';
 import is from '@/utils/is';
 
-// eslint-disable-next-line import/order
 import cache from '../cache/cache';
 
 const logger = loggerMain.child({ module: 'plex.top' });
-export default async (type: 1 | 2) => {
+
+export default async (server: MediaServerEntity, type: 1 | 2) => {
   try {
-    return await cache.wrap(`popular__${type}`, async () => getTopData(type));
+    return await cache.wrap(`popular__${type}`, async () =>
+      getTopData(server, type),
+    );
   } catch (err) {
     logger.error(`Error getting top data - ${type}`, err);
     return {};
   }
 };
 
-async function getTopData(type: 1 | 2) {
-  const baseurl = `${config.get('plex.protocol')}://${config.get(
-    'plex.host',
-  )}:${config.get('plex.port')}`;
-  const client = PlexAPIClient(baseurl, config.get('plex.token'));
+async function getTopData(server: MediaServerEntity, type: 1 | 2) {
+  const client = getPlexClient(server);
 
   const d = new Date();
   d.setMonth(d.getMonth() - 1);
@@ -36,33 +33,32 @@ async function getTopData(type: 1 | 2) {
   const timestamp = d.getTime() / 1000 || 0;
 
   try {
-    const data = await client.get('/library/all/top', {
-      queries: {
-        type,
-        'viewedAt>': timestamp,
-        limit: 20,
-      },
+    const data = await client.library.getTopWatchedContent({
+      type,
+      limit: 20,
+      'viewedAt>': timestamp,
     });
-    if (!data.MediaContainer.Metadata) {
+    if (
+      !is.truthy(data.MediaContainer) ||
+      !is.truthy(data.MediaContainer.Metadata)
+    ) {
       return {};
     }
-    return await parseTop(data, type);
+    return await parseTop(data.MediaContainer, type);
   } catch (err) {
-    if (isValidationError(err)) {
-      const zodError = fromError(err);
-      logger.error(zodError, 'Error getting top data');
-      return {};
-    }
     logger.debug(err, 'Error getting top data');
     return {};
   }
 }
 
 async function parseTop(
-  data: MediaContainer,
+  data: GetLibraryTopContentResponse['MediaContainer'],
   type: number,
 ): Promise<{ [key: string]: any }> {
-  const top = data.MediaContainer.Metadata;
+  if (!is.truthy(data) || !is.truthy(data.Metadata)) {
+    return {};
+  }
+  const top = data.Metadata;
   if (!top) {
     logger.debug(
       "No Plex Top Data, you're probably not a Plex Pass user. This is not an error",

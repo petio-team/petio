@@ -1,6 +1,32 @@
 import { StatusCodes } from 'http-status-codes';
 import { DefaultContext } from 'koa';
 
+declare global {
+  namespace Koa {
+    interface Context {
+      success: ({
+        statusCode,
+        data,
+      }: {
+        statusCode: number;
+        data?: any;
+      }) => void;
+      error: ({
+        statusCode,
+        code,
+        message,
+      }: {
+        statusCode: number;
+        code: string;
+        message: string | undefined;
+      }) => void;
+      ok: (params: any) => void;
+      created: (params: any) => void;
+      accepted: (params: any) => void;
+    }
+  }
+}
+
 export default () => async (ctx: DefaultContext, next: () => Promise<any>) => {
   ctx.success = ({ statusCode, data = undefined }: any) => {
     const status = 'success';

@@ -4,59 +4,16 @@ import { Context } from 'koa';
 import { z } from 'zod';
 
 import { validateRequest } from '@/api/middleware/validation';
-import { WriteConfig } from '@/config/config';
-import { config } from '@/config/index';
-import logger from '@/infra/logger/logger';
 import Mailer from '@/services/mail/mailer';
 
 const createMail = async (ctx: Context) => {
-  const { email } = ctx.request.body;
-
-  if (!email) {
-    logger.log('error', 'MAILER: Update email config failed');
-
-    ctx.status = StatusCodes.BAD_REQUEST;
-    ctx.body = 'missing fields';
-    return;
-  }
-
-  config.set('email.enabled', email.enabled);
-  config.set('email.username', email.user);
-  config.set('email.password', email.pass);
-  config.set('email.host', email.server);
-  config.set('email.port', email.port);
-  config.set('email.ssl', email.secure);
-  config.set('email.from', email.from);
-
-  try {
-    await WriteConfig();
-  } catch (e) {
-    logger.error(e);
-
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = 'failed to write config to filesystem';
-    return;
-  }
-
-  logger.log('debug', 'MAILER: Config updated');
-
   ctx.status = StatusCodes.OK;
-  ctx.body = { config: config.get('email') };
+  ctx.body = {};
 };
 
 const getMailConfig = async (ctx: Context) => {
   ctx.status = StatusCodes.OK;
-  ctx.body = {
-    config: {
-      emailEnabled: config.get('email.enabled'),
-      emailUser: config.get('email.username'),
-      emailPass: config.get('email.password'),
-      emailServer: config.get('email.host'),
-      emailPort: config.get('email.port'),
-      emailSecure: config.get('email.ssl'),
-      emailFrom: config.get('email.from'),
-    },
-  };
+  ctx.body = {};
 };
 
 const testConnection = async (ctx: Context) => {

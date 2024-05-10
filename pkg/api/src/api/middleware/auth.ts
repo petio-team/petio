@@ -2,8 +2,10 @@ import * as HttpStatus from 'http-status-codes';
 import jwt from 'jsonwebtoken';
 import { Context, Next } from 'koa';
 
+import { getFromContainer } from '@/infra/container/container';
 import loggerMain from '@/infra/logger/logger';
-import { UserModel } from '@/models/user';
+import { UserMapper } from '@/resources/user/mapper';
+import { UserRepository } from '@/resources/user/repository';
 
 const logger = loggerMain.child({ module: 'middleware.auth' });
 
@@ -37,12 +39,14 @@ export async function authenticate(ctx: Context) {
       removeCookie(ctx);
       throw new Error(`id missing from jwt data`);
     }
-
-    const resp = await UserModel.findOne({ _id: (jwtData as any).id }).exec();
-    if (!resp) {
+    const userRepo = await getFromContainer(UserRepository).findOne({
+      _id: jwtData.id,
+    });
+    if (userRepo.isNone()) {
       throw new Error('no user found');
     }
-    userData = resp.toJSON();
+    const userResult = userRepo.unwrap();
+    userData = getFromContainer(UserMapper).toResponse(userResult);
   } catch (error) {
     logger.debug('user not found in db', error);
     throw new Error(`AUTH: User not found in DB - route ${ctx.path}`);

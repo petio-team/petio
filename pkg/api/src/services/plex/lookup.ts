@@ -1,20 +1,24 @@
-import Movie from '@/models/movie';
-import Show from '@/models/show';
+import { getFromContainer } from '@/infra/container/container';
+import { MovieRepository } from '@/resources/movie/repository';
+import { ShowRepository } from '@/resources/show/repository';
 
 export default async (id, type) => {
-  let plexMatch: any = {};
   if (type === 'movie') {
-    plexMatch = await Movie.findOne({
+    const movieRepo = getFromContainer(MovieRepository);
+    const result = await movieRepo.findOne({
       ratingKey: id,
-    }).exec();
-  } else {
-    plexMatch = await Show.findOne({
-      ratingKey: id,
-    }).exec();
+    });
+    if (result.isNone()) {
+      return null;
+    }
+    return result.unwrap();
   }
-  if (!plexMatch) {
-    return { error: 'not found, invalid key' };
-  } 
-    return plexMatch;
-  
+  const showRepo = getFromContainer(ShowRepository);
+  const result = await showRepo.findOne({
+    ratingKey: id,
+  });
+  if (result.isNone()) {
+    return null;
+  }
+  return result.unwrap();
 };

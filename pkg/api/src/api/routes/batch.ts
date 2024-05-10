@@ -7,7 +7,7 @@ import { movieLookup } from '@/services/tmdb/movie';
 import { showLookup } from '@/services/tmdb/show';
 
 const handleTv = async (ctx: Context) => {
-  const {ids} = ctx.request.body;
+  const { ids } = ctx.request.body;
   const min = ctx.request.body.min === undefined ? true : ctx.request.body.min;
   const output = await Promise.all(
     ids.map(async (id) => {
@@ -20,7 +20,7 @@ const handleTv = async (ctx: Context) => {
 };
 
 const handleMovie = async (ctx: Context) => {
-  const {ids} = ctx.request.body;
+  const { ids } = ctx.request.body;
   const min = ctx.request.body.min === undefined ? true : ctx.request.body.min;
   const output = await Promise.all(
     ids.map(async (id): Promise<any> => {

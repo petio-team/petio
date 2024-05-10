@@ -38,7 +38,7 @@
 	},
 	"Generates a new resource mapper class": {
 		"scope": "typescript",
-		"prefix": "grmc",
+		"prefix": "grm",
 		"body": [
 		  "import { Mapper } from \"@/infra/entity/mapper\";",
 		  "import { Service } from \"diod\";",
@@ -100,9 +100,9 @@
 		],
 		"description": "Generates a new mapper class"
 	},
-	"Generates a new resource mongoose database repository": {
+	"Generates a new resource database repository": {
 		"scope": "typescript",
-		"prefix": "grmdr",
+		"prefix": "grdr",
 		"body": [
 		  "import { Service } from 'diod';",
 		  "",
@@ -144,7 +144,7 @@
 	},
 	"Generates a new resource repository class": {
 		"scope": "typescript",
-		"prefix": "grrc",
+		"prefix": "grr",
 		"body": [
 		  "import { MongooseRepository } from \"@/infra/database/repository\";",
 		  "import { Service } from \"diod\";",
@@ -184,7 +184,7 @@
 	},
 	"Generates a new resource mongoose schema": {
 		"scope": "typescript",
-		"prefix": "grms",
+		"prefix": "grs",
 		"body": [
 		  "import { Schema } from 'mongoose';",
 		  "",
@@ -192,9 +192,16 @@
 		  "",
 		  "import { ${1}Props } from './types';",
 		  "",
+		  "/**",
+		  " * Represents the properties of a ${1} schema.",
+		  " */",
 		  "export type ${1}SchemaProps = BaseEntityProps & ${1}Props;",
+		  "",
+		  "/**",
+		  " * Represents the ${1} schema.",
+		  " */",
 		  "export const ${1}Schema = new Schema<${1}SchemaProps>({",
-		  "  id: { type: String, required: true },",
+		  "  id: { type: String, required: true, unique: true, index: true },",
 		  "  // TODO: fill in the rest",
 		  "  createdAt: { type: Date, required: true },",
 		  "  updatedAt: { type: Date, required: true },",
@@ -204,21 +211,28 @@
 		"description": "Generates a new mongoose schema"
 	},
 	"Generates resource types": {
+		"scope": "typescript",
 		"prefix": "grt",
 		"body": [
+		  "import { Override } from '@/utils/override';",
+		  "",
 		  "/**",
 		  " * Represents the properties of a ${1}.",
 		  " */",
 		  "export type ${1}Props = {",
-		  "  // TODO: add fields here",
+		  "  // TODO: add fields",
 		  "};",
 		  "",
 		  "/**",
 		  " * Represents the properties for creating a ${1}.",
 		  " */",
-		  "export type Create${1}Props = ${1}Props & {",
-		  "  // TODO: add additional fields",
-		  "};"
+		  "export type Create${1}Props = Override<",
+		  "  ${1}Props,",
+		  "  {",
+		  "    // TODO: add fields to override",
+		  "  }",
+		  ">;",
+		  ""
 		],
 		"description": "Generates resource types"
 	}

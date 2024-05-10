@@ -1,18 +1,20 @@
-import { PopulateOptions } from "mongoose";
-import { Mapper } from "../entity/mapper";
-import { PaginationOptions } from "./pagination";
+import { PopulateOptions } from 'mongoose';
+
+import { Mapper } from '../entity/mapper';
+import { PaginationOptions } from './pagination';
 
 /**
  * Represents the options for a relation.
  */
 export type RelationOptions = PopulateOptions & {
-  mapper: Mapper<any, any>,
+  mapper: Mapper<any, any>;
 };
 
 /**
  * Options for the `findOne` method.
  */
-export interface FindOneOptions<T = any> extends Pick<PaginationOptions, 'order'> {
+export interface FindOneOptions<T = any>
+  extends Pick<PaginationOptions, 'order'> {
   /**
    * Specifies the fields to be selected in the query result.
    */
@@ -39,7 +41,10 @@ export interface FindOneOptions<T = any> extends Pick<PaginationOptions, 'order'
  *
  * @typeparam T - The type of data being saved.
  */
-export type SaveOptions<T = any> = Pick<FindOneOptions<T>, 'session'>;
+export interface SaveOptions<T = any>
+  extends Pick<FindOneOptions<T>, 'session'> {
+  id: string;
+}
 
 /**
  * Options for finding all entities in the database.
@@ -57,8 +62,8 @@ export interface FindAllOptions<T = any>
  */
 export interface CreateOptions<T = any>
   extends Pick<FindOneOptions<T>, 'session'> {
-    id: string;
-  }
+  id: string;
+}
 
 /**
  * Options for checking the existence of an entity in the database.
@@ -67,15 +72,18 @@ export interface CreateOptions<T = any>
  */
 export interface ExistOptions<T = any>
   extends Pick<FindOneOptions<T>, 'session' | 'withDeleted' | 'relations'> {
-    excludeId?: string[];
-  }
+  excludeId?: string[];
+}
 
 /**
  * Represents the options for performing many operations in the database.
  *
  * @template T - The type of the data being operated on.
  */
-export type ManyOptions<T = any> = Pick<FindOneOptions<T>, 'session' | 'relations'>;
+export type ManyOptions<T = any> = Pick<
+  FindOneOptions<T>,
+  'session' | 'relations'
+>;
 
 /**
  * Options for updating many entities in the database.
@@ -103,4 +111,7 @@ export type RestoreManyOptions<T = any> = ManyOptions<T>;
  *
  * @template T - The type of the entity.
  */
-export type RawOptions<T = any> = Pick<FindOneOptions<T>, 'session' | 'withDeleted'>;
+export type RawOptions<T = any> = Pick<
+  FindOneOptions<T>,
+  'session' | 'withDeleted'
+>;

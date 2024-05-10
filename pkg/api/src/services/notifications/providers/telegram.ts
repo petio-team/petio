@@ -1,8 +1,8 @@
+import TelegramAPI from '@/infra/telegram/api';
 
 import { BaseNotification, INotification } from '../notification';
 import { INotify, NotifyEvent, NotifyPayload } from '../notify';
 import { AuthConfig } from '../url/url';
-import TelegramAPI from '@/infra/telegram/api';
 
 export interface TelegramNotification extends INotification {
   chatId: string;
@@ -36,14 +36,14 @@ export class TelegramProvider
   private makeOutput(type: NotifyEvent, data: NotifyPayload): string {
     let output = '';
 
-    output += `<b>${  type  }</b>\n\n`;
+    output += `<b>${type}</b>\n\n`;
 
     if (data.title) {
-      output += `<b>${  data.title  }</b>\n`;
+      output += `<b>${data.title}</b>\n`;
     }
 
     if (data.content) {
-      output += `${data.content  }\n`;
+      output += `${data.content}\n`;
     }
 
     if (data.request) {

@@ -5,14 +5,20 @@ import axios from 'axios';
 import http from 'http';
 
 import { TMDB_API_KEY } from '@/infra/config/env';
+import { getFromContainer } from '@/infra/container/container';
 import loggerMain from '@/infra/logger/logger';
-import { TMDBAPI } from '@/infra/tmdb/tmdb';
+import {
+  MovieDetailsResponse,
+  MovieVideosResponse,
+  TheMovieDatabaseClient,
+  TvSeriesDetailsResponse,
+  TvSeriesVideosResponse,
+} from '@/infra/tmdb/client';
+import { CacheService } from '@/services/cache/cache';
 import fanartLookup from '@/services/fanart';
 import { lookup as imdb } from '@/services/meta/imdb';
 import onServer from '@/services/plex/server';
 import getLanguage from '@/services/tmdb/languages';
-
-import cache from '../cache/cache';
 
 const agent = new http.Agent({ family: 4 });
 
@@ -189,15 +195,12 @@ export default showLookup;
 
 // Get show details via the tmdbid
 export const getShowDetails = async (id: number) => {
+  const client = getFromContainer(TheMovieDatabaseClient);
   try {
     const [details, plex] = await Promise.all([
-      TMDBAPI.get('/tv/:id', {
-        params: {
-          id,
-        },
-        queries: {
-          append_to_response: 'videos',
-        },
+      client.default.tvSeriesDetails({
+        seriesId: id,
+        appendToResponse: 'videos',
       }),
       onServer('show', undefined, undefined, id),
     ]);
@@ -206,6 +209,9 @@ export const getShowDetails = async (id: number) => {
     if (plex && plex.exists) {
       exists = true;
     }
+    const tvDetails = details as TvSeriesDetailsResponse & {
+      videos: TvSeriesVideosResponse | undefined;
+    };
 
     return {
       on_server: exists,
@@ -214,18 +220,19 @@ export const getShowDetails = async (id: number) => {
       first_air_date: details.first_air_date,
       id: details.id,
       backdrop_path: details.backdrop_path,
-      videos: details.videos
-        ? {
-            results: [
-              ...details.videos.results.filter(
-                (obj) => obj.type === 'Teaser' && obj.site === 'YouTube',
-              ),
-              ...details.videos.results.filter(
-                (obj) => obj.type === 'Trailer' && obj.site === 'YouTube',
-              ),
-            ],
-          }
-        : [],
+      videos:
+        tvDetails.videos && tvDetails.videos.results
+          ? {
+              results: [
+                ...tvDetails.videos.results.filter(
+                  (obj) => obj.type === 'Teaser' && obj.site === 'YouTube',
+                ),
+                ...tvDetails.videos.results.filter(
+                  (obj) => obj.type === 'Trailer' && obj.site === 'YouTube',
+                ),
+              ],
+            }
+          : [],
     };
   } catch (e) {
     logger.error(`failed to get show details with id ${id}`, e);
@@ -235,18 +242,18 @@ export const getShowDetails = async (id: number) => {
 
 // Get movie details via the tmdbid
 export const getMovieDetails = async (id: number) => {
+  const client = getFromContainer(TheMovieDatabaseClient);
   try {
     const [details, plex] = await Promise.all([
-      TMDBAPI.get('/movie/:id', {
-        params: {
-          id,
-        },
-        queries: {
-          append_to_response: 'videos',
-        },
+      client.default.movieDetails({
+        movieId: id,
+        appendToResponse: 'videos',
       }),
       onServer('movie', undefined, undefined, id),
     ]);
+    const movieDetails = details as MovieDetailsResponse & {
+      videos: MovieVideosResponse | undefined;
+    };
 
     let exists = false;
     if (plex && plex.exists) {
@@ -260,18 +267,19 @@ export const getMovieDetails = async (id: number) => {
       release_date: details.release_date,
       id: details.id,
       backdrop_path: details.backdrop_path,
-      videos: details.videos
-        ? {
-            results: [
-              ...details.videos.results.filter(
-                (obj) => obj.type === 'Teaser' && obj.site === 'YouTube',
-              ),
-              ...details.videos.results.filter(
-                (obj) => obj.type === 'Trailer' && obj.site === 'YouTube',
-              ),
-            ],
-          }
-        : [],
+      videos:
+        movieDetails.videos && movieDetails.videos.results
+          ? {
+              results: [
+                ...movieDetails.videos.results.filter(
+                  (obj) => obj.type === 'Teaser' && obj.site === 'YouTube',
+                ),
+                ...movieDetails.videos.results.filter(
+                  (obj) => obj.type === 'Trailer' && obj.site === 'YouTube',
+                ),
+              ],
+            }
+          : [],
     };
   } catch (e) {
     logger.error(`failed to get movie details with id ${id}`, e);
@@ -282,7 +290,9 @@ export const getMovieDetails = async (id: number) => {
 async function getShowData(id) {
   let data = false;
   try {
-    data = await cache.wrap(id, async () => tmdbData(id));
+    data = await getFromContainer(CacheService).wrap(id, async () =>
+      tmdbData(id),
+    );
   } catch (err) {
     logger.warn(`Error getting show data - ${id}`, err);
   }
@@ -292,7 +302,9 @@ async function getShowData(id) {
 async function externalId(id) {
   let data = false;
   try {
-    data = await cache.wrap(`ext_${id}`, async () => idLookup(id));
+    data = await getFromContainer(CacheService).wrap(`ext_${id}`, async () =>
+      idLookup(id),
+    );
   } catch (err) {
     logger.debug(`Error getting external ID - ${id}`, err);
   }
@@ -302,8 +314,9 @@ async function externalId(id) {
 export async function getRecommendations(id, page = 1) {
   let data = false;
   try {
-    data = await cache.wrap(`rec_${id}__${page}`, async () =>
-      recommendationData(id, page),
+    data = await getFromContainer(CacheService).wrap(
+      `rec_${id}__${page}`,
+      async () => recommendationData(id, page),
     );
   } catch (err) {
     logger.warn(`Error getting recommendation data - ${id}`, err);
@@ -314,8 +327,9 @@ export async function getRecommendations(id, page = 1) {
 export async function getSimilar(id, page = 1) {
   let data = false;
   try {
-    data = await cache.wrap(`similar_${id}__${page}`, async () =>
-      similarData(id, page),
+    data = await getFromContainer(CacheService).wrap(
+      `similar_${id}__${page}`,
+      async () => similarData(id, page),
     );
   } catch (err) {
     logger.warn(`Error getting similar data - ${id}`, err);
@@ -326,7 +340,9 @@ export async function getSimilar(id, page = 1) {
 async function getReviews(id) {
   let data = false;
   try {
-    data = await cache.wrap(`rev_${id}`, async () => reviewsData(id));
+    data = await getFromContainer(CacheService).wrap(`rev_${id}`, async () =>
+      reviewsData(id),
+    );
   } catch (err) {
     logger.warn(`Error getting review data - ${id}`, err);
   }
@@ -336,8 +352,9 @@ async function getReviews(id) {
 async function getSeasons(seasons, id) {
   let data: any = false;
   try {
-    data = await cache.wrap(`seasons_${id}`, async () =>
-      seasonsData(seasons, id),
+    data = await getFromContainer(CacheService).wrap(
+      `seasons_${id}`,
+      async () => seasonsData(seasons, id),
     );
   } catch (err) {
     logger.warn(`Error getting season data - ${id}`, err);
@@ -356,7 +373,7 @@ async function tmdbData(id) {
     if (data.aggregate_credits.cast.length > 50)
       data.aggregate_credits.cast.length = 50;
     data.credits.cast = [];
-    data.aggregate_credits.cast.map((item, i) => {
+    data.aggregate_credits.cast.forEach((item, i) => {
       const character = item.roles.length > 0 ? item.roles[0].character : false;
       data.credits.cast[i] = {
         name: item.name,

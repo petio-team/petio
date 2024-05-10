@@ -2,20 +2,38 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
+import { getFromContainer } from '@/infra/container/container';
 import logger from '@/infra/logger/logger';
-import Issue from '@/models/issue';
-import { UserModel } from '@/models/user';
+import { IssueEntity } from '@/resources/issue/entity';
+import { IssueMapper } from '@/resources/issue/mapper';
+import { IssueRepository } from '@/resources/issue/repository';
+import { UserRepository } from '@/resources/user/repository';
 import Mailer from '@/services/mail/mailer';
 import { movieLookup } from '@/services/tmdb/movie';
 import { showLookup } from '@/services/tmdb/show';
 
 const listAllIssues = async (ctx: Context) => {
   ctx.status = StatusCodes.OK;
-  ctx.body = await Issue.find();
+  const issues = await getFromContainer(IssueRepository).findAll();
+  ctx.body = issues.map((issue) =>
+    getFromContainer(IssueMapper).toResponse(issue),
+  );
 };
 
-async function mailIssue(user_id, media_id, type, title) {
-  const userData = await UserModel.findOne({ id: user_id });
+async function mailIssue(
+  user_id: any,
+  media_id: any,
+  type: string,
+  title: any,
+) {
+  const userResult = await getFromContainer(UserRepository).findOne({
+    id: user_id,
+  });
+  if (userResult.isNone()) {
+    logger.log('warn', 'MAILER: User not found');
+    return;
+  }
+  const userData = userResult.unwrap();
   let media: any = false;
   if (type === 'series') {
     media = await showLookup(media_id, true);
@@ -46,7 +64,14 @@ async function mailIssue(user_id, media_id, type, title) {
 }
 
 async function mailIssueResolve(user_id, media_id, type, title, message) {
-  const userData = await UserModel.findOne({ id: user_id });
+  const userResult = await getFromContainer(UserRepository).findOne({
+    id: user_id,
+  });
+  if (userResult.isNone()) {
+    logger.log('warn', 'MAILER: User not found');
+    return;
+  }
+  const userData = userResult.unwrap();
   let media: any = false;
   if (type === 'series') {
     media = await showLookup(media_id, true);
@@ -82,21 +107,18 @@ const deleteIssues = async (ctx: Context) => {
   const { message } = body;
 
   try {
-    const issue = await Issue.findById(issueId);
-    if (!issue) {
+    const issueResult = await getFromContainer(IssueRepository).findOne({
+      id: issueId,
+    });
+    if (issueResult.isNone()) {
       ctx.status = StatusCodes.NOT_FOUND;
       ctx.body = { error: 'error no issue found' };
       return;
     }
+    const issue = issueResult.unwrap();
 
-    mailIssueResolve(
-      issue.user,
-      issue.mediaId,
-      issue.type,
-      issue.title,
-      message,
-    );
-    await Issue.findByIdAndDelete(issueId);
+    mailIssueResolve(issue.id, issue.user, issue.type, issue.title, message);
+    await getFromContainer(IssueRepository).deleteManyByIds([issueId]);
 
     ctx.status = StatusCodes.OK;
     ctx.body = {};
@@ -113,22 +135,25 @@ const deleteIssues = async (ctx: Context) => {
 const addIssue = async (ctx: Context) => {
   const body = ctx.request.body as any;
 
-  const newIssue = new Issue({
-    mediaId: body.mediaId,
-    type: body.type,
-    title: body.title,
-    user: body.user,
-    sonarrId: false,
-    radarrId: false,
-    issue: body.issue,
-    comment: body.comment,
-  });
-
   try {
-    const savedIssue = await newIssue.save();
+    const issueResult = await getFromContainer(IssueRepository).create(
+      new IssueEntity({
+        id: body.mediaId,
+        props: {
+          type: body.type,
+          title: body.title,
+          user: body.user,
+          tmdbId: 0,
+          sonarrs: [],
+          radarrs: [],
+          issue: body.issue,
+          comment: body.comment,
+        },
+      }),
+    );
     mailIssue(body.user, body.mediaId, body.type, body.title);
     ctx.status = StatusCodes.OK;
-    ctx.body = savedIssue;
+    ctx.body = getFromContainer(IssueMapper).toResponse(issueResult);
   } catch (err) {
     logger.error(err);
     logger.log('warn', 'ROUTE: Error addding issue');

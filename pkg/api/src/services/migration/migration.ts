@@ -1,10 +1,10 @@
-import { mergeFiles } from "@/infra/config/file";
+import { ArrConfig, EmailConfig, MainConfig, backupOldFiles, mergeFiles } from "@/infra/config/file";
 import { Logger } from "@/infra/logger/logger";
 import { fileExists } from "@/utils/file";
 import { Service } from "diod";
 import fs from 'fs/promises';
 import path from "path";
-import { ArrConfig, EmailConfig, MainConfig } from "@/config/migration";
+
 import { MediaServerRepository } from "@/resources/media-server/repository";
 import { MediaServerEntity } from "@/resources/media-server/entity";
 import { MediaServerType } from "@/resources/media-server/types";
@@ -17,6 +17,12 @@ import { AuthType } from "@/resources/settings/types";
 import { DownloaderRepository } from "@/resources/downloader/repository";
 import { DownloaderEntity } from "@/resources/downloader/entity";
 import { DownloaderType } from "@/resources/downloader/types";
+import { UserRepository } from "@/resources/user/repository";
+import { UserEntity } from "@/resources/user/entity";
+import { UserRole } from "@/resources/user/types";
+import { MongooseDatabaseConnection } from "@/infra/database/connection";
+import { getFromContainer } from "@/infra/container/container";
+import dotenv from 'dotenv';
 
 @Service()
 export class MigrationService {
@@ -25,10 +31,7 @@ export class MigrationService {
    */
   constructor(
     private logger: Logger,
-    private mediaServer: MediaServerRepository,
-    private notification: NotificationRepository,
-    private downloader: DownloaderRepository,
-    private settings: SettingsRepository,
+    private connection: MongooseDatabaseConnection
   ) {}
 
   /**
@@ -38,7 +41,7 @@ export class MigrationService {
    */
   async migrateOldFiles(): Promise<void> {
     const files = await mergeFiles();
-    if (files.main || files.email || files.sonarrs || files.radarrs) {
+    if (files.main || files.email || files.sonarr || files.radarr) {
       this.logger.info('Found old files to migrate');
       if (files.main) {
         await this.processMainConfig(files.main);
@@ -46,11 +49,11 @@ export class MigrationService {
       if (files.email) {
         await this.processEmailConfig(files.email);
       }
-      if (files.sonarrs) {
-        await Promise.all(files.sonarrs.map((config) => this.processArrConfigs(config, 'sonarr')));
+      if (files.sonarr) {
+        await Promise.all(files.sonarr.map((config) => this.processArrConfigs(config, 'sonarr')));
       }
-      if (files.radarrs) {
-        await Promise.all(files.radarrs.map((config) => this.processArrConfigs(config, 'radarr')));
+      if (files.radarr) {
+        await Promise.all(files.radarr.map((config) => this.processArrConfigs(config, 'radarr')));
       }
     }
   }
@@ -61,18 +64,19 @@ export class MigrationService {
    * @param type - The type of downloader ('sonarr' or 'radarr').
    * @returns A promise that resolves when the downloader entity is created.
    */
-  async processArrConfigs(config: ArrConfig, type: 'sonarr' | 'radarr') {
-    await this.downloader.create(
+  private async processArrConfigs(config: ArrConfig, type: 'sonarr' | 'radarr') {
+    const downloader = getFromContainer(DownloaderRepository);
+    await downloader.findOrCreate(
       DownloaderEntity.create({
         name: config.title,
         type: type === 'radarr' ? DownloaderType.RADARR : DownloaderType.SONARR,
-        url: config.hostname,
+        url: `${config.protocol}://${config.hostname}:${config.port}${config.urlBase !== '' ? config.urlBase : ''}`,
         token: config.apiKey,
         metadata: {
           profile: config.profile,
           path: config.path,
         },
-        enabled: config.enabled,
+        enabled: config.active,
       })
     );
   }
@@ -82,19 +86,38 @@ export class MigrationService {
    * @param config - The email configuration object.
    * @returns A promise that resolves to void.
    */
-  async processEmailConfig(config: EmailConfig): Promise<void> {
-    await this.notification.create(
-      NotificationEntity.create({
-        name: 'email',
-        url: `smtp://${config.emailUser}:${config.emailPass}@${config.emailServer}:${config.emailPort}`,
-        type: NotificationType.EMAIL,
-        metadata: {
-          from: config.emailFrom,
-          secure: config.emailSecure,
-        },
-        enabled: config.emailEnabled,
-      })
-    );
+  private async processEmailConfig(config: EmailConfig): Promise<void> {
+    if (config.emailServer !== '' && config.emailUser !== '' && config.emailPass !== '') {
+      const notification = getFromContainer(NotificationRepository);
+      await notification.findOneOrCreate(
+        NotificationEntity.create({
+          name: 'email',
+          url: `smtp://${config.emailUser}:${config.emailPass}@${config.emailServer}:${config.emailPort}`,
+          type: NotificationType.EMAIL,
+          metadata: {
+            from: config.emailFrom,
+            secure: config.emailSecure,
+          },
+          enabled: config.emailEnabled,
+        })
+      );
+    }
+  }
+
+  /**
+   * Tries to establish a connection to the database using the provided URL.
+   *
+   * @param url - The URL of the database to connect to.
+   * @returns A promise that resolves to a boolean indicating whether the connection was successful.
+   */
+  private async tryDatabaseConnection(url: string): Promise<boolean> {
+    try {
+      await this.connection.connect('default', url, {});
+      return true;
+    } catch (error) {
+      this.logger.error('Failed to connect to the database for migration url', { url });
+      return false;
+    }
   }
 
   /**
@@ -102,15 +125,22 @@ export class MigrationService {
    * @param config - The main configuration object.
    * @returns A promise that resolves when all the necessary operations are completed.
    */
-  async processMainConfig(config: MainConfig) {
-    if (process.pkg) {
-      await this.createEnvFile(`
-        DATABASE_URL=${config.DB_URL}
-        HTTP_BASE_PATH=${config.base_path}
-      `);
+  private async processMainConfig(config: MainConfig) {
+    const tryConnection = await this.tryDatabaseConnection(config.DB_URL);
+    if (!tryConnection) {
+      this.logger.error('Failed to connect to the database, exiting process');
+      process.exit(1);
     }
-    return Promise.all([
-      this.notification.create(
+    if (process.pkg) {
+      await this.createEnvFile(`DATABASE_URL=${config.DB_URL}\nHTTP_BASE_PATH=${config.base_path}`);
+      dotenv.config({ override: true });
+    }
+    const notification = getFromContainer(NotificationRepository);
+    const mediaServer = getFromContainer(MediaServerRepository);
+    const settings = getFromContainer(SettingsRepository);
+    const user = getFromContainer(UserRepository);
+    await Promise.all([
+      config.discord_webhook && config.discord_webhook !== '' ? notification.findOneOrCreate(
         NotificationEntity.create({
           name: 'discord',
           url: config.discord_webhook,
@@ -118,8 +148,8 @@ export class MigrationService {
           metadata: {},
           enabled: true,
         })
-      ),
-      this.notification.create(
+      ) : undefined,
+      config.telegram_bot_token && config.telegram_bot_token !== '' ? notification.findOneOrCreate(
         NotificationEntity.create({
           name: 'telegram',
           url: "https://telegram.org",
@@ -131,35 +161,53 @@ export class MigrationService {
           },
           enabled: true,
         })
-      ),
-      this.mediaServer.create(
+      ) : undefined,
+      mediaServer.findOneOrCreate(
         MediaServerEntity.create({
           name: 'default',
           type: MediaServerType.PLEX,
-          url: `${config.plexProtocol}://${config.plexIp}:${config.plexPort}`,
+          url: `${config.plexProtocol}://${config.plexIp}:${config.plexPort}${config.base_path !== '' ? config.base_path : ''}`,
           token: config.plexToken,
           enabled: true,
           metadata: {},
         })
       ),
-      this.settings.create(
+      settings.findOrCreate(
         SettingsEntity.create({
           authType: AuthType.STANDARD,
           initialCache: false,
-          initialSetup: false,
+          initialSetup: true,
           popularContent: config.plexPopular,
         })
       ),
+      // ? In future maybe we re-pull this from plex
+      user.findOrCreate(
+        UserEntity.create({
+          title: config.adminDisplayName,
+          username: config.adminUsername,
+          password: config.adminPass,
+          thumbnail: config.adminThumb,
+          email: config.adminEmail,
+          role: UserRole.ADMIN,
+          owner: true,
+        })
+      )
     ]);
-    // TODO: add admin user
+    // backup files
+    await backupOldFiles();
   }
 
+  /**
+   * Creates or updates the .env file with the provided content.
+   * If the .env file already exists, it logs the content to be added to the file.
+   * If the .env file does not exist, it creates the file and adds the content.
+   * @param content - The content to be added to the .env file.
+   */
   async createEnvFile(content: string) {
     const envFile = path.join(process.cwd(), '.env');
     const hasEnvFile = await fileExists(envFile);
     if (hasEnvFile) {
-      this.logger.info('Please add the following variables to your .env file:');
-      this.logger.info(content);
+      this.logger.info(`Copy and paste the below into your env file (.env):\n${content}`);
     } else {
       this.logger.info('Creating .env file and adding variables');
       await fs.writeFile(envFile, content);

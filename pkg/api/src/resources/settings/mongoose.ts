@@ -31,4 +31,18 @@ export class SettingsMongooseRepository
     );
     super(model, mapper);
   }
+
+  /**
+   * Finds or creates a settings entity.
+   *
+   * @param settings - The settings entity to find or create.
+   * @returns A promise that resolves to the settings entity.
+   */
+  async findOrCreate(settings: SettingsEntity): Promise<SettingsEntity> {
+    const found = await this.findOne({});
+    if (found.isNone()) {
+      return this.create(settings);
+    }
+    return found.unwrap();
+  }
 }

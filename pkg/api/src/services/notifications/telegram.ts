@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-import { config } from '@/config/index';
 import logger from '@/infra/logger/logger';
 
 export default class Telegram {
@@ -11,9 +10,9 @@ export default class Telegram {
   sendSilently: any;
 
   constructor() {
-    this.botToken = config.get('notifications.telegram.token') || null;
-    this.chatId = config.get('notifications.telegram.id') || null;
-    this.sendSilently = config.get('notifications.telegram.silent') || false;
+    this.botToken = null;
+    this.chatId = null;
+    this.sendSilently = false;
   }
 
   check() {

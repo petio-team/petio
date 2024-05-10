@@ -8,13 +8,17 @@ import request from 'xhr-request';
 import xmlParser from 'xml-js';
 
 import { authenticate } from '@/api/middleware/auth';
-import { config } from '@/config/index';
+import { getFromContainer } from '@/infra/container/container';
 import loggerMain from '@/infra/logger/logger';
-import { GetUserByPlexID, UserModel, UserRole } from '@/models/user';
+import { UserEntity } from '@/resources/user/entity';
+import { UserMapper } from '@/resources/user/mapper';
+import { UserRepository } from '@/resources/user/repository';
+import { UserRole } from '@/resources/user/types';
+import { SettingsService } from '@/services/settings/settings';
 
 const logger = loggerMain.child({ module: 'routes.login' });
 
-function success(ctx: Context, user: any, isAdmin = false): void {
+function success(ctx: Context, user: UserEntity, isAdmin = false): void {
   const token = jwt.sign({ id: user.id, admin: isAdmin }, ctx.app.keys[0]);
 
   ctx.cookies.set('petio_jwt', token, {
@@ -33,7 +37,7 @@ function success(ctx: Context, user: any, isAdmin = false): void {
   };
 }
 
-async function plexOauth(token: any): Promise<any> {
+async function plexOauth(token: string): Promise<any> {
   try {
     const plex = await axios.get(
       `https://plex.tv/users/account?X-Plex-Token=${token}`,
@@ -47,18 +51,12 @@ async function plexOauth(token: any): Promise<any> {
   return undefined;
 }
 
-async function saveRequestIp(user, request_ip) {
+async function saveRequestIp(user: UserEntity, request_ip: string) {
   try {
-    await UserModel.updateOne(
-      // eslint-disable-next-line no-underscore-dangle
-      { _id: user._id },
-      {
-        $set: {
-          lastIp: request_ip,
-          lastLogin: new Date(),
-        },
-      },
-    ).exec();
+    await getFromContainer(UserRepository).updateMany(
+      { id: user.id },
+      { lastIp: request_ip, lastLogin: new Date() },
+    );
   } catch (err) {
     logger.error('LOGIN: Update IP failed', err);
   }
@@ -68,10 +66,9 @@ const attemptPlexAuth = async (ctx: Context) => {
   const requestIp = ctx.request.ip;
   const { token } = ctx.request.body;
   try {
-    const userId = await plexOauth(token);
-    const dbUser = await GetUserByPlexID(userId);
-
-    if (!dbUser) {
+    const plexId = await plexOauth(token);
+    const userRepo = await getFromContainer(UserRepository).findOne({ plexId });
+    if (userRepo.isNone()) {
       ctx.error({
         statusCode: StatusCodes.FORBIDDEN,
         code: 'USER_NOT_FOUND',
@@ -79,7 +76,7 @@ const attemptPlexAuth = async (ctx: Context) => {
       });
       return;
     }
-
+    const dbUser = userRepo.unwrap();
     if (dbUser.disabled) {
       ctx.error({
         statusCode: StatusCodes.FORBIDDEN,
@@ -89,7 +86,7 @@ const attemptPlexAuth = async (ctx: Context) => {
       return;
     }
 
-    const isAdmin = dbUser.role === UserRole.Admin;
+    const isAdmin = dbUser.role === UserRole.ADMIN;
     success(ctx, dbUser, isAdmin);
     saveRequestIp(dbUser, requestIp);
   } catch (err) {
@@ -115,7 +112,7 @@ function plexAuth(username: string, password: string) {
           'X-Plex-Platform-Version': '1.0',
           'X-Plex-Device-Name': 'Petio API',
           'X-Plex-Version': '1.0',
-          'X-Plex-Client-Identifier': `petio_${config.get('petio.identifier')}`,
+          'X-Plex-Client-Identifier': `petio_${''}`,
           Authorization: `Basic ${Buffer.from(
             `${username}:${password}`,
           ).toString('base64')}`,
@@ -147,10 +144,6 @@ const attemptAuth = async (ctx: Context) => {
     user: { username, password },
   } = ctx.request.body || { user: {} };
 
-  if (!config.get('auth.type')) {
-    config.set('auth.type', 1);
-  }
-
   logger.debug(`LOGIN: New login attempted from ip ${requestIp}`);
 
   // check for existing jwt (skip if performing admin auth)
@@ -171,7 +164,7 @@ const attemptAuth = async (ctx: Context) => {
       return;
     } catch (err) {
       // if existing jwt failed, continue onto normal login flow
-      logger.debug(`LOGIN: No JWT: ${requestIp}`, err);
+      logger.debug(err, `LOGIN: No JWT: ${requestIp}`);
       return;
     }
   }
@@ -180,11 +173,10 @@ const attemptAuth = async (ctx: Context) => {
 
   try {
     // Find user in db
-    const dbUser = await UserModel.findOne({
+    const dbRepo = await getFromContainer(UserRepository).findOne({
       $or: [{ username }, { email: username }],
-    }).exec();
-
-    if (!dbUser) {
+    });
+    if (dbRepo.isNone()) {
       ctx.error({
         statusCode: StatusCodes.FORBIDDEN,
         code: 'USER_NOT_FOUND',
@@ -193,7 +185,7 @@ const attemptAuth = async (ctx: Context) => {
       logger.debug(`LOGIN: User not found ${username} - ${requestIp}`);
       return;
     }
-
+    const dbUser = dbRepo.unwrap();
     if (dbUser.disabled) {
       ctx.error({
         statusCode: StatusCodes.FORBIDDEN,
@@ -203,9 +195,10 @@ const attemptAuth = async (ctx: Context) => {
       return;
     }
 
-    const isAdmin = dbUser.role === UserRole.Admin;
+    const isAdmin = dbUser.role === UserRole.ADMIN;
+    const { authType } = await getFromContainer(SettingsService).getSettings();
 
-    if (config.get('auth.type') === 1 || password) {
+    if (authType === 1 || password) {
       if (dbUser.password) {
         if (!bcrypt.compareSync(password, dbUser.password)) {
           ctx.error({
@@ -219,10 +212,10 @@ const attemptAuth = async (ctx: Context) => {
         // throws on invalid credentials
         await plexAuth(username, password);
       }
-      success(ctx, dbUser.toJSON(), isAdmin);
+      success(ctx, getFromContainer(UserMapper).toResponse(dbUser), isAdmin);
     } else {
       // passwordless login, no check required. But we downgrade admin perms
-      success(ctx, dbUser.toJSON(), false);
+      success(ctx, getFromContainer(UserMapper).toResponse(dbUser), false);
     }
     saveRequestIp(dbUser, requestIp);
   } catch (err) {

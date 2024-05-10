@@ -1,3 +1,5 @@
+import { Override } from '../../utils/override';
+
 /**
  * Represents the type of notification.
  */
@@ -21,4 +23,9 @@ export type NotificationProps = {
 /**
  * Represents the properties for creating a notification.
  */
-export type CreateNotificationProps = NotificationProps;
+export type CreateNotificationProps = Override<
+  NotificationProps,
+  {
+    //  TODO: add additional fields
+  }
+>;

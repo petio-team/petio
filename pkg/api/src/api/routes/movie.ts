@@ -18,7 +18,7 @@ const getMovieDiscovery = async (ctx: Context) => {
   const body = ctx.request.body as any;
 
   const page = body.page ? body.page : 1;
-  const {params} = body;
+  const { params } = body;
 
   ctx.status = StatusCodes.OK;
   ctx.body = await discoverMovie(page, params);

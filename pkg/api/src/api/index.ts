@@ -11,20 +11,22 @@ import cors from '@/api/middleware/cors';
 import errorHandler from '@/api/middleware/errorHandling';
 import api from '@/api/routes/api';
 import web from '@/api/routes/web';
-import { config } from '@/config/index';
 import {
   HTTP_ADDR,
   HTTP_BASE_PATH,
   HTTP_PORT,
   HTTP_TRUSTED_PROXIES,
 } from '@/infra/config/env';
+import { getFromContainer } from '@/infra/container/container';
+import { SettingsService } from '@/services/settings/settings';
 
 import responseHandler from './http/responseHandler';
 import logging from './middleware/logging';
 import options from './middleware/options';
 
-const routes = (): Koa => {
+const routes = (keys: string[]): Koa => {
   const app = new Koa();
+  app.keys = keys;
 
   // web/frontend/reac
   web(app);
@@ -35,13 +37,14 @@ const routes = (): Koa => {
   return app;
 };
 
-export const createKoaServer = () => {
+export const createKoaServer = async () => {
   let server: Server<typeof IncomingMessage, typeof ServerResponse>;
 
   const app = new Koa();
+  const settings = await getFromContainer(SettingsService).getSettings();
 
   // Set security keys
-  app.keys = config.get('petio.keys');
+  app.keys = settings.appKeys;
 
   // Enable trusted proxies
   if (HTTP_TRUSTED_PROXIES.length > 0) {
@@ -60,7 +63,7 @@ export const createKoaServer = () => {
   ].forEach((middleware) => app.use(middleware));
 
   // Mount endpoints
-  app.use(mount(HTTP_BASE_PATH, routes()));
+  app.use(mount(HTTP_BASE_PATH, routes(settings.appKeys)));
 
   let serverShuttingDown: any;
 

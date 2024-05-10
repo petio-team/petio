@@ -1,14 +1,13 @@
-import axios from 'axios';
+import { MediaServerEntity } from '@/resources/media-server/entity';
+import { getPlexClient } from '@/services/plex/client';
 
-import MakePlexURL from '@/services/plex/util';
-
-export default async () => {
-  const url = MakePlexURL('/status/sessions').toString();
+export default async (server: MediaServerEntity) => {
+  const client = getPlexClient(server);
 
   try {
-    const res = await axios.get(url);
-    return res.data;
+    return await client.sessions.getSessions();
   } catch (e) {
     // Do nothing
+    return null;
   }
 };

@@ -8,4 +8,6 @@ import { DownloaderSchemaProps } from "./schema";
  * This class extends the `MongooseBaseRepository` class and provides specific functionality for the `DownloaderEntity` and `DownloaderSchema`.
  */
 @Service()
-export abstract class DownloaderRepository extends MongooseRepository<DownloaderEntity, DownloaderSchemaProps> {}
+export abstract class DownloaderRepository extends MongooseRepository<DownloaderEntity, DownloaderSchemaProps> {
+  abstract findOrCreate(downloader: DownloaderEntity): Promise<DownloaderEntity>;
+}

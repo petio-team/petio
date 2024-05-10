@@ -32,4 +32,18 @@ export class NotificationMongooseRepository
     );
     super(model, mapper);
   }
+
+  /**
+   * Finds a notification entity by the provided entity or creates a new one if it does not exist.
+   *
+   * @param entity - The notification entity to find or create.
+   * @returns A promise that resolves to the found or created notification entity.
+   */
+  async findOneOrCreate(entity: NotificationEntity): Promise<NotificationEntity> {
+    const found = await this.findOne({ url: entity.url });
+    if (found.isNone()) {
+      return this.create(entity);
+    }
+    return found.unwrap();
+  }
 }

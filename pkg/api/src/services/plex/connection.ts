@@ -7,5 +7,6 @@ export default async (prot, ip, port, token) => {
     return res.status;
   } catch (e) {
     // Do nothing
+    return -1;
   }
 };

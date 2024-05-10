@@ -1,3 +1,5 @@
+import { Override } from '../../utils/override';
+
 /**
  * Represents the authentication types.
  */
@@ -12,6 +14,7 @@ export enum AuthType {
 export type SettingsProps = {
   popularContent: boolean;
   authType: AuthType;
+  appKeys: string[];
   initialCache: boolean;
   initialSetup: boolean;
 };
@@ -19,6 +22,13 @@ export type SettingsProps = {
 /**
  * Represents the properties for creating a Settings.
  */
-export type CreateSettingsProps = SettingsProps & {
-  // TODO: add additional fields
-};
+export type CreateSettingsProps = Override<
+  SettingsProps,
+  {
+    popularContent?: boolean;
+    authType?: AuthType;
+    appKeys?: string[];
+    initialCache?: boolean;
+    initialSetup?: boolean;
+  }
+>;

@@ -1,16 +1,35 @@
-import axios from 'axios';
+import { PlexClient } from '@/infra/plex';
 
-import MakePlexURL from '@/services/plex/util';
+export type GetStatisticsResources = {
+  MediaContainer: {
+    size: number;
+    StatisticsResources: Array<{
+      timespan: number;
+      at: number;
+      hostCpuUtilization: number;
+      processCpuUtilization: number;
+      hostMemoryUtilization: number;
+      processMemoryUtilization: number;
+    }>;
+  };
+};
 
-export default async () => {
-  const url = MakePlexURL('/statistics/resources', {
-    timespan: 6,
-  }).toString();
-
+export default async (
+  client: PlexClient,
+): Promise<GetStatisticsResources | null> => {
   try {
-    const res = await axios.get(url);
-    return res.data;
+    return await client.request.request<GetStatisticsResources>({
+      method: 'GET',
+      url: '/statistics/resources',
+      query: {
+        timespan: '6',
+      },
+      errors: {
+        400: 'Bad Request - A parameter was not specified, or was specified incorrectly.',
+        401: 'Unauthorized - Returned if the X-Plex-Token is missing from the header or query.',
+      },
+    });
   } catch (e) {
-    // Do nothing
+    return null;
   }
 };

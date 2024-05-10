@@ -27,7 +27,6 @@ import show from '@/api/routes/show';
 import top from '@/api/routes/top';
 import trending from '@/api/routes/trending';
 import user from '@/api/routes/user';
-import { config as conf } from '@/config/index';
 
 const api = new Router({ prefix: '/api' });
 
@@ -41,7 +40,8 @@ export default (app: Koa, subpath: string) => {
   app.use(setupMiddleware);
   api.use(
     jwt({
-      secret: conf.get('petio.keys'),
+      // TODO: fix this and generate keys again
+      secret: app.keys as string[],
       cookie: 'petio_jwt',
       debug: true,
     }).unless({

@@ -1,14 +1,14 @@
 import Router from '@koa/router';
-import axios from 'axios';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import { WriteConfig } from '@/config/config';
-import { config } from '@/config/index';
+import { getFromContainer } from '@/infra/container/container';
 import logger from '@/infra/logger/logger';
-import { UserModel } from '@/models/user';
+import { MediaServerRepository } from '@/resources/media-server/repository';
+import { UserRepository } from '@/resources/user/repository';
+import { getPlexClient } from '@/services/plex/client';
 import plexLookup from '@/services/plex/lookup';
-import MakePlexURL from '@/services/plex/util';
+import is from '@/utils/is';
 
 const lookupByIdAndType = async (ctx: Context) => {
   const { type } = ctx.params;
@@ -22,40 +22,44 @@ const lookupByIdAndType = async (ctx: Context) => {
   }
 };
 
-async function updateCredentials(obj) {
-  if (obj.plexClientID === undefined) {
-    throw new Error('plex client id does not exist in object');
-  }
-
-  config.set('plex.client', obj.plexClientID);
-  try {
-    await WriteConfig();
-  } catch (err) {
-    logger.log({ level: 'error', message: err });
-    logger.error('PLX: Error config not found');
-  }
-}
-
 const testPlexConnection = async (ctx: Context) => {
-  const url = MakePlexURL('/').toString();
+  const userRepo = getFromContainer(UserRepository);
+  const serverRepo = getFromContainer(MediaServerRepository);
+
   try {
-    const admin = await UserModel.findOne({ owner: true }).exec();
-    if (!admin) {
-      ctx.status = StatusCodes.NOT_FOUND;
+    const [userResult, serverResult] = await Promise.all([
+      userRepo.findOne({ owner: true }),
+      serverRepo.findOne({}),
+    ]);
+    if (userResult.isNone()) {
+      ctx.status = StatusCodes.BAD_REQUEST;
       ctx.body = 'no admin user could be found';
       return;
     }
+    if (serverResult.isNone()) {
+      ctx.status = StatusCodes.BAD_REQUEST;
+      ctx.body = 'no server could be found';
+      return;
+    }
+    const user = userResult.unwrap();
+    const server = serverResult.unwrap();
 
-    await axios.get(
-      `https://plex.tv/pms/resources?X-Plex-Token=${config.get('plex.token')}`,
-    );
-    const connection = await axios.get(url);
-    const data = connection.data.MediaContainer;
+    const plexServer = await getPlexClient(
+      server,
+    ).server.getServerCapabilities();
+    const data = plexServer.MediaContainer;
+    if (is.falsy(data)) {
+      ctx.status = StatusCodes.BAD_REQUEST;
+      ctx.body = {
+        connection: false,
+        error: 'Plex connection test failed',
+      };
+      return;
+    }
     if (
-      data.myPlexUsername === admin.username ||
-      data.myPlexUsername === admin.email
+      data.myPlexUsername === user.username ||
+      data.myPlexUsername === user.email
     ) {
-      await updateCredentials({ plexClientID: data.machineIdentifier });
       ctx.status = StatusCodes.OK;
       ctx.body = {
         connection: true,
@@ -70,7 +74,7 @@ const testPlexConnection = async (ctx: Context) => {
     };
     return;
   } catch (err) {
-    logger.log({ level: 'error', message: err });
+    logger.error('Plex connection test failed', err);
 
     ctx.status = StatusCodes.BAD_REQUEST;
     ctx.body = {

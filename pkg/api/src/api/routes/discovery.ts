@@ -2,9 +2,10 @@
 import Router from '@koa/router';
 import { Context } from 'koa';
 
+import { getFromContainer } from '@/infra/container/container';
 import logger from '@/infra/logger/logger';
-import { UserModel } from '@/models/user';
-import cache from '@/services/cache/cache';
+import { UserRepository } from '@/resources/user/repository';
+import { CacheService } from '@/services/cache/cache';
 import { DiscoveryResult } from '@/services/discovery/display';
 
 import {
@@ -14,17 +15,19 @@ import {
 } from '../http/request';
 
 const getMovies = async (ctx: Context) => {
-  const user = await UserModel.findById(ctx.state.user.id);
-  if (!user) {
-    StatusBadRequest(ctx, 'Could not get discovery by authed user');
+  const userRepo = await getFromContainer(UserRepository).findOne({
+    id: ctx.state.user.id,
+  });
+  if (userRepo.isNone()) {
+    StatusOk(ctx, {});
     return;
   }
-
+  const user = userRepo.unwrap();
   const userId = user.altId ? user.altId : user.plexId;
 
   try {
     logger.debug(`ROUTE: Movie Discovery Profile returned for ${userId}`);
-    const cachedData = (await cache.get(
+    const cachedData = (await getFromContainer(CacheService).get(
       `discovery.user.movie.${userId}`,
     )) as DiscoveryResult | null;
     if (!cachedData) {
@@ -42,17 +45,19 @@ const getMovies = async (ctx: Context) => {
 };
 
 const getShows = async (ctx: Context) => {
-  const user = await UserModel.findById(ctx.state.user.id);
-  if (!user) {
-    StatusBadRequest(ctx, 'Could not get discovery by authed user');
+  const userRepo = await getFromContainer(UserRepository).findOne({
+    id: ctx.state.user.id,
+  });
+  if (userRepo.isNone()) {
+    StatusOk(ctx, {});
     return;
   }
-
+  const user = userRepo.unwrap();
   const userId = user.altId ? user.altId : user.plexId;
 
   try {
     logger.debug(`ROUTE: TV Discovery Profile returned for ${userId}`);
-    const cachedData = (await cache.get(
+    const cachedData = (await getFromContainer(CacheService).get(
       `discovery.user.show.${userId}`,
     )) as DiscoveryResult | null;
     if (!cachedData) {

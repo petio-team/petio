@@ -1,37 +1,43 @@
-import { SharedCache } from '@david.uhlir/shared-cache';
 import cluster from 'cluster';
 import dotenv from 'dotenv';
 import 'reflect-metadata';
 
 import { createKoaServer } from '@/api';
-import { HasConfig, config, toObject } from '@/config';
+import builder from '@/builder';
 import {
+  DATABASE_URL,
   HTTP_ADDR,
   HTTP_BASE_PATH,
   HTTP_PORT,
   PGID,
   PUID,
 } from '@/infra/config/env';
-import { useContainer } from '@/infra/container/container';
-import { MongooseDatabase } from '@/infra/database/mongoose';
+import { getFromContainer, useContainer } from '@/infra/container/container';
+import { MongooseDatabaseConnection } from '@/infra/database/connection';
 import logger from '@/infra/logger/logger';
 import { Master } from '@/infra/worker/master';
-import builder from '@/loaders//builder';
-import ConfigLoader from '@/loaders/config';
 import { runCron } from '@/services/cron';
+import { MigrationService } from '@/services/migration/migration';
+import { SettingsService } from '@/services/settings/settings';
 
 import appConfig from '../package.json';
 
 /**
- * Checks if the application has a valid configuration.
- * @returns A promise that resolves to a boolean indicating whether the configuration is valid.
+ * Creates a default database connection using Mongoose.
+ *
+ * @returns A promise that resolves to the default database connection.
  */
-async function hasValidConfig() {
-  try {
-    return await SharedCache.getData<boolean>('hasConfig');
-  } catch (e) {
-    return false;
-  }
+async function createDefaultDbConnection() {
+  return getFromContainer(MongooseDatabaseConnection).connect(
+    'default',
+    DATABASE_URL,
+    {
+      autoCreate: true,
+      autoIndex: true,
+      serverSelectionTimeoutMS: 5000,
+    },
+    true,
+  );
 }
 
 /**
@@ -44,18 +50,14 @@ async function hasValidConfig() {
  * @returns A promise that resolves when the primary loading process is complete.
  */
 async function doPrimary() {
-  // Validate db connection
-  await new MongooseDatabase().getConnection();
+  // Attempt to file old configuration files and migrate them
+  await getFromContainer(MigrationService).migrateOldFiles();
 
-  // TODO: migrate config to db and remove it/rename it to prevent doing this
-  const hasConfig = await HasConfig();
-  if (hasConfig) {
-    await SharedCache.setData('hasConfig', hasConfig);
-    const configLoaded = await ConfigLoader();
-    if (configLoaded) {
-      await SharedCache.setData('config', toObject());
-    }
-  }
+  // Validate db connection (this should be valid even after config migration)
+  await createDefaultDbConnection();
+
+  // Load settings into cache
+  await getFromContainer(SettingsService).getSettings();
 
   logger.info(
     `Petio v${appConfig.version} [${
@@ -64,29 +66,27 @@ async function doPrimary() {
   );
 
   // run workers
-  await Master.getInstance().runWorkers();
+  await getFromContainer(Master).runWorkers();
 }
 
 /**
  * Performs the necessary initialization and starts the worker based on the environment variables.
+ *
  * If the configuration is valid, it loads the configuration, services, and starts the web worker.
  * If the configuration is not valid, it displays a warning message to proceed with the initial setup.
  * If the configuration is valid and the environment variable 'job' is set, it starts the job worker.
  */
 async function doWorker() {
-  const hasConfig = await hasValidConfig();
-  if (hasConfig) {
-    const cfg = await SharedCache.getData('config');
-    config.load(cfg);
-    // load services
-    await new MongooseDatabase().getConnection();
-  }
+  await createDefaultDbConnection();
+
+  // Get the settings from cache
+  const settings = await getFromContainer(SettingsService).getSettings();
 
   if (process.env.web) {
     logger.info(
       `Serving Web UI on http://${HTTP_ADDR}:${HTTP_PORT}${HTTP_BASE_PATH}`,
     );
-    if (!hasConfig) {
+    if (!settings.initialSetup) {
       logger.warn(
         'Initial setup is required, please proceed to the Web UI to begin the setup',
       );
@@ -94,7 +94,7 @@ async function doWorker() {
     await createKoaServer();
   }
 
-  if (hasConfig && process.env.job) {
+  if (settings.initialCache && process.env.job) {
     await runCron();
   }
 }

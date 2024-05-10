@@ -1,9 +1,13 @@
+import { getFromContainer } from '@/infra/container/container';
 import logger from '@/infra/logger/logger';
-import { UserModel } from '@/models/user';
+import { UserRepository } from '@/resources/user/repository';
 
 export default class QuotaSystem {
   async reset() {
     logger.debug('QUOTA: Reseting Quotas');
-    UserModel.updateMany({}, { $set: { quotaCount: 0 } });
+    getFromContainer(UserRepository).updateMany(
+      {},
+      { $set: { quotaCount: 0 } },
+    );
   }
 }

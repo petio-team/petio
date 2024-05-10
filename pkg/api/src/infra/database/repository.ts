@@ -1,16 +1,28 @@
-import { Option } from "oxide.ts";
-import { AnyObject, Document } from "mongoose";
-import { CreateManyOptions, CreateOptions, ExistOptions, FindAllOptions, FindOneOptions, ManyOptions, RawOptions, RestoreManyOptions, SaveOptions, SoftDeleteManyOptions } from "./options";
+import { AnyObject, Document, Model } from 'mongoose';
+import { Option } from 'oxide.ts';
+
+import {
+  CreateManyOptions,
+  CreateOptions,
+  ExistOptions,
+  FindAllOptions,
+  FindOneOptions,
+  ManyOptions,
+  RawOptions,
+  RestoreManyOptions,
+  SaveOptions,
+  SoftDeleteManyOptions,
+} from './options';
 
 /**
  * Abstract class representing a Mongoose repository.
  * @template Entity - The entity type.
- * @template Model - The Mongoose model type.
+ * @template ModelProps - The Mongoose model type.
  */
-export abstract class MongooseRepository<Entity, Model> {
+export abstract class MongooseRepository<Entity, ModelProps> {
   abstract findAll(
     find?: Record<string, any>,
-    options?: FindAllOptions<any>
+    options?: FindAllOptions<any>,
   ): Promise<Entity[]>;
 
   abstract findAllDistinct(
@@ -34,28 +46,25 @@ export abstract class MongooseRepository<Entity, Model> {
     options?: ExistOptions<any>,
   ): Promise<boolean>;
 
-  abstract create(
-    data: Entity,
-    options?: CreateOptions<any>
-  ): Promise<Entity>;
+  abstract create(data: Entity, options?: CreateOptions<any>): Promise<Entity>;
 
   abstract save(
-    repository: Model & Document<string>,
-    options?: SaveOptions
+    repository: ModelProps & Document<string>,
+    options?: SaveOptions<any>,
   ): Promise<Entity>;
 
   abstract delete(
-    repository: Model,
+    repository: ModelProps,
     options?: SaveOptions,
   ): Promise<Entity>;
 
   abstract softDelete(
-    repository: Model & Document<string> & { deletedAt?: Date },
+    repository: ModelProps & Document<string> & { deletedAt?: Date },
     options?: SaveOptions,
   ): Promise<Entity>;
 
   abstract restore(
-    repository: Model & Document<string> & { deletedAt?: Date },
+    repository: ModelProps & Document<string> & { deletedAt?: Date },
     options?: SaveOptions,
   ): Promise<Entity>;
 
@@ -66,7 +75,7 @@ export abstract class MongooseRepository<Entity, Model> {
 
   abstract deleteManyByIds(
     id: string[],
-    options?: ManyOptions<any>
+    options?: ManyOptions<any>,
   ): Promise<boolean>;
 
   abstract deleteMany(
@@ -105,5 +114,5 @@ export abstract class MongooseRepository<Entity, Model> {
     options?: RawOptions,
   ): Promise<RawResponse[]>;
 
-  abstract model(): Promise<any>;
+  abstract model(): Model<ModelProps>;
 }

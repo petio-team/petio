@@ -1,58 +1,68 @@
 /* eslint-disable no-restricted-syntax */
-import RadarrAPI from '@/infra/arr/radarr';
-import { Movie } from '@/infra/arr/radarr/movie';
+import { getFromContainer } from '@/infra/container/container';
 import loggerMain from '@/infra/logger/logger';
-import {
-  DownloaderType,
-  GetAllDownloaders,
-  IDownloader,
-} from '@/models/downloaders';
-import Request from '@/models/request';
+import { MovieResource, RadarrV3Client } from '@/infra/servarr/radarr';
+import { DownloaderEntity } from '@/resources/downloader/entity';
+import { DownloaderRepository } from '@/resources/downloader/repository';
+import { DownloaderType } from '@/resources/downloader/types';
+import { RequestRepository } from '@/resources/request/repository';
+import { lookup } from '@/services/meta/imdb';
+import is from '@/utils/is';
 
 const logger = loggerMain.child({ module: 'downloaders.radarr' });
 
 export default class Radarr {
-  instance: IDownloader;
+  instance: DownloaderEntity;
 
-  client: RadarrAPI;
+  client: RadarrV3Client;
 
-  constructor(instance: IDownloader) {
+  constructor(instance: DownloaderEntity) {
     this.instance = instance;
-
-    const url = new URL(instance.url);
-    this.client = new RadarrAPI(url, instance.token);
+    this.client = new RadarrV3Client({
+      BASE: instance.url,
+      HEADERS: {
+        'x-api-key': instance.token,
+      },
+    });
   }
 
-  public getClient(): RadarrAPI {
+  public getClient(): RadarrV3Client {
     return this.client;
   }
 
-  async queue() {
+  async queue(): Promise<Object> {
     if (!this.instance.id) {
-      return;
+      return {};
     }
 
     const queue = {};
-    queue[this.instance.id] = await this.client.GetQueue();
+    queue[this.instance.id] = await this.client.queue.getApiV3Queue();
     const { totalRecords } = queue[this.instance.id];
     const { pageSize } = queue[this.instance.id];
     const pages = Math.ceil(totalRecords / pageSize);
+    // eslint-disable-next-line no-plusplus
     for (let p = 2; p <= pages; p++) {
-      const queuePage = await this.client.GetQueue(p);
-      queue[this.instance.id].records = [
-        ...queue[this.instance.id].records,
-        ...queuePage.records,
-      ];
+      // eslint-disable-next-line no-await-in-loop
+      const queuePage = await this.client.queue.getApiV3Queue({
+        page: p,
+      });
+      if (is.truthy(queuePage.records) && queuePage.records.length !== 0) {
+        queue[this.instance.id].records = [
+          ...queue[this.instance.id].records,
+          ...queuePage.records,
+        ];
+      }
     }
     queue[this.instance.id].serverName = this.instance.name;
     return queue;
   }
 
-  async add(movieData: Movie, path = '', profile = -1, tag = '') {
+  async add(movie: MovieResource, path = '', profile = -1, tag = '') {
+    const movieData = movie;
     movieData.qualityProfileId =
-      profile !== -1 ? profile : this.instance.profile.id;
+      profile !== -1 ? profile : (this.instance.metadata.profile as number);
     movieData.rootFolderPath = `${
-      path !== '' ? path : this.instance.path.location
+      path !== '' ? path : (this.instance.metadata.path as string)
     }`;
     movieData.addOptions = {
       searchForMovie: true,
@@ -61,7 +71,9 @@ export default class Radarr {
     if (tag) movieData.tags = [parseInt(tag, 10)];
 
     try {
-      const add = await this.client.CreateMovie(movieData);
+      const add = await this.client.movie.postApiV3Movie({
+        requestBody: movieData,
+      });
 
       if (Array.isArray(add)) {
         if (add[1].errorMessage) throw add[1].errorMessage;
@@ -81,7 +93,10 @@ export default class Radarr {
       // Target server
       if (allInstances) {
         try {
-          const radarrData = await this.client.LookupMovie(job.tmdb_id);
+          const radarrData =
+            (await this.client.movieLookup.getApiV3MovieLookupTmdb(
+              job.tmdb_id,
+            )) as any;
           let radarrId = -1;
           if (radarrData[0].id) {
             logger.debug(
@@ -89,21 +104,23 @@ export default class Radarr {
             );
             radarrId = radarrData[0].id;
           } else {
-            radarrId = await this.add(radarrData[0]);
-            logger.debug(
-              `SERVICE - RADARR: [${this.instance.name}] Radarr job added for ${job.title}`,
-            );
+            const id = await this.add(radarrData[0]);
+            if (id) {
+              radarrId = id;
+              logger.debug(
+                `SERVICE - RADARR: [${this.instance.name}] Radarr job added for ${job.title}`,
+              );
+            }
           }
           if (!this.instance.id) {
             return;
           }
-          await Request.findOneAndUpdate(
+          await getFromContainer(RequestRepository).updateMany(
             {
               requestId: job.requestId,
             },
             { $push: { radarrId: { [this.instance.id]: radarrId } } },
-            { useFindAndModify: false },
-          ).exec();
+          );
         } catch (err) {
           logger.error(
             `SERVICE - RADARR: [${this.instance.name}] Unable to add movie ${job.title}`,
@@ -112,7 +129,9 @@ export default class Radarr {
         }
       } else {
         // Loop for all servers default
-        const instances = await GetAllDownloaders(DownloaderType.Radarr);
+        const instances = await getFromContainer(DownloaderRepository).findAll({
+          type: DownloaderType.RADARR,
+        });
         // eslint-disable-next-line no-restricted-syntax
         for (const instance of instances) {
           if (!instance.enabled) {
@@ -123,10 +142,16 @@ export default class Radarr {
           }
 
           try {
-            const url = new URL(instance.url);
-            const api = new RadarrAPI(url, instance.token);
+            const api = new RadarrV3Client({
+              BASE: instance.url,
+              HEADERS: {
+                'x-api-key': instance.token,
+              },
+            });
 
-            const radarrData = await api.LookupMovie(job.tmdb_id);
+            const radarrData = (await api.movieLookup.getApiV3MovieLookupTmdb(
+              job.tmdb_id,
+            )) as any;
             let radarrId = -1;
             if (radarrData[0].id) {
               logger.debug(
@@ -134,22 +159,24 @@ export default class Radarr {
               );
               radarrId = radarrData[0].id;
             } else {
-              radarrId = await this.add(radarrData[0]);
-              logger.debug(
-                `SERVICE - RADARR: [${instance.name}] Radarr job added for ${job.title}`,
-              );
+              const id = await this.add(radarrData[0]);
+              if (id) {
+                radarrId = id;
+                logger.debug(
+                  `SERVICE - RADARR: [${instance.name}] Radarr job added for ${job.title}`,
+                );
+              }
             }
             if (!instance.id) {
               continue;
             }
 
-            await Request.findOneAndUpdate(
+            await getFromContainer(RequestRepository).updateMany(
               {
                 requestId: job.requestId,
               },
               { $push: { radarrId: { [instance.id]: radarrId } } },
-              { useFindAndModify: false },
-            ).exec();
+            );
           } catch (err) {
             logger.error(
               `SERVICE - RADARR: [${this.instance.name}] Unable to add movie ${job.title}`,
@@ -162,7 +189,9 @@ export default class Radarr {
 
   async manualAdd(job, manual) {
     try {
-      const radarrData = await this.client.LookupMovie(job.id);
+      const radarrData = (await this.client.movieLookup.getApiV3MovieLookupTmdb(
+        job.id,
+      )) as any;
       let radarrId = -1;
       if (radarrData[0] && radarrData[0].id) {
         logger.debug(
@@ -170,26 +199,28 @@ export default class Radarr {
         );
         radarrId = radarrData[0].id;
       } else {
-        radarrId = await this.add(
+        const id = await this.add(
           radarrData[0],
           manual.path,
           manual.profile,
           manual.tag,
         );
-        logger.debug(
-          `SERVICE - RADARR: [${this.instance.name}] Radarr job added for ${job.title}`,
-        );
+        if (id) {
+          radarrId = id;
+          logger.debug(
+            `SERVICE - RADARR: [${this.instance.name}] Radarr job added for ${job.title}`,
+          );
+        }
       }
       if (!this.instance.id) {
         return;
       }
-      await Request.findOneAndUpdate(
+      await getFromContainer(RequestRepository).updateMany(
         {
           requestId: job.id,
         },
         { $push: { radarrId: { [this.instance.id]: radarrId } } },
-        { useFindAndModify: false },
-      ).exec();
+      );
     } catch (err) {
       logger.error(
         `SERVICE - RADARR: [${this.instance.name}] Unable to add movie ${job.title}`,
@@ -200,16 +231,19 @@ export default class Radarr {
 
   async processRequest(id) {
     logger.debug(`SERVICE - RADARR: Processing request`);
-    const req = await Request.findOne({ requestId: id }).exec();
-    if (!req) {
+    const requestResult = await getFromContainer(RequestRepository).findOne({
+      requestId: id,
+    });
+    if (requestResult.isNone()) {
       logger.debug(`SERVICE - RADARR: no request found`);
       return;
     }
+    const req = requestResult.unwrap();
 
     if (req.type === 'movie') {
-      if (!req.tmdb_id) {
+      if (!req.tmdbId) {
         logger.debug(`SERVICE - RADARR: TMDB ID not found for ${req.title}`);
-      } else if (req.radarrId.length === 0) {
+      } else if (req.radarrs.length === 0) {
         if (!req.approved) {
           logger.debug(
             `SERVICE - RADARR: Request requires approval - ${req.title}`,

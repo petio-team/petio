@@ -1,15 +1,19 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-
-/* eslint-disable no-restricted-syntax */
-import { isErrorFromPath } from '@zodios/core';
+import { AxiosRequestConfig } from 'axios';
 import Bluebird from 'bluebird';
 
-import { config } from '@/config';
+import { getFromContainer } from '@/infra/container/container';
 import loggerMain from '@/infra/logger/logger';
-import { PlexAPIClient, PlexApiEndpoints } from '@/infra/plex/plex';
-import DiscoveryModel from '@/models/discovery';
-import MovieModel, { Movie } from '@/models/movie';
-import ShowModel, { Show } from '@/models/show';
+import { PlexClient } from '@/infra/plex';
+import { Interceptors } from '@/infra/plex/core/OpenAPI';
+import { DiscoveryEntity } from '@/resources/discovery/entity';
+import { DiscoveryRepository } from '@/resources/discovery/repository';
+import { MediaServerEntity } from '@/resources/media-server/entity';
+import { MediaServerRepository } from '@/resources/media-server/repository';
+import { MovieEntity } from '@/resources/movie/entity';
+import { MovieRepository } from '@/resources/movie/repository';
+import { ShowEntity } from '@/resources/show/entity';
+import { ShowRepository } from '@/resources/show/repository';
 import is from '@/utils/is';
 
 type MovieBuild = {
@@ -28,62 +32,76 @@ type ShowBuild = {
 const logger = loggerMain.child({ module: 'discovery.build' });
 
 export default async (id: string) => {
+  const discoveryRepo = getFromContainer(DiscoveryRepository);
   try {
-    const [data, existing] = await Bluebird.all([
+    const [data, discovery] = await Bluebird.all([
       build(id),
-      DiscoveryModel.findOne({ id }).exec(),
+      discoveryRepo.findOne({ id }),
     ]);
+    if (discovery.isNone()) {
+      logger.debug(`no discovery found for user - ${id}`);
+      return;
+    }
     if (!is.truthy(data)) {
       logger.debug(`no data for user - ${id}`);
       return;
     }
+    const existing = discovery.unwrap().getProps();
     if (existing) {
-      existing.id = id;
-      existing.movie = {
-        genres: data.movies.genres,
-        people: {
-          cast: data.movies.actors,
-          director: data.movies.directors,
-        },
-        history: data.movies.history,
-      };
-      existing.series = {
-        genres: data.shows.genres,
-        history: data.shows.history,
-        people: {
-          cast: data.shows.actors,
-          director: {},
-        },
-      };
-      await existing.save();
-    } else {
-      const newDiscover = new DiscoveryModel({
-        id,
-        movie: {
-          genres: data.movies.genres,
-          people: {
-            cast: data.movies.actors,
-            director: data.movies.directors,
+      await discoveryRepo.updateMany(
+        { id: existing.id },
+        {
+          movie: {
+            genres: data.movies.genres,
+            people: {
+              cast: data.movies.actors,
+              director: data.movies.directors,
+            },
+            history: data.movies.history,
           },
-          history: data.movies.history,
+          series: {
+            genres: data.shows.genres,
+            history: data.shows.history,
+            people: {
+              cast: data.shows.actors,
+              director: {},
+            },
+          },
         },
-        series: {
-          genres: data.shows.genres,
-          history: data.shows.history,
-          people: {
-            cast: data.shows.actors,
-            director: {},
+      );
+    } else {
+      const newDiscover = new DiscoveryEntity({
+        id,
+        props: {
+          movie: {
+            genres: data.movies.genres,
+            people: {
+              cast: data.movies.actors,
+              director: data.movies.directors,
+            },
+            history: data.movies.history,
+          },
+          series: {
+            genres: data.shows.genres,
+            history: data.shows.history,
+            people: {
+              cast: data.shows.actors,
+              director: {},
+            },
           },
         },
       });
-      await newDiscover.save();
+      await discoveryRepo.create(newDiscover);
     }
   } catch (e) {
     logger.error(e);
   }
 };
 
-function buildMovieGenres(movie: Movie, currentGenres: Record<string, any>) {
+function buildMovieGenres(
+  movie: MovieEntity,
+  currentGenres: Record<string, any>,
+) {
   const genres: Record<string, any> = currentGenres;
   const cr = buildCertification(movie.contentRating, 'movie');
   for (const genre of movie.Genre) {
@@ -115,7 +133,7 @@ function buildMovieGenres(movie: Movie, currentGenres: Record<string, any>) {
   return genres;
 }
 
-function buildShowGenres(show: Show, currentGenres: Record<string, any>) {
+function buildShowGenres(show: ShowEntity, currentGenres: Record<string, any>) {
   const genres: Record<string, any> = currentGenres;
   for (const genre of show.Genre) {
     const cr = buildCertification(show.contentRating, 'show');
@@ -167,27 +185,43 @@ async function build(id: string) {
     },
   };
   try {
-    const data = await getHistory(id);
-    if (!is.truthy(data) || !is.truthy(data.MediaContainer.Metadata)) {
+    const server = await getServerInstance();
+    if (!server) {
+      logger.debug(`no server found for user - ${id}`);
+      return null;
+    }
+    const client = getPlexClientFromServer(server);
+    const data = await client.sessions.getSessionHistory({
+      accountId: id,
+    });
+    if (
+      !is.truthy(data) ||
+      !is.truthy(data.MediaContainer) ||
+      !is.truthy(data.MediaContainer.Metadata)
+    ) {
       logger.debug(`no history for user - ${id}`);
       return null;
     }
     const items = data.MediaContainer.Metadata;
     const [movieResults, showResults] = await Bluebird.all([
       Bluebird.filter(items, (i) => i.type === 'movie').map(async (i) =>
-        MovieModel.findOne({ ratingKey: i.ratingKey }).exec(),
+        getFromContainer(MovieRepository).findOne({ ratingKey: i.ratingKey }),
       ),
       Bluebird.filter(
         items,
         (i) => i.type === 'episode' && is.truthy(i.grandparentKey),
       ).map(async (i) =>
-        ShowModel.findOne({
+        getFromContainer(ShowRepository).findOne({
           ratingKey: i.grandparentKey!.replace('/library/metadata/', ''),
-        }).exec(),
+        }),
       ),
     ]);
-    const movieResultsFiltered = movieResults.filter(is.truthy);
-    const showResultsFiltered = showResults.filter(is.truthy);
+    const movieResultsFiltered = movieResults
+      .filter((m) => m.isSome())
+      .map((m) => m.unwrap());
+    const showResultsFiltered = showResults
+      .filter((s) => s.isSome())
+      .map((s) => s.unwrap());
 
     for (const movie of movieResultsFiltered) {
       if (movie.tmdb_id) {
@@ -313,32 +347,33 @@ function buildCertification(certification: string, type: string) {
   }
 }
 
-async function getHistory(id: string, library?: number) {
-  const baseurl = `${config.get('plex.protocol')}://${config.get(
-    'plex.host',
-  )}:${config.get('plex.port')}`;
-  const client = PlexAPIClient(baseurl, config.get('plex.token'));
-  try {
-    const content = await client.get('/status/sessions/history/all', {
-      queries: {
-        accountID: id,
-        sort: 'viewedAt:desc',
-        'viewedAt>': 0,
-        librarySectionID: library,
-      },
-    });
-    return content;
-  } catch (err) {
-    if (
-      !isErrorFromPath(
-        PlexApiEndpoints,
-        'get',
-        '/status/sessions/history/all',
-        err,
-      )
-    ) {
-      logger.error(err.message, `Failed to get history from Plex`);
-    }
+async function getServerInstance() {
+  const server = await getFromContainer(MediaServerRepository).findOne({});
+  if (server.isNone()) {
+    logger.debug(`no server found for user`);
     return null;
   }
+  return server.unwrap();
+}
+
+function getPlexClientFromServer(server: MediaServerEntity) {
+  const requestInterceptor: Interceptors<AxiosRequestConfig> =
+    new Interceptors();
+  requestInterceptor.use(async (config: AxiosRequestConfig) => {
+    const cfg = config;
+    if (cfg.headers) {
+      cfg.headers['X-Plex-Token'] = server.token;
+      cfg.headers['X-Plex-Container-Size'] = 1000;
+    }
+    return cfg;
+  });
+
+  const client = new PlexClient({
+    BASE: server.url,
+    interceptors: {
+      request: requestInterceptor,
+      response: new Interceptors(),
+    },
+  });
+  return client;
 }

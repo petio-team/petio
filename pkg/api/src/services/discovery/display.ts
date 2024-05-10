@@ -6,11 +6,13 @@
 import Bluebird from 'bluebird';
 import request from 'xhr-request';
 
-import { config } from '@/config/index';
 // eslint-disable-next-line import/order
 import { TMDB_API_KEY } from '@/infra/config/env';
+import { getFromContainer } from '@/infra/container/container';
 import loggerMain from '@/infra/logger/logger';
-import DiscoveryModel from '@/models/discovery';
+import { TheMovieDatabaseClient } from '@/infra/tmdb/client';
+import { DiscoveryRepository } from '@/resources/discovery/repository';
+import { MediaServerRepository } from '@/resources/media-server/repository';
 import getHistory from '@/services/plex/history';
 import onServer from '@/services/plex/server';
 import getTop from '@/services/plex/top';
@@ -25,6 +27,7 @@ import {
 import is from '@/utils/is';
 
 import cache from '../cache/cache';
+import { getPlexClient } from '../plex/client';
 
 const logger = loggerMain.child({ module: 'discovery.display' });
 
@@ -345,19 +348,28 @@ export default async (
   if (!id) {
     throw new Error('invalid media id');
   }
+  const mediaServerRepo = getFromContainer(MediaServerRepository);
+  const discoveryRepo = getFromContainer(DiscoveryRepository);
   try {
+    const serverResult = await mediaServerRepo.findOne({});
+    if (serverResult.isNone()) {
+      logger.error(`no server found for discovery`);
+      return makeDiscoveryResult();
+    }
+    const server = serverResult.unwrap();
     logger.debug({ id }, `user id used for displaying user content`);
-    const [discovery, upcoming, popular] = await Bluebird.all([
-      DiscoveryModel.findOne({ id }).exec(),
+    const [discoveryResult, upcoming, popular] = await Bluebird.all([
+      discoveryRepo.findOne({ id }),
       comingSoon(contentType),
-      getTop(contentType === 'movie' ? 1 : 2),
+      getTop(server, contentType === 'movie' ? 1 : 2),
     ]);
-    if (!discovery) {
+    if (discoveryResult.isNone()) {
       logger.debug(
         `no user data yet for ${id} - this is likely still being built, generic discovery returned`,
       );
       return makeDiscoveryResult(contentType, popular, upcoming.results);
     }
+    const discovery = discoveryResult.unwrap();
     const watchHistory =
       contentType === 'movie'
         ? discovery.movie.history
@@ -379,7 +391,7 @@ export default async (
       sortGenres(mediaGenres, contentType, watchHistory),
       sortActors(mediaActors, contentType, watchHistory),
       sortDirectors(mediaDirectors, contentType, watchHistory),
-      getHistory(id, contentType),
+      getHistory(getPlexClient(server), id, contentType),
     ]);
     const recentData = await buildRecentData(
       history,
@@ -621,73 +633,22 @@ function genreID(genreName: any, type: string) {
 }
 
 function discoverMovie(page = 1, params = {}) {
-  const tmdb = 'https://api.themoviedb.org/3/';
-  let par = '';
-  Object.keys(params).forEach((i) => {
-    par += `&${i}=${params[i]}`;
-  });
-  const url = `${tmdb}discover/movie?api_key=${TMDB_API_KEY}${par}&page=${page}&append_to_response=videos`;
-  return new Promise((resolve, reject) => {
-    request(
-      url,
-      {
-        method: 'GET',
-        json: true,
-      },
-      (err: any, data: unknown) => {
-        if (err) {
-          reject(err);
-        }
-
-        resolve(data);
-      },
-    );
+  return getFromContainer(TheMovieDatabaseClient).default.discoverMovie({
+    page,
+    ...params,
   });
 }
 
 function discoverShow(page = 1, params = {}) {
-  const tmdb = 'https://api.themoviedb.org/3/';
-  let par = '';
-  Object.keys(params).forEach((i) => {
-    par += `&${i}=${params[i]}`;
-  });
-  const url = `${tmdb}discover/tv?api_key=${TMDB_API_KEY}${par}&page=${page}&append_to_response=videos`;
-  return new Promise((resolve, reject) => {
-    request(
-      url,
-      {
-        method: 'GET',
-        json: true,
-      },
-      (err: any, data: unknown) => {
-        if (err) {
-          reject(err);
-        }
-
-        resolve(data);
-      },
-    );
+  return getFromContainer(TheMovieDatabaseClient).default.discoverTv({
+    page,
+    ...params,
   });
 }
 
-function searchPeople(term: any) {
-  const tmdb = 'https://api.themoviedb.org/3/';
-  const url = `${tmdb}search/person?query=${term}&include_adult=false&api_key=${TMDB_API_KEY}`;
-  return new Promise((resolve, reject) => {
-    request(
-      url,
-      {
-        method: 'GET',
-        json: true,
-      },
-      (err: any, data: unknown) => {
-        if (err) {
-          reject(err);
-        }
-
-        resolve(data);
-      },
-    );
+async function searchPeople(term: any) {
+  return getFromContainer(TheMovieDatabaseClient).default.searchPerson({
+    query: term,
   });
 }
 
@@ -805,7 +766,7 @@ async function comingSoon(type: string) {
                 videos: result.videos,
               };
       },
-      { concurrency: config.get('general.concurrency') },
+      { concurrency: 1 },
     );
     return data;
   } catch (error) {

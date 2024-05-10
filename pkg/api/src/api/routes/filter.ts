@@ -2,15 +2,17 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
+import { getFromContainer } from '@/infra/container/container';
 import logger from '@/infra/logger/logger';
-import Filter from '@/models/filter';
+import { FilterEntity } from '@/resources/filter/entity';
+import { FilterRepository } from '@/resources/filter/repository';
+import { FilterType } from '@/resources/filter/types';
 
 const getFilters = async (ctx: Context) => {
   try {
-    ctx.status = StatusCodes.OK;
-    ctx.body = await Filter.find();
-  } catch {
-    logger.warn('FILTER: Unable to load filters');
+    ctx.ok({});
+  } catch (err) {
+    logger.error(err, 'FILTER: Unable to load filters');
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = {};
   }
@@ -21,53 +23,58 @@ const updateFilter = async (ctx: Context) => {
 
   const movieFilter = body.movie;
   const tvFilter = body.tv;
-  const existingMovie = await Filter.findOne({ id: 'movie_filters' });
-  const existingTv = await Filter.findOne({ id: 'tv_filters' });
+
+  const filterRepo = getFromContainer(FilterRepository);
+  const existingMovie = await filterRepo.findOne({ id: 'movie_filters' });
+  const existingTv = await filterRepo.findOne({ id: 'tv_filters' });
 
   try {
     if (existingMovie) {
-      await Filter.findOneAndUpdate(
+      await filterRepo.updateMany(
         { id: 'movie_filters' },
         {
           $set: {
             data: movieFilter,
           },
         },
-        { useFindAndModify: false },
       );
       logger.debug('FILTER: Movie Filter updated');
     } else {
-      const newMovie = new Filter({
-        id: 'movie_filters',
-        data: movieFilter,
-      });
-      await newMovie.save();
+      await filterRepo.create(
+        FilterEntity.create({
+          type: FilterType.MOVIE,
+          filters: movieFilter.filters,
+          actions: movieFilter.actions,
+          collapse: movieFilter.collapse,
+        }),
+      );
       logger.debug('FILTER: New Movie filter created');
     }
     if (existingTv) {
-      await Filter.findOneAndUpdate(
+      await filterRepo.updateMany(
         { id: 'tv_filters' },
         {
           $set: {
             data: tvFilter,
           },
         },
-        { useFindAndModify: false },
       );
       logger.debug('FILTER: TV Filter updated');
     } else {
-      const newTv = new Filter({
-        id: 'tv_filters',
-        data: tvFilter,
-      });
-      await newTv.save();
+      await filterRepo.create(
+        FilterEntity.create({
+          type: FilterType.SHOW,
+          filters: tvFilter.filters,
+          actions: tvFilter.actions,
+          collapse: tvFilter.collapse,
+        }),
+      );
       logger.debug('FILTER: New TV filter created');
     }
     logger.info('FILTER: Filters updated');
     ctx.status = StatusCodes.OK;
   } catch (err) {
-    logger.error('FILTER: Error saving filters');
-    logger.log({ level: 'error', message: err });
+    logger.error('FILTER: Error saving filters', err);
 
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = {};
@@ -80,4 +87,5 @@ export default (app: Router) => {
   route.post('/update', updateFilter);
 
   app.use(route.routes());
+  app.use(route.allowedMethods());
 };

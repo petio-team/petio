@@ -1,16 +1,17 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import bluebird from 'bluebird';
 
+import { getFromContainer } from '@/infra/container/container';
 import logger from '@/infra/logger/logger';
-import { TMDBAPI } from '@/infra/tmdb/tmdb';
 import {
-  MediaType,
-  TimeWindow,
-  TrendingMovie,
-  TrendingPeople,
-  TrendingTv,
-} from '@/infra/tmdb/trending/trending';
+  TheMovieDatabaseClient,
+  TrendingMoviesResponse,
+  TrendingPeopleResponse,
+  TrendingTvResponse,
+} from '@/infra/tmdb/client';
+import { CacheService } from '@/services/cache/cache';
+import is from '@/utils/is';
 
-import cache from '../cache/cache';
 import { getMovieDetails, getShowDetails } from './show';
 
 const Companies = [
@@ -124,10 +125,12 @@ const Networks = [
   },
 ];
 
+const DEFAULT_TTL: number = 1000 * 60 * 60 * 24;
+
 async function trending() {
   logger.debug(`TMDB Trending lookup`);
 
-  const [people, movies, shows]: any = await Promise.all([
+  const [people, movies, shows] = await Promise.all([
     getPerson(),
     getMovies(),
     getShows(),
@@ -148,14 +151,22 @@ export default trending;
 async function getPerson() {
   let data = {};
   try {
-    data = await cache.wrap('trending_person', async () => {
-      const people = await personData();
-      return people.map((person) => ({
-        id: person.id,
-        name: person.name,
-        profile_path: person.profile_path,
-      }));
-    });
+    const results = await getFromContainer(CacheService).wrap(
+      'trending_person',
+      async () => {
+        const people = await personData();
+        if (is.falsy(people)) {
+          return [];
+        }
+        return people.map((person) => ({
+          id: person.id,
+          name: person.name,
+          profile_path: person.profile_path,
+        }));
+      },
+      DEFAULT_TTL,
+    );
+    data = results;
   } catch (err) {
     logger.warn(`Error getting trending people`, err);
   }
@@ -165,10 +176,20 @@ async function getPerson() {
 async function getMovies() {
   let data = {};
   try {
-    data = await cache.wrap('trending_movies', async () => {
-      const movies = await moviesData();
-      return bluebird.map(movies, async (movie) => getMovieDetails(movie.id));
-    });
+    const results = await getFromContainer(CacheService).wrap(
+      'trending_movies',
+      async () => {
+        const movies = await moviesData();
+        if (is.falsy(movies)) {
+          return [];
+        }
+        return bluebird
+          .filter(movies, (m) => is.truthy(m.id))
+          .map(async (movie) => getMovieDetails(movie.id!));
+      },
+      DEFAULT_TTL,
+    );
+    data = results;
   } catch (err) {
     logger.warn(`Error getting trending movies`, err);
   }
@@ -178,10 +199,20 @@ async function getMovies() {
 async function getShows() {
   let data = {};
   try {
-    data = await cache.wrap('trending_shows', async () => {
-      const shows = await showsData();
-      return bluebird.map(shows, (show) => getShowDetails(show.id));
-    });
+    const results = await getFromContainer(CacheService).wrap(
+      'trending_shows',
+      async () => {
+        const shows = await showsData();
+        if (is.falsy(shows)) {
+          return [];
+        }
+        return bluebird
+          .filter(shows, (s) => is.truthy(s.id))
+          .map(async (show) => getShowDetails(show.id!));
+      },
+      DEFAULT_TTL,
+    );
+    data = results;
   } catch (err) {
     logger.warn(`Error getting trending shows`, err);
   }
@@ -190,41 +221,38 @@ async function getShows() {
 
 // Lookup layer
 
-async function personData(): Promise<TrendingPeople[]> {
+async function personData(): Promise<TrendingPeopleResponse['results']> {
   logger.debug('Person from source not cache', {
     module: 'tmdb.trending',
   });
-  const data = await TMDBAPI.get('/trending/:media_type/:time_window', {
-    params: {
-      media_type: MediaType.Person,
-      time_window: TimeWindow.Week,
-    },
+  const data = await getFromContainer(
+    TheMovieDatabaseClient,
+  ).default.trendingPeople({
+    timeWindow: 'week',
   });
-  return data.results as TrendingPeople[];
+  return data.results;
 }
 
-async function moviesData(): Promise<TrendingMovie[]> {
+async function moviesData(): Promise<TrendingMoviesResponse['results']> {
   logger.debug('Movies from source not cache', {
     module: 'tmdb.trending',
   });
-  const data = await TMDBAPI.get('/trending/:media_type/:time_window', {
-    params: {
-      media_type: MediaType.Movie,
-      time_window: TimeWindow.Week,
-    },
+  const data = await getFromContainer(
+    TheMovieDatabaseClient,
+  ).default.trendingMovies({
+    timeWindow: 'week',
   });
-  return data.results as TrendingMovie[];
+  return data.results;
 }
 
-async function showsData(): Promise<TrendingTv[]> {
+async function showsData(): Promise<TrendingTvResponse['results']> {
   logger.debug('Shows from source not cache', {
     module: 'tmdb.trending',
   });
-  const data = await TMDBAPI.get('/trending/:media_type/:time_window', {
-    params: {
-      media_type: MediaType.Tv,
-      time_window: TimeWindow.Week,
-    },
+  const data = await getFromContainer(
+    TheMovieDatabaseClient,
+  ).default.trendingTv({
+    timeWindow: 'week',
   });
-  return data.results as TrendingTv[];
+  return data.results;
 }

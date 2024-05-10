@@ -4,64 +4,125 @@ import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 import { z } from 'zod';
 
-import {
-  StatusBadRequest,
-  StatusInternalServerError,
-} from '@/api/http/request';
 import { adminRequired } from '@/api/middleware/auth';
 import { validateRequest } from '@/api/middleware/validation';
-import { ArrError } from '@/infra/arr/error';
-import RadarrAPI, { GetRadarrInstanceFromDb } from '@/infra/arr/radarr';
-import SonarrAPI, { GetSonarrInstanceFromDb } from '@/infra/arr/sonarr';
+import { getFromContainer } from '@/infra/container/container';
 import logger from '@/infra/logger/logger';
-import {
-  CreateOrUpdateDownloader,
-  DeleteDownloaderById,
-  DownloaderType,
-  GetAllDownloaders,
-} from '@/models/downloaders';
+import { RadarrV3Client } from '@/infra/servarr/radarr';
+import { SonarrV3Client } from '@/infra/servarr/sonarr';
+import { DownloaderEntity } from '@/resources/downloader/entity';
+import { DownloaderMapper } from '@/resources/downloader/mapper';
+import { DownloaderRepository } from '@/resources/downloader/repository';
+import { DownloaderType } from '@/resources/downloader/types';
 import { ArrInput, ArrInputSchema } from '@/schemas/downloaders';
 
-const getSonarrOptionsById = async (ctx: Context) => {
-  const instance = await GetSonarrInstanceFromDb(ctx.params.id);
-  if (!instance) {
-    ctx.error({
-      statusCode: StatusCodes.BAD_REQUEST,
-      code: 'INVALID_INSTANCE',
-      message: `no instance was found with the id: ${ctx.params.id}`,
-    });
-    return;
-  }
+const SonarrAvailabilities = {
+  0: 'Standard',
+  1: 'Daily',
+  2: 'Anime',
+};
 
-  const [paths, profiles, languages, tags] = await Promise.all([
-    instance.GetRootPaths(),
-    instance.GetQualityProfiles(),
-    instance.GetLanguages(),
-    instance.GetTags(),
-  ]);
+const RadarrAvailabilities = {
+  0: 'Announced',
+  1: 'In Cinemas',
+  2: 'Released',
+};
 
-  ctx.success({
-    statusCode: StatusCodes.OK,
-    data: {
-      paths,
-      profiles,
-      languages,
-      tags,
-    },
+async function getInstances(type: DownloaderType) {
+  const instances = await getFromContainer(DownloaderRepository).findAll({
+    type,
   });
+  const Cls = type === DownloaderType.SONARR ? SonarrV3Client : RadarrV3Client;
+  return instances.map((i) => ({
+    instance: i,
+    client: new Cls({
+      BASE: i.url.replace(/\/$/, ''),
+      HEADERS: {
+        'x-api-key': i.token,
+      },
+    }),
+  }));
+}
+
+async function getInstance(
+  id: string,
+  type: DownloaderType.RADARR,
+): Promise<RadarrV3Client | undefined>;
+async function getInstance(
+  id: string,
+  type: DownloaderType.SONARR,
+): Promise<SonarrV3Client | undefined>;
+async function getInstance(id: string, type: DownloaderType) {
+  const result = await getFromContainer(DownloaderRepository).findOne({
+    id,
+    type,
+  });
+  if (result.isSome()) {
+    const instance = result.unwrap();
+    const Cls =
+      type === DownloaderType.SONARR ? SonarrV3Client : RadarrV3Client;
+    return new Cls({
+      BASE: instance.url.replace(/\/$/, ''),
+      HEADERS: {
+        'x-api-key': instance.token,
+      },
+    });
+  }
+  return undefined;
+}
+
+const getSonarrOptionsById = async (ctx: Context) => {
+  try {
+    const instance = await getInstance(ctx.params.id, DownloaderType.SONARR);
+    if (!instance) {
+      ctx.error({
+        statusCode: StatusCodes.BAD_REQUEST,
+        code: 'INVALID_INSTANCE',
+        message: `no instance was found with the id: ${ctx.params.id}`,
+      });
+      return;
+    }
+
+    const [paths, profiles, languages, tags] = await Promise.all([
+      instance.rootFolder.getApiV3Rootfolder(),
+      instance.qualityProfile.getApiV3Qualityprofile(),
+      instance.language.getApiV3Language(),
+      instance.tag.getApiV3Tag(),
+    ]);
+
+    ctx.success({
+      statusCode: StatusCodes.OK,
+      data: {
+        paths,
+        profiles,
+        languages,
+        tags,
+      },
+    });
+  } catch (err) {
+    logger.error(`failed to get sonarr options`, err);
+    ctx.error({
+      statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: 'FAILED_GET_OPTIONS',
+      message: 'failed to get sonarr options',
+    });
+  }
 };
 
 const getSonarrPathsById = async (ctx: Context) => {
   try {
-    const instance = await GetSonarrInstanceFromDb(ctx.params.id);
+    const instance = await getInstance(ctx.params.id, DownloaderType.SONARR);
     if (!instance) {
-      ctx.status = StatusCodes.NOT_FOUND;
-      ctx.body = 'no instance could be found with that id';
+      ctx.error({
+        statusCode: StatusCodes.BAD_REQUEST,
+        code: 'INVALID_INSTANCE',
+        message: `no instance was found with the id: ${ctx.params.id}`,
+      });
       return;
     }
 
     ctx.status = StatusCodes.OK;
-    ctx.body = await instance.GetRootPaths();
+    ctx.body = await instance.rootFolder.getApiV3Rootfolder();
   } catch (error) {
     logger.error(error.stack);
 
@@ -72,14 +133,17 @@ const getSonarrPathsById = async (ctx: Context) => {
 
 const getSonarrProfilesById = async (ctx: Context) => {
   try {
-    const instance = await GetSonarrInstanceFromDb(ctx.params.id);
+    const instance = await getInstance(ctx.params.id, DownloaderType.SONARR);
     if (!instance) {
-      ctx.status = StatusCodes.NOT_FOUND;
-      ctx.body = 'no instance could be found with that id';
+      ctx.error({
+        statusCode: StatusCodes.BAD_REQUEST,
+        code: 'INVALID_INSTANCE',
+        message: `no instance was found with the id: ${ctx.params.id}`,
+      });
       return;
     }
 
-    const profiles = await instance.GetQualityProfiles();
+    const profiles = await instance.qualityProfile.getApiV3Qualityprofile();
 
     ctx.status = StatusCodes.OK;
     ctx.body = profiles;
@@ -91,14 +155,17 @@ const getSonarrProfilesById = async (ctx: Context) => {
 
 const getSonarrLanguagesById = async (ctx: Context) => {
   try {
-    const instance = await GetSonarrInstanceFromDb(ctx.params.id);
+    const instance = await getInstance(ctx.params.id, DownloaderType.SONARR);
     if (!instance) {
-      ctx.status = StatusCodes.NOT_FOUND;
-      ctx.body = 'no instance could be found with that id';
+      ctx.error({
+        statusCode: StatusCodes.BAD_REQUEST,
+        code: 'INVALID_INSTANCE',
+        message: `no instance was found with the id: ${ctx.params.id}`,
+      });
       return;
     }
 
-    const languages = await instance.GetLanguages();
+    const languages = await instance.language.getApiV3Language();
 
     ctx.status = StatusCodes.OK;
     ctx.body = languages;
@@ -110,14 +177,17 @@ const getSonarrLanguagesById = async (ctx: Context) => {
 
 const getSonarrTagsById = async (ctx: Context) => {
   try {
-    const instance = await GetSonarrInstanceFromDb(ctx.params.id);
+    const instance = await getInstance(ctx.params.id, DownloaderType.SONARR);
     if (!instance) {
-      ctx.status = StatusCodes.NOT_FOUND;
-      ctx.body = 'no instance could be found with that id';
+      ctx.error({
+        statusCode: StatusCodes.BAD_REQUEST,
+        code: 'INVALID_INSTANCE',
+        message: `no instance was found with the id: ${ctx.params.id}`,
+      });
       return;
     }
 
-    const tags = await instance.GetTags();
+    const tags = await instance.tag.getApiV3Tag();
 
     ctx.status = StatusCodes.OK;
     ctx.body = tags;
@@ -129,16 +199,18 @@ const getSonarrTagsById = async (ctx: Context) => {
 
 const testSonarrConnectionById = async (ctx: Context) => {
   try {
-    const instance = await GetSonarrInstanceFromDb(ctx.params.id);
+    const instance = await getInstance(ctx.params.id, DownloaderType.SONARR);
     if (!instance) {
-      ctx.status = StatusCodes.NOT_FOUND;
-      ctx.body = 'no instance could be found with that id';
+      ctx.error({
+        statusCode: StatusCodes.BAD_REQUEST,
+        code: 'INVALID_INSTANCE',
+        message: `no instance was found with the id: ${ctx.params.id}`,
+      });
       return;
     }
 
-    const test = await instance.TestConnection();
     const data = {
-      connection: test,
+      connection: await instance.apiInfo.getApi(),
     };
 
     ctx.status = StatusCodes.OK;
@@ -158,42 +230,34 @@ const getSonarrConfig = async (ctx: Context) => {
     withTags,
   } = ctx.request.query;
 
-  const instances = await GetAllDownloaders(DownloaderType.Sonarr);
+  const downloaders = await getInstances(DownloaderType.SONARR);
 
-  const results = await bluebird.map(instances, async (instance) => {
-    const url = new URL(instance.url);
-    const api = new SonarrAPI(url, instance.token, instance.version);
-
-    const protocol = url.protocol.substring(0, url.protocol.length - 1);
-
-    let port: number;
-    if (!url.port) {
-      port = url.protocol === 'http' ? 80 : 443;
-    } else {
-      port = parseInt(url.port, 10);
-    }
-
+  const results = await bluebird.map(downloaders, async (downloader) => {
+    const { instance, client } = downloader;
     const [paths, profiles, languages, availabilities, tags] =
       await Promise.all([
-        withPaths ? api.GetRootPaths() : undefined,
-        withProfiles ? api.GetQualityProfiles() : undefined,
-        withLanguages ? api.GetLanguages() : undefined,
-        withAvailabilities ? api.GetSeriesTypes() : undefined,
-        withTags ? api.GetTags() : undefined,
+        withPaths ? client.rootFolder.getApiV3Rootfolder() : undefined,
+        withProfiles
+          ? client.qualityProfile.getApiV3Qualityprofile()
+          : undefined,
+        withLanguages ? client.language.getApiV3Language() : undefined,
+        withAvailabilities ? SonarrAvailabilities : undefined,
+        withTags ? client.tag.getApiV3Tag() : undefined,
       ]);
 
+    const url = new URL(instance.url);
     return {
       id: instance.id,
       name: instance.name,
-      protocol,
+      protocol: url.protocol.replace(':', ''),
       host: url.hostname,
-      port,
+      port: url.port,
       subpath: url.pathname,
       token: instance.token,
-      profile: instance.profile,
-      path: instance.path,
-      language: instance.language,
-      availability: instance.availability,
+      profile: instance.metadata.profile,
+      path: instance.metadata.path,
+      language: instance.metadata.language,
+      availability: instance.metadata.availability,
       enabled: instance.enabled,
       paths,
       profiles,
@@ -219,65 +283,65 @@ const updateSonarrConfig = async (ctx: Context) => {
       `${instance.protocol}://${instance.host}:${instance.port}/${instance.subpath}`,
     );
 
-    const api = new SonarrAPI(url, instance.token);
-    await api.TestConnection();
+    const api = new SonarrV3Client({
+      BASE: url.toString(),
+      HEADERS: {
+        'x-api-key': instance.token,
+      },
+    });
+    const status = await api.system.getApiV3SystemStatus();
 
-    const newInstance = await CreateOrUpdateDownloader({
+    const entity = DownloaderEntity.create({
       name: instance.name,
-      type: DownloaderType.Sonarr,
+      type: DownloaderType.SONARR,
       url: url.toString(),
       token: instance.token,
-      version: api.GetVersion().toString(),
-      path: instance.path,
-      profile: instance.profile,
-      language: instance.language,
-      availability: instance.availability,
       enabled: instance.enabled,
+      metadata: {
+        path: instance.path,
+        profile: instance.profile,
+        language: instance.language,
+        availability: instance.availability,
+        version: status.version,
+      },
     });
 
-    const [paths, profiles, languages, availabilities] = await Promise.all([
-      api.GetRootPaths(),
-      api.GetQualityProfiles(),
-      api.GetLanguages(),
-      api.GetSeriesTypes(),
-    ]);
-
-    const result = {
-      id: newInstance.id,
-      name: instance.name,
-      protocol: instance.protocol,
-      host: instance.host,
-      port: instance.port,
-      subpath: instance.subpath === '' ? '/' : instance.subpath,
-      token: instance.token,
-      path: instance.path,
-      profile: instance.profile,
-      language: instance.language,
-      availability: instance.availability,
-      enabled: instance.enabled,
-      paths,
-      profiles,
-      languages,
-      availabilities,
-    };
+    const existingInstance = await getFromContainer(
+      DownloaderRepository,
+    ).findOne({
+      id: instance.id,
+    });
+    if (existingInstance.isNone()) {
+      await getFromContainer(DownloaderRepository).create(entity);
+    } else {
+      const currentInstance = existingInstance.unwrap();
+      await getFromContainer(DownloaderRepository).updateMany(
+        { id: currentInstance.id },
+        {
+          name: entity.name,
+          url: entity.url,
+          token: entity.token,
+          enabled: entity.enabled,
+          metadata: entity.metadata,
+        },
+      );
+    }
 
     ctx.status = StatusCodes.OK;
-    ctx.body = result;
+    ctx.body = getFromContainer(DownloaderMapper).toResponse(entity);
     return;
   } catch (error) {
     logger.debug(`ROUTE: Error saving sonarr config`, error);
-
-    if (error instanceof ArrError) {
-      StatusBadRequest(ctx, error.message);
-    } else {
-      StatusInternalServerError(ctx, error.message);
-    }
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = {};
   }
 };
 
 const deleteSonarrById = async (ctx: Context) => {
   try {
-    const deleted = await DeleteDownloaderById(ctx.params.id);
+    const deleted = await getFromContainer(
+      DownloaderRepository,
+    ).deleteManyByIds([ctx.params.id]);
     if (!deleted) {
       ctx.status = StatusCodes.NOT_FOUND;
       ctx.body = `failed to delete instance with the id: ${ctx.params.id}`;
@@ -298,7 +362,7 @@ const deleteSonarrById = async (ctx: Context) => {
 };
 
 const getCalendarData = async (ctx: Context) => {
-  const instances = await GetAllDownloaders();
+  const instances = await getFromContainer(DownloaderRepository).findAll();
   if (!instances.length) {
     ctx.success({
       statusCode: StatusCodes.OK,
@@ -311,15 +375,25 @@ const getCalendarData = async (ctx: Context) => {
   const calendarData = await bluebird.map(instances, async (instance) => {
     const url = new URL(instance.url);
     const api =
-      instance.type === DownloaderType.Sonarr
-        ? new SonarrAPI(url, instance.token, instance.version)
-        : new RadarrAPI(url, instance.token, instance.version);
+      instance.type === DownloaderType.SONARR
+        ? new SonarrV3Client({
+            BASE: url.toString(),
+            HEADERS: {
+              'x-api-key': instance.token,
+            },
+          })
+        : new RadarrV3Client({
+            BASE: url.toString(),
+            HEADERS: {
+              'x-api-key': instance.token,
+            },
+          });
 
-    return api.Calendar(
-      true,
-      new Date(now.getFullYear(), now.getMonth() - 1, 1),
-      new Date(now.getFullYear(), now.getMonth() + 2, 1),
-    );
+    return api.calendar.getApiV3Calendar({
+      unmonitored: true,
+      start: new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString(),
+      end: new Date(now.getFullYear(), now.getMonth() + 2, 1).toISOString(),
+    });
   });
 
   ctx.success({
@@ -330,7 +404,7 @@ const getCalendarData = async (ctx: Context) => {
 
 const getRadarrOptionsById = async (ctx: Context) => {
   try {
-    const instance = await GetRadarrInstanceFromDb(ctx.params.id);
+    const instance = await getInstance(ctx.params.id, DownloaderType.RADARR);
     if (!instance) {
       ctx.status = StatusCodes.NOT_FOUND;
       ctx.body = 'no instance could be found with that id';
@@ -339,11 +413,11 @@ const getRadarrOptionsById = async (ctx: Context) => {
 
     const [paths, profiles, languages, tags, minimumAvailability] =
       await Promise.all([
-        instance.GetRootPaths(),
-        instance.GetQualityProfiles(),
-        instance.GetLanguages(),
-        instance.GetTags(),
-        instance.GetMinimumAvailability(),
+        instance.rootFolder.getApiV3Rootfolder(),
+        instance.qualityProfile.getApiV3Qualityprofile(),
+        instance.language.getApiV3Language(),
+        instance.tag.getApiV3Tag(),
+        RadarrAvailabilities,
       ]);
 
     ctx.status = StatusCodes.OK;
@@ -366,7 +440,7 @@ const getRadarrOptionsById = async (ctx: Context) => {
 
 const getRadarrPathsById = async (ctx: Context) => {
   try {
-    const instance = await GetRadarrInstanceFromDb(ctx.params.id);
+    const instance = await getInstance(ctx.params.id, DownloaderType.RADARR);
     if (!instance) {
       ctx.status = StatusCodes.NOT_FOUND;
       ctx.body = 'no instance could be found with that id';
@@ -374,7 +448,7 @@ const getRadarrPathsById = async (ctx: Context) => {
     }
 
     ctx.status = StatusCodes.OK;
-    ctx.body = await instance.GetRootPaths();
+    ctx.body = await instance.rootFolder.getApiV3Rootfolder();
   } catch (error) {
     logger.error(error.stack);
 
@@ -385,14 +459,14 @@ const getRadarrPathsById = async (ctx: Context) => {
 
 const getRadarrProfilesById = async (ctx: Context) => {
   try {
-    const instance = await GetRadarrInstanceFromDb(ctx.params.id);
+    const instance = await getInstance(ctx.params.id, DownloaderType.RADARR);
     if (!instance) {
       ctx.status = StatusCodes.NOT_FOUND;
       ctx.body = 'no instance could be found with that id';
       return;
     }
 
-    const profiles = await instance.GetQualityProfiles();
+    const profiles = await instance.qualityProfile.getApiV3Qualityprofile();
 
     ctx.status = StatusCodes.OK;
     ctx.body = profiles;
@@ -404,14 +478,14 @@ const getRadarrProfilesById = async (ctx: Context) => {
 
 const getRadarrLanguagesById = async (ctx: Context) => {
   try {
-    const instance = await GetRadarrInstanceFromDb(ctx.params.id);
+    const instance = await getInstance(ctx.params.id, DownloaderType.RADARR);
     if (!instance) {
       ctx.status = StatusCodes.NOT_FOUND;
       ctx.body = 'no instance could be found with that id';
       return;
     }
 
-    const languages = await instance.GetLanguages();
+    const languages = await instance.language.getApiV3Language();
 
     ctx.status = StatusCodes.OK;
     ctx.body = languages;
@@ -423,14 +497,14 @@ const getRadarrLanguagesById = async (ctx: Context) => {
 
 const getRadarrTagsById = async (ctx: Context) => {
   try {
-    const instance = await GetRadarrInstanceFromDb(ctx.params.id);
+    const instance = await getInstance(ctx.params.id, DownloaderType.RADARR);
     if (!instance) {
       ctx.status = StatusCodes.NOT_FOUND;
       ctx.body = 'no instance could be found with that id';
       return;
     }
 
-    const tags = await instance.GetTags();
+    const tags = await instance.tag.getApiV3Tag();
 
     ctx.status = StatusCodes.OK;
     ctx.body = tags;
@@ -442,14 +516,14 @@ const getRadarrTagsById = async (ctx: Context) => {
 
 const testRadarrConnectionById = async (ctx: Context) => {
   try {
-    const instance = await GetRadarrInstanceFromDb(ctx.params.id);
+    const instance = await getInstance(ctx.params.id, DownloaderType.RADARR);
     if (!instance) {
       ctx.status = StatusCodes.NOT_FOUND;
       ctx.body = 'no instance could be found with that id';
       return;
     }
 
-    const test = await instance.TestConnection();
+    const test = await instance.system.getApiV3SystemStatus();
     const data = {
       connection: test,
     };
@@ -471,41 +545,34 @@ const getRadarrConfig = async (ctx: Context) => {
     withTags,
   } = ctx.request.query;
 
-  const instances = await GetAllDownloaders(DownloaderType.Radarr);
-  const results = await bluebird.map(instances, async (instance) => {
-    const url = new URL(instance.url);
-    const api = new RadarrAPI(url, instance.token, instance.version);
+  const downloaders = await getInstances(DownloaderType.RADARR);
 
-    const protocol = url.protocol.substring(0, url.protocol.length - 1);
-
-    let port: number;
-    if (!url.port) {
-      port = url.protocol === 'http' ? 80 : 443;
-    } else {
-      port = parseInt(url.port, 10);
-    }
-
+  const results = await bluebird.map(downloaders, async (downloader) => {
+    const { instance, client } = downloader;
     const [paths, profiles, languages, availabilities, tags] =
       await Promise.all([
-        withPaths ? api.GetRootPaths() : undefined,
-        withProfiles ? api.GetQualityProfiles() : undefined,
-        withLanguages ? api.GetLanguages() : undefined,
-        withAvailabilities ? api.GetMinimumAvailability() : undefined,
-        withTags ? api.GetTags() : undefined,
+        withPaths ? client.rootFolder.getApiV3Rootfolder() : undefined,
+        withProfiles
+          ? client.qualityProfile.getApiV3Qualityprofile()
+          : undefined,
+        withLanguages ? client.language.getApiV3Language() : undefined,
+        withAvailabilities ? SonarrAvailabilities : undefined,
+        withTags ? client.tag.getApiV3Tag() : undefined,
       ]);
 
+    const url = new URL(instance.url);
     return {
       id: instance.id,
       name: instance.name,
-      protocol,
+      protocol: url.protocol.replace(':', ''),
       host: url.hostname,
-      port,
-      subpath: url.pathname === '' ? '/' : url.pathname,
+      port: url.port,
+      subpath: url.pathname,
       token: instance.token,
-      profile: instance.profile,
-      path: instance.path,
-      language: instance.language,
-      availability: instance.availability,
+      profile: instance.metadata.profile,
+      path: instance.metadata.path,
+      language: instance.metadata.language,
+      availability: instance.metadata.availability,
       enabled: instance.enabled,
       paths,
       profiles,
@@ -531,65 +598,65 @@ const updateRadarrConfig = async (ctx: Context) => {
       `${instance.protocol}://${instance.host}:${instance.port}/${instance.subpath}`,
     );
 
-    const api = new RadarrAPI(url, instance.token);
-    await api.TestConnection();
+    const api = new RadarrV3Client({
+      BASE: url.toString(),
+      HEADERS: {
+        'x-api-key': instance.token,
+      },
+    });
+    const status = await api.system.getApiV3SystemStatus();
 
-    const newInstance = await CreateOrUpdateDownloader({
+    const entity = DownloaderEntity.create({
       name: instance.name,
-      type: DownloaderType.Radarr,
+      type: DownloaderType.RADARR,
       url: url.toString(),
       token: instance.token,
-      version: api.GetVersion().toString(),
-      path: instance.path,
-      profile: instance.profile,
-      language: instance.language,
-      availability: instance.availability,
       enabled: instance.enabled,
+      metadata: {
+        path: instance.path,
+        profile: instance.profile,
+        language: instance.language,
+        availability: instance.availability,
+        version: status.version,
+      },
     });
 
-    const [paths, profiles, languages, availabilities] = await Promise.all([
-      api.GetRootPaths(),
-      api.GetQualityProfiles(),
-      api.GetLanguages(),
-      api.GetMinimumAvailability(),
-    ]);
-
-    const result = {
-      id: newInstance.id,
-      name: instance.name,
-      protocol: instance.protocol,
-      host: instance.host,
-      port: instance.port,
-      subpath: instance.subpath === '' ? '/' : instance.subpath,
-      token: instance.token,
-      path: instance.path,
-      profile: instance.profile,
-      language: instance.language,
-      availability: instance.availability,
-      enabled: instance.enabled,
-      paths,
-      profiles,
-      languages,
-      availabilities,
-    };
+    const existingInstance = await getFromContainer(
+      DownloaderRepository,
+    ).findOne({
+      id: instance.id,
+    });
+    if (existingInstance.isNone()) {
+      await getFromContainer(DownloaderRepository).create(entity);
+    } else {
+      const currentInstance = existingInstance.unwrap();
+      await getFromContainer(DownloaderRepository).updateMany(
+        { id: currentInstance.id },
+        {
+          name: entity.name,
+          url: entity.url,
+          token: entity.token,
+          enabled: entity.enabled,
+          metadata: entity.metadata,
+        },
+      );
+    }
 
     ctx.status = StatusCodes.OK;
-    ctx.body = result;
+    ctx.body = getFromContainer(DownloaderMapper).toResponse(entity);
     return;
   } catch (error) {
     logger.debug(`ROUTE: Error saving radarr config`, error);
-
-    if (error instanceof ArrError) {
-      StatusBadRequest(ctx, error.message);
-    } else {
-      StatusInternalServerError(ctx, error.message);
-    }
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = {};
   }
 };
 
 const deleteRadarrById = async (ctx: Context) => {
   try {
-    const deleted = await DeleteDownloaderById(ctx.params.id);
+    const deleted = await getFromContainer(
+      DownloaderRepository,
+    ).deleteManyByIds(ctx.params.id);
     if (!deleted) {
       ctx.status = StatusCodes.NOT_FOUND;
       ctx.body = `failed to delete instance with the id: ${ctx.params.id}`;
@@ -615,7 +682,7 @@ export default (app: Router) => {
     '/sonarr/options/:id',
     validateRequest({
       params: z.object({
-        id: z.string().uuid(),
+        id: z.string(),
       }),
     }),
     adminRequired,
@@ -625,7 +692,7 @@ export default (app: Router) => {
     '/sonarr/paths/:id',
     validateRequest({
       params: z.object({
-        id: z.string().uuid(),
+        id: z.string(),
       }),
     }),
     adminRequired,
@@ -635,7 +702,7 @@ export default (app: Router) => {
     '/sonarr/profiles/:id',
     validateRequest({
       params: z.object({
-        id: z.string().uuid(),
+        id: z.string(),
       }),
     }),
     adminRequired,
@@ -645,7 +712,7 @@ export default (app: Router) => {
     '/sonarr/languages/:id',
     validateRequest({
       params: z.object({
-        id: z.string().uuid(),
+        id: z.string(),
       }),
     }),
     adminRequired,
@@ -655,7 +722,7 @@ export default (app: Router) => {
     '/sonarr/tags/:id',
     validateRequest({
       params: z.object({
-        id: z.string().uuid(),
+        id: z.string(),
       }),
     }),
     adminRequired,
@@ -665,7 +732,7 @@ export default (app: Router) => {
     '/sonarr/test/:id',
     validateRequest({
       params: z.object({
-        id: z.string().uuid(),
+        id: z.string(),
       }),
     }),
     adminRequired,
@@ -698,7 +765,7 @@ export default (app: Router) => {
     '/sonarr/:id',
     validateRequest({
       params: z.object({
-        id: z.string().uuid(),
+        id: z.string(),
       }),
     }),
     adminRequired,
@@ -708,7 +775,7 @@ export default (app: Router) => {
     '/radarr/options/:id',
     validateRequest({
       params: z.object({
-        id: z.string().uuid(),
+        id: z.string(),
       }),
     }),
     adminRequired,
@@ -718,7 +785,7 @@ export default (app: Router) => {
     '/radarr/paths/:id',
     validateRequest({
       params: z.object({
-        id: z.string().uuid(),
+        id: z.string(),
       }),
     }),
     adminRequired,
@@ -728,7 +795,7 @@ export default (app: Router) => {
     '/radarr/profiles/:id',
     validateRequest({
       params: z.object({
-        id: z.string().uuid(),
+        id: z.string(),
       }),
     }),
     adminRequired,
@@ -738,7 +805,7 @@ export default (app: Router) => {
     '/radarr/languages/:id',
     validateRequest({
       params: z.object({
-        id: z.string().uuid(),
+        id: z.string(),
       }),
     }),
     adminRequired,
@@ -748,7 +815,7 @@ export default (app: Router) => {
     '/radarr/tags/:id',
     validateRequest({
       params: z.object({
-        id: z.string().uuid(),
+        id: z.string(),
       }),
     }),
     adminRequired,
@@ -758,7 +825,7 @@ export default (app: Router) => {
     '/radarr/test/:id',
     validateRequest({
       params: z.object({
-        id: z.string().uuid(),
+        id: z.string(),
       }),
     }),
     adminRequired,
@@ -790,7 +857,7 @@ export default (app: Router) => {
     '/radarr/:id',
     validateRequest({
       params: z.object({
-        id: z.string().uuid(),
+        id: z.string(),
       }),
     }),
     adminRequired,

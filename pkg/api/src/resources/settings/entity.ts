@@ -17,6 +17,11 @@ export class SettingsEntity extends BaseEntity<SettingsProps> {
     const id = nanoid();
     const props: SettingsProps = {
       ...create,
+      popularContent: create.popularContent || false,
+      authType: create.authType || 1,
+      appKeys: create.appKeys || [],
+      initialCache: create.initialCache || false,
+      initialSetup: create.initialSetup || false,
     };
     return new SettingsEntity({ id, props });
   }

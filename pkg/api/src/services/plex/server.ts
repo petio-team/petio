@@ -1,33 +1,39 @@
-import { config } from '@/config/index';
-import Movie from '@/models/movie';
-import Show from '@/models/show';
+import { getFromContainer } from '@/infra/container/container';
+import { MovieRepository } from '@/resources/movie/repository';
+import { ShowRepository } from '@/resources/show/repository';
 
-export default async (type, imdb, tvdb, tmdb) => {
-  const clientId = config.get('plex.client');
+export default async (
+  type: string,
+  imdb?: { toString: () => any },
+  tvdb?: { toString: () => any },
+  tmdb?: { toString: () => any },
+) => {
+  const clientId = '';
   if (type === 'movie') {
     let foundItemsImdb: any = false;
     let foundItemsTvdb: any = false;
     let foundItemsTmdb: any = false;
     let found: any = false;
+    const movieRepo = getFromContainer(MovieRepository);
 
     if (imdb) {
-      foundItemsImdb = await Movie.find({
+      foundItemsImdb = await movieRepo.findAll({
         imdb_id: imdb.toString(),
-      }).exec();
+      });
       found = foundItemsImdb;
     }
 
     if (tvdb) {
-      foundItemsTvdb = await Movie.find({
+      foundItemsTvdb = await movieRepo.findAll({
         externalId: tvdb.toString(),
-      }).exec();
+      });
       found = foundItemsTvdb;
     }
 
     if (tmdb) {
-      foundItemsTmdb = await Movie.find({
+      foundItemsTmdb = await movieRepo.findAll({
         tmdb_id: tmdb.toString(),
-      }).exec();
+      });
       found = foundItemsTmdb;
     }
 
@@ -53,8 +59,7 @@ export default async (type, imdb, tvdb, tmdb) => {
         resolutions,
       };
     }
-      return { exists: false, resolutions: [] };
-
+    return { exists: false, resolutions: [] };
   }
 
   if (type === 'show' || type === 'tv') {
@@ -62,25 +67,26 @@ export default async (type, imdb, tvdb, tmdb) => {
     let foundItemsTvdb: any = false;
     let foundItemsTmdb: any = false;
     let found: any = false;
+    const showRepo = getFromContainer(ShowRepository);
 
     if (imdb) {
-      foundItemsImdb = await Show.find({
+      foundItemsImdb = await showRepo.findAll({
         imdb_id: imdb.toString(),
-      }).exec();
+      });
       found = foundItemsImdb;
     }
 
     if (tvdb) {
-      foundItemsTvdb = await Show.find({
+      foundItemsTvdb = await showRepo.findAll({
         tvdb_id: tvdb.toString(),
-      }).exec();
+      });
       found = foundItemsTvdb;
     }
 
     if (tmdb) {
-      foundItemsTmdb = await Show.find({
+      foundItemsTmdb = await showRepo.findAll({
         tmdb_id: tmdb.toString(),
-      }).exec();
+      });
       found = foundItemsTmdb;
     }
 
@@ -119,7 +125,6 @@ export default async (type, imdb, tvdb, tmdb) => {
         resolutions,
       };
     }
-      return { exists: false, resolutions: [] };
-
   }
+  return { exists: false, resolutions: [] };
 };

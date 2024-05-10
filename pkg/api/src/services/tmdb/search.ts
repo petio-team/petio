@@ -3,7 +3,6 @@ import Promise from 'bluebird';
 import http from 'http';
 import sanitize from 'sanitize-filename';
 
-import { config } from '@/config/index';
 import { TMDB_API_KEY } from '@/infra/config/env';
 import loggerMain from '@/infra/logger/logger';
 import onServer from '@/services/plex/server';
@@ -31,7 +30,7 @@ async function search(term) {
       const res: any = await onServer('movie', false, false, result.id);
       movies.results[i].on_server = res.exists;
     },
-    { concurrency: config.get('general.concurrency') },
+    { concurrency: 2 },
   );
 
   await Promise.map(
@@ -41,7 +40,7 @@ async function search(term) {
       const res: any = await onServer('show', false, false, result.id);
       shows.results[i].on_server = res.exists;
     },
-    { concurrency: config.get('general.concurrency') },
+    { concurrency: 2 },
   );
 
   return {

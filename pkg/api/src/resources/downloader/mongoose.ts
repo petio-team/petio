@@ -31,4 +31,18 @@ export class DownloaderMongooseRepository
     );
     super(model, mapper);
   }
+
+  /**
+   * Finds or creates a downloader entity.
+   *
+   * @param downloader - The downloader entity to find or create.
+   * @returns A promise that resolves to the downloader entity.
+   */
+  async findOrCreate(downloader: DownloaderEntity): Promise<DownloaderEntity> {
+    const found = await this.findOne({ url: downloader.url });
+    if (found.isNone()) {
+      return this.create(downloader);
+    }
+    return found.unwrap();
+  }
 }

@@ -1,9 +1,17 @@
+import { getFromContainer } from '@/infra/container/container';
 import loggerMain from '@/infra/logger/logger';
-import Archive from '@/models/archive';
-import { DownloaderType, GetAllDownloaders } from '@/models/downloaders';
-import Profile from '@/models/profile';
-import Request from '@/models/request';
-import { User, UserModel, UserRole } from '@/models/user';
+import { ArchiveEntity } from '@/resources/archive/entity';
+import { ArchiveRepository } from '@/resources/archive/repository';
+import { DownloaderRepository } from '@/resources/downloader/repository';
+import { DownloaderType } from '@/resources/downloader/types';
+import { ProfileEntity } from '@/resources/profile/entity';
+import { ProfileRepository } from '@/resources/profile/repository';
+import { RequestEntity } from '@/resources/request/entity';
+import { RequestRepository } from '@/resources/request/repository';
+import { RequestType } from '@/resources/request/types';
+import { UserEntity } from '@/resources/user/entity';
+import { UserRepository } from '@/resources/user/repository';
+import { UserRole } from '@/resources/user/types';
 import Radarr from '@/services/downloaders/radarr';
 import Sonarr from '@/services/downloaders/sonarr';
 import Mailer from '@/services/mail/mailer';
@@ -17,9 +25,9 @@ const logger = loggerMain.child({ module: 'requests.process' });
 export default class ProcessRequest {
   request: any;
 
-  user: User | undefined;
+  user?: UserEntity;
 
-  constructor(req = {}, usr?: User) {
+  constructor(req = {}, usr?: UserEntity) {
     this.request = req;
     this.user = usr;
   }
@@ -33,20 +41,23 @@ export default class ProcessRequest {
     const quotaPass = await this.checkQuota();
     if (quotaPass) {
       try {
-        const existing = await Request.findOne({
+        const existing = await getFromContainer(RequestRepository).findOne({
           requestId: this.request.id,
-        }).exec();
+        });
         if (existing) {
           out = await this.existing();
         } else {
           out = await this.create();
         }
         if (quotaPass !== 'admin') {
-          const updatedUser = await UserModel.findOneAndUpdate(
-            { id: this.user.id },
-            { $inc: { quotaCount: 1 } },
-            { new: true, useFindAndModify: false },
-          ).exec();
+          const updatedUser = await getFromContainer(UserRepository)
+            .model()
+            .findOneAndUpdate(
+              { id: this.user.id },
+              { $inc: { quotaCount: 1 } },
+              { new: true, useFindAndModify: false },
+            )
+            .exec();
           if (!updatedUser) {
             throw new Error('no user found');
           }
@@ -80,45 +91,55 @@ export default class ProcessRequest {
     if (!this.user) {
       throw new Error('user required');
     }
-    const profile = this.user.profileId
-      ? await Profile.findById(this.user.profileId).exec()
-      : false;
-    let autoApprove = profile ? profile.autoApprove : false;
-    let autoApproveTv = profile ? profile.autoApproveTv : false;
+    let autoApprove = false;
+    let autoApproveTv = false;
+    let profile: ProfileEntity | null = null;
+    if (this.user.profileId) {
+      const profileResult = await getFromContainer(ProfileRepository).findOne({
+        id: this.user.profileId,
+      });
+      if (profileResult.isSome()) {
+        profile = profileResult.unwrap();
+        autoApprove = profile.autoApprove ?? false;
+        autoApproveTv = profile.autoApproveTv ?? false;
+      }
+    }
     if (this.user.role === 'admin') {
       autoApprove = true;
       autoApproveTv = true;
     }
-    const requestDb = await Request.findOne({
+    const requestResult = await getFromContainer(RequestRepository).findOne({
       requestId: this.request.id,
-    }).exec();
-    if (!requestDb) {
-      return;
+    });
+    if (requestResult.isNone()) {
+      return undefined;
     }
+    const requestDb = requestResult.unwrap().getProps();
 
     if (!requestDb.users.includes(this.user.id)) {
       requestDb.users.push(this.user.id);
-      requestDb.markModified('users');
     }
     if (this.request.type === 'tv') {
       const existingSeasons = requestDb.seasons || {};
       // eslint-disable-next-line no-restricted-syntax
-      for (const [k, _v] of this.request.seasons) {
+      for (const [k] of this.request.seasons) {
         existingSeasons[k] = true;
       }
       requestDb.seasons = existingSeasons;
       this.request.seasons = existingSeasons;
-      requestDb.markModified('seasons');
     }
-    await requestDb.save();
     if (
       (this.request.type === 'movie' && autoApprove) ||
       (this.request.type === 'tv' && autoApproveTv)
     ) {
       requestDb.approved = true;
-      await requestDb.save();
-      this.sendToDvr(profile);
     }
+    await getFromContainer(RequestRepository).updateMany(
+      { requestId: this.request.id },
+      requestDb,
+    );
+    await this.sendToDvr(profile);
+
     return {
       message: 'request updated',
       user: this.user.title,
@@ -130,21 +151,21 @@ export default class ProcessRequest {
     if (!this.user) {
       throw new Error('user required');
     }
-
-    const profile = this.user.profileId
-      ? await Profile.findById(this.user.profileId).exec()
-      : false;
     let autoApprove = false;
-
-    if (profile) {
-      if (this.request.type === 'movie') {
-        autoApprove = profile.autoApprove ?? false;
-      } else {
-        autoApprove = profile.autoApproveTv ?? false;
+    let profile: ProfileEntity | null = null;
+    if (this.user.profileId) {
+      const profileResult = await getFromContainer(ProfileRepository).findOne({
+        id: this.user.profileId,
+      });
+      if (profileResult.isSome()) {
+        profile = profileResult.unwrap();
+        autoApprove =
+          this.request.type === 'movie'
+            ? profile.autoApprove
+            : profile.autoApproveTv;
       }
     }
-
-    if (this.user.role === UserRole.Admin) {
+    if (this.user.role === UserRole.ADMIN) {
       autoApprove = true;
     }
 
@@ -153,25 +174,33 @@ export default class ProcessRequest {
       this.request.tvdb_id = lookup.tvdb_id;
     }
 
-    const newRequest = new Request({
-      requestId: this.request.id,
-      type: this.request.type,
-      title: this.request.title,
-      thumb: this.request.thumb,
-      users: [this.user.id],
-      imdb_id: this.request.imdb_id,
-      tmdb_id: this.request.tmdb_id,
-      tvdb_id: this.request.tvdb_id,
-      approved: autoApprove,
-      timeStamp: new Date(),
+    const newRequest = new RequestEntity({
+      id: this.request.id,
+      props: {
+        type:
+          this.request.type === 'movie' ? RequestType.MOVIE : RequestType.TV,
+        status: 1,
+        title: this.request.title,
+        thumbnail: this.request.thumb,
+        users: [this.user.id],
+        imdbId: this.request.imdb_id,
+        tmdbId: this.request.tmdb_id,
+        tvdbId: this.request.tvdb_id,
+        seasons: this.request.type === 'tv' ? this.request.seasons : {},
+        pending: {},
+        sonarrs: [],
+        radarrs: [],
+        approved: autoApprove,
+        timestamp: new Date(),
+      },
     });
 
-    if (this.request.type === 'tv') {
-      newRequest.seasons = this.request.seasons;
-    }
-
     try {
-      await newRequest.save();
+      const { id, ...newRequestProps } = newRequest.getProps();
+      await getFromContainer(RequestRepository).updateMany(
+        { requestId: id },
+        newRequestProps,
+      );
       if (autoApprove) {
         this.sendToDvr(profile);
       } else {
@@ -203,7 +232,7 @@ export default class ProcessRequest {
         'REQ: Pending Request Matched on custom filter, setting default',
       );
       // eslint-disable-next-line no-restricted-syntax
-      for (const [k, _v] of filterMatch) {
+      for (const [k] of filterMatch) {
         const matchedFilter = filterMatch[k];
         pending[matchedFilter.server] = {
           path: matchedFilter.path,
@@ -212,7 +241,9 @@ export default class ProcessRequest {
         };
       }
     } else if (this.request.type === 'movie') {
-      const instances = await GetAllDownloaders(DownloaderType.Radarr);
+      const instances = await getFromContainer(DownloaderRepository).findAll({
+        type: DownloaderType.RADARR,
+      });
       // eslint-disable-next-line no-restricted-syntax
       for (const instance of instances) {
         if (!instance.id) {
@@ -220,14 +251,16 @@ export default class ProcessRequest {
         }
         if (profile.radarr && profile.radarr[instance.id]) {
           pending[instance.id] = {
-            path: instance.path,
-            profile: instance.profile,
+            path: instance.metadata.path,
+            profile: instance.metadata.profile,
             tag: false,
           };
         }
       }
     } else {
-      const instances = await GetAllDownloaders(DownloaderType.Sonarr);
+      const instances = await getFromContainer(DownloaderRepository).findAll({
+        type: DownloaderType.SONARR,
+      });
       // eslint-disable-next-line no-restricted-syntax
       for (const instance of instances) {
         if (!instance.id) {
@@ -235,18 +268,18 @@ export default class ProcessRequest {
         }
         if (profile.sonarr && profile.sonarr[instance.id]) {
           pending[instance.id] = {
-            path: instance.path,
-            profile: instance.profile,
+            path: instance.metadata.path,
+            profile: instance.metadata.profile,
             tag: false,
           };
         }
       }
     }
     if (Object.keys(pending).length > 0) {
-      await Request.updateOne(
+      await getFromContainer(RequestRepository).updateMany(
         { requestId: this.request.id },
         { $set: { pendingDefault: pending } },
-      ).exec();
+      );
 
       logger.debug('REQ: Pending Defaults set for later');
     } else {
@@ -255,7 +288,7 @@ export default class ProcessRequest {
   }
 
   async sendToDvr(profile) {
-    const instances = await GetAllDownloaders();
+    const instances = await getFromContainer(DownloaderRepository).findAll();
     let filterMatch: any = await filter(this.request);
     if (filterMatch) {
       if (!Array.isArray(filterMatch)) filterMatch = [filterMatch];
@@ -289,7 +322,7 @@ export default class ProcessRequest {
     if (profile) {
       if (profile.radarr && this.request.type === 'movie') {
         // eslint-disable-next-line no-restricted-syntax
-        for (const [k, _v] of profile.radarr) {
+        for (const [k] of profile.radarr) {
           const active = profile.radarr[k];
           if (active) {
             const instance = instances.find((i) => i.id === k);
@@ -302,7 +335,7 @@ export default class ProcessRequest {
       }
       if (profile.sonarr && this.request.type === 'tv') {
         // eslint-disable-next-line no-restricted-syntax
-        for (const [k, _v] of profile.sonarr) {
+        for (const [k] of profile.sonarr) {
           const active = profile.sonarr[k];
           if (active) {
             const instance = instances.find((i) => i.id === k);
@@ -318,7 +351,7 @@ export default class ProcessRequest {
       logger.debug('REQ: No profile for DVR');
       if (this.request.type === 'tv') {
         const sonarrs = instances.filter(
-          (i) => i.type === DownloaderType.Sonarr,
+          (i) => i.type === DownloaderType.SONARR,
         );
         // eslint-disable-next-line no-restricted-syntax
         for (const instance of sonarrs) {
@@ -327,7 +360,7 @@ export default class ProcessRequest {
       }
       if (this.request.type === 'movie') {
         const radarrs = instances.filter(
-          (i) => i.type === DownloaderType.Radarr,
+          (i) => i.type === DownloaderType.RADARR,
         );
         // eslint-disable-next-line no-restricted-syntax
         for (const instance of radarrs) {
@@ -339,7 +372,7 @@ export default class ProcessRequest {
 
   async removeFromDVR() {
     if (this.request) {
-      const instances = await GetAllDownloaders();
+      const instances = await getFromContainer(DownloaderRepository).findAll();
       if (this.request.radarrId.length > 0 && this.request.type === 'movie') {
         for (let i = 0; i < Object.keys(this.request.radarrId).length; i += 1) {
           const radarrIds = this.request.radarrId[i];
@@ -353,7 +386,9 @@ export default class ProcessRequest {
 
           const server = new Radarr(instance);
           try {
-            await server.getClient().DeleteMovie(rId);
+            await server.getClient().movie.deleteApiV3MovieById({
+              id: rId,
+            });
             logger.info(
               `REQ: ${this.request.title} removed from Radarr server - ${serverUuid}`,
             );
@@ -368,7 +403,7 @@ export default class ProcessRequest {
           const sId = sonarrIds[Object.keys(sonarrIds)[0]];
           const serverUuid = Object.keys(sonarrIds)[0];
 
-          const instance = instances.find((i) => i.id === serverUuid);
+          const instance = instances.find((s) => s.id === serverUuid);
           if (!instance) {
             continue;
           }
@@ -393,9 +428,9 @@ export default class ProcessRequest {
 
     const userData = this.user;
     const requestData = this.request;
-    const type = requestData.type === 'tv' ? 'TV Show' : 'Movie';
+    const requestType = requestData.type === 'tv' ? 'TV Show' : 'Movie';
     const title: any = 'New Request';
-    const subtitle: any = `A new request has been added for the ${type} "${requestData.title}"`;
+    const subtitle: any = `A new request has been added for the ${requestType} "${requestData.title}"`;
     const image: any = `https://image.tmdb.org/t/p/w500${requestData.thumb}`;
     [new Discord(), new Telegram()].forEach((notification) =>
       notification.send(title, subtitle, userData.title as any, image),
@@ -411,10 +446,10 @@ export default class ProcessRequest {
     const requestData: any = this.request;
     const email: never = userData.email as never;
     const title: never = userData.title as never;
-    const type = requestData.type === 'tv' ? 'TV Show' : 'Movie';
+    const requestType = requestData.type === 'tv' ? 'TV Show' : 'Movie';
     new Mailer().mail(
-      `You've just requested a ${type}: ${requestData.title}`,
-      `${type}: ${requestData.title}`,
+      `You've just requested a ${requestType}: ${requestData.title}`,
+      `${requestType}: ${requestData.title}`,
       `Your request has been received and you'll receive an email once it has been added to Plex!`,
       `https://image.tmdb.org/t/p/w500${requestData.thumb}`,
       [email],
@@ -427,20 +462,27 @@ export default class ProcessRequest {
       throw new Error('user required');
     }
 
-    const user = await UserModel.findById(this.user.id);
-    if (!user) throw new Error('user required');
-
-    if (user.role === UserRole.Admin) return 'admin';
-
-    const userQuota = user.quotaCount ? user.quotaCount : 0;
-    const profile = user.profileId
-      ? await Profile.findById(user.profileId).exec()
-      : false;
-    const quotaCap = profile ? profile.quota : 0;
-    if (!quotaCap) {
-      return false;
+    const userResult = await getFromContainer(UserRepository).findOne({
+      id: this.user.id,
+    });
+    if (userResult.isNone()) {
+      throw new Error('user required');
     }
+    const user = userResult.unwrap();
+    if (user.role === UserRole.ADMIN) {
+      return 'admin';
+    }
+    const userQuota = user.quotaCount || 0;
+    let quotaCap = 0;
 
+    if (user.profileId) {
+      const profileResult = await getFromContainer(ProfileRepository).findOne({
+        id: user.profileId,
+      });
+      if (profileResult.isSome()) {
+        quotaCap = profileResult.unwrap().quota;
+      }
+    }
     if (quotaCap > 0 && userQuota >= quotaCap) {
       return false;
     }
@@ -448,38 +490,39 @@ export default class ProcessRequest {
     return true;
   }
 
-  async archive(complete: boolean, removed: boolean, reason = false) {
+  async archive(complete: boolean, removed: boolean, reason = '') {
     const oldReq = this.request;
-    const archiveRequest = new Archive({
-      requestId: this.request.requestId,
-      type: this.request.type,
-      title: this.request.title,
-      thumb: this.request.thumb,
-      imdb_id: this.request.imdb_id,
-      tmdb_id: this.request.tmdb_id,
-      tvdb_id: this.request.tvdb_id,
-      users: this.request.users,
-      sonarrId: this.request.sonarrId,
-      radarrId: this.request.radarrId,
-      approved: this.request.approved,
-      removed: !!removed,
-      removed_reason: reason,
-      complete: !!complete,
-      timeStamp: this.request.timeStamp ? this.request.timeStamp : new Date(),
-    });
-    await archiveRequest.save();
-    await Request.findOneAndRemove(
-      {
-        requestId: this.request.requestId,
+    const archiveRequest = new ArchiveEntity({
+      id: this.request.requestId,
+      props: {
+        type: this.request.type,
+        title: this.request.title,
+        thumb: this.request.thumb,
+        imdb_id: this.request.imdb_id,
+        tmdb_id: this.request.tmdb_id,
+        tvdb_id: this.request.tvdb_id,
+        users: this.request.users,
+        sonarrId: this.request.sonarrId,
+        radarrId: this.request.radarrId,
+        approved: this.request.approved,
+        removed: !!removed,
+        removed_reason: reason,
+        complete: !!complete,
+        timeStamp: this.request.timeStamp ? this.request.timeStamp : new Date(),
       },
-      { useFindAndModify: false },
-    )
-      .exec()
-      .then(() => {
-        logger.debug(`REQ: Request ${oldReq.title} Archived!`);
-      })
-      .catch((err) => {
-        logger.error(`REQ: Archive Error`, err);
+    });
+    try {
+      const { id, ...archiveRequestProps } = archiveRequest.getProps();
+      await getFromContainer(ArchiveRepository).updateMany(
+        { requestId: id },
+        archiveRequestProps,
+      );
+      await getFromContainer(RequestRepository).deleteMany({
+        requestId: this.request.requestId,
       });
+      logger.debug(`REQ: Request ${oldReq.title} Archived!`);
+    } catch (err) {
+      logger.error(`REQ: Archive Error`, err);
+    }
   }
 }

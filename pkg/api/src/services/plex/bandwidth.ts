@@ -1,11 +1,12 @@
 import axios from 'axios';
 
 import loggerMain from '@/infra/logger/logger';
-import MakePlexURL from '@/services/plex/util';
+import { MediaServerEntity } from '@/resources/media-server/entity';
 
 const logger = loggerMain.child({ module: 'plex.bandwidth' });
 
-function timeDifference(previous) {
+function timeDifference(prev) {
+  let previous = prev;
   const now = new Date();
   const current = Math.round(now.getTime() / 1000);
   previous = new Date(previous);
@@ -26,13 +27,11 @@ function timeDifference(previous) {
   return current;
 }
 
-export default async () => {
-  const url = MakePlexURL('/statistics/bandwidth', {
-    timespan: 6,
-  }).toString();
-
+export default async (server: MediaServerEntity) => {
   try {
-    const res = await axios.get(url);
+    const res = await axios.get(
+      `${server.url}/statistics/bandwidth?timespan=6&X-Plex-Token=${server.token}`,
+    );
     const data: any = {};
     const bWidth: any = [];
     res.data.MediaContainer.StatisticsBandwidth.forEach((el) => {
@@ -55,10 +54,13 @@ export default async () => {
       .forEach((key) => {
         bWidth.push(data[key]);
       });
-    if (bWidth.length > 30) bWidth.length = 30;
+    if (bWidth.length > 30) {
+      bWidth.length = 30;
+    }
     bWidth.reverse();
     return bWidth;
   } catch (err) {
     logger.error(`failed to get plex bandwith statistics`, err);
+    return {};
   }
 };

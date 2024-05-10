@@ -1,14 +1,15 @@
+import { getFromContainer } from '@/infra/container/container';
 import logger from '@/infra/logger/logger';
-import Movie from '@/models/movie';
-import Show from '@/models/show';
-import { UserModel } from '@/models/user';
+import { MovieRepository } from '@/resources/movie/repository';
+import { ShowRepository } from '@/resources/show/repository';
+import { UserRepository } from '@/resources/user/repository';
 
 export default async () => {
   try {
     const [movie, show, user] = await Promise.all([
-      Movie.findOne(),
-      Show.findOne(),
-      UserModel.findOne(),
+      getFromContainer(MovieRepository).findOne({}),
+      getFromContainer(ShowRepository).findOne({}),
+      getFromContainer(UserRepository).findOne({}),
     ]);
     if (movie && show && user) {
       return {

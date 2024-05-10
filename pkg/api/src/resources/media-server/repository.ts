@@ -8,4 +8,6 @@ import { MediaServerSchemaProps } from "./schema";
  * This class extends the `MongooseBaseRepository` class and provides specific functionality for the `MediaServerEntity` and `MediaServerSchema`.
  */
 @Service()
-export abstract class MediaServerRepository extends MongooseRepository<MediaServerEntity, MediaServerSchemaProps> {}
+export abstract class MediaServerRepository extends MongooseRepository<MediaServerEntity, MediaServerSchemaProps> {
+  abstract findOneOrCreate(entity: MediaServerEntity): Promise<MediaServerEntity>;
+}

@@ -1,70 +1,67 @@
-/* eslint-disable import/order */
-
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { isErrorFromPath } from '@zodios/core';
+import Bluebird from 'bluebird';
 
-import { config } from '@/config';
+import { getFromContainer } from '@/infra/container/container';
 import loggerMain from '@/infra/logger/logger';
-import { PlexAPIClient, PlexApiEndpoints } from '@/infra/plex/plex';
+import { GetSessionHistoryResponse, PlexClient } from '@/infra/plex';
+import { CacheService } from '@/services/cache/cache';
 import plexLookup from '@/services/plex/lookup';
 import { movieLookup } from '@/services/tmdb/movie';
 import { showLookup } from '@/services/tmdb/show';
-
-import cache from '../cache/cache';
+import is from '@/utils/is';
 
 const logger = loggerMain.child({ module: 'plex.history' });
 
-export default async (id, type) => {
+export default async (client: PlexClient, id, type) => {
   let data: any = false;
   try {
-    data = await cache.wrap(`hist__${id}__${type}`, async () => {
-      const history = await getHistory(id);
-      return parseHistory(history, type);
-    });
+    data = await getFromContainer(CacheService).wrap(
+      `hist__${id}__${type}`,
+      async () => {
+        const history = await getHistory(client, id);
+        if (history) {
+          return parseHistory(history, type);
+        }
+        return {};
+      },
+    );
   } catch (err) {
-    logger.error(`Error getting history data - ${id}`, err);
+    logger.error(err, `Error getting history data - ${id}`);
     return [];
   }
   return data;
 };
 
-async function getHistory(id: string, library?: number) {
-  const baseurl = `${config.get('plex.protocol')}://${config.get(
-    'plex.host',
-  )}:${config.get('plex.port')}`;
-  const client = PlexAPIClient(baseurl, config.get('plex.token'));
+async function getHistory(client: PlexClient, id: string, library?: number) {
   try {
-    // const d = new Date();
-    // d.setDate(0);
-    // d.setMonth(d.getMonth() - 6);
-    // const time = d.getTime();
-    // console.log(`history time: ${d.toISOString()}`);
+    const d = new Date();
+    const m = d.getMonth();
+    d.setDate(0);
+    d.setMonth(d.getMonth() - 1);
+    if (d.getMonth() === m) {
+      d.setDate(0);
+    }
+    d.setHours(0, 0, 0, 0);
+    const time = d.getTime();
 
-    const content = await client.get('/status/sessions/history/all', {
-      queries: {
-        accountID: id,
-        sort: 'viewedAt:desc',
-        // 'viewedAt>': time,
-        librarySectionID: library,
-      },
+    const content = await client.sessions.getSessionHistory({
+      accountId: id,
+      sort: 'viewedAt:desc',
+      'viewedAt>': time,
+      librarySectionID: library,
     });
     return content;
   } catch (err) {
-    if (
-      !isErrorFromPath(
-        PlexApiEndpoints,
-        'get',
-        '/status/sessions/history/all',
-        err,
-      )
-    ) {
-      logger.error(`Failed to get history from Plex`, err);
-    }
+    logger.error(err, 'Error getting history data');
     return null;
   }
 }
 
-async function parseHistory(data, type) {
+async function parseHistory(data: GetSessionHistoryResponse, historyType) {
+  if (!is.truthy(data.MediaContainer)) {
+    return {};
+  }
+  let type = historyType;
   if (type === 'show') {
     type = 'episode';
   }
@@ -74,46 +71,45 @@ async function parseHistory(data, type) {
   }
   const histArr: any = [];
   const items: any = [];
-  for (let i = 0; i < history.length; i++) {
-    const item = history[i];
+  await Bluebird.map(history, async (item) => {
     if (type === item.type || type === 'all') {
-      const media_type = item.type;
-      let media_id = item.ratingKey;
+      const mediaType = item.type;
+      let mediaId = item.ratingKey;
 
-      if (media_type === 'episode' && item.grandparentKey) {
-        media_id = item.grandparentKey.replace('/library/metadata/', '');
-      } else if (media_type === 'episode' && item.parentKey) {
-        media_id = item.parentKey.replace('/library/metadata/', '');
+      if (mediaType === 'episode' && item.grandparentKey) {
+        mediaId = item.grandparentKey.replace('/library/metadata/', '');
+      } else if (mediaType === 'episode' && item.parentKey) {
+        mediaId = item.parentKey.replace('/library/metadata/', '');
       }
 
-      const key = media_id;
+      const key = mediaId;
 
       if (!histArr.includes(key)) {
-        if (media_type === 'episode') {
-          const plexData: any = await plexLookup(media_id, 'show');
-          media_id = plexData.tmdb_id;
+        if (mediaType === 'episode') {
+          const plexData: any = await plexLookup(mediaId, 'show');
+          mediaId = plexData.tmdb_id;
         } else {
-          const plexData: any = await plexLookup(media_id, 'movie');
-          media_id = plexData.tmdb_id;
+          const plexData: any = await plexLookup(mediaId, 'movie');
+          mediaId = plexData.tmdb_id;
         }
 
         histArr.push(key);
 
-        if (media_type === type || type === 'all')
+        if (mediaType === type || type === 'all')
           items.push({
-            media_id,
-            media_type,
+            mediaId,
+            mediaType,
           });
       }
     }
-  }
+  });
 
   const output = await Promise.all(
     items.map(async (item) => {
       const lookup =
-        item.media_type === 'movie'
-          ? movieLookup(item.media_id, false)
-          : showLookup(item.media_id, false);
+        item.mediaType === 'movie'
+          ? movieLookup(item.mediaId, false)
+          : showLookup(item.mediaId, false);
       return lookup;
     }),
   );

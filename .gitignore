@@ -4,6 +4,7 @@ data/
 db/
 logs/
 dist/
+tmp/
 .eslintcache
 *.log
 .DS_Store

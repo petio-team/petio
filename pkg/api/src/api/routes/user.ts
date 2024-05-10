@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import multer from '@koa/multer';
 import Router from '@koa/router';
 import axios from 'axios';
@@ -8,9 +9,13 @@ import send from 'koa-send';
 import path from 'path';
 
 import { DATA_DIR } from '@/infra/config/env';
+import { getFromContainer } from '@/infra/container/container';
 import logger from '@/infra/logger/logger';
-import Profile from '@/models/profile';
-import { UserModel, UserRole } from '@/models/user';
+import { ProfileRepository } from '@/resources/profile/repository';
+import { UserEntity } from '@/resources/user/entity';
+import { UserMapper } from '@/resources/user/mapper';
+import { UserRepository } from '@/resources/user/repository';
+import { UserRole } from '@/resources/user/types';
 
 import { adminRequired } from '../middleware/auth';
 
@@ -33,68 +38,53 @@ const upload = multer({
 });
 
 const getAllUsers = async (ctx: Context) => {
-  let userData: any;
   try {
-    userData = await UserModel.find().exec();
+    const userResult = await getFromContainer(UserRepository).findAll();
+    if (!userResult.length) {
+      ctx.status = StatusCodes.NOT_FOUND;
+      ctx.body = {};
+      return;
+    }
+    ctx.status = StatusCodes.OK;
+    ctx.body = userResult.map((u) =>
+      getFromContainer(UserMapper).toResponse(u),
+    );
   } catch (err) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = { error: err };
-    return;
-  }
-
-  if (userData) {
-    const data = Object.values(Object.assign(userData));
-    Object.keys(data).forEach((u) => {
-      const user = data[u];
-      if (user) {
-        if (user.password) user.password = 'removed';
-      }
-    });
-
-    ctx.status = StatusCodes.OK;
-    ctx.body = data;
-  } else {
-    ctx.status = StatusCodes.NOT_FOUND;
-    ctx.body = {};
   }
 };
 
 const getUserById = async (ctx: Context) => {
-  let userData: any;
   try {
-    userData = await UserModel.findOne({ id: ctx.params.id }).exec();
+    const userResult = await getFromContainer(UserRepository).findOne({
+      id: ctx.params.id,
+    });
+    if (userResult.isNone()) {
+      ctx.status = StatusCodes.NOT_FOUND;
+      ctx.body = {};
+      return;
+    }
+    const userData = userResult.unwrap();
+    ctx.status = StatusCodes.OK;
+    ctx.body = getFromContainer(UserMapper).toResponse(userData);
   } catch (err) {
     ctx.status = StatusCodes.NOT_FOUND;
     ctx.body = { error: err };
-    return;
-  }
-  if (userData) {
-    if (userData.password) userData.password = 'removed';
-    ctx.status = StatusCodes.OK;
-    ctx.body = userData;
-  } else {
-    ctx.status = StatusCodes.NOT_FOUND;
-    ctx.body = {};
   }
 };
 
 const createCustomUser = async (ctx: Context) => {
   const { body } = ctx.request;
-
   const { user } = body;
-  if (!user) {
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = {
-      error: 'No user details',
-    };
-  }
-  const dbUser = await UserModel.findOne({
+
+  const dbUser = await getFromContainer(UserRepository).findOne({
     $or: [
       { username: user.username },
       { email: user.email },
       { title: user.username },
     ],
-  }).exec();
+  });
   if (dbUser) {
     ctx.status = StatusCodes.OK;
     ctx.body = {
@@ -102,20 +92,17 @@ const createCustomUser = async (ctx: Context) => {
     };
   } else {
     try {
-      const newUser = new UserModel({
-        id: user.id,
+      const newUser = UserEntity.create({
         title: user.username,
         username: user.username,
         password: bcrypt.hashSync(user.password, 12),
         email: user.email,
-        recommendationsPlaylistId: false,
         thumbnail: '',
         altId: user.linked,
-        isOwner: false,
       });
-      await newUser.save();
+      const data = await getFromContainer(UserRepository).create(newUser);
       ctx.status = StatusCodes.OK;
-      ctx.body = newUser;
+      ctx.body = getFromContainer(UserMapper).toResponse(data);
     } catch (err) {
       logger.error(err, 'ROUTE: Unable to create custom user');
       ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
@@ -138,38 +125,50 @@ const editUser = async (ctx: Context) => {
   }
 
   try {
-    const u = await UserModel.findOne({ _id: user.id }).exec();
-    if (!u) {
+    const userResult = await getFromContainer(UserRepository).findOne({
+      id: user.id,
+    });
+    if (userResult.isNone()) {
       throw new Error(`failed to find user with id: ${user.id}`);
     }
+    const u = userResult.unwrap();
+    const props = getFromContainer(UserMapper).toPeristence(u);
 
-    if (user.clearPassword && u.role !== UserRole.Admin) {
-      u.password = undefined;
+    if (user.clearPassword && u.role !== UserRole.ADMIN) {
+      props.password = undefined;
     }
 
     if (user.password) {
-      u.password = bcrypt.hashSync(user.password, 10);
+      props.password = bcrypt.hashSync(user.password, 12);
     }
 
     if (user.profile) {
-      u.profileId = user.profile;
+      props.profileId = user.profile;
     } else {
-      u.profileId = undefined;
+      props.profileId = undefined;
     }
 
     if (user.email) {
-      u.email = user.email;
+      props.email = user.email;
     }
 
     if (user.role) {
-      u.role = user.role;
+      props.role = user.role;
     }
 
     if (user.disabled) {
-      u.disabled = user.disabled;
+      props.disabled = user.disabled;
     }
 
-    const results = await u.save();
+    const { id, ...rest } = user;
+    const results = await getFromContainer(UserRepository).updateMany(
+      {
+        id: user.id,
+      },
+      {
+        $set: rest,
+      },
+    );
     if (!results) {
       throw new Error(`failed to save user with id: ${user.id}`);
     }
@@ -204,20 +203,30 @@ const editMultipleUsers = async (ctx: Context) => {
   try {
     await Promise.all(
       users.map(async (user: string) => {
-        const u = await UserModel.findOne({ _id: user }).exec();
-        if (!u) {
+        const userResult = await getFromContainer(UserRepository).findOne({
+          id: user,
+        });
+        if (userResult.isNone()) {
           throw new Error(`failed to find user with id: ${user}`);
         }
+        const u = userResult.unwrap();
+        const props = getFromContainer(UserMapper).toPeristence(u);
 
         if (profile) {
-          u.profileId = profile;
+          props.profileId = profile;
         } else {
-          u.profileId = undefined;
+          props.profileId = undefined;
         }
 
-        u.disabled = !enabled;
+        props.disabled = !enabled;
 
-        const results = u.save();
+        const { _id, ...rest } = props;
+        const results = getFromContainer(UserRepository).updateMany(
+          { _id },
+          {
+            $set: rest,
+          },
+        );
         if (!results) {
           throw new Error(`failed to save user with id: ${user}`);
         }
@@ -259,7 +268,7 @@ const deleteUser = async (ctx: Context) => {
 
   try {
     // eslint-disable-next-line no-underscore-dangle
-    await UserModel.findByIdAndDelete(user._id);
+    await getFromContainer(UserRepository).deleteManyByIds([user._id]);
     ctx.status = StatusCodes.OK;
     ctx.body = {
       message: 'User deleted',
@@ -281,16 +290,14 @@ const updateUserThumbnail = async (ctx: Context) => {
     return;
   }
   try {
-    await UserModel.findOneAndUpdate(
+    await getFromContainer(UserRepository).updateMany(
       { id: ctx.params.id },
       {
         $set: {
           custom_thumb: ctx.file.path,
         },
       },
-      { useFindAndModify: false },
-    ).exec();
-
+    );
     ctx.status = StatusCodes.OK;
     ctx.body = {};
   } catch (err) {
@@ -303,34 +310,32 @@ const updateUserThumbnail = async (ctx: Context) => {
 };
 
 const getThumbnailById = async (ctx: Context) => {
-  let userData: any = false;
   try {
-    userData = await UserModel.findOne({ _id: ctx.params.id }).exec();
-  } catch (err) {
-    ctx.status = StatusCodes.BAD_REQUEST;
-    ctx.body = { error: err };
-    return;
-  }
-
-  if (!userData) {
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = 'user data missing';
-    return;
-  }
-
-  if (userData.custom_thumb) {
-    send(ctx, `${UPLOAD_DIR}/${userData.custom_thumb}`);
-    return;
-  }
-  const url = userData.thumbnail;
-
-  try {
-    const resp = await axios.get(url, {
-      responseType: 'stream',
+    const userResult = await getFromContainer(UserRepository).findOne({
+      id: ctx.params.id,
     });
-    ctx.response.set('Content-Type', 'image/png');
-    ctx.status = StatusCodes.OK;
-    ctx.body = resp.data;
+    if (userResult.isNone()) {
+      ctx.status = StatusCodes.BAD_REQUEST;
+      ctx.body = {};
+      return;
+    }
+    const userData = userResult.unwrap();
+
+    if (userData.customThumbnail) {
+      send(ctx, `${UPLOAD_DIR}/${userData.customThumbnail}`);
+      return;
+    }
+    const url = userData.thumbnail;
+    if (url) {
+      const resp = await axios.get(url, {
+        responseType: 'stream',
+      });
+      ctx.response.set('Content-Type', 'image/png');
+      ctx.status = StatusCodes.OK;
+      ctx.body = resp.data;
+    }
+    ctx.status = StatusCodes.NOT_FOUND;
+    ctx.body = {};
   } catch (e) {
     logger.log(
       'warn',
@@ -343,24 +348,31 @@ const getThumbnailById = async (ctx: Context) => {
 };
 
 const getQuota = async (ctx: Context) => {
-  const user = await UserModel.findOne({ _id: ctx.state.user.id }).exec();
-  if (!user) {
-    ctx.status = StatusCodes.NOT_FOUND;
-    ctx.body = {};
+  const userResult = await getFromContainer(UserRepository).findOneById(
+    ctx.state.user.id,
+  );
+  if (userResult.isNone()) {
+    ctx.status = StatusCodes.OK;
+    ctx.body = {
+      current: 0,
+      total: 0,
+    };
     return;
   }
-  const profile = user.profileId
-    ? await Profile.findById(user.profileId).exec()
-    : false;
+  const user = userResult.unwrap();
   let total = 0;
-  const current = user.quotaCount ? user.quotaCount : 0;
-  if (profile) {
-    total = profile.quota ? profile.quota : 0;
+  if (user.profileId) {
+    const profileResult = await getFromContainer(ProfileRepository).findOne({
+      id: user.profileId,
+    });
+    if (profileResult.isSome()) {
+      const profile = profileResult.unwrap();
+      total = profile.quota;
+    }
   }
-
   ctx.status = StatusCodes.OK;
   ctx.body = {
-    current,
+    current: user.quotaCount,
     total,
   };
 };

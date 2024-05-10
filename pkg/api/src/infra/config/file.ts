@@ -1,4 +1,4 @@
-import fs from 'fs/promises';
+import fs, { mkdir } from 'fs/promises';
 import path from 'path';
 import { z } from 'zod';
 
@@ -8,15 +8,20 @@ import is from '@/utils/is';
 
 const MainConfigSchema = z.object({
   DB_URL: z.string().url().min(1),
-  discord_webhook: z.string().min(1),
-  telegram_bot_token: z.string().min(1),
-  telegram_bot_id: z.string().min(1),
-  telegram_send_silent: z.string().min(1),
-  plexPopular: z.boolean(),
-  base_path: z.string().min(1),
+  discord_webhook: z
+    .string()
+    .regex(
+      /^.*(discord|discordapp).com\/api\/webhooks\/([\d]+)\/([a-zA-Z0-9_.-]*)$/,
+    )
+    .optional(),
+  telegram_bot_token: z.string().min(1).optional(),
+  telegram_bot_id: z.string().min(1).optional(),
+  telegram_send_silent: z.string().min(1).optional(),
+  plexPopular: z.boolean().default(false),
+  base_path: z.string().default('/'),
   plexProtocol: z.string().min(1),
   plexIp: z.string().min(1),
-  plexPort: z.number(),
+  plexPort: z.coerce.number(),
   plexToken: z.string().min(1),
   plexClientID: z.string().min(1),
   adminUsername: z.string().min(1),
@@ -29,13 +34,13 @@ const MainConfigSchema = z.object({
 export type MainConfig = z.infer<typeof MainConfigSchema>;
 
 const EmailConfigSchema = z.object({
-  emailEnabled: z.boolean(),
-  emailUser: z.string().min(1),
-  emailPass: z.string().min(1),
-  emailServer: z.string().min(1),
-  emailPort: z.number(),
-  emailSecure: z.boolean(),
-  emailFrom: z.string().min(1),
+  emailEnabled: z.boolean().default(false),
+  emailUser: z.string(),
+  emailPass: z.string(),
+  emailServer: z.string(),
+  emailPort: z.coerce.number().default(53),
+  emailSecure: z.boolean().default(false),
+  emailFrom: z.string().default('From Petio'),
 });
 export type EmailConfig = z.infer<typeof EmailConfigSchema>;
 
@@ -44,29 +49,28 @@ const ArrConfigSchema = z.object({
   title: z.string().min(1),
   protocol: z.string().min(1),
   hostname: z.string().min(1),
-  port: z.number(),
+  port: z.coerce.number().positive(),
   apiKey: z.string().min(1),
   urlBase: z.string().min(1),
-  path: z.number(),
-  path_title: z.string().min(1),
-  profile: z.number(),
-  profile_title: z.string().min(1),
-  enabled: z.boolean(),
+  path: z.coerce.number().optional(),
+  path_title: z.string().min(1).optional(),
+  profile: z.coerce.number().optional(),
+  profile_title: z.string().min(1).optional(),
+  active: z.boolean().default(false),
 });
 export type ArrConfig = z.infer<typeof ArrConfigSchema>;
 
 const FinalOutputSchema = z.object({
   main: MainConfigSchema.optional(),
   email: EmailConfigSchema.optional(),
-  sonarrs: ArrConfigSchema.array().optional(),
-  radarrs: ArrConfigSchema.array().optional(),
+  sonarr: ArrConfigSchema.array().optional(),
+  radarr: ArrConfigSchema.array().optional(),
 });
 export type FinalOutput = z.infer<typeof FinalOutputSchema>;
 
 export type Configs = {
   file: string;
   schema: z.ZodSchema;
-  field?: string;
 };
 
 const configFiles: Configs[] = [
@@ -79,11 +83,11 @@ const configFiles: Configs[] = [
     schema: EmailConfigSchema,
   },
   {
-    file: 'sonarrs',
+    file: 'sonarr',
     schema: ArrConfigSchema.array(),
   },
   {
-    file: 'radarrs',
+    file: 'radarr',
     schema: ArrConfigSchema.array(),
   },
 ];
@@ -92,7 +96,7 @@ export const hasFiles = async () => {
   const files = await Promise.all(
     configFiles.map(async (file) => {
       try {
-        const filePath = path.join(DATA_DIR, `${file}.json`);
+        const filePath = path.join(DATA_DIR, `${file.file}.json`);
         const stat = await fs.stat(filePath);
         if (stat.isFile()) {
           return file;
@@ -109,14 +113,22 @@ export const hasFiles = async () => {
 export const parseFiles = async (configs: Configs[]) => {
   const files = await Promise.all(
     configs.map(async (file) => {
-      const filePath = path.join(DATA_DIR, `${file}.json`);
-      const content = await fs.readFile(filePath);
-      const parsed = await file.schema.safeParseAsync(content);
-      if (!parsed.success) {
-        logger.error(`failed to parse config '${file}.json'`);
+      try {
+        const filePath = path.join(DATA_DIR, `${file.file}.json`);
+        const content = await fs.readFile(filePath);
+        const toJSON = JSON.parse(content.toString());
+        const parsed = await file.schema.safeParseAsync(toJSON);
+        if (!parsed.success) {
+          logger.error(
+            `failed to parse config '${file.file}.json'`,
+            parsed.error,
+          );
+          return undefined;
+        }
+        return { [file.file]: parsed.data };
+      } catch (error) {
         return undefined;
       }
-      return { [file.file]: parsed.data };
     }),
   );
   return files.filter(is.truthy);
@@ -133,4 +145,21 @@ export const mergeFiles = async (): Promise<FinalOutput> => {
     return outputResults.data;
   }
   return {};
+};
+
+export const backupOldFiles = async () => {
+  const backupFolder = path.join(DATA_DIR, 'migration-backup');
+  await mkdir(backupFolder, { recursive: true });
+  logger.info('Backing up old migration files to backup folder');
+  await Promise.all(
+    configFiles.map(async (file) => {
+      try {
+        const filePath = path.join(DATA_DIR, `${file.file}.json`);
+        const backupPath = path.join(backupFolder, `${file.file}.json`);
+        await fs.rename(filePath, backupPath);
+      } catch (error) {
+        logger.error(`failed to backup ${file.file}.json`, error);
+      }
+    }),
+  );
 };

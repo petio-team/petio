@@ -15,4 +15,3 @@ export default (app: Router) => {
 
   app.use(route.routes());
 };
-

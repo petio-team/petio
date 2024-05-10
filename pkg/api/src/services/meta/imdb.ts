@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import axios from 'axios';
 import fs from 'fs';
 import lineReader from 'line-reader';
@@ -5,8 +6,9 @@ import path from 'path';
 import zlib from 'zlib';
 
 import { DATA_DIR } from '@/infra/config/env';
+import { getFromContainer } from '@/infra/container/container';
 import loggerMain from '@/infra/logger/logger';
-import Imdb from '@/models/imdb';
+import { ImdbRepository } from '@/resources/imdb/repository';
 
 const logger = loggerMain.child({ module: 'meta.imdb' });
 
@@ -14,9 +16,13 @@ export async function lookup(imdb_id) {
   if (!imdb_id) {
     return false;
   }
-
-  const data = await Imdb.findOne({ id: imdb_id }).exec();
-  if (!data) return false;
+  const imdbResult = await getFromContainer(ImdbRepository).findOne({
+    id: imdb_id,
+  });
+  if (imdbResult.isNone()) {
+    return false;
+  }
+  const data = imdbResult.unwrap();
   return {
     rating: { ratingValue: data.rating },
     description: false,
@@ -25,8 +31,8 @@ export async function lookup(imdb_id) {
 
 export async function storeCache(firstTime = false) {
   if (firstTime) {
-    const exists = await Imdb.findOne({}).exec();
-    if (exists) {
+    const imdbResult = await getFromContainer(ImdbRepository).findOne({});
+    if (imdbResult.isSome()) {
       logger.debug('IMDB: Cache exists skipping setup');
       return;
     }
@@ -62,7 +68,7 @@ export async function storeCache(firstTime = false) {
 
 async function parseData(file): Promise<any> {
   logger.debug('IMDB: Cache Emptying old cache');
-  await Imdb.deleteMany({}).exec();
+  await getFromContainer(ImdbRepository).deleteMany({});
   logger.debug('IMDB: Cache cleared, parsing download, updating local cache');
   return new Promise((resolve, reject) => {
     let buffer: any = [];
@@ -102,5 +108,5 @@ async function parseData(file): Promise<any> {
 }
 
 async function processBuffer(data) {
-  await Imdb.bulkWrite(data);
+  await getFromContainer(ImdbRepository).createMany(data);
 }

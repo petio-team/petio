@@ -61,7 +61,7 @@ export const authConfigToEmailSettings = (
   const settings = {} as EmailNotification;
 
   settings.host = url.arguments.source || 'localhost';
-  settings.port = url.arguments.value ? parseInt(url.arguments.value) : 25;
+  settings.port = url.arguments.value ? parseInt(url.arguments.value, 10) : 25;
   settings.username = url.arguments.identifier || '';
   settings.password = url.arguments.secret || '';
   settings.from = url.options.from || 'Petio';

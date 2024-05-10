@@ -1,21 +1,35 @@
+/* eslint-disable no-underscore-dangle */
+
+/* eslint-disable prefer-destructuring */
+
+/* eslint-disable guard-for-in */
 import axios from 'axios';
 import Bluebird from 'bluebird';
 import xmlParser from 'xml-js';
 
-import { config } from '@/config/index';
-import { TMDB_API_KEY } from '@/infra/config/env';
+import { getFromContainer } from '@/infra/container/container';
 import loggerMain from '@/infra/logger/logger';
-import Library from '@/models/library';
-import MovieModel from '@/models/movie';
-import Profile from '@/models/profile';
-import Request from '@/models/request';
-import ShowModel from '@/models/show';
-import { CreateOrUpdateUser, User, UserModel, UserRole } from '@/models/user';
+import { GetLibrariesResponse, PlexClient } from '@/infra/plex';
+import { TheMovieDatabaseClient } from '@/infra/tmdb/client';
+import { MediaLibraryEntity } from '@/resources/media-library/entity';
+import { MediaLibraryRepository } from '@/resources/media-library/repository';
+import { MediaServerEntity } from '@/resources/media-server/entity';
+import { MovieEntity } from '@/resources/movie/entity';
+import { MovieRepository } from '@/resources/movie/repository';
+import { ProfileRepository } from '@/resources/profile/repository';
+import { RequestRepository } from '@/resources/request/repository';
+import { ShowEntity } from '@/resources/show/entity';
+import { ShowRepository } from '@/resources/show/repository';
+import { UserEntity } from '@/resources/user/entity';
+import { UserRepository } from '@/resources/user/repository';
+import { UserRole } from '@/resources/user/types';
 import Mailer from '@/services/mail/mailer';
 import Discord from '@/services/notifications/discord';
 import Telegram from '@/services/notifications/telegram';
+import { getPlexClient } from '@/services/plex/client';
 import ProcessRequest from '@/services/requests/process';
 import { showLookup } from '@/services/tmdb/show';
+import is from '@/utils/is';
 
 const logger = loggerMain.child({ module: 'plex.library' });
 
@@ -28,124 +42,131 @@ export default class LibraryUpdate {
 
   tmdb: any;
 
-  constructor() {
+  client: PlexClient;
+
+  constructor(private server: MediaServerEntity) {
     this.mailer = [];
     this.tmdb = 'https://api.themoviedb.org/3/';
     this.full = true;
     this.timestamp = false;
+    this.client = getPlexClient(server);
   }
 
   timeout(ms) {
+    // eslint-disable-next-line no-promise-executor-return
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   async partial() {
     logger.debug(`CRON: Running Partial`);
     this.full = false;
-    let recent: any = false;
     try {
-      recent = await this.getRecent();
+      const recent = await this.getRecent();
+      if (!recent || !recent.Metadata || recent.Metadata.length === 0) {
+        logger.error('CRON: No recent found');
+        return;
+      }
+      const metadata = recent.Metadata;
+
+      const matched = {};
+
+      await Bluebird.map(
+        metadata,
+        async (obj) => {
+          if (!obj.ratingKey) {
+            logger.warn(`CRON: Partial scan - no rating key found`);
+            return;
+          }
+          if (obj.type === 'movie') {
+            if (!matched[obj.ratingKey]) {
+              matched[obj.ratingKey] = true;
+              await this.saveMovie(obj);
+              logger.debug(`CRON: Partial scan - ${obj.title}`);
+            }
+          } else if (obj.type === 'show') {
+            if (matched[obj.ratingKey]) {
+              matched[obj.ratingKey] = true;
+              await this.saveShow(obj);
+              logger.debug(`CRON: Partial scan - ${obj.title}`);
+            }
+          } else if (obj.type === 'season') {
+            if (!obj.parentRatingKey) {
+              logger.warn(`CRON: Partial scan - no parent rating key found`);
+              return;
+            }
+            if (!matched[obj.parentRatingKey]) {
+              matched[obj.parentRatingKey] = true;
+              const parent = {
+                ratingKey: obj.parentRatingKey,
+                guid: obj.parentGuid,
+                key: obj.parentKey,
+                type: 'show',
+                title: obj.parentTitle,
+                contentRating: '',
+                summary: '',
+                index: obj.index,
+                rating: '',
+                year: '',
+                thumb: '',
+                art: '',
+                banner: '',
+                theme: '',
+                duration: '',
+                originallyAvailableAt: '',
+                leafCount: '',
+                viewedLeafCount: '',
+                childCount: '',
+                addedAt: '',
+                updatedAt: '',
+                Genre: '',
+                studio: '',
+                titleSort: '',
+              };
+
+              await this.saveShow(parent);
+              logger.debug(
+                `CRON: Partial scan - ${parent.title} - Built from series`,
+              );
+            }
+          } else {
+            logger.warn(`CRON: Partial scan type not found - ${obj.type}`);
+          }
+        },
+        { concurrency: 1 },
+      );
+      this.execMail();
+      logger.debug('Partial Scan Complete');
+      this.checkOldRequests();
     } catch (err) {
       logger.error(err, `CRON: Partial scan failed - unable to get recent`);
-      return;
     }
-    const matched = {};
-
-    await Bluebird.map(
-      Object.keys(recent.Metadata),
-      async (i) => {
-        const obj = recent.Metadata[i];
-
-        if (obj.type === 'movie') {
-          if (!matched[obj.ratingKey]) {
-            matched[obj.ratingKey] = true;
-            await this.saveMovie(obj);
-            logger.debug(`CRON: Partial scan - ${obj.title}`);
-          }
-        } else if (obj.type === 'show') {
-          if (matched[obj.ratingKey]) {
-            matched[obj.ratingKey] = true;
-            await this.saveShow(obj);
-            logger.debug(`CRON: Partial scan - ${obj.title}`);
-          }
-        } else if (obj.type === 'season') {
-          if (!matched[obj.parentRatingKey]) {
-            matched[obj.parentRatingKey] = true;
-            const parent = {
-              ratingKey: obj.parentRatingKey,
-              guid: obj.parentGuid,
-              key: obj.parentKey,
-              type: 'show',
-              title: obj.parentTitle,
-              contentRating: '',
-              summary: '',
-              index: obj.index,
-              rating: '',
-              year: '',
-              thumb: '',
-              art: '',
-              banner: '',
-              theme: '',
-              duration: '',
-              originallyAvailableAt: '',
-              leafCount: '',
-              viewedLeafCount: '',
-              childCount: '',
-              addedAt: '',
-              updatedAt: '',
-              Genre: '',
-              studio: '',
-              titleSort: '',
-            };
-
-            await this.saveShow(parent);
-            logger.debug(
-              `CRON: Partial scan - ${parent.title} - Built from series`,
-            );
-          }
-        } else {
-          logger.warn(`CRON: Partial scan type not found - ${obj.type}`);
-        }
-      },
-      { concurrency: config.get('general.concurrency') },
-    );
-    this.execMail();
-    logger.debug('Partial Scan Complete');
-    this.checkOldRequests();
   }
 
   async scan() {
     this.timestamp = new Date().toString();
     logger.debug(`CRON: Running Full`);
-    let libraries = false;
     try {
-      libraries = await this.getLibraries();
-    } catch (err) {
-      logger.error(`CRON: Error`, err);
-    }
-
-    if (libraries) {
+      const libraries = await this.getLibraries();
+      if (!is.truthy(libraries)) {
+        logger.error('CRON: No libraries found');
+        return;
+      }
       await this.saveLibraries(libraries);
       await this.updateLibraryContent(libraries);
       this.execMail();
-      logger.debug('CRON: Full Scan Complete');
-      this.checkOldRequests();
+      await this.checkOldRequests();
       // await this.deleteOld();
-    } else {
-      logger.warn("CRON: Couldn't update libraries");
+      logger.debug('CRON: Full Scan Complete');
+    } catch (err) {
+      logger.error(err, `CRON: Error`);
     }
   }
 
   async getLibraries() {
-    const url = `${config.get('plex.protocol')}://${config.get(
-      'plex.host',
-    )}:${config.get('plex.port')}/library/sections/?X-Plex-Token=${config.get(
-      'plex.token',
-    )}`;
     try {
-      const res = await axios.get(url);
+      const res = await this.client.library.getLibraries();
       logger.debug('CRON: Found Libraries');
-      return res.data.MediaContainer;
+      return res;
     } catch (err) {
       logger.error('CRON: Library update failed!', err);
       throw err;
@@ -153,24 +174,23 @@ export default class LibraryUpdate {
   }
 
   async getRecent() {
-    const url = `${config.get('plex.protocol')}://${config.get(
-      'plex.host',
-    )}:${config.get(
-      'plex.port',
-    )}/library/recentlyAdded/?X-Plex-Token=${config.get('plex.token')}`;
     try {
-      const res = await axios.get(url);
+      const res = await this.client.library.getRecentlyAdded();
       logger.debug('CRON: Recently Added received');
-      return res.data.MediaContainer;
+      return res.MediaContainer;
     } catch (err) {
       logger.error(err, 'CRON: Recently added failed!');
       throw new Error('Recently added failed');
     }
   }
 
-  async saveLibraries(libraries) {
+  async saveLibraries(libraries: GetLibrariesResponse) {
+    if (!is.truthy(libraries.MediaContainer?.Directory)) {
+      logger.warn('CRON: No directories found');
+      return;
+    }
     await Promise.all(
-      libraries.Directory.map(async (lib) => {
+      libraries.MediaContainer.Directory.map(async (lib) => {
         await this.saveLibrary(lib);
       }),
     );
@@ -178,14 +198,15 @@ export default class LibraryUpdate {
 
   async saveLibrary(lib) {
     let libraryItem: any = false;
+    const libraryRepo = getFromContainer(MediaLibraryRepository);
     try {
-      libraryItem = await Library.findOne({ uuid: lib.uuid }).exec();
+      libraryItem = await libraryRepo.findOne({ uuid: lib.uuid });
     } catch {
       logger.debug('CRON: Library Not found, attempting to create');
     }
     if (!libraryItem) {
       try {
-        const newLibrary = new Library({
+        const newLibrary = MediaLibraryEntity.create({
           allowSync: lib.allowSync,
           art: lib.art,
           composite: lib.composite,
@@ -199,22 +220,20 @@ export default class LibraryUpdate {
           scanner: lib.scanner,
           language: lib.language,
           uuid: lib.uuid,
-          updatedAt: lib.updatedAt,
-          createdAt: lib.createdAt,
           scannedAt: lib.scannedAt,
           content: lib.content,
           directory: lib.directory,
           contentChangedAt: lib.contentChangedAt,
           hidden: lib.hidden,
         });
-        await newLibrary.save();
+        await libraryRepo.create(newLibrary);
       } catch (err) {
         logger.error(`CRON: Error`, err);
       }
     } else {
       let updatedLibraryItem: any = false;
       try {
-        updatedLibraryItem = await Library.updateOne(
+        updatedLibraryItem = await libraryRepo.updateMany(
           { uuid: lib.uuid },
           {
             $set: {
@@ -240,8 +259,7 @@ export default class LibraryUpdate {
               hidden: lib.hidden,
             },
           },
-          { useFindAndModify: false },
-        ).exec();
+        );
       } catch (err) {
         logger.error(`CRON: Error`, err);
         return;
@@ -252,10 +270,16 @@ export default class LibraryUpdate {
     }
   }
 
-  async updateLibraryContent(libraries) {
-    for (const l in libraries.Directory) {
-      const lib = libraries.Directory[l];
-      const music: any = [];
+  async updateLibraryContent(libraries: GetLibrariesResponse) {
+    if (!is.truthy(libraries.MediaContainer?.Directory)) {
+      logger.warn('CRON: No directories found');
+      return;
+    }
+    await Bluebird.map(libraries.MediaContainer.Directory, async (lib) => {
+      if (!is.truthy(lib.key)) {
+        logger.warn(`CRON: No key found for library - ${lib.title}`);
+        return;
+      }
       try {
         const libContent = await this.getLibrary(lib.key);
         if (!libContent || !libContent.Metadata) {
@@ -264,89 +288,85 @@ export default class LibraryUpdate {
           });
           return;
         }
-        await Promise.map(
-          Object.keys(libContent.Metadata),
+        if (!is.truthy(libContent.Metadata)) {
+          logger.warn(`CRON: No metadata found in library - ${lib.title}`);
+          return;
+        }
+        const metadata = libContent.Metadata;
+        await Bluebird.map(
+          metadata,
           async (item) => {
-            const obj: any = libContent.Metadata[item];
-            if (obj.type === 'movie') {
-              await this.saveMovie(obj);
-            } else if (obj.type === 'show') {
-              await this.saveShow(obj);
+            if (item.type === 'movie') {
+              await this.saveMovie(item);
+            } else if (item.type === 'show') {
+              await this.saveShow(item);
             } else {
-              logger.debug(`CRON: Unknown media type - ${obj.type}`);
+              logger.debug(`CRON: Unknown media type - ${item.type}`);
             }
           },
-          { concurrency: config.get('general.concurrency') },
+          { concurrency: 2 },
         );
       } catch (err) {
         logger.error(`CRON: Unable to get library content`, err);
       }
-    }
+    });
   }
 
   async getLibrary(id) {
-    const url = `${config.get('plex.protocol')}://${config.get(
-      'plex.host',
-    )}:${config.get(
-      'plex.port',
-    )}/library/sections/${id}/all?X-Plex-Token=${config.get('plex.token')}`;
     try {
-      const res = await axios.get(url);
-      return res.data.MediaContainer;
+      const res = await this.client.library.getLibraryItems({
+        sectionId: id,
+        tag: 'all',
+      });
+      return res.MediaContainer;
     } catch (err) {
       logger.error(`failed to get library content for ${id}`, err);
       throw new Error('Unable to get library content');
     }
   }
 
-  async getMeta(id) {
-    const url = `${config.get('plex.protocol')}://${config.get(
-      'plex.host',
-    )}:${config.get(
-      'plex.port',
-    )}/library/metadata/${id}?includeChildren=1&X-Plex-Token=${config.get(
-      'plex.token',
-    )}`;
+  async getMeta(id: number) {
     try {
-      const res = await axios.get(url);
-      return res.data.MediaContainer.Metadata[0];
+      const res = await this.client.library.getMetadata({
+        ratingKey: id,
+      });
+      return res.MediaContainer;
     } catch (err) {
       logger.error(`failed to get meta for ${id}`, err);
       throw new Error('Unable to get meta');
     }
   }
 
-  async getSeason(id) {
-    const url = `${config.get('plex.protocol')}://${config.get(
-      'plex.host',
-    )}:${config.get(
-      'plex.port',
-    )}/library/metadata/${id}/children?X-Plex-Token=${config.get(
-      'plex.token',
-    )}`;
+  async getSeason(id: number) {
     try {
-      const res = await axios.get(url);
-      return res.data.MediaContainer.Metadata;
+      const res = await this.client.library.getMetadataChildren({
+        ratingKey: id,
+      });
+      return res.MediaContainer;
     } catch (err) {
       logger.error(`failed to get season data for ${id}`, err);
       throw new Error('Unable to get meta');
     }
   }
 
-  async saveMovie(movieObj) {
-    let movieDb: any = false;
+  async saveMovie(movie) {
+    let movieObj = movie;
+    let movieDb: MovieEntity | null = null;
     const { title } = movieObj;
     const externalIds: any = {};
     let tmdbId = false;
     let externalId: any = false;
-    let added = false;
     logger.debug(`CRON: Movie Job: ${title}`);
     try {
-      movieDb = await MovieModel.findOne({
+      const movieRepo = getFromContainer(MovieRepository);
+      const movieResults = await movieRepo.findOne({
         ratingKey: parseInt(movieObj.ratingKey, 10),
-      }).exec();
-    } catch {
-      movieDb = false;
+      });
+      if (movieResults.isSome()) {
+        movieDb = movieResults.unwrap();
+      }
+    } catch (err) {
+      movieDb = null;
     }
     let idSource = movieObj.guid
       .replace('com.plexapp.agents.', '')
@@ -443,58 +463,76 @@ export default class LibraryUpdate {
       );
       return;
     }
-    if (!movieDb) {
-      added = true;
-      movieDb = new MovieModel({
-        ratingKey: movieObj.ratingKey,
-      });
-    }
-    movieDb.title = movieObj.title;
-    movieDb.ratingKey = movieObj.ratingKey;
-    movieDb.studio = movieObj.studio;
-    movieDb.type = movieObj.type;
-    movieDb.contentRating = movieObj.contentRating;
-    movieDb.rating = movieObj.rating;
-    movieDb.year = movieObj.year;
-    movieDb.addedAt = movieObj.addedAt;
-    movieDb.updatedAt = movieObj.updatedAt;
-    movieDb.Media = movieObj.Media;
-    movieDb.Genre = movieObj.Genre;
-    movieDb.Director = movieObj.Director;
-    movieDb.Writer = movieObj.Writer;
-    movieDb.Country = movieObj.Country;
-    movieDb.Role = movieObj.Role;
-    movieDb.idSource = idSource;
-    movieDb.externalId = externalId;
-    movieDb.imdb_id = externalIds.hasOwnProperty('imdb_id')
-      ? externalIds.imdb_id
-      : false;
-    movieDb.tmdb_id = idSource === 'tmdb' ? externalId : tmdbId;
+    const movieEntity = MovieEntity.create({
+      title: movieObj.title,
+      ratingKey: movieObj.ratingKey,
+      key: movieObj.key,
+      guid: movieObj.guid,
+      studio: movieObj.studio,
+      type: movieObj.type,
+      titleSort: movieObj.titleSort,
+      contentRating: movieObj.contentRating,
+      summary: movieObj.summary,
+      index: movieObj.index,
+      rating: movieObj.rating,
+      year: movieObj.year,
+      tagline: movieObj.tagline,
+      thumb: movieObj.thumb,
+      art: movieObj.art,
+      banner: movieObj.banner,
+      theme: movieObj.theme,
+      duration: movieObj.duration,
+      originallyAvailableAt: movieObj.originallyAvailableAt,
+      leafCount: movieObj.leafCount,
+      viewedLeafCount: movieObj.viewedLeafCount,
+      childCount: movieObj.childCount,
+      addedAt: movieObj.addedAt,
+      primaryExtraKey: movieObj.primaryExtraKey,
+      ratingImage: movieObj.ratingImage,
+      Genre: movieObj.Genre,
+      Media: movieObj.Media,
+      Director: movieObj.Director,
+      Writer: movieObj.Writer,
+      Country: movieObj.Country,
+      Role: movieObj.Role,
+      idSource,
+      externalId,
+      imdb_id: idSource === 'imdb' ? externalId : externalIds.imdb_id,
+      tmdb_id: idSource === 'tmdb' ? externalId : tmdbId,
+      petioTimestamp: new Date(),
+    });
 
     try {
-      await movieDb.save();
-      if (added) {
-        await this.mailAdded(movieObj, movieDb.tmdb_id);
+      if (!movieDb) {
+        await getFromContainer(MovieRepository).create(movieEntity);
+        await this.mailAdded(movieObj, externalId);
         logger.debug(`CRON: Movie Added - ${movieObj.title}`);
+        return;
       }
+      const { id, createdAt, ...rest } = movieEntity.getProps();
+      await getFromContainer(MovieRepository).updateMany(
+        { id: movieDb.id },
+        rest,
+      );
     } catch (err) {
       logger.error(`CRON: Failed to save ${title} to Db`, err);
     }
   }
 
-  async saveShow(showObj) {
+  async saveShow(show) {
+    let showObj = show;
     let showDb: any = false;
     const { title } = showObj;
     let externalIds: any = {};
-    let tmdbId = false;
-    let externalId = false;
-    let added = false;
+    let tmdbId = '';
+    let externalId = '';
     let seasons: any = [];
     logger.debug(`CRON: TV Job: ${title}`);
+    const showRepository = getFromContainer(ShowRepository);
     try {
-      showDb = await ShowModel.findOne({
+      showDb = await showRepository.findOne({
         ratingKey: parseInt(showObj.ratingKey, 10),
-      }).exec();
+      });
     } catch {
       showDb = false;
     }
@@ -507,7 +545,11 @@ export default class LibraryUpdate {
     }
     try {
       showObj = await this.getMeta(showObj.ratingKey);
-      seasons = await Promise.map(
+      if (!showObj) {
+        logger.warn(`CRON: No meta found for ${title}`);
+        return;
+      }
+      seasons = await Bluebird.map(
         showObj.Children.Metadata,
         async (season: any) => {
           const seasonData = await this.getSeason(season.ratingKey);
@@ -529,7 +571,7 @@ export default class LibraryUpdate {
           }
           return thisSeason;
         },
-        { concurrency: config.get('general.concurrency') },
+        { concurrency: 1 },
       );
     } catch (err) {
       logger.warn(`CRON: Unable to fetch meta for ${title}`, err);
@@ -572,12 +614,11 @@ export default class LibraryUpdate {
         .replace('com.plexapp.agents.', '')
         .split('://')[1]
         .split('?')[0];
-
       if (idSource !== 'tmdb') {
         try {
           tmdbId = await this.externalIdTv(externalId, idSource);
         } catch {
-          tmdbId = false;
+          tmdbId = '';
         }
       } else {
         try {
@@ -593,47 +634,51 @@ export default class LibraryUpdate {
       );
       return;
     }
-    if (!showDb) {
-      added = true;
-      showDb = new ShowModel({
-        ratingKey: showObj.ratingKey,
-      });
-    }
-    showDb.ratingKey = showObj.ratingKey;
-    showDb.key = showObj.key;
-    showDb.guid = showObj.guid;
-    showDb.studio = showObj.studio;
-    showDb.type = showObj.type;
-    showDb.title = showObj.title;
-    showDb.titleSort = showObj.titleSort;
-    showDb.contentRating = showObj.contentRating;
-    showDb.rating = showObj.rating;
-    showDb.year = showObj.year;
-    showDb.leafCount = showObj.leafCount;
-    showDb.childCount = showObj.childCount;
-    showDb.addedAt = showObj.addedAt;
-    showDb.updatedAt = showObj.updatedAt;
-    showDb.Genre = showObj.Genre;
-    showDb.idSource = idSource;
-    showDb.externalId = externalId;
-    showDb.imdb_id = idSource === 'imdb' ? externalId : externalIds.imdb_id;
-    showDb.tvdb_id = idSource === 'tvdb' ? externalId : externalIds.tvdb_id;
-    showDb.tmdb_id = idSource === 'tmdb' ? externalId : tmdbId;
-    showDb.seasonData = {};
-    for (const s in seasons) {
-      const season: any = seasons[s];
-      showDb.seasonData[season.seasonNumber] = {
-        seasonNumber: season.seasonNumber,
-        title: season.title,
-        episodes: season.episodes,
-      };
-    }
+    const showEntity = ShowEntity.create({
+      ratingKey: showObj.ratingKey,
+      key: showObj.key,
+      guid: showObj.guid,
+      studio: showObj.studio,
+      type: showObj.type,
+      title: showObj.title,
+      titleSort: showObj.titleSort,
+      contentRating: showObj.contentRating,
+      summary: showObj.summary,
+      index: showObj.index,
+      rating: showObj.rating,
+      year: showObj.year,
+      thumb: showObj.thumb,
+      art: showObj.art,
+      banner: showObj.banner,
+      theme: showObj.theme,
+      duration: showObj.duration,
+      originallyAvailableAt: showObj.originallyAvailableAt,
+      leafCount: showObj.leafCount,
+      viewedLeafCount: showObj.viewedLeafCount,
+      childCount: showObj.childCount,
+      addedAt: showObj.addedAt,
+      Genre: showObj.Genre,
+      idSource,
+      externalId,
+      imdb_id: idSource === 'imdb' ? externalId : externalIds.imdb_id,
+      tvdb_id: idSource === 'tvdb' ? externalId : externalIds.tvdb_id,
+      tmdb_id: idSource === 'tmdb' ? externalId : tmdbId,
+      petioTimestamp: new Date(),
+      seasonData: seasons.map((s) => ({
+        seasonNumber: s.seasonNumber,
+        title: s.title,
+        episodes: s.episodes,
+      })),
+    });
     try {
-      await showDb.save();
-      if (added) {
+      if (!showDb) {
+        await showRepository.create(showEntity);
         await this.mailAdded(showObj, showDb.tmdb_id);
         logger.debug(`CRON: Show Added - ${showObj.title}`);
+        return;
       }
+      const { id, createdAt, ...rest } = showEntity.getProps();
+      await showRepository.updateMany({ id: showDb.id }, rest);
     } catch (err) {
       logger.error(`CRON: Failed to save ${title} to Db`, err);
     }
@@ -657,9 +702,7 @@ export default class LibraryUpdate {
   }
 
   async getFriends() {
-    const url = `https://plex.tv/api/users?X-Plex-Token=${config.get(
-      'plex.token',
-    )}`;
+    const url = `https://plex.tv/api/users?X-Plex-Token=${this.server.token}`;
     try {
       const res = await axios.get(url);
       const dataParse = JSON.parse(
@@ -676,28 +719,25 @@ export default class LibraryUpdate {
     // Maybe delete all and rebuild each time?
     try {
       let defaultProfile: any;
-      const results: any = await Profile.findOne({ isDefault: true }).exec();
-      if (results) {
-        defaultProfile = results.toObject();
+      const results = await getFromContainer(ProfileRepository).findOne({
+        isDefault: true,
+      });
+      if (results.isSome()) {
+        defaultProfile = results.unwrap();
       }
 
-      const user: User = {
-        title: obj.title ?? obj.username ?? 'User',
-        username: obj.username ? obj.username : obj.title,
-        email:
-          obj.email && obj.email !== '' ? obj.email.toLowerCase() : undefined,
-        thumbnail: obj.thumb ?? '',
-        plexId: obj.id,
-        // eslint-disable-next-line no-underscore-dangle
-        profileId: defaultProfile ? defaultProfile._id.toString() : undefined,
-        role: UserRole.User,
-        owner: false,
-        custom: false,
-        disabled: false,
-        quotaCount: 0,
-      };
-
-      const newUser = await CreateOrUpdateUser(user);
+      const newUser = await getFromContainer(UserRepository).create(
+        UserEntity.create({
+          title: obj.title ?? obj.username ?? 'User',
+          username: obj.username ? obj.username : obj.title,
+          email:
+            obj.email && obj.email !== '' ? obj.email.toLowerCase() : undefined,
+          thumbnail: obj.thumb ?? '',
+          plexId: obj.id,
+          profileId: defaultProfile ? defaultProfile._id.toString() : undefined,
+          role: UserRole.USER,
+        }),
+      );
       logger.debug(`synced friend ${newUser.username}`);
     } catch (err) {
       logger.error(err, 'failed to save friend');
@@ -705,10 +745,13 @@ export default class LibraryUpdate {
   }
 
   async mailAdded(plexData, ref_id) {
-    const request = await Request.findOne({ tmdb_id: ref_id }).exec();
-    if (request) {
+    const request = await getFromContainer(RequestRepository).findOne({
+      tmdb_id: ref_id,
+    });
+    if (request.isSome()) {
+      const data = request.unwrap();
       await Promise.all(
-        request.users.map(async (user, i) => {
+        data.users.map(async (user, i) => {
           await this.sendMail(user, i, request);
         }),
       );
@@ -717,11 +760,14 @@ export default class LibraryUpdate {
   }
 
   async sendMail(user, i, request) {
-    const userData = await UserModel.findOne({ id: user }).exec();
-    if (!userData) {
+    const results = await getFromContainer(UserRepository).findOne({
+      id: user,
+    });
+    if (results.isNone()) {
       logger.error('CRON: Err: No user data');
       return;
     }
+    const userData = results.unwrap();
     this.discordNotify(userData, request);
     if (!userData.email) {
       logger.warn('CRON: Err: User has no email');
@@ -760,119 +806,144 @@ export default class LibraryUpdate {
     this.mailer = [];
   }
 
-  async externalIdTv(id, type) {
-    const url = `${this.tmdb}find/${id}?api_key=${TMDB_API_KEY}&language=en-US&external_source=${type}_id`;
-    const res = await axios.get(url);
-    return res.data.tv_results[0].id;
+  async externalIdTv(id: string, type: string) {
+    const client = getFromContainer(TheMovieDatabaseClient);
+    const data = await client.default.findById({
+      externalId: id,
+      externalSource: type === 'tvdb' ? 'tvdb_id' : 'imdb_id',
+    });
+    if (data.tv_results && data.tv_results[0]) {
+      return (data.tv_results as any[])[0].id;
+    }
+    return {};
   }
 
   async tmdbExternalIds(id) {
-    const url = `${this.tmdb}tv/${id}/external_ids?api_key=${TMDB_API_KEY}`;
-    const res = await axios.get(url);
-    return res.data;
+    const client = getFromContainer(TheMovieDatabaseClient);
+    return client.default.tvSeriesExternalIds({
+      seriesId: id,
+    });
   }
 
-  async externalIdMovie(id, type) {
-    const url = `${this.tmdb}find/${id}?api_key=${TMDB_API_KEY}&language=en-US&external_source=${type}_id`;
-    const res = await axios.get(url);
-    return res.data.movie_results[0].id;
+  async externalIdMovie(id: string, type: string) {
+    const client = getFromContainer(TheMovieDatabaseClient);
+    const data = await client.default.findById({
+      externalId: id,
+      externalSource: type === 'tvdb' ? 'tvdb_id' : 'imdb_id',
+    });
+    if (data.movie_results && data.movie_results[0]) {
+      return (data.movie_results as any[])[0].id;
+    }
+    return {};
   }
 
   async checkOldRequests() {
     logger.debug('CRON: Checking old requests');
-    const requests = await Request.find().exec();
-    for (const element of requests) {
-      let onServer: any = false;
-      const request = element;
-      if (request.type === 'tv') {
-        onServer = await ShowModel.findOne({ tmdb_id: request.tmdb_id }).exec();
-        if (!request.tvdb_id) {
-          logger.debug(
-            `CRON: No TVDB ID for request: ${request.title}, attempting to pull meta`,
-          );
-          const lookup = await showLookup(request.tmdb_id, true);
-          request.thumb = lookup.poster_path;
-          request.tvdb_id = lookup.tvdb_id;
-          try {
-            await request.save();
+    const requests = await getFromContainer(RequestRepository).findAll();
+    await Bluebird.map(
+      requests,
+      async (req) => {
+        let onServer: any = false;
+        const request = req.getProps();
+        if (request.type === 'tv') {
+          onServer = await getFromContainer(ShowRepository).findOne({
+            tmdb_id: request.tmdbId,
+          });
+          if (!request.tvdbId) {
             logger.debug(
-              `CRON: Meta updated for request: ${request.title}, processing request with updated meta`,
+              `CRON: No TVDB ID for request: ${request.title}, attempting to pull meta`,
             );
-            if (request.tvdb_id)
-              new ProcessRequest({
-                id: request.requestId,
-                type: request.type,
-                title: request.title,
-                thumb: request.thumb,
-                imdb_id: request.imdb_id,
-                tmdb_id: request.tmdb_id,
-                tvdb_id: request.tvdb_id,
-                approved: request.approved,
-              }).sendToDvr(false);
-          } catch (err) {
-            logger.warn(
-              `CRON: Failed to update meta for request: ${request.title}`,
-              err,
-            );
+            const lookup = await showLookup(request.tmdbId, true);
+            request.thumbnail = lookup.poster_path;
+            request.tvdbId = lookup.tvdb_id;
+            try {
+              await getFromContainer(RequestRepository).updateMany(
+                { id: request.id },
+                {
+                  tvdbId: request.tvdbId,
+                  thumbnail: request.thumbnail,
+                },
+              );
+              logger.debug(
+                `CRON: Meta updated for request: ${request.title}, processing request with updated meta`,
+              );
+              if (request.tvdbId)
+                new ProcessRequest({
+                  id: request.id,
+                  type: request.type,
+                  title: request.title,
+                  thumb: request.thumbnail,
+                  imdb_id: request.imdbId,
+                  tmdb_id: request.tmdbId,
+                  tvdb_id: request.tvdbId,
+                  approved: request.approved,
+                }).sendToDvr(false);
+            } catch (err) {
+              logger.warn(
+                `CRON: Failed to update meta for request: ${request.title}`,
+                err,
+              );
+            }
           }
         }
-      }
-      if (request.type === 'movie') {
-        onServer = await MovieModel.findOne({
-          tmdb_id: request.tmdb_id,
-        }).exec();
-      }
+        if (request.type === 'movie') {
+          onServer = await getFromContainer(MovieRepository).findOne({
+            tmdb_id: request.tmdbId,
+          });
+        }
 
-      if (onServer) {
-        logger.debug(`CRON: Found missed request - ${request.title}`);
-        new ProcessRequest(request).archive(true, false, false);
-        const emails: any = [];
-        const titles: any = [];
-        await Promise.all(
-          request.users.map(async (user) => {
-            const userData = await UserModel.findOne({ id: user }).exec();
-            if (!userData) return;
-            emails.push(userData.email);
-            titles.push(userData.title);
-          }),
-        );
-        new Mailer().mail(
-          `${request.title} added to Plex!`,
-          `${request.title} added to Plex!`,
-          'Your request has now been processed and is ready to watch on Plex, thanks for your request!',
-          `https://image.tmdb.org/t/p/w500${request.thumb}`,
-          emails,
-          titles,
-        );
-      }
-    }
+        if (onServer) {
+          logger.debug(`CRON: Found missed request - ${request.title}`);
+          new ProcessRequest(request).archive(true, false, false);
+          const emails: any = [];
+          const titles: any = [];
+          await Promise.all(
+            request.users.map(async (user) => {
+              const results = await getFromContainer(UserRepository).findOne({
+                id: user,
+              });
+              if (results.isNone()) {
+                return;
+              }
+              const userData = results.unwrap();
+              emails.push(userData.email);
+              titles.push(userData.title);
+            }),
+          );
+          new Mailer().mail(
+            `${request.title} added to Plex!`,
+            `${request.title} added to Plex!`,
+            'Your request has now been processed and is ready to watch on Plex, thanks for your request!',
+            `https://image.tmdb.org/t/p/w500${request.thumbnail}`,
+            emails,
+            titles,
+          );
+        }
+        return true;
+      },
+      { concurrency: 2 },
+    );
   }
 
   async deleteOld() {
+    const movieRepo = getFromContainer(MovieRepository);
+    const showRepo = getFromContainer(ShowRepository);
     const [movies, shows] = await Bluebird.all([
-      MovieModel.find({
+      movieRepo.findAll({
         petioTimestamp: { $ne: this.timestamp },
-      }).exec(),
-      ShowModel.find({
+      }),
+      showRepo.findAll({
         petioTimestamp: { $ne: this.timestamp },
-      }).exec(),
+      }),
     ]);
     await Bluebird.all([
       Bluebird.map(movies, async (movie) => {
         logger.warn(`deleting movie no longer found in plex: ${movie.title}`);
-        await MovieModel.findOneAndRemove(
-          // eslint-disable-next-line no-underscore-dangle
-          { _id: movie._id },
-          { useFindAndModify: false },
-        ).exec();
+        await movieRepo.deleteManyByIds([movie.id]);
       }),
       Bluebird.map(shows, async (show) => {
         logger.warn(`deleting show no longer found in plex: ${show.title}`);
-        await ShowModel.findOneAndRemove(
-          // eslint-disable-next-line no-underscore-dangle
-          { _id: show._id },
-          { useFindAndModify: false },
-        ).exec();
+        await showRepo.deleteManyByIds([show.id]);
       }),
     ]);
   }

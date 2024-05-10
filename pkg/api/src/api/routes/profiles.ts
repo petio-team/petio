@@ -3,22 +3,21 @@ import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
 import { adminRequired } from '@/api/middleware/auth';
+import { getFromContainer } from '@/infra/container/container';
 import logger from '@/infra/logger/logger';
-import Profile from '@/models/profile';
-import { UserModel } from '@/models/user';
+import { ProfileEntity } from '@/resources/profile/entity';
+import { ProfileMapper } from '@/resources/profile/mapper';
+import { ProfileRepository } from '@/resources/profile/repository';
+import { UserRepository } from '@/resources/user/repository';
 
 const listProfiles = async (ctx: Context) => {
-  let data: any;
   try {
-    data = await Profile.find();
-    if (data) {
-      ctx.status = StatusCodes.OK;
-      ctx.body = data;
-      return;
-    }
-
-    ctx.status = StatusCodes.NOT_FOUND;
-    ctx.body = { error: 'not found' };
+    const profileResults = await getFromContainer(ProfileRepository).findAll();
+    ctx.status = StatusCodes.OK;
+    ctx.body = profileResults.map((p) =>
+      getFromContainer(ProfileMapper).toResponse(p),
+    );
+    return;
   } catch (err) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = { error: err };
@@ -32,18 +31,18 @@ const saveProfile = async (ctx: Context) => {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = { error: 'no profile details' };
   }
+  const profileRepo = getFromContainer(ProfileRepository);
 
   if (profile.isDefault) {
     try {
-      await Profile.findOneAndUpdate(
+      await profileRepo.updateMany(
         { isDefault: true },
         {
           $set: {
             isDefault: false,
           },
         },
-        { new: true, useFindAndModify: false },
-      ).exec();
+      );
     } catch {
       ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
       ctx.body = {
@@ -55,7 +54,7 @@ const saveProfile = async (ctx: Context) => {
 
   if (profile.id) {
     try {
-      await Profile.findOneAndUpdate(
+      await profileRepo.updateMany(
         { _id: profile.id },
         {
           $set: {
@@ -68,8 +67,7 @@ const saveProfile = async (ctx: Context) => {
             isDefault: profile.isDefault,
           },
         },
-        { new: true, useFindAndModify: false },
-      ).exec();
+      );
       ctx.status = StatusCodes.OK;
       ctx.body = {
         message: 'profile updated',
@@ -82,7 +80,7 @@ const saveProfile = async (ctx: Context) => {
     }
   } else {
     try {
-      const newProfile = new Profile({
+      const newProfile = ProfileEntity.create({
         name: profile.name,
         sonarr: profile.sonarr,
         radarr: profile.radarr,
@@ -91,14 +89,12 @@ const saveProfile = async (ctx: Context) => {
         quota: profile.quota,
         isDefault: profile.isDefault,
       });
-      await newProfile.save();
+      await profileRepo.create(newProfile);
 
       ctx.status = StatusCodes.OK;
-      ctx.body = newProfile;
+      ctx.body = getFromContainer(ProfileMapper).toResponse(newProfile);
     } catch (err) {
-      logger.log('error', 'ROUTE: Profile failed to save');
-      logger.log({ level: 'error', message: err });
-
+      logger.error(err, 'ROUTE: Profile failed to save');
       ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
       ctx.body = {
         error: 'error creating user',
@@ -119,7 +115,7 @@ const deleteProfile = async (ctx: Context) => {
   }
 
   try {
-    await UserModel.updateMany(
+    await getFromContainer(UserRepository).updateMany(
       {
         profileId: profile.id,
       },
@@ -130,21 +126,19 @@ const deleteProfile = async (ctx: Context) => {
       },
     );
   } catch (err) {
-    logger.log('error', 'ROUTE: Profile failed to delete');
-    logger.log({ level: 'error', message: err });
-
+    logger.error(err, 'ROUTE: Profile failed to delete');
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = { error: 'failed to unset profile' };
     return;
   }
 
   try {
-    await Profile.findOneAndRemove({ _id: profile.id });
+    await getFromContainer(ProfileRepository).deleteMany({ id: profile.id });
     ctx.status = StatusCodes.OK;
     ctx.body = {
       message: 'Profile deleted',
     };
-  } catch {
+  } catch (err) {
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = {
       error: 'Failed to delete',

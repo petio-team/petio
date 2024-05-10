@@ -4,47 +4,30 @@ import { Context } from 'koa';
 import * as z from 'zod';
 
 import { validateRequest } from '@/api/middleware/validation';
-import { HasConfig, WriteConfig } from '@/config/config';
-import { config } from '@/config/index';
+import { HTTP_BASE_PATH } from '@/infra/config/env';
+import { getFromContainer } from '@/infra/container/container';
 import logger from '@/infra/logger/logger';
-import setupReady from '@/services/setup/setup';
+import { SettingsService } from '@/services/settings/settings';
 
 const getConfig = async (ctx: Context) => {
-  const configStatus = await HasConfig();
-  let ready = false;
-  if (configStatus !== false) {
-    try {
-      const setupCheck = await setupReady();
-      if (setupCheck.ready) {
-        ready = true;
-      }
-      if (setupCheck.error) {
-        ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-        ctx.body = {
-          error: 'An error has occured',
-        };
-        return;
-      }
-    } catch {
-      ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-      ctx.body = {
-        error: 'An error has occured',
-      };
-      return;
-    }
+  try {
+    const settings = await getFromContainer(SettingsService).getSettings();
+    ctx.body = {
+      config: settings.initialSetup,
+      login_type: settings.authType,
+      ready: settings.initialSetup,
+    };
+  } catch (err) {
+    logger.error(`failed to get config`, err);
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = {
+      error: 'An error has occured',
+    };
   }
-  ctx.body = {
-    config: configStatus,
-    login_type: config.get('auth.type'),
-    ready,
-  };
 };
 
 const updateConfig = async (ctx: Context) => {
   const {
-    plexToken,
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    base_path,
     // eslint-disable-next-line @typescript-eslint/naming-convention
     login_type,
     plexPopular,
@@ -58,59 +41,41 @@ const updateConfig = async (ctx: Context) => {
     discord_webhook,
   } = ctx.request.body;
 
-  if (plexToken) {
-    config.set('plex.token', plexToken);
-  }
-  if (base_path) {
-    config.set('petio.subpath', base_path);
-  }
-  if (login_type) {
-    config.set('auth.type', login_type);
-  }
-  if (plexPopular) {
-    config.set('general.popular', plexPopular);
-  }
-  if (telegram_bot_token) {
-    config.set('notifications.telegram.token', telegram_bot_token);
-  }
-  if (telegram_chat_id) {
-    config.set('notifications.telegram.id', telegram_chat_id);
-  }
-  if (telegram_send_silently) {
-    config.set('notifications.telegram.silent', telegram_send_silently);
-  }
-  if (discord_webhook) {
-    config.set('notifications.discord.url', discord_webhook);
-  }
-
+  const settings = getFromContainer(SettingsService);
   try {
-    await WriteConfig();
+    const currentSettings = await settings.getSettings();
+    if (login_type || plexPopular) {
+      await settings.updateSettings({
+        authType: login_type ?? currentSettings.authType,
+        popularContent: plexPopular ?? currentSettings.popularContent,
+      });
+    }
   } catch (err) {
     logger.error(err);
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = 'Config Not Found';
     return;
   }
-
   ctx.status = StatusCodes.OK;
   ctx.body = 'config updated';
 };
 
 const getCurrentConfig = async (ctx: Context) => {
   try {
+    const settings = await getFromContainer(SettingsService).getSettings();
+
     ctx.status = StatusCodes.OK;
     ctx.body = {
-      base_path: config.get('petio.subpath'),
-      login_type: config.get('auth.type'),
-      plexPopular: config.get('general.popular'),
-      discord_webhook: config.get('notifications.discord.url'),
-      telegram_bot_token: config.get('notifications.telegram.token'),
-      telegram_chat_id: config.get('notifications.telegram.id'),
-      telegram_send_silently: config.get('notifications.telegram.silent'),
+      base_path: HTTP_BASE_PATH,
+      login_type: settings.authType,
+      plexPopular: settings.popularContent,
+      discord_webhook: '',
+      telegram_bot_token: '',
+      telegram_chat_id: '',
+      telegram_send_silently: false,
     };
   } catch (err) {
-    logger.log('error', 'ROUTE: Config error');
-    logger.log({ level: 'error', message: err });
+    logger.error('ROUTE: Config error', err);
 
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = 'config not found';

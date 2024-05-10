@@ -18,7 +18,9 @@ export class MediaServerMapper implements Mapper<MediaServerEntity, MediaServerS
     return {
       id: copy.id,
       name: copy.name,
+      type: copy.type,
       url: copy.url,
+      token: copy.token,
       enabled: copy.enabled,
       metadata: copy.metadata,
       libraries: copy.libraries,
@@ -38,7 +40,9 @@ export class MediaServerMapper implements Mapper<MediaServerEntity, MediaServerS
       id: record.id,
       props: {
         name: record.name,
+        type: record.type,
         url: record.url,
+        token: record.token,
         enabled: record.enabled,
         metadata: record.metadata,
         libraries: record.libraries || [],
@@ -60,6 +64,7 @@ export class MediaServerMapper implements Mapper<MediaServerEntity, MediaServerS
       id: copy.id,
       name: copy.name,
       url: copy.url,
+      // do not include token in response
       enabled: copy.enabled,
       metadata: copy.metadata,
       libraries: copy.libraries,

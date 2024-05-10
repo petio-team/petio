@@ -1,6 +1,5 @@
 import nodemailer from 'nodemailer';
 
-import { config } from '@/config/index';
 import loggerMain from '@/infra/logger/logger';
 
 const logger = loggerMain.child({ module: 'mail.mailer' });
@@ -19,7 +18,7 @@ export default class Mailer {
   async _check() {
     try {
       const verify = await this.transport.verify();
-      if (!config.get('email.from')) throw 'No From Email set';
+      if (false) throw 'No From Email set';
       return verify;
     } catch (err) {
       return err;
@@ -28,11 +27,11 @@ export default class Mailer {
 
   // Build mail transport
   _transport() {
-    const emailUser = config.get('email.username');
-    const emailPass = config.get('email.password');
-    const smtpServer = config.get('email.host');
-    const smtpPort = config.get('email.port');
-    const secure = config.get('email.ssl');
+    const emailUser = '';
+    const emailPass = '';
+    const smtpServer = '';
+    const smtpPort = '';
+    const secure = '';
 
     const transporter = nodemailer.createTransport({
       host: smtpServer,
@@ -87,7 +86,7 @@ export default class Mailer {
 
   // Build email and send to transport
   mail(subject, title, text, img, to: string[] = [], name: string[] = []) {
-    if (!config.get('email.enabled')) {
+    if (!true) {
       logger.debug('MAILER: Email disabled, skipping sending emails');
       return;
     }
@@ -104,15 +103,13 @@ export default class Mailer {
         i++;
         setTimeout(async () => {
           logger.debug(
-            `MAILER: Sending email from: ${config.get(
-              'email.from',
-            )} to ${send} with the subject ${subject}`,
+            `MAILER: Sending email from: ${''} to ${send} with the subject ${subject}`,
           );
           try {
             this.transport.sendMail({
-              from: `"Petio" <${config.get('email.from')}>`,
+              from: `"Petio" <${''}>`,
               to: `${username} <${send}>`,
-              bcc: config.get('admin.email'),
+              bcc: '',
               subject,
               html: this.mailHtml(title, text, img, username),
               text,
