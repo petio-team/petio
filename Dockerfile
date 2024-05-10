@@ -36,6 +36,7 @@ RUN groupadd -g 1000 petio && \
     mkdir -p /app && chown petio:petio /app
 
 # Copy all the build files from both frontend and backend
+COPY --from=builder --chown=petio:petio --chmod=0755 /build/node_modules/napi-nanoid-linux-x64-musl/napi-nanoid.linux-x64-musl.node /app
 COPY --from=builder --chown=petio:petio --chmod=0755 /build/pkg/frontend/build /app/views/frontend
 COPY --from=builder --chown=petio:petio --chmod=0755 /build/dist/api/index.js /app/index.js
 COPY ./scripts/docker /
