@@ -147,7 +147,10 @@ export default class LibraryUpdate {
     logger.debug(`CRON: Running Full`);
     try {
       const libraries = await this.getLibraries();
-      if (!is.truthy(libraries)) {
+      if (
+        !is.truthy(libraries.MediaContainer) ||
+        libraries.MediaContainer.size === 0
+      ) {
         logger.error('CRON: No libraries found');
         return;
       }
@@ -189,23 +192,22 @@ export default class LibraryUpdate {
       logger.warn('CRON: No directories found');
       return;
     }
+    logger.debug(
+      `CRON: Found ${libraries.MediaContainer.Directory.length} libraries`,
+    );
     await Promise.all(
-      libraries.MediaContainer.Directory.map(async (lib) => {
-        await this.saveLibrary(lib);
-      }),
+      libraries.MediaContainer.Directory.map(async (lib) =>
+        this.saveLibrary(lib),
+      ),
     );
   }
 
   async saveLibrary(lib) {
-    let libraryItem: any = false;
     const libraryRepo = getFromContainer(MediaLibraryRepository);
     try {
-      libraryItem = await libraryRepo.findOne({ uuid: lib.uuid });
-    } catch {
-      logger.debug('CRON: Library Not found, attempting to create');
-    }
-    if (!libraryItem) {
-      try {
+      const libraryResults = await libraryRepo.findOne({ uuid: lib.uuid });
+      if (libraryResults.isNone()) {
+        logger.debug(`CRON: Library Added ${lib.title}`);
         const newLibrary = MediaLibraryEntity.create({
           allowSync: lib.allowSync,
           art: lib.art,
@@ -227,46 +229,38 @@ export default class LibraryUpdate {
           hidden: lib.hidden,
         });
         await libraryRepo.create(newLibrary);
-      } catch (err) {
-        logger.error(`CRON: Error`, err);
-      }
-    } else {
-      let updatedLibraryItem: any = false;
-      try {
-        updatedLibraryItem = await libraryRepo.updateMany(
-          { uuid: lib.uuid },
-          {
-            $set: {
-              allowSync: lib.allowSync,
-              art: lib.art,
-              composite: lib.composite,
-              filters: lib.filters,
-              refreshing: lib.refreshing,
-              thumb: lib.thumb,
-              key: lib.key,
-              type: lib.type,
-              title: lib.title,
-              agent: lib.agent,
-              scanner: lib.scanner,
-              language: lib.language,
-              uuid: lib.uuid,
-              updatedAt: lib.updatedAt,
-              createdAt: lib.createdAt,
-              scannedAt: lib.scannedAt,
-              content: lib.content,
-              directory: lib.directory,
-              contentChangedAt: lib.contentChangedAt,
-              hidden: lib.hidden,
-            },
-          },
-        );
-      } catch (err) {
-        logger.error(`CRON: Error`, err);
         return;
       }
+      const updatedLibraryItem = await libraryRepo.updateMany(
+        { uuid: lib.uuid },
+        {
+          allowSync: lib.allowSync,
+          art: lib.art,
+          composite: lib.composite,
+          filters: lib.filters,
+          refreshing: lib.refreshing,
+          thumb: lib.thumb,
+          key: lib.key,
+          type: lib.type,
+          title: lib.title,
+          agent: lib.agent,
+          scanner: lib.scanner,
+          language: lib.language,
+          uuid: lib.uuid,
+          updatedAt: lib.updatedAt,
+          createdAt: lib.createdAt,
+          scannedAt: lib.scannedAt,
+          content: lib.content,
+          directory: lib.directory,
+          contentChangedAt: lib.contentChangedAt,
+          hidden: lib.hidden,
+        },
+      );
       if (updatedLibraryItem) {
         logger.debug(`CRON: Library Updated ${lib.title}`);
       }
+    } catch (err) {
+      logger.error(err, `CRON: Failed to update library ${lib.title}`);
     }
   }
 
@@ -332,7 +326,7 @@ export default class LibraryUpdate {
       });
       return res.MediaContainer;
     } catch (err) {
-      logger.error(`failed to get meta for ${id}`, err);
+      logger.error(err, `failed to get meta for ${id}`);
       throw new Error('Unable to get meta');
     }
   }
@@ -378,7 +372,7 @@ export default class LibraryUpdate {
     try {
       movieObj = await this.getMeta(movieObj.ratingKey);
     } catch (err) {
-      logger.error(`CRON: Unable to fetch meta for ${title}`, err);
+      logger.error(err, `CRON: Unable to fetch meta for ${title}`);
       return;
     }
     if (idSource === 'plex') {
@@ -544,8 +538,9 @@ export default class LibraryUpdate {
       return;
     }
     try {
+      logger.debug(`saving show ${title} with key ${showObj.ratingKey}`);
       showObj = await this.getMeta(showObj.ratingKey);
-      if (!showObj) {
+      if (!showObj || !showObj.Children || !showObj.Children.Metadata) {
         logger.warn(`CRON: No meta found for ${title}`);
         return;
       }
@@ -574,7 +569,7 @@ export default class LibraryUpdate {
         { concurrency: 1 },
       );
     } catch (err) {
-      logger.warn(`CRON: Unable to fetch meta for ${title}`, err);
+      logger.warn(err, `CRON: Unable to fetch meta for ${title}`);
       return;
     }
     if (idSource === 'plex') {
@@ -894,7 +889,7 @@ export default class LibraryUpdate {
 
         if (onServer) {
           logger.debug(`CRON: Found missed request - ${request.title}`);
-          new ProcessRequest(request).archive(true, false, false);
+          await new ProcessRequest(request).archive(true, false, '');
           const emails: any = [];
           const titles: any = [];
           await Promise.all(
