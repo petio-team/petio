@@ -2,12 +2,12 @@ import pino from 'pino';
 
 import { Logger } from '@/infra/logger/logger';
 import { PlexClient } from '@/infra/plex';
+import is from '@/infra/utils/is';
 import { MediaLibraryEntity } from '@/resources/media-library/entity';
 import { MediaLibraryType } from '@/resources/media-library/types';
 import { MediaServerEntity } from '@/resources/media-server/entity';
 import { UserEntity } from '@/resources/user/entity';
 import { ScannerProvider } from '@/services/scanner/provider';
-import is from '@/utils/is';
 
 export class PlexScannerProvider implements ScannerProvider {
   private logger: pino.Logger;

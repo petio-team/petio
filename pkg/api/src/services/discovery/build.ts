@@ -6,6 +6,7 @@ import { getFromContainer } from '@/infra/container/container';
 import loggerMain from '@/infra/logger/logger';
 import { PlexClient } from '@/infra/plex';
 import { Interceptors } from '@/infra/plex/core/OpenAPI';
+import is from '@/infra/utils/is';
 import { DiscoveryEntity } from '@/resources/discovery/entity';
 import { DiscoveryRepository } from '@/resources/discovery/repository';
 import { MediaServerEntity } from '@/resources/media-server/entity';
@@ -14,7 +15,6 @@ import { MovieEntity } from '@/resources/movie/entity';
 import { MovieRepository } from '@/resources/movie/repository';
 import { ShowEntity } from '@/resources/show/entity';
 import { ShowRepository } from '@/resources/show/repository';
-import is from '@/utils/is';
 
 type MovieBuild = {
   history: Record<string, string>;

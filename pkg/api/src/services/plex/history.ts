@@ -4,11 +4,11 @@ import Bluebird from 'bluebird';
 import { getFromContainer } from '@/infra/container/container';
 import loggerMain from '@/infra/logger/logger';
 import { GetSessionHistoryResponse, PlexClient } from '@/infra/plex';
+import is from '@/infra/utils/is';
 import { CacheService } from '@/services/cache/cache';
 import plexLookup from '@/services/plex/lookup';
 import { movieLookup } from '@/services/tmdb/movie';
 import { showLookup } from '@/services/tmdb/show';
-import is from '@/utils/is';
 
 const logger = loggerMain.child({ module: 'plex.history' });
 

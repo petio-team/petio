@@ -9,8 +9,8 @@ import {
   TrendingPeopleResponse,
   TrendingTvResponse,
 } from '@/infra/tmdb/client';
+import is from '@/infra/utils/is';
 import { CacheService } from '@/services/cache/cache';
-import is from '@/utils/is';
 
 import { getMovieDetails, getShowDetails } from './show';
 

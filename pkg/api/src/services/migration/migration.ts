@@ -1,6 +1,6 @@
 import { ArrConfig, EmailConfig, MainConfig, backupOldFiles, mergeFiles } from "@/infra/config/file";
 import { Logger } from "@/infra/logger/logger";
-import { fileExists } from "@/utils/file";
+import { fileExists } from "@/infra/utils/file";
 import { Service } from "diod";
 import fs from 'fs/promises';
 import path from "path";

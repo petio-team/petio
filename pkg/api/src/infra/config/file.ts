@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 import { DATA_DIR } from '@/infra/config/env';
 import logger from '@/infra/logger/logger';
-import is from '@/utils/is';
+import is from '@/infra/utils/is';
 
 const MainConfigSchema = z.object({
   DB_URL: z.string().url().min(1),

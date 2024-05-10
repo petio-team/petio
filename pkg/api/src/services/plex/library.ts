@@ -11,6 +11,7 @@ import { getFromContainer } from '@/infra/container/container';
 import loggerMain from '@/infra/logger/logger';
 import { GetLibrariesResponse, PlexClient } from '@/infra/plex';
 import { TheMovieDatabaseClient } from '@/infra/tmdb/client';
+import is from '@/infra/utils/is';
 import { MediaLibraryEntity } from '@/resources/media-library/entity';
 import { MediaLibraryRepository } from '@/resources/media-library/repository';
 import { MediaServerEntity } from '@/resources/media-server/entity';
@@ -29,7 +30,6 @@ import Telegram from '@/services/notifications/telegram';
 import { getPlexClient } from '@/services/plex/client';
 import ProcessRequest from '@/services/requests/process';
 import { showLookup } from '@/services/tmdb/show';
-import is from '@/utils/is';
 
 const logger = loggerMain.child({ module: 'plex.library' });
 

@@ -1,4 +1,4 @@
-import { Override } from '@/utils/override';
+import { Override } from '@/infra/utils/override';
 
 /**
  * Represents the type of media in a library.

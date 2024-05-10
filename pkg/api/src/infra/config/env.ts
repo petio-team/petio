@@ -2,7 +2,7 @@ import path from 'path';
 import { parseEnv, port } from 'znv';
 import { z } from 'zod';
 
-import { removeSlashes } from '@/utils/urls';
+import { removeSlashes } from '@/infra/utils/urls';
 
 // Used to extend the NodeJS Process interface to include the pkg property (vercel pkg)
 declare global {

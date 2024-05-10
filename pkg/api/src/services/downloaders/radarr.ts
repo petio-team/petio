@@ -2,12 +2,12 @@
 import { getFromContainer } from '@/infra/container/container';
 import loggerMain from '@/infra/logger/logger';
 import { MovieResource, RadarrV3Client } from '@/infra/servarr/radarr';
+import is from '@/infra/utils/is';
 import { DownloaderEntity } from '@/resources/downloader/entity';
 import { DownloaderRepository } from '@/resources/downloader/repository';
 import { DownloaderType } from '@/resources/downloader/types';
 import { RequestRepository } from '@/resources/request/repository';
 import { lookup } from '@/services/meta/imdb';
-import is from '@/utils/is';
 
 const logger = loggerMain.child({ module: 'downloaders.radarr' });
 

@@ -4,11 +4,11 @@ import { Context } from 'koa';
 
 import { getFromContainer } from '@/infra/container/container';
 import logger from '@/infra/logger/logger';
+import is from '@/infra/utils/is';
 import { MediaServerRepository } from '@/resources/media-server/repository';
 import { UserRepository } from '@/resources/user/repository';
 import { getPlexClient } from '@/services/plex/client';
 import plexLookup from '@/services/plex/lookup';
-import is from '@/utils/is';
 
 const lookupByIdAndType = async (ctx: Context) => {
   const { type } = ctx.params;

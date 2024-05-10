@@ -5,6 +5,7 @@ import { Context } from 'koa';
 
 import { getFromContainer } from '@/infra/container/container';
 import logger from '@/infra/logger/logger';
+import is from '@/infra/utils/is';
 import { DownloaderEntity } from '@/resources/downloader/entity';
 import { DownloaderRepository } from '@/resources/downloader/repository';
 import { RequestRepository } from '@/resources/request/repository';
@@ -18,7 +19,6 @@ import {
   getAllUserRequests,
 } from '@/services/requests/display';
 import ProcessRequest from '@/services/requests/process';
-import is from '@/utils/is';
 
 const listRequests = async (ctx: Context) => {
   ctx.status = StatusCodes.OK;

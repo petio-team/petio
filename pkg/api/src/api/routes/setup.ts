@@ -7,6 +7,7 @@ import { validateRequest } from '@/api/middleware/validation';
 import { getFromContainer } from '@/infra/container/container';
 import logger from '@/infra/logger/logger';
 import { PlexClient } from '@/infra/plex';
+import { generateKeys } from '@/infra/utils/security';
 import { Worker } from '@/infra/worker/worker';
 import { MediaServerEntity } from '@/resources/media-server/entity';
 import { MediaServerRepository } from '@/resources/media-server/repository';
@@ -16,7 +17,6 @@ import { UserRepository } from '@/resources/user/repository';
 import { UserRole } from '@/resources/user/types';
 import { SetupTestInput, SetupTestInputSchema } from '@/schemas/setup';
 import { SettingsService } from '@/services/settings/settings';
-import { generateKeys } from '@/utils/security';
 
 const testServer = async (ctx: Context) => {
   const body = ctx.request.body as SetupTestInput;

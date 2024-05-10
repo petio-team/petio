@@ -11,6 +11,7 @@ import { TMDB_API_KEY } from '@/infra/config/env';
 import { getFromContainer } from '@/infra/container/container';
 import loggerMain from '@/infra/logger/logger';
 import { TheMovieDatabaseClient } from '@/infra/tmdb/client';
+import is from '@/infra/utils/is';
 import { DiscoveryRepository } from '@/resources/discovery/repository';
 import { MediaServerRepository } from '@/resources/media-server/repository';
 import getHistory from '@/services/plex/history';
@@ -24,7 +25,6 @@ import {
   getRecommendations as getShowRecommendations,
   showLookup,
 } from '@/services/tmdb/show';
-import is from '@/utils/is';
 
 import cache from '../cache/cache';
 import { getPlexClient } from '../plex/client';

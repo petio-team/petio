@@ -5,9 +5,9 @@ import { Context } from 'koa';
 import { adminRequired } from '@/api/middleware/auth';
 import { getFromContainer } from '@/infra/container/container';
 import logger from '@/infra/logger/logger';
+import is from '@/infra/utils/is';
 import { MediaServerRepository } from '@/resources/media-server/repository';
 import getSessions from '@/services/plex/sessions';
-import is from '@/utils/is';
 
 const getSessionsData = async (ctx: Context) => {
   try {
