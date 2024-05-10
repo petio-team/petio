@@ -1,9 +1,9 @@
 import { AxiosRequestConfig } from 'axios';
 import { ContainerBuilder } from 'diod';
 
-import { TMDB_API_KEY } from '@/infra/config/env';
-import { Interceptors } from '@/infra/plex/core/OpenAPI';
-import { TheMovieDatabaseClient } from '@/infra/tmdb/client';
+import { TMDB_API_KEY } from '@/infrastructure/config/env';
+import { Interceptors } from '@/infrastructure/plex/core/OpenAPI';
+import { TheMovieDatabaseClient } from '@/infrastructure/tmdb/client';
 
 export default (builder: ContainerBuilder) => {
   builder.register(TheMovieDatabaseClient).useFactory(() => {

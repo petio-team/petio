@@ -1,4 +1,4 @@
-import { PlexClient } from '@/infra/plex';
+import { PlexClient } from '@/infrastructure/plex';
 
 export type GetStatisticsResources = {
   MediaContainer: {

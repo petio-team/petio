@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-import loggerMain from '@/infra/logger/logger';
+import loggerMain from '@/infrastructure/logger/logger';
 
 const logger = loggerMain.child({ module: 'mail.mailer' });
 

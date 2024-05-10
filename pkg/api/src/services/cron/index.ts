@@ -1,6 +1,7 @@
 import { Agenda } from '@hokify/agenda';
 
-import { DATABASE_URL } from '@/infra/config/env';
+import { DATABASE_URL } from '@/infrastructure/config/env';
+
 import discovery from '../discovery';
 import LibraryUpdate from '../plex/library';
 import QuotaSystem from '../requests/quotas';

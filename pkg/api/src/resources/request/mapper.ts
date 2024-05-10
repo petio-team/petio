@@ -1,4 +1,4 @@
-import { Mapper } from "@/infra/entity/mapper";
+import { Mapper } from "@/infrastructure/entity/mapper";
 import { Service } from "diod";
 import { RequestType } from "@/resources/request/types";
 import { RequestSchemaProps } from "./schema";

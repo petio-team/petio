@@ -7,11 +7,11 @@ import Bluebird from 'bluebird';
 import request from 'xhr-request';
 
 // eslint-disable-next-line import/order
-import { TMDB_API_KEY } from '@/infra/config/env';
-import { getFromContainer } from '@/infra/container/container';
-import loggerMain from '@/infra/logger/logger';
-import { TheMovieDatabaseClient } from '@/infra/tmdb/client';
-import is from '@/infra/utils/is';
+import { TMDB_API_KEY } from '@/infrastructure/config/env';
+import { getFromContainer } from '@/infrastructure/container/container';
+import loggerMain from '@/infrastructure/logger/logger';
+import { TheMovieDatabaseClient } from '@/infrastructure/tmdb/client';
+import is from '@/infrastructure/utils/is';
 import { DiscoveryRepository } from '@/resources/discovery/repository';
 import { MediaServerRepository } from '@/resources/media-server/repository';
 import getHistory from '@/services/plex/history';

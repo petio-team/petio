@@ -1,4 +1,4 @@
-import { Mapper } from "@/infra/entity/mapper";
+import { Mapper } from "@/infrastructure/entity/mapper";
 import { Service } from "diod";
 import { SettingsSchemaProps } from "./schema";
 import { SettingsEntity } from "./entity";

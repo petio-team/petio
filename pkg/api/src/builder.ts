@@ -1,6 +1,6 @@
 import { ContainerBuilder } from 'diod';
 
-import infra from '@/infra';
+import infra from '@/infrastructure';
 import resources from '@/resources';
 import services from '@/services';
 

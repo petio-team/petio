@@ -2,8 +2,8 @@
 import Router from '@koa/router';
 import { Context } from 'koa';
 
-import { getFromContainer } from '@/infra/container/container';
-import logger from '@/infra/logger/logger';
+import { getFromContainer } from '@/infrastructure/container/container';
+import logger from '@/infrastructure/logger/logger';
 import { UserRepository } from '@/resources/user/repository';
 import { CacheService } from '@/services/cache/cache';
 import { DiscoveryResult } from '@/services/discovery/display';

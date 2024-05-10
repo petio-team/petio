@@ -1,8 +1,8 @@
 import axios from 'axios';
 import http from 'http';
 
-import { TMDB_API_KEY } from '@/infra/config/env';
-import logger from '@/infra/logger/logger';
+import { TMDB_API_KEY } from '@/infrastructure/config/env';
+import logger from '@/infrastructure/logger/logger';
 
 const agent = new http.Agent({ family: 4 });
 

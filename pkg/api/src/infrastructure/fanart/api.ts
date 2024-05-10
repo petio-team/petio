@@ -1,7 +1,7 @@
 import { Zodios } from '@zodios/core';
 import * as z from 'zod';
 
-import { pluginQuery } from '@/infra/utils/zodios';
+import { pluginQuery } from '@/infrastructure/utils/zodios';
 
 import { FANART_API_KEY } from '../config/env';
 

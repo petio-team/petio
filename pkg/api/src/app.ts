@@ -11,11 +11,14 @@ import {
   HTTP_PORT,
   PGID,
   PUID,
-} from '@/infra/config/env';
-import { getFromContainer, useContainer } from '@/infra/container/container';
-import { MongooseDatabaseConnection } from '@/infra/database/connection';
-import logger from '@/infra/logger/logger';
-import { Master } from '@/infra/worker/master';
+} from '@/infrastructure/config/env';
+import {
+  getFromContainer,
+  useContainer,
+} from '@/infrastructure/container/container';
+import { MongooseDatabaseConnection } from '@/infrastructure/database/connection';
+import logger from '@/infrastructure/logger/logger';
+import { Master } from '@/infrastructure/worker/master';
 import { runCron } from '@/services/cron';
 import { MigrationService } from '@/services/migration/migration';
 import { SettingsService } from '@/services/settings/settings';

@@ -1,4 +1,4 @@
-import { MongooseRepository } from "@/infra/database/repository";
+import { MongooseRepository } from "@/infrastructure/database/repository";
 import { Service } from "diod";
 import { MovieEntity } from "./entity";
 import { MovieSchemaProps } from "./schema";

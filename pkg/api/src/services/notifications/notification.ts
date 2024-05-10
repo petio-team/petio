@@ -1,6 +1,6 @@
 import { container } from 'tsyringe';
 
-import logger from '@/infra/logger/logger';
+import logger from '@/infrastructure/logger/logger';
 
 import { INotify } from './notify';
 import {

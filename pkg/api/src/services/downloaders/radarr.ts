@@ -1,8 +1,8 @@
 /* eslint-disable no-restricted-syntax */
-import { getFromContainer } from '@/infra/container/container';
-import loggerMain from '@/infra/logger/logger';
-import { MovieResource, RadarrV3Client } from '@/infra/servarr/radarr';
-import is from '@/infra/utils/is';
+import { getFromContainer } from '@/infrastructure/container/container';
+import loggerMain from '@/infrastructure/logger/logger';
+import { MovieResource, RadarrV3Client } from '@/infrastructure/servarr/radarr';
+import is from '@/infrastructure/utils/is';
 import { DownloaderEntity } from '@/resources/downloader/entity';
 import { DownloaderRepository } from '@/resources/downloader/repository';
 import { DownloaderType } from '@/resources/downloader/types';

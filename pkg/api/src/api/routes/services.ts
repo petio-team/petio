@@ -6,10 +6,10 @@ import { z } from 'zod';
 
 import { adminRequired } from '@/api/middleware/auth';
 import { validateRequest } from '@/api/middleware/validation';
-import { getFromContainer } from '@/infra/container/container';
-import logger from '@/infra/logger/logger';
-import { RadarrV3Client } from '@/infra/servarr/radarr';
-import { SonarrV3Client } from '@/infra/servarr/sonarr';
+import { getFromContainer } from '@/infrastructure/container/container';
+import logger from '@/infrastructure/logger/logger';
+import { RadarrV3Client } from '@/infrastructure/servarr/radarr';
+import { SonarrV3Client } from '@/infrastructure/servarr/sonarr';
 import { DownloaderEntity } from '@/resources/downloader/entity';
 import { DownloaderMapper } from '@/resources/downloader/mapper';
 import { DownloaderRepository } from '@/resources/downloader/repository';

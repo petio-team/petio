@@ -3,8 +3,8 @@ import Promise from 'bluebird';
 import http from 'http';
 import sanitize from 'sanitize-filename';
 
-import { TMDB_API_KEY } from '@/infra/config/env';
-import loggerMain from '@/infra/logger/logger';
+import { TMDB_API_KEY } from '@/infrastructure/config/env';
+import loggerMain from '@/infrastructure/logger/logger';
 import onServer from '@/services/plex/server';
 import { movieLookup } from '@/services/tmdb/movie';
 import { showLookup } from '@/services/tmdb/show';

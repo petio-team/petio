@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import Bluebird from 'bluebird';
 
-import { getFromContainer } from '@/infra/container/container';
-import loggerMain from '@/infra/logger/logger';
-import { GetSessionHistoryResponse, PlexClient } from '@/infra/plex';
-import is from '@/infra/utils/is';
+import { getFromContainer } from '@/infrastructure/container/container';
+import loggerMain from '@/infrastructure/logger/logger';
+import { GetSessionHistoryResponse, PlexClient } from '@/infrastructure/plex';
+import is from '@/infrastructure/utils/is';
 import { CacheService } from '@/services/cache/cache';
 import plexLookup from '@/services/plex/lookup';
 import { movieLookup } from '@/services/tmdb/movie';

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import loggerMain from '@/infra/logger/logger';
-import { GetLibraryTopContentResponse } from '@/infra/plex';
-import is from '@/infra/utils/is';
+import loggerMain from '@/infrastructure/logger/logger';
+import { GetLibraryTopContentResponse } from '@/infrastructure/plex';
+import is from '@/infrastructure/utils/is';
 import { MediaServerEntity } from '@/resources/media-server/entity';
 import { getPlexClient } from '@/services/plex/client';
 import plexLookup from '@/services/plex/lookup';

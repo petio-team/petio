@@ -1,8 +1,8 @@
 /* eslint-disable no-restricted-syntax */
 import Bluebird from 'bluebird';
 
-import { getFromContainer } from '@/infra/container/container';
-import logger from '@/infra/logger/logger';
+import { getFromContainer } from '@/infrastructure/container/container';
+import logger from '@/infrastructure/logger/logger';
 import { DownloaderEntity } from '@/resources/downloader/entity';
 import { DownloaderRepository } from '@/resources/downloader/repository';
 import { DownloaderType } from '@/resources/downloader/types';

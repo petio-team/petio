@@ -2,8 +2,8 @@
 import Bluebird from 'bluebird';
 import _ from 'lodash';
 
-import { getFromContainer } from '@/infra/container/container';
-import loggerMain from '@/infra/logger/logger';
+import { getFromContainer } from '@/infrastructure/container/container';
+import loggerMain from '@/infrastructure/logger/logger';
 import { UserRepository } from '@/resources/user/repository';
 
 import cache from '../cache/cache';

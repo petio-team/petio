@@ -8,9 +8,9 @@ import { Context } from 'koa';
 import send from 'koa-send';
 import path from 'path';
 
-import { DATA_DIR } from '@/infra/config/env';
-import { getFromContainer } from '@/infra/container/container';
-import logger from '@/infra/logger/logger';
+import { DATA_DIR } from '@/infrastructure/config/env';
+import { getFromContainer } from '@/infrastructure/container/container';
+import logger from '@/infrastructure/logger/logger';
 import { ProfileRepository } from '@/resources/profile/repository';
 import { UserEntity } from '@/resources/user/entity';
 import { UserMapper } from '@/resources/user/mapper';

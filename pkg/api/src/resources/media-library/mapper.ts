@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import { Mapper } from "@/infra/entity/mapper";
+import { Mapper } from "@/infrastructure/entity/mapper";
 import { Service } from "diod";
 import { MediaLibraryType } from "@/resources/media-library/types";
 import { MediaLibrarySchemaProps } from "./schema";

@@ -2,9 +2,9 @@
 import axios, { AxiosResponse } from 'axios';
 import http from 'http';
 
-import { TMDB_API_KEY } from '@/infra/config/env';
-import { getFromContainer } from '@/infra/container/container';
-import loggerMain from '@/infra/logger/logger';
+import { TMDB_API_KEY } from '@/infrastructure/config/env';
+import { getFromContainer } from '@/infrastructure/container/container';
+import loggerMain from '@/infrastructure/logger/logger';
 import {
   DiscoverMovieResponse,
   MovieCreditsResponse,
@@ -13,8 +13,8 @@ import {
   MovieReleaseDatesResponse,
   MovieVideosResponse,
   TheMovieDatabaseClient,
-} from '@/infra/tmdb/client';
-import is from '@/infra/utils/is';
+} from '@/infrastructure/tmdb/client';
+import is from '@/infrastructure/utils/is';
 import { CacheService } from '@/services/cache/cache';
 import fanartLookup from '@/services/fanart';
 import { lookup } from '@/services/meta/imdb';

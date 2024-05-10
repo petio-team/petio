@@ -1,8 +1,8 @@
 import cluster from 'cluster';
 import { ContainerBuilder } from 'diod';
 
-import { Master } from '@/infra/worker/master';
-import { Worker } from '@/infra/worker/worker';
+import { Master } from '@/infrastructure/worker/master';
+import { Worker } from '@/infrastructure/worker/worker';
 
 export default (builder: ContainerBuilder) => {
   if (cluster.isPrimary) {

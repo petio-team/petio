@@ -1,4 +1,4 @@
-import { getFromContainer } from '@/infra/container/container';
+import { getFromContainer } from '@/infrastructure/container/container';
 import { ArchiveRepository } from '@/resources/archive/repository';
 
 export const getArchive = async (userId) => {

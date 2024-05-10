@@ -1,6 +1,7 @@
-import { z } from "zod";
-import { Movie } from "@/infra/arr/radarr/v4/movie";
-import { Series } from "@/infra/arr/sonarr/v3/series";
+import { z } from 'zod';
+
+import { Movie } from '@/infrastructure/arr/radarr/v4/movie';
+import { Series } from '@/infrastructure/arr/sonarr/v3/series';
 
 // {
 //   '634492': {
@@ -71,27 +72,30 @@ export const RequestsSchema = z.object({
     available_resolutions: z.array(z.unknown()),
     imdb_data: z.boolean(),
     reviews: z.unknown().optional(),
-    collection: z.boolean()
+    collection: z.boolean(),
   }),
   approved: z.boolean(),
   manualStatus: z.unknown().optional(),
   process_stage: z.object({
     status: z.string(),
     message: z.string(),
-    step: z.number()
+    step: z.number(),
   }),
-  defaults: z.unknown().optional()
+  defaults: z.unknown().optional(),
 });
 export type Requests = z.infer<typeof RequestsSchema>;
 
 export type RequestChildren = {
-  id: number,
-  info: Movie | Series & {
-    serverName: string,
-  } | {
-    message: string,
-  },
-  status: any[],
+  id: number;
+  info:
+    | Movie
+    | (Series & {
+        serverName: string;
+      })
+    | {
+        message: string;
+      };
+  status: any[];
 };
 
 export type RequestState = {

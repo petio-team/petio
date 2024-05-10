@@ -1,5 +1,5 @@
-import { getFromContainer } from '@/infra/container/container';
-import loggerMain from '@/infra/logger/logger';
+import { getFromContainer } from '@/infrastructure/container/container';
+import loggerMain from '@/infrastructure/logger/logger';
 import { ArchiveEntity } from '@/resources/archive/entity';
 import { ArchiveRepository } from '@/resources/archive/repository';
 import { DownloaderRepository } from '@/resources/downloader/repository';

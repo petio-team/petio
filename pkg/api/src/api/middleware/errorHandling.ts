@@ -1,8 +1,8 @@
 import { StatusCodes } from 'http-status-codes';
 import { DefaultContext } from 'koa';
 
-import { getFromContainer } from '@/infra/container/container';
-import { Logger } from '@/infra/logger/logger';
+import { getFromContainer } from '@/infrastructure/container/container';
+import { Logger } from '@/infrastructure/logger/logger';
 
 import HttpError from '../http/errors/http';
 import NotFound from '../http/errors/notFound';

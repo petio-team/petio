@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 
-import { PGID, PUID } from '@/infra/config/env';
+import { PGID, PUID } from '@/infrastructure/config/env';
 
 export const fileExists = async (file: string): Promise<boolean> => {
   try {

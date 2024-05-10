@@ -4,11 +4,11 @@ import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
 import { validateRequest } from '@/api/middleware/validation';
-import { getFromContainer } from '@/infra/container/container';
-import logger from '@/infra/logger/logger';
-import { PlexClient } from '@/infra/plex';
-import { generateKeys } from '@/infra/utils/security';
-import { Worker } from '@/infra/worker/worker';
+import { getFromContainer } from '@/infrastructure/container/container';
+import logger from '@/infrastructure/logger/logger';
+import { PlexClient } from '@/infrastructure/plex';
+import { generateKeys } from '@/infrastructure/utils/security';
+import { Worker } from '@/infrastructure/worker/worker';
 import { MediaServerEntity } from '@/resources/media-server/entity';
 import { MediaServerRepository } from '@/resources/media-server/repository';
 import { MediaServerType } from '@/resources/media-server/types';

@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import { Mapper } from "@/infra/entity/mapper";
+import { Mapper } from "@/infrastructure/entity/mapper";
 import { Service } from "diod";
 import { UserRole } from "@/resources/user/types";
 import { UserSchemaProps } from "./schema";

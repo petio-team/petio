@@ -1,9 +1,9 @@
 /* eslint-disable no-await-in-loop */
 
 /* eslint-disable no-restricted-syntax */
-import { getFromContainer } from '@/infra/container/container';
-import loggerMain from '@/infra/logger/logger';
-import { SonarrV3Client } from '@/infra/servarr/sonarr';
+import { getFromContainer } from '@/infrastructure/container/container';
+import loggerMain from '@/infrastructure/logger/logger';
+import { SonarrV3Client } from '@/infrastructure/servarr/sonarr';
 import { DownloaderEntity } from '@/resources/downloader/entity';
 import { DownloaderRepository } from '@/resources/downloader/repository';
 import { DownloaderType } from '@/resources/downloader/types';

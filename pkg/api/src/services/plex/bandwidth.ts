@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import loggerMain from '@/infra/logger/logger';
+import loggerMain from '@/infrastructure/logger/logger';
 import { MediaServerEntity } from '@/resources/media-server/entity';
 
 const logger = loggerMain.child({ module: 'plex.bandwidth' });

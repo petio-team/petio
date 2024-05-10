@@ -3,9 +3,9 @@ import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
 import { adminRequired } from '@/api/middleware/auth';
-import { getFromContainer } from '@/infra/container/container';
-import logger from '@/infra/logger/logger';
-import is from '@/infra/utils/is';
+import { getFromContainer } from '@/infrastructure/container/container';
+import logger from '@/infrastructure/logger/logger';
+import is from '@/infrastructure/utils/is';
 import { MediaServerRepository } from '@/resources/media-server/repository';
 import getSessions from '@/services/plex/sessions';
 

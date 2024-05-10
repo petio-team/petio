@@ -1,4 +1,4 @@
-import { Mapper } from "@/infra/entity/mapper";
+import { Mapper } from "@/infrastructure/entity/mapper";
 import { Service } from "diod";
 import { ArchiveSchemaProps } from "./schema";
 import { ArchiveEntity } from "./entity";

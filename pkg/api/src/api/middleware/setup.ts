@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
 import { Context, Next } from 'koa';
 
-import { getFromContainer } from '@/infra/container/container';
+import { getFromContainer } from '@/infrastructure/container/container';
 import { SettingsService } from '@/services/settings/settings';
 
 export default async (ctx: Context, next: Next) => {

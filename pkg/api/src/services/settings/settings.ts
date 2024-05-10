@@ -1,4 +1,4 @@
-import { Logger } from "@/infra/logger/logger";
+import { Logger } from "@/infrastructure/logger/logger";
 import { SettingsEntity } from "@/resources/settings/entity";
 import { SettingsRepository } from "@/resources/settings/repository";
 import { SettingsSchemaProps } from "@/resources/settings/schema";

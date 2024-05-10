@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import { Mapper } from "@/infra/entity/mapper";
+import { Mapper } from "@/infrastructure/entity/mapper";
 import { Service } from "diod";
 import { MovieSchemaProps } from "./schema";
 import { MovieEntity } from "./entity";

@@ -1,8 +1,8 @@
 import pino from 'pino';
 
-import { Logger } from '@/infra/logger/logger';
-import { PlexClient } from '@/infra/plex';
-import is from '@/infra/utils/is';
+import { Logger } from '@/infrastructure/logger/logger';
+import { PlexClient } from '@/infrastructure/plex';
+import is from '@/infrastructure/utils/is';
 import { MediaLibraryEntity } from '@/resources/media-library/entity';
 import { MediaLibraryType } from '@/resources/media-library/types';
 import { MediaServerEntity } from '@/resources/media-server/entity';

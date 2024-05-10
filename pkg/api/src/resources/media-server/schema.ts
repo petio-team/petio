@@ -1,6 +1,6 @@
 import { Schema } from 'mongoose';
 
-import { BaseEntityProps } from '@/infra/entity/entity';
+import { BaseEntityProps } from '@/infrastructure/entity/entity';
 
 import { MediaServerProps } from './types';
 

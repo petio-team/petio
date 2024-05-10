@@ -1,7 +1,7 @@
 import Cors from '@koa/cors';
 import Koa from 'koa';
 
-import { HTTP_CORS_DOMAINS } from '@/infra/config/env';
+import { HTTP_CORS_DOMAINS } from '@/infrastructure/config/env';
 
 export default () => {
   const corsOptions = {

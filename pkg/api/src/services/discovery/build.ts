@@ -2,11 +2,11 @@
 import { AxiosRequestConfig } from 'axios';
 import Bluebird from 'bluebird';
 
-import { getFromContainer } from '@/infra/container/container';
-import loggerMain from '@/infra/logger/logger';
-import { PlexClient } from '@/infra/plex';
-import { Interceptors } from '@/infra/plex/core/OpenAPI';
-import is from '@/infra/utils/is';
+import { getFromContainer } from '@/infrastructure/container/container';
+import loggerMain from '@/infrastructure/logger/logger';
+import { PlexClient } from '@/infrastructure/plex';
+import { Interceptors } from '@/infrastructure/plex/core/OpenAPI';
+import is from '@/infrastructure/utils/is';
 import { DiscoveryEntity } from '@/resources/discovery/entity';
 import { DiscoveryRepository } from '@/resources/discovery/repository';
 import { MediaServerEntity } from '@/resources/media-server/entity';

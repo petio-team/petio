@@ -1,4 +1,4 @@
-import { MongooseRepository } from "@/infra/database/repository";
+import { MongooseRepository } from "@/infrastructure/database/repository";
 import { Service } from "diod";
 import { SettingsEntity } from "./entity";
 import { SettingsSchemaProps } from "./schema";

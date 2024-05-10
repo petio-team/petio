@@ -4,9 +4,9 @@ import { Context } from 'koa';
 import * as z from 'zod';
 
 import { validateRequest } from '@/api/middleware/validation';
-import { HTTP_BASE_PATH } from '@/infra/config/env';
-import { getFromContainer } from '@/infra/container/container';
-import logger from '@/infra/logger/logger';
+import { HTTP_BASE_PATH } from '@/infrastructure/config/env';
+import { getFromContainer } from '@/infrastructure/container/container';
+import logger from '@/infrastructure/logger/logger';
 import { SettingsService } from '@/services/settings/settings';
 
 const getConfig = async (ctx: Context) => {

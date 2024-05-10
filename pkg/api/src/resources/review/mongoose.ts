@@ -1,7 +1,7 @@
 import { Service } from 'diod';
 
-import { MongooseBaseRepository } from '@/infra/database/base-repository';
-import { MongooseDatabaseConnection } from '@/infra/database/connection';
+import { MongooseBaseRepository } from '@/infrastructure/database/base-repository';
+import { MongooseDatabaseConnection } from '@/infrastructure/database/connection';
 import { ReviewEntity } from './entity';
 import { ReviewMapper } from './mapper';
 import { ReviewRepository } from './repository';

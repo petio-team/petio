@@ -5,7 +5,7 @@
 		"body": [
 		  "import { nanoid } from 'napi-nanoid';",
 		  "",
-		  "import { BaseEntity } from '@/infra/entity/entity';",
+		  "import { BaseEntity } from '@/infrastructure/entity/entity';",
 		  "import {",
 		  "  Create${1}Props,",
 		  "  ${1}Props,",
@@ -40,7 +40,7 @@
 		"scope": "typescript",
 		"prefix": "grm",
 		"body": [
-		  "import { Mapper } from \"@/infra/entity/mapper\";",
+		  "import { Mapper } from \"@/infrastructure/entity/mapper\";",
 		  "import { Service } from \"diod\";",
 		  "import { ${1}SchemaProps } from \"./schema\";",
 		  "import { ${1}Entity } from \"./entity\";",
@@ -106,8 +106,8 @@
 		"body": [
 		  "import { Service } from 'diod';",
 		  "",
-		  "import { MongooseBaseRepository } from '@/infra/database/base-repository';",
-		  "import { MongooseDatabaseConnection } from '@/infra/database/connection';",
+		  "import { MongooseBaseRepository } from '@/infrastructure/database/base-repository';",
+		  "import { MongooseDatabaseConnection } from '@/infrastructure/database/connection';",
 		  "import { ${1}Entity } from './entity';",
 		  "import { ${1}Mapper } from './mapper';",
 		  "import { ${1}Repository } from './repository';",
@@ -146,7 +146,7 @@
 		"scope": "typescript",
 		"prefix": "grr",
 		"body": [
-		  "import { MongooseRepository } from \"@/infra/database/repository\";",
+		  "import { MongooseRepository } from \"@/infrastructure/database/repository\";",
 		  "import { Service } from \"diod\";",
 		  "import { ${1}Entity } from \"./entity\";",
 		  "import { ${1}SchemaProps } from \"./schema\";",
@@ -188,7 +188,7 @@
 		"body": [
 		  "import { Schema } from 'mongoose';",
 		  "",
-		  "import { BaseEntityProps } from '@/infra/entity/entity';",
+		  "import { BaseEntityProps } from '@/infrastructure/entity/entity';",
 		  "",
 		  "import { ${1}Props } from './types';",
 		  "",

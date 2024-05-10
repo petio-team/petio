@@ -1,4 +1,4 @@
-import { PlexClient } from '@/infra/plex';
+import { PlexClient } from '@/infrastructure/plex';
 import { MediaServerEntity } from '@/resources/media-server/entity';
 
 export function getPlexClient(server: MediaServerEntity) {

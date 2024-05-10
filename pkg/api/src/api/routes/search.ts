@@ -2,7 +2,7 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import logger from '@/infra/logger/logger';
+import logger from '@/infrastructure/logger/logger';
 import search from '@/services/tmdb/search';
 
 const searchByTerm = async (ctx: Context) => {

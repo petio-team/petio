@@ -2,8 +2,8 @@ import * as HttpStatus from 'http-status-codes';
 import jwt from 'jsonwebtoken';
 import { Context, Next } from 'koa';
 
-import { getFromContainer } from '@/infra/container/container';
-import loggerMain from '@/infra/logger/logger';
+import { getFromContainer } from '@/infrastructure/container/container';
+import loggerMain from '@/infrastructure/logger/logger';
 import { UserMapper } from '@/resources/user/mapper';
 import { UserRepository } from '@/resources/user/repository';
 

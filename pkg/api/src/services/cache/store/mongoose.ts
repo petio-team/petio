@@ -1,9 +1,8 @@
 import { Cache, Milliseconds, Store } from 'cache-manager';
 
+import { getFromContainer } from '@/infrastructure/container/container';
 import { CacheEntity } from '@/resources/cache/entity';
 import { CacheRepository } from '@/resources/cache/repository';
-
-import { getFromContainer } from '../../../infra/container/container';
 
 const defaultExpiry: number = 60 * 1000;
 

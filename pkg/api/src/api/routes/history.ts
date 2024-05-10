@@ -2,8 +2,8 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import { getFromContainer } from '@/infra/container/container';
-import logger from '@/infra/logger/logger';
+import { getFromContainer } from '@/infrastructure/container/container';
+import logger from '@/infrastructure/logger/logger';
 import { MediaServerRepository } from '@/resources/media-server/repository';
 import getBandwidth from '@/services/plex/bandwidth';
 import { getPlexClient } from '@/services/plex/client';

@@ -4,16 +4,16 @@
 import axios from 'axios';
 import http from 'http';
 
-import { TMDB_API_KEY } from '@/infra/config/env';
-import { getFromContainer } from '@/infra/container/container';
-import loggerMain from '@/infra/logger/logger';
+import { TMDB_API_KEY } from '@/infrastructure/config/env';
+import { getFromContainer } from '@/infrastructure/container/container';
+import loggerMain from '@/infrastructure/logger/logger';
 import {
   MovieDetailsResponse,
   MovieVideosResponse,
   TheMovieDatabaseClient,
   TvSeriesDetailsResponse,
   TvSeriesVideosResponse,
-} from '@/infra/tmdb/client';
+} from '@/infrastructure/tmdb/client';
 import { CacheService } from '@/services/cache/cache';
 import fanartLookup from '@/services/fanart';
 import { lookup as imdb } from '@/services/meta/imdb';

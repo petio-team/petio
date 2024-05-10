@@ -1,7 +1,7 @@
 import { IpcMethodHandler } from '@david.uhlir/ipc-method';
 import cluster from 'cluster';
 
-import logger from '@/infra/logger/logger';
+import logger from '@/infrastructure/logger/logger';
 
 import { masterReciever, workerReciever } from './recievers';
 

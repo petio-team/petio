@@ -1,5 +1,5 @@
-import { getFromContainer } from '@/infra/container/container';
-import logger from '@/infra/logger/logger';
+import { getFromContainer } from '@/infrastructure/container/container';
+import logger from '@/infrastructure/logger/logger';
 import { UserRepository } from '@/resources/user/repository';
 
 export default class QuotaSystem {

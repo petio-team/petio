@@ -1,6 +1,6 @@
-import { getFromContainer } from '@/infra/container/container';
-import { FanartAPI } from '@/infra/fanart/api';
-import loggerMain from '@/infra/logger/logger';
+import { getFromContainer } from '@/infrastructure/container/container';
+import { FanartAPI } from '@/infrastructure/fanart/api';
+import loggerMain from '@/infrastructure/logger/logger';
 import { CacheService } from '@/services/cache/cache';
 
 const logger = loggerMain.child({ module: 'fanart.index' });

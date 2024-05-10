@@ -2,9 +2,9 @@ import fs, { mkdir } from 'fs/promises';
 import path from 'path';
 import { z } from 'zod';
 
-import { DATA_DIR } from '@/infra/config/env';
-import logger from '@/infra/logger/logger';
-import is from '@/infra/utils/is';
+import { DATA_DIR } from '@/infrastructure/config/env';
+import logger from '@/infrastructure/logger/logger';
+import is from '@/infrastructure/utils/is';
 
 const MainConfigSchema = z.object({
   DB_URL: z.string().url().min(1),

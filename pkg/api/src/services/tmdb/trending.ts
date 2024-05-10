@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import bluebird from 'bluebird';
 
-import { getFromContainer } from '@/infra/container/container';
-import logger from '@/infra/logger/logger';
+import { getFromContainer } from '@/infrastructure/container/container';
+import logger from '@/infrastructure/logger/logger';
 import {
   TheMovieDatabaseClient,
   TrendingMoviesResponse,
   TrendingPeopleResponse,
   TrendingTvResponse,
-} from '@/infra/tmdb/client';
-import is from '@/infra/utils/is';
+} from '@/infrastructure/tmdb/client';
+import is from '@/infrastructure/utils/is';
 import { CacheService } from '@/services/cache/cache';
 
 import { getMovieDetails, getShowDetails } from './show';

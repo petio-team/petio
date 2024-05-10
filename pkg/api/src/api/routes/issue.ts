@@ -2,8 +2,8 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import { getFromContainer } from '@/infra/container/container';
-import logger from '@/infra/logger/logger';
+import { getFromContainer } from '@/infrastructure/container/container';
+import logger from '@/infrastructure/logger/logger';
 import { IssueEntity } from '@/resources/issue/entity';
 import { IssueMapper } from '@/resources/issue/mapper';
 import { IssueRepository } from '@/resources/issue/repository';

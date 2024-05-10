@@ -8,8 +8,8 @@ import request from 'xhr-request';
 import xmlParser from 'xml-js';
 
 import { authenticate } from '@/api/middleware/auth';
-import { getFromContainer } from '@/infra/container/container';
-import loggerMain from '@/infra/logger/logger';
+import { getFromContainer } from '@/infrastructure/container/container';
+import loggerMain from '@/infrastructure/logger/logger';
 import { UserEntity } from '@/resources/user/entity';
 import { UserMapper } from '@/resources/user/mapper';
 import { UserRepository } from '@/resources/user/repository';

@@ -1,6 +1,6 @@
-import { ArrConfig, EmailConfig, MainConfig, backupOldFiles, mergeFiles } from "@/infra/config/file";
-import { Logger } from "@/infra/logger/logger";
-import { fileExists } from "@/infra/utils/file";
+import { ArrConfig, EmailConfig, MainConfig, backupOldFiles, mergeFiles } from "@/infrastructure/config/file";
+import { Logger } from "@/infrastructure/logger/logger";
+import { fileExists } from "@/infrastructure/utils/file";
 import { Service } from "diod";
 import fs from 'fs/promises';
 import path from "path";
@@ -20,8 +20,8 @@ import { DownloaderType } from "@/resources/downloader/types";
 import { UserRepository } from "@/resources/user/repository";
 import { UserEntity } from "@/resources/user/entity";
 import { UserRole } from "@/resources/user/types";
-import { MongooseDatabaseConnection } from "@/infra/database/connection";
-import { getFromContainer } from "@/infra/container/container";
+import { MongooseDatabaseConnection } from "@/infrastructure/database/connection";
+import { getFromContainer } from "@/infrastructure/container/container";
 import dotenv from 'dotenv';
 
 @Service()

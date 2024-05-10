@@ -1,7 +1,7 @@
 import { Service } from 'diod';
 
-import { MongooseBaseRepository } from '@/infra/database/base-repository';
-import { MongooseDatabaseConnection } from '@/infra/database/connection';
+import { MongooseBaseRepository } from '@/infrastructure/database/base-repository';
+import { MongooseDatabaseConnection } from '@/infrastructure/database/connection';
 import { NotificationEntity } from './entity';
 import { NotificationMapper } from './mapper';
 import { NotificationRepository } from './repository';

@@ -1,4 +1,4 @@
-import { Logger } from "@/infra/logger/logger";
+import { Logger } from "@/infrastructure/logger/logger";
 import { MediaLibraryRepository } from "@/resources/media-library/repository";
 import { MediaServerEntity } from "@/resources/media-server/entity";
 import { MediaServerRepository } from "@/resources/media-server/repository";

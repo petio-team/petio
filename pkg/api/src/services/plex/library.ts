@@ -7,11 +7,11 @@ import axios from 'axios';
 import Bluebird from 'bluebird';
 import xmlParser from 'xml-js';
 
-import { getFromContainer } from '@/infra/container/container';
-import loggerMain from '@/infra/logger/logger';
-import { GetLibrariesResponse, PlexClient } from '@/infra/plex';
-import { TheMovieDatabaseClient } from '@/infra/tmdb/client';
-import is from '@/infra/utils/is';
+import { getFromContainer } from '@/infrastructure/container/container';
+import loggerMain from '@/infrastructure/logger/logger';
+import { GetLibrariesResponse, PlexClient } from '@/infrastructure/plex';
+import { TheMovieDatabaseClient } from '@/infrastructure/tmdb/client';
+import is from '@/infrastructure/utils/is';
 import { MediaLibraryEntity } from '@/resources/media-library/entity';
 import { MediaLibraryRepository } from '@/resources/media-library/repository';
 import { MediaServerEntity } from '@/resources/media-server/entity';

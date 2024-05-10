@@ -3,9 +3,9 @@ import Bluebird from 'bluebird';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import { getFromContainer } from '@/infra/container/container';
-import logger from '@/infra/logger/logger';
-import is from '@/infra/utils/is';
+import { getFromContainer } from '@/infrastructure/container/container';
+import logger from '@/infrastructure/logger/logger';
+import is from '@/infrastructure/utils/is';
 import { DownloaderEntity } from '@/resources/downloader/entity';
 import { DownloaderRepository } from '@/resources/downloader/repository';
 import { RequestRepository } from '@/resources/request/repository';

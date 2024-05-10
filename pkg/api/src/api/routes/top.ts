@@ -2,7 +2,7 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import { getFromContainer } from '@/infra/container/container';
+import { getFromContainer } from '@/infrastructure/container/container';
 import { MediaServerRepository } from '@/resources/media-server/repository';
 import getTop from '@/services/plex/top';
 

@@ -1,7 +1,7 @@
 import { Context, Next } from 'koa';
 import PinoHttp from 'pino-http';
 
-import logger from '@/infra/logger/logger';
+import logger from '@/infrastructure/logger/logger';
 
 const httpLogger = PinoHttp({
   logger: logger.core(),

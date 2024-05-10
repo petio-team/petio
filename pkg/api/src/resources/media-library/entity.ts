@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-import { BaseEntity } from '@/infra/entity/entity';
+import { BaseEntity } from '@/infrastructure/entity/entity';
 
 import { CreateMediaLibraryProps, MediaLibraryProps } from './types';
 

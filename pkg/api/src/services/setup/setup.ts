@@ -1,5 +1,5 @@
-import { getFromContainer } from '@/infra/container/container';
-import logger from '@/infra/logger/logger';
+import { getFromContainer } from '@/infrastructure/container/container';
+import logger from '@/infrastructure/logger/logger';
 import { MovieRepository } from '@/resources/movie/repository';
 import { ShowRepository } from '@/resources/show/repository';
 import { UserRepository } from '@/resources/user/repository';

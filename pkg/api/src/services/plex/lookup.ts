@@ -1,4 +1,4 @@
-import { getFromContainer } from '@/infra/container/container';
+import { getFromContainer } from '@/infrastructure/container/container';
 import { MovieRepository } from '@/resources/movie/repository';
 import { ShowRepository } from '@/resources/show/repository';
 

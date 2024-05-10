@@ -16,8 +16,8 @@ import {
   HTTP_BASE_PATH,
   HTTP_PORT,
   HTTP_TRUSTED_PROXIES,
-} from '@/infra/config/env';
-import { getFromContainer } from '@/infra/container/container';
+} from '@/infrastructure/config/env';
+import { getFromContainer } from '@/infrastructure/container/container';
 import { SettingsService } from '@/services/settings/settings';
 
 import responseHandler from './http/responseHandler';

@@ -1,6 +1,6 @@
 import { nanoid } from 'napi-nanoid';
 
-import { BaseEntity } from '@/infra/entity/entity';
+import { BaseEntity } from '@/infrastructure/entity/entity';
 
 import { CreateIssueProps, IssueProps } from './types';
 

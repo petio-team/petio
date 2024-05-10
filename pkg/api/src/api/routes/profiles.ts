@@ -3,8 +3,8 @@ import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
 import { adminRequired } from '@/api/middleware/auth';
-import { getFromContainer } from '@/infra/container/container';
-import logger from '@/infra/logger/logger';
+import { getFromContainer } from '@/infrastructure/container/container';
+import logger from '@/infrastructure/logger/logger';
 import { ProfileEntity } from '@/resources/profile/entity';
 import { ProfileMapper } from '@/resources/profile/mapper';
 import { ProfileRepository } from '@/resources/profile/repository';

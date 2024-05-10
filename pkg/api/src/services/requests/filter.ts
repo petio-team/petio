@@ -1,8 +1,8 @@
 /* eslint-disable no-plusplus */
 
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { getFromContainer } from '@/infra/container/container';
-import logger from '@/infra/logger/logger';
+import { getFromContainer } from '@/infrastructure/container/container';
+import logger from '@/infrastructure/logger/logger';
 import { FilterRepository } from '@/resources/filter/repository';
 import { movieLookup } from '@/services/tmdb/movie';
 import { showLookup } from '@/services/tmdb/show';

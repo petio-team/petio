@@ -1,7 +1,7 @@
-import { MongooseBaseRepository } from '@/infra/database/base-repository';
+import { MongooseBaseRepository } from '@/infrastructure/database/base-repository';
 
 import { Service } from 'diod';
-import { MongooseDatabaseConnection } from '@/infra/database/connection';
+import { MongooseDatabaseConnection } from '@/infrastructure/database/connection';
 import { MediaServerEntity } from './entity';
 import { MediaServerMapper } from './mapper';
 import { MediaServerRepository } from './repository';

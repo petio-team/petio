@@ -1,4 +1,4 @@
-import TelegramAPI from '@/infra/telegram/api';
+import TelegramAPI from '@/infrastructure/telegram/api';
 
 import { BaseNotification, INotification } from '../notification';
 import { INotify, NotifyEvent, NotifyPayload } from '../notify';

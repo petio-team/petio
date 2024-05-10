@@ -5,9 +5,9 @@ import lineReader from 'line-reader';
 import path from 'path';
 import zlib from 'zlib';
 
-import { DATA_DIR } from '@/infra/config/env';
-import { getFromContainer } from '@/infra/container/container';
-import loggerMain from '@/infra/logger/logger';
+import { DATA_DIR } from '@/infrastructure/config/env';
+import { getFromContainer } from '@/infrastructure/container/container';
+import loggerMain from '@/infrastructure/logger/logger';
 import { ImdbRepository } from '@/resources/imdb/repository';
 
 const logger = loggerMain.child({ module: 'meta.imdb' });
