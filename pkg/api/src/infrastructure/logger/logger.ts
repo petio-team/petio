@@ -1,6 +1,6 @@
 /* eslint-disable import/order */
 import * as FileStreamRotator from 'file-stream-rotator';
-import path from 'path';
+import { join } from 'node:path';
 import pino, { Logger as PinoLogger } from 'pino';
 import PinoPretty from 'pino-pretty';
 
@@ -26,7 +26,7 @@ export class Logger {
    * @returns The created logger instance.
    */
   private createLogger(level: string): PinoLogger<string> {
-    const logsFolder = path.join(DATA_DIR, './logs');
+    const logsFolder = join(DATA_DIR, './logs');
     return pino(
       {
         level,
@@ -44,11 +44,11 @@ export class Logger {
         {
           level,
           stream: FileStreamRotator.getStream({
-            filename: path.join(logsFolder, 'petio-%DATE%.log'),
+            filename: join(logsFolder, 'petio-%DATE%.log'),
             frequency: 'daily',
             verbose: false,
             create_symlink: true,
-            audit_file: path.join(logsFolder, 'audit.json'),
+            audit_file: join(logsFolder, 'audit.json'),
             date_format: 'YYYY-MM-DD',
             max_logs: '7d',
           }),

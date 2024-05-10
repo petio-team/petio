@@ -1,4 +1,4 @@
-import path from 'path';
+import { join } from 'node:path';
 import { parseEnv, port } from 'znv';
 import { z } from 'zod';
 
@@ -90,7 +90,7 @@ export const {
     },
   },
   DATA_DIR: {
-    schema: z.string().min(1).default(path.join(process.cwd(), './data')),
+    schema: z.string().min(1).default(join(process.cwd(), './data')),
     description: 'The directory to store data in.',
   },
   TMDB_API_KEY: {

@@ -1,8 +1,4 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import axios, { AxiosResponse } from 'axios';
-import http from 'http';
-
-import { TMDB_API_KEY } from '@/infrastructure/config/env';
 import { getFromContainer } from '@/infrastructure/container/container';
 import loggerMain from '@/infrastructure/logger/logger';
 import {
@@ -20,8 +16,6 @@ import fanartLookup from '@/services/fanart';
 import { lookup } from '@/services/meta/imdb';
 import onServer from '@/services/plex/server';
 import getLanguage from '@/services/tmdb/languages';
-
-const agent = new http.Agent({ family: 4 });
 
 const logger = loggerMain.child({ module: 'tmdb.movie' });
 
@@ -350,16 +344,9 @@ export async function discoverMovie(
   return data;
 }
 
-interface CompanyData {
-  id: number;
-  [x: string]: any;
-}
-
-export async function company(id: number): Promise<CompanyData> {
-  const tmdb = 'https://api.themoviedb.org/3/';
-  const url = `${tmdb}company/${id}?api_key=${TMDB_API_KEY}`;
-  const res: AxiosResponse<CompanyData> = await axios.get(url, {
-    httpAgent: agent,
+export async function company(id: number) {
+  const client = getFromContainer(TheMovieDatabaseClient);
+  return client.default.companyDetails({
+    companyId: id,
   });
-  return res.data;
 }

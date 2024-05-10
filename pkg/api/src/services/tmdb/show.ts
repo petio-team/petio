@@ -1,10 +1,8 @@
+/* eslint-disable no-param-reassign */
+
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
 /* eslint-disable no-restricted-syntax */
-import axios from 'axios';
-import http from 'http';
-
-import { TMDB_API_KEY } from '@/infrastructure/config/env';
 import { getFromContainer } from '@/infrastructure/container/container';
 import loggerMain from '@/infrastructure/logger/logger';
 import {
@@ -19,8 +17,6 @@ import fanartLookup from '@/services/fanart';
 import { lookup as imdb } from '@/services/meta/imdb';
 import onServer from '@/services/plex/server';
 import getLanguage from '@/services/tmdb/languages';
-
-const agent = new http.Agent({ family: 4 });
 
 const logger = loggerMain.child({ module: 'tmdb.show' });
 
@@ -288,65 +284,60 @@ export const getMovieDetails = async (id: number) => {
 };
 
 async function getShowData(id) {
-  let data = false;
   try {
-    data = await getFromContainer(CacheService).wrap(id, async () =>
+    return await getFromContainer(CacheService).wrap(id, async () =>
       tmdbData(id),
     );
   } catch (err) {
     logger.warn(`Error getting show data - ${id}`, err);
+    return undefined;
   }
-  return data;
 }
 
 async function externalId(id) {
-  let data = false;
   try {
-    data = await getFromContainer(CacheService).wrap(`ext_${id}`, async () =>
+    return await getFromContainer(CacheService).wrap(`ext_${id}`, async () =>
       idLookup(id),
     );
   } catch (err) {
     logger.debug(`Error getting external ID - ${id}`, err);
+    return undefined;
   }
-  return data;
 }
 
 export async function getRecommendations(id, page = 1) {
-  let data = false;
   try {
-    data = await getFromContainer(CacheService).wrap(
+    return await getFromContainer(CacheService).wrap(
       `rec_${id}__${page}`,
       async () => recommendationData(id, page),
     );
   } catch (err) {
     logger.warn(`Error getting recommendation data - ${id}`, err);
+    return undefined;
   }
-  return data;
 }
 
 export async function getSimilar(id, page = 1) {
-  let data = false;
   try {
-    data = await getFromContainer(CacheService).wrap(
+    return await getFromContainer(CacheService).wrap(
       `similar_${id}__${page}`,
       async () => similarData(id, page),
     );
   } catch (err) {
     logger.warn(`Error getting similar data - ${id}`, err);
+    return undefined;
   }
-  return data;
 }
 
 async function getReviews(id) {
-  let data = false;
   try {
-    data = await getFromContainer(CacheService).wrap(`rev_${id}`, async () =>
+    return await getFromContainer(CacheService).wrap(`rev_${id}`, async () =>
       reviewsData(id),
     );
   } catch (err) {
     logger.warn(`Error getting review data - ${id}`, err);
+    return undefined;
   }
-  return data;
 }
 
 async function getSeasons(seasons, id) {
@@ -365,44 +356,55 @@ async function getSeasons(seasons, id) {
 // Lookup layer
 
 async function tmdbData(id) {
-  const tmdb = 'https://api.themoviedb.org/3/';
-  const url = `${tmdb}tv/${id}?api_key=${TMDB_API_KEY}&append_to_response=aggregate_credits,videos,keywords,content_ratings,credits`;
-  const res = await axios.get(url, { httpAgent: agent });
-  const { data } = res;
-  if (data.aggregate_credits) {
-    if (data.aggregate_credits.cast.length > 50)
-      data.aggregate_credits.cast.length = 50;
-    data.credits.cast = [];
-    data.aggregate_credits.cast.forEach((item, i) => {
-      const character = item.roles.length > 0 ? item.roles[0].character : false;
-      data.credits.cast[i] = {
-        name: item.name,
-        profile_path: item.profile_path,
-        character,
-        id: item.id,
-      };
-    });
-    delete data.aggregate_credits;
+  const client = getFromContainer(TheMovieDatabaseClient);
+  try {
+    const details = (await client.default.tvSeriesDetails({
+      seriesId: id,
+      appendToResponse:
+        'aggregate_credits,videos,keywords,content_ratings,credits',
+    })) as any;
+    if (details.aggregate_credits) {
+      if (details.aggregate_credits.cast.length > 50) {
+        details.aggregate_credits.cast.length = 50;
+      }
+      details.credits.cast = [];
+      details.aggregate_credits.cast.forEach((item, i) => {
+        const character =
+          item.roles.length > 0 ? item.roles[0].character : false;
+        details.credits.cast[i] = {
+          name: item.name,
+          profile_path: item.profile_path,
+          character,
+          id: item.id,
+        };
+      });
+      delete details.aggregate_credits;
+    }
+    if (details.content_ratings) {
+      details.age_rating = findEnRating(details.content_ratings.results);
+      delete details.content_ratings;
+    }
+    return details;
+  } catch (e) {
+    logger.error(`failed to get show details with id ${id}`, e);
+    return {};
   }
-  if (data.content_ratings) {
-    data.age_rating = findEnRating(data.content_ratings.results);
-    delete data.content_ratings;
-  }
-  return data;
 }
 
 async function recommendationData(id, page = 1) {
-  const tmdb = 'https://api.themoviedb.org/3/';
-  const url = `${tmdb}tv/${id}/recommendations?api_key=${TMDB_API_KEY}&page=${page}`;
-  const res = await axios.get(url, { httpAgent: agent });
-  return res.data;
+  const client = getFromContainer(TheMovieDatabaseClient);
+  return client.default.tvSeriesRecommendations({
+    seriesId: id,
+    page,
+  });
 }
 
 async function similarData(id, page = 1) {
-  const tmdb = 'https://api.themoviedb.org/3/';
-  const url = `${tmdb}tv/${id}/similar?api_key=${TMDB_API_KEY}&page=${page}`;
-  const res = await axios.get(url, { httpAgent: agent });
-  return res.data;
+  const client = getFromContainer(TheMovieDatabaseClient);
+  return client.default.tvSeriesSimilar({
+    seriesId: id,
+    page,
+  });
 }
 
 async function seasonsData(seasons, id) {
@@ -418,17 +420,18 @@ async function seasonsAsync(seasonList, id) {
 }
 
 async function getSeason(id, season) {
-  const tmdb = 'https://api.themoviedb.org/3/';
-  const url = `${tmdb}tv/${id}/season/${season}?api_key=${TMDB_API_KEY}`;
-  const res = await axios.get(url, { httpAgent: agent });
-  return res.data;
+  const client = getFromContainer(TheMovieDatabaseClient);
+  return client.default.tvSeasonDetails({
+    seriesId: id,
+    seasonNumber: season,
+  });
 }
 
 async function reviewsData(id) {
-  const tmdb = 'https://api.themoviedb.org/3/';
-  const url = `${tmdb}tv/${id}/reviews?api_key=${TMDB_API_KEY}`;
-  const res = await axios.get(url, { httpAgent: agent });
-  return res.data;
+  const client = getFromContainer(TheMovieDatabaseClient);
+  return client.default.tvSeriesReviews({
+    seriesId: id,
+  });
 }
 
 // Lets i18n this soon
@@ -462,39 +465,32 @@ function findEnRating(data) {
 }
 
 async function idLookup(id) {
-  const tmdb = 'https://api.themoviedb.org/3/';
-  const url = `${tmdb}tv/${id}/external_ids?api_key=${TMDB_API_KEY}`;
-  try {
-    const res = await axios.get(url, { httpAgent: agent });
-    return res.data;
-  } catch (err) {
-    logger.error(`failed to look up show ${id}`, err);
-    throw err;
-  }
+  const client = getFromContainer(TheMovieDatabaseClient);
+  return client.default.tvSeriesExternalIds({
+    seriesId: id,
+  });
 }
 
 export async function discoverSeries(page = 1, params = {}) {
-  const tmdb = 'https://api.themoviedb.org/3/';
-  let par = '';
-  Object.keys(params).forEach((i) => {
-    par += `&${i}=${params[i]}`;
-  });
-  const url = `${tmdb}discover/tv?api_key=${TMDB_API_KEY}${par}&page=${page}`;
-  const res = await axios.get(url, { httpAgent: agent });
-  if (res.data && res.data.results.length > 0) {
+  const client = getFromContainer(TheMovieDatabaseClient);
+  const data = (await client.default.discoverTv({
+    page,
+    ...params,
+  })) as any;
+  if (data && data.results.length > 0) {
     await Promise.all(
-      res.data.results.map(async (show) => {
+      data.results.map(async (show) => {
         const check: any = await onServer('show', false, false, show.id);
         show.on_server = check.exists;
       }),
     );
   }
-  return res.data;
+  return data;
 }
 
 export async function network(id) {
-  const tmdb = 'https://api.themoviedb.org/3/';
-  const url = `${tmdb}network/${id}?api_key=${TMDB_API_KEY}`;
-  const res = await axios.get(url, { httpAgent: agent });
-  return res.data;
+  const client = getFromContainer(TheMovieDatabaseClient);
+  return client.default.networkDetails({
+    networkId: id,
+  });
 }

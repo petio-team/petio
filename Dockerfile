@@ -7,42 +7,27 @@ WORKDIR /build
 COPY . .
 
 # Run yarn to fetch dependencies
-RUN yarn workspaces focus --all && \
+RUN set -eux; \
+    yarn workspaces focus --all && \
     yarn workspace frontend run build && \
-    yarn workspace api run build:prod && \
-    chmod -R u=rwX,go=rX /build/pkg
+    yarn workspace api run build:prod; \
+    apkArch="$(apk --print-arch)"; \
+    case "$apkArch" in \
+    armhf) export GOARM='6' ;; \
+    x86) export GO386='387' ;; \
+    esac; \
 
-FROM alpine
+    npx pkg . --no-bytecode --public-packages \"*\" --public --targets node18-alpine-x64 --output /build/dist/releases
+
+FROM scratch
 
 # Set enviornment variables for the app
 ENV APP_DIR="/app"
 ENV VIEWS_FOLDER="/app/views"
 ENV DATA_FOLDER="/data"
 
-# Install needed dependencies to get the image setup and then remove the cache
-RUN apk add --no-cache \
-    shadow \
-    wget \
-    bash \
-    nodejs && \
-    # Remove package cache
-    rm -rf /var/cache/apk/* && \
-    rm -rf /tmp/*
-
-# Create petio user, group and create folders with permissions
-RUN groupadd -g 1000 petio && \
-    useradd -r -u 1000 -g petio petio && \
-    # Make sure the app directory exists and has the correct permissions
-    mkdir -p /app && chown petio:petio /app
-
 # Copy all the build files from both frontend and backend
-COPY --from=builder --chown=petio:petio --chmod=0755 /build/node_modules/napi-nanoid-linux-x64-musl/napi-nanoid.linux-x64-musl.node /app
-COPY --from=builder --chown=petio:petio --chmod=0755 /build/pkg/frontend/build /app/views/frontend
-COPY --from=builder --chown=petio:petio --chmod=0755 /build/dist/api/index.js /app/index.js
-COPY ./scripts/docker /
-
-# Give our init script permission to be executed
-RUN chmod +x /init.sh
+COPY --from=builder --chown=petio:petio --chmod=0755 /build/dist/
 
 # Makes sure we are in the app folder from now on
 WORKDIR /app

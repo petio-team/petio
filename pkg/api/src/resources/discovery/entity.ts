@@ -1,4 +1,4 @@
-import { nanoid } from 'napi-nanoid';
+import { nanoid } from 'nanoid';
 
 import { BaseEntity } from '@/infrastructure/entity/entity';
 

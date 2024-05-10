@@ -4,12 +4,12 @@ import bcrypt from 'bcryptjs';
 import { StatusCodes } from 'http-status-codes';
 import jwt from 'jsonwebtoken';
 import { Context } from 'koa';
-import request from 'xhr-request';
 import xmlParser from 'xml-js';
 
 import { authenticate } from '@/api/middleware/auth';
 import { getFromContainer } from '@/infrastructure/container/container';
 import loggerMain from '@/infrastructure/logger/logger';
+import { PlexTvClient } from '@/infrastructure/plextv';
 import { UserEntity } from '@/resources/user/entity';
 import { UserMapper } from '@/resources/user/mapper';
 import { UserRepository } from '@/resources/user/repository';
@@ -99,43 +99,30 @@ const attemptPlexAuth = async (ctx: Context) => {
   }
 };
 
-function plexAuth(username: string, password: string) {
+async function plexAuth(username: string, password: string) {
   logger.info(`LOGIN: Using Plex Auth for ${username}`);
-  return new Promise((resolve, reject) => {
-    request(
-      'https://plex.tv/users/sign_in.json',
-      {
-        method: 'POST',
-        json: true,
-        headers: {
-          'X-Plex-Product': 'Petio',
-          'X-Plex-Platform-Version': '1.0',
-          'X-Plex-Device-Name': 'Petio API',
-          'X-Plex-Version': '1.0',
-          'X-Plex-Client-Identifier': `petio_${''}`,
-          Authorization: `Basic ${Buffer.from(
-            `${username}:${password}`,
-          ).toString('base64')}`,
-        },
+  const client = getFromContainer(PlexTvClient);
+  try {
+    const result = await client.request.request({
+      method: 'POST',
+      url: 'https://plex.tv/users/sign_in.json',
+      headers: {
+        'X-Plex-Product': 'Petio',
+        'X-Plex-Platform-Version': '1.0',
+        'X-Plex-Device-Name': 'Petio API',
+        'X-Plex-Version': '1.0',
+        'X-Plex-Client-Identifier': `petio_${''}`,
+        Authorization: `Basic ${Buffer.from(`${username}:${password}`).toString(
+          'base64',
+        )}`,
       },
-      (err: any, data: any) => {
-        if (err) {
-          logger.warn(`LOGIN: Plex auth failed for ${username}`);
-          reject();
-        }
-        if (!data) {
-          logger.warn(`LOGIN: Plex auth error ${username}`);
-          reject(new Error('LOGIN: Failed Plex Auth'));
-        } else if (data.error) {
-          logger.warn(`LOGIN: Plex auth error ${username}`);
-          reject(new Error('LOGIN: Failed Plex Auth'));
-        } else {
-          logger.info(`LOGIN: Plex auth passed ${username}`);
-          resolve(data);
-        }
-      },
-    );
-  });
+    });
+    logger.info(`LOGIN: Plex auth passed ${username}`);
+    return result;
+  } catch (err) {
+    logger.error(`LOGIN: Plex auth failed for ${username}`);
+    throw new Error('LOGIN: Failed Plex Auth');
+  }
 }
 
 const attemptAuth = async (ctx: Context) => {
