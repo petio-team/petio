@@ -1,9 +1,12 @@
+import { Service } from 'diod';
+
 import { MediaServerRepository } from '@/resources/media-server/repository';
 import { AgendaCronService } from '@/services/cron/agenda-cron';
 import { Jobber } from '@/services/cron/job';
 import { JobCronName } from '@/services/cron/types';
 import LibraryUpdate from '@/services/plex/library';
 
+@Service()
 export class JobUsersScan implements Jobber {
   constructor(
     private cronService: AgendaCronService,

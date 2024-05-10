@@ -10,7 +10,11 @@ import {
 import { Logger } from '@/infrastructure/logger/logger';
 import { Jobber } from '@/services/cron/job';
 import { JobFullLibraryScan } from '@/services/cron/jobs/full_library_scan';
+import { JobImdbCache } from '@/services/cron/jobs/imdb_cache';
 import { JobPartialLibraryScan } from '@/services/cron/jobs/partial_library_scan';
+import { JobQuotaReset } from '@/services/cron/jobs/quota_reset';
+import { JobTmdbCache } from '@/services/cron/jobs/tmdb_cache';
+import { JobUsersScan } from '@/services/cron/jobs/users_scan';
 
 import { AgendaCronService } from './agenda-cron';
 import { JobCronName } from './types';
@@ -18,6 +22,10 @@ import { JobCronName } from './types';
 export default (builder: ContainerBuilder) => {
   builder.registerAndUse(JobFullLibraryScan).asSingleton().addTag('job');
   builder.registerAndUse(JobPartialLibraryScan).asSingleton().addTag('job');
+  builder.registerAndUse(JobUsersScan).asSingleton().addTag('job');
+  builder.registerAndUse(JobQuotaReset).asSingleton().addTag('job');
+  builder.registerAndUse(JobTmdbCache).asSingleton().addTag('job');
+  builder.registerAndUse(JobImdbCache).asSingleton().addTag('job');
 
   builder
     .register(AgendaCronService)

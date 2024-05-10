@@ -1,10 +1,10 @@
+import { Service } from 'diod';
+
 import { MediaServerRepository } from '@/resources/media-server/repository';
 import { AgendaCronService } from '@/services/cron/agenda-cron';
 import { Jobber } from '@/services/cron/job';
-import { CronService } from '@/services/cron/service';
 import { JobCronName } from '@/services/cron/types';
 import LibraryUpdate from '@/services/plex/library';
-import { Service } from 'diod';
 
 @Service()
 export class JobPartialLibraryScan implements Jobber {
