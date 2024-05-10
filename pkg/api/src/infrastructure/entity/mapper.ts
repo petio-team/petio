@@ -1,11 +1,11 @@
-import { BaseEntity } from "./entity";
+import { BaseEntity } from './entity';
 
-export interface Mapper<
+export abstract class Mapper<
   Entity extends BaseEntity<any>,
   DbRecord,
   Response = any,
 > {
-  toPeristence(entity: Entity): DbRecord;
-  toEntity(record: DbRecord): Entity;
-  toResponse(entity: Entity): Response;
+  abstract toPeristence(entity: Entity): DbRecord;
+  abstract toEntity(record: DbRecord): Entity;
+  abstract toResponse(entity: Entity): Response;
 }

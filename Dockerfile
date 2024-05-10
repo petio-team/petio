@@ -7,17 +7,10 @@ WORKDIR /build
 COPY . .
 
 # Run yarn to fetch dependencies
-RUN set -eux; \
-    yarn workspaces focus --all && \
+RUN yarn workspaces focus --all && \
     yarn workspace frontend run build && \
-    yarn workspace api run build:prod; \
-    apkArch="$(apk --print-arch)"; \
-    case "$apkArch" in \
-    armhf) export GOARM='6' ;; \
-    x86) export GO386='387' ;; \
-    esac; \
-
-    npx pkg . --no-bytecode --public-packages \"*\" --public --targets node18-alpine-x64 --output /build/dist/releases
+    yarn workspace api run build:prod && \
+    npx pkg . --no-bytecode --public-packages \"*\" --public --targets node18-alpine-x64
 
 FROM scratch
 
@@ -27,7 +20,9 @@ ENV VIEWS_FOLDER="/app/views"
 ENV DATA_FOLDER="/data"
 
 # Copy all the build files from both frontend and backend
-COPY --from=builder --chown=petio:petio --chmod=0755 /build/dist/
+COPY --from=builder --chown=petio:petio --chmod=0755 /build/node_modules/napi-nanoid-linux-x64-musl/napi-nanoid.linux-x64-musl.node /app
+COPY --from=builder --chown=petio:petio --chmod=0755 /build/pkg/frontend/build /app/views/frontend
+COPY --from=builder --chown=petio:petio --chmod=0755 /build/dist/api/index.js /app/index.js
 
 # Makes sure we are in the app folder from now on
 WORKDIR /app

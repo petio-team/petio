@@ -1,12 +1,13 @@
-import { Logger } from "@/infrastructure/logger/logger";
-import { MediaLibraryRepository } from "@/resources/media-library/repository";
-import { MediaServerEntity } from "@/resources/media-server/entity";
-import { MediaServerRepository } from "@/resources/media-server/repository";
-import { ScannerProvider } from "@/services/scanner/provider";
-import { scannerProviders } from "@/services/scanner/providers";
-import Bluebird from "bluebird";
-import { Service } from "diod";
-import pino from "pino";
+import Bluebird from 'bluebird';
+import { Service } from 'diod';
+import pino from 'pino';
+
+import { Logger } from '@/infrastructure/logger/logger';
+import { MediaLibraryRepository } from '@/resources/media-library/repository';
+import { MediaServerEntity } from '@/resources/media-server/entity';
+import { MediaServerRepository } from '@/resources/media-server/repository';
+import { ScannerProvider } from '@/services/scanner/provider';
+import { scannerProviders } from '@/services/scanner/providers';
 
 @Service()
 export class ScannerService {
@@ -23,7 +24,7 @@ export class ScannerService {
     private mediaLibrary: MediaLibraryRepository,
     private mediaServer: MediaServerRepository,
   ) {
-    this.logger = logger.child({ module: "services.scanner" });
+    this.logger = logger.child({ module: 'services.scanner' });
   }
 
   /**
@@ -50,30 +51,60 @@ export class ScannerService {
    */
   async syncLibraries() {
     const servers = await this.mediaServer.findAll();
-    await Bluebird.map(servers, async (server) => {
-      const provider = this.getProvider(server);
-      if (!provider) {
-        return;
-      }
-      try {
-        const [providerLibraries, repositoryLibraries] = await Promise.all([
-          provider.getLibraries(),
-          this.mediaLibrary.findAll({}),
-        ]);
-        const newLibraries = providerLibraries.filter((library) => !repositoryLibraries.some((repoLibrary) => repoLibrary.uuid === library.uuid));
-        const updatedLibraries = providerLibraries.filter((library) => repositoryLibraries.some((repoLibrary) => repoLibrary.uuid === library.uuid));
-        const deletedLibraries = repositoryLibraries.filter((library) => !providerLibraries.some((repoLibrary) => repoLibrary.uuid === library.uuid));
+    await Bluebird.map(
+      servers,
+      async (server) => {
+        const provider = this.getProvider(server);
+        if (!provider) {
+          return;
+        }
+        try {
+          const [providerLibraries, repositoryLibraries] = await Promise.all([
+            provider.getLibraries(),
+            this.mediaLibrary.findAll({}),
+          ]);
+          const newLibraries = providerLibraries.filter(
+            (library) =>
+              !repositoryLibraries.some(
+                (repoLibrary) => repoLibrary.uuid === library.uuid,
+              ),
+          );
+          const updatedLibraries = providerLibraries.filter((library) =>
+            repositoryLibraries.some(
+              (repoLibrary) => repoLibrary.uuid === library.uuid,
+            ),
+          );
+          const deletedLibraries = repositoryLibraries.filter(
+            (library) =>
+              !providerLibraries.some(
+                (repoLibrary) => repoLibrary.uuid === library.uuid,
+              ),
+          );
 
-        this.logger.debug(`library ${server.id} stats - added: ${newLibraries.length}, updated: ${updatedLibraries.length}, deleted: ${deletedLibraries.length}`);
+          this.logger.debug(
+            `library ${server.id} stats - added: ${newLibraries.length}, updated: ${updatedLibraries.length}, deleted: ${deletedLibraries.length}`,
+          );
 
-        await Promise.all([
-          this.mediaLibrary.deleteManyByIds(deletedLibraries.map(library => library.id)),
-          this.mediaLibrary.createMany(newLibraries),
-          ...updatedLibraries.map(async (l) => this.mediaLibrary.updateMany({ id: l.id }, { ...l, createdAt: undefined })),
-        ]);
-      } catch (error) {
-        this.logger.error(error, `Failed to sync libraries for server ${server.id}`);
-      }
-    }, { concurrency: 1 });
+          await Promise.all([
+            this.mediaLibrary.deleteManyByIds(
+              deletedLibraries.map((library) => library.id),
+            ),
+            this.mediaLibrary.createMany(newLibraries),
+            ...updatedLibraries.map(async (l) =>
+              this.mediaLibrary.updateMany(
+                { id: l.id },
+                { ...l, createdAt: undefined },
+              ),
+            ),
+          ]);
+        } catch (error) {
+          this.logger.error(
+            error,
+            `Failed to sync libraries for server ${server.id}`,
+          );
+        }
+      },
+      { concurrency: 1 },
+    );
   }
 }

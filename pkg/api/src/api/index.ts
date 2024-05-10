@@ -7,8 +7,11 @@ import { AddressInfo } from 'net';
 import { IncomingMessage, ServerResponse } from 'node:http';
 import { promisify } from 'util';
 
+import responseHandler from '@/api/http/responseHandler';
 import cors from '@/api/middleware/cors';
 import errorHandler from '@/api/middleware/errorHandling';
+import logging from '@/api/middleware/logging';
+import options from '@/api/middleware/options';
 import api from '@/api/routes/api';
 import web from '@/api/routes/web';
 import {
@@ -19,10 +22,6 @@ import {
 } from '@/infrastructure/config/env';
 import { getFromContainer } from '@/infrastructure/container/container';
 import { SettingsService } from '@/services/settings/settings';
-
-import responseHandler from './http/responseHandler';
-import logging from './middleware/logging';
-import options from './middleware/options';
 
 const routes = (keys: string[]): Koa => {
   const app = new Koa();

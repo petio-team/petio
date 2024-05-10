@@ -3,7 +3,7 @@
   "private": true,
   "author": "Petio Team",
   "license": "MIT",
-  "bin": "./dist/api/index.js",
+  "bin": "./dist/api/app.js",
   "workspaces": [
     "pkg/api",
     "pkg/frontend",

@@ -62,11 +62,7 @@ async function doPrimary() {
   // Load settings into cache
   await getFromContainer(SettingsService).getSettings();
 
-  logger.info(
-    `Petio v${appConfig.version} [${
-      logger.core().level
-    }] [pid:${PUID},gid:${PGID}]`,
-  );
+  logger.info(`Petio v${appConfig.version} [debug] [pid:${PUID},gid:${PGID}]`);
 
   // run workers
   await getFromContainer(Master).runWorkers();
