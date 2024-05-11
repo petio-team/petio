@@ -46,4 +46,4 @@ jobs:
       - run: echo "SHORT_SHA=`git rev-parse --short HEAD`" >> $GITHUB_ENV
 
       - name: Run build
-        run: earthly --ci --push +build-all COMMIT=$SHORT_SHA LABEL=$IMAGE_LABEL
+        run: earthly --ci --push +build-all --COMMIT=$SHORT_SHA --LABEL=$IMAGE_LABEL
