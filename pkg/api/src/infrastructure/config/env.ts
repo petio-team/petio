@@ -33,6 +33,7 @@ export const {
     description: 'The environment the application is running in.',
     defaults: {
       development: 'development',
+      docker: 'docker',
       _: 'production',
     },
   },
@@ -55,6 +56,7 @@ export const {
     description: 'The URL to use for the database connection.',
     defaults: {
       development: 'mongodb://mongo:27017/petio',
+      docker: 'mongodb://mongo:27017/petio',
       _: 'mongodb://localhost:27017/petio',
     },
   },

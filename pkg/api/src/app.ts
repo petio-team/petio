@@ -1,9 +1,9 @@
 import cluster from 'cluster';
-import dotenv from 'dotenv';
 import 'reflect-metadata';
 
 import { createKoaServer } from '@/api';
 import builder from '@/builder';
+import { tryLoadEnv } from '@/infrastructure/config/dotenv';
 import {
   DATABASE_URL,
   HTTP_ADDR,
@@ -100,7 +100,7 @@ async function doWorker() {
 
 (async (): Promise<void> => {
   // load .env file
-  dotenv.config({ override: true });
+  tryLoadEnv();
   // build containers
   useContainer(builder());
 

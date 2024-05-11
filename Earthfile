@@ -28,6 +28,7 @@ build-image:
     ENV DATA_DIR=/data
     ENV HTTP_ADDR=0.0.0.0
     ENV HTTP_PORT=7777
+    ENV NODE_ENV=docker
     COPY \
         --platform=linux/amd64 \
         (+build/releases/petio-linuxstatic-$TARGETARCH) ./petio

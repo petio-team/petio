@@ -1,8 +1,9 @@
 import { Service } from 'diod';
-import dotenv from 'dotenv';
 import fs from 'fs/promises';
-import path from 'path';
+import { join } from 'path';
 
+import { tryLoadEnv } from '@/infrastructure/config/dotenv';
+import { DATA_DIR, NODE_ENV } from '@/infrastructure/config/env';
 import {
   ArrConfig,
   EmailConfig,
@@ -49,9 +50,16 @@ export class MigrationService {
     const files = await mergeFiles();
     if (files.main || files.email || files.sonarr || files.radarr) {
       this.logger.info('Found old files to migrate');
+      const hasValidConnection = this.connection.get('default');
       try {
         if (files.main) {
           await this.processMainConfig(files.main);
+        }
+        if (!hasValidConnection) {
+          this.logger.error(
+            'No valid database connection present, unable to migrate files, exiting process',
+          );
+          process.exit(1);
         }
         if (files.email) {
           await this.processEmailConfig(files.email);
@@ -164,7 +172,7 @@ export class MigrationService {
       await this.createEnvFile(
         `DATABASE_URL=${config.DB_URL}\nHTTP_BASE_PATH=${config.base_path}`,
       );
-      dotenv.config({ override: true });
+      tryLoadEnv();
     }
     const notification = getFromContainer(NotificationRepository);
     const mediaServer = getFromContainer(MediaServerRepository);
@@ -241,7 +249,10 @@ export class MigrationService {
    * @param content - The content to be added to the .env file.
    */
   async createEnvFile(content: string) {
-    const envFile = path.join(process.cwd(), '.env');
+    const envFile =
+      NODE_ENV === 'docker'
+        ? join(DATA_DIR, '.env')
+        : join(process.cwd(), '.env');
     const hasEnvFile = await fileExists(envFile);
     if (hasEnvFile) {
       this.logger.info(
