@@ -75,7 +75,7 @@ export type Configs = {
 
 const configFiles: Configs[] = [
   {
-    file: 'main',
+    file: 'config',
     schema: MainConfigSchema,
   },
   {
