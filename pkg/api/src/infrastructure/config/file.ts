@@ -1,3 +1,4 @@
+import { existsSync } from 'fs';
 import fs, { mkdir } from 'fs/promises';
 import path from 'path';
 import { z } from 'zod';
@@ -115,6 +116,9 @@ export const parseFiles = async (configs: Configs[]) => {
     configs.map(async (file) => {
       try {
         const filePath = path.join(DATA_DIR, `${file.file}.json`);
+        if (!existsSync(filePath)) {
+          return undefined;
+        }
         const content = await fs.readFile(filePath);
         const toJSON = JSON.parse(content.toString());
         const parsed = await file.schema.safeParseAsync(toJSON);
@@ -127,6 +131,7 @@ export const parseFiles = async (configs: Configs[]) => {
         }
         return { [file.file]: parsed.data };
       } catch (error) {
+        logger.debug(`failed to process ${file.file}.json`, error);
         return undefined;
       }
     }),

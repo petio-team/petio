@@ -53,6 +53,7 @@ export class MigrationService {
       const hasValidConnection = this.connection.get('default');
       try {
         if (files.main) {
+          this.logger.debug(`parsing main config file`);
           await this.processMainConfig(files.main);
         }
         if (!hasValidConnection) {
@@ -62,9 +63,11 @@ export class MigrationService {
           process.exit(1);
         }
         if (files.email) {
+          this.logger.debug(`parsing email config file`);
           await this.processEmailConfig(files.email);
         }
         if (files.sonarr) {
+          this.logger.debug(`parsing sonarr config file`);
           await Promise.all(
             files.sonarr.map((config) =>
               this.processArrConfigs(config, 'sonarr'),
@@ -72,6 +75,7 @@ export class MigrationService {
           );
         }
         if (files.radarr) {
+          this.logger.debug(`parsing radarr config file`);
           await Promise.all(
             files.radarr.map((config) =>
               this.processArrConfigs(config, 'radarr'),
