@@ -1,5 +1,7 @@
 version: '3'
 dotenv: ['.env']
+vars:
+  COMMIT_SHA: {sh: 'git rev-parse --short HEAD'}
 tasks:
   default:
     cmds:
@@ -10,3 +12,7 @@ tasks:
       - yarn workspaces focus --all
       - yarn workspace frontend run build
       - yarn workspace api run build
+
+  ci:
+    cmds:
+      - earthly --ci --push +build-all --COMMIT={{ .COMMIT_SHA }} --LABEL=nightly
