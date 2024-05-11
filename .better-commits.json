@@ -5,7 +5,7 @@
     "initial_value": "feat",
     "max_items": 100,
     "infer_type_from_branch": true,
-    "append_emoji_to_label": false,
+    "append_emoji_to_label": true,
     "append_emoji_to_commit": false,
     "options": [
       {
