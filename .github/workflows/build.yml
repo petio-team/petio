@@ -37,13 +37,10 @@ jobs:
       - if: ${{ github.ref == format('refs/heads/{0}', 'dev') }}
         run: echo "IMAGE_LABEL=nightly" >> $GITHUB_ENV
 
-      - if: ${{ github.ref == format('refs/heads/{0}', 'preview') }}
-        run: echo "IMAGE_LABEL=staging" >> $GITHUB_ENV
-
       - if: ${{ env.IMAGE_LABEL == '' }}
         run: echo "IMAGE_LABEL=$BRANCH_NAME" >> $GITHUB_ENV
 
       - run: echo "SHORT_SHA=`git rev-parse --short HEAD`" >> $GITHUB_ENV
 
-      - name: Run build
-        run: earthly --ci --push +build-all --COMMIT=$SHORT_SHA --LABEL=$IMAGE_LABEL
+      - name: Build
+        run: earthly --ci --push +build-all --COMMIT_SHA=$SHORT_SHA --LABEL=$IMAGE_LABEL

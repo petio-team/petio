@@ -13,6 +13,14 @@ tasks:
       - yarn workspace frontend run build
       - yarn workspace api run build
 
+  dev:api:
+    cmds:
+      - yarn workspace api run watch
+
+  dev:fe:
+    cmds:
+      - yarn workspace frontend run start
+
   ci:
     cmds:
-      - earthly --ci --push +build-all --COMMIT={{ .COMMIT_SHA }} --LABEL=nightly
+      - earthly +build-all --COMMIT_SHA={{ .COMMIT_SHA }} --LABEL=nightly

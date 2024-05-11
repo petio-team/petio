@@ -22,8 +22,8 @@ build:
 build-image:
     ARG TARGETPLATFORM
     ARG TARGETARCH
-    ARG TAG=latest
-    ARG --required COMMIT
+    ARG LABEL=unknown
+    ARG --required COMMIT_SHA
     FROM --platform=$TARGETPLATFORM scratch
     ENV DATA_DIR=/data
     ENV HTTP_ADDR=0.0.0.0
@@ -33,5 +33,9 @@ build-image:
         (+build/releases/petio-linuxstatic-$TARGETARCH) ./petio
     VOLUME ["/data"]
     ENTRYPOINT ["/petio"]
-    SAVE IMAGE --push ghcr.io/petio-team/petio:$TAG
-    SAVE IMAGE --push ghcr.io/petio-team/petio:$COMMIT
+    SAVE IMAGE --push ghcr.io/petio-team/petio:$LABEL
+    SAVE IMAGE --push ghcr.io/petio-team/petio:$COMMIT_SHA
+
+release:
+    FROM node:20.11.1-alpine3.19
+    RUN npx semantic-release -d -b dev

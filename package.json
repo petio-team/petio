@@ -35,5 +35,22 @@
     ],
     "outputPath": "dist/releases"
   },
+  "release": {
+    "branches": [
+      "main"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      [
+        "@semantic-release/github",
+        {
+          "assets": [
+            "dist/releases/**"
+          ]
+        }
+      ]
+    ]
+  },
   "packageManager": "yarn@3.2.1"
 }

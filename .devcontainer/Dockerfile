@@ -7,5 +7,5 @@ RUN sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/loc
 RUN wget https://github.com/earthly/earthly/releases/latest/download/earthly-linux-amd64 -O /usr/local/bin/earthly \
     && chmod +x /usr/local/bin/earthly \
     && /usr/local/bin/earthly bootstrap --with-autocomplete
-# Make sure better-commits exists
-RUN npm install -g better-commits
+# Make sure better-commits and semantic-release exists
+RUN npm install -g better-commits semantic-release
