@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 import { adminRequired } from '@/api/middleware/auth';
 import { validateRequest } from '@/api/middleware/validation';
+import { ArrInput, ArrInputSchema } from '@/api/schemas/downloaders';
 import { getFromContainer } from '@/infrastructure/container/container';
 import logger from '@/infrastructure/logger/logger';
 import { RadarrV3Client } from '@/infrastructure/servarr/radarr';
@@ -14,7 +15,6 @@ import { DownloaderEntity } from '@/resources/downloader/entity';
 import { DownloaderMapper } from '@/resources/downloader/mapper';
 import { DownloaderRepository } from '@/resources/downloader/repository';
 import { DownloaderType } from '@/resources/downloader/types';
-import { ArrInput, ArrInputSchema } from '@/schemas/downloaders';
 
 const SonarrAvailabilities = {
   0: 'Standard',

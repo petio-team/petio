@@ -4,6 +4,7 @@ import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
 import { validateRequest } from '@/api/middleware/validation';
+import { SetupTestInput, SetupTestInputSchema } from '@/api/schemas/setup';
 import { getFromContainer } from '@/infrastructure/container/container';
 import logger from '@/infrastructure/logger/logger';
 import { PlexClient } from '@/infrastructure/plex';
@@ -15,7 +16,6 @@ import { MediaServerType } from '@/resources/media-server/types';
 import { UserEntity } from '@/resources/user/entity';
 import { UserRepository } from '@/resources/user/repository';
 import { UserRole } from '@/resources/user/types';
-import { SetupTestInput, SetupTestInputSchema } from '@/schemas/setup';
 import { SettingsService } from '@/services/settings/settings';
 
 const testServer = async (ctx: Context) => {
