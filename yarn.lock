@@ -15555,7 +15555,7 @@ __metadata:
     husky: ^8.0.1
     prettier: ^2.6.2
   bin:
-    petio: ./dist/api/index.js
+    petio: ./dist/api/app.js
   languageName: unknown
   linkType: soft
 

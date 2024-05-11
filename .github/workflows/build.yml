@@ -6,29 +6,22 @@ jobs:
   build:
     if: "!contains(github.event.head_commit.message, 'skip ci')"
     runs-on: ubuntu-latest
+    env:
+      FORCE_COLOR: 1
+      BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Docker Meta
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ghcr.io/petio-team/petio
-          tags: |
-            type=ref,event=pr
-            type=ref,event=tag
-            type=sha,format=long
-            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'master') }}
-            type=raw,value=nightly,enable=${{ github.ref == format('refs/heads/{0}', 'dev') }}
-            type=raw,value=new-ui,enable=${{ github.ref == format('refs/heads/{0}', 'new-ui') }}
-            type=raw,value=preview,enable=${{ github.ref == format('refs/heads/{0}', 'preview') }}
+        uses: actions/checkout@v4
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
+
+      - uses: earthly/actions-setup@v1
+        with:
+          version: v0.8.0
 
       - name: Login to GitHub Container Registry
         if: ${{ github.event_name != 'pull_request' && github.actor != 'dependabot[bot]' }}
@@ -38,33 +31,19 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GHCR_TOKEN }}
 
-      - name: Cache Docker layers
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-buildx
+      - if: ${{ github.ref == format('refs/heads/{0}', 'master') }}
+        run: echo "IMAGE_LABEL=latest" >> $GITHUB_ENV
 
-      - name: Build and Push
-        id: docker_build
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          platforms: linux/amd64
-          file: ./Dockerfile
-          push: ${{ github.event_name != 'pull_request' && github.actor != 'dependabot[bot]' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new
+      - if: ${{ github.ref == format('refs/heads/{0}', 'dev') }}
+        run: echo "IMAGE_LABEL=nightly" >> $GITHUB_ENV
 
-      # Temp fix
-      # https://github.com/docker/build-push-action/issues/252
-      # https://github.com/moby/buildkit/issues/1896
-      - name: Move cache
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+      - if: ${{ github.ref == format('refs/heads/{0}', 'preview') }}
+        run: echo "IMAGE_LABEL=staging" >> $GITHUB_ENV
 
-      - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}
+      - if: ${{ env.IMAGE_LABEL == '' }}
+        run: echo "IMAGE_LABEL=$BRANCH_NAME" >> $GITHUB_ENV
+
+      - run: echo "SHORT_SHA=`git rev-parse --short HEAD`" >> $GITHUB_ENV
+
+      - name: Run build
+        run: earthly --ci --push +build-all COMMIT=$SHORT_SHA LABEL=$IMAGE_LABEL

@@ -43,7 +43,8 @@
         "yoavbls.pretty-ts-errors",
         "BitBelt.converttoasciiart",
         "typespec.typespec-vscode",
-        "rangav.vscode-thunder-client"
+        "rangav.vscode-thunder-client",
+        "earthly.earthfile-syntax-highlighting"
       ],
       "settings": {
         "files.eol": "\n",

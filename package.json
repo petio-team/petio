@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "prepare": "is-ci || husky install",
-    "release": "npx pkg . --no-bytecode --public-packages \"*\" --public"
+    "pkg": "npx pkg . --no-bytecode --public-packages \"*\" --public"
   },
   "devDependencies": {
     "@commitlint/cli": "^16.2.3",
@@ -27,14 +27,14 @@
       "./pkg/frontend/build/**/*"
     ],
     "targets": [
-      "node18-alpine-arm64",
-      "node18-alpine-x64",
-      "node18-linux-arm64",
-      "node18-linux-x64",
-      "node18-linuxstatic-arm64",
-      "node18-linuxstatic-x64",
-      "node18-windows-x64",
-      "node18-windows-arm64"
+      "latest-alpine-arm64",
+      "latest-alpine-x64",
+      "latest-linux-arm64",
+      "latest-linux-x64",
+      "latest-linuxstatic-arm64",
+      "latest-linuxstatic-x64",
+      "latest-windows-x64",
+      "latest-windows-arm64"
     ],
     "outputPath": "dist/releases"
   },

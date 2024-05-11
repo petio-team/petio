@@ -9,6 +9,8 @@ services:
     image: ghcr.io/petio-team/petio:${PETIO_DOCKER_TAG:-latest}
     container_name: '${PETIO_DOCKER_CONT_NAME:-petio}'
     hostname: ${PETIO_DOCKER_HOSTNAME:-petio}
+    environment:
+      - DATABASE_URL=${DATABASE_URL:-mongodb://mongo:27017/petio}
     ports:
       - '${PETIO_DOCKER_ADDRESS:-127.0.0.1}:${PETIO_DOCKER_PORT:-7777}:7777'
     networks:
@@ -26,6 +28,5 @@ services:
       - '${MONGODB_DOCKER_PORT:-27017}:27017'
     networks:
       - petio-network
-    user: '${PUID:-1000}:${PGID:-1000}'
     volumes:
       - ${MONGODB_DATA_VOLUME:-./data/db}:/data/db
