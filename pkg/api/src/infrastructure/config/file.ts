@@ -117,6 +117,7 @@ export const parseFiles = async (configs: Configs[]) => {
       try {
         const filePath = path.join(DATA_DIR, `${file.file}.json`);
         if (!existsSync(filePath)) {
+          logger.debug(`no file found for ${file.file}.json`);
           return undefined;
         }
         const content = await fs.readFile(filePath);
