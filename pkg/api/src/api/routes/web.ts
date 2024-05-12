@@ -5,8 +5,6 @@ import mount from 'koa-mount';
 import serve from 'koa-static';
 import { join } from 'path';
 
-import { NODE_ENV } from '@/infrastructure/config/env';
-
 const pathExists = (file: string) => {
   if (fs.existsSync(file)) {
     if (fs.lstatSync(file).isFile()) {
@@ -24,10 +22,9 @@ function serveReact(app: Koa, dir: string, urlPath: string) {
 }
 
 export default (app: Koa) => {
-  const viewsPath =
-    NODE_ENV === 'production'
-      ? join(__dirname, '../../../web/build')
-      : join(__dirname, '../../../../../web/build');
+  const viewsPath = process.pkg
+    ? join(__dirname, '../../web/build')
+    : join(__dirname, '../../../../../web/build');
 
   let frontendPath = viewsPath;
   if (!pathExists(join(frontendPath, 'index.html'))) {
