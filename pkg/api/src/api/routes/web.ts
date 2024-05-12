@@ -26,8 +26,8 @@ function serveReact(app: Koa, dir: string, urlPath: string) {
 export default (app: Koa) => {
   const viewsPath =
     NODE_ENV === 'production'
-      ? join(__dirname, '../../pkg/frontend/build')
-      : join(__dirname, '../../../../frontend/build');
+      ? join(__dirname, '../../../web/build')
+      : join(__dirname, '../../../../../web/build');
 
   let frontendPath = viewsPath;
   if (!pathExists(join(frontendPath, 'index.html'))) {

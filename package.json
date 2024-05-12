@@ -6,8 +6,7 @@
   "bin": "./dist/api/app.js",
   "workspaces": [
     "pkg/api",
-    "pkg/frontend",
-    "pkg/admin"
+    "web"
   ],
   "scripts": {
     "prepare": "is-ci || husky install",
@@ -21,7 +20,7 @@
   "pkg": {
     "scripts": [],
     "assets": [
-      "./pkg/frontend/build/**/*"
+      "./web/build/**/*"
     ],
     "targets": [
       "latest-alpine-arm64",

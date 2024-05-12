@@ -12,7 +12,7 @@ build:
     COPY . .
     RUN \
         yarn workspaces focus --all && \
-        yarn workspace frontend run build && \
+        yarn workspace web run build && \
         yarn workspace api run build:prod && \
         yarn run pkg && \
         # rename x64 to amd64
