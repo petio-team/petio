@@ -3,9 +3,9 @@
   "private": true,
   "author": "Petio Team",
   "license": "MIT",
-  "bin": "./dist/api/app.js",
+  "bin": "./dist/server/app.js",
   "workspaces": [
-    "pkg/api",
+    "server",
     "web"
   ],
   "scripts": {
@@ -20,7 +20,7 @@
   "pkg": {
     "scripts": [],
     "assets": [
-      "./web/build/**/*"
+      "./dist/web/**/*"
     ],
     "targets": [
       "latest-alpine-arm64",
@@ -32,7 +32,7 @@
       "latest-windows-x64",
       "latest-windows-arm64"
     ],
-    "outputPath": "dist/releases"
+    "outputPath": "dist/binaries"
   },
   "release": {
     "branches": [
@@ -45,7 +45,7 @@
         "@semantic-release/github",
         {
           "assets": [
-            "dist/releases/**"
+            "dist/binaries/**"
           ]
         }
       ]

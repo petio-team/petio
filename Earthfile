@@ -12,12 +12,12 @@ build:
     COPY . .
     RUN \
         yarn workspaces focus --all && \
-        yarn workspace web run build && \
-        yarn workspace api run build:prod && \
+        yarn workspace web run build:prod && \
+        yarn workspace server run build:prod && \
         yarn run pkg && \
         # rename x64 to amd64
-        for f in ./dist/releases/*; do mv "$f" "$(echo "$f" | sed s/x64/amd64/)"; done
-    SAVE ARTIFACT ./dist/releases
+        for f in ./dist/binaries/*; do mv "$f" "$(echo "$f" | sed s/x64/amd64/)"; done
+    SAVE ARTIFACT ./dist/binaries
 
 build-image:
     ARG TARGETPLATFORM
@@ -31,7 +31,7 @@ build-image:
     ENV NODE_ENV=docker
     COPY \
         --platform=linux/amd64 \
-        (+build/releases/petio-linuxstatic-$TARGETARCH) ./petio
+        (+build/binaries/petio-linuxstatic-$TARGETARCH) ./petio
     VOLUME ["/data"]
     ENTRYPOINT ["/petio"]
     SAVE IMAGE --push ghcr.io/petio-team/petio:$LABEL

@@ -1,5 +1,5 @@
 {
-  "name": "api",
+  "name": "server",
   "version": "0.6.0",
   "description": "Petio API",
   "main": "./src/app.ts",
@@ -8,7 +8,7 @@
     "watch": "nodemon",
     "inspect": "nodemon --exec \"node --require tsconfig-paths/register --require ts-node/register --inspect ./src/app.ts\"",
     "build": "tsc && tsc-alias",
-    "build:prod": "yarn tsup ./src/app.ts --out-dir ../../dist/api --minify --target=esnext --clean --shims",
+    "build:prod": "yarn tsup ./src/app.ts --out-dir ../dist/server --minify --target=esnext --clean --shims",
     "test": "ts-mocha --paths src/**/*.test.ts",
     "depcheck": "depcheck",
     "lint": "eslint . --ext .ts",

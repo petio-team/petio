@@ -31,6 +31,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "build:prod": "BUILD_PATH='../dist/web' react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

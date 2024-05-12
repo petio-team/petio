@@ -9,4 +9,5 @@ RUN wget https://github.com/earthly/earthly/releases/latest/download/earthly-lin
     && /usr/local/bin/earthly bootstrap --with-autocomplete
 # Make sure better-commits and semantic-release exists
 RUN npm install -g better-commits semantic-release \
-    && alias bc="better-commits" && alias sr="semantic-release"
+    && echo "alias bc='better-commits'" >> /root/.zshrc \
+    && echo "alias sr='semantic-release'" >> /root/.zshrc

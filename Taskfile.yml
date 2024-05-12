@@ -5,21 +5,39 @@ vars:
 tasks:
   default:
     cmds:
-      - task: dev:api
+      - task: dev:server
 
   build:
     cmds:
       - yarn workspaces focus --all
-      - yarn workspace frontend run build
-      - yarn workspace api run build
+      - yarn workspace web run build
+      - yarn workspace server run build
 
-  dev:api:
+  build:prod:
     cmds:
-      - yarn workspace api run watch
+      - yarn workspaces focus --all
+      - yarn workspace web run build:prod
+      - yarn workspace server run build:prod
 
-  dev:fe:
+  dev:binary:
+    dir: ./dist/binaries
     cmds:
-      - yarn workspace frontend run start
+      - ./petio-alpine-x64
+
+  dev:local:
+    cmds:
+      - task: build:prod
+      - yarn run pkg
+      - task: dev:binary
+
+
+  dev:server:
+    cmds:
+      - yarn workspace server run watch
+
+  dev:web:
+    cmds:
+      - yarn workspace web run start
 
   ci:
     cmds:

@@ -2,7 +2,6 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "commonjs",
-    "typeRoots": ["../../node_modules/@types", "./src/types"],
     "allowJs": true,
     "checkJs": false,
     "outDir": "build",
@@ -30,6 +29,10 @@
       "@/*": ["./src/*"]
     }
   },
-  "exclude": ["node_modules", "dist", "tests"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/**/*.tests.ts"
+  ],
   "include": ["./src/**/*"]
 }
