@@ -53,7 +53,7 @@
           "source.fixAll.eslint": "always"
         },
         "eslint.workingDirectories": [
-          "/workspace/pkg/api"
+          "/workspace/server"
         ],
         "eslint.validate": [
           "javascript",
