@@ -1,14 +1,13 @@
 /* eslint-disable import/order */
 import Bluebird from 'bluebird';
-import _ from 'lodash';
 
 import { getFromContainer } from '@/infrastructure/container/container';
 import loggerMain from '@/infrastructure/logger/logger';
 import { UserRepository } from '@/resources/user/repository';
 import { CacheService } from '@/services/cache/cache';
+import display from '@/services/discovery/display';
 
 import build from './build';
-import display from './display';
 
 const logger = loggerMain.child({ module: 'services.discovery' });
 
@@ -21,20 +20,21 @@ export default async () => {
     if (!users.length) {
       return;
     }
-    const userIds = users.map((user) => {
-      if (user.altId) {
-        return user.altId;
-      }
-      if (!user.custom) {
-        return user.plexId;
-      }
-      return user.id?.toString();
-    });
-    const validUserIds = _.compact(userIds);
+    logger.debug(`found ${users.length} users to build discovery profiles for`);
     await Bluebird.map(
-      validUserIds,
-      async (userId) => {
-        logger.debug(`building discovery profile for user - ${userId}`);
+      users,
+      async (user) => {
+        logger.debug(
+          `building discovery profile for user - ${user.title} (${user.id})`,
+        );
+        let userId;
+        if (user.altId) {
+          userId = user.altId;
+        } else if (!user.custom) {
+          userId = user.plexId;
+        } else {
+          userId = user.id?.toString();
+        }
         await build(userId);
         const [displayMovies, displayShows] = await Bluebird.all([
           display(userId, 'movie'),

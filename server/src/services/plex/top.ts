@@ -6,7 +6,7 @@ import is from '@/infrastructure/utils/is';
 import { MediaServerEntity } from '@/resources/media-server/entity';
 import { CacheService } from '@/services/cache/cache';
 import { getPlexClient } from '@/services/plex/client';
-import plexLookup from '@/services/plex/lookup';
+import { movieDbLookup, showDbLookup } from '@/services/plex/lookup';
 import { movieLookup } from '@/services/tmdb/movie';
 import { showLookup } from '@/services/tmdb/show';
 
@@ -68,18 +68,24 @@ async function parseTop(
   }
   const promises = top.map(async (item: { ratingKey: any }) => {
     const { ratingKey } = item;
-    let plexData: any = false;
     if (type === 2) {
-      plexData = await plexLookup(ratingKey, 'show');
+      const plexData = await showDbLookup(ratingKey);
+      if (is.falsy(plexData)) {
+        return {};
+      }
+      if (plexData.tmdb_id) {
+        return { [plexData.tmdb_id]: await showLookup(plexData.tmdb_id, true) };
+      }
     } else {
-      plexData = await plexLookup(ratingKey, 'movie');
-    }
-    if (plexData.tmdb_id) {
-      const rt =
-        type === 2
-          ? await showLookup(plexData.tmdb_id, true)
-          : await movieLookup(plexData.tmdb_id, true);
-      return { [plexData.tmdb_id]: rt };
+      const plexData = await movieDbLookup(ratingKey);
+      if (is.falsy(plexData)) {
+        return {};
+      }
+      if (plexData.tmdb_id) {
+        return {
+          [plexData.tmdb_id]: await movieLookup(plexData.tmdb_id, true),
+        };
+      }
     }
     return null;
   });

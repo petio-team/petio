@@ -2,7 +2,7 @@ import { getFromContainer } from '@/infrastructure/container/container';
 import { MovieRepository } from '@/resources/movie/repository';
 import { ShowRepository } from '@/resources/show/repository';
 
-export default async (id, type) => {
+export default async (id: string, type: 'movie' | 'show') => {
   if (type === 'movie') {
     const movieRepo = getFromContainer(MovieRepository);
     const result = await movieRepo.findOne({
@@ -22,3 +22,23 @@ export default async (id, type) => {
   }
   return result.unwrap();
 };
+
+export async function movieDbLookup(id: string) {
+  const movieResult = await getFromContainer(MovieRepository).findOne({
+    ratingKey: id,
+  });
+  if (movieResult.isNone()) {
+    return null;
+  }
+  return movieResult.unwrap();
+}
+
+export async function showDbLookup(id: string) {
+  const showResult = await getFromContainer(ShowRepository).findOne({
+    ratingKey: id,
+  });
+  if (showResult.isNone()) {
+    return null;
+  }
+  return showResult.unwrap();
+}

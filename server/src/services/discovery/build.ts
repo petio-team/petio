@@ -38,16 +38,13 @@ export default async (id: string) => {
       build(id),
       discoveryRepo.findOne({ id }),
     ]);
-    if (discovery.isNone()) {
-      logger.debug(`no discovery found for user - ${id}`);
-      return;
-    }
     if (!is.truthy(data)) {
       logger.debug(`no data for user - ${id}`);
       return;
     }
-    const existing = discovery.unwrap().getProps();
-    if (existing) {
+    logger.debug(data);
+    if (discovery.isSome()) {
+      const existing = discovery.unwrap().getProps();
       await discoveryRepo.updateMany(
         { id: existing.id },
         {
@@ -193,6 +190,7 @@ async function build(id: string) {
     const client = getPlexClientFromServer(server);
     const data = await client.sessions.getSessionHistory({
       accountId: id,
+      sort: 'viewedAt:desc',
     });
     if (
       !is.truthy(data) ||
