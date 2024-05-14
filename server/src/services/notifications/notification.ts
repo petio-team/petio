@@ -1,44 +1,51 @@
-import { container } from 'tsyringe';
+import { map } from 'bluebird';
+import { Service } from 'diod';
+import pino from 'pino';
 
-import logger from '@/infrastructure/logger/logger';
+import { Logger } from '@/infrastructure/logger/logger';
+import { NotificationRepository } from '@/resources/notification/repository';
+import { BaseNotificationProvider } from '@/services/notifications/base-provider';
+import { providers } from '@/services/notifications/providers';
+import { NotifyEvent, NotifyPayload } from '@/services/notifications/types';
 
-import { INotify } from './notify';
-import {
-  DiscordProvider,
-  authConfigToDiscordSettings,
-} from './providers/discord';
-import { EmailProvider, authConfigToEmailSettings } from './providers/email';
-import {
-  TelegramProvider,
-  authConfigToTelegramSettings,
-} from './providers/telegram';
-import { AuthConfig } from './url/url';
+@Service()
+export class NotificationService {
+  private logger: pino.Logger;
 
-export interface INotification {
-  enabled: boolean;
-}
+  private notifications: BaseNotificationProvider<any>[] = [];
 
-export const getNotificationProvider = (
-  config: AuthConfig,
-): INotify | undefined => {
-  switch (config.service) {
-    case 'discord':
-      return new DiscordProvider(authConfigToDiscordSettings(config));
-    case 'telegram':
-      return new TelegramProvider(authConfigToTelegramSettings(config));
-    case 'email':
-      return new EmailProvider(authConfigToEmailSettings(config));
-    default:
-      return undefined;
+  constructor(
+    private notificationRepo: NotificationRepository,
+    logger: Logger,
+  ) {
+    this.logger = logger.child({ module: 'services.notification.service' });
   }
-};
 
-export class BaseNotification<T extends INotification> {
-  protected config: T;
+  public async loadNotifications() {
+    const notifications = await this.notificationRepo.findAll();
+    this.notifications = notifications.map((notification) => {
+      const provider = providers[notification.type];
+      if (!provider.validator()) {
+        throw new Error('Invalid notification provider');
+      }
+      // eslint-disable-next-line new-cap
+      return new provider.provider(notification.getProps());
+    });
+  }
 
-  public logger = logger.child({ module: 'notification.service' });
-
-  constructor(config: T) {
-    this.config = config;
+  public async send(type: NotifyEvent, data: NotifyPayload) {
+    await map(
+      this.notifications,
+      async (instance) => {
+        try {
+          await instance.sendNotification(type, data);
+        } catch (err) {
+          this.logger.error(err);
+        }
+      },
+      {
+        concurrency: 2,
+      },
+    );
   }
 }

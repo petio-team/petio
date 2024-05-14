@@ -131,9 +131,12 @@ export class MigrationService {
       await notification.findOneOrCreate(
         NotificationEntity.create({
           name: 'email',
-          url: `smtp://${config.emailUser}:${config.emailPass}@${config.emailServer}:${config.emailPort}`,
-          type: NotificationType.EMAIL,
+          type: NotificationType.SMTP,
           metadata: {
+            host: config.emailServer,
+            port: config.emailPort,
+            username: config.emailUser,
+            password: config.emailPass,
             from: config.emailFrom,
             secure: config.emailSecure,
           },
@@ -182,14 +185,21 @@ export class MigrationService {
     const mediaServer = getFromContainer(MediaServerRepository);
     const settings = getFromContainer(SettingsRepository);
     const user = getFromContainer(UserRepository);
-    await Promise.all([
+    const extractedDiscordWebhook =
       config.discord_webhook && config.discord_webhook !== ''
+        ? this.extractDiscordIdAndToken(config.discord_webhook)
+        : null;
+
+    await Promise.all([
+      extractedDiscordWebhook
         ? notification.findOneOrCreate(
             NotificationEntity.create({
               name: 'discord',
-              url: config.discord_webhook,
               type: NotificationType.DISCORD,
-              metadata: {},
+              metadata: {
+                id: extractedDiscordWebhook.id,
+                token: extractedDiscordWebhook.token,
+              },
               enabled: true,
             }),
           )
@@ -198,7 +208,6 @@ export class MigrationService {
         ? notification.findOneOrCreate(
             NotificationEntity.create({
               name: 'telegram',
-              url: 'https://telegram.org',
               type: NotificationType.TELEGRAM,
               metadata: {
                 token: config.telegram_bot_token,
@@ -244,6 +253,17 @@ export class MigrationService {
     ]);
     // backup files
     await backupOldFiles();
+  }
+
+  extractDiscordIdAndToken(webhookUrl: string) {
+    const matches = webhookUrl.match(/discord.com\/api\/webhooks\/(\d+)\/(.+)/);
+    if (!matches) {
+      return null;
+    }
+    return {
+      id: matches[1],
+      token: matches[2],
+    };
   }
 
   /**

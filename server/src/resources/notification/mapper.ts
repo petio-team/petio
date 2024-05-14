@@ -1,13 +1,17 @@
-import { Mapper } from "@/infrastructure/entity/mapper";
-import { Service } from "diod";
-import { NotificationSchemaProps } from "./schema";
-import { NotificationEntity } from "./entity";
+import { Service } from 'diod';
+
+import { Mapper } from '@/infrastructure/entity/mapper';
+
+import { NotificationEntity } from './entity';
+import { NotificationSchemaProps } from './schema';
 
 /**
  * Mapper class for converting between NotificationEntity and NotificationSchemaProps.
  */
 @Service()
-export class NotificationMapper implements Mapper<NotificationEntity, NotificationSchemaProps, any> {
+export class NotificationMapper
+  implements Mapper<NotificationEntity, NotificationSchemaProps, any>
+{
   /**
    * Converts a NotificationEntity to a NotificationSchemaProps.
    * @param entity - The entity to convert.
@@ -18,7 +22,6 @@ export class NotificationMapper implements Mapper<NotificationEntity, Notificati
     return {
       id: copy.id,
       name: copy.name,
-      url: copy.url,
       type: copy.type,
       metadata: copy.metadata,
       enabled: copy.enabled,
@@ -37,7 +40,6 @@ export class NotificationMapper implements Mapper<NotificationEntity, Notificati
       id: record.id,
       props: {
         name: record.name,
-        url: record.url,
         type: record.type,
         metadata: record.metadata,
         enabled: record.enabled,
@@ -57,7 +59,6 @@ export class NotificationMapper implements Mapper<NotificationEntity, Notificati
     return {
       id: copy.id,
       name: copy.name,
-      url: copy.url,
       type: copy.type,
       metadata: copy.metadata,
       enabled: copy.enabled,

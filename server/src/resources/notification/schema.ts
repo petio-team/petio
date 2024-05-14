@@ -15,7 +15,6 @@ export type NotificationSchemaProps = BaseEntityProps & NotificationProps;
 export const NotificationSchema = new Schema<NotificationSchemaProps>({
   id: { type: String, required: true, unique: true, index: true },
   name: { type: String, required: true },
-  url: { type: String, required: true },
   type: { type: String, required: true },
   metadata: { type: Object, required: true },
   enabled: { type: Boolean, required: true },
