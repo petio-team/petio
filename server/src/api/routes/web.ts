@@ -1,9 +1,10 @@
 import fs from 'fs';
 import Koa from 'koa';
-import addTrailingSlashes from 'koa-add-trailing-slashes';
 import mount from 'koa-mount';
 import serve from 'koa-static';
 import { join } from 'path';
+
+import { addTrailingSlashes } from '@/api/middleware/add-trailing-slashes';
 
 const pathExists = (file: string) => {
   if (fs.existsSync(file)) {

@@ -42,7 +42,6 @@
     "http-status-codes": "^2.2.0",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.13.4",
-    "koa-add-trailing-slashes": "^2.0.1",
     "koa-body": "^5.0.0",
     "koa-compress": "^5.1.0",
     "koa-helmet": "^6.1.0",

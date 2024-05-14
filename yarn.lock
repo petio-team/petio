@@ -12407,13 +12407,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"koa-add-trailing-slashes@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "koa-add-trailing-slashes@npm:2.0.1"
-  checksum: 505131723f8e3eb4bf29ecc5c5421bacc5703ed742b19aabde00b87f55de65aabc43bab43ebf2b3bf7e3a00a26a75d8d4ecaa64677ebdbd9797ba0fcbc7c041f
-  languageName: node
-  linkType: hard
-
 "koa-body@npm:^5.0.0":
   version: 5.0.0
   resolution: "koa-body@npm:5.0.0"
@@ -17451,7 +17444,6 @@ __metadata:
     http-status-codes: ^2.2.0
     jsonwebtoken: ^8.5.1
     koa: ^2.13.4
-    koa-add-trailing-slashes: ^2.0.1
     koa-body: ^5.0.0
     koa-compress: ^5.1.0
     koa-helmet: ^6.1.0
