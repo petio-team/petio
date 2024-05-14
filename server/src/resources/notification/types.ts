@@ -31,7 +31,6 @@ export type CreateNotificationProps = Override<
 
 /**
  * Represents a Discord notification.
- * @template T - The type of the notification properties.
  */
 export type DiscordNotificationProps = Override<
   NotificationProps,
