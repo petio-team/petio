@@ -150,19 +150,15 @@ export default function SettingsArr(props) {
       type: 'loading',
     });
     try {
-      let data = [...servers];
-
-      data.push({
-        ...newServer,
-      });
+      const { id, ...rest } = newServer;
       let responseData = null;
       if (type === 'radarr') {
-        responseData = await saveRadarrConfig(newServer);
+        responseData = await saveRadarrConfig(rest);
       } else {
-        responseData = await saveSonarrConfig(newServer);
+        responseData = await saveSonarrConfig(rest);
       }
       serverData = {
-        ...data,
+        ...newServer,
         id: responseData.id,
       };
       const test = await testServer(serverData.id);
