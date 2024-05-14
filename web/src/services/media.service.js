@@ -278,7 +278,7 @@ async function getDiscovery(type = 'movies') {
   if (store.getState().media.discovery[type].length > 0) return;
   try {
     if (type === 'movies') {
-      const data = await get('/discovery/movies');
+      const { data } = await get('/discovery/movies');
       let movies = {};
       let discovery = [];
       data.forEach((row) => {
@@ -300,7 +300,7 @@ async function getDiscovery(type = 'movies') {
       });
       return data;
     } else if (type === 'tv') {
-      const data = await get('/discovery/shows');
+      const { data } = await get('/discovery/shows');
       let shows = {};
       let discovery = [];
       data.forEach((row) => {
