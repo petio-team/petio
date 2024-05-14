@@ -17,7 +17,7 @@ const pathExists = (file: string) => {
 
 function serveReact(app: Koa, dir: string, urlPath: string) {
   const spa = new Koa();
-  spa.use(addTrailingSlashes({ defer: false }));
+  spa.use(addTrailingSlashes());
   spa.use(serve(dir));
   app.use(mount(urlPath, spa));
 }
