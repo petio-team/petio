@@ -727,7 +727,7 @@ export default class LibraryUpdate {
         defaultProfile = results.unwrap();
       }
 
-      const newUser = await getFromContainer(UserRepository).create(
+      const newUser = await getFromContainer(UserRepository).findOrCreate(
         UserEntity.create({
           title: obj.title ?? obj.username ?? 'User',
           username: obj.username ? obj.username : obj.title,
