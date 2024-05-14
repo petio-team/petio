@@ -19,7 +19,7 @@ const getMovies = async (ctx: Context) => {
     id: ctx.state.user.id,
   });
   if (userRepo.isNone()) {
-    StatusOk(ctx, {});
+    StatusOk(ctx, []);
     return;
   }
   const user = userRepo.unwrap();
@@ -49,7 +49,7 @@ const getShows = async (ctx: Context) => {
     id: ctx.state.user.id,
   });
   if (userRepo.isNone()) {
-    StatusOk(ctx, {});
+    StatusOk(ctx, []);
     return;
   }
   const user = userRepo.unwrap();
