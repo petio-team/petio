@@ -3,14 +3,7 @@ import fs from 'fs/promises';
 import { join } from 'path';
 
 import { tryLoadEnv } from '@/infrastructure/config/dotenv';
-import { DATA_DIR, NODE_ENV } from '@/infrastructure/config/env';
-import {
-  ArrConfig,
-  EmailConfig,
-  MainConfig,
-  backupOldFiles,
-  mergeFiles,
-} from '@/infrastructure/config/file';
+import { NODE_ENV } from '@/infrastructure/config/env';
 import { getFromContainer } from '@/infrastructure/container/container';
 import { MongooseDatabaseConnection } from '@/infrastructure/database/connection';
 import { Logger } from '@/infrastructure/logger/logger';
@@ -30,6 +23,13 @@ import { AuthType } from '@/resources/settings/types';
 import { UserEntity } from '@/resources/user/entity';
 import { UserRepository } from '@/resources/user/repository';
 import { UserRole } from '@/resources/user/types';
+import {
+  ArrConfig,
+  EmailConfig,
+  MainConfig,
+  backupOldFiles,
+  mergeFiles,
+} from '@/services/migration/file';
 
 @Service()
 export class MigrationService {
@@ -48,43 +48,47 @@ export class MigrationService {
    */
   async migrateOldFiles(): Promise<void> {
     const files = await mergeFiles();
-    if (files.main || files.email || files.sonarr || files.radarr) {
+    this.logger.debug(`config data found`, files);
+    if (files.main) {
       this.logger.info('Found old files to migrate');
-      const hasValidConnection = this.connection.get('default');
       try {
-        if (files.main) {
-          this.logger.debug(`parsing main config file`);
-          await this.processMainConfig(files.main);
-        }
-        if (!hasValidConnection) {
-          this.logger.error(
-            'No valid database connection present, unable to migrate files, exiting process',
-          );
-          process.exit(1);
-        }
-        if (files.email) {
-          this.logger.debug(`parsing email config file`);
-          await this.processEmailConfig(files.email);
-        }
-        if (files.sonarr) {
-          this.logger.debug(`parsing sonarr config file`);
-          await Promise.all(
-            files.sonarr.map((config) =>
-              this.processArrConfigs(config, 'sonarr'),
-            ),
-          );
-        }
-        if (files.radarr) {
-          this.logger.debug(`parsing radarr config file`);
-          await Promise.all(
-            files.radarr.map((config) =>
-              this.processArrConfigs(config, 'radarr'),
-            ),
-          );
+        this.logger.debug(`parsing main config file`);
+        await this.processMainConfig(files.main);
+        if (files.email || files.sonarr || files.radarr) {
+          if (!this.connection.has('default')) {
+            this.logger.error(
+              'No valid database connection present, unable to migrate files, exiting process',
+            );
+            process.exit(1);
+          }
+          if (files.email) {
+            this.logger.debug(`parsing email config file`);
+            await this.processEmailConfig(files.email);
+          }
+          if (files.sonarr) {
+            this.logger.debug(`parsing sonarr config file`);
+            await Promise.all(
+              files.sonarr.map((config) =>
+                this.processArrConfigs(config, 'sonarr'),
+              ),
+            );
+          }
+          if (files.radarr) {
+            this.logger.debug(`parsing radarr config file`);
+            await Promise.all(
+              files.radarr.map((config) =>
+                this.processArrConfigs(config, 'radarr'),
+              ),
+            );
+          }
         }
       } catch (err) {
         this.logger.error('Failed to migrate old files', err);
       }
+    } else {
+      this.logger.info(
+        'You must have a config.json file in order to migrate old files',
+      );
     }
   }
 
@@ -154,7 +158,7 @@ export class MigrationService {
    */
   private async tryDatabaseConnection(url: string): Promise<boolean> {
     try {
-      await this.connection.connect('default', url, {});
+      await this.connection.connect('default', url, {}, true);
       return true;
     } catch (error) {
       this.logger.error('Failed to connect to the database for migration url', {
@@ -176,10 +180,18 @@ export class MigrationService {
       process.exit(1);
     }
     if (process.pkg) {
-      await this.createEnvFile(
-        `DATABASE_URL=${config.DB_URL}\nHTTP_BASE_PATH=${config.base_path}`,
-      );
-      tryLoadEnv();
+      if (NODE_ENV === 'production') {
+        await this.createEnvFile(
+          `DATABASE_URL=${config.DB_URL}\nHTTP_BASE_PATH=${config.base_path}`,
+        );
+        tryLoadEnv();
+      } else if (NODE_ENV === 'docker') {
+        this.logger.warn(
+          `\nYou are using docker, so an env file can not be generated for you.
+Instead you can paste the contents of the file into your docker compose environments section:\n
+DATABASE_URL=mongo://mongo:27017\nHTTP_BASE_PATH=/\n`,
+        );
+      }
     }
     const notification = getFromContainer(NotificationRepository);
     const mediaServer = getFromContainer(MediaServerRepository);
@@ -273,10 +285,7 @@ export class MigrationService {
    * @param content - The content to be added to the .env file.
    */
   async createEnvFile(content: string) {
-    const envFile =
-      NODE_ENV === 'docker'
-        ? join(DATA_DIR, '.env')
-        : join(process.cwd(), '.env');
+    const envFile = join(process.cwd(), '.env');
     const hasEnvFile = await fileExists(envFile);
     if (hasEnvFile) {
       this.logger.info(

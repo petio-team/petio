@@ -53,11 +53,21 @@ async function createDefaultDbConnection() {
  * @returns A promise that resolves when the primary loading process is complete.
  */
 async function doPrimary() {
-  // Attempt to file old configuration files and migrate them
-  await getFromContainer(MigrationService).migrateOldFiles();
-
   // Validate db connection (this should be valid even after config migration)
-  await createDefaultDbConnection();
+  const connectionExists = await createDefaultDbConnection();
+  if (!connectionExists) {
+    logger.debug(
+      `No database connection found, attempting to find and migrate old files`,
+    );
+    // Attempt to file old configuration files and migrate them
+    await getFromContainer(MigrationService).migrateOldFiles();
+  }
+  if (!getFromContainer(MongooseDatabaseConnection).has('default')) {
+    logger.error(
+      'No valid database connection present, unable to proceed, exiting process',
+    );
+    process.exit(1);
+  }
 
   // Load settings into cache
   await getFromContainer(SettingsService).getSettings();
