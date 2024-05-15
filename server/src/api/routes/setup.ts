@@ -36,7 +36,7 @@ const FinishSetupBodySchema = z.object({
   server: z.object({
     protocol: z.enum(['http', 'https']),
     host: z.string().min(1),
-    port: z.number().min(1),
+    port: z.coerce.number(),
     token: z.string().min(1),
   }),
 });
