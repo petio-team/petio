@@ -129,7 +129,7 @@
   "breaking_change": {
     "add_exclamation_to_title": false
   },
-  "confirm_with_editor": true,
+  "confirm_with_editor": false,
   "confirm_commit": true,
   "print_commit_output": true,
   "branch_pre_commands": [],

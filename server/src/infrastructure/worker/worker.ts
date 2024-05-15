@@ -1,7 +1,8 @@
-import { IpcMethodHandler } from "@david.uhlir/ipc-method";
-import cluster from "cluster";
-import { Service } from "diod";
-import { masterReciever, workerReciever } from "./recievers";
+import { IpcMethodHandler } from '@david.uhlir/ipc-method';
+import cluster from 'cluster';
+import { Service } from 'diod';
+
+import { masterReciever, workerReciever } from './recievers';
 
 @Service()
 export class Worker {
@@ -9,7 +10,9 @@ export class Worker {
 
   constructor() {
     if (!cluster.isWorker) {
-      throw new Error("Worker class should be instantiated in the worker cluster");
+      throw new Error(
+        'Worker class should be instantiated in the worker cluster',
+      );
     }
     this.handler = new IpcMethodHandler(['worker-com'], workerReciever);
   }
