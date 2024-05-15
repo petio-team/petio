@@ -2,6 +2,7 @@ import Router from '@koa/router';
 import bcrypt from 'bcryptjs';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
+import { z } from 'zod';
 
 import { validateRequest } from '@/api/middleware/validation';
 import { SetupTestInput, SetupTestInputSchema } from '@/api/schemas/setup';
@@ -67,17 +68,28 @@ const testMongo = async (ctx: Context) => {
   };
 };
 
-const finishSetup = async (ctx: Context) => {
-  const { body } = ctx.request;
+const FinishSetupBodySchema = z.object({
+  user: z.object({
+    display: z.string(),
+    username: z.string(),
+    password: z.string(),
+    email: z.string(),
+    thumb: z.string(),
+    id: z.string(),
+  }),
+  server: z.object({
+    protocol: z.string(),
+    host: z.string(),
+    port: z.number(),
+    token: z.string(),
+    clientId: z.string(),
+  }),
+});
+type FinishSetupBody = z.infer<typeof FinishSetupBodySchema>;
 
-  const { user } = body;
-  const { server } = body;
-  const dbUrl = body.db;
-  if (!user || !server || !dbUrl) {
-    ctx.status = StatusCodes.BAD_REQUEST;
-    ctx.body = 'missing fields';
-    return;
-  }
+const finishSetup = async (ctx: Context) => {
+  const body = ctx.request.body as FinishSetupBody;
+  const { server, user } = body;
 
   try {
     await getFromContainer(MediaServerRepository).findOneOrCreate(
@@ -99,7 +111,7 @@ const finishSetup = async (ctx: Context) => {
         UserEntity.create({
           title: user.display ?? user.username,
           username: user.username,
-          password: bcrypt.hashSync(user.password, 10),
+          password: bcrypt.hashSync(user.password, 12),
           email: user.email,
           thumbnail: user.thumb,
           altId: '1',
@@ -139,7 +151,13 @@ export default (app: Router) => {
     testServer,
   );
   route.post('/test_mongo', testMongo);
-  route.post('/set', finishSetup);
+  route.post(
+    '/set',
+    validateRequest({
+      body: FinishSetupBodySchema,
+    }),
+    finishSetup,
+  );
 
   app.use(route.routes());
 };
