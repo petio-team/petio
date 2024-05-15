@@ -27,11 +27,11 @@ const routes = (keys: string[]): Koa => {
   const app = new Koa();
   app.keys = keys;
 
-  // web/frontend/reac
-  web(app);
-
   // setup old api
   api(app, HTTP_BASE_PATH);
+
+  // web/frontend/react
+  web(app);
 
   return app;
 };
