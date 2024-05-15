@@ -1,7 +1,7 @@
 /* eslint-disable import/order */
 import * as FileStreamRotator from 'file-stream-rotator';
 import { join } from 'node:path';
-import pino, { Logger as PinoLogger } from 'pino';
+import pino, { ChildLoggerOptions, Logger as PinoLogger } from 'pino';
 import PinoPretty from 'pino-pretty';
 
 import { DATA_DIR, LOG_LEVEL } from '../config/env';
@@ -128,8 +128,8 @@ export class Logger {
    * @param obj - The additional properties for the child logger.
    * @returns The child logger instance.
    */
-  public child(obj: object) {
-    return this.logger.child<string>(obj);
+  public child(obj: object, options?: ChildLoggerOptions<string>) {
+    return this.logger.child<string>(obj, options);
   }
 
   /**
