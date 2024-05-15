@@ -36,13 +36,20 @@ export default function SetupServer(props) {
     }
   }
 
+  function selectServer(id) {
+    setPicked(id);
+    props.setSetupServer(id);
+  }
+
   function saveServer() {
     if (!picked)
       props.newNotification({
         type: 'error',
         message: 'No server selected please pick a server from the list',
       });
-    if (picked) props.setSetupServer(picked);
+    if (picked) {
+      props.submit();
+    }
   }
 
   return (
@@ -72,7 +79,7 @@ export default function SetupServer(props) {
                     : ''
                 } mb-1`}
                 data-id={key}
-                onClick={(e) => setPicked(e.target.dataset.id)}
+                onClick={(e) => selectServer(e.target.dataset.id)}
               >
                 <div className={styles.server_option__icon}>
                   {serverIcon(server.platform)}
@@ -149,7 +156,7 @@ export default function SetupServer(props) {
           }`}
           onClick={saveServer}
         >
-          Next
+          Finish
         </button>
       </div>
     </div>

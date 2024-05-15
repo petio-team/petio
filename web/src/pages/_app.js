@@ -242,7 +242,7 @@ function Petio({ redux_pos }) {
     return <Loading />;
   }
 
-  if (globalConfig.config === false) {
+  if (globalConfig.config === false || globalConfig.config === undefined) {
     setupMode = true;
   }
 

@@ -162,7 +162,6 @@ async function getUserFromToken(token) {
       let connections = server.getElementsByTagName('Connection');
 
       for (let connection of connections) {
-        console.log(connection);
         let uri = connection.getAttribute('uri');
         let details = getUrlDetails(uri);
         setup.servers[
@@ -188,7 +187,6 @@ async function getUserFromToken(token) {
     platform: 'docker',
     status: 'pending',
   };
-  console.log(setup.servers);
   updateStore({
     type: 'user/plex-details',
     servers: setup.servers,
@@ -209,7 +207,6 @@ function testPlexServers(servers, token) {
 async function testPlexServer(server, key) {
   try {
     let test = await testServer(server);
-    console.log(test);
     server.status = test.status;
     updateStore({
       type: 'user/plex-server',
@@ -217,7 +214,6 @@ async function testPlexServer(server, key) {
       server: server,
     });
   } catch (e) {
-    console.log(e);
     server.status = 'failed';
     updateStore({
       type: 'user/plex-server',

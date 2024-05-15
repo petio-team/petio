@@ -8,7 +8,7 @@
   min-height: calc(
     100vh - (env(safe-area-inset-top) + env(safe-area-inset-bottom))
   );
-  padding: calc(var(--gutter) * 5) 0;
+  padding: calc(var(--spacing) * 5) 0;
 }
 
 .steps {
@@ -90,7 +90,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-right: calc(var(--gutter) * 2);
+    margin-right: calc(var(--spacing) * 2);
 
     svg {
       height: 100%;
@@ -99,7 +99,7 @@
   }
 
   &__name {
-    padding-right: calc(var(--gutter) * 2);
+    padding-right: calc(var(--spacing) * 2);
     max-width: 60%;
     word-break: break-all;
 
@@ -113,7 +113,7 @@
     height: 10px;
     display: flex;
     align-items: center;
-    margin-left: calc(var(--gutter) * 2);
+    margin-left: calc(var(--spacing) * 2);
 
     svg {
       height: 100%;
@@ -196,7 +196,7 @@
     margin-bottom: var(--spacing);
 
     &__item {
-      margin-right: calc(var(--gutter) * 2);
+      margin-right: calc(var(--spacing) * 2);
       cursor: pointer;
 
       &__active {

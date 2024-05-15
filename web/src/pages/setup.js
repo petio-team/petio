@@ -26,7 +26,7 @@ function Setup({ config, redux_user, newNotification }) {
   useEffect(() => {
     if (step === 0 && redux_user.plexUser) updateStep(1);
     if (step === 1 && setupUser) updateStep(2);
-    if (step === 2 && setupServer) updateStep(3);
+    // if (step === 2 && setupServer) updateStep(3);
   }, [redux_user, setupUser, step, setupServer]);
 
   async function submit() {
@@ -34,7 +34,7 @@ function Setup({ config, redux_user, newNotification }) {
     let config = {
       user: setupUser.user,
       server: selectedServer,
-      db: setupDb,
+      // db: 'mongodb:mongo:27017',
     };
     const nId = newNotification({
       type: 'loading',
@@ -68,15 +68,16 @@ function Setup({ config, redux_user, newNotification }) {
   }
 
   let steps = [];
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 3; i++) {
     steps.push(
       <div
-        className={`${styles.step} ${step > i
+        className={`${styles.step} ${
+          step > i
             ? styles.step__complete
             : step === i
-              ? styles.step__active
-              : ''
-          }`}
+            ? styles.step__active
+            : ''
+        }`}
         key={`setup_step_${i}`}
       >
         <p className={typo.body}>{i + 1}</p>
@@ -104,19 +105,20 @@ function Setup({ config, redux_user, newNotification }) {
           plexServers={redux_user.plexServers}
           setSetupServer={setSetupServer}
           newNotification={newNotification}
-        />
-      );
-      break;
-    case 3:
-      content = (
-        <SetupDb
-          newNotification={newNotification}
           submit={submit}
-          setSetupDb={setSetupDb}
         />
       );
       break;
-    case 4:
+    // case 3:
+    //   content = (
+    //     <SetupDb
+    //       newNotification={newNotification}
+    //       submit={submit}
+    //       setSetupDb={setSetupDb}
+    //     />
+    //   );
+    //   break;
+    case 3:
       content = <p className={typo.body}>loading, please wait...</p>;
       break;
     default:
