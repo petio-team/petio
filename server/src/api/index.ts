@@ -79,7 +79,7 @@ export const createKoaServer = async () => {
   return new Promise((resolve, reject) => {
     server = app.listen(HTTP_PORT, HTTP_ADDR, () => {
       const { port } = server.address() as AddressInfo;
-      const url = `http://localhost:${port}`;
+      const url = `http://${HTTP_ADDR}:${port}`;
 
       resolve({
         stop,

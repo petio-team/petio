@@ -6,6 +6,7 @@ import cron from '@/services/cron';
 import migration from '@/services/migration';
 import scanner from '@/services/scanner';
 import settings from '@/services/settings';
+import setup from '@/services/setup';
 
 export default (builder: ContainerBuilder) => {
   cache(builder);
@@ -14,5 +15,6 @@ export default (builder: ContainerBuilder) => {
   }
   scanner(builder);
   migration(builder);
+  setup(builder);
   settings(builder);
 };

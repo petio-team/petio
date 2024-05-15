@@ -1,5 +1,4 @@
 import Router from '@koa/router';
-import bcrypt from 'bcryptjs';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 import { z } from 'zod';
@@ -8,52 +7,21 @@ import { validateRequest } from '@/api/middleware/validation';
 import { SetupTestInput, SetupTestInputSchema } from '@/api/schemas/setup';
 import { getFromContainer } from '@/infrastructure/container/container';
 import logger from '@/infrastructure/logger/logger';
-import { PlexClient } from '@/infrastructure/plex';
-import { generateKeys } from '@/infrastructure/utils/security';
-import { Worker } from '@/infrastructure/worker/worker';
-import { MediaServerEntity } from '@/resources/media-server/entity';
-import { MediaServerRepository } from '@/resources/media-server/repository';
-import { MediaServerType } from '@/resources/media-server/types';
-import { UserEntity } from '@/resources/user/entity';
-import { UserRepository } from '@/resources/user/repository';
-import { UserRole } from '@/resources/user/types';
-import { SettingsService } from '@/services/settings/settings';
+import { SetupService } from '@/services/setup/setup';
 
 const testServer = async (ctx: Context) => {
   const body = ctx.request.body as SetupTestInput;
-
   const { server } = body;
-  if (!server) {
-    logger.warn('Test Server bad request');
-
-    ctx.status = StatusCodes.BAD_REQUEST;
-    ctx.body = 'bad request';
-    return;
-  }
-  logger.debug(
-    `Testing Server ${server.protocol}://${server.host}:${server.port}?X-Plex-Token=${server.token}`,
-  );
-  try {
-    const client = new PlexClient({
-      BASE: `${server.protocol}://${server.host}:${server.port}`,
-      HEADERS: {
-        'X-Plex-Token': server.token,
-      },
-    });
-    await client.server.getServerCapabilities();
-    logger.debug(
-      `Test Server success - ${server.protocol}://${server.host}:${server.port}?X-Plex-Token=${server.token}`,
-    );
+  const service = getFromContainer(SetupService);
+  const connected = await service.testServerConnection(server);
+  if (connected) {
     ctx.status = StatusCodes.OK;
     ctx.body = {
       status: 'connected',
       code: 200,
     };
-  } catch (err) {
-    logger.debug(
-      `Test Server failed - ${server.protocol}://${server.host}:${server.port}?X-Plex-Token=${server.token}`,
-    );
-    ctx.status = StatusCodes.BAD_REQUEST;
+  } else {
+    ctx.status = StatusCodes.OK;
     ctx.body = {
       status: 'failed',
       code: 400,
@@ -61,28 +29,15 @@ const testServer = async (ctx: Context) => {
   }
 };
 
-const testMongo = async (ctx: Context) => {
-  ctx.status = StatusCodes.OK;
-  ctx.body = {
-    status: 'connected',
-  };
-};
-
 const FinishSetupBodySchema = z.object({
   user: z.object({
-    display: z.string(),
-    username: z.string(),
-    password: z.string(),
-    email: z.string(),
-    thumb: z.string(),
-    id: z.string(),
+    password: z.string().min(8),
   }),
   server: z.object({
-    protocol: z.string(),
-    host: z.string(),
-    port: z.number(),
-    token: z.string(),
-    clientId: z.string(),
+    protocol: z.enum(['http', 'https']),
+    host: z.string().min(1),
+    port: z.number().min(1),
+    token: z.string().min(1),
   }),
 });
 type FinishSetupBody = z.infer<typeof FinishSetupBodySchema>;
@@ -92,52 +47,55 @@ const finishSetup = async (ctx: Context) => {
   const { server, user } = body;
 
   try {
-    await getFromContainer(MediaServerRepository).findOneOrCreate(
-      MediaServerEntity.create({
-        name: 'default',
-        type: MediaServerType.PLEX,
-        url: `${server.protocol}://${server.host}:${server.port}`,
-        token: server.token,
-        metadata: {
-          clientId: server.clientId,
-        },
-        enabled: true,
-      }),
-    );
+    const service = getFromContainer(SetupService);
 
-    const keys = generateKeys(10);
     await Promise.all([
-      getFromContainer(UserRepository).findOrCreate(
-        UserEntity.create({
-          title: user.display ?? user.username,
-          username: user.username,
-          password: bcrypt.hashSync(user.password, 12),
-          email: user.email,
-          thumbnail: user.thumb,
-          altId: '1',
-          plexId: user.id,
-          lastIp: ctx.ip,
-          role: UserRole.ADMIN,
-          owner: true,
-        }),
-      ),
-      getFromContainer(SettingsService).updateSettings({
-        initialSetup: true,
-        appKeys: keys,
+      service.createAdminUser({
+        token: server.token,
+        password: user.password,
+        ip: ctx.ip,
       }),
+      service.createMediaServer({
+        protocol: server.protocol,
+        host: server.host,
+        port: server.port,
+        token: server.token,
+      }),
+      service.updateSettings(),
     ]);
 
-    setTimeout(async () => {
-      logger.info('restarting to apply new configurations');
-      await getFromContainer(Worker).getReciever().restartWorkers();
-    }, 1000);
+    service.restartWorkers();
 
     ctx.status = StatusCodes.OK;
     ctx.body = {};
   } catch (err) {
-    logger.error('Config creation error', err);
+    logger.error('failed to finish setup', err);
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = 'error creating config';
+  }
+};
+
+const getPlexUser = async (ctx: Context) => {
+  const { token } = ctx.request.body;
+  const service = getFromContainer(SetupService);
+
+  try {
+    const user = await service.getPlexUser(token);
+    if (!user) {
+      ctx.status = StatusCodes.OK;
+      ctx.body = {
+        message: 'failed to get user',
+      };
+    }
+    ctx.status = StatusCodes.OK;
+    ctx.body = {
+      message: 'success',
+      data: user,
+    };
+  } catch (err) {
+    logger.error('failed to get plex user', err);
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = 'error getting plex user';
   }
 };
 
@@ -150,13 +108,21 @@ export default (app: Router) => {
     }),
     testServer,
   );
-  route.post('/test_mongo', testMongo);
   route.post(
     '/set',
     validateRequest({
       body: FinishSetupBodySchema,
     }),
     finishSetup,
+  );
+  route.post(
+    '/plex/user',
+    validateRequest({
+      body: z.object({
+        token: z.string(),
+      }),
+    }),
+    getPlexUser,
   );
 
   app.use(route.routes());
