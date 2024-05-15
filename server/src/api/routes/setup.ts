@@ -79,20 +79,20 @@ const finishSetup = async (ctx: Context) => {
     return;
   }
 
-  await getFromContainer(MediaServerRepository).findOneOrCreate(
-    MediaServerEntity.create({
-      name: 'default',
-      type: MediaServerType.PLEX,
-      url: `${server.protocol}://${server.host}:${server.port}`,
-      token: server.token,
-      metadata: {
-        clientId: server.clientId,
-      },
-      enabled: true,
-    }),
-  );
-
   try {
+    await getFromContainer(MediaServerRepository).findOneOrCreate(
+      MediaServerEntity.create({
+        name: 'default',
+        type: MediaServerType.PLEX,
+        url: `${server.protocol}://${server.host}:${server.port}`,
+        token: server.token,
+        metadata: {
+          clientId: server.clientId,
+        },
+        enabled: true,
+      }),
+    );
+
     const keys = generateKeys(10);
     await Promise.all([
       getFromContainer(UserRepository).findOrCreate(
@@ -115,8 +115,10 @@ const finishSetup = async (ctx: Context) => {
       }),
     ]);
 
-    logger.info('restarting to apply new configurations');
-    await getFromContainer(Worker).getReciever().restartWorkers();
+    setTimeout(async () => {
+      logger.info('restarting to apply new configurations');
+      await getFromContainer(Worker).getReciever().restartWorkers();
+    }, 1000);
 
     ctx.status = StatusCodes.OK;
     ctx.body = {};
