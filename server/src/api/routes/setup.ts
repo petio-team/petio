@@ -74,7 +74,7 @@ const finishSetup = async (ctx: Context) => {
   const { server } = body;
   const dbUrl = body.db;
   if (!user || !server || !dbUrl) {
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.status = StatusCodes.BAD_REQUEST;
     ctx.body = 'missing fields';
     return;
   }
