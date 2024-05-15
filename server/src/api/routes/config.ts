@@ -13,9 +13,9 @@ const getConfig = async (ctx: Context) => {
   try {
     const settings = await getFromContainer(SettingsService).getSettings();
     ctx.body = {
-      config: settings.initialSetup,
-      login_type: settings.authType,
-      ready: settings.initialSetup,
+      config: settings.initialSetup || false,
+      login_type: settings.authType || 1,
+      ready: settings.initialSetup || false,
     };
   } catch (err) {
     logger.error(`failed to get config`, err);
