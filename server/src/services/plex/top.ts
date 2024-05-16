@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { getFromContainer } from '@/infrastructure/container/container';
 import loggerMain from '@/infrastructure/logger/logger';
-import { GetLibraryTopContentResponse } from '@/infrastructure/plex';
+import {
+  GetLibraryTopContentResponse,
+  getTopWatchedMedia,
+} from '@/infrastructure/plex/custom/topWatchedMedia';
 import is from '@/infrastructure/utils/is';
 import { MediaServerEntity } from '@/resources/media-server/entity';
 import { CacheService } from '@/services/cache/cache';
@@ -34,7 +37,7 @@ async function getTopData(server: MediaServerEntity, type: 1 | 2) {
   const timestamp = d.getTime() / 1000 || 0;
 
   try {
-    const data = await client.library.getTopWatchedContent({
+    const data = await getTopWatchedMedia(client, {
       type,
       limit: 20,
       'viewedAt>': timestamp,
