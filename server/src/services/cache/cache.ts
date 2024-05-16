@@ -1,12 +1,12 @@
 import {
-  createCache,
   MemoryCache,
   MultiCache,
-  multiCaching,
+  createCache,
   memoryStore,
+  multiCaching,
 } from 'cache-manager';
-
 import { Service } from 'diod';
+
 import MongooseStore, { MongooseCache } from './store/mongoose';
 
 @Service()
@@ -31,11 +31,11 @@ export class CacheService {
     this.cache = multiCaching([this.memoryCache, this.mongooseCache]);
   }
 
-  public async get(key: string): Promise<unknown> {
+  public async get<T>(key: string): Promise<T | undefined> {
     return this.cache.get(key);
   }
 
-  public async set(key: string, value: unknown, ttl?: number): Promise<void> {
+  public async set<T>(key: string, value: T, ttl?: number): Promise<void> {
     return this.cache.set(key, value, ttl);
   }
 
@@ -55,4 +55,3 @@ export class CacheService {
     return this.cache.del(key);
   }
 }
-
