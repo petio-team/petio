@@ -3,16 +3,19 @@ import { Service } from 'diod';
 import { AgendaCronService } from '@/services/cron/agenda-cron';
 import { Jobber } from '@/services/cron/job';
 import { JobCronName } from '@/services/cron/types';
-import discovery from '@/services/discovery';
+import { DiscoveryService } from '@/services/discovery/discovery';
 
 @Service()
 export class JobDiscoveryScan implements Jobber {
-  constructor(private cronService: AgendaCronService) {}
+  constructor(
+    private cronService: AgendaCronService,
+    private discoverService: DiscoveryService,
+  ) {}
 
   register(): Promise<void> {
     return this.cronService.add(
       JobCronName.DISCOVERY_SCAN,
-      async () => discovery(),
+      async () => this.discoverService.buildUserDiscovery(),
       '1 days',
       {
         lockLifetime: 1000 * 60 * 60 * 2,

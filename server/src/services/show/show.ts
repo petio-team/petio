@@ -1,8 +1,10 @@
+import { Service } from 'diod';
 import pino from 'pino';
 
 import { Logger } from '@/infrastructure/logger/logger';
 import { showLookup } from '@/services/tmdb/show';
 
+@Service()
 export class ShowService {
   private logger: pino.Logger;
 

@@ -3,6 +3,7 @@ import { ContainerBuilder } from 'diod';
 
 import cache from '@/services/cache';
 import cron from '@/services/cron';
+import discovery from '@/services/discovery';
 import migration from '@/services/migration';
 import movie from '@/services/movie';
 import scanner from '@/services/scanner';
@@ -16,6 +17,7 @@ export default (builder: ContainerBuilder) => {
   if (cluster.isWorker && process.env.job) {
     cron(builder);
   }
+  discovery(builder);
   scanner(builder);
   migration(builder);
   movie(builder);

@@ -4,70 +4,36 @@ import { Context } from 'koa';
 
 import { getFromContainer } from '@/infrastructure/container/container';
 import logger from '@/infrastructure/logger/logger';
-import { UserRepository } from '@/resources/user/repository';
-import { CacheService } from '@/services/cache/cache';
-import { DiscoveryResult } from '@/services/discovery/display';
+import { DiscoveryService } from '@/services/discovery/discovery';
 
-import {
-  StatusBadRequest,
-  StatusInternalServerError,
-  StatusOk,
-} from '../http/request';
+import { StatusInternalServerError, StatusOk } from '../http/request';
 
 const getMovies = async (ctx: Context) => {
-  const userRepo = await getFromContainer(UserRepository).findOne({
-    id: ctx.state.user.id,
-  });
-  if (userRepo.isNone()) {
-    StatusOk(ctx, []);
-    return;
-  }
-  const user = userRepo.unwrap();
-  const userId = user.altId ? user.altId : user.plexId;
-
   try {
-    logger.debug(`ROUTE: Movie Discovery Profile returned for ${userId}`);
-    const cachedData = (await getFromContainer(CacheService).get(
-      `discovery.user.movie.${userId}`,
-    )) as DiscoveryResult | null;
-    if (!cachedData) {
-      StatusOk(ctx, {
-        message: 'No discovery data found for user',
-      });
+    const service = getFromContainer(DiscoveryService);
+    const data = await service.getMovies(ctx.state.user.id);
+    if (!data) {
+      StatusOk(ctx, {});
       return;
     }
-    StatusOk(ctx, cachedData);
-    return;
+    StatusOk(ctx, data);
   } catch (err) {
-    logger.error(err);
+    logger.error(`failed to get discovery data for movies`, err);
     StatusInternalServerError(ctx, 'Could not get movie discovery data');
   }
 };
 
 const getShows = async (ctx: Context) => {
-  const userRepo = await getFromContainer(UserRepository).findOne({
-    id: ctx.state.user.id,
-  });
-  if (userRepo.isNone()) {
-    StatusOk(ctx, []);
-    return;
-  }
-  const user = userRepo.unwrap();
-  const userId = user.altId ? user.altId : user.plexId;
-
   try {
-    logger.debug(`ROUTE: TV Discovery Profile returned for ${userId}`);
-    const cachedData = (await getFromContainer(CacheService).get(
-      `discovery.user.show.${userId}`,
-    )) as DiscoveryResult | null;
-    if (!cachedData) {
-      StatusBadRequest(ctx, 'No discovery data found');
+    const service = getFromContainer(DiscoveryService);
+    const data = await service.getShows(ctx.state.user.id);
+    if (!data) {
+      StatusOk(ctx, {});
       return;
     }
-    StatusOk(ctx, cachedData);
-    return;
+    StatusOk(ctx, data);
   } catch (err) {
-    logger.error(err);
+    logger.error(`failed to get discovery data for shows`, err);
     StatusInternalServerError(ctx, 'Could not get show discovery data');
   }
 };
