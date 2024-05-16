@@ -4,6 +4,7 @@ import { ContainerBuilder } from 'diod';
 import cache from '@/services/cache';
 import cron from '@/services/cron';
 import discovery from '@/services/discovery';
+import filter from '@/services/filter';
 import migration from '@/services/migration';
 import movie from '@/services/movie';
 import scanner from '@/services/scanner';
@@ -18,6 +19,7 @@ export default (builder: ContainerBuilder) => {
     cron(builder);
   }
   discovery(builder);
+  filter(builder);
   scanner(builder);
   migration(builder);
   movie(builder);

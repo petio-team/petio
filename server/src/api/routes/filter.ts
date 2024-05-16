@@ -1,12 +1,13 @@
 import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
+import { z } from 'zod';
 
 import { getFromContainer } from '@/infrastructure/container/container';
 import logger from '@/infrastructure/logger/logger';
-import { FilterEntity } from '@/resources/filter/entity';
-import { FilterRepository } from '@/resources/filter/repository';
-import { FilterType } from '@/resources/filter/types';
+import { FilterService } from '@/services/filter/filter';
+
+import { validateRequest } from '../middleware/validation';
 
 const getFilters = async (ctx: Context) => {
   try {
@@ -24,58 +25,16 @@ const updateFilter = async (ctx: Context) => {
   const movieFilter = body.movie;
   const tvFilter = body.tv;
 
-  const filterRepo = getFromContainer(FilterRepository);
-  const existingMovie = await filterRepo.findOne({ id: 'movie_filters' });
-  const existingTv = await filterRepo.findOne({ id: 'tv_filters' });
-
   try {
-    if (existingMovie) {
-      await filterRepo.updateMany(
-        { id: 'movie_filters' },
-        {
-          $set: {
-            data: movieFilter,
-          },
-        },
-      );
-      logger.debug('FILTER: Movie Filter updated');
-    } else {
-      await filterRepo.create(
-        FilterEntity.create({
-          type: FilterType.MOVIE,
-          filters: movieFilter.filters,
-          actions: movieFilter.actions,
-          collapse: movieFilter.collapse,
-        }),
-      );
-      logger.debug('FILTER: New Movie filter created');
-    }
-    if (existingTv) {
-      await filterRepo.updateMany(
-        { id: 'tv_filters' },
-        {
-          $set: {
-            data: tvFilter,
-          },
-        },
-      );
-      logger.debug('FILTER: TV Filter updated');
-    } else {
-      await filterRepo.create(
-        FilterEntity.create({
-          type: FilterType.SHOW,
-          filters: tvFilter.filters,
-          actions: tvFilter.actions,
-          collapse: tvFilter.collapse,
-        }),
-      );
-      logger.debug('FILTER: New TV filter created');
-    }
-    logger.info('FILTER: Filters updated');
+    const service = getFromContainer(FilterService);
+    await Promise.all([
+      service.updateMovieFilter(movieFilter),
+      service.updateShowFilter(tvFilter),
+    ]);
     ctx.status = StatusCodes.OK;
+    ctx.body = {};
   } catch (err) {
-    logger.error('FILTER: Error saving filters', err);
-
+    logger.error('failed to update filters', err);
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = {};
   }
@@ -84,7 +43,58 @@ const updateFilter = async (ctx: Context) => {
 const route = new Router({ prefix: '/filter' });
 export default (app: Router) => {
   route.get('/', getFilters);
-  route.post('/update', updateFilter);
+  route.post(
+    '/update',
+    validateRequest({
+      body: z.object({
+        movie: z.object({
+          type: z.string(),
+          filters: z.array(
+            z.object({
+              condition: z.string(),
+              operator: z.string(),
+              value: z.string(),
+              comparison: z.string(),
+            }),
+          ),
+          actions: z.array(
+            z.object({
+              server: z.string(),
+              path: z.string(),
+              profile: z.string(),
+              language: z.string(),
+              tag: z.string(),
+              type: z.string().optional(),
+            }),
+          ),
+          collapse: z.boolean(),
+        }),
+        tv: z.object({
+          type: z.string(),
+          filters: z.array(
+            z.object({
+              condition: z.string(),
+              operator: z.string(),
+              value: z.string(),
+              comparison: z.string(),
+            }),
+          ),
+          actions: z.array(
+            z.object({
+              server: z.string(),
+              path: z.string(),
+              profile: z.string(),
+              language: z.string(),
+              tag: z.string(),
+              type: z.string().optional(),
+            }),
+          ),
+          collapse: z.boolean(),
+        }),
+      }),
+    }),
+    updateFilter,
+  );
 
   app.use(route.routes());
   app.use(route.allowedMethods());
