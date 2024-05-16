@@ -2,54 +2,31 @@
 import multer from '@koa/multer';
 import Router from '@koa/router';
 import axios from 'axios';
-import bcrypt from 'bcryptjs';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 import send from 'koa-send';
 import path from 'path';
+import { z } from 'zod';
 
+import { validateRequest } from '@/api/middleware/validation';
 import { DATA_DIR } from '@/infrastructure/config/env';
 import { getFromContainer } from '@/infrastructure/container/container';
 import logger from '@/infrastructure/logger/logger';
-import { ProfileRepository } from '@/resources/profile/repository';
-import { UserEntity } from '@/resources/user/entity';
-import { UserMapper } from '@/resources/user/mapper';
-import { UserRepository } from '@/resources/user/repository';
-import { UserRole } from '@/resources/user/types';
+import { UserService } from '@/services/user/user';
 
 import { adminRequired } from '../middleware/auth';
 
 const UPLOAD_DIR = path.join(DATA_DIR, './uploads');
 
-const storage = multer.diskStorage({
-  destination(_req, _file, cb) {
-    cb(null, UPLOAD_DIR);
-  },
-  filename(req: any, file, cb) {
-    req.newThumb = `${file.fieldname}-${Date.now()}${path.extname(
-      file.originalname,
-    )}`;
-    cb(null, req.newThumb);
-  },
-});
-
-const upload = multer({
-  storage,
-});
-
 const getAllUsers = async (ctx: Context) => {
   try {
-    const userResult = await getFromContainer(UserRepository).findAll();
-    if (!userResult.length) {
-      ctx.status = StatusCodes.NOT_FOUND;
-      ctx.body = {};
-      return;
-    }
+    const service = getFromContainer(UserService);
+    const usersResult = await service.getAllUsers();
+
     ctx.status = StatusCodes.OK;
-    ctx.body = userResult.map((u) =>
-      getFromContainer(UserMapper).toResponse(u),
-    );
+    ctx.body = usersResult;
   } catch (err) {
+    logger.debug('failed to get all users', err);
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = { error: err };
   }
@@ -57,19 +34,18 @@ const getAllUsers = async (ctx: Context) => {
 
 const getUserById = async (ctx: Context) => {
   try {
-    const userResult = await getFromContainer(UserRepository).findOne({
-      id: ctx.params.id,
-    });
-    if (userResult.isNone()) {
+    const service = getFromContainer(UserService);
+    const userResult = await service.getUserById(ctx.params.id);
+    if (!userResult) {
       ctx.status = StatusCodes.NOT_FOUND;
       ctx.body = {};
       return;
     }
-    const userData = userResult.unwrap();
     ctx.status = StatusCodes.OK;
-    ctx.body = getFromContainer(UserMapper).toResponse(userData);
+    ctx.body = userResult;
   } catch (err) {
-    ctx.status = StatusCodes.NOT_FOUND;
+    logger.debug('failed to get user by id', err);
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = { error: err };
   }
 };
@@ -78,38 +54,16 @@ const createCustomUser = async (ctx: Context) => {
   const { body } = ctx.request;
   const { user } = body;
 
-  const dbUser = await getFromContainer(UserRepository).findOne({
-    $or: [
-      { username: user.username },
-      { email: user.email },
-      { title: user.username },
-    ],
-  });
-  if (dbUser) {
+  try {
+    const service = getFromContainer(UserService);
+    const userData = await service.createUser(user);
+
     ctx.status = StatusCodes.OK;
-    ctx.body = {
-      error: 'User exists, please change the username or email',
-    };
-  } else {
-    try {
-      const newUser = UserEntity.create({
-        title: user.username,
-        username: user.username,
-        password: bcrypt.hashSync(user.password, 12),
-        email: user.email,
-        thumbnail: '',
-        altId: user.linked,
-      });
-      const data = await getFromContainer(UserRepository).create(newUser);
-      ctx.status = StatusCodes.OK;
-      ctx.body = getFromContainer(UserMapper).toResponse(data);
-    } catch (err) {
-      logger.error(err, 'ROUTE: Unable to create custom user');
-      ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-      ctx.body = {
-        error: 'Error creating user',
-      };
-    }
+    ctx.body = userData;
+  } catch (err) {
+    logger.error('failed to create custom user', err);
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = { error: err };
   }
 };
 
@@ -117,60 +71,15 @@ const editUser = async (ctx: Context) => {
   const { body } = ctx.request;
   const { user } = body;
 
-  if (!user) {
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = {
-      error: 'No user details',
-    };
-  }
-
   try {
-    const userResult = await getFromContainer(UserRepository).findOne({
-      id: user.id,
-    });
-    if (userResult.isNone()) {
-      throw new Error(`failed to find user with id: ${user.id}`);
-    }
-    const u = userResult.unwrap();
-    const props = getFromContainer(UserMapper).toPeristence(u);
-
-    if (user.clearPassword && u.role !== UserRole.ADMIN) {
-      props.password = undefined;
-    }
-
-    if (user.password) {
-      props.password = bcrypt.hashSync(user.password, 12);
-    }
-
-    if (user.profile) {
-      props.profileId = user.profile;
-    } else {
-      props.profileId = undefined;
-    }
-
-    if (user.email) {
-      props.email = user.email;
-    }
-
-    if (user.role) {
-      props.role = user.role;
-    }
-
-    if (user.disabled) {
-      props.disabled = user.disabled;
-    }
-
-    const { id, ...rest } = user;
-    const results = await getFromContainer(UserRepository).updateMany(
-      {
-        id: user.id,
-      },
-      {
-        $set: rest,
-      },
-    );
-    if (!results) {
-      throw new Error(`failed to save user with id: ${user.id}`);
+    const service = getFromContainer(UserService);
+    const updated = await service.updateUser(user);
+    if (!updated) {
+      ctx.status = StatusCodes.BAD_REQUEST;
+      ctx.body = {
+        error: 'Failed to update user',
+      };
+      return;
     }
 
     ctx.status = StatusCodes.OK;
@@ -188,7 +97,7 @@ const editUser = async (ctx: Context) => {
 
 const editMultipleUsers = async (ctx: Context) => {
   const { body } = ctx.request;
-  const users = body.users as [];
+  const users = body.users as any[];
   const { enabled } = body;
   const { profile } = body;
 
@@ -201,41 +110,23 @@ const editMultipleUsers = async (ctx: Context) => {
   }
 
   try {
-    await Promise.all(
-      users.map(async (user: string) => {
-        const userResult = await getFromContainer(UserRepository).findOne({
-          id: user,
-        });
-        if (userResult.isNone()) {
-          throw new Error(`failed to find user with id: ${user}`);
-        }
-        const u = userResult.unwrap();
-        const props = getFromContainer(UserMapper).toPeristence(u);
+    const service = getFromContainer(UserService);
+    const results = await service.updateMultipleUsers({
+      ids: users,
+      enabled,
+      profile,
+    });
 
-        if (profile) {
-          props.profileId = profile;
-        } else {
-          props.profileId = undefined;
-        }
-
-        props.disabled = !enabled;
-
-        const { _id, ...rest } = props;
-        const results = getFromContainer(UserRepository).updateMany(
-          { _id },
-          {
-            $set: rest,
-          },
-        );
-        if (!results) {
-          throw new Error(`failed to save user with id: ${user}`);
-        }
-      }),
-    );
+    const updated = results.filter((r) => r === true);
+    const failed = results.filter((r) => r === false);
 
     ctx.status = StatusCodes.OK;
     ctx.body = {
       message: 'Users saved',
+      data: {
+        updated,
+        failed,
+      },
     };
   } catch (err) {
     logger.error(err);
@@ -248,27 +139,18 @@ const editMultipleUsers = async (ctx: Context) => {
 
 const deleteUser = async (ctx: Context) => {
   const { body } = ctx.request;
-
   const { user } = body;
-  if (!user) {
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = {
-      error: 'No user details',
-    };
-    return;
-  }
-
-  if (!user.custom) {
-    ctx.status = StatusCodes.UNAUTHORIZED;
-    ctx.body = {
-      error: 'Cannot delete non custom users',
-    };
-    return;
-  }
 
   try {
-    // eslint-disable-next-line no-underscore-dangle
-    await getFromContainer(UserRepository).deleteManyByIds([user._id]);
+    const service = getFromContainer(UserService);
+    const deleted = await service.deleteUser(user.id);
+    if (!deleted) {
+      ctx.status = StatusCodes.BAD_REQUEST;
+      ctx.body = {
+        error: 'Failed to delete user',
+      };
+      return;
+    }
     ctx.status = StatusCodes.OK;
     ctx.body = {
       message: 'User deleted',
@@ -281,113 +163,177 @@ const deleteUser = async (ctx: Context) => {
   }
 };
 
-const updateUserThumbnail = async (ctx: Context) => {
-  if (!ctx.params.id) {
-    logger.warn('ROUTE: No user ID');
-
-    ctx.status = StatusCodes.BAD_REQUEST;
-    ctx.body = {};
-    return;
-  }
-  try {
-    await getFromContainer(UserRepository).updateMany(
-      { id: ctx.params.id },
-      {
-        $set: {
-          custom_thumb: ctx.file.path,
-        },
-      },
-    );
-    ctx.status = StatusCodes.OK;
-    ctx.body = {};
-  } catch (err) {
-    logger.error('failed to update user', err);
-    logger.warn('ROUTE: Failed to update user thumb in db');
-
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = {};
-  }
-};
-
 const getThumbnailById = async (ctx: Context) => {
   try {
-    const userResult = await getFromContainer(UserRepository).findOne({
-      id: ctx.params.id,
-    });
-    if (userResult.isNone()) {
-      ctx.status = StatusCodes.BAD_REQUEST;
+    const service = getFromContainer(UserService);
+    const results = await service.getUserThumbnail(ctx.params.id);
+    if (!results) {
+      ctx.status = StatusCodes.NOT_FOUND;
       ctx.body = {};
       return;
     }
-    const userData = userResult.unwrap();
-
-    if (userData.customThumbnail) {
-      send(ctx, `${UPLOAD_DIR}/${userData.customThumbnail}`);
+    const { thumbnail, customThumbnail } = results;
+    if (customThumbnail) {
+      send(ctx, `${UPLOAD_DIR}/${customThumbnail}`);
       return;
     }
-    const url = userData.thumbnail;
-    if (url) {
-      const resp = await axios.get(url, {
-        responseType: 'stream',
-      });
-      ctx.response.set('Content-Type', 'image/png');
-      ctx.status = StatusCodes.OK;
-      ctx.body = resp.data;
+    if (!thumbnail) {
+      ctx.status = StatusCodes.NOT_FOUND;
+      ctx.body = {};
+      return;
     }
-    ctx.status = StatusCodes.NOT_FOUND;
-    ctx.body = {};
-  } catch (e) {
-    logger.log(
-      'warn',
-      `ROUTE: Unable to get user thumb - Got error: ${e.message}`,
-      e,
-    );
+    const resp = await axios.get(thumbnail, {
+      responseType: 'stream',
+    });
+    ctx.response.set('Content-Type', 'image/png');
+    ctx.status = StatusCodes.OK;
+    ctx.body = resp.data;
+  } catch (err) {
+    logger.error('failed to get user thumb', err);
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = 'Unable to get user thumb';
   }
 };
 
-const getQuota = async (ctx: Context) => {
-  const userResult = await getFromContainer(UserRepository).findOneById(
-    ctx.state.user.id,
-  );
-  if (userResult.isNone()) {
-    ctx.status = StatusCodes.OK;
-    ctx.body = {
-      current: 0,
-      total: 0,
-    };
-    return;
-  }
-  const user = userResult.unwrap();
-  let total = 0;
-  if (user.profileId) {
-    const profileResult = await getFromContainer(ProfileRepository).findOne({
-      id: user.profileId,
-    });
-    if (profileResult.isSome()) {
-      const profile = profileResult.unwrap();
-      total = profile.quota;
+const updateUserThumbnail = async (ctx: Context) => {
+  try {
+    const service = getFromContainer(UserService);
+    const updated = await service.updateUserThumbnail(
+      ctx.params.id,
+      ctx.newThumb,
+    );
+    if (!updated) {
+      ctx.status = StatusCodes.BAD_REQUEST;
+      ctx.body = {
+        error: 'Failed to update user thumb',
+      };
+      return;
     }
+    ctx.status = StatusCodes.OK;
+    ctx.body = {};
+  } catch (err) {
+    logger.error('failed to update user', err);
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = {};
   }
-  ctx.status = StatusCodes.OK;
-  ctx.body = {
-    current: user.quotaCount,
-    total,
-  };
+};
+
+const getQuota = async (ctx: Context) => {
+  try {
+    const service = getFromContainer(UserService);
+    const quota = await service.getQuotaCount(ctx.state.user.id);
+    ctx.status = StatusCodes.OK;
+    ctx.body = quota;
+  } catch (err) {
+    logger.error('failed to get user quota', err);
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
+    ctx.body = 'Unable to get user quota';
+  }
 };
 
 const route = new Router({ prefix: '/user' });
 export default (app: Router) => {
-  route.get('/all', getAllUsers, adminRequired);
+  route.get('/all', adminRequired, getAllUsers);
+  route.get(
+    '/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().min(1),
+      }),
+    }),
+    getUserById,
+  );
+  route.post(
+    '/create_custom',
+    adminRequired,
+    validateRequest({
+      body: z.object({
+        user: z.object({
+          username: z.string(),
+          email: z.string(),
+          password: z.string(),
+          admin: z.boolean(),
+          quota: z.number(),
+          enabled: z.boolean(),
+          title: z.string(),
+        }),
+      }),
+    }),
+    createCustomUser,
+  );
+  route.post(
+    '/edit',
+    validateRequest({
+      body: z.object({
+        user: z.object({
+          id: z.string(),
+          username: z.string(),
+          email: z.string(),
+          admin: z.boolean(),
+          quota: z.number(),
+          enabled: z.boolean(),
+          title: z.string(),
+        }),
+      }),
+    }),
+    editUser,
+  );
+  route.post(
+    '/bulk_edit',
+    adminRequired,
+    validateRequest({
+      body: z.object({
+        users: z.array(z.string()),
+        enabled: z.boolean(),
+        profile: z.string(),
+      }),
+    }),
+    editMultipleUsers,
+  );
+  route.post(
+    '/delete_user',
+    adminRequired,
+    validateRequest({
+      body: z.object({
+        user: z.object({
+          id: z.string(),
+        }),
+      }),
+    }),
+    deleteUser,
+  );
+  route.get(
+    '/thumb/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().min(1),
+      }),
+    }),
+    getThumbnailById,
+  );
+  route.post(
+    '/thumb/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().min(1),
+      }),
+    }),
+    multer({
+      storage: multer.diskStorage({
+        destination(_req, _file, cb) {
+          cb(null, UPLOAD_DIR);
+        },
+        filename(req: any, file, cb) {
+          req.newThumb = `${file.fieldname}-${Date.now()}${path.extname(
+            file.originalname,
+          )}`;
+          cb(null, req.newThumb);
+        },
+      }),
+    }).single('img'),
+    updateUserThumbnail,
+  );
   route.get('/quota', getQuota);
-  route.get('/thumb/:id', getThumbnailById);
-  route.get('/:id', getUserById);
-  route.post('/create_custom', createCustomUser, adminRequired);
-  route.post('/edit', editUser);
-  route.post('/bulk_edit', editMultipleUsers, adminRequired);
-  route.post('/delete_user', deleteUser, adminRequired);
-  route.post('/thumb/:id', upload.single('img'), updateUserThumbnail);
 
   app.use(route.routes());
 };

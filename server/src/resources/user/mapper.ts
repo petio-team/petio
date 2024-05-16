@@ -1,9 +1,11 @@
 /* eslint-disable no-underscore-dangle */
-import { Mapper } from "@/infrastructure/entity/mapper";
-import { Service } from "diod";
-import { UserRole } from "@/resources/user/types";
-import { UserSchemaProps } from "./schema";
-import { UserEntity } from "./entity";
+import { Service } from 'diod';
+
+import { Mapper } from '@/infrastructure/entity/mapper';
+import { UserRole } from '@/resources/user/types';
+
+import { UserEntity } from './entity';
+import { UserSchemaProps } from './schema';
 
 /**
  * Mapper class for converting between UserEntity and UserSchemaProps.
@@ -24,7 +26,7 @@ export class UserMapper implements Mapper<UserEntity, UserSchemaProps, any> {
       password: copy.password,
       email: copy.email,
       thumbnail: copy.thumbnail,
-      custom_thumb: copy.custom,
+      custom_thumb: copy.customThumbnail,
       altId: copy.altId,
       plexId: copy.plexId,
       lastIp: copy.lastIp,

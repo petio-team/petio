@@ -14,7 +14,7 @@ export type UserProps = {
   password?: string;
   email: string;
   thumbnail?: string;
-  customThumbnail?: boolean;
+  customThumbnail?: string;
   altId?: string;
   plexId?: string;
   lastIp?: string;
@@ -38,5 +38,7 @@ export type CreateUserProps = Override<
     custom?: boolean;
     disabled?: boolean;
     quotaCount?: number;
+    thumbnail?: string;
+    customThumbnail?: string;
   }
 >;

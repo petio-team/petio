@@ -10,7 +10,7 @@ export type UserSchemaProps = {
   password?: string;
   email: string;
   thumbnail?: string;
-  custom_thumb?: boolean;
+  custom_thumb?: string;
   altId?: string;
   plexId?: string;
   role: string;
@@ -32,7 +32,7 @@ export const UserSchema = new Schema<UserSchemaProps>({
   password: { type: String, required: false },
   email: { type: String, required: true },
   thumbnail: { type: String, required: false },
-  custom_thumb: { type: Boolean, required: true },
+  custom_thumb: { type: String, required: false },
   altId: { type: String, required: false },
   plexId: { type: String, required: false },
   role: { type: String, required: true },

@@ -18,6 +18,8 @@ export class UserEntity extends BaseEntity<UserProps> {
     const props: UserProps = {
       ...create,
       role: create.role || UserRole.USER,
+      thumbnail: create.thumbnail || '',
+      customThumbnail: create.customThumbnail || '',
       owner: create.owner || false,
       custom: create.custom || false,
       disabled: create.disabled || false,
@@ -70,7 +72,7 @@ export class UserEntity extends BaseEntity<UserProps> {
    * Gets whether the user has a custom thumbnail.
    * @returns Whether the user has a custom thumbnail.
    */
-  get customThumbnail(): boolean | undefined {
+  get customThumbnail(): string | undefined {
     return this.props.customThumbnail;
   }
 
