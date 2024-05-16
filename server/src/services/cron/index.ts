@@ -3,6 +3,7 @@ import Bluebird from 'bluebird';
 import { ContainerBuilder } from 'diod';
 
 import { DATABASE_URL } from '@/infrastructure/config/env';
+import { ContainerTags } from '@/infrastructure/container/constants';
 import {
   findTaggedServiceIdentifiers,
   getFromContainer,
@@ -20,12 +21,30 @@ import { AgendaCronService } from './agenda-cron';
 import { JobCronName } from './types';
 
 export default (builder: ContainerBuilder) => {
-  builder.registerAndUse(JobFullLibraryScan).asSingleton().addTag('job');
-  builder.registerAndUse(JobPartialLibraryScan).asSingleton().addTag('job');
-  builder.registerAndUse(JobUsersScan).asSingleton().addTag('job');
-  builder.registerAndUse(JobQuotaReset).asSingleton().addTag('job');
-  builder.registerAndUse(JobTmdbCache).asSingleton().addTag('job');
-  builder.registerAndUse(JobImdbCache).asSingleton().addTag('job');
+  builder
+    .registerAndUse(JobFullLibraryScan)
+    .asSingleton()
+    .addTag(ContainerTags.CRON_JOB);
+  builder
+    .registerAndUse(JobPartialLibraryScan)
+    .asSingleton()
+    .addTag(ContainerTags.CRON_JOB);
+  builder
+    .registerAndUse(JobUsersScan)
+    .asSingleton()
+    .addTag(ContainerTags.CRON_JOB);
+  builder
+    .registerAndUse(JobQuotaReset)
+    .asSingleton()
+    .addTag(ContainerTags.CRON_JOB);
+  builder
+    .registerAndUse(JobTmdbCache)
+    .asSingleton()
+    .addTag(ContainerTags.CRON_JOB);
+  builder
+    .registerAndUse(JobImdbCache)
+    .asSingleton()
+    .addTag(ContainerTags.CRON_JOB);
 
   builder
     .register(AgendaCronService)
@@ -57,7 +76,7 @@ export default (builder: ContainerBuilder) => {
 
 export async function runCron() {
   const cronService = getFromContainer<AgendaCronService>(AgendaCronService);
-  const tags = findTaggedServiceIdentifiers<Jobber>('job');
+  const tags = findTaggedServiceIdentifiers<Jobber>(ContainerTags.CRON_JOB);
   const jobs = tags.map((tag) => getFromContainer<Jobber>(tag));
   await Bluebird.map(jobs, async (job) => job.register());
   return cronService.bootstrap();
