@@ -8,13 +8,12 @@ import send from 'koa-send';
 import path from 'path';
 import { z } from 'zod';
 
+import { adminRequired } from '@/api/middleware/auth';
 import { validateRequest } from '@/api/middleware/validation';
 import { DATA_DIR } from '@/infrastructure/config/env';
 import { getFromContainer } from '@/infrastructure/container/container';
 import logger from '@/infrastructure/logger/logger';
 import { UserService } from '@/services/user/user';
-
-import { adminRequired } from '../middleware/auth';
 
 const UPLOAD_DIR = path.join(DATA_DIR, './uploads');
 
@@ -234,15 +233,6 @@ const getQuota = async (ctx: Context) => {
 const route = new Router({ prefix: '/user' });
 export default (app: Router) => {
   route.get('/all', adminRequired, getAllUsers);
-  route.get(
-    '/:id',
-    validateRequest({
-      params: z.object({
-        id: z.string().min(1),
-      }),
-    }),
-    getUserById,
-  );
   route.post(
     '/create_custom',
     adminRequired,
@@ -334,6 +324,16 @@ export default (app: Router) => {
     updateUserThumbnail,
   );
   route.get('/quota', getQuota);
+  route.get(
+    '/:id',
+    validateRequest({
+      params: z.object({
+        id: z.string().min(1),
+      }),
+    }),
+    getUserById,
+  );
 
   app.use(route.routes());
+  app.use(route.allowedMethods());
 };

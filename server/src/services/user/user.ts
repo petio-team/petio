@@ -194,7 +194,10 @@ export class UserService {
   async getQuotaCount(id: string) {
     const userResult = await this.userRepository.findOne({ id });
     if (userResult.isNone()) {
-      return null;
+      return {
+        total: 0,
+        current: 0,
+      };
     }
     const user = userResult.unwrap();
     let total = 0;

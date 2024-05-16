@@ -8,6 +8,7 @@ import HttpError from '../http/errors/http';
 import NotFound from '../http/errors/notFound';
 
 export default () => async (ctx: DefaultContext, next: () => Promise<any>) => {
+  const logger = getFromContainer(Logger);
   try {
     await next();
 
@@ -20,7 +21,7 @@ export default () => async (ctx: DefaultContext, next: () => Promise<any>) => {
       throw new NotFound();
     }
   } catch (err) {
-    getFromContainer(Logger).debug(`http error`, err);
+    logger.debug(`http error`, err);
     if (err instanceof HttpError) {
       ctx.error({
         statusCode: err.statusCode,

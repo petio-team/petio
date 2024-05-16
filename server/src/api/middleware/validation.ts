@@ -84,9 +84,9 @@ export function validateRequest({
       }
     }
     if (errors.length > 0) {
-      return sendErrors(errors, ctx);
+      sendErrors(errors, ctx);
+      return;
     }
     await next();
-    return undefined;
   };
 }
