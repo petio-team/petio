@@ -2,7 +2,6 @@ import Router from '@koa/router';
 import Koa from 'koa';
 import jwt from 'koa-jwt';
 
-import setupMiddleware from '@/api/middleware/setup';
 import batch from '@/api/routes/batch';
 import config from '@/api/routes/config';
 import discovery from '@/api/routes/discovery';
@@ -30,59 +29,61 @@ import user from '@/api/routes/user';
 
 const api = new Router({ prefix: '/api' });
 
-export default (app: Koa, subpath: string) => {
+export default (app: Koa, subpath: string, isSetup: boolean) => {
   let path = subpath;
   if (path === '/') {
     path = '';
   }
 
-  // make sure setup is complete before allowing access to non setup routes
-  app.use(setupMiddleware);
-  api.use(
-    jwt({
-      // TODO: fix this and generate keys again
-      secret: app.keys as string[],
-      cookie: 'petio_jwt',
-      debug: true,
-    }).unless({
-      path: [
-        `${path}/api/health`,
-        `${path}/api/config`,
-        `${path}/api/login`,
-        `${path}/api/login/plex_login`,
-        `${path}/api/setup`,
-        `${path}/api/setup/test_server`,
-        `${path}/api/setup/test_mongo`,
-        `${path}/api/setup/set`,
-      ],
-    }),
-  );
-
-  // api routes
   health(api);
-  batch(api);
   config(api);
-  discovery(api);
-  filter(api);
-  history(api);
-  issue(api);
-  login(api);
-  mail(api);
-  movie(api);
-  notifications(api);
-  person(api);
-  plex(api);
-  profiles(api);
-  request(api);
-  review(api);
-  search(api);
-  services(api);
-  sessions(api);
-  setup(api);
-  show(api);
-  top(api);
-  trending(api);
-  user(api);
+
+  if (isSetup) {
+    setup(api);
+  } else {
+    // make sure setup is complete before allowing access to non setup routes
+    api.use(
+      jwt({
+        // TODO: fix this and generate keys again
+        secret: (app.keys as string[]) ?? [],
+        cookie: 'petio_jwt',
+        debug: true,
+      }).unless({
+        path: [
+          `${path}/api/health`,
+          `${path}/api/config`,
+          `${path}/api/login`,
+          `${path}/api/login/plex_login`,
+          `${path}/api/setup`,
+          `${path}/api/setup/test_server`,
+          `${path}/api/setup/test_mongo`,
+          `${path}/api/setup/set`,
+        ],
+      }),
+    );
+
+    batch(api);
+    discovery(api);
+    filter(api);
+    history(api);
+    issue(api);
+    login(api);
+    mail(api);
+    movie(api);
+    notifications(api);
+    person(api);
+    plex(api);
+    profiles(api);
+    request(api);
+    review(api);
+    search(api);
+    services(api);
+    sessions(api);
+    show(api);
+    top(api);
+    trending(api);
+    user(api);
+  }
 
   app.use(api.routes());
   app.use(api.allowedMethods());

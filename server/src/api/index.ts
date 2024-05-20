@@ -21,14 +21,15 @@ import {
   HTTP_TRUSTED_PROXIES,
 } from '@/infrastructure/config/env';
 import { getFromContainer } from '@/infrastructure/container/container';
+import { SettingsSchemaProps } from '@/resources/settings/schema';
 import { SettingsService } from '@/services/settings/settings';
 
-const routes = (keys: string[]): Koa => {
+const routes = (settings: SettingsSchemaProps): Koa => {
   const app = new Koa();
-  app.keys = keys;
+  app.keys = settings.appKeys ?? [];
 
   // setup old api
-  api(app, HTTP_BASE_PATH);
+  api(app, HTTP_BASE_PATH, !settings.initialSetup);
 
   // web/frontend/react
   web(app);
@@ -43,7 +44,7 @@ export const createKoaServer = async () => {
   const settings = await getFromContainer(SettingsService).getSettings();
 
   // Set security keys
-  app.keys = settings.appKeys;
+  app.keys = settings.appKeys ?? [];
 
   // Enable trusted proxies
   if (HTTP_TRUSTED_PROXIES.length > 0) {
@@ -62,7 +63,7 @@ export const createKoaServer = async () => {
   ].forEach((middleware) => app.use(middleware));
 
   // Mount endpoints
-  app.use(mount(HTTP_BASE_PATH, routes(settings.appKeys)));
+  app.use(mount(HTTP_BASE_PATH, routes(settings)));
 
   let serverShuttingDown: any;
 
