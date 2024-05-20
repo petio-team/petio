@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 
 import Meta from '../components/meta';
 import SetupAuth from '../components/setup/setupAuth';
-import SetupDb from '../components/setup/setupDb';
 import SetupServer from '../components/setup/setupServer';
 import SetupUser from '../components/setup/setupUser';
 import { getHealth, saveConfig } from '../services/config.service';
@@ -21,12 +20,10 @@ function Setup({ config, redux_user, newNotification }) {
   const [step, updateStep] = useState(0);
   const [setupUser, setSetupUser] = useState(null);
   const [setupServer, setSetupServer] = useState(false);
-  const [setupDb, setSetupDb] = useState(null);
 
   useEffect(() => {
     if (step === 0 && redux_user.plexUser) updateStep(1);
     if (step === 1 && setupUser) updateStep(2);
-    // if (step === 2 && setupServer) updateStep(3);
   }, [redux_user, setupUser, step, setupServer]);
 
   async function submit() {
@@ -34,7 +31,6 @@ function Setup({ config, redux_user, newNotification }) {
     let config = {
       user: setupUser.user,
       server: selectedServer,
-      // db: 'mongodb:mongo:27017',
     };
     const nId = newNotification({
       type: 'loading',
@@ -109,15 +105,6 @@ function Setup({ config, redux_user, newNotification }) {
         />
       );
       break;
-    // case 3:
-    //   content = (
-    //     <SetupDb
-    //       newNotification={newNotification}
-    //       submit={submit}
-    //       setSetupDb={setSetupDb}
-    //     />
-    //   );
-    //   break;
     case 3:
       content = <p className={typo.body}>loading, please wait...</p>;
       break;

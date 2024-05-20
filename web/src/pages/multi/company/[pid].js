@@ -7,7 +7,6 @@ import { useParams } from 'react-router-dom';
 import NotFound from '../../404';
 import Grid from '../../../components/grid';
 import Hero from '../../../components/hero';
-import { Loading } from '../../../components/loading';
 import Meta from '../../../components/meta';
 import media from '../../../services/media.service';
 import hero from '../../../styles/components/hero.module.scss';
