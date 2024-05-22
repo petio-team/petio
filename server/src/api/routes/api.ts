@@ -26,6 +26,7 @@ import show from '@/api/routes/show';
 import top from '@/api/routes/top';
 import trending from '@/api/routes/trending';
 import user from '@/api/routes/user';
+import { NODE_ENV } from '@/infrastructure/config/env';
 
 const api = new Router({ prefix: '/api' });
 
@@ -47,7 +48,7 @@ export default (app: Koa, subpath: string, isSetup: boolean) => {
         // TODO: fix this and generate keys again
         secret: (app.keys as string[]) ?? [],
         cookie: 'petio_jwt',
-        debug: true,
+        debug: NODE_ENV === 'development',
       }).unless({
         path: [
           `${path}/api/health`,
