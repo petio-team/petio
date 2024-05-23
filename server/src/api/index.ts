@@ -1,11 +1,7 @@
-import { Server } from 'http';
 import Koa from 'koa';
 import koaBody from 'koa-body';
 import compress from 'koa-compress';
 import mount from 'koa-mount';
-import { AddressInfo } from 'net';
-import { IncomingMessage, ServerResponse } from 'node:http';
-import { promisify } from 'util';
 
 import responseHandler from '@/api/http/responseHandler';
 import cors from '@/api/middleware/cors';
@@ -21,6 +17,7 @@ import {
   HTTP_TRUSTED_PROXIES,
 } from '@/infrastructure/config/env';
 import { getFromContainer } from '@/infrastructure/container/container';
+import { HttpServer } from '@/infrastructure/http/http-server';
 import { SettingsSchemaProps } from '@/resources/settings/schema';
 import { SettingsService } from '@/services/settings/settings';
 
@@ -38,10 +35,14 @@ const routes = (settings: SettingsSchemaProps): Koa => {
 };
 
 export const createKoaServer = async () => {
-  let server: Server<typeof IncomingMessage, typeof ServerResponse>;
-
   const app = new Koa();
   const settings = await getFromContainer(SettingsService).getSettings();
+
+  await getFromContainer(HttpServer).start(
+    HTTP_ADDR,
+    HTTP_PORT,
+    app.callback(),
+  );
 
   // Set security keys
   app.keys = settings.appKeys ?? [];
@@ -64,33 +65,4 @@ export const createKoaServer = async () => {
 
   // Mount endpoints
   app.use(mount(HTTP_BASE_PATH, routes(settings)));
-
-  let serverShuttingDown: any;
-
-  const stop = () => {
-    if (serverShuttingDown) {
-      return serverShuttingDown;
-    }
-    serverShuttingDown = promisify(server.close.bind(server));
-    return serverShuttingDown;
-  };
-
-  const getConnection = () => promisify(server.getConnections.bind(server))();
-
-  return new Promise((resolve, reject) => {
-    server = app.listen(HTTP_PORT, HTTP_ADDR, () => {
-      const { port } = server.address() as AddressInfo;
-      const url = `http://${HTTP_ADDR}:${port}`;
-
-      resolve({
-        stop,
-        getConnection,
-        port,
-        server,
-        url,
-      });
-    });
-
-    server.once('error', reject);
-  });
 };
