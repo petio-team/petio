@@ -149,7 +149,12 @@ export type MovieDetailsData = {
 export type MovieDetailsResponse = {
     adult?: boolean;
     backdrop_path?: string;
-    belongs_to_collection?: unknown;
+    belongs_to_collection?: {
+      id: number
+      name: string
+      poster_path: string
+      backdrop_path: string
+    }
     budget?: number;
     genres?: Array<{
         id?: number;

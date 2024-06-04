@@ -1,4 +1,5 @@
 import type { AxiosRequestConfig, AxiosResponse } from 'axios';
+
 import type { ApiRequestOptions } from './ApiRequestOptions';
 
 type Headers = Record<string, string>;
@@ -25,33 +26,33 @@ export class Interceptors<T> {
 }
 
 export type OpenAPIConfig = {
-	BASE: string;
-	CREDENTIALS: 'include' | 'omit' | 'same-origin';
-	ENCODE_PATH?: ((path: string) => string) | undefined;
-	HEADERS?: Headers | Resolver<Headers> | undefined;
-	PASSWORD?: string | Resolver<string> | undefined;
-	TOKEN?: string | Resolver<string> | undefined;
-	USERNAME?: string | Resolver<string> | undefined;
-	VERSION: string;
-	WITH_CREDENTIALS: boolean;
-	interceptors: {
-		request: Interceptors<AxiosRequestConfig>;
-		response: Interceptors<AxiosResponse>;
-	};
+  BASE: string;
+  CREDENTIALS: 'include' | 'omit' | 'same-origin';
+  ENCODE_PATH?: ((path: string) => string) | undefined;
+  HEADERS?: Headers | Resolver<Headers> | undefined;
+  PASSWORD?: string | Resolver<string> | undefined;
+  TOKEN?: string | Resolver<string> | undefined;
+  USERNAME?: string | Resolver<string> | undefined;
+  VERSION: string;
+  WITH_CREDENTIALS: boolean;
+  interceptors: {
+    request: Interceptors<AxiosRequestConfig>;
+    response: Interceptors<AxiosResponse>;
+  };
 };
 
 export const OpenAPI: OpenAPIConfig = {
-	BASE: 'https://api.themoviedb.org',
-	CREDENTIALS: 'include',
-	ENCODE_PATH: undefined,
-	HEADERS: undefined,
-	PASSWORD: undefined,
-	TOKEN: undefined,
-	USERNAME: undefined,
-	VERSION: '3',
-	WITH_CREDENTIALS: false,
-	interceptors: {
-		request: new Interceptors(),
-		response: new Interceptors(),
-	},
+  BASE: 'https://api.themoviedb.org',
+  CREDENTIALS: 'include',
+  ENCODE_PATH: undefined,
+  HEADERS: undefined,
+  PASSWORD: undefined,
+  TOKEN: undefined,
+  USERNAME: undefined,
+  VERSION: '3',
+  WITH_CREDENTIALS: false,
+  interceptors: {
+    request: new Interceptors(),
+    response: new Interceptors(),
+  },
 };

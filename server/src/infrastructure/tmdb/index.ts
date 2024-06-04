@@ -8,11 +8,13 @@ import { TheMovieDatabaseClient } from '@/infrastructure/tmdb/client';
 export default (builder: ContainerBuilder) => {
   builder.register(TheMovieDatabaseClient).useFactory(() => {
     const requestInterceptor = new Interceptors<AxiosRequestConfig>();
-    requestInterceptor.use((config: AxiosRequestConfig) => {
-      const cfg = config;
-      cfg.params = { ...config.params, api_key: TMDB_API_KEY };
-      return cfg;
-    });
+    requestInterceptor.use((config: AxiosRequestConfig) => ({
+      ...config,
+      params: {
+        ...config.params,
+        api_key: TMDB_API_KEY,
+      },
+    }));
     return new TheMovieDatabaseClient({
       interceptors: {
         request: requestInterceptor,
