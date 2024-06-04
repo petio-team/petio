@@ -31,12 +31,42 @@ export type MovieSchemaProps = {
   updatedAt: number;
   primaryExtraKey: string;
   ratingImage: string;
-  Media: any[];
-  Genre: any[];
-  Director: any[];
-  Writer: any[];
-  Country: any[];
-  Role: any[];
+  Media: {
+    ratingKey: number;
+    videoResolution: string;
+  }[];
+  Genre: {
+    id: number;
+    filter: string;
+    tag: string;
+  }[];
+  Director: {
+    id?: number;
+    filter?: string;
+    tag?: string;
+    tagKey?: string;
+    thumb?: string;
+  }[];
+  Writer: {
+    id?: number;
+    filter?: string;
+    tag?: string;
+    tagKey?: string;
+    thumb?: string;
+  }[];
+  Country: {
+    id?: number;
+    filter?: string;
+    tag?: string;
+  }[];
+  Role: {
+    id?: number;
+    filter?: string;
+    tag?: string;
+    tagKey?: string;
+    role?: string;
+    thumb?: string;
+  }[];
   idSource: string;
   externalId: string;
   imdb_id: string;

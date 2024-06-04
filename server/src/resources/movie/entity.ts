@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 import { BaseEntity } from '@/infrastructure/entity/entity';
 
-import { CreateMovieProps, MovieProps } from './types';
+import { CreateMovieProps, MovieProps, MovieProviders } from './types';
 
 /**
  * Represents a Movie entity.
@@ -17,12 +17,6 @@ export class MovieEntity extends BaseEntity<MovieProps> {
     const id = new mongoose.Types.ObjectId().toString();
     const props: MovieProps = {
       ...create,
-      Media: create.Media || [],
-      Genre: create.Genre || [],
-      Director: create.Director || [],
-      Writer: create.Writer || [],
-      Country: create.Country || [],
-      Role: create.Role || [],
     };
     return new MovieEntity({ id, props });
   }
@@ -35,128 +29,28 @@ export class MovieEntity extends BaseEntity<MovieProps> {
     return this.props.title;
   }
 
-  get ratingKey(): number {
-    return this.props.ratingKey;
+  /**
+   * Gets the description of the movie.
+   * @returns The description of the movie.
+   */
+  get description(): string {
+    return this.props.description;
   }
 
-  get key(): string {
-    return this.props.key;
+  /**
+   * Gets the certification of the movie.
+   * @returns The certification of the movie.
+   */
+  get certification(): string | undefined {
+    return this.props.certification;
   }
 
-  get guid(): string {
-    return this.props.guid;
-  }
-
-  get studio(): string {
-    return this.props.studio;
-  }
-
-  get type(): string {
-    return this.props.type;
-  }
-
-  get titleSort(): string {
-    return this.props.titleSort;
-  }
-
-  get contentRating(): string {
-    return this.props.contentRating;
-  }
-
-  get summary(): string {
-    return this.props.summary;
-  }
-
+  /**
+   * Gets the tagline of the movie.
+   * @returns The tagline of the movie.
+   */
   get tagline(): string {
     return this.props.tagline;
-  }
-
-  get originallyAvailableAt(): string {
-    return this.props.originallyAvailableAt;
-  }
-
-  get primaryExtraKey(): string {
-    return this.props.primaryExtraKey;
-  }
-
-  get ratingImage(): string {
-    return this.props.ratingImage;
-  }
-
-  get Media(): any[] {
-    return this.props.Media;
-  }
-
-  get Genre(): any[] {
-    return this.props.Genre;
-  }
-
-  get Director(): any[] {
-    return this.props.Director;
-  }
-
-  get Writer(): any[] {
-    return this.props.Writer;
-  }
-
-  get Country(): any[] {
-    return this.props.Country;
-  }
-
-  get Role(): any[] {
-    return this.props.Role;
-  }
-
-  get idSource(): string {
-    return this.props.idSource;
-  }
-
-  get externalId(): string {
-    return this.props.externalId;
-  }
-
-  get imdb_id(): string {
-    return this.props.imdb_id;
-  }
-
-  get tmdb_id(): string {
-    return this.props.tmdb_id;
-  }
-
-  get petioTimestamp(): Date {
-    return this.props.petioTimestamp;
-  }
-
-  /**
-   * Gets the year of the movie.
-   * @returns The year of the movie.
-   */
-  get year(): number {
-    return this.props.year;
-  }
-
-  /**
-   * Gets the rating of the movie.
-   * @returns The rating of the movie.
-   */
-  get rating(): number {
-    return this.props.rating;
-  }
-
-  /**
-   * Gets the thumb of the movie.
-   * @returns The thumb of the movie.
-   */
-  get thumb(): string {
-    return this.props.thumb;
-  }
-
-  /**
-   * Gets the art of the movie.
-   * @returns The art of the movie.
-   */
-  get art(): string {
-    return this.props.art;
   }
 
   /**
@@ -168,11 +62,257 @@ export class MovieEntity extends BaseEntity<MovieProps> {
   }
 
   /**
-   * Gets the addedAt of the movie.
-   * @returns The addedAt of the movie.
+   * Gets the release date of the movie.
+   * @returns The release date of the movie.
    */
-  get addedAt(): number {
-    return this.props.addedAt;
+  get releaseDate(): Date {
+    return this.props.releaseDate;
+  }
+
+  /**
+   * Gets the release status of the movie.
+   * @returns The release status of the movie.
+   */
+  get releaseStatus(): string | undefined {
+    return this.props.releaseStatus;
+  }
+
+  /**
+   * Gets the budget of the movie.
+   * @returns The budget of the movie.
+   */
+  get budget(): number | undefined {
+    return this.props.budget;
+  }
+
+  /**
+   * Gets the revenue of the movie.
+   * @returns The revenue of the movie.
+   */
+  get revenue(): number | undefined {
+    return this.props.revenue;
+  }
+
+  /**
+   * Gets the rating of the movie.
+   * @returns The rating of the movie.
+   */
+  get rating(): {
+    plex?: number;
+    imdb?: number;
+    tmdb?: number;
+  } {
+    return this.props.rating;
+  }
+
+  /**
+   * Gets the language of the movie.
+   * @returns The language of the movie.
+   */
+  get language():
+    | {
+        spoken: string[];
+        original: string;
+      }
+    | undefined {
+    return this.props.language;
+  }
+
+  /**
+   * Gets the artwork of the movie.
+   * @returns The artwork of the movie.
+   */
+  get artwork(): {
+    logo?: string;
+    thumbnail?: string;
+    poster?: string;
+    banner?: string;
+    background?: string;
+  } {
+    return this.props.artwork;
+  }
+
+  /**
+   * Gets the studios of the movie.
+   * @returns The studios of the movie.
+   */
+  get studios(): {
+    name: string;
+    logoPath: string;
+    providers?: MovieProviders;
+  }[] {
+    return this.props.studios;
+  }
+
+  /**
+   * Gets the roles of the movie.
+   * @returns The roles of the movie.
+   */
+  get roles():
+    | {
+        executiveProducers: {
+          name: string;
+          thumbnail: string;
+          providers?: MovieProviders;
+        }[];
+        producers: {
+          name: string;
+          thumbnail: string;
+          providers?: MovieProviders;
+        }[];
+        directors: {
+          name: string;
+          thumbnail: string;
+          providers?: MovieProviders;
+        }[];
+        authors: {
+          name: string;
+          thumbnail: string;
+          providers?: MovieProviders;
+        }[];
+        writers: {
+          name: string;
+          thumbnail: string;
+          providers?: MovieProviders;
+        }[];
+        actors: {
+          name: string;
+          character: string;
+          thumbnail: string;
+          providers?: MovieProviders;
+        }[];
+      }
+    | undefined {
+    return this.props.roles;
+  }
+
+  /**
+   * Gets the resources of the movie.
+   * @returns The resources of the movie.
+   */
+  get resources():
+    | {
+        resolution: string;
+        path: string;
+        providers?: MovieProviders;
+      }[]
+    | undefined {
+    return this.props.resources;
+  }
+
+  /**
+   * Gets the countries of the movie.
+   * @returns The countries of the movie.
+   */
+  get countries():
+    | {
+        name: string;
+        code: string;
+      }[]
+    | undefined {
+    return this.props.countries;
+  }
+
+  /**
+   * Gets the keywords of the movie.
+   * @returns The keywords of the movie.
+   */
+  get keywords():
+    | {
+        name: string;
+        providers?: MovieProviders;
+      }[]
+    | undefined {
+    return this.props.keywords;
+  }
+
+  /**
+   * Gets the genres of the movie.
+   * @returns The genres of the movie.
+   */
+  get genres():
+    | {
+        name: string;
+        providers?: MovieProviders;
+      }[]
+    | undefined {
+    return this.props.genres;
+  }
+
+  /**
+   * Gets the videos associated with the movie.
+   * @returns An array of trailers, each containing a key.
+   */
+  get videos():
+    | {
+        trailers: {
+          key: string;
+        }[];
+      }
+    | undefined {
+    return this.props.videos;
+  }
+
+  /**
+   * Gets the collections associated with the movie.
+   * @returns An array of collections, each containing a name and an array of movies.
+   */
+  get collections():
+    | {
+        name: string;
+        movies: {
+          name: string;
+          posterUrl: string;
+          providers?: MovieProviders;
+        }[];
+        providers: MovieProviders;
+      }
+    | undefined {
+    return this.props.collections;
+  }
+
+  /**
+   * Gets the similar movies for this movie.
+   * @returns An array of objects representing similar movies, each containing the title, poster URL, and optional providers.
+   */
+  get similars():
+    | {
+        title: string;
+        posterUrl: string;
+        providers?: MovieProviders;
+      }[]
+    | undefined {
+    return this.props.similars;
+  }
+
+  /**
+   * Gets the recommendations for the movie.
+   * @returns An array of movie recommendations, each containing the title, poster URL, and optional providers.
+   */
+  get recommendations():
+    | {
+        title: string;
+        posterUrl: string;
+        providers?: MovieProviders;
+      }[]
+    | undefined {
+    return this.props.recommendations;
+  }
+
+  /**
+   * Gets the providers of the movie.
+   * @returns The movie providers.
+   */
+  get providers(): MovieProviders {
+    return this.props.providers;
+  }
+
+  /**
+   * Gets the source of the movie.
+   * @returns The source of the movie.
+   */
+  get source(): string {
+    return this.props.source;
   }
 
   /**
