@@ -1,0 +1,1099 @@
+openapi: 3.1.0
+info:
+  title: Fanart-API
+  summary: A Fanart API Map
+  description: An Open API Spec for interacting with Fanart.tv API
+  version: 3.0.0
+  contact:
+    name: Michael
+    url: 'https://petio.tv'
+    email: 'me@justmichael.xyz'
+  license:
+    name: MIT
+    identifier: MIT
+servers:
+  - url: 'https://webservice.fanart.tv/v3'
+security:
+  - Token: []
+components:
+  securitySchemes:
+    Token:
+      description: Fanart API Key
+      type: apiKey
+      in: query
+      name: api_key
+paths:
+  '/movies/latest':
+    get:
+      tags:
+        - Movie
+      summary: Get Latest Movies
+      operationId: getMoviesLatest
+      description: Gets the latest movies
+      parameters:
+        - name: date
+          description: The unix timestamp used to get results after
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        '200':
+          description: Latest Movies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    tmdb_id:
+                      type: string
+                      examples:
+                        - '17610'
+                    imdb_id:
+                      type: string
+                      examples:
+                        - 'tt1045778'
+                    name:
+                      type: string
+                      examples:
+                        - 'Year One'
+                    new_images:
+                      type: string
+                      examples:
+                        - '1'
+                    total_images:
+                      type: string
+                      examples:
+                        - '7'
+        '404':
+          description: 'Not Found'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    examples:
+                      - 'error'
+                  'error message':
+                    type: string
+                    examples:
+                      - 'Not Found'
+
+  '/movies/{movieId}':
+    get:
+      tags:
+        - Movie
+      summary: Get Images for Movie
+      operationId: getMovieImages
+      description: Retrieves images about a specific movie
+      parameters:
+        - name: movieId
+          description: The ID of the movie
+          in: path
+          schema:
+            type: string
+          required: true
+        - name: date
+          description: The unix timestamp used to get results after
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        '200':
+          description: Movie Images
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    examples:
+                      - Interstellar
+                  tmdb_id:
+                    type: string
+                    examples:
+                      - '57336'
+                  imdb_id:
+                    type: string
+                    examples:
+                      - 'tt0816692'
+                  hdmovieclearart:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples:
+                            - '88699'
+                        url:
+                          type: string
+                          examples:
+                            - 'https://assets.fanart.tv/fanart/movies/157336/hdmovieclearart/interstellar-5463e7ad94049.png'
+                        lang:
+                          type: string
+                          examples:
+                            - 'en'
+                            - 'ru'
+                        likes:
+                          type: string
+                          examples:
+                            - '17'
+                            - '5'
+                  hdmovielogo:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples:
+                            - '83630'
+                        url:
+                          type: string
+                          examples:
+                            - 'https://assets.fanart.tv/fanart/movies/157336/hdmovielogo/interstellar-541dd6756e663.png'
+                        lang:
+                          type: string
+                          examples:
+                            - 'en'
+                            - 'ru'
+                        likes:
+                          type: string
+                          examples:
+                            - '22'
+                  movieposter:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples:
+                            - '100862'
+                        url:
+                          type: string
+                          examples:
+                            - 'https://assets.fanart.tv/fanart/movies/157336/movieposter/interstellar-550825f7cc108.jpg'
+                        lang:
+                          type: string
+                          examples:
+                            - 'en'
+                            - 'ru'
+                        likes:
+                          type: string
+                          examples:
+                            - '12'
+                  moviedisc:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples:
+                            - '87022'
+                        url:
+                          type: string
+                          examples:
+                            - 'https://assets.fanart.tv/fanart/movies/157336/moviedisc/interstellar-544fc7176aba4.png'
+                        lang:
+                          type: string
+                          examples:
+                            - 'en'
+                            - 'ru'
+                        likes:
+                          type: string
+                          examples:
+                            - '12'
+                        disc:
+                          type: string
+                          examples:
+                            - '1'
+                        disc_type:
+                          type: string
+                          examples:
+                            - 'dvd'
+                            - 'bluray'
+                            - 'uhd-bluray'
+                  moviebackground:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples:
+                            - '86718'
+                        url:
+                          type: string
+                          examples:
+                            - 'https://assets.fanart.tv/fanart/movies/157336/moviebackground/interstellar-544bb9af46801.jpg'
+                        lang:
+                          type: string
+                          examples:
+                            - 'en'
+                            - 'ru'
+                        likes:
+                          type: string
+                          examples:
+                            - '8'
+                  moviethumb:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples:
+                            - '83580'
+                        url:
+                          type: string
+                          examples:
+                            - 'https://assets.fanart.tv/fanart/movies/157336/moviethumb/interstellar-541db498b25cf.jpg'
+                        lang:
+                          type: string
+                          examples:
+                            - 'en'
+                            - 'ru'
+                        likes:
+                          type: string
+                          examples:
+                            - '5'
+                  moviebanner:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples:
+                            - '83871'
+                        url:
+                          type: string
+                          examples:
+                            - 'https://assets.fanart.tv/fanart/movies/157336/moviebanner/interstellar-542033b1b28dd.jpg'
+                        lang:
+                          type: string
+                          examples:
+                            - 'en'
+                            - 'ru'
+                        likes:
+                          type: string
+                          examples:
+                            - '3'
+        '404':
+          description: 'Not Found'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    examples:
+                      - 'error'
+                  'error message':
+                    type: string
+                    examples:
+                      - 'Not Found'
+  '/tv/latest':
+    get:
+      tags:
+        - TV
+      summary: Get Latest Shows
+      operationId: getTVLatest
+      description: Retrieves images about a specific show
+      parameters:
+        - name: date
+          description: The unix timestamp used to get results after
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        '200':
+          description: Latest Shows
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      examples:
+                        - '79473'
+                    name:
+                      type: string
+                      examples:
+                        - 'Witchblade (2006)'
+                    new_images:
+                      type: string
+                      examples:
+                        - '2'
+                    total_images:
+                      type: string
+                      examples:
+                        - '7'
+        '404':
+          description: 'Not Found'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    examples:
+                      - 'error'
+                  'error message':
+                    type: string
+                    examples:
+                      - 'Not Found'
+
+  '/tv/{showId}':
+    get:
+      tags:
+        - TV
+      summary: Get Images for Show
+      operationId: getTVImages
+      description: Retrieves images about a specific show
+      parameters:
+        - name: showId
+          description: The ID of the show
+          in: path
+          schema:
+            type: string
+          required: true
+        - name: date
+          description: The unix timestamp used to get results after
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        '200':
+          description: Show Results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    examples:
+                      - 'Bones'
+                  thetvdb_id:
+                    type: string
+                    examples:
+                      - '75682'
+                  clearlogo:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples:
+                            - '2112'
+                        url:
+                          type: string
+                          examples:
+                            - 'http://assets.fanart.tv/fanart/tv/75682/clearlogo/Bones-75682.png'
+                        lang:
+                          type: string
+                          examples:
+                            - 'en'
+                            - 'ru'
+                        likes:
+                          type: string
+                          examples:
+                            - '7'
+                  hdtvlogo:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples:
+                            - '20329'
+                        url:
+                          type: string
+                          examples:
+                            - 'http://assets.fanart.tv/fanart/tv/75682/hdtvlogo/bones-503e7abe533b1.png'
+                        lang:
+                          type: string
+                          examples:
+                            - 'en'
+                            - 'ru'
+                        likes:
+                          type: string
+                          examples:
+                            - '1'
+                  clearart:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples:
+                            - '11780'
+                        url:
+                          type: string
+                          examples:
+                            - 'http://assets.fanart.tv/fanart/tv/75682/clearart/bones-4df372a733e83.png'
+                        lang:
+                          type: string
+                          examples:
+                            - 'en'
+                            - 'ru'
+                        likes:
+                          type: string
+                          examples:
+                            - '2'
+                  showbackground:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples:
+                            - '19374'
+                        url:
+                          type: string
+                          examples:
+                            - 'http://assets.fanart.tv/fanart/tv/75682/showbackground/bones-500994f33356b.jpg'
+                        lang:
+                          type: string
+                          examples:
+                            - 'en'
+                            - 'ru'
+                        likes:
+                          type: string
+                          examples:
+                            - '2'
+                        season:
+                          type: string
+                          examples:
+                            - '2'
+                  tvthumb:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples:
+                            - '21765'
+                        url:
+                          type: string
+                          examples:
+                            - 'http://assets.fanart.tv/fanart/tv/75682/tvthumb/bones-5070c96416c4e.jpg'
+                        lang:
+                          type: string
+                          examples:
+                            - 'en'
+                            - 'ru'
+                        likes:
+                          type: string
+                          examples:
+                            - '2'
+                  seasonposter:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples:
+                            - '38103'
+                        url:
+                          type: string
+                          examples:
+                            - 'http://assets.fanart.tv/fanart/tv/75682/seasonposter/bones-533e41121d4c8.jpg'
+                        lang:
+                          type: string
+                          examples:
+                            - 'en'
+                            - 'ru'
+                        likes:
+                          type: string
+                          examples:
+                            - '2'
+                  seasonthumb:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples:
+                            - '4311'
+                        url:
+                          type: string
+                          examples:
+                            - 'http://assets.fanart.tv/fanart/tv/75682/seasonthumb/Bones (5).jpg'
+                        lang:
+                          type: string
+                          examples:
+                            - 'en'
+                            - 'ru'
+                        likes:
+                          type: string
+                          examples:
+                            - '1'
+                        season:
+                          type: string
+                          examples:
+                            - '5'
+                  hdclearart:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples:
+                            - '22106'
+                        url:
+                          type: string
+                          examples:
+                            - 'http://assets.fanart.tv/fanart/tv/75682/hdclearart/bones-5076b476a0cee.png'
+                        lang:
+                          type: string
+                          examples:
+                            - 'en'
+                            - 'ru'
+                        likes:
+                          type: string
+                          examples:
+                            - '1'
+                  tvbanner:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples:
+                            - '28254'
+                        url:
+                          type: string
+                          examples:
+                            - 'http://assets.fanart.tv/fanart/tv/75682/tvbanner/bones-517afc7dc43ed.jpg'
+                        lang:
+                          type: string
+                          examples:
+                            - 'en'
+                            - 'ru'
+                        likes:
+                          type: string
+                          examples:
+                            - '1'
+                  characterart:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples:
+                            - '18513'
+                        url:
+                          type: string
+                          examples:
+                            - 'http://assets.fanart.tv/fanart/tv/75682/characterart/bones-4fc8e8b0d3490.png'
+                        lang:
+                          type: string
+                          examples:
+                            - 'en'
+                            - 'ru'
+                        likes:
+                          type: string
+                          examples:
+                            - '0'
+                  tvposter:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples:
+                            - '36565'
+                        url:
+                          type: string
+                          examples:
+                            - 'http://assets.fanart.tv/fanart/tv/75682/tvposter/bones-52deb10f82d0f.jpg'
+                        lang:
+                          type: string
+                          examples:
+                            - 'en'
+                            - 'ru'
+                        likes:
+                          type: string
+                          examples:
+                            - '0'
+                  seasonbanner:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples:
+                            - '37718'
+                        url:
+                          type: string
+                          examples:
+                            - 'http://assets.fanart.tv/fanart/tv/75682/seasonbanner/bones-532e0883bb9d7.jpg'
+                        lang:
+                          type: string
+                          examples:
+                            - 'en'
+                            - 'ru'
+                        likes:
+                          type: string
+                          examples:
+                            - '0'
+                        season:
+                          type: string
+                          examples:
+                            - '1'
+        '404':
+          description: 'Not Found'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    examples:
+                      - 'error'
+                  'error message':
+                    type: string
+                    examples:
+                      - 'Not Found'
+
+  '/music/latest':
+    get:
+      tags:
+        - Music
+      summary: Get Latest Artists
+      operationId: getArtistsLatest
+      description: Gets the latest artists
+      parameters:
+        - name: date
+          description: The unix timestamp used to get results after
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        '200':
+          description: Latest Artists
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      examples:
+                        - '932cb13f-677c-4e63-beb1-fca45574d280'
+                    name:
+                      type: string
+                      examples:
+                        - 'Zazie'
+                    new_images:
+                      type: string
+                      examples:
+                        - '1'
+                    total_images:
+                      type: string
+                      examples:
+                        - '10'
+        '404':
+          description: 'Not Found'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    examples:
+                      - 'error'
+                  'error message':
+                    type: string
+                    examples:
+                      - 'Not Found'
+
+  '/music/{artistId}':
+    get:
+      tags:
+        - Music
+      summary: Get Images for Artist
+      operationId: getArtistImages
+      description: Retrieves images about a specific artist
+      parameters:
+        - name: artistId
+          description: The ID of the artist
+          in: path
+          schema:
+            type: string
+          required: true
+        - name: date
+          description: The unix timestamp used to get results after
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        '200':
+          description: Artist Images
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    examples:
+                      - 'Evanescence'
+                  mbid_id:
+                    type: string
+                    examples:
+                      - 'f4a31f0a-51dd-4fa7-986d-3095c40c5ed9'
+                  artistbackground:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples:
+                            - '6'
+                        url:
+                          type: string
+                          examples:
+                            - 'http://assets.fanart.tv/fanart/music/f4a31f0a-51dd-4fa7-986d-3095c40c5ed9/artistbackground/evanescence-4dc7198199ccd.jpg'
+                        likes:
+                          type: string
+                          examples:
+                            - '4'
+                  artistthumb:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples:
+                            - '60344'
+                        url:
+                          type: string
+                          examples:
+                            - 'http://assets.fanart.tv/fanart/music/f4a31f0a-51dd-4fa7-986d-3095c40c5ed9/artistthumb/evanescence-5097c77793b6f.jpg'
+                        likes:
+                          type: string
+                          examples:
+                            - '3'
+                  musiclogo:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples:
+                            - '5474'
+                        url:
+                          type: string
+                          examples:
+                            - 'http://assets.fanart.tv/fanart/music/f4a31f0a-51dd-4fa7-986d-3095c40c5ed9/musiclogo/evanescence-4df95bceb4b1c.png'
+                        likes:
+                          type: string
+                          examples:
+                            - '2'
+                  hdmusiclogo:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples:
+                            - '50850'
+                        url:
+                          type: string
+                          examples:
+                            - 'http://assets.fanart.tv/fanart/music/f4a31f0a-51dd-4fa7-986d-3095c40c5ed9/hdmusiclogo/evanescence-5049ce8bbe373.png'
+                        likes:
+                          type: string
+                          examples:
+                            - '2'
+                  albums:
+                    type: object
+                    additionalProperties:
+                      type: object
+                      properties:
+                        albumcover:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                examples:
+                                  - '43'
+                              url:
+                                type: string
+                                examples:
+                                  - 'http://assets.fanart.tv/fanart/music/f4a31f0a-51dd-4fa7-986d-3095c40c5ed9/albumcover/fallen-4dc8683fa58fe.jpg'
+                              likes:
+                                type: string
+                                examples:
+                                  - '1'
+                        cdart:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                examples:
+                                  - '12419'
+                              url:
+                                type: string
+                                examples:
+                                  - 'http://assets.fanart.tv/fanart/music/f4a31f0a-51dd-4fa7-986d-3095c40c5ed9/cdart/evanescence-4e9a1074cfde2.png'
+                              likes:
+                                type: string
+                                examples:
+                                  - '0'
+                              disc:
+                                type: string
+                                examples:
+                                  - '1'
+                              size:
+                                type: string
+                                examples:
+                                  - '1000'
+
+                  musicbanner:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples:
+                            - '56733'
+                        url:
+                          type: string
+                          examples:
+                            - 'http://assets.fanart.tv/fanart/music/f4a31f0a-51dd-4fa7-986d-3095c40c5ed9/musicbanner/evanescence-507beae754bf6.jpg'
+                        likes:
+                          type: string
+                          examples:
+                            - '1'
+        '404':
+          description: 'Not Found'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    examples:
+                      - 'error'
+                  'error message':
+                    type: string
+                    examples:
+                      - 'Not Found'
+
+  '/music/albums/{albumId}':
+    get:
+      tags:
+        - Music
+      summary: Get Album
+      operationId: getAlbum
+      description: Retrieves album by id
+      parameters:
+        - name: albumId
+          description: The ID of the album
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Album Results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    examples:
+                      - 'Evanescence'
+                  mbid_id:
+                    type: string
+                    examples:
+                      - 'f4a31f0a-51dd-4fa7-986d-3095c40c5ed9'
+                  albums:
+                    type: object
+                    additionalProperties:
+                      type: object
+                      properties:
+                        cdart:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                examples:
+                                  - '56733'
+                              url:
+                                type: string
+                                examples:
+                                  - 'http://assets.fanart.tv/fanart/music/f4a31f0a-51dd-4fa7-986d-3095c40c5ed9/musicbanner/evanescence-507beae754bf6.jpg'
+                              likes:
+                                type: string
+                                examples:
+                                  - '1'
+                              disc:
+                                type: string
+                                examples:
+                                  - '1'
+                              size:
+                                type: string
+                                examples:
+                                  - '1000'
+                        albumcover:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                examples:
+                                  - '116236'
+                              url:
+                                type: string
+                                examples:
+                                  - 'http://assets.fanart.tv/fanart/music/f4a31f0a-51dd-4fa7-986d-3095c40c5ed9/albumcover/anywhere-but-home-532dbf4618e4b.jpg'
+                              likes:
+                                type: string
+                                examples:
+                                  - '0'
+
+        '404':
+          description: 'Not Found'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    examples:
+                      - 'error'
+                  'error message':
+                    type: string
+                    examples:
+                      - 'Not Found'
+
+  '/music/labels/{labelId}':
+    get:
+      tags:
+        - Music
+      summary: Get Label
+      operationId: getLabel
+      description: Retrieves album by id
+      parameters:
+        - name: labelId
+          description: The ID of the label
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Label Results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    examples:
+                      - 'Profile Records'
+                  id:
+                    type: string
+                    examples:
+                      - 'e832b688-546b-45e3-83e5-9f8db5dcde1d'
+                  musiclabel:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples:
+                            - '120425'
+                        url:
+                          type: string
+                          examples:
+                            - 'http://assets.fanart.tv/labels/e832b688-546b-45e3-83e5-9f8db5dcde1d/musiclabel/profile-records-53633ee474306.png'
+                        colour:
+                          type: string
+                          examples:
+                            - 'colour'
+                        likes:
+                          type: string
+                          examples:
+                            - '0'
+
+        '404':
+          description: 'Not Found'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    examples:
+                      - 'error'
+                  'error message':
+                    type: string
+                    examples:
+                      - 'Not Found'
+
+tags:
+  - name: Movie
+    description: Movie related resources of the fanart.tv API
+  - name: TV
+    description: TV related resources of the fanart.tv API
+  - name: Music
+    description: Music related resources of the fanart.tv API
