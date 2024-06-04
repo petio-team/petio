@@ -1,0 +1,385 @@
+openapi: 3.1.0
+info:
+  title: Radarr-Servarr-API
+  summary: A Servarr API Map
+  description: An Open API Spec for interacting with Radarr Servarr API
+  version: 1.0.0
+  contact:
+    name: Michael
+    url: 'https://petio.tv'
+    email: 'me@justmichael.xyz'
+  license:
+    name: MIT
+    identifier: MIT
+servers:
+  - url: 'https://radarrapi.servarr.com/v1'
+paths:
+  '/movie/{movieId}':
+    get:
+      tags:
+        - Movie
+      summary: Get a movie by ID
+      description: Get a movie by ID
+      operationId: getMovieById
+      parameters:
+        - name: movieId
+          in: path
+          required: true
+          description: The ID of the movie
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ImdbId:
+                    type: string
+                  Overview:
+                    type: string
+                  Title:
+                    type: string
+                  OriginalTitle:
+                    type: string
+                  TitleSlug:
+                    type: string
+                  Ratings:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        Count:
+                          type: number
+                        Value:
+                          type: number
+                        Origin:
+                          type: string
+                        Type:
+                          type: string
+                      required:
+                        - Count
+                        - Value
+                        - Origin
+                        - Type
+                  MovieRatings:
+                    type: object
+                    properties:
+                      Tmdb:
+                        type: object
+                        properties:
+                          Count:
+                            type: number
+                          Value:
+                            type: number
+                          Type:
+                            type: string
+                        required:
+                          - Count
+                          - Value
+                          - Type
+                      Imdb:
+                        type: object
+                        nullable: true
+                        properties:
+                          Count:
+                            type: number
+                          Value:
+                            type: number
+                          Type:
+                            type: string
+                        required:
+                          - Count
+                          - Value
+                          - Type
+                      Metacritic:
+                        type: object
+                        nullable: true
+                        properties:
+                          Count:
+                            type: number
+                          Value:
+                            type: number
+                          Type:
+                            type: string
+                        required:
+                          - Count
+                          - Value
+                          - Type
+                      RottenTomatoes:
+                        type: object
+                        nullable: true
+                        properties:
+                          Count:
+                            type: number
+                          Value:
+                            type: number
+                          Type:
+                            type: string
+                        required:
+                          - Count
+                          - Value
+                          - Type
+                    required:
+                      - Tmdb
+                      - Imdb
+                      - Metacritic
+                      - RottenTomatoes
+                  Runtime:
+                    type: number
+                  Images:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        CoverType:
+                          type: string
+                        Url:
+                          type: string
+                      required:
+                        - CoverType
+                        - Url
+                  Genres:
+                    type: array
+                    items:
+                      type: string
+                  Popularity:
+                    type: number
+                  Premier:
+                    type: string
+                    nullable: true
+                  InCinema:
+                    type: string
+                    nullable: true
+                  PhysicalRelease:
+                    type: string
+                    nullable: true
+                  DigitalRelease:
+                    type: string
+                    nullable: true
+                  Year:
+                    type: number
+                  AlternativeTitles:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        Title:
+                          type: string
+                        Type:
+                          type: string
+                        Language:
+                          type: string
+                      required:
+                        - Title
+                        - Type
+                        - Language
+                  Translations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        Title:
+                          type: string
+                        Overview:
+                          type: string
+                        Language:
+                          type: string
+                      required:
+                        - Title
+                        - Overview
+                        - Language
+                  Recommendations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        TmdbId:
+                          type: number
+                        Title:
+                          type: string
+                      required:
+                        - TmdbId
+                        - Title
+                  Credits:
+                    type: object
+                    properties:
+                      Cast:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            Name:
+                              type: string
+                            Order:
+                              type: number
+                            Character:
+                              type: string
+                            TmdbId:
+                              type: number
+                            CreditId:
+                              type: string
+                            Images:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  CoverType:
+                                    type: string
+                                  Url:
+                                    type: string
+                                required:
+                                  - CoverType
+                                  - Url
+                          required:
+                            - Name
+                            - Order
+                            - Character
+                            - TmdbId
+                            - CreditId
+                            - Images
+                      Crew:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            Name:
+                              type: string
+                            Job:
+                              type: string
+                            Department:
+                              type: string
+                            TmdbId:
+                              type: number
+                            CreditId:
+                              type: string
+                            Images:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  CoverType:
+                                    type: string
+                                  Url:
+                                    type: string
+                                required:
+                                  - CoverType
+                                  - Url
+                          required:
+                            - Name
+                            - Job
+                            - Department
+                            - TmdbId
+                            - CreditId
+                            - Images
+                    required:
+                      - Cast
+                      - Crew
+                  Studio:
+                    type: string
+                  YoutubeTrailerId:
+                    type: string
+                  Certifications:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        Country:
+                          type: string
+                        Certification:
+                          type: string
+                      required:
+                        - Country
+                        - Certification
+                  Status:
+                    type: string
+                    nullable: true
+                  Collection:
+                    type: object
+                    nullable: true
+                    properties:
+                      Name:
+                        type: string
+                      Images:
+                        type: array
+                        nullable: true
+                        items:
+                          type: object
+                          properties:
+                            CoverType:
+                              type: string
+                            Url:
+                              type: string
+                          required:
+                            - CoverType
+                            - Url
+                      Overview:
+                        type: string
+                        nullable: true
+                      Translations:
+                        type: array
+                        nullable: true
+                        items:
+                          type: object
+                          properties:
+                            Title:
+                              type: string
+                            Overview:
+                              type: string
+                            Language:
+                              type: string
+                          required:
+                            - Title
+                            - Overview
+                            - Language
+                      Parts:
+                        nullable: true
+                        type: array
+                      TmdbId:
+                        type: number
+                    required:
+                      - Name
+                      - Images
+                      - Overview
+                      - Translations
+                      - Parts
+                      - TmdbId
+                  OriginalLanguage:
+                    type: string
+                  Homepage:
+                    type: string
+                  TmdbId:
+                    type: number
+                required:
+                  - ImdbId
+                  - Overview
+                  - Title
+                  - OriginalTitle
+                  - TitleSlug
+                  - Ratings
+                  - MovieRatings
+                  - Runtime
+                  - Images
+                  - Genres
+                  - Popularity
+                  - Premier
+                  - InCinema
+                  - PhysicalRelease
+                  - DigitalRelease
+                  - Year
+                  - AlternativeTitles
+                  - Translations
+                  - Recommendations
+                  - Credits
+                  - Studio
+                  - YoutubeTrailerId
+                  - Certifications
+                  - Status
+                  - Collection
+                  - OriginalLanguage
+                  - Homepage
+                  - TmdbId
+        '404':
+          description: Not Found

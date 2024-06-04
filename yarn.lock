@@ -17475,6 +17475,7 @@ __metadata:
     tsconfig-paths: ^4.1.0
     tsup: ^8.0.2
     tsyringe: ^4.7.0
+    type-fest: ^4.18.2
     typescript: ^4.9
     xml-js: ^1.6.11
     znv: ^0.4.0
@@ -18852,6 +18853,13 @@ __metadata:
   version: 0.3.1
   resolution: "type-fest@npm:0.3.1"
   checksum: 347ff46c2285616635cb59f722e7f396bee81b8988b6fc1f1536b725077f2abf6ccfa22ab7a78e9b6ce7debea0e6614bbf5946cbec6674ec1bde12113af3a65c
+  languageName: node
+  linkType: hard
+
+"type-fest@npm:^4.18.2":
+  version: 4.18.2
+  resolution: "type-fest@npm:4.18.2"
+  checksum: 2e9272b2b97b2f4ea2bbffda43cfce9ca89c474ad7c9565e39b80fee2ce609ea60385faffbbef98994b38feb3fa5fa38feb33acf175f4f85ee21d1773e87bf44
   languageName: node
   linkType: hard
 

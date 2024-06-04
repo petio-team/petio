@@ -41,14 +41,14 @@ export type OpenAPIConfig = {
 };
 
 export const OpenAPI: OpenAPIConfig = {
-	BASE: 'http://localhost:7878',
+	BASE: 'https://radarrapi.servarr.com/v1',
 	CREDENTIALS: 'include',
 	ENCODE_PATH: undefined,
 	HEADERS: undefined,
 	PASSWORD: undefined,
 	TOKEN: undefined,
 	USERNAME: undefined,
-	VERSION: '3.0.0',
+	VERSION: '1.0.0',
 	WITH_CREDENTIALS: false,
 	interceptors: {
 		request: new Interceptors(),
