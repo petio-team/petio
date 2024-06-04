@@ -1,5 +1,6 @@
 import { Service } from 'diod';
 import http, { IncomingMessage, Server, ServerResponse } from 'http';
+import { Http2ServerRequest, Http2ServerResponse } from 'http2';
 import { promisify } from 'util';
 
 /**
@@ -43,7 +44,10 @@ export class HttpServer {
   async start(
     address: string,
     port: number,
-    cb?: (req: IncomingMessage, res: ServerResponse) => void,
+    cb?: (
+      req: IncomingMessage | Http2ServerRequest,
+      res: ServerResponse | Http2ServerResponse,
+    ) => void,
   ): Promise<void> {
     this.server = http.createServer(cb || undefined);
     return new Promise((resolve, reject) => {
