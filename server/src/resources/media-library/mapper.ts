@@ -1,15 +1,19 @@
 /* eslint-disable no-underscore-dangle */
-import { Mapper } from "@/infrastructure/entity/mapper";
-import { Service } from "diod";
-import { MediaLibraryType } from "@/resources/media-library/types";
-import { MediaLibrarySchemaProps } from "./schema";
-import { MediaLibraryEntity } from "./entity";
+import { Service } from 'diod';
+
+import { Mapper } from '@/infrastructure/entity/mapper';
+import { MediaLibraryType } from '@/resources/media-library/types';
+
+import { MediaLibraryEntity } from './entity';
+import { MediaLibrarySchemaProps } from './schema';
 
 /**
  * Mapper class for converting between MediaLibraryEntity and MediaLibrarySchemaProps.
  */
 @Service()
-export class MediaLibraryMapper implements Mapper<MediaLibraryEntity, MediaLibrarySchemaProps, any> {
+export class MediaLibraryMapper
+  implements Mapper<MediaLibraryEntity, MediaLibrarySchemaProps, any>
+{
   /**
    * Converts a MediaLibraryEntity to a MediaLibrarySchemaProps.
    * @param entity - The entity to convert.
@@ -18,7 +22,7 @@ export class MediaLibraryMapper implements Mapper<MediaLibraryEntity, MediaLibra
   toPeristence(entity: MediaLibraryEntity): MediaLibrarySchemaProps {
     const copy = entity.getProps();
     return {
-      _id: copy.id,
+      id: copy.id,
       allowSync: copy.allowSync,
       art: copy.art,
       composite: copy.composite,
@@ -49,7 +53,7 @@ export class MediaLibraryMapper implements Mapper<MediaLibraryEntity, MediaLibra
    */
   toEntity(record: MediaLibrarySchemaProps): MediaLibraryEntity {
     return new MediaLibraryEntity({
-      id: record._id,
+      id: record.id,
       props: {
         allowSync: record.allowSync,
         art: record.art,
@@ -58,7 +62,10 @@ export class MediaLibraryMapper implements Mapper<MediaLibraryEntity, MediaLibra
         refreshing: record.refreshing,
         thumb: record.thumb,
         key: record.key,
-        type: record.type === 'movie' ? MediaLibraryType.MOVIE : MediaLibraryType.SHOW,
+        type:
+          record.type === 'movie'
+            ? MediaLibraryType.MOVIE
+            : MediaLibraryType.SHOW,
         title: record.title,
         agent: record.agent,
         scanner: record.scanner,
