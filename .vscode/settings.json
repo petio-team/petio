@@ -6,5 +6,5 @@
     ]
   },
   "typescript.tsdk": "node_modules/typescript/lib",
-  "ionic.previewInEditor": true
+  "typescript.enablePromptUseWorkspaceTsdk": true
 }

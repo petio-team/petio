@@ -1,5 +1,12 @@
-import { ExceptionBase } from "./base";
-import { ARGUMENT_INVALID, ARGUMENT_NOT_PROVIDED, ARGUMENT_OUT_OF_RANGE, CONFLICT, INTERNAL_SERVER_ERROR, NOT_FOUND } from "./codes";
+import { ExceptionBase } from './base';
+import {
+  ARGUMENT_INVALID,
+  ARGUMENT_NOT_PROVIDED,
+  ARGUMENT_OUT_OF_RANGE,
+  CONFLICT,
+  INTERNAL_SERVER_ERROR,
+  NOT_FOUND,
+} from './codes';
 
 /**
  * Used to indicate that an incorrect argument was provided to a method/function/class constructor
