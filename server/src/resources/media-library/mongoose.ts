@@ -41,7 +41,8 @@ export class MediaLibraryMongooseRepository
   async update(
     entity: MediaLibraryEntity,
   ): Promise<MediaLibraryEntity | undefined> {
-    const { uuid, ...update } = this.mapper.toPeristence(entity);
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const { _id, uuid, ...update } = this.mapper.toPeristence(entity);
     const updated = await this.model().findOneAndUpdate({ uuid }, update, {
       new: true,
     });

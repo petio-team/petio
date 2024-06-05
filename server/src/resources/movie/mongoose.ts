@@ -33,9 +33,10 @@ export class MovieMongooseRepository
    * @returns A promise that resolves to the updated or created movie entity.
    */
   async updateOrCreate(entity: MovieEntity): Promise<MovieEntity> {
-    const schema = this.mapper.toPeristence(entity);
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const { _id, ...rest } = this.mapper.toPeristence(entity);
     const result = await this.repository
-      .findOneAndUpdate({ tmdb_id: schema.tmdb_id }, schema, {
+      .findOneAndUpdate({ tmdb_id: rest.tmdb_id }, rest, {
         upsert: true,
         new: true,
       })
