@@ -341,7 +341,7 @@ export class TmdbShowProvider implements ShowProvider {
                   trailers: show.videos.results
                     .filter(
                       (video) =>
-                        video.site === 'Youtube' &&
+                        video.site === 'YouTube' &&
                         video.type === 'Trailer' &&
                         is.truthy(video.key),
                     )
