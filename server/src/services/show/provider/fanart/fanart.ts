@@ -120,10 +120,6 @@ export class FanartShowProvider implements ShowArtworkProvider {
       );
       return Ok(images);
     } catch (error) {
-      this.logger.error(
-        { showId: id, error },
-        'Failed to get show artwork: an error occurred',
-      );
       if (error instanceof ApiError) {
         if (error.status === 404) {
           return Err(new NotFoundException('Show artwork not found'));
