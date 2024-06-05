@@ -28,14 +28,27 @@ export type ShowSchemaProps = {
   childCount: number;
   addedAt: number;
   updatedAt: number;
-  Genre: any[];
+  Genre: {
+    id: number;
+    name: string;
+  }[];
   idSource: string;
   externalId: string;
   tvdb_id: string;
   imdb_id: string;
   tmdb_id: string;
   petioTimestamp: Date;
-  seasonData: object;
+  seasonData: {
+    seasonNumber: number;
+    title: string;
+    episodes: {
+      title: string;
+      episodeNumber: number;
+      resolution?: string;
+      videoCodec?: string;
+      audioCodec?: string;
+    }[];
+  }[];
 };
 
 /**
@@ -72,5 +85,5 @@ export const ShowSchema = new Schema<ShowSchemaProps>({
   imdb_id: { type: String, required: true },
   tmdb_id: { type: String, required: true },
   petioTimestamp: { type: Date, required: true },
-  seasonData: { type: Object, required: true },
+  seasonData: { type: [Object], required: true },
 });

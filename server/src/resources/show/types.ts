@@ -1,47 +1,134 @@
 import { Override } from '@/infrastructure/utils/override';
 
 /**
+ * Represents the roles associated with a show.
+ */
+export type ShowRolesProps = {
+  creators?: {
+    name: string;
+    thumbnail: string;
+    providers: { tmdb: number };
+  }[];
+  executiveProducers?: { name: string; thumbnail: string }[];
+  producers?: { name: string; thumbnail: string }[];
+  directors?: { name: string; thumbnail: string }[];
+  authors?: { name: string; thumbnail: string }[];
+  writers?: { name: string; thumbnail: string }[];
+  actors?: { name: string; character: string; thumbnail: string }[];
+};
+
+/**
+ * Represents the properties of a show season.
+ */
+export type ShowSeasonProps = {
+  name: string;
+  index: number;
+  rating?: number;
+  description?: string;
+  posterPath?: string;
+  bannerPath?: string;
+  episodes: {
+    index: number;
+    name: string;
+    description?: string;
+    airDate?: string;
+    rating?: number;
+    runtime?: number;
+    stillPath?: string;
+    resources?: {
+      resolution: string;
+      path?: string;
+    }[];
+  }[];
+  providers?: {
+    plex?: number;
+  };
+};
+
+/**
  * Represents the properties of a Show.
  */
 export type ShowProps = {
-  ratingKey: number;
-  key: string;
-  guid: string;
-  studio: string;
-  type: string;
   title: string;
-  titleSort: string;
-  contentRating: string;
-  summary: string;
-  index: number;
-  rating: number;
-  year: number;
-  thumb: string;
-  art: string;
-  banner: string;
-  theme: string;
+  description: string;
+  tagline?: string;
+  certification?: string;
   duration: number;
-  originallyAvailableAt: string;
-  leafCount: number;
-  viewedLeafCount: number;
-  childCount: number;
-  addedAt: number;
-  Genre: any[];
-  idSource: string;
-  externalId: string;
-  tvdb_id: string;
-  imdb_id: string;
-  tmdb_id: string;
-  petioTimestamp: Date;
-  seasonData: object;
+  type?: string;
+  status?: string;
+  firstAirDate?: Date;
+  finalAirDate?: Date;
+  rating: {
+    tmdb?: number;
+  };
+  language?: {
+    spoken: string[];
+    original: string;
+  };
+  artwork: {
+    logo?: string;
+    thumbnail?: string;
+    poster?: string;
+    banner?: string;
+    background?: string;
+  };
+  networks?: {
+    name: string;
+    logoPath?: string;
+    provider?: {
+      tmdb: number;
+    };
+  }[];
+  totalSeasons?: number;
+  totalEpisodes?: number;
+  seasons: ShowSeasonProps[];
+  roles?: ShowRolesProps;
+  countries?: {
+    name: string;
+    code: string;
+  }[];
+  keywords?: {
+    name: string;
+    providers?: {
+      tmdb: number;
+    };
+  }[];
+  genres?: {
+    name: string;
+    providers?: {
+      tmdb: number;
+    };
+  }[];
+  videos?: {
+    trailers: {
+      key: string;
+    }[];
+  };
+  similars?: {
+    title: string;
+    posterUrl: string;
+    providers: {
+      tmdb: number;
+    };
+  }[];
+  recommendations?: {
+    title: string;
+    posterUrl: string;
+    providers: {
+      tmdb: number;
+    };
+  }[];
+  providers: {
+    tvdb?: number;
+    tmdb?: number;
+    imdb?: string;
+    tvrage?: number;
+    plex?: number;
+  };
+  source: string;
 };
 
 /**
  * Represents the properties for creating a Show.
  */
-export type CreateShowProps = Override<
-  ShowProps,
-  {
-    // TODO: add fields to override
-  }
->;
+export type CreateShowProps = Override<ShowProps, {}>;

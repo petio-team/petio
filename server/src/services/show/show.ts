@@ -1,21 +1,132 @@
 import { Service } from 'diod';
+import { None, Option, Some } from 'oxide.ts';
 import pino from 'pino';
 
 import { Logger } from '@/infrastructure/logger/logger';
-import { showLookup } from '@/services/tmdb/show';
+import { toQueryString } from '@/infrastructure/utils/object-to-query-string';
+import { ShowEntity } from '@/resources/show/entity';
+import { ShowRepository } from '@/resources/show/repository';
+import { ShowProps } from '@/resources/show/types';
+import { CacheService } from '@/services/cache/cache';
+import {
+  ShowArtworkProvider,
+  ShowProvider,
+} from '@/services/show/provider/provider';
+import { GetShowOptions } from '@/services/show/types';
 
 @Service()
 export class ShowService {
+  /**
+   * The default time-to-live (TTL) for caching movie data.
+   * The value is set to 1 day (86400000 milliseconds).
+   */
+  private defaultCacheTTL = 86400000;
+
+  /**
+   * The logger used for logging messages in the Show service.
+   */
   private logger: pino.Logger;
 
-  constructor(logger: Logger) {
+  constructor(
+    logger: Logger,
+    private showRepository: ShowRepository,
+    private cacheService: CacheService,
+    private showProvider: ShowProvider,
+    private showArtworkProvider: ShowArtworkProvider,
+  ) {
     this.logger = logger.child({ module: 'services.show' });
   }
 
+  /**
+   * Retrieves a show by its ID.
+   *
+   * @param id - The ID of the show.
+   * @param options - Optional parameters for fetching the show.
+   * @returns A Promise that resolves to an Option containing the ShowEntity if found, or None if not found.
+   */
+  async getShow(
+    id: number,
+    options?: GetShowOptions,
+  ): Promise<Option<ShowEntity>> {
+    const optionsAsString =
+      options && Object.keys(options).length ? toQueryString(options) : '';
+    const cacheName = `show.${id}${optionsAsString}`;
+    try {
+      const result = await this.cacheService.wrap<ShowProps | undefined>(
+        cacheName,
+        async () => {
+          const [dbResult, detailsResult, artworkResult] = await Promise.all([
+            options?.withServer
+              ? this.showRepository.findOne({ tmdb_id: id })
+              : undefined,
+            this.showProvider.getDetails(id),
+            options?.withArtwork
+              ? this.showArtworkProvider.getArtworkImages(id)
+              : undefined,
+          ]);
+          if (detailsResult.isErr()) {
+            return undefined;
+          }
+          const details = detailsResult.unwrap();
+          const artwork = artworkResult?.isOk()
+            ? artworkResult.unwrap()
+            : undefined;
+          return {
+            ...details,
+            artwork: {
+              ...details.artwork,
+              logo: artwork?.logo,
+              thumbnail: artwork?.thumbnail,
+              poster: artwork?.poster,
+            },
+            seasons: details.seasons.map((season) => ({
+              ...season,
+              posterPath:
+                artwork?.seasons?.thumbnail?.find(
+                  (thumb) => thumb.index === season.index,
+                )?.url || season.posterPath,
+              bannerPath:
+                artwork?.seasons?.banner?.find(
+                  (banner) => banner.index === season.index,
+                )?.url || season.bannerPath,
+            })),
+            providers: {
+              ...details.providers,
+              plex: dbResult?.isSome()
+                ? parseInt(dbResult.unwrap().id, 10)
+                : undefined,
+            },
+          };
+        },
+        this.defaultCacheTTL,
+      );
+      return result ? Some(ShowEntity.create(result)) : None;
+    } catch (error) {
+      this.logger.error(
+        { showId: id, error },
+        'Failed to lookup show: an error occurred',
+      );
+      return None;
+    }
+  }
+
+  /**
+   * Retrieves a batch of shows based on the provided IDs.
+   * @param ids - An array of show IDs.
+   * @param minified - A boolean indicating whether to retrieve minified show data.
+   * @returns A promise that resolves to an array of show results.
+   */
   async getBatchedShows(ids: number[], minified: boolean = false) {
     const showResult = await Promise.all(
-      ids.map((m) => showLookup(m, minified)),
+      ids.map((m) =>
+        this.getShow(m, {
+          withServer: true,
+          withArtwork: !minified,
+        }),
+      ),
     );
-    return showResult;
+    return showResult
+      .filter((show) => show.isSome())
+      .map((show) => show.unwrap());
   }
 }
