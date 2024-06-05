@@ -1,10 +1,10 @@
 /* eslint-disable no-restricted-syntax */
 import Bluebird from 'bluebird';
 
+import { QueueResource as MovieQueueResource } from '@/infrastructure/arr/radarr-api';
+import { QueueResource as ShowQueueResource } from '@/infrastructure/arr/sonarr-api';
 import { getFromContainer } from '@/infrastructure/container/container';
 import logger from '@/infrastructure/logger/logger';
-import { QueueResource as MovieQueueResource } from '@/infrastructure/servarr/radarr';
-import { QueueResource as ShowQueueResource } from '@/infrastructure/servarr/sonarr';
 import is from '@/infrastructure/utils/is';
 import { DownloaderEntity } from '@/resources/downloader/entity';
 import { DownloaderRepository } from '@/resources/downloader/repository';
