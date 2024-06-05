@@ -164,6 +164,41 @@ export class ShowMapper
           name: creator.name,
           profile_path: creator.thumbnail,
         })) || [],
+      credits: {
+        cast:
+          copy.roles?.actors?.map((actor) => ({
+            name: actor.name,
+            character: actor.character,
+            profile_path: actor.thumbnail,
+          })) || [],
+        crew: [
+          ...(copy.roles?.directors?.map((director) => ({
+            name: director.name,
+            job: 'Director',
+            profile_path: director.thumbnail,
+          })) || []),
+          ...(copy.roles?.writers?.map((writer) => ({
+            name: writer.name,
+            job: 'Writer',
+            profile_path: writer.thumbnail,
+          })) || []),
+          ...(copy.roles?.authors?.map((author) => ({
+            name: author.name,
+            job: 'Author',
+            profile_path: author.thumbnail,
+          })) || []),
+          ...(copy.roles?.producers?.map((producer) => ({
+            name: producer.name,
+            job: 'Producer',
+            profile_path: producer.thumbnail,
+          })) || []),
+          ...(copy.roles?.executiveProducers?.map((executiveProducer) => ({
+            name: executiveProducer.name,
+            job: 'Executive Producer',
+            profile_path: executiveProducer.thumbnail,
+          })) || []),
+        ],
+      },
       spoken_languages: copy.language?.spoken.map((language) => ({
         name: language,
       })),
