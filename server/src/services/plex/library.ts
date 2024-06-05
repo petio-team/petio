@@ -9,7 +9,11 @@ import xmlParser from 'xml-js';
 
 import { getFromContainer } from '@/infrastructure/container/container';
 import loggerMain from '@/infrastructure/logger/logger';
-import { GetLibrariesResponse, PlexClient } from '@/infrastructure/plex';
+import {
+  GetLibrariesResponse,
+  GetMetadataResponse,
+  PlexClient,
+} from '@/infrastructure/plex';
 import { TheMovieDatabaseClient } from '@/infrastructure/tmdb/client';
 import is from '@/infrastructure/utils/is';
 import { MediaLibraryEntity } from '@/resources/media-library/entity';
@@ -341,6 +345,7 @@ export default class LibraryUpdate {
     try {
       const res = await this.client.library.getMetadataChildren({
         ratingKey: id,
+        includeElements: 'Stream',
       });
       return res.MediaContainer;
     } catch (err) {
@@ -519,6 +524,40 @@ export default class LibraryUpdate {
     }
   }
 
+  async buildSeasons(
+    container: Required<GetMetadataResponse['MediaContainer']>,
+  ) {
+    const seasonsResults = await Bluebird.map(
+      container?.Metadata ?? [],
+      async (season: any) => {
+        const seasonData = await this.getSeason(season.ratingKey);
+        if (!is.truthy(seasonData?.Metadata)) {
+          return undefined;
+        }
+        const thisSeason = {
+          seasonNumber: season.index,
+          title: season.title,
+          episodes: seasonData.Metadata.map((metadata) => ({
+            title: metadata.title,
+            episodeNumber: metadata.index,
+            resolution: is.truthy(metadata.Media)
+              ? metadata.Media[0].videoResolution
+              : undefined,
+            videoCodec: is.truthy(metadata.Media)
+              ? metadata.Media[0].videoCodec
+              : undefined,
+            audioCodec: is.truthy(metadata.Media)
+              ? metadata.Media[0].audioCodec
+              : undefined,
+          })),
+        };
+        return thisSeason;
+      },
+      { concurrency: 2 },
+    );
+    return seasonsResults.filter(is.truthy);
+  }
+
   async saveShow(show) {
     let showObj = show;
     let showDb: any = false;
@@ -546,40 +585,19 @@ export default class LibraryUpdate {
     try {
       logger.debug(`saving show ${title} with key ${showObj.ratingKey}`);
       showObj = await this.getMeta(showObj.ratingKey);
-      if (!showObj || !showObj.Children || !showObj.Children.Metadata) {
+      if (!is.truthy(showObj.Metadata)) {
         logger.warn(`CRON: No meta found for ${title}`);
         return;
       }
-      seasons = await Bluebird.map(
-        showObj.Children.Metadata,
-        async (season: any) => {
-          const seasonData = await this.getSeason(season.ratingKey);
-          const thisSeason = {
-            seasonNumber: season.index,
-            title: season.title,
-            episodes: {},
-          };
-          for (const e in seasonData) {
-            const ep = seasonData[e];
-            thisSeason.episodes[ep.index] = {
-              title: ep.title,
-              episodeNumber: ep.index,
-              seasonNumber: ep.parentIndex,
-              resolution: ep.Media[0].videoResolution,
-              videoCodec: ep.Media[0].videoCodec,
-              audioCodec: ep.Media[0].audioCodec,
-            };
-          }
-          return thisSeason;
-        },
-        { concurrency: 1 },
-      );
+      seasons = await this.buildSeasons(showObj);
     } catch (err) {
       logger.warn(err, `CRON: Unable to fetch meta for ${title}`);
       return;
     }
     if (idSource === 'plex') {
+      logger.debug(`CRON: Show matched - ${title} - using Plex agent`);
       try {
+        logger.debug(showObj.Guid, `plex guid object`);
         if (!Array.isArray(showObj.Guid)) {
           logger.warn(
             `CRON: Show couldn't be matched - ${title} - try rematching in Plex`,
