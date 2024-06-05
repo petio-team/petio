@@ -55,19 +55,22 @@ export class ShowService {
       const result = await this.cacheService.wrap<ShowProps | undefined>(
         cacheName,
         async () => {
-          const [dbResult, detailsResult, artworkResult] = await Promise.all([
+          const [dbResult, detailsResult] = await Promise.all([
             options?.withServer
               ? this.showRepository.findOne({ tmdb_id: id })
               : undefined,
             this.showProvider.getDetails(id),
-            options?.withArtwork
-              ? this.showArtworkProvider.getArtworkImages(id)
-              : undefined,
           ]);
           if (detailsResult.isErr()) {
             return undefined;
           }
           const details = detailsResult.unwrap();
+          const artworkResult =
+            options?.withArtwork && details.providers.tvdb
+              ? await this.showArtworkProvider.getArtworkImages(
+                  details.providers.tvdb,
+                )
+              : undefined;
           const artwork = artworkResult?.isOk()
             ? artworkResult.unwrap()
             : undefined;
@@ -75,9 +78,9 @@ export class ShowService {
             ...details,
             artwork: {
               ...details.artwork,
-              logo: artwork?.logo,
-              thumbnail: artwork?.thumbnail,
-              poster: artwork?.poster,
+              logo: artwork?.logo || details.artwork.logo,
+              thumbnail: artwork?.thumbnail || details.artwork.thumbnail,
+              poster: artwork?.poster || details.artwork.poster,
             },
             seasons: details.seasons.map((season) => ({
               ...season,

@@ -1,14 +1,17 @@
 import { Service } from 'diod';
 import { Err, Ok } from 'oxide.ts';
+import pino from 'pino';
 
 import {
   InternalServerErrorException,
   NotFoundException,
 } from '@/infrastructure/exceptions/exceptions';
 import { ApiError, FanartTVAPI } from '@/infrastructure/fanart/client';
+import { Logger } from '@/infrastructure/logger/logger';
 import is from '@/infrastructure/utils/is';
 import { CacheService } from '@/services/cache/cache';
 import {
+  ShowArtworkImages,
   ShowArtworkProvider,
   ShowProviderArtworkImagesResponse,
 } from '@/services/show/provider/provider';
@@ -21,16 +24,22 @@ export class FanartShowProvider implements ShowArtworkProvider {
    */
   private defaultCacheTTL = 86400000;
 
+  //
+  private logger: pino.Logger;
+
   constructor(
     private readonly client: FanartTVAPI,
     private readonly cache: CacheService,
-  ) {}
+    logger: Logger,
+  ) {
+    this.logger = logger.child({ module: 'services.show.provider.fanart' });
+  }
 
   public async getArtworkImages(
     id: number,
   ): Promise<ShowProviderArtworkImagesResponse> {
     try {
-      const images = await this.cache.wrap(
+      const images = await this.cache.wrap<ShowArtworkImages>(
         `fanart.show.${id}.images`,
         async () => {
           const artworkImages = await this.client.tv.getTvImages({
@@ -44,28 +53,39 @@ export class FanartShowProvider implements ShowArtworkProvider {
                   is.truthy(logo.lang) &&
                   logo.lang === 'en',
               )[0]
-              .url?.replace('http://', 'https://'),
+              ?.url?.replace('http://', 'https://'),
             thumbnail: artworkImages?.tvthumb
               ?.filter(
-                (thumb) => is.truthy(thumb.url) && thumb.lang === 'en',
+                (thumb) =>
+                  is.truthy(thumb.lang) &&
+                  is.truthy(thumb.url) &&
+                  thumb.lang === 'en',
               )[0]
-              .url?.replace('http://', 'https://'),
+              ?.url?.replace('http://', 'https://'),
             poster: artworkImages?.tvposter
               ?.filter(
-                (poster) => is.truthy(poster.url) && poster.lang === 'en',
+                (poster) =>
+                  is.truthy(poster.lang) &&
+                  is.truthy(poster.url) &&
+                  poster.lang === 'en',
               )[0]
-              .url?.replace('http://', 'https://'),
+              ?.url?.replace('http://', 'https://'),
             banner: artworkImages?.tvbanner
               ?.filter(
-                (banner) => is.truthy(banner.url) && banner.lang === 'en',
+                (banner) =>
+                  is.truthy(banner.lang) &&
+                  is.truthy(banner.url) &&
+                  banner.lang === 'en',
               )[0]
-              .url?.replace('http://', 'https://'),
+              ?.url?.replace('http://', 'https://'),
             background: artworkImages?.showbackground
               ?.filter(
                 (background) =>
-                  is.truthy(background.url) && background.lang === 'en',
+                  is.truthy(background.lang) &&
+                  is.truthy(background.url) &&
+                  background.lang === 'en',
               )[0]
-              .url?.replace('http://', 'https://'),
+              ?.url?.replace('http://', 'https://'),
             seasons: {
               thumbnail: artworkImages?.seasonthumb
                 ? artworkImages.seasonthumb
@@ -100,6 +120,10 @@ export class FanartShowProvider implements ShowArtworkProvider {
       );
       return Ok(images);
     } catch (error) {
+      this.logger.error(
+        { showId: id, error },
+        'Failed to get show artwork: an error occurred',
+      );
       if (error instanceof ApiError) {
         if (error.status === 404) {
           return Err(new NotFoundException('Show artwork not found'));

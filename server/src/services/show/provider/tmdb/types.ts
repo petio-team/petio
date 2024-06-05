@@ -1,4 +1,5 @@
 import {
+  TvSeasonAggregateCreditsResponse,
   TvSeriesContentRatingsResponse,
   TvSeriesCreditsResponse,
   TvSeriesDetailsResponse,
@@ -19,4 +20,5 @@ export type ShowDetailsProviderResponse = TvSeriesDetailsResponse & {
   recommendations?: TvSeriesRecommendationsResponse;
   similar?: TvSeriesSimilarResponse;
   external_ids?: Omit<TvSeriesExternalIdsResponse, 'id'>;
+  aggregate_credits?: Omit<TvSeasonAggregateCreditsResponse, 'id'>;
 };

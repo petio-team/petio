@@ -94,7 +94,7 @@ export class TmdbShowProvider implements ShowProvider {
             index: seasonDetails.season_number!,
             rating: seasonDetails.vote_average,
             description: seasonDetails.overview,
-            posterPath: seasonDetails.poster_path,
+            posterPath: this.tmdbBaseImageUrl + seasonDetails.poster_path,
             episodes:
               seasonDetails.episodes?.map((episode) => ({
                 index: episode.episode_number!,
@@ -103,7 +103,7 @@ export class TmdbShowProvider implements ShowProvider {
                 airDate: episode.air_date,
                 rating: episode.vote_average,
                 runtime: episode.runtime,
-                stillPath: episode.still_path,
+                stillPath: this.tmdbBaseImageUrl + episode.still_path,
               })) || [],
           };
         },
@@ -143,6 +143,7 @@ export class TmdbShowProvider implements ShowProvider {
               'recommendations',
               'similar',
               'videos',
+              'aggregate_credits',
             ].join(','),
           })) as ShowDetailsProviderResponse;
           const seasonsResult = show.seasons
@@ -196,7 +197,7 @@ export class TmdbShowProvider implements ShowProvider {
                 )
                 .map((network) => ({
                   name: network.name!,
-                  logoPath: network.logo_path,
+                  logoPath: this.tmdbBaseImageUrl + network.logo_path,
                   provider: {
                     tmdb: network.id!,
                   },
@@ -216,12 +217,16 @@ export class TmdbShowProvider implements ShowProvider {
                     tmdb: creator.id!,
                   },
                 })),
-              executiveProducers: show.credits?.crew
+              executiveProducers: show.aggregate_credits?.crew
                 ?.filter(
                   (crew) =>
                     is.truthy(crew.id) &&
                     is.truthy(crew.name) &&
-                    crew.job === 'Executive Producer',
+                    is.truthy(crew.jobs) &&
+                    crew.department === 'Production' &&
+                    is.truthy(
+                      crew.jobs.find((job) => job.job === 'Executive Producer'),
+                    ),
                 )
                 .map((producer) => ({
                   name: producer.name!,
@@ -230,12 +235,12 @@ export class TmdbShowProvider implements ShowProvider {
                     tmdb: producer.id!,
                   },
                 })),
-              producers: show.credits?.crew
+              producers: show.aggregate_credits?.crew
                 ?.filter(
                   (crew) =>
                     is.truthy(crew.id) &&
                     is.truthy(crew.name) &&
-                    crew.job === 'Producer',
+                    crew.department === 'Production',
                 )
                 .map((producer) => ({
                   name: producer.name!,
@@ -244,12 +249,14 @@ export class TmdbShowProvider implements ShowProvider {
                     tmdb: producer.id!,
                   },
                 })),
-              directors: show.credits?.crew
+              directors: show.aggregate_credits?.crew
                 ?.filter(
                   (crew) =>
                     is.truthy(crew.id) &&
                     is.truthy(crew.name) &&
-                    crew.job === 'Director',
+                    is.truthy(crew.jobs) &&
+                    crew.department === 'Directing' &&
+                    is.truthy(crew.jobs.find((job) => job.job === 'Director')),
                 )
                 .map((director) => ({
                   name: director.name!,
@@ -258,12 +265,12 @@ export class TmdbShowProvider implements ShowProvider {
                     tmdb: director.id!,
                   },
                 })),
-              writers: show.credits?.crew
+              writers: show.aggregate_credits?.crew
                 ?.filter(
                   (crew) =>
                     is.truthy(crew.id) &&
                     is.truthy(crew.name) &&
-                    crew.job === 'Writer',
+                    crew.department === 'Writing',
                 )
                 .map((writer) => ({
                   name: writer.name!,
@@ -272,30 +279,17 @@ export class TmdbShowProvider implements ShowProvider {
                     tmdb: writer.id!,
                   },
                 })),
-              authors: show.credits?.crew
-                ?.filter(
-                  (crew) =>
-                    is.truthy(crew.id) &&
-                    is.truthy(crew.name) &&
-                    crew.job === 'Author',
-                )
-                .map((author) => ({
-                  name: author.name!,
-                  thumbnail: this.tmdbBaseImageUrl + author.profile_path,
-                  providers: {
-                    tmdb: author.id!,
-                  },
-                })),
-              actors: show.credits?.cast
+              actors: show.aggregate_credits?.cast
                 ?.filter(
                   (cast) =>
                     is.truthy(cast.id) &&
                     is.truthy(cast.name) &&
-                    is.truthy(cast.character),
+                    is.truthy(cast.roles) &&
+                    cast.roles.length > 0,
                 )
                 .map((actor) => ({
                   name: actor.name!,
-                  character: actor.character!,
+                  character: actor.roles![0].character!,
                   thumbnail: this.tmdbBaseImageUrl + actor.profile_path,
                   providers: {
                     tmdb: actor.id!,
