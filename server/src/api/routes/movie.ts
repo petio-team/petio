@@ -2,16 +2,41 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import { company, discoverMovie, movieLookup } from '@/services/tmdb/movie';
+import { getFromContainer } from '@/infrastructure/container/container';
+import { MovieMapper } from '@/resources/movie/mapper';
+import { MovieService } from '@/services/movie/movie';
+import { company, discoverMovie } from '@/services/tmdb/movie';
 
 const lookupById = async (ctx: Context) => {
+  const service = getFromContainer(MovieService);
+  const mapper = getFromContainer(MovieMapper);
+  const details = await service.getMovie(ctx.params.id, {
+    withArtwork: true,
+    withServer: true,
+    withRating: true,
+  });
+  if (details.isNone()) {
+    ctx.status = StatusCodes.NOT_FOUND;
+    return;
+  }
   ctx.status = StatusCodes.OK;
-  ctx.body = await movieLookup(ctx.params.id);
+  ctx.body = mapper.toResponse(details.unwrap());
 };
 
 const lookupByIdMinified = async (ctx: Context) => {
+  const service = getFromContainer(MovieService);
+  const mapper = getFromContainer(MovieMapper);
+  const details = await service.getMovie(ctx.params.id, {
+    withArtwork: false,
+    withServer: true,
+    withRating: false,
+  });
+  if (details.isNone()) {
+    ctx.status = StatusCodes.NOT_FOUND;
+    return;
+  }
   ctx.status = StatusCodes.OK;
-  ctx.body = await movieLookup(ctx.params.id, true);
+  ctx.body = mapper.toResponse(details.unwrap());
 };
 
 const getMovieDiscovery = async (ctx: Context) => {

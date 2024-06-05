@@ -13,10 +13,10 @@ const getMovies = async (ctx: Context) => {
     const service = getFromContainer(DiscoveryService);
     const data = await service.getMovies(ctx.state.user.id);
     if (!data) {
-      StatusOk(ctx, {});
+      StatusOk(ctx, []);
       return;
     }
-    StatusOk(ctx, data);
+    StatusOk(ctx, [data]);
   } catch (err) {
     logger.error(`failed to get discovery data for movies`, err);
     StatusInternalServerError(ctx, 'Could not get movie discovery data');
@@ -28,10 +28,10 @@ const getShows = async (ctx: Context) => {
     const service = getFromContainer(DiscoveryService);
     const data = await service.getShows(ctx.state.user.id);
     if (!data) {
-      StatusOk(ctx, {});
+      StatusOk(ctx, []);
       return;
     }
-    StatusOk(ctx, data);
+    StatusOk(ctx, [data]);
   } catch (err) {
     logger.error(`failed to get discovery data for shows`, err);
     StatusInternalServerError(ctx, 'Could not get show discovery data');

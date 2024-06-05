@@ -2,16 +2,39 @@ import Router from '@koa/router';
 import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
-import { discoverSeries, network, showLookup } from '@/services/tmdb/show';
+import { getFromContainer } from '@/infrastructure/container/container';
+import { ShowMapper } from '@/resources/show/mapper';
+import { ShowService } from '@/services/show/show';
+import { discoverSeries, network } from '@/services/tmdb/show';
 
 const lookupById = async (ctx: Context) => {
+  const service = getFromContainer(ShowService);
+  const mapper = getFromContainer(ShowMapper);
+  const details = await service.getShow(ctx.params.id, {
+    withArtwork: true,
+    withServer: true,
+  });
+  if (details.isNone()) {
+    ctx.status = StatusCodes.NOT_FOUND;
+    return;
+  }
   ctx.status = StatusCodes.OK;
-  ctx.body = await showLookup(ctx.params.id, false);
+  ctx.body = mapper.toResponse(details.unwrap());
 };
 
 const lookupByIdMinified = async (ctx: Context) => {
+  const service = getFromContainer(ShowService);
+  const mapper = getFromContainer(ShowMapper);
+  const details = await service.getShow(ctx.params.id, {
+    withArtwork: true,
+    withServer: true,
+  });
+  if (details.isNone()) {
+    ctx.status = StatusCodes.NOT_FOUND;
+    return;
+  }
   ctx.status = StatusCodes.OK;
-  ctx.body = await showLookup(ctx.params.id, true);
+  ctx.body = mapper.toResponse(details.unwrap());
 };
 
 const discoverSeriesData = async (ctx: Context) => {
