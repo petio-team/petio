@@ -8,6 +8,7 @@ export type ShowResponseProps = {
   tagline: string;
   overview: string;
   backdrop_path: string;
+  poster_path?: string;
   original_language?: string;
   status: string;
   age_rating?: string;

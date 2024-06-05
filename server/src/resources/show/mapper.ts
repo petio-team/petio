@@ -130,6 +130,7 @@ export class ShowMapper
       tagline: copy.tagline || '',
       overview: copy.description,
       backdrop_path: copy.artwork.background || '',
+      poster_path: copy.artwork.poster || '',
       original_language: copy.language?.original || '',
       status: copy.status || '',
       age_rating: copy.certification || '',
