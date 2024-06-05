@@ -33,6 +33,7 @@ export type ShowResponseProps = {
       episode_number: number;
       air_date: string;
       overview: string;
+      still_path: string;
     }>;
   }>;
   recommendations?: Array<{

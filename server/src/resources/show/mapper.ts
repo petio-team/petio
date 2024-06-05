@@ -155,6 +155,7 @@ export class ShowMapper
           episode_number: episode.index,
           air_date: episode.airDate || '',
           overview: episode.description || '',
+          still_path: episode.stillPath || '',
         })),
       })),
       created_by:
