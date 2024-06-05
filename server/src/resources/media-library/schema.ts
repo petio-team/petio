@@ -4,7 +4,7 @@ import { Schema } from 'mongoose';
  * Represents the properties of a MediaLibrary schema.
  */
 export type MediaLibrarySchemaProps = {
-  id: string;
+  _id: string;
   allowSync: boolean;
   art: string;
   composite: string;

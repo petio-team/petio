@@ -22,7 +22,7 @@ export class MediaLibraryMapper
   toPeristence(entity: MediaLibraryEntity): MediaLibrarySchemaProps {
     const copy = entity.getProps();
     return {
-      id: copy.id,
+      _id: copy.id,
       allowSync: copy.allowSync,
       art: copy.art,
       composite: copy.composite,
@@ -53,7 +53,7 @@ export class MediaLibraryMapper
    */
   toEntity(record: MediaLibrarySchemaProps): MediaLibraryEntity {
     return new MediaLibraryEntity({
-      id: record.id,
+      id: record._id,
       props: {
         allowSync: record.allowSync,
         art: record.art,

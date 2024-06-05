@@ -14,5 +14,7 @@ export abstract class MediaLibraryRepository extends MongooseRepository<
   MediaLibraryEntity,
   MediaLibrarySchemaProps
 > {
-  abstract update(entity: MediaLibraryEntity): Promise<MediaLibraryEntity>;
+  abstract update(
+    entity: MediaLibraryEntity,
+  ): Promise<MediaLibraryEntity | undefined>;
 }

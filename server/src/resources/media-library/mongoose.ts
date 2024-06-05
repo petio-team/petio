@@ -38,14 +38,13 @@ export class MediaLibraryMongooseRepository
    * @returns A Promise that resolves to the updated media library entity.
    * @throws Error if the media library entity with the specified id is not found.
    */
-  async update(entity: MediaLibraryEntity): Promise<MediaLibraryEntity> {
-    const { id, uuid, ...update } = this.mapper.toPeristence(entity);
+  async update(
+    entity: MediaLibraryEntity,
+  ): Promise<MediaLibraryEntity | undefined> {
+    const { uuid, ...update } = this.mapper.toPeristence(entity);
     const updated = await this.model().findOneAndUpdate({ uuid }, update, {
       new: true,
     });
-    if (!updated) {
-      throw new Error(`MediaLibrary with id ${id} not found`);
-    }
-    return this.mapper.toEntity(updated);
+    return updated ? this.mapper.toEntity(updated) : undefined;
   }
 }
