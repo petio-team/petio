@@ -74,7 +74,7 @@ async function getMovie(id, minified = false, noextras = false) {
   } catch (e) {
     updateStore({
       type: 'media/store-movies',
-      shows: { [id]: 'error' },
+      movies: { [id]: 'error' },
     });
     throw e;
   }
@@ -372,9 +372,7 @@ export async function search(term) {
 
 async function batchLookup(ids, type = 'movie', minified = true) {
   if (ids && Array.isArray(ids) && ids.length > 0) {
-    ids.forEach((id, i) => {
-      ids[i] = parseInt(id);
-    });
+    ids = ids.map((id) => parseInt(id.id, 10));
     try {
       const data = await post(`/batch/${type}`, {
         ids: ids,
