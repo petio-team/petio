@@ -124,7 +124,7 @@ export class ShowMapper
   toResponse(entity: ShowEntity): ShowResponseProps {
     const copy = entity.getProps();
     return {
-      id: copy.id,
+      id: copy.providers.tmdb?.toString() || '',
       name: copy.title,
       type: copy.type || '',
       tagline: copy.tagline || '',
@@ -140,7 +140,7 @@ export class ShowMapper
       number_of_episodes: copy.totalEpisodes || 0,
       number_of_seasons: copy.totalSeasons || 0,
       logo: copy.artwork.logo || '',
-      tile: copy.artwork.thumbnail || '',
+      tile: copy.artwork.poster || '',
       original_language_format: copy.language?.original || '',
       imdb_id: copy.providers.imdb?.toString() || '',
       tmdb_id: copy.providers.tmdb?.toString() || '',
@@ -171,12 +171,14 @@ export class ShowMapper
           id: network.provider?.tmdb || 0,
           name: network.name,
         })) || [],
-      genres: copy.genres?.map((genre) => ({
-        id: genre.providers?.tmdb || 0,
-      })),
-      keywords: copy.keywords?.map((keyword) => ({
-        id: keyword.providers?.tmdb || 0,
-      })),
+      genres:
+        copy.genres?.map((genre) => ({
+          id: genre.providers?.tmdb?.toString() || '',
+        })) || [],
+      keywords:
+        copy.keywords?.map((keyword) => ({
+          id: keyword.providers?.tmdb?.toString() || '',
+        })) || [],
       videos: copy.videos
         ? {
             results: copy.videos.trailers.map((video) => ({

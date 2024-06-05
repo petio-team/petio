@@ -77,10 +77,10 @@ export type ShowResponseProps = {
     }>;
   };
   genres?: Array<{
-    id: number;
+    id: string;
   }>;
   keywords?: Array<{
-    id: number;
+    id: string;
   }>;
   videos?: {
     results: Array<{
