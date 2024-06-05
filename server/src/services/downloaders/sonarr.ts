@@ -1,9 +1,9 @@
 /* eslint-disable no-await-in-loop */
 
 /* eslint-disable no-restricted-syntax */
+import { ArrSonarrAPIClient } from '@/infrastructure/arr/sonarr-api';
 import { getFromContainer } from '@/infrastructure/container/container';
 import loggerMain from '@/infrastructure/logger/logger';
-import { SonarrV3Client } from '@/infrastructure/servarr/sonarr';
 import { DownloaderEntity } from '@/resources/downloader/entity';
 import { DownloaderRepository } from '@/resources/downloader/repository';
 import { DownloaderType } from '@/resources/downloader/types';
@@ -14,11 +14,11 @@ const logger = loggerMain.child({ module: 'downloaders.sonarr' });
 export default class Sonarr {
   instance: DownloaderEntity;
 
-  client: SonarrV3Client;
+  client: ArrSonarrAPIClient;
 
   constructor(instance: DownloaderEntity) {
     this.instance = instance;
-    this.client = new SonarrV3Client({
+    this.client = new ArrSonarrAPIClient({
       BASE: instance.url,
       HEADERS: {
         'x-api-key': instance.token,
@@ -26,7 +26,7 @@ export default class Sonarr {
     });
   }
 
-  public getClient(): SonarrV3Client {
+  public getClient(): ArrSonarrAPIClient {
     return this.client;
   }
 
@@ -36,7 +36,7 @@ export default class Sonarr {
       type: DownloaderType.SONARR,
     });
     for (const instance of instances) {
-      const api = new SonarrV3Client({
+      const api = new ArrSonarrAPIClient({
         BASE: instance.url,
         HEADERS: {
           'x-api-key': instance.token,

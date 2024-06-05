@@ -1,24 +1,26 @@
 /* eslint-disable no-restricted-syntax */
+import {
+  ArrRadarrAPIClient,
+  MovieResource,
+} from '@/infrastructure/arr/radarr-api';
 import { getFromContainer } from '@/infrastructure/container/container';
 import loggerMain from '@/infrastructure/logger/logger';
-import { MovieResource, RadarrV3Client } from '@/infrastructure/servarr/radarr';
 import is from '@/infrastructure/utils/is';
 import { DownloaderEntity } from '@/resources/downloader/entity';
 import { DownloaderRepository } from '@/resources/downloader/repository';
 import { DownloaderType } from '@/resources/downloader/types';
 import { RequestRepository } from '@/resources/request/repository';
-import { lookup } from '@/services/meta/imdb';
 
 const logger = loggerMain.child({ module: 'downloaders.radarr' });
 
 export default class Radarr {
   instance: DownloaderEntity;
 
-  client: RadarrV3Client;
+  client: ArrRadarrAPIClient;
 
   constructor(instance: DownloaderEntity) {
     this.instance = instance;
-    this.client = new RadarrV3Client({
+    this.client = new ArrRadarrAPIClient({
       BASE: instance.url,
       HEADERS: {
         'x-api-key': instance.token,
@@ -26,7 +28,7 @@ export default class Radarr {
     });
   }
 
-  public getClient(): RadarrV3Client {
+  public getClient(): ArrRadarrAPIClient {
     return this.client;
   }
 
@@ -142,7 +144,7 @@ export default class Radarr {
           }
 
           try {
-            const api = new RadarrV3Client({
+            const api = new ArrRadarrAPIClient({
               BASE: instance.url,
               HEADERS: {
                 'x-api-key': instance.token,
