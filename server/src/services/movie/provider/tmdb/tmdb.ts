@@ -122,7 +122,7 @@ export class TmdbMovieProvider implements MovieProvider {
           studios:
             detailsResult.production_companies?.map((c) => ({
               name: c.name!,
-              logoPath: c.logo_path!,
+              logoPath: c.logo_path ? this.tmdbBaseImageUrl + c.logo_path : '',
               providers: {
                 tmdb: {
                   id: c.id!,
@@ -135,7 +135,9 @@ export class TmdbMovieProvider implements MovieProvider {
                 .filter((c) => c.job === 'Executive Producer')
                 .map((c) => ({
                   name: c.name!,
-                  thumbnail: c.profile_path!,
+                  thumbnail: c.profile_path
+                    ? this.tmdbBaseImageUrl + c.profile_path
+                    : '',
                   providers: {
                     tmdb: {
                       id: c.id!,
@@ -147,7 +149,9 @@ export class TmdbMovieProvider implements MovieProvider {
                 .filter((c) => c.job === 'Producer')
                 .map((c) => ({
                   name: c.name!,
-                  thumbnail: c.profile_path!,
+                  thumbnail: c.profile_path
+                    ? this.tmdbBaseImageUrl + c.profile_path
+                    : '',
                   providers: {
                     tmdb: {
                       id: c.id!,
@@ -159,7 +163,9 @@ export class TmdbMovieProvider implements MovieProvider {
                 .filter((c) => c.job === 'Director')
                 .map((c) => ({
                   name: c.name!,
-                  thumbnail: c.profile_path!,
+                  thumbnail: c.profile_path
+                    ? this.tmdbBaseImageUrl + c.profile_path
+                    : '',
                   providers: {
                     tmdb: {
                       id: c.id!,
@@ -171,7 +177,9 @@ export class TmdbMovieProvider implements MovieProvider {
                 .filter((c) => c.job === 'Author')
                 .map((c) => ({
                   name: c.name!,
-                  thumbnail: c.profile_path!,
+                  thumbnail: c.profile_path
+                    ? this.tmdbBaseImageUrl + c.profile_path
+                    : '',
                   providers: {
                     tmdb: {
                       id: c.id!,
@@ -183,7 +191,9 @@ export class TmdbMovieProvider implements MovieProvider {
                 .filter((c) => c.job === 'Writer')
                 .map((c) => ({
                   name: c.name!,
-                  thumbnail: c.profile_path!,
+                  thumbnail: c.profile_path
+                    ? this.tmdbBaseImageUrl + c.profile_path
+                    : '',
                   providers: {
                     tmdb: {
                       id: c.id!,
@@ -194,7 +204,9 @@ export class TmdbMovieProvider implements MovieProvider {
               detailsResult.credits?.cast.map((c) => ({
                 name: c.name!,
                 character: c.character!,
-                thumbnail: c.profile_path!,
+                thumbnail: c.profile_path
+                  ? this.tmdbBaseImageUrl + c.profile_path
+                  : '',
                 providers: {
                   tmdb: {
                     id: c.id!,

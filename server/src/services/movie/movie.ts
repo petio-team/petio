@@ -51,7 +51,7 @@ export class MovieService {
   ): Promise<Option<MovieEntity>> {
     const optionsAsString =
       options && Object.keys(options).length ? toQueryString(options) : '';
-    const cacheName = `movie.lookup.${id}${optionsAsString}`;
+    const cacheName = `movie.${id}${optionsAsString}`;
     try {
       const result = await this.cache.wrap(
         cacheName,
@@ -134,6 +134,6 @@ export class MovieService {
         }),
       ),
     );
-    return movieResult;
+    return movieResult.filter((m) => m.isSome()).map((m) => m.unwrap());
   }
 }

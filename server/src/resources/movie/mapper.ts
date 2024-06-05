@@ -159,8 +159,22 @@ export class MovieMapper
           producers: [],
           executiveProducers: [],
         },
-        genres: [],
-        countries: [],
+        genres: record.Genre.filter((genre) => is.truthy(genre.tag)).map(
+          (genre) => ({
+            name: genre.tag || '',
+            providers: {
+              plex: {
+                id: genre.id || 0,
+              },
+            },
+          }),
+        ),
+        countries: record.Country.filter((country) =>
+          is.truthy(country.tag),
+        ).map((country) => ({
+          name: country.tag || '',
+          code: '',
+        })),
         resources: record.Media.map((media) => ({
           resolution: media.videoResolution,
           path: '',
