@@ -210,7 +210,7 @@ export class MovieMapper
   toResponse(entity: MovieEntity): MovieResponseProps {
     const copy = entity.getProps();
     return {
-      id: copy.id,
+      id: copy.providers.tmdb?.id.toString() || '',
       title: copy.title,
       tagline: copy.tagline,
       overview: copy.description,
@@ -236,15 +236,16 @@ export class MovieMapper
           }
         : undefined,
       collection: copy.collections?.movies.map((movie) => ({
-        id: movie.providers?.plex?.id || movie.providers?.tmdb?.id || 0,
+        id: `${movie.providers?.plex?.id || movie.providers?.tmdb?.id || 0}`,
         name: movie.name,
         poster_path: movie.posterUrl || '',
       })),
       recommendations: copy.recommendations?.map((recommendation) => ({
-        id:
+        id: `${
           recommendation.providers?.plex?.id ||
           recommendation.providers?.tmdb?.id ||
-          0,
+          0
+        }`,
         title: recommendation.title,
         poster_path: recommendation.posterUrl || '',
       })),
@@ -312,16 +313,18 @@ export class MovieMapper
           })) || []),
         ],
       },
-      genres: copy.genres
-        ?.filter((genre) => is.truthy(genre.providers?.tmdb?.id))
-        .map((genre) => ({
-          id: genre.providers?.tmdb?.id || 0,
-        })),
-      keywords: copy.keywords
-        ?.filter((keyword) => is.truthy(keyword.providers?.tmdb?.id))
-        .map((keyword) => ({
-          id: keyword.providers?.tmdb?.id || 0,
-        })),
+      genres:
+        copy.genres
+          ?.filter((genre) => is.truthy(genre.providers?.tmdb?.id))
+          .map((genre) => ({
+            id: genre.providers?.tmdb?.id || 0,
+          })) || [],
+      keywords:
+        copy.keywords
+          ?.filter((keyword) => is.truthy(keyword.providers?.tmdb?.id))
+          .map((keyword) => ({
+            id: keyword.providers?.tmdb?.id?.toString() || '',
+          })) || [],
       videos: copy.videos
         ? {
             results: copy.videos.trailers.map((video) => ({

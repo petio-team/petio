@@ -24,12 +24,12 @@ export type MovieResponseProps = {
     name: string;
   };
   collection?: Array<{
-    id: number;
+    id: string;
     name: string;
     poster_path: string;
   }>;
   recommendations?: Array<{
-    id: number;
+    id: string;
     title: string;
     poster_path: string;
   }>;
@@ -69,7 +69,7 @@ export type MovieResponseProps = {
     id: number;
   }>;
   keywords?: Array<{
-    id: number;
+    id: string;
   }>;
   videos?: {
     results: Array<{
