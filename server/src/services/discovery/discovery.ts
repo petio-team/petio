@@ -8,6 +8,9 @@ import { CacheService } from '@/services/cache/cache';
 import build from '@/services/discovery/build';
 import display, { DiscoveryResult } from '@/services/discovery/display';
 
+/**
+ * Service responsible for handling user discovery.
+ */
 @Service()
 export class DiscoveryService {
   private logger: pino.Logger;
@@ -20,6 +23,11 @@ export class DiscoveryService {
     this.logger = logger.child({ module: 'services.discovery' });
   }
 
+  /**
+   * Builds the user discovery profiles.
+   * Retrieves all users and builds their discovery profiles by calling the `build` function.
+   * The discovery profiles are then cached for future use.
+   */
   async buildUserDiscovery() {
     const users = await this.userRepo.findAll();
     if (!users.length) {
@@ -77,10 +85,15 @@ export class DiscoveryService {
     );
   }
 
+  /**
+   * Retrieves the movies for a given user.
+   * @param userId - The ID of the user.
+   * @returns A Promise that resolves to an array of movies, or null if no movies are found.
+   */
   async getMovies(userId: string) {
     const userResult = await this.userRepo.findOne({ id: userId });
     if (userResult.isNone()) {
-      return null;
+      return [];
     }
     const user = userResult.unwrap();
     const userPlexId = user.altId ? user.altId : user.plexId;
@@ -93,6 +106,11 @@ export class DiscoveryService {
     return null;
   }
 
+  /**
+   * Retrieves the shows for a given user.
+   * @param userId - The ID of the user.
+   * @returns A Promise that resolves to the shows for the user, or null if the user is not found or the data is not cached.
+   */
   async getShows(userId: string) {
     const userResult = await this.userRepo.findOne({ id: userId });
     if (userResult.isNone()) {
