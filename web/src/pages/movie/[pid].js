@@ -8,7 +8,7 @@ import NotFound from '../404';
 import { ReactComponent as IssueIcon } from '../../assets/svg/issue.svg';
 import { ReactComponent as TrailerIcon } from '../../assets/svg/v1/trailer.svg';
 import { ReactComponent as WatchlistIcon } from '../../assets/svg/watchlist.svg';
-import Carousel from '../../components/carousel';
+import Carousel from '../../components/Carousel';
 import Critics from '../../components/critics';
 import Hero from '../../components/hero';
 import IssueModal from '../../components/issueModal';

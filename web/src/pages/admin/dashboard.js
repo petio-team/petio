@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 
-import Carousel from '../../components/carousel';
+import Carousel from '../../components/Carousel';
 import media from '../../services/media.service';
 import typo from '../../styles/components/typography.module.scss';
 import styles from '../../styles/views/admin.module.scss';
