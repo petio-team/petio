@@ -174,7 +174,8 @@ function Carousel({
         >
           {data && data.length > 0
             ? data.map((item, i) => {
-                if (item === 'watched') return null;
+                if (!item || item.length === 0 || item === 'watched')
+                  return null;
 
                 if (type === 'request') {
                   return (

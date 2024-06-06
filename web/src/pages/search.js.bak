@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import Carousel from '../components/carousel';
+import Carousel from '../components/Carousel';
 import Meta from '../components/meta';
 import media from '../services/media.service';
 import typo from '../styles/components/typography.module.scss';

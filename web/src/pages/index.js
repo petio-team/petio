@@ -4,7 +4,7 @@ import 'react-lazy-load-image-component/src/effects/opacity.css';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import Carousel from '../components/carousel';
+import Carousel from '../components/Carousel';
 import Hero from '../components/hero';
 import { Loading } from '../components/loading';
 import Meta from '../components/meta';
