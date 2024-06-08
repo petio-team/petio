@@ -123,32 +123,40 @@ export class ScannerService {
    * @returns A promise that resolves to the updated or created movie entity.
    */
   private async syncMovie(movie: MovieEntity) {
-    if (!is.truthy(movie.providers.tmdb?.id)) {
-      return undefined;
-    }
-    const detailsResult = await this.movieService.getMovie(
-      movie.providers.tmdb!.id,
-      {
-        withArtwork: true,
-        withServer: false,
-        withRating: true,
-      },
-    );
-    if (detailsResult.isNone()) {
-      return undefined;
-    }
-    const details = detailsResult.unwrap();
-    this.logger.debug(`Syncing movie ${movie.title}`);
-    return this.movieRepository.updateOrCreate(
-      MovieEntity.create({
-        ...details.getProps(),
-        resources: movie.resources,
-        providers: {
-          ...details.providers,
-          ...movie.providers,
+    try {
+      if (!is.truthy(movie.providers.tmdb?.id)) {
+        return undefined;
+      }
+      const detailsResult = await this.movieService.getMovie(
+        movie.providers.tmdb!.id,
+        {
+          withArtwork: true,
+          withServer: false,
+          withRating: true,
         },
-      }),
-    );
+      );
+      if (detailsResult.isNone()) {
+        return undefined;
+      }
+      const details = detailsResult.unwrap();
+      this.logger.debug(`Syncing movie ${movie.title}`);
+      return await this.movieRepository.updateOrCreate(
+        MovieEntity.create({
+          ...details.getProps(),
+          resources: movie.resources,
+          providers: {
+            ...details.providers,
+            ...movie.providers,
+          },
+        }),
+      );
+    } catch (error) {
+      this.logger.error(
+        error,
+        `Failed to sync movie '${movie.title}' (${movie.providers.tmdb?.id})`,
+      );
+      return undefined;
+    }
   }
 
   /**
@@ -157,40 +165,51 @@ export class ScannerService {
    * @returns A promise that resolves to the updated or created show entity.
    */
   private async syncShow(show: ShowEntity) {
-    if (!is.truthy(show.providers.tmdb)) {
-      return undefined;
-    }
-    const detailsResult = await this.showService.getShow(show.providers.tmdb!, {
-      withArtwork: true,
-      withServer: false,
-    });
-    if (detailsResult.isNone()) {
-      return undefined;
-    }
-    const details = detailsResult.unwrap();
-    this.logger.debug(`Syncing show '${show.title}'`);
-    return this.showRepository.updateOrCreate(
-      ShowEntity.create({
-        ...details.getProps(),
-        seasons: details.seasons.map((season) => ({
-          ...season,
-          episodes: season.episodes.map((episode) => ({
-            ...episode,
-            resources: show.seasons
-              .find((s) => s.index)
-              ?.episodes.find((e) => e.index)?.resources,
+    try {
+      if (!is.truthy(show.providers.tmdb)) {
+        return undefined;
+      }
+      const detailsResult = await this.showService.getShow(
+        show.providers.tmdb!,
+        {
+          withArtwork: true,
+          withServer: false,
+        },
+      );
+      if (detailsResult.isNone()) {
+        return undefined;
+      }
+      const details = detailsResult.unwrap();
+      this.logger.debug(`Syncing show '${show.title}'`);
+      return await this.showRepository.updateOrCreate(
+        ShowEntity.create({
+          ...details.getProps(),
+          seasons: details.seasons.map((season) => ({
+            ...season,
+            episodes: season.episodes.map((episode) => ({
+              ...episode,
+              resources: show.seasons
+                .find((s) => s.index)
+                ?.episodes.find((e) => e.index)?.resources,
+            })),
+            providers: {
+              ...season.providers,
+              ...show.seasons.find((s) => s.index)?.providers,
+            },
           })),
           providers: {
-            ...season.providers,
-            ...show.seasons.find((s) => s.index)?.providers,
+            ...details.providers,
+            ...show.providers,
           },
-        })),
-        providers: {
-          ...details.providers,
-          ...show.providers,
-        },
-      }),
-    );
+        }),
+      );
+    } catch (error) {
+      this.logger.error(
+        error,
+        `Failed to sync show '${show.title}' (${show.providers.tmdb})`,
+      );
+      return undefined;
+    }
   }
 
   /**
