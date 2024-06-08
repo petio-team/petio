@@ -1,34 +1,45 @@
 import { Service } from 'diod';
 import { Err, Ok } from 'oxide.ts';
+import pino from 'pino';
 
 import {
   InternalServerErrorException,
   NotFoundException,
 } from '@/infrastructure/exceptions/exceptions';
+import { Logger } from '@/infrastructure/logger/logger';
 import { ApiError, TheMovieDatabaseClient } from '@/infrastructure/tmdb/client';
 import is from '@/infrastructure/utils/is';
-import { CacheService } from '@/services/cache/cache';
+import { CacheProvider } from '@/services/cache/cache-provider';
 import {
   MovieArtworkImages,
   MovieProvider,
   MovieProviderCollectionDetailsResponse,
   MovieProviderDetailsResponse,
+  MovieTrendingProvider,
+  MovieTrendingReponse,
 } from '@/services/movie/provider/provider';
 import { MovieLookupProviderResponse } from '@/services/movie/provider/tmdb/types';
 
 import { MetadataSources } from '../../../../resources/movie/types';
 
 @Service()
-export class TmdbMovieProvider implements MovieProvider {
+export class TmdbMovieProvider implements MovieProvider, MovieTrendingProvider {
   /**
    * The base URL for retrieving original movie images from TMDB.
    */
-  private tmdbBaseImageUrl = 'https://image.tmdb.org/t/p/original';
+  // private tmdbBaseImageUrl = 'https://image.tmdb.org/t/p/original';
+
+  private logger: pino.Logger;
 
   constructor(
+    logger: Logger,
     private readonly client: TheMovieDatabaseClient,
-    private readonly cache: CacheService,
-  ) {}
+    private readonly cache: CacheProvider,
+  ) {
+    this.logger = logger.child({
+      module: 'services.movie.provider.tmdb',
+    });
+  }
 
   /**
    * Builds the artwork URLs for a movie based on the provided images.
@@ -39,28 +50,38 @@ export class TmdbMovieProvider implements MovieProvider {
     images: MovieLookupProviderResponse['images'],
   ): MovieArtworkImages {
     return {
-      logo: images?.logos
-        ?.filter(
-          (logo) =>
-            is.truthy(logo.file_path) &&
-            is.truthy(logo.iso_639_1) &&
-            logo.iso_639_1 === 'en',
-        )
-        .map((logo) => ({
-          file_path: this.tmdbBaseImageUrl + logo.file_path,
-        }))[0].file_path,
-      poster: images?.posters
-        ?.filter(
-          (poster) => is.truthy(poster.file_path) && poster.iso_639_1 === 'en',
-        )
-        .map((logo) => ({
-          file_path: this.tmdbBaseImageUrl + logo.file_path,
-        }))[0].file_path,
-      background: images?.backdrops
-        ?.filter((bg) => is.truthy(bg.file_path) && bg.iso_639_1 === 'en')
-        .map((logo) => ({
-          file_path: this.tmdbBaseImageUrl + logo.file_path,
-        }))[0].file_path,
+      logo:
+        images?.logos
+          ?.filter(
+            (logo) =>
+              is.truthy(logo.file_path) &&
+              is.truthy(logo.iso_639_1) &&
+              logo.iso_639_1 === 'en',
+          )
+          .map((logo) => ({
+            file_path: logo.file_path,
+          }))[0]?.file_path ||
+        images?.logos[0]?.file_path ||
+        '',
+      poster:
+        images?.posters
+          ?.filter(
+            (poster) =>
+              is.truthy(poster.file_path) && poster.iso_639_1 === 'en',
+          )
+          .map((logo) => ({
+            file_path: logo.file_path,
+          }))[0]?.file_path ||
+        images?.posters[0]?.file_path ||
+        '',
+      background:
+        images?.backdrops
+          ?.filter((bg) => is.truthy(bg.file_path) && bg.iso_639_1 === 'en')
+          .map((logo) => ({
+            file_path: logo.file_path,
+          }))[0]?.file_path ||
+        images?.backdrops[0]?.file_path ||
+        '',
     };
   }
 
@@ -122,7 +143,7 @@ export class TmdbMovieProvider implements MovieProvider {
           studios:
             detailsResult.production_companies?.map((c) => ({
               name: c.name!,
-              logoPath: c.logo_path ? this.tmdbBaseImageUrl + c.logo_path : '',
+              logoPath: c.logo_path ? c.logo_path : '',
               providers: {
                 tmdb: {
                   id: c.id!,
@@ -135,9 +156,7 @@ export class TmdbMovieProvider implements MovieProvider {
                 .filter((c) => c.job === 'Executive Producer')
                 .map((c) => ({
                   name: c.name!,
-                  thumbnail: c.profile_path
-                    ? this.tmdbBaseImageUrl + c.profile_path
-                    : '',
+                  thumbnail: c.profile_path ? c.profile_path : '',
                   providers: {
                     tmdb: {
                       id: c.id!,
@@ -149,9 +168,7 @@ export class TmdbMovieProvider implements MovieProvider {
                 .filter((c) => c.job === 'Producer')
                 .map((c) => ({
                   name: c.name!,
-                  thumbnail: c.profile_path
-                    ? this.tmdbBaseImageUrl + c.profile_path
-                    : '',
+                  thumbnail: c.profile_path ? c.profile_path : '',
                   providers: {
                     tmdb: {
                       id: c.id!,
@@ -163,9 +180,7 @@ export class TmdbMovieProvider implements MovieProvider {
                 .filter((c) => c.job === 'Director')
                 .map((c) => ({
                   name: c.name!,
-                  thumbnail: c.profile_path
-                    ? this.tmdbBaseImageUrl + c.profile_path
-                    : '',
+                  thumbnail: c.profile_path ? c.profile_path : '',
                   providers: {
                     tmdb: {
                       id: c.id!,
@@ -177,9 +192,7 @@ export class TmdbMovieProvider implements MovieProvider {
                 .filter((c) => c.job === 'Author')
                 .map((c) => ({
                   name: c.name!,
-                  thumbnail: c.profile_path
-                    ? this.tmdbBaseImageUrl + c.profile_path
-                    : '',
+                  thumbnail: c.profile_path ? c.profile_path : '',
                   providers: {
                     tmdb: {
                       id: c.id!,
@@ -191,9 +204,7 @@ export class TmdbMovieProvider implements MovieProvider {
                 .filter((c) => c.job === 'Writer')
                 .map((c) => ({
                   name: c.name!,
-                  thumbnail: c.profile_path
-                    ? this.tmdbBaseImageUrl + c.profile_path
-                    : '',
+                  thumbnail: c.profile_path ? c.profile_path : '',
                   providers: {
                     tmdb: {
                       id: c.id!,
@@ -204,9 +215,7 @@ export class TmdbMovieProvider implements MovieProvider {
               detailsResult.credits?.cast.map((c) => ({
                 name: c.name!,
                 character: c.character!,
-                thumbnail: c.profile_path
-                  ? this.tmdbBaseImageUrl + c.profile_path
-                  : '',
+                thumbnail: c.profile_path ? c.profile_path : '',
                 providers: {
                   tmdb: {
                     id: c.id!,
@@ -246,9 +255,7 @@ export class TmdbMovieProvider implements MovieProvider {
           collections,
           similars: detailsResult.similar?.results.map((m) => ({
             title: m.title!,
-            posterUrl: m.poster_path
-              ? this.tmdbBaseImageUrl + m.poster_path
-              : '',
+            posterUrl: m.poster_path ? m.poster_path : '',
             providers: {
               tmdb: {
                 id: m.id!,
@@ -257,9 +264,7 @@ export class TmdbMovieProvider implements MovieProvider {
           })),
           recommendations: detailsResult.recommendations?.results.map((m) => ({
             title: m.title!,
-            posterUrl: m.poster_path
-              ? this.tmdbBaseImageUrl + m.poster_path
-              : '',
+            posterUrl: m.poster_path ? m.poster_path : '',
             providers: {
               tmdb: {
                 id: m.id!,
@@ -314,9 +319,7 @@ export class TmdbMovieProvider implements MovieProvider {
             movies:
               collectionResult.parts?.map((m) => ({
                 name: m.title!,
-                posterUrl: m.poster_path
-                  ? this.tmdbBaseImageUrl + m.poster_path
-                  : '',
+                posterUrl: m.poster_path ? m.poster_path : '',
                 providers: {
                   tmdb: {
                     id: m.id!,
@@ -340,6 +343,36 @@ export class TmdbMovieProvider implements MovieProvider {
       }
       return Err(
         new InternalServerErrorException('Failed to fetch collection details'),
+      );
+    }
+  }
+
+  /**
+   * Retrieves the trending movies from the TMDB provider.
+   * @returns A promise that resolves to the trending movies.
+   */
+  async getTrending(): Promise<MovieTrendingReponse> {
+    try {
+      const results = await this.cache.wrap('tmdb.movie.trending', async () => {
+        const data = await this.client.default.trendingMovies({
+          timeWindow: 'week',
+        });
+        return (
+          data.results
+            ?.filter((movie) => is.truthy(movie.id))
+            ?.map((movie) => movie.id!) || []
+        );
+      });
+      return Ok(results);
+    } catch (error) {
+      this.logger.error(error, 'Failed to fetch trending movies');
+      if (error instanceof ApiError) {
+        if (error.status === 404) {
+          return Err(new NotFoundException('Trending movies not found'));
+        }
+      }
+      return Err(
+        new InternalServerErrorException('Failed to fetch trending movies'),
       );
     }
   }

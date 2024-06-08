@@ -9,12 +9,37 @@ export type ShowRolesProps = {
     thumbnail: string;
     providers: { tmdb: number };
   }[];
-  executiveProducers?: { name: string; thumbnail: string }[];
-  producers?: { name: string; thumbnail: string }[];
-  directors?: { name: string; thumbnail: string }[];
-  authors?: { name: string; thumbnail: string }[];
-  writers?: { name: string; thumbnail: string }[];
-  actors?: { name: string; character: string; thumbnail: string }[];
+  executiveProducers?: {
+    name: string;
+    thumbnail: string;
+    providers: { tmdb: number };
+  }[];
+  producers?: {
+    name: string;
+    thumbnail: string;
+    providers: { tmdb: number };
+  }[];
+  directors?: {
+    name: string;
+    thumbnail: string;
+    providers: { tmdb: number };
+  }[];
+  authors?: {
+    name: string;
+    thumbnail: string;
+    providers: { tmdb: number };
+  }[];
+  writers?: {
+    name: string;
+    thumbnail: string;
+    providers: { tmdb: number };
+  }[];
+  actors?: {
+    name: string;
+    character: string;
+    thumbnail: string;
+    providers: { tmdb: number };
+  }[];
 };
 
 /**

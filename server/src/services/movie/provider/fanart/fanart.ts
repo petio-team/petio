@@ -7,19 +7,19 @@ import {
 } from '@/infrastructure/exceptions/exceptions';
 import { ApiError, FanartTVAPI } from '@/infrastructure/fanart/client';
 import is from '@/infrastructure/utils/is';
-import { CacheService } from '@/services/cache/cache';
+import { CacheProvider } from '@/services/cache/cache-provider';
 import {
   MovieArtworkProvider,
   MovieProviderArtworkImagesResponse,
 } from '@/services/movie/provider/provider';
 
 @Service()
-export class FanartMovieArtworkProvider implements MovieArtworkProvider {
+export class FanartMovieProvider implements MovieArtworkProvider {
   private defaultCacheTTL = 86400000; // 1 day
 
   constructor(
     private readonly client: FanartTVAPI,
-    private readonly cache: CacheService,
+    private readonly cache: CacheProvider,
   ) {}
 
   /**

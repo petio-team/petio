@@ -3,15 +3,15 @@ import { None, Option, Some } from 'oxide.ts';
 import pino from 'pino';
 
 import { Logger } from '@/infrastructure/logger/logger';
-import { ApiError } from '@/infrastructure/tmdb/client';
 import { toQueryString } from '@/infrastructure/utils/object-to-query-string';
 import { MovieEntity } from '@/resources/movie/entity';
 import { MovieRepository } from '@/resources/movie/repository';
-import { CacheService } from '@/services/cache/cache';
+import { CacheProvider } from '@/services/cache/cache-provider';
 import {
   MovieArtworkProvider,
   MovieProvider,
   MovieRatingProvider,
+  MovieTrendingProvider,
 } from '@/services/movie/provider/provider';
 import { MovieLookupOptions } from '@/services/movie/types';
 
@@ -30,11 +30,12 @@ export class MovieService {
 
   constructor(
     logger: Logger,
+    private cacheProvider: CacheProvider,
     private movieRepository: MovieRepository,
     private movieProvider: MovieProvider,
     private artworkProvider: MovieArtworkProvider,
     private ratingProvider: MovieRatingProvider,
-    private cache: CacheService,
+    private trendingProvider: MovieTrendingProvider,
   ) {
     this.logger = logger.child({ module: 'services.movie' });
   }
@@ -53,7 +54,7 @@ export class MovieService {
       options && Object.keys(options).length ? toQueryString(options) : '';
     const cacheName = `movie.${id}${optionsAsString}`;
     try {
-      const result = await this.cache.wrap(
+      const result = await this.cacheProvider.wrap(
         cacheName,
         async () => {
           const [dbResult, detailsResult, artworkResult, ratingProvider] =
@@ -81,7 +82,8 @@ export class MovieService {
             ...details,
             artwork: {
               ...details.artwork,
-              ...artwork,
+              logo: details.artwork.logo,
+              thumbnail: artwork?.thumbnail || details.artwork.thumbnail,
             },
             rating: {
               ...details.rating,
@@ -99,23 +101,53 @@ export class MovieService {
         },
         this.defaultCacheTTL,
       );
-      return result ? Some(MovieEntity.create(result)) : None;
-    } catch (error) {
-      if (error instanceof ApiError) {
-        if (error.status === 404) {
-          this.logger.debug(
-            { movieId: id },
-            'Failed to lookup movie: movie not found',
-          );
-          return None;
-        }
+      if (!result) {
+        this.logger.debug(
+          { movieId: id },
+          'Failed to lookup movie: movie not found',
+        );
+        return None;
       }
+      return Some(MovieEntity.create(result));
+    } catch (error) {
       this.logger.error(
         { movieId: id, error },
         'Failed to lookup movie: an error occurred',
       );
       return None;
     }
+  }
+
+  /**
+   * Retrieves the trending movies.
+   * @returns A Promise that resolves to an array of MovieEntity objects representing the trending movies.
+   */
+  async getTrending() {
+    const results = await this.cacheProvider.wrap(
+      `movie.trending`,
+      async () => {
+        const trendingResults = await this.trendingProvider.getTrending();
+        if (trendingResults.isErr()) {
+          return [];
+        }
+        const trending = trendingResults.unwrap();
+        const data = await Promise.all(
+          trending.map((movie) =>
+            this.getMovie(movie, {
+              withArtwork: true,
+              withRating: true,
+              withServer: true,
+            }),
+          ),
+        );
+        return data
+          .filter((m) => m.isSome())
+          .map((m) => m.unwrap())
+          .map((m) => m.getProps());
+      },
+      this.defaultCacheTTL,
+    );
+    return results.map((m) => MovieEntity.create(m));
   }
 
   /**

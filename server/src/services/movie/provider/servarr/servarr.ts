@@ -9,7 +9,7 @@ import {
   ApiError,
   ServarrRadarrAPIClient,
 } from '@/infrastructure/servarr/radarr-api/client';
-import { CacheService } from '@/services/cache/cache';
+import { CacheProvider } from '@/services/cache/cache-provider';
 import {
   MovieProviderRatingResponse,
   MovieRatingProvider,
@@ -25,7 +25,7 @@ export class ServarrMovieRatingProvider implements MovieRatingProvider {
 
   constructor(
     private client: ServarrRadarrAPIClient,
-    private cache: CacheService,
+    private cache: CacheProvider,
   ) {}
 
   /**

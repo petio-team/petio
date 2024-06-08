@@ -9,7 +9,7 @@ import {
 import { ApiError, FanartTVAPI } from '@/infrastructure/fanart/client';
 import { Logger } from '@/infrastructure/logger/logger';
 import is from '@/infrastructure/utils/is';
-import { CacheService } from '@/services/cache/cache';
+import { CacheProvider } from '@/services/cache/cache-provider';
 import {
   ShowArtworkImages,
   ShowArtworkProvider,
@@ -29,7 +29,7 @@ export class FanartShowProvider implements ShowArtworkProvider {
 
   constructor(
     private readonly client: FanartTVAPI,
-    private readonly cache: CacheService,
+    private readonly cache: CacheProvider,
     logger: Logger,
   ) {
     this.logger = logger.child({ module: 'services.show.provider.fanart' });

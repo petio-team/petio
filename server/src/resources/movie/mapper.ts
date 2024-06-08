@@ -258,7 +258,7 @@ export class MovieMapper
                 resolution: resource.resolution,
               })) || [],
           }
-        : undefined,
+        : false,
       available_resolutions: copy.resources?.map(
         (resource) => resource.resolution,
       ),
@@ -281,32 +281,38 @@ export class MovieMapper
       credits: {
         cast:
           copy.roles?.actors.map((actor) => ({
+            id: actor.providers?.tmdb?.id || 0,
             character: actor.character,
             name: actor.name,
             profile_path: actor.thumbnail || '',
           })) || [],
         crew: [
           ...(copy.roles?.directors.map((director) => ({
+            id: director.providers?.tmdb?.id || 0,
             job: 'Director',
             name: director.name,
             profile_path: director.thumbnail || '',
           })) || []),
           ...(copy.roles?.authors.map((author) => ({
+            id: author.providers?.tmdb?.id || 0,
             job: 'Author',
             name: author.name,
             profile_path: author.thumbnail || '',
           })) || []),
           ...(copy.roles?.writers.map((writer) => ({
+            id: writer.providers?.tmdb?.id || 0,
             job: 'Writer',
             name: writer.name,
             profile_path: writer.thumbnail || '',
           })) || []),
           ...(copy.roles?.producers.map((producer) => ({
+            id: producer.providers?.tmdb?.id || 0,
             job: 'Producer',
             name: producer.name,
             profile_path: producer.thumbnail || '',
           })) || []),
           ...(copy.roles?.executiveProducers.map((producer) => ({
+            id: producer.providers?.tmdb?.id || 0,
             job: 'Executive Producer',
             name: producer.name,
             profile_path: producer.thumbnail || '',

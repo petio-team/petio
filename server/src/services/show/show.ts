@@ -7,10 +7,11 @@ import { toQueryString } from '@/infrastructure/utils/object-to-query-string';
 import { ShowEntity } from '@/resources/show/entity';
 import { ShowRepository } from '@/resources/show/repository';
 import { ShowProps } from '@/resources/show/types';
-import { CacheService } from '@/services/cache/cache';
+import { CacheProvider } from '@/services/cache/cache-provider';
 import {
   ShowArtworkProvider,
   ShowProvider,
+  ShowTrendingProvider,
 } from '@/services/show/provider/provider';
 import { GetShowOptions } from '@/services/show/types';
 
@@ -30,9 +31,10 @@ export class ShowService {
   constructor(
     logger: Logger,
     private showRepository: ShowRepository,
-    private cacheService: CacheService,
+    private cacheProvider: CacheProvider,
     private showProvider: ShowProvider,
     private showArtworkProvider: ShowArtworkProvider,
+    private showTrendingProvider: ShowTrendingProvider,
   ) {
     this.logger = logger.child({ module: 'services.show' });
   }
@@ -52,7 +54,7 @@ export class ShowService {
       options && Object.keys(options).length ? toQueryString(options) : '';
     const cacheName = `show.${id}${optionsAsString}`;
     try {
-      const result = await this.cacheService.wrap<ShowProps | undefined>(
+      const result = await this.cacheProvider.wrap<ShowProps | undefined>(
         cacheName,
         async () => {
           const [dbResult, detailsResult] = await Promise.all([
@@ -65,6 +67,7 @@ export class ShowService {
             return undefined;
           }
           const details = detailsResult.unwrap();
+
           const artworkResult =
             options?.withArtwork && details.providers.tvdb
               ? await this.showArtworkProvider.getArtworkImages(
@@ -80,7 +83,6 @@ export class ShowService {
               ...details.artwork,
               logo: artwork?.logo || details.artwork.logo,
               thumbnail: artwork?.thumbnail || details.artwork.thumbnail,
-              poster: artwork?.poster || details.artwork.poster,
             },
             seasons: details.seasons.map((season) => ({
               ...season,
@@ -131,5 +133,35 @@ export class ShowService {
     return showResult
       .filter((show) => show.isSome())
       .map((show) => show.unwrap());
+  }
+
+  /**
+   * Retrieves the trending shows.
+   * @returns A Promise that resolves to an Option of ShowEntity array.
+   */
+  async getTrending(): Promise<ShowEntity[]> {
+    try {
+      const trending = await this.cacheProvider.wrap<ShowProps[]>(
+        'show.trending',
+        async () => {
+          const ids = await this.showTrendingProvider.getTrending();
+          const data = await Promise.all(
+            ids
+              .unwrap()
+              .map((id) =>
+                this.getShow(id, { withArtwork: true, withServer: true }),
+              ),
+          );
+          return data
+            .filter((show) => show.isSome())
+            .map((show) => show.unwrap().getProps());
+        },
+        this.defaultCacheTTL,
+      );
+      return trending.map((props) => ShowEntity.create(props));
+    } catch (error) {
+      this.logger.error({ error }, 'Error fetching trending shows');
+      return [];
+    }
   }
 }

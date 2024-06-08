@@ -42,13 +42,15 @@ export type ShowResponseProps = {
     title: string;
     poster_path: string;
   }>;
-  on_server?: {
-    serverKey: string;
-    versions: Array<{
-      ratingKey: number;
-      resolution: string;
-    }>;
-  };
+  on_server?:
+    | {
+        serverKey: string;
+        versions: Array<{
+          ratingKey: number;
+          resolution: string;
+        }>;
+      }
+    | boolean;
   imdb_data?: {
     rating: {
       ratingValue: number;
@@ -68,11 +70,13 @@ export type ShowResponseProps = {
   }>;
   credits?: {
     cast: Array<{
+      id: number;
       character: string;
       name: string;
       profile_path: string;
     }>;
     crew: Array<{
+      id: number;
       job: string;
       name: string;
       profile_path: string;

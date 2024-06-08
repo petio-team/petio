@@ -8,11 +8,12 @@ import {
 import { ApiError, TheMovieDatabaseClient } from '@/infrastructure/tmdb/client';
 import is from '@/infrastructure/utils/is';
 import { ShowProps, ShowSeasonProps } from '@/resources/show/types';
-import { CacheService } from '@/services/cache/cache';
+import { CacheProvider } from '@/services/cache/cache-provider';
 import {
   ShowArtworkImages,
   ShowProvider,
   ShowProviderDetailsResponse,
+  ShowProviderTrendingResponse,
   ShowSeasonProviderDetailsResponse,
 } from '@/services/show/provider/provider';
 import { ShowDetailsProviderResponse } from '@/services/show/provider/tmdb/types';
@@ -28,11 +29,11 @@ export class TmdbShowProvider implements ShowProvider {
   /**
    * The base URL for retrieving original movie images from TMDB.
    */
-  private tmdbBaseImageUrl = 'https://image.tmdb.org/t/p/original';
+  // private tmdbBaseImageUrl = 'https://image.tmdb.org/t/p/original';
 
   constructor(
     private readonly client: TheMovieDatabaseClient,
-    private readonly cache: CacheService,
+    private readonly cache: CacheProvider,
   ) {}
 
   /**
@@ -44,28 +45,38 @@ export class TmdbShowProvider implements ShowProvider {
     images: ShowDetailsProviderResponse['images'],
   ): ShowArtworkImages {
     return {
-      logo: images?.logos
-        ?.filter(
-          (logo) =>
-            is.truthy(logo.file_path) &&
-            is.truthy(logo.iso_639_1) &&
-            logo.iso_639_1 === 'en',
-        )
-        .map((logo) => ({
-          file_path: this.tmdbBaseImageUrl + logo.file_path,
-        }))[0].file_path,
-      poster: images?.posters
-        ?.filter(
-          (poster) => is.truthy(poster.file_path) && poster.iso_639_1 === 'en',
-        )
-        .map((logo) => ({
-          file_path: this.tmdbBaseImageUrl + logo.file_path,
-        }))[0].file_path,
-      background: images?.backdrops
-        ?.filter((bg) => is.truthy(bg.file_path) && bg.iso_639_1 === 'en')
-        .map((logo) => ({
-          file_path: this.tmdbBaseImageUrl + logo.file_path,
-        }))[0].file_path,
+      logo:
+        images?.logos
+          ?.filter(
+            (logo) =>
+              is.truthy(logo.file_path) &&
+              is.truthy(logo.iso_639_1) &&
+              logo.iso_639_1 === 'en',
+          )
+          .map((logo) => ({
+            file_path: logo.file_path,
+          }))[0]?.file_path ||
+        images?.logos?.[0]?.file_path ||
+        '',
+      poster:
+        images?.posters
+          ?.filter(
+            (poster) =>
+              is.truthy(poster.file_path) && poster.iso_639_1 === 'en',
+          )
+          .map((logo) => ({
+            file_path: logo.file_path,
+          }))[0]?.file_path ||
+        images?.posters?.[0]?.file_path ||
+        '',
+      background:
+        images?.backdrops
+          ?.filter((bg) => is.truthy(bg.file_path) && bg.iso_639_1 === 'en')
+          .map((logo) => ({
+            file_path: logo.file_path,
+          }))[0]?.file_path ||
+        images?.backdrops?.[0]?.file_path ||
+        '',
     };
   }
 
@@ -94,7 +105,7 @@ export class TmdbShowProvider implements ShowProvider {
             index: seasonDetails.season_number!,
             rating: seasonDetails.vote_average,
             description: seasonDetails.overview,
-            posterPath: this.tmdbBaseImageUrl + seasonDetails.poster_path,
+            posterPath: seasonDetails.poster_path,
             episodes:
               seasonDetails.episodes?.map((episode) => ({
                 index: episode.episode_number!,
@@ -103,7 +114,7 @@ export class TmdbShowProvider implements ShowProvider {
                 airDate: episode.air_date,
                 rating: episode.vote_average,
                 runtime: episode.runtime,
-                stillPath: this.tmdbBaseImageUrl + episode.still_path,
+                stillPath: episode.still_path,
               })) || [],
           };
         },
@@ -197,7 +208,7 @@ export class TmdbShowProvider implements ShowProvider {
                 )
                 .map((network) => ({
                   name: network.name!,
-                  logoPath: this.tmdbBaseImageUrl + network.logo_path,
+                  logoPath: network.logo_path,
                   provider: {
                     tmdb: network.id!,
                   },
@@ -208,11 +219,14 @@ export class TmdbShowProvider implements ShowProvider {
             roles: {
               creators: show.created_by
                 ?.filter(
-                  (creator) => is.truthy(creator.id) && is.truthy(creator.name),
+                  (creator) =>
+                    is.truthy(creator.id) &&
+                    is.truthy(creator.name) &&
+                    is.truthy(creator.profile_path),
                 )
                 .map((creator) => ({
                   name: creator.name!,
-                  thumbnail: this.tmdbBaseImageUrl + creator.profile_path,
+                  thumbnail: creator.profile_path!,
                   providers: {
                     tmdb: creator.id!,
                   },
@@ -222,6 +236,7 @@ export class TmdbShowProvider implements ShowProvider {
                   (crew) =>
                     is.truthy(crew.id) &&
                     is.truthy(crew.name) &&
+                    is.truthy(crew.profile_path) &&
                     is.truthy(crew.jobs) &&
                     crew.department === 'Production' &&
                     is.truthy(
@@ -230,7 +245,7 @@ export class TmdbShowProvider implements ShowProvider {
                 )
                 .map((producer) => ({
                   name: producer.name!,
-                  thumbnail: this.tmdbBaseImageUrl + producer.profile_path,
+                  thumbnail: (producer.profile_path as any)!,
                   providers: {
                     tmdb: producer.id!,
                   },
@@ -240,11 +255,12 @@ export class TmdbShowProvider implements ShowProvider {
                   (crew) =>
                     is.truthy(crew.id) &&
                     is.truthy(crew.name) &&
+                    is.truthy(crew.profile_path) &&
                     crew.department === 'Production',
                 )
                 .map((producer) => ({
                   name: producer.name!,
-                  thumbnail: this.tmdbBaseImageUrl + producer.profile_path,
+                  thumbnail: (producer.profile_path as any)!,
                   providers: {
                     tmdb: producer.id!,
                   },
@@ -254,13 +270,14 @@ export class TmdbShowProvider implements ShowProvider {
                   (crew) =>
                     is.truthy(crew.id) &&
                     is.truthy(crew.name) &&
+                    is.truthy(crew.profile_path) &&
                     is.truthy(crew.jobs) &&
                     crew.department === 'Directing' &&
                     is.truthy(crew.jobs.find((job) => job.job === 'Director')),
                 )
                 .map((director) => ({
                   name: director.name!,
-                  thumbnail: this.tmdbBaseImageUrl + director.profile_path,
+                  thumbnail: (director.profile_path as any)!,
                   providers: {
                     tmdb: director.id!,
                   },
@@ -270,11 +287,12 @@ export class TmdbShowProvider implements ShowProvider {
                   (crew) =>
                     is.truthy(crew.id) &&
                     is.truthy(crew.name) &&
+                    is.truthy(crew.profile_path) &&
                     crew.department === 'Writing',
                 )
                 .map((writer) => ({
                   name: writer.name!,
-                  thumbnail: this.tmdbBaseImageUrl + writer.profile_path,
+                  thumbnail: (writer.profile_path as any)!,
                   providers: {
                     tmdb: writer.id!,
                   },
@@ -284,13 +302,14 @@ export class TmdbShowProvider implements ShowProvider {
                   (cast) =>
                     is.truthy(cast.id) &&
                     is.truthy(cast.name) &&
+                    is.truthy(cast.profile_path) &&
                     is.truthy(cast.roles) &&
                     cast.roles.length > 0,
                 )
                 .map((actor) => ({
                   name: actor.name!,
                   character: actor.roles![0].character!,
-                  thumbnail: this.tmdbBaseImageUrl + actor.profile_path,
+                  thumbnail: actor.profile_path!,
                   providers: {
                     tmdb: actor.id!,
                   },
@@ -317,7 +336,7 @@ export class TmdbShowProvider implements ShowProvider {
               )
               .map((recommendation) => ({
                 title: recommendation.name!,
-                posterUrl: this.tmdbBaseImageUrl + recommendation.poster_path!,
+                posterUrl: recommendation.poster_path!,
                 providers: {
                   tmdb: recommendation.id!,
                 },
@@ -331,7 +350,7 @@ export class TmdbShowProvider implements ShowProvider {
               )
               .map((similar) => ({
                 title: similar.name!,
-                posterUrl: this.tmdbBaseImageUrl + similar.poster_path!,
+                posterUrl: similar.poster_path!,
                 providers: {
                   tmdb: similar.id!,
                 },
@@ -370,6 +389,34 @@ export class TmdbShowProvider implements ShowProvider {
       }
       return Err(
         new InternalServerErrorException('Failed to fetch show details'),
+      );
+    }
+  }
+
+  /**
+   * Retrieves the trending TV shows from the TMDB API.
+   * @returns A Promise that resolves to a ShowProviderTrendingResponse.
+   */
+  async getTrending(): Promise<ShowProviderTrendingResponse> {
+    try {
+      const trending = await this.cache.wrap<number[]>(
+        'tmdb.show.trending',
+        async () => {
+          const results = await this.client.default.trendingTv({
+            timeWindow: 'week',
+          });
+          return (
+            results.results
+              ?.filter((show) => is.truthy(show.id))
+              ?.map((show) => show.id!) || []
+          );
+        },
+        this.defaultCacheTTL,
+      );
+      return Ok(trending);
+    } catch (error) {
+      return Err(
+        new InternalServerErrorException('Failed to fetch trending shows'),
       );
     }
   }

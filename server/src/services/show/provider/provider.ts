@@ -34,3 +34,8 @@ export abstract class ShowArtworkProvider {
     id: number,
   ): Promise<ShowProviderArtworkImagesResponse>;
 }
+
+export type ShowProviderTrendingResponse = Result<number[], ExceptionBase>;
+export abstract class ShowTrendingProvider {
+  abstract getTrending(): Promise<ShowProviderTrendingResponse>;
+}

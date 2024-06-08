@@ -33,3 +33,8 @@ export type MovieProviderRatingResponse = Result<MovieRating, ExceptionBase>;
 export abstract class MovieRatingProvider {
   abstract getRatings(id: number): Promise<MovieProviderRatingResponse>;
 }
+
+export type MovieTrendingReponse = Result<number[], ExceptionBase>;
+export abstract class MovieTrendingProvider {
+  abstract getTrending(): Promise<MovieTrendingReponse>;
+}

@@ -168,32 +168,38 @@ export class ShowMapper
       credits: {
         cast:
           copy.roles?.actors?.map((actor) => ({
+            id: actor.providers.tmdb || 0,
             name: actor.name,
             character: actor.character,
             profile_path: actor.thumbnail,
           })) || [],
         crew: [
           ...(copy.roles?.directors?.map((director) => ({
+            id: director.providers.tmdb || 0,
             name: director.name,
             job: 'Director',
             profile_path: director.thumbnail,
           })) || []),
           ...(copy.roles?.writers?.map((writer) => ({
+            id: writer.providers.tmdb || 0,
             name: writer.name,
             job: 'Writer',
             profile_path: writer.thumbnail,
           })) || []),
           ...(copy.roles?.authors?.map((author) => ({
+            id: author.providers.tmdb || 0,
             name: author.name,
             job: 'Author',
             profile_path: author.thumbnail,
           })) || []),
           ...(copy.roles?.producers?.map((producer) => ({
+            id: producer.providers.tmdb || 0,
             name: producer.name,
             job: 'Producer',
             profile_path: producer.thumbnail,
           })) || []),
           ...(copy.roles?.executiveProducers?.map((executiveProducer) => ({
+            id: executiveProducer.providers.tmdb || 0,
             name: executiveProducer.name,
             job: 'Executive Producer',
             profile_path: executiveProducer.thumbnail,
@@ -229,10 +235,12 @@ export class ShowMapper
           title: recommendation.title,
           poster_path: recommendation.posterUrl,
         })) || [],
-      on_server: {
-        serverKey: '',
-        versions: [],
-      },
+      on_server: copy.providers.plex
+        ? {
+            serverKey: copy.providers.plex?.toString(),
+            versions: [],
+          }
+        : false,
     };
   }
 }

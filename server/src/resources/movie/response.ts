@@ -33,13 +33,15 @@ export type MovieResponseProps = {
     title: string;
     poster_path: string;
   }>;
-  on_server?: {
-    serverKey: string;
-    versions: Array<{
-      ratingKey: number;
-      resolution: string;
-    }>;
-  };
+  on_server?:
+    | {
+        serverKey: string;
+        versions: Array<{
+          ratingKey: number;
+          resolution: string;
+        }>;
+      }
+    | boolean;
   available_resolutions?: string[];
   imdb_data?: {
     rating: {
