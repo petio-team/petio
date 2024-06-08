@@ -189,6 +189,7 @@ function Tv({
   }
 
   const credits = filterCrew();
+  const logo = tvData.logo?.includes(`https://assets.fanart.tv`) ? tvData.logo : `https://image.tmdb.org/t/p/original/${tvData.logo}`;
 
   return (
     <div className={styles.wrap} key={`tv_single_${pid}`}>
@@ -216,7 +217,7 @@ function Tv({
               <div className={styles.overview__logo}>
                 {tvData && tvData.logo ? (
                   <LazyLoadImage
-                    src={tvData.logo}
+                    src={logo}
                     alt={tvData.name}
                     effect="opacity"
                     visibleByDefault={true}

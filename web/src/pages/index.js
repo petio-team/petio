@@ -104,7 +104,7 @@ function Home({
                 >
                   {redux_featured.logo ? (
                     <LazyLoadImage
-                      src={redux_featured.logo}
+                      src={`https://image.tmdb.org/t/p/original${redux_featured.logo}`}
                       alt={redux_featured.title}
                       effect="opacity"
                       visibleByDefault={true}

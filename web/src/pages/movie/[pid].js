@@ -212,6 +212,8 @@ function Movie({
   }
 
   const credits = filterCrew();
+  const logo = movieData.logo?.includes(`https://assets.fanart.tv`) ? movieData.logo : `https://image.tmdb.org/t/p/original/${movieData.logo}`;
+
   return (
     <div className={styles.wrap} key={`movie_single_${pid}`}>
       <Meta title={movieData ? movieData.title : ''} />
@@ -238,7 +240,7 @@ function Movie({
               <div className={styles.overview__logo}>
                 {movieData && movieData.logo ? (
                   <LazyLoadImage
-                    src={movieData.logo}
+                    src={logo}
                     alt={movieData.title}
                     effect="opacity"
                     visibleByDefault={true}

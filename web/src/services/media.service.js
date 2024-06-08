@@ -68,8 +68,8 @@ async function getMovie(id, minified = false, noextras = false) {
       movies: { [data.id]: { ...data, ready: true } },
     });
     if (minified || noextras) return;
-    if (data.recommendations) batchLookup(data.recommendations, 'movie');
-    if (data.collection) batchLookup(data.collection, 'movie');
+    if (data.recommendations) batchLookup(data.recommendations.map((r) => r.id), 'movie');
+    if (data.collection) batchLookup(data.collection.map((r) => r.id), 'movie');
     return data;
   } catch (e) {
     updateStore({
@@ -90,7 +90,7 @@ async function getTv(id, minified = false, noextras = false) {
       shows: { [data.id]: { ...data, ready: true } },
     });
     if (minified || noextras) return;
-    batchLookup(data.recommendations, 'tv');
+    batchLookup(data.recommendations.map((r) => r.id), 'tv');
     return data;
   } catch (e) {
     updateStore({
@@ -372,7 +372,7 @@ export async function search(term) {
 
 async function batchLookup(ids, type = 'movie', minified = true) {
   if (ids && Array.isArray(ids) && ids.length > 0) {
-    ids = ids.map((id) => parseInt(id.id, 10));
+    ids = ids.map((id) => parseInt(id, 10));
     try {
       const data = await post(`/batch/${type}`, {
         ids: ids,
