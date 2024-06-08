@@ -7,6 +7,7 @@ export enum JobCronName {
   DISCOVERY_SCAN = 'DISCOVERY_SCAN',
   QUOTA_RESET = 'QUOTA_RESET',
   RESOURCE_CACHE = 'RESOURCE_CACHE',
+  CLEAR_CACHE = 'CLEAR_CACHE',
 }
 
 export type CronOptions = {

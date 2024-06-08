@@ -10,6 +10,7 @@ import {
 } from '@/infrastructure/container/container';
 import { Logger } from '@/infrastructure/logger/logger';
 import { Jobber } from '@/services/cron/job';
+import { ClearCacheJob } from '@/services/cron/jobs/clear-cache';
 import { ContentScanJob } from '@/services/cron/jobs/content-scan';
 import { LibraryScanJob } from '@/services/cron/jobs/library-scan';
 import { QuotaResetJob } from '@/services/cron/jobs/quota-reset';
@@ -41,6 +42,10 @@ export default (builder: ContainerBuilder) => {
     .asSingleton()
     .addTag(ContainerTags.CRON_JOB);
   builder
+    .registerAndUse(ClearCacheJob)
+    .asSingleton()
+    .addTag(ContainerTags.CRON_JOB);
+  builder
     .register(AgendaCronService)
     .useFactory(
       (c) =>
@@ -60,6 +65,10 @@ export default (builder: ContainerBuilder) => {
     .asSingleton();
 };
 
+/**
+ * Runs the cron jobs by registering and bootstrapping them.
+ * @returns A promise that resolves when the cron jobs are successfully registered and bootstrapped.
+ */
 export async function runCron() {
   const cronService = getFromContainer<AgendaCronService>(AgendaCronService);
   const tags = findTaggedServiceIdentifiers<Jobber>(ContainerTags.CRON_JOB);
