@@ -4,7 +4,7 @@ import pino from 'pino';
 
 import { Logger } from '@/infrastructure/logger/logger';
 import { UserRepository } from '@/resources/user/repository';
-import { CacheService } from '@/services/cache/cache';
+import { CacheProvider } from '@/services/cache/cache-provider';
 import build from '@/services/discovery/build';
 import display, { DiscoveryResult } from '@/services/discovery/display';
 
@@ -17,7 +17,7 @@ export class DiscoveryService {
 
   constructor(
     logger: Logger,
-    private cacheService: CacheService,
+    private cacheProvider: CacheProvider,
     private userRepo: UserRepository,
   ) {
     this.logger = logger.child({ module: 'services.discovery' });
@@ -67,12 +67,12 @@ export class DiscoveryService {
           display(userId, 'show'),
         ]);
         await Bluebird.all([
-          this.cacheService.set(
+          this.cacheProvider.set(
             `discovery.user.movie.${userId}`,
             displayMovies,
             60 * 60 * 24 * 30,
           ),
-          this.cacheService.set(
+          this.cacheProvider.set(
             `discovery.user.show.${userId}`,
             displayShows,
             60 * 60 * 24 * 30,
@@ -97,9 +97,9 @@ export class DiscoveryService {
     }
     const user = userResult.unwrap();
     const userPlexId = user.altId ? user.altId : user.plexId;
-    const cachedData = await this.cacheService.get<DiscoveryResult | undefined>(
-      `discovery.user.movie.${userPlexId}`,
-    );
+    const cachedData = await this.cacheProvider.get<
+      DiscoveryResult | undefined
+    >(`discovery.user.movie.${userPlexId}`);
     if (cachedData) {
       return cachedData;
     }
@@ -118,9 +118,9 @@ export class DiscoveryService {
     }
     const user = userResult.unwrap();
     const userPlexId = user.altId ? user.altId : user.plexId;
-    const cachedData = await this.cacheService.get<DiscoveryResult | undefined>(
-      `discovery.user.show.${userPlexId}`,
-    );
+    const cachedData = await this.cacheProvider.get<
+      DiscoveryResult | undefined
+    >(`discovery.user.show.${userPlexId}`);
     if (cachedData) {
       return cachedData;
     }

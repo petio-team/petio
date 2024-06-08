@@ -10,7 +10,7 @@ import {
   TrendingTvResponse,
 } from '@/infrastructure/tmdb/client';
 import is from '@/infrastructure/utils/is';
-import { CacheService } from '@/services/cache/cache';
+import { CacheProvider } from '@/services/cache/cache-provider';
 
 import { getMovieDetails, getShowDetails } from './show';
 
@@ -147,11 +147,10 @@ async function trending() {
 export default trending;
 
 // Caching Layer
-
 async function getPerson() {
   let data = {};
   try {
-    const results = await getFromContainer(CacheService).wrap(
+    const results = await getFromContainer(CacheProvider).wrap(
       'trending_person',
       async () => {
         const people = await personData();
@@ -176,7 +175,7 @@ async function getPerson() {
 async function getMovies() {
   let data = {};
   try {
-    const results = await getFromContainer(CacheService).wrap(
+    const results = await getFromContainer(CacheProvider).wrap(
       'trending_movies',
       async () => {
         const movies = await moviesData();
@@ -199,7 +198,7 @@ async function getMovies() {
 async function getShows() {
   let data = {};
   try {
-    const results = await getFromContainer(CacheService).wrap(
+    const results = await getFromContainer(CacheProvider).wrap(
       'trending_shows',
       async () => {
         const shows = await showsData();

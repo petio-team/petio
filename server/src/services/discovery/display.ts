@@ -12,7 +12,7 @@ import { TheMovieDatabaseClient } from '@/infrastructure/tmdb/client';
 import is from '@/infrastructure/utils/is';
 import { DiscoveryRepository } from '@/resources/discovery/repository';
 import { MediaServerRepository } from '@/resources/media-server/repository';
-import { CacheService } from '@/services/cache/cache';
+import { CacheProvider } from '@/services/cache/cache-provider';
 import getHistory from '@/services/plex/history';
 import onServer from '@/services/plex/server';
 import getTop from '@/services/plex/top';
@@ -414,8 +414,9 @@ export default async (
 async function genreLookup(id: any, genre: any, type: string) {
   let data = false;
   try {
-    data = await getFromContainer(CacheService).wrap(`gl__${id}__${type}`, () =>
-      genreLookupData(id, genre, type),
+    data = await getFromContainer(CacheProvider).wrap(
+      `gl__${id}__${type}`,
+      () => genreLookupData(id, genre, type),
     );
   } catch (err) {
     logger.error(`Error getting genre data`, err);
@@ -426,7 +427,7 @@ async function genreLookup(id: any, genre: any, type: string) {
 async function actorLookup(match: { id: any }, type: string) {
   let data = false;
   try {
-    data = await getFromContainer(CacheService).wrap(
+    data = await getFromContainer(CacheProvider).wrap(
       `al__${match.id}__${type}`,
       () => actorLookupData(match, type),
     );

@@ -5,7 +5,7 @@ import { getFromContainer } from '@/infrastructure/container/container';
 import loggerMain from '@/infrastructure/logger/logger';
 import { GetSessionHistoryResponse, PlexClient } from '@/infrastructure/plex';
 import is from '@/infrastructure/utils/is';
-import { CacheService } from '@/services/cache/cache';
+import { CacheProvider } from '@/services/cache/cache-provider';
 import plexLookup from '@/services/plex/lookup';
 import { movieLookup } from '@/services/tmdb/movie';
 import { showLookup } from '@/services/tmdb/show';
@@ -15,7 +15,7 @@ const logger = loggerMain.child({ module: 'plex.history' });
 export default async (client: PlexClient, id, type) => {
   let data: any = false;
   try {
-    data = await getFromContainer(CacheService).wrap(
+    data = await getFromContainer(CacheProvider).wrap(
       `hist__${id}__${type}`,
       async () => {
         const history = await getHistory(client, id);

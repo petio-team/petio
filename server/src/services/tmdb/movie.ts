@@ -11,7 +11,7 @@ import {
   TheMovieDatabaseClient,
 } from '@/infrastructure/tmdb/client';
 import is from '@/infrastructure/utils/is';
-import { CacheService } from '@/services/cache/cache';
+import { CacheProvider } from '@/services/cache/cache-provider';
 import fanartLookup from '@/services/fanart';
 import { lookup } from '@/services/meta/imdb';
 import onServer from '@/services/plex/server';
@@ -175,7 +175,7 @@ export async function movieLookup(id, minified = false) {
 
 async function getMovieData(id: number) {
   try {
-    return await getFromContainer(CacheService).wrap(
+    return await getFromContainer(CacheProvider).wrap(
       `movie_data_${id}`,
       async () => tmdbData(id),
     );
@@ -188,7 +188,7 @@ async function getMovieData(id: number) {
 export async function getRecommendations(id: number, page = 1) {
   let data = false;
   try {
-    data = await getFromContainer(CacheService).wrap(
+    data = await getFromContainer(CacheProvider).wrap(
       `rec_${id}_${page}`,
       async () => recommendationData(id, page),
     );
@@ -201,7 +201,7 @@ export async function getRecommendations(id: number, page = 1) {
 export async function getSimilar(id: number, page = 1) {
   let data = false;
   try {
-    data = await getFromContainer(CacheService).wrap(
+    data = await getFromContainer(CacheProvider).wrap(
       `similar_${id}_${page}`,
       async () => similarData(id, page),
     );
@@ -214,7 +214,7 @@ export async function getSimilar(id: number, page = 1) {
 async function getReviews(id: number): Promise<any> {
   let data: any = false;
   try {
-    data = await getFromContainer(CacheService).wrap(`rev_${id}`, async () =>
+    data = await getFromContainer(CacheProvider).wrap(`rev_${id}`, async () =>
       reviewsData(id),
     );
   } catch (err) {
@@ -226,7 +226,7 @@ async function getReviews(id: number): Promise<any> {
 async function getCollection(id: number): Promise<any> {
   let data: any = false;
   try {
-    data = await getFromContainer(CacheService).wrap(`col_${id}`, async () =>
+    data = await getFromContainer(CacheProvider).wrap(`col_${id}`, async () =>
       getCollectionData(id),
     );
   } catch (err) {

@@ -4,7 +4,7 @@ import loggerMain from '@/infrastructure/logger/logger';
 import { CancelablePromise, PlexClient } from '@/infrastructure/plex';
 import is from '@/infrastructure/utils/is';
 import { MediaServerEntity } from '@/resources/media-server/entity';
-import { CacheService } from '@/services/cache/cache';
+import { CacheProvider } from '@/services/cache/cache-provider';
 import { getPlexClient } from '@/services/plex/client';
 import { movieDbLookup, showDbLookup } from '@/services/plex/lookup';
 import { movieLookup } from '@/services/tmdb/movie';
@@ -99,7 +99,7 @@ export const getTopWatched = (
 
 export default async (server: MediaServerEntity, type: 1 | 2) => {
   try {
-    return await getFromContainer(CacheService).wrap(
+    return await getFromContainer(CacheProvider).wrap(
       `popular__${type}`,
       async () => getTopData(server, type),
     );

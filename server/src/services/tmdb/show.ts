@@ -12,7 +12,7 @@ import {
   TvSeriesDetailsResponse,
   TvSeriesVideosResponse,
 } from '@/infrastructure/tmdb/client';
-import { CacheService } from '@/services/cache/cache';
+import { CacheProvider } from '@/services/cache/cache-provider';
 import fanartLookup from '@/services/fanart';
 import { lookup as imdb } from '@/services/meta/imdb';
 import onServer from '@/services/plex/server';
@@ -285,7 +285,7 @@ export const getMovieDetails = async (id: number) => {
 
 async function getShowData(id) {
   try {
-    return await getFromContainer(CacheService).wrap(id, async () =>
+    return await getFromContainer(CacheProvider).wrap(id, async () =>
       tmdbData(id),
     );
   } catch (err) {
@@ -296,7 +296,7 @@ async function getShowData(id) {
 
 async function externalId(id) {
   try {
-    return await getFromContainer(CacheService).wrap(`ext_${id}`, async () =>
+    return await getFromContainer(CacheProvider).wrap(`ext_${id}`, async () =>
       idLookup(id),
     );
   } catch (err) {
@@ -307,7 +307,7 @@ async function externalId(id) {
 
 export async function getRecommendations(id, page = 1) {
   try {
-    return await getFromContainer(CacheService).wrap(
+    return await getFromContainer(CacheProvider).wrap(
       `rec_${id}__${page}`,
       async () => recommendationData(id, page),
     );
@@ -319,7 +319,7 @@ export async function getRecommendations(id, page = 1) {
 
 export async function getSimilar(id, page = 1) {
   try {
-    return await getFromContainer(CacheService).wrap(
+    return await getFromContainer(CacheProvider).wrap(
       `similar_${id}__${page}`,
       async () => similarData(id, page),
     );
@@ -331,7 +331,7 @@ export async function getSimilar(id, page = 1) {
 
 async function getReviews(id) {
   try {
-    return await getFromContainer(CacheService).wrap(`rev_${id}`, async () =>
+    return await getFromContainer(CacheProvider).wrap(`rev_${id}`, async () =>
       reviewsData(id),
     );
   } catch (err) {
@@ -343,7 +343,7 @@ async function getReviews(id) {
 async function getSeasons(seasons, id) {
   let data: any = false;
   try {
-    data = await getFromContainer(CacheService).wrap(
+    data = await getFromContainer(CacheProvider).wrap(
       `seasons_${id}`,
       async () => seasonsData(seasons, id),
     );
