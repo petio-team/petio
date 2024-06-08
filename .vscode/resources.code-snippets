@@ -214,7 +214,7 @@
 		"scope": "typescript",
 		"prefix": "grt",
 		"body": [
-		  "import { Override } from '@/utils/override';",
+		  "import { Override } from '@/infrastructure/utils/override';",
 		  "",
 		  "/**",
 		  " * Represents the properties of a ${1}.",
