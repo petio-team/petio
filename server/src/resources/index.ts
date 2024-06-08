@@ -2,6 +2,7 @@ import { ContainerBuilder } from 'diod';
 
 import archive from '@/resources/archive';
 import cache from '@/resources/cache';
+import company from '@/resources/company';
 import discovery from '@/resources/discovery';
 import downloader from '@/resources/downloader';
 import filter from '@/resources/filter';
@@ -10,7 +11,9 @@ import issue from '@/resources/issue';
 import mediaLibrary from '@/resources/media-library';
 import mediaServer from '@/resources/media-server';
 import movie from '@/resources/movie';
+import network from '@/resources/network';
 import notification from '@/resources/notification';
+import person from '@/resources/person';
 import profile from '@/resources/profile';
 import request from '@/resources/request';
 import review from '@/resources/review';
@@ -21,6 +24,7 @@ import user from '@/resources/user';
 export default (builder: ContainerBuilder) => {
   archive(builder);
   cache(builder);
+  company(builder);
   discovery(builder);
   downloader(builder);
   filter(builder);
@@ -29,7 +33,9 @@ export default (builder: ContainerBuilder) => {
   mediaLibrary(builder);
   mediaServer(builder);
   movie(builder);
+  network(builder);
   notification(builder);
+  person(builder);
   profile(builder);
   request(builder);
   review(builder);
