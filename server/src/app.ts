@@ -20,7 +20,7 @@ import { MongooseDatabaseConnection } from '@/infrastructure/database/connection
 import logger from '@/infrastructure/logger/logger';
 import { Master } from '@/infrastructure/worker/master';
 import { CacheService } from '@/services/cache/cache-service';
-import { runCron } from '@/services/cron';
+import { AgendaCronService } from '@/services/cron/agenda-cron';
 import { MigrationService } from '@/services/migration/migration';
 import { SettingsService } from '@/services/settings/settings';
 
@@ -112,7 +112,7 @@ async function doWorker() {
   }
 
   if (settings.initialSetup && process.env.job) {
-    await runCron();
+    await getFromContainer(AgendaCronService).bootstrap();
   }
 }
 

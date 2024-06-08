@@ -1,8 +1,16 @@
 import { Agenda } from '@hokify/agenda';
-
+import Bluebird from 'bluebird';
 import { Service } from 'diod';
+
+import { ContainerTags } from '@/infrastructure/container/constants';
+import {
+  findTaggedServiceIdentifiers,
+  getFromContainer,
+} from '@/infrastructure/container/container';
 import { Logger } from '@/infrastructure/logger/logger';
-import { CronService } from './service';
+import { Jobber } from '@/services/cron/job';
+
+import { CronService } from './cron-service';
 import { CronJobProcessor, CronOptions, JobCronName } from './types';
 
 /**
@@ -11,7 +19,7 @@ import { CronJobProcessor, CronOptions, JobCronName } from './types';
 @Service()
 export class AgendaCronService extends CronService {
   constructor(
-    activeJobs: JobCronName[], 
+    activeJobs: JobCronName[],
     private agenda: Agenda,
     logger: Logger,
   ) {
@@ -51,6 +59,21 @@ export class AgendaCronService extends CronService {
   }
 
   /**
+   * Registers the cron jobs by finding the tagged service identifiers and
+   * calling the `register` method on each job.
+   * @returns A promise that resolves when all jobs have been registered.
+   */
+  async registerJobs(): Promise<void> {
+    const jobIdentifiers = findTaggedServiceIdentifiers(
+      ContainerTags.AGENDA_CRON_JOB,
+    );
+    await Bluebird.mapSeries(jobIdentifiers, async (identifier) => {
+      const job = getFromContainer<Jobber>(identifier);
+      await job.register();
+    });
+  }
+
+  /**
    * Removes a cron job from the Agenda scheduler.
    * @param jobName - The name of the job to remove.
    */
@@ -62,6 +85,7 @@ export class AgendaCronService extends CronService {
    * Initializes the Agenda scheduler.
    */
   protected async initialise() {
+    await this.registerJobs();
     await this.agenda.start();
   }
 

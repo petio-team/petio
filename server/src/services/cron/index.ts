@@ -1,15 +1,9 @@
 import { Agenda } from '@hokify/agenda';
-import Bluebird from 'bluebird';
 import { ContainerBuilder } from 'diod';
 
 import { DATABASE_URL } from '@/infrastructure/config/env';
 import { ContainerTags } from '@/infrastructure/container/constants';
-import {
-  findTaggedServiceIdentifiers,
-  getFromContainer,
-} from '@/infrastructure/container/container';
 import { Logger } from '@/infrastructure/logger/logger';
-import { Jobber } from '@/services/cron/job';
 import { ClearCacheJob } from '@/services/cron/jobs/clear-cache';
 import { ContentScanJob } from '@/services/cron/jobs/content-scan';
 import { LibraryScanJob } from '@/services/cron/jobs/library-scan';
@@ -24,27 +18,27 @@ export default (builder: ContainerBuilder) => {
   builder
     .registerAndUse(LibraryScanJob)
     .asSingleton()
-    .addTag(ContainerTags.CRON_JOB);
+    .addTag(ContainerTags.AGENDA_CRON_JOB);
   builder
     .registerAndUse(ContentScanJob)
     .asSingleton()
-    .addTag(ContainerTags.CRON_JOB);
+    .addTag(ContainerTags.AGENDA_CRON_JOB);
   builder
     .registerAndUse(UsersScanJob)
     .asSingleton()
-    .addTag(ContainerTags.CRON_JOB);
+    .addTag(ContainerTags.AGENDA_CRON_JOB);
   builder
     .registerAndUse(QuotaResetJob)
     .asSingleton()
-    .addTag(ContainerTags.CRON_JOB);
+    .addTag(ContainerTags.AGENDA_CRON_JOB);
   builder
     .registerAndUse(ResourceCacheJob)
     .asSingleton()
-    .addTag(ContainerTags.CRON_JOB);
+    .addTag(ContainerTags.AGENDA_CRON_JOB);
   builder
     .registerAndUse(ClearCacheJob)
     .asSingleton()
-    .addTag(ContainerTags.CRON_JOB);
+    .addTag(ContainerTags.AGENDA_CRON_JOB);
   builder
     .register(AgendaCronService)
     .useFactory(
@@ -54,7 +48,7 @@ export default (builder: ContainerBuilder) => {
           new Agenda({
             db: { address: DATABASE_URL, collection: 'jobs' },
             processEvery: '2 minutes',
-            maxConcurrency: 1,
+            maxConcurrency: 2,
             defaultConcurrency: 1,
             defaultLockLifetime: 1000 * 60 * 10,
             ensureIndex: true,
@@ -64,15 +58,3 @@ export default (builder: ContainerBuilder) => {
     )
     .asSingleton();
 };
-
-/**
- * Runs the cron jobs by registering and bootstrapping them.
- * @returns A promise that resolves when the cron jobs are successfully registered and bootstrapped.
- */
-export async function runCron() {
-  const cronService = getFromContainer<AgendaCronService>(AgendaCronService);
-  const tags = findTaggedServiceIdentifiers<Jobber>(ContainerTags.CRON_JOB);
-  const jobs = tags.map((tag) => getFromContainer<Jobber>(tag));
-  await Bluebird.map(jobs, async (job) => job.register());
-  return cronService.bootstrap();
-}

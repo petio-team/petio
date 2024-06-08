@@ -54,19 +54,19 @@ export abstract class CronService {
    */
   async bootstrap(): Promise<void> {
     if (!this.activeJobs || !this.activeJobs.length) {
-      this.logger.trace('no active jobs found');
+      this.logger.trace('No active jobs found');
     } else {
       this.logger.trace(
-        'found following active jobs:',
+        'Found following active jobs:',
         this.activeJobs.join(', '),
       );
     }
 
     try {
       await this.initialise();
-      this.logger.debug('cron service initialised');
+      this.logger.debug('Cron service initialised');
     } catch (err) {
-      this.logger.error(err, 'failed to initialise cron service');
+      this.logger.error(err, 'Failed to initialise cron service');
     }
   }
 
@@ -77,10 +77,15 @@ export abstract class CronService {
     try {
       await this.shutdown();
     } catch (err) {
-      this.logger.error(err, 'failed to terminate cron service');
+      this.logger.error(err, 'Failed to terminate cron service');
     }
   }
 
+  /**
+   * Checks if a job with the specified name is active.
+   * @param jobName - The name of the job to check.
+   * @returns A boolean indicating whether the job is active or not.
+   */
   private isActiveJob(jobName: JobCronName): boolean {
     return this.activeJobs.includes(jobName);
   }
@@ -99,7 +104,7 @@ export abstract class CronService {
     options: CronOptions,
   ): Promise<void> {
     if (!this.isActiveJob(jobName)) {
-      this.logger.trace(`job '${jobName}' is not active`);
+      this.logger.trace(`Job '${jobName}' is not active`);
       return;
     }
 
@@ -122,20 +127,20 @@ export abstract class CronService {
             });
             const finishedAt = new Date();
             _this.logger.info(
-              `job '${jobName}' processed in ${
+              `Job '${jobName}' processed in ${
                 finishedAt.getTime() - startedAt.getTime()
               }ms`,
             );
           } catch (err) {
-            _this.logger.error(err, `failed to process job '${jobName}'`);
+            _this.logger.error(err, `Failed to process job '${jobName}'`);
           }
         },
         interval,
         mergedOptions,
       );
-      this.logger.debug(`job '${jobName}' added`);
+      this.logger.debug(`Job '${jobName}' added`);
     } catch (err) {
-      this.logger.error(err, `failed to add job '${jobName}'`);
+      this.logger.error(err, `Failed to add job '${jobName}'`);
     }
   }
 
@@ -145,15 +150,15 @@ export abstract class CronService {
    */
   async remove(jobName: JobCronName): Promise<void> {
     if (!this.isActiveJob(jobName)) {
-      this.logger.trace(`job '${jobName}' is not active`);
+      this.logger.trace(`Job '${jobName}' is not active`);
       return;
     }
 
     try {
       await this.removeJob(jobName);
-      this.logger.info(`job '${jobName}' removed`);
+      this.logger.info(`Job '${jobName}' removed`);
     } catch (err) {
-      this.logger.error(err, `failed to remove job '${jobName}'`);
+      this.logger.error(err, `Failed to remove job '${jobName}'`);
     }
   }
 }
