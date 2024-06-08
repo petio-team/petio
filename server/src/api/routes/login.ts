@@ -14,7 +14,7 @@ import { UserEntity } from '@/resources/user/entity';
 import { UserMapper } from '@/resources/user/mapper';
 import { UserRepository } from '@/resources/user/repository';
 import { UserRole } from '@/resources/user/types';
-import { SettingsService } from '@/services/settings/settings';
+import { SettingsService } from '@/services/settings/settings-service';
 
 const logger = loggerMain.child({ module: 'routes.login' });
 

@@ -14,7 +14,7 @@ import { MediaServerType } from '@/resources/media-server/types';
 import { UserEntity } from '@/resources/user/entity';
 import { UserRepository } from '@/resources/user/repository';
 import { UserRole } from '@/resources/user/types';
-import { SettingsService } from '@/services/settings/settings';
+import { SettingsService } from '@/services/settings/settings-service';
 import {
   CreateAdminUserProps,
   CreateMediaServerProps,

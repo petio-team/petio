@@ -7,7 +7,7 @@ import { validateRequest } from '@/api/middleware/validation';
 import { HTTP_BASE_PATH } from '@/infrastructure/config/env';
 import { getFromContainer } from '@/infrastructure/container/container';
 import logger from '@/infrastructure/logger/logger';
-import { SettingsService } from '@/services/settings/settings';
+import { SettingsService } from '@/services/settings/settings-service';
 
 const getConfig = async (ctx: Context) => {
   try {

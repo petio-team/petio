@@ -11,7 +11,7 @@ import { QuotaResetJob } from '@/services/cron/jobs/quota-reset';
 import { ResourceCacheJob } from '@/services/cron/jobs/resource-cache';
 import { UsersScanJob } from '@/services/cron/jobs/users-scan';
 
-import { AgendaCronService } from './agenda-cron';
+import { AgendaCronService } from './agenda-cron-service';
 import { JobCronName } from './types';
 
 export default (builder: ContainerBuilder) => {

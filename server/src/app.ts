@@ -20,9 +20,9 @@ import { MongooseDatabaseConnection } from '@/infrastructure/database/connection
 import logger from '@/infrastructure/logger/logger';
 import { Master } from '@/infrastructure/worker/master';
 import { CacheService } from '@/services/cache/cache-service';
-import { AgendaCronService } from '@/services/cron/agenda-cron';
-import { MigrationService } from '@/services/migration/migration';
-import { SettingsService } from '@/services/settings/settings';
+import { AgendaCronService } from '@/services/cron/agenda-cron-service';
+import { MigrationService } from '@/services/migration/migration-service';
+import { SettingsService } from '@/services/settings/settings-service';
 
 import appConfig from '../package.json';
 

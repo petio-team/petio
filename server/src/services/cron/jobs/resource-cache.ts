@@ -1,6 +1,6 @@
 import { Service } from 'diod';
 
-import { AgendaCronService } from '@/services/cron/agenda-cron';
+import { AgendaCronService } from '@/services/cron/agenda-cron-service';
 import { Jobber } from '@/services/cron/job';
 import { JobCronName } from '@/services/cron/types';
 import { MovieService } from '@/services/movie/movie';

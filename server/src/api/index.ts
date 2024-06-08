@@ -19,7 +19,7 @@ import {
 import { getFromContainer } from '@/infrastructure/container/container';
 import { HttpServer } from '@/infrastructure/http/http-server';
 import { SettingsSchemaProps } from '@/resources/settings/schema';
-import { SettingsService } from '@/services/settings/settings';
+import { SettingsService } from '@/services/settings/settings-service';
 
 const routes = (settings: SettingsSchemaProps): Koa => {
   const app = new Koa();

@@ -2,7 +2,7 @@ import { Service } from 'diod';
 import pino from 'pino';
 
 import { Logger } from '@/infrastructure/logger/logger';
-import { AgendaCronService } from '@/services/cron/agenda-cron';
+import { AgendaCronService } from '@/services/cron/agenda-cron-service';
 import { Jobber } from '@/services/cron/job';
 import { JobCronName } from '@/services/cron/types';
 
