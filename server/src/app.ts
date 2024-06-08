@@ -74,13 +74,13 @@ async function doPrimary() {
   const settingsService = getFromContainer(SettingsService);
   await settingsService.getSettings();
 
+  logger.info(`Petio v${appConfig.version} [debug] [pid:${PUID},gid:${PGID}]`);
+
   // Create initial cache if it doesn't exist
   logger.info('Updating cache with common resources');
   const cacheService = getFromContainer(CacheService);
   await cacheService.getCommonResources();
-  logger.info('Cache finished updating');
-
-  logger.info(`Petio v${appConfig.version} [debug] [pid:${PUID},gid:${PGID}]`);
+  logger.info('Finished updating cache with common resources');
 
   // run workers
   await getFromContainer(Master).runWorkers();
