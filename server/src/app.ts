@@ -19,6 +19,7 @@ import {
 import { MongooseDatabaseConnection } from '@/infrastructure/database/connection';
 import logger from '@/infrastructure/logger/logger';
 import { Master } from '@/infrastructure/worker/master';
+import { CacheService } from '@/services/cache/cache-service';
 import { runCron } from '@/services/cron';
 import { MigrationService } from '@/services/migration/migration';
 import { SettingsService } from '@/services/settings/settings';
@@ -70,7 +71,14 @@ async function doPrimary() {
   }
 
   // Load settings into cache
-  await getFromContainer(SettingsService).getSettings();
+  const settingsService = getFromContainer(SettingsService);
+  await settingsService.getSettings();
+
+  // Create initial cache if it doesn't exist
+  logger.info('Updating cache with common resources');
+  const cacheService = getFromContainer(CacheService);
+  await cacheService.getCommonResources();
+  logger.info('Cache finished updating');
 
   logger.info(`Petio v${appConfig.version} [debug] [pid:${PUID},gid:${PGID}]`);
 
