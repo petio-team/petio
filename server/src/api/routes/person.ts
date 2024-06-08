@@ -38,13 +38,6 @@ const lookupById = async (ctx: Context) => {
   };
 };
 
-// const lookupById = async (ctx: Context) => {
-//   const data = await personLookup(ctx.params.id);
-
-//   ctx.status = StatusCodes.OK;
-//   ctx.body = data;
-// };
-
 const route = new Router({ prefix: '/person' });
 
 export default (app: Router) => {
