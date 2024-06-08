@@ -3,17 +3,20 @@ import { Service } from 'diod';
 import { AgendaCronService } from '@/services/cron/agenda-cron';
 import { Jobber } from '@/services/cron/job';
 import { JobCronName } from '@/services/cron/types';
-import trending from '@/services/tmdb/trending';
+import { MovieService } from '@/services/movie/movie';
 
 @Service()
-export class TmdbCacheJob implements Jobber {
-  constructor(private cronService: AgendaCronService) {}
+export class ResourceCacheJob implements Jobber {
+  constructor(
+    private cronService: AgendaCronService,
+    private movieService: MovieService,
+  ) {}
 
   register(): Promise<void> {
     return this.cronService.add(
-      JobCronName.TMDB_CACHE,
+      JobCronName.RESOURCE_CACHE,
       async () => {
-        await trending();
+        await Promise.all([this.movieService.getTrending()]);
       },
       '6 hours',
       {

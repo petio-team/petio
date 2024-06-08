@@ -11,10 +11,9 @@ import {
 import { Logger } from '@/infrastructure/logger/logger';
 import { Jobber } from '@/services/cron/job';
 import { ContentScanJob } from '@/services/cron/jobs/content-scan';
-import { ImdbCacheJob } from '@/services/cron/jobs/imdb-cache';
 import { LibraryScanJob } from '@/services/cron/jobs/library-scan';
 import { QuotaResetJob } from '@/services/cron/jobs/quota-reset';
-import { TmdbCacheJob } from '@/services/cron/jobs/tmdb-cache';
+import { ResourceCacheJob } from '@/services/cron/jobs/resource-cache';
 import { UsersScanJob } from '@/services/cron/jobs/users-scan';
 
 import { AgendaCronService } from './agenda-cron';
@@ -38,14 +37,9 @@ export default (builder: ContainerBuilder) => {
     .asSingleton()
     .addTag(ContainerTags.CRON_JOB);
   builder
-    .registerAndUse(TmdbCacheJob)
+    .registerAndUse(ResourceCacheJob)
     .asSingleton()
     .addTag(ContainerTags.CRON_JOB);
-  builder
-    .registerAndUse(ImdbCacheJob)
-    .asSingleton()
-    .addTag(ContainerTags.CRON_JOB);
-
   builder
     .register(AgendaCronService)
     .useFactory(
