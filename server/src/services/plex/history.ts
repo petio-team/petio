@@ -2,8 +2,9 @@
 import Bluebird from 'bluebird';
 
 import { getFromContainer } from '@/infrastructure/container/container';
+import { PlexMediaServerApiClient } from '@/infrastructure/generated/custom/plex-api-client/plex-api-client';
+import { GetSessionHistoryResponse } from '@/infrastructure/generated/plex-media-server-api-client';
 import loggerMain from '@/infrastructure/logger/logger';
-import { GetSessionHistoryResponse, PlexClient } from '@/infrastructure/plex';
 import is from '@/infrastructure/utils/is';
 import { CacheProvider } from '@/services/cache/cache-provider';
 import plexLookup from '@/services/plex/lookup';
@@ -12,7 +13,7 @@ import { showLookup } from '@/services/tmdb/show';
 
 const logger = loggerMain.child({ module: 'plex.history' });
 
-export default async (client: PlexClient, id, type) => {
+export default async (client: PlexMediaServerApiClient, id, type) => {
   let data: any = false;
   try {
     data = await getFromContainer(CacheProvider).wrap(
@@ -32,7 +33,11 @@ export default async (client: PlexClient, id, type) => {
   return data;
 };
 
-async function getHistory(client: PlexClient, id: string, library?: number) {
+async function getHistory(
+  client: PlexMediaServerApiClient,
+  id: string,
+  library?: number,
+) {
   try {
     const d = new Date();
     const m = d.getMonth();
@@ -44,8 +49,8 @@ async function getHistory(client: PlexClient, id: string, library?: number) {
     d.setHours(0, 0, 0, 0);
     const time = d.getTime();
 
-    const content = await client.sessions.getSessionHistory({
-      accountId: id,
+    const content = await client.getSessionHistory({
+      accountId: parseInt(id, 10),
       sort: 'viewedAt:desc',
       'viewedAt>': time,
       librarySectionID: library,
@@ -86,10 +91,10 @@ async function parseHistory(data: GetSessionHistoryResponse, historyType) {
 
       if (!histArr.includes(key)) {
         if (mediaType === 'episode') {
-          const plexData: any = await plexLookup(mediaId, 'show');
+          const plexData: any = await plexLookup(mediaId!, 'show');
           mediaId = plexData.tmdb_id;
         } else {
-          const plexData: any = await plexLookup(mediaId, 'movie');
+          const plexData: any = await plexLookup(mediaId!, 'movie');
           mediaId = plexData.tmdb_id;
         }
 

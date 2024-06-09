@@ -3,9 +3,9 @@ import { AxiosRequestConfig } from 'axios';
 import Bluebird from 'bluebird';
 
 import { getFromContainer } from '@/infrastructure/container/container';
+import { PlexMediaServerApiClient } from '@/infrastructure/generated/custom/plex-api-client/plex-api-client';
+import { Interceptors } from '@/infrastructure/generated/plex-media-server-api-client/core/OpenAPI';
 import loggerMain from '@/infrastructure/logger/logger';
-import { PlexClient } from '@/infrastructure/plex';
-import { Interceptors } from '@/infrastructure/plex/core/OpenAPI';
 import is from '@/infrastructure/utils/is';
 import { DiscoveryEntity } from '@/resources/discovery/entity';
 import { DiscoveryRepository } from '@/resources/discovery/repository';
@@ -188,8 +188,8 @@ async function build(id: string) {
       return null;
     }
     const client = getPlexClientFromServer(server);
-    const data = await client.sessions.getSessionHistory({
-      accountId: id,
+    const data = await client.getSessionHistory({
+      accountId: parseInt(id, 10),
       sort: 'viewedAt:desc',
     });
     if (
@@ -366,7 +366,7 @@ function getPlexClientFromServer(server: MediaServerEntity) {
     return cfg;
   });
 
-  const client = new PlexClient({
+  const client = new PlexMediaServerApiClient({
     BASE: server.url,
     interceptors: {
       request: requestInterceptor,

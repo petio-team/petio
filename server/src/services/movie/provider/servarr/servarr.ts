@@ -5,10 +5,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@/infrastructure/exceptions/exceptions';
-import {
-  ApiError,
-  ServarrRadarrAPIClient,
-} from '@/infrastructure/servarr/radarr-api/client';
+import { ServarrRadarrApiClient } from '@/infrastructure/generated/clients';
+import { ApiError } from '@/infrastructure/generated/servarr-radarr-api-client';
 import { CacheProvider } from '@/services/cache/cache-provider';
 import {
   MovieProviderRatingResponse,
@@ -24,7 +22,7 @@ export class ServarrMovieRatingProvider implements MovieRatingProvider {
   private defaultCacheTTL = 86400000;
 
   constructor(
-    private client: ServarrRadarrAPIClient,
+    private client: ServarrRadarrApiClient,
     private cache: CacheProvider,
   ) {}
 

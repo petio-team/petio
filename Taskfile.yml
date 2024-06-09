@@ -2,6 +2,8 @@ version: '3'
 dotenv: ['.env']
 vars:
   COMMIT_SHA: {sh: 'git rev-parse --short HEAD'}
+  OPENAPI_GENERATOR_LIBRARY: "@hey-api/openapi-ts"
+  OPENAPI_GENERATOR_VERSION: 0.45.0
 tasks:
   default:
     cmds:
@@ -30,7 +32,6 @@ tasks:
       - yarn run pkg
       - task: dev:binary
 
-
   dev:server:
     cmds:
       - yarn workspace server run watch
@@ -38,6 +39,123 @@ tasks:
   dev:web:
     cmds:
       - yarn workspace web run start
+
+  gen:openapi-discord:
+    cmds:
+      - |
+        npx {{ .OPENAPI_GENERATOR_LIBRARY }}@{{ .OPENAPI_GENERATOR_VERSION }} \
+        -i "https://raw.githubusercontent.com/discord/discord-api-spec/main/specs/openapi.json" \
+        -o "./server/src/infrastructure/generated/discord-api-client" \
+        -c axios \
+        --name DiscordV10ApiClient \
+        --schemas true \
+        --services true \
+        --useOptions
+
+  gen:openapi-fanart:
+    cmds:
+      - |
+        npx {{ .OPENAPI_GENERATOR_LIBRARY }}@{{ .OPENAPI_GENERATOR_VERSION }} \
+        -i "./api/fanart/openapi.yaml" \
+        -o "./server/src/infrastructure/generated/fanart-api-client" \
+        -c axios \
+        --name FanartTvV3ApiClient \
+        --schemas true \
+        --services true \
+        --useOptions
+
+  gen:openapi-plex:
+    cmds:
+      - |
+        npx {{ .OPENAPI_GENERATOR_LIBRARY }}@{{ .OPENAPI_GENERATOR_VERSION }} \
+        -i "https://raw.githubusercontent.com/LukeHagar/plex-api-spec/main/plex-media-server-spec-dereferenced.yaml" \
+        -o "./server/src/infrastructure/generated/plex-media-server-api-client" \
+        -c axios \
+        --name PlexMediaServerV0ApiClient \
+        --schemas true \
+        --services true \
+        --useOptions
+
+  gen:openapi-plextv:
+    cmds:
+      - |
+        npx {{ .OPENAPI_GENERATOR_LIBRARY }}@{{ .OPENAPI_GENERATOR_VERSION }} \
+        -i "https://raw.githubusercontent.com/LukeHagar/plex-api-spec/main/plex-tv-spec-dereferenced.yaml" \
+        -o "./server/src/infrastructure/generated/plex-tv-api-client" \
+        -c axios \
+        --name PlexTvV0ApiClient \
+        --schemas true \
+        --services true \
+        --useOptions
+
+  gen:openapi-radarr:
+    cmds:
+      - |
+        npx {{ .OPENAPI_GENERATOR_LIBRARY }}@{{ .OPENAPI_GENERATOR_VERSION }} \
+        -i "https://raw.githubusercontent.com/Radarr/Radarr/develop/src/Radarr.Api.V3/openapi.json" \
+        -o "./server/src/infrastructure/generated/radarr-api-client" \
+        -c axios \
+        --name RadarrV3ApiClient \
+        --schemas true \
+        --services true \
+        --useOptions
+
+  gen:openapi-sonarr:
+    cmds:
+      - |
+        npx {{ .OPENAPI_GENERATOR_LIBRARY }}@{{ .OPENAPI_GENERATOR_VERSION }} \
+        -i "https://raw.githubusercontent.com/Sonarr/Sonarr/develop/src/Sonarr.Api.V3/openapi.json" \
+        -o "./server/src/infrastructure/generated/sonarr-api-client" \
+        -c axios \
+        --name SonarrV3ApiClient \
+        --schemas true \
+        --services true \
+        --useOptions
+
+  gen:openapi-servarr-radarr:
+    cmds:
+      - |
+        npx {{ .OPENAPI_GENERATOR_LIBRARY }}@{{ .OPENAPI_GENERATOR_VERSION }} \
+        -i "./api/servarr/radarrapi.openapi.yaml" \
+        -o "./server/src/infrastructure/generated/servarr-radarr-api-client" \
+        -c axios \
+        --name ServarrRadarrV1ApiClient
+
+  gen:openapi-telegram:
+    cmds:
+      - |
+        npx {{ .OPENAPI_GENERATOR_LIBRARY }}@{{ .OPENAPI_GENERATOR_VERSION }} \
+        -i "https://raw.githubusercontent.com/sys-001/telegram-bot-api-versions/main/files/openapi/json/v700.json" \
+        -o "./server/src/infrastructure/generated/telegram-api-client" \
+        -c axios \
+        --name TelegramV7ApiClient \
+        --schemas true \
+        --services true \
+        --useOptions
+
+  gen:openapi-tmdb:
+    cmds:
+      - |
+        npx {{ .OPENAPI_GENERATOR_LIBRARY }}@{{ .OPENAPI_GENERATOR_VERSION }} \
+        -i "https://developer.themoviedb.org/openapi/64542913e1f86100738e227f" \
+        -o "./server/src/infrastructure/generated/tmdb-api-client" \
+        -c axios \
+        --name TheMovieDatabaseV3ApiClient \
+        --schemas true \
+        --services true \
+        --useOptions
+
+  gen:openapi:
+    cmds:
+      - task: gen:openapi-discord
+      - task: gen:openapi-fanart
+      - task: gen:openapi-plex
+      - task: gen:openapi-plextv
+      - task: gen:openapi-radarr
+      - task: gen:openapi-sonarr
+      - task: gen:openapi-servarr-radarr
+      - task: gen:openapi-telegram
+      - task: gen:openapi-tmdb
 
   ci:
     cmds:

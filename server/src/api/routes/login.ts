@@ -8,8 +8,8 @@ import xmlParser from 'xml-js';
 
 import { authenticate } from '@/api/middleware/auth';
 import { getFromContainer } from '@/infrastructure/container/container';
+import { PlexMediaServerV0ApiClient } from '@/infrastructure/generated/plex-media-server-api-client';
 import loggerMain from '@/infrastructure/logger/logger';
-import { PlexTvClient } from '@/infrastructure/plextv';
 import { UserEntity } from '@/resources/user/entity';
 import { UserMapper } from '@/resources/user/mapper';
 import { UserRepository } from '@/resources/user/repository';
@@ -101,7 +101,7 @@ const attemptPlexAuth = async (ctx: Context) => {
 
 async function plexAuth(username: string, password: string) {
   logger.info(`LOGIN: Using Plex Auth for ${username}`);
-  const client = getFromContainer(PlexTvClient);
+  const client = getFromContainer(PlexMediaServerV0ApiClient);
   try {
     const result = await client.request.request({
       method: 'POST',

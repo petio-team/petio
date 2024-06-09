@@ -1,9 +1,9 @@
 import Bluebird from 'bluebird';
 import pino from 'pino';
 
+import { PlexMediaServerApiClient } from '@/infrastructure/generated/custom/plex-api-client/plex-api-client';
+import { PlexTvApiClient } from '@/infrastructure/generated/custom/plex-tv-api-client/plex-tv-api-client';
 import { Logger } from '@/infrastructure/logger/logger';
-import { PlexClient } from '@/infrastructure/plex';
-import { PlexTvClientCustom } from '@/infrastructure/plextv/custom/PlexTvClientCustom';
 import is from '@/infrastructure/utils/is';
 import { MediaLibraryEntity } from '@/resources/media-library/entity';
 import { MediaLibraryType } from '@/resources/media-library/types';
@@ -26,24 +26,24 @@ export class PlexScannerProvider implements ScannerProvider {
   /**
    * The Plex client used for communication with the Plex server.
    */
-  private client: PlexClient;
+  private client: PlexMediaServerApiClient;
 
   /**
    * The Plex TV client used for communication with the Plex TV API.
    */
-  private tvClient: PlexTvClientCustom;
+  private tvClient: PlexTvApiClient;
 
   /**
    * Represents a Plex provider for the scanner service.
    */
   constructor(server: MediaServerEntity, logger: Logger) {
-    this.client = new PlexClient({
+    this.client = new PlexMediaServerApiClient({
       BASE: server.url,
       HEADERS: {
         'X-Plex-Token': server.token,
       },
     });
-    this.tvClient = new PlexTvClientCustom({
+    this.tvClient = new PlexTvApiClient({
       HEADERS: {
         'X-Plex-Token': server.token,
       },
@@ -129,7 +129,7 @@ export class PlexScannerProvider implements ScannerProvider {
         if (!is.truthy(season.ratingKey) || season.type !== 'season') {
           return undefined;
         }
-        const episodesResult = await this.client.library.getMetadataChildren({
+        const episodesResult = await this.client.getMetadataChildren({
           ratingKey: parseInt(season.ratingKey, 10),
           includeElements: 'Stream',
         });
@@ -345,7 +345,7 @@ export class PlexScannerProvider implements ScannerProvider {
   ): Promise<T[]> {
     try {
       const content = await this.client.library.getLibraryItems({
-        sectionId: library.key,
+        sectionId: parseInt(library.key, 10),
         tag: 'all',
       });
       if (

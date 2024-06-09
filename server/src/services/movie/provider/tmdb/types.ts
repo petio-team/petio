@@ -1,9 +1,12 @@
-import {
-  CancelablePromise,
-  MovieDetailsResponse,
-} from '@/infrastructure/tmdb/client';
+import { MovieDetailsResponse } from '@/infrastructure/generated/tmdb-api-client';
 
 export type MovieLookupProviderResponse = MovieDetailsResponse & {
+  belongs_to_collection?: {
+    id: number;
+    name: string;
+    poster_path: string;
+    backdrop_path: string;
+  };
   credits?: {
     cast: Array<{
       adult: boolean;
@@ -139,5 +142,3 @@ export type MovieLookupProviderResponse = MovieDetailsResponse & {
     }>;
   };
 };
-export type MovieLookupProviderResponseCancelable =
-  CancelablePromise<MovieLookupProviderResponse>;

@@ -6,7 +6,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@/infrastructure/exceptions/exceptions';
-import { ApiError, FanartTVAPI } from '@/infrastructure/fanart/client';
+import { FanartTvApiClient } from '@/infrastructure/generated/clients';
+import { ApiError } from '@/infrastructure/generated/fanart-api-client';
 import { Logger } from '@/infrastructure/logger/logger';
 import is from '@/infrastructure/utils/is';
 import { CacheProvider } from '@/services/cache/cache-provider';
@@ -28,7 +29,7 @@ export class FanartShowProvider implements ShowArtworkProvider {
   private logger: pino.Logger;
 
   constructor(
-    private readonly client: FanartTVAPI,
+    private readonly client: FanartTvApiClient,
     private readonly cache: CacheProvider,
     logger: Logger,
   ) {

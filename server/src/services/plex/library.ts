@@ -8,13 +8,13 @@ import Bluebird from 'bluebird';
 import xmlParser from 'xml-js';
 
 import { getFromContainer } from '@/infrastructure/container/container';
-import loggerMain from '@/infrastructure/logger/logger';
+import { TheMovieDatabaseApiClient } from '@/infrastructure/generated/clients';
+import { PlexMediaServerApiClient } from '@/infrastructure/generated/custom/plex-api-client/plex-api-client';
 import {
   GetLibrariesResponse,
   GetMetadataResponse,
-  PlexClient,
-} from '@/infrastructure/plex';
-import { TheMovieDatabaseClient } from '@/infrastructure/tmdb/client';
+} from '@/infrastructure/generated/plex-media-server-api-client';
+import loggerMain from '@/infrastructure/logger/logger';
 import is from '@/infrastructure/utils/is';
 import { MediaLibraryEntity } from '@/resources/media-library/entity';
 import { MediaLibraryRepository } from '@/resources/media-library/repository';
@@ -46,7 +46,7 @@ export default class LibraryUpdate {
 
   tmdb: any;
 
-  client: PlexClient;
+  client: PlexMediaServerApiClient;
 
   constructor(private server: MediaServerEntity) {
     this.mailer = [];
@@ -343,7 +343,7 @@ export default class LibraryUpdate {
 
   async getSeason(id: number) {
     try {
-      const res = await this.client.library.getMetadataChildren({
+      const res = await this.client.getMetadataChildren({
         ratingKey: id,
         includeElements: 'Stream',
       });
@@ -537,7 +537,7 @@ export default class LibraryUpdate {
         const thisSeason = {
           seasonNumber: season.index,
           title: season.title,
-          episodes: seasonData.Metadata.map((metadata) => ({
+          episodes: seasonData?.Metadata.map((metadata) => ({
             title: metadata.title,
             episodeNumber: metadata.index,
             resolution: is.truthy(metadata.Media)
@@ -826,7 +826,7 @@ export default class LibraryUpdate {
   }
 
   async externalIdTv(id: string, type: string) {
-    const client = getFromContainer(TheMovieDatabaseClient);
+    const client = getFromContainer(TheMovieDatabaseApiClient);
     const data = await client.default.findById({
       externalId: id,
       externalSource: type === 'tvdb' ? 'tvdb_id' : 'imdb_id',
@@ -838,14 +838,14 @@ export default class LibraryUpdate {
   }
 
   async tmdbExternalIds(id) {
-    const client = getFromContainer(TheMovieDatabaseClient);
+    const client = getFromContainer(TheMovieDatabaseApiClient);
     return client.default.tvSeriesExternalIds({
       seriesId: id,
     });
   }
 
   async externalIdMovie(id: string, type: string) {
-    const client = getFromContainer(TheMovieDatabaseClient);
+    const client = getFromContainer(TheMovieDatabaseApiClient);
     const data = await client.default.findById({
       externalId: id,
       externalSource: type === 'tvdb' ? 'tvdb_id' : 'imdb_id',

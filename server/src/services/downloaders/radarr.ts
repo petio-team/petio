@@ -1,9 +1,9 @@
 /* eslint-disable no-restricted-syntax */
-import {
-  ArrRadarrAPIClient,
-  MovieResource,
-} from '@/infrastructure/arr/radarr-api';
 import { getFromContainer } from '@/infrastructure/container/container';
+import {
+  MovieResource,
+  RadarrV3ApiClient,
+} from '@/infrastructure/generated/radarr-api-client';
 import loggerMain from '@/infrastructure/logger/logger';
 import is from '@/infrastructure/utils/is';
 import { DownloaderEntity } from '@/resources/downloader/entity';
@@ -16,11 +16,11 @@ const logger = loggerMain.child({ module: 'downloaders.radarr' });
 export default class Radarr {
   instance: DownloaderEntity;
 
-  client: ArrRadarrAPIClient;
+  client: RadarrV3ApiClient;
 
   constructor(instance: DownloaderEntity) {
     this.instance = instance;
-    this.client = new ArrRadarrAPIClient({
+    this.client = new RadarrV3ApiClient({
       BASE: instance.url,
       HEADERS: {
         'x-api-key': instance.token,
@@ -28,7 +28,7 @@ export default class Radarr {
     });
   }
 
-  public getClient(): ArrRadarrAPIClient {
+  public getClient(): RadarrV3ApiClient {
     return this.client;
   }
 
@@ -144,7 +144,7 @@ export default class Radarr {
           }
 
           try {
-            const api = new ArrRadarrAPIClient({
+            const api = new RadarrV3ApiClient({
               BASE: instance.url,
               HEADERS: {
                 'x-api-key': instance.token,

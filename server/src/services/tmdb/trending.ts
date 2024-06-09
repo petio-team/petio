@@ -2,13 +2,13 @@
 import bluebird from 'bluebird';
 
 import { getFromContainer } from '@/infrastructure/container/container';
-import logger from '@/infrastructure/logger/logger';
+import { TheMovieDatabaseApiClient } from '@/infrastructure/generated/clients';
 import {
-  TheMovieDatabaseClient,
   TrendingMoviesResponse,
   TrendingPeopleResponse,
   TrendingTvResponse,
-} from '@/infrastructure/tmdb/client';
+} from '@/infrastructure/generated/tmdb-api-client';
+import logger from '@/infrastructure/logger/logger';
 import is from '@/infrastructure/utils/is';
 import { CacheProvider } from '@/services/cache/cache-provider';
 
@@ -225,7 +225,7 @@ async function personData(): Promise<TrendingPeopleResponse['results']> {
     module: 'tmdb.trending',
   });
   const data = await getFromContainer(
-    TheMovieDatabaseClient,
+    TheMovieDatabaseApiClient,
   ).default.trendingPeople({
     timeWindow: 'week',
   });
@@ -237,7 +237,7 @@ async function moviesData(): Promise<TrendingMoviesResponse['results']> {
     module: 'tmdb.trending',
   });
   const data = await getFromContainer(
-    TheMovieDatabaseClient,
+    TheMovieDatabaseApiClient,
   ).default.trendingMovies({
     timeWindow: 'week',
   });
@@ -249,7 +249,7 @@ async function showsData(): Promise<TrendingTvResponse['results']> {
     module: 'tmdb.trending',
   });
   const data = await getFromContainer(
-    TheMovieDatabaseClient,
+    TheMovieDatabaseApiClient,
   ).default.trendingTv({
     timeWindow: 'week',
   });

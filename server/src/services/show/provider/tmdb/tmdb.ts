@@ -5,7 +5,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@/infrastructure/exceptions/exceptions';
-import { ApiError, TheMovieDatabaseClient } from '@/infrastructure/tmdb/client';
+import { TheMovieDatabaseApiClient } from '@/infrastructure/generated/clients';
+import { ApiError } from '@/infrastructure/generated/tmdb-api-client';
 import is from '@/infrastructure/utils/is';
 import { ShowProps, ShowSeasonProps } from '@/resources/show/types';
 import { CacheProvider } from '@/services/cache/cache-provider';
@@ -32,7 +33,7 @@ export class TmdbShowProvider implements ShowProvider {
   // private tmdbBaseImageUrl = 'https://image.tmdb.org/t/p/original';
 
   constructor(
-    private readonly client: TheMovieDatabaseClient,
+    private readonly client: TheMovieDatabaseApiClient,
     private readonly cache: CacheProvider,
   ) {}
 

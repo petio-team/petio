@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { getFromContainer } from '@/infrastructure/container/container';
-import loggerMain from '@/infrastructure/logger/logger';
+import { TheMovieDatabaseApiClient } from '@/infrastructure/generated/clients';
 import {
   DiscoverMovieResponse,
   MovieCreditsResponse,
@@ -8,8 +8,8 @@ import {
   MovieKeywordsResponse,
   MovieReleaseDatesResponse,
   MovieVideosResponse,
-  TheMovieDatabaseClient,
-} from '@/infrastructure/tmdb/client';
+} from '@/infrastructure/generated/tmdb-api-client';
+import loggerMain from '@/infrastructure/logger/logger';
 import is from '@/infrastructure/utils/is';
 import { CacheProvider } from '@/services/cache/cache-provider';
 import fanartLookup from '@/services/fanart';
@@ -247,7 +247,7 @@ type TMDBData = MovieDetailsResponse & {
 };
 
 async function tmdbData(id: number): Promise<TMDBData> {
-  const client = getFromContainer(TheMovieDatabaseClient);
+  const client = getFromContainer(TheMovieDatabaseApiClient);
   const result = await client.default.movieDetails({
     movieId: id,
     appendToResponse: 'credits,videos,keywords,release_dates',
@@ -261,7 +261,7 @@ async function tmdbData(id: number): Promise<TMDBData> {
 }
 
 async function recommendationData(id: number, page = 1): Promise<any> {
-  const client = getFromContainer(TheMovieDatabaseClient);
+  const client = getFromContainer(TheMovieDatabaseApiClient);
   return client.default.movieRecommendations({
     movieId: id,
     page,
@@ -269,7 +269,7 @@ async function recommendationData(id: number, page = 1): Promise<any> {
 }
 
 async function similarData(id: number, page = 1): Promise<any> {
-  const client = getFromContainer(TheMovieDatabaseClient);
+  const client = getFromContainer(TheMovieDatabaseApiClient);
   return client.default.movieSimilar({
     movieId: id,
     page,
@@ -277,14 +277,14 @@ async function similarData(id: number, page = 1): Promise<any> {
 }
 
 async function getCollectionData(id: number): Promise<any> {
-  const client = getFromContainer(TheMovieDatabaseClient);
+  const client = getFromContainer(TheMovieDatabaseApiClient);
   return client.default.collectionDetails({
     collectionId: id,
   });
 }
 
 async function reviewsData(id: number): Promise<any> {
-  const client = getFromContainer(TheMovieDatabaseClient);
+  const client = getFromContainer(TheMovieDatabaseApiClient);
   return client.default.movieReviews({
     movieId: id,
   });
@@ -328,7 +328,7 @@ export async function discoverMovie(
   page = 1,
   params = {},
 ): Promise<DiscoverMovieOutput> {
-  const client = getFromContainer(TheMovieDatabaseClient);
+  const client = getFromContainer(TheMovieDatabaseApiClient);
   const data = (await client.default.discoverMovie({
     page,
     ...params,
@@ -345,7 +345,7 @@ export async function discoverMovie(
 }
 
 export async function company(id: number) {
-  const client = getFromContainer(TheMovieDatabaseClient);
+  const client = getFromContainer(TheMovieDatabaseApiClient);
   return client.default.companyDetails({
     companyId: id,
   });

@@ -5,7 +5,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@/infrastructure/exceptions/exceptions';
-import { ApiError, TheMovieDatabaseClient } from '@/infrastructure/tmdb/client';
+import { TheMovieDatabaseApiClient } from '@/infrastructure/generated/clients';
+import { ApiError } from '@/infrastructure/generated/tmdb-api-client';
 import { CompanyProps } from '@/resources/company/types';
 import { CacheProvider } from '@/services/cache/cache-provider';
 import {
@@ -22,7 +23,7 @@ export class CompanyTmdbProvider implements CompanyDetailsProvider {
   private defaultCacheTTL = 86400000;
 
   constructor(
-    private readonly client: TheMovieDatabaseClient,
+    private readonly client: TheMovieDatabaseApiClient,
     private readonly cacheProvider: CacheProvider,
   ) {}
 

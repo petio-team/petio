@@ -3,9 +3,10 @@ import { Service } from 'diod';
 import { nanoid } from 'nanoid';
 import pino from 'pino';
 
+import { PlexMediaServerApiClient } from '@/infrastructure/generated/custom/plex-api-client/plex-api-client';
+import { PlexTvApiClient } from '@/infrastructure/generated/custom/plex-tv-api-client/plex-tv-api-client';
+import { GetUserDetailsResponse } from '@/infrastructure/generated/custom/plex-tv-api-client/types';
 import { Logger } from '@/infrastructure/logger/logger';
-import { PlexClient } from '@/infrastructure/plex';
-import { PlexTvClient } from '@/infrastructure/plextv';
 import { generateKeys } from '@/infrastructure/utils/security';
 import { Worker } from '@/infrastructure/worker/worker';
 import { MediaServerEntity } from '@/resources/media-server/entity';
@@ -59,7 +60,7 @@ export class SetupService {
    */
   async testServerConnection(props: TestMediaServerProps) {
     try {
-      const client = new PlexClient({
+      const client = new PlexMediaServerApiClient({
         BASE: `${props.protocol}://${props.host}:${props.port}`,
         HEADERS: {
           'X-Plex-Token': props.token,
@@ -88,12 +89,13 @@ export class SetupService {
    * @param props - The properties of the admin user.
    */
   async createAdminUser(props: CreateAdminUserProps) {
-    const client = new PlexTvClient({
+    const client = new PlexTvApiClient({
       HEADERS: {
         'X-Plex-Token': props.token,
       },
     });
-    const data = await client.plexTv.getUserDetails();
+    const data =
+      (await client.plexTv.getUserDetails()) as GetUserDetailsResponse;
 
     await this.userRepo.findOrCreate(
       UserEntity.create({
@@ -152,12 +154,13 @@ export class SetupService {
    */
   async getPlexUser(props: GetPlexUserProps) {
     try {
-      const client = new PlexTvClient({
+      const client = new PlexTvApiClient({
         HEADERS: {
           'X-Plex-Token': props.token,
         },
       });
-      const user = await client.plexTv.getUserDetails();
+      const user =
+        (await client.plexTv.getUserDetails()) as GetUserDetailsResponse;
       return { name: user.title, email: user.email };
     } catch (err) {
       this.logger.debug('Failed to get plex user', err);

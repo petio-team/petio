@@ -1,7 +1,7 @@
 import {
   PersonCombinedCreditsResponse,
   PersonDetailsResponse,
-} from '@/infrastructure/tmdb/client';
+} from '@/infrastructure/generated/tmdb-api-client';
 
 export type PersonDetailsProviderResponse = PersonDetailsResponse & {
   combined_credits?: Omit<PersonCombinedCreditsResponse, 'id'>;

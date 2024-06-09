@@ -5,7 +5,7 @@ export default async (server: MediaServerEntity) => {
   const client = getPlexClient(server);
 
   try {
-    return await client.sessions.getSessions();
+    return client.sessions.getSessions();
   } catch (e) {
     // Do nothing
     return null;

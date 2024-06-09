@@ -5,7 +5,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@/infrastructure/exceptions/exceptions';
-import { ApiError, FanartTVAPI } from '@/infrastructure/fanart/client';
+import { FanartTvApiClient } from '@/infrastructure/generated/clients';
+import { ApiError } from '@/infrastructure/generated/fanart-api-client';
 import is from '@/infrastructure/utils/is';
 import { CacheProvider } from '@/services/cache/cache-provider';
 import {
@@ -18,7 +19,7 @@ export class FanartMovieProvider implements MovieArtworkProvider {
   private defaultCacheTTL = 86400000; // 1 day
 
   constructor(
-    private readonly client: FanartTVAPI,
+    private readonly client: FanartTvApiClient,
     private readonly cache: CacheProvider,
   ) {}
 

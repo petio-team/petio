@@ -5,7 +5,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@/infrastructure/exceptions/exceptions';
-import { ApiError, TheMovieDatabaseClient } from '@/infrastructure/tmdb/client';
+import { TheMovieDatabaseApiClient } from '@/infrastructure/generated/clients';
+import { ApiError } from '@/infrastructure/generated/tmdb-api-client';
 import is from '@/infrastructure/utils/is';
 import { PersonEntity } from '@/resources/person/entity';
 import { PersonGender, PersonProps } from '@/resources/person/types';
@@ -27,7 +28,7 @@ export class TmdbPersonProvider implements PersonDetailsProvider {
 
   constructor(
     private cacheProvider: CacheProvider,
-    private client: TheMovieDatabaseClient,
+    private client: TheMovieDatabaseApiClient,
   ) {}
 
   /**

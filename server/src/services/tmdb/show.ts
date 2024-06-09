@@ -4,14 +4,14 @@
 
 /* eslint-disable no-restricted-syntax */
 import { getFromContainer } from '@/infrastructure/container/container';
-import loggerMain from '@/infrastructure/logger/logger';
+import { TheMovieDatabaseApiClient } from '@/infrastructure/generated/clients';
 import {
   MovieDetailsResponse,
   MovieVideosResponse,
-  TheMovieDatabaseClient,
   TvSeriesDetailsResponse,
   TvSeriesVideosResponse,
-} from '@/infrastructure/tmdb/client';
+} from '@/infrastructure/generated/tmdb-api-client';
+import loggerMain from '@/infrastructure/logger/logger';
 import { CacheProvider } from '@/services/cache/cache-provider';
 import fanartLookup from '@/services/fanart';
 import { lookup as imdb } from '@/services/meta/imdb';
@@ -191,7 +191,7 @@ export default showLookup;
 
 // Get show details via the tmdbid
 export const getShowDetails = async (id: number) => {
-  const client = getFromContainer(TheMovieDatabaseClient);
+  const client = getFromContainer(TheMovieDatabaseApiClient);
   try {
     const [details, plex] = await Promise.all([
       client.default.tvSeriesDetails({
@@ -238,7 +238,7 @@ export const getShowDetails = async (id: number) => {
 
 // Get movie details via the tmdbid
 export const getMovieDetails = async (id: number) => {
-  const client = getFromContainer(TheMovieDatabaseClient);
+  const client = getFromContainer(TheMovieDatabaseApiClient);
   try {
     const [details, plex] = await Promise.all([
       client.default.movieDetails({
@@ -356,7 +356,7 @@ async function getSeasons(seasons, id) {
 // Lookup layer
 
 async function tmdbData(id) {
-  const client = getFromContainer(TheMovieDatabaseClient);
+  const client = getFromContainer(TheMovieDatabaseApiClient);
   try {
     const details = (await client.default.tvSeriesDetails({
       seriesId: id,
@@ -392,7 +392,7 @@ async function tmdbData(id) {
 }
 
 async function recommendationData(id, page = 1) {
-  const client = getFromContainer(TheMovieDatabaseClient);
+  const client = getFromContainer(TheMovieDatabaseApiClient);
   return client.default.tvSeriesRecommendations({
     seriesId: id,
     page,
@@ -400,7 +400,7 @@ async function recommendationData(id, page = 1) {
 }
 
 async function similarData(id, page = 1) {
-  const client = getFromContainer(TheMovieDatabaseClient);
+  const client = getFromContainer(TheMovieDatabaseApiClient);
   return client.default.tvSeriesSimilar({
     seriesId: id,
     page,
@@ -420,7 +420,7 @@ async function seasonsAsync(seasonList, id) {
 }
 
 async function getSeason(id, season) {
-  const client = getFromContainer(TheMovieDatabaseClient);
+  const client = getFromContainer(TheMovieDatabaseApiClient);
   return client.default.tvSeasonDetails({
     seriesId: id,
     seasonNumber: season,
@@ -428,7 +428,7 @@ async function getSeason(id, season) {
 }
 
 async function reviewsData(id) {
-  const client = getFromContainer(TheMovieDatabaseClient);
+  const client = getFromContainer(TheMovieDatabaseApiClient);
   return client.default.tvSeriesReviews({
     seriesId: id,
   });
@@ -465,14 +465,14 @@ function findEnRating(data) {
 }
 
 async function idLookup(id) {
-  const client = getFromContainer(TheMovieDatabaseClient);
+  const client = getFromContainer(TheMovieDatabaseApiClient);
   return client.default.tvSeriesExternalIds({
     seriesId: id,
   });
 }
 
 export async function discoverSeries(page = 1, params = {}) {
-  const client = getFromContainer(TheMovieDatabaseClient);
+  const client = getFromContainer(TheMovieDatabaseApiClient);
   const data = (await client.default.discoverTv({
     page,
     ...params,
@@ -489,7 +489,7 @@ export async function discoverSeries(page = 1, params = {}) {
 }
 
 export async function network(id) {
-  const client = getFromContainer(TheMovieDatabaseClient);
+  const client = getFromContainer(TheMovieDatabaseApiClient);
   return client.default.networkDetails({
     networkId: id,
   });

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { MovieResource } from '@/infrastructure/arr/radarr-api';
-import { SeriesResource } from '@/infrastructure/arr/sonarr-api';
+import { MovieResource } from '@/infrastructure/generated/radarr-api-client';
+import { SeriesResource } from '@/infrastructure/generated/sonarr-api-client';
 import { MovieEntity } from '@/resources/movie/entity';
 import { ShowEntity } from '@/resources/show/entity';
 

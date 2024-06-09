@@ -1,8 +1,8 @@
 import {
-  DiscordAPIClient,
+  DiscordV10ApiClient,
   RichEmbed,
   RichEmbedField,
-} from '@/infrastructure/discord';
+} from '@/infrastructure/generated/discord-api-client';
 import { DiscordNotificationProps } from '@/resources/notification/types';
 import { BaseNotificationProvider } from '@/services/notifications/base-provider';
 import { NotifyEvent, NotifyPayload } from '@/services/notifications/types';
@@ -12,11 +12,11 @@ const CommonProps = {
 };
 
 export class DiscordNotificationProvider extends BaseNotificationProvider<DiscordNotificationProps> {
-  private client: DiscordAPIClient;
+  private client: DiscordV10ApiClient;
 
   constructor(notification: DiscordNotificationProps) {
     super(notification);
-    this.client = new DiscordAPIClient();
+    this.client = new DiscordV10ApiClient();
   }
 
   private buildFields(

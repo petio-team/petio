@@ -7,8 +7,8 @@ import Bluebird from 'bluebird';
 
 // eslint-disable-next-line import/order
 import { getFromContainer } from '@/infrastructure/container/container';
+import { TheMovieDatabaseApiClient } from '@/infrastructure/generated/clients';
 import loggerMain from '@/infrastructure/logger/logger';
-import { TheMovieDatabaseClient } from '@/infrastructure/tmdb/client';
 import is from '@/infrastructure/utils/is';
 import { DiscoveryRepository } from '@/resources/discovery/repository';
 import { MediaServerRepository } from '@/resources/media-server/repository';
@@ -633,21 +633,21 @@ function genreID(genreName: any, type: string) {
 }
 
 function discoverMovie(page = 1, params = {}) {
-  return getFromContainer(TheMovieDatabaseClient).default.discoverMovie({
+  return getFromContainer(TheMovieDatabaseApiClient).default.discoverMovie({
     page,
     ...params,
   });
 }
 
 function discoverShow(page = 1, params = {}) {
-  return getFromContainer(TheMovieDatabaseClient).default.discoverTv({
+  return getFromContainer(TheMovieDatabaseApiClient).default.discoverTv({
     page,
     ...params,
   });
 }
 
 async function searchPeople(term: any) {
-  return getFromContainer(TheMovieDatabaseClient).default.searchPerson({
+  return getFromContainer(TheMovieDatabaseApiClient).default.searchPerson({
     query: term,
   });
 }

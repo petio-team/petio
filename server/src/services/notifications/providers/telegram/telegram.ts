@@ -1,14 +1,14 @@
-import { TelegramAPIClient } from '@/infrastructure/telegram';
+import { TelegramV7ApiClient } from '@/infrastructure/generated/telegram-api-client';
 import { BaseNotificationProvider } from '@/services/notifications/base-provider';
 import { TelegramNotificationProps } from '@/services/notifications/providers/telegram/types';
 import { NotifyEvent, NotifyPayload } from '@/services/notifications/types';
 
 export class TelegramNotificationProvider extends BaseNotificationProvider<TelegramNotificationProps> {
-  private client: TelegramAPIClient;
+  private client: TelegramV7ApiClient;
 
   constructor(notification: TelegramNotificationProps) {
     super(notification);
-    this.client = new TelegramAPIClient({
+    this.client = new TelegramV7ApiClient({
       BASE: `https://api.telegram.org/bot${notification.metadata.botId}`,
     });
   }

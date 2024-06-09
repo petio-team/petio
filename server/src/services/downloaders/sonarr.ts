@@ -1,8 +1,8 @@
 /* eslint-disable no-await-in-loop */
 
 /* eslint-disable no-restricted-syntax */
-import { ArrSonarrAPIClient } from '@/infrastructure/arr/sonarr-api';
 import { getFromContainer } from '@/infrastructure/container/container';
+import { SonarrV3ApiClient } from '@/infrastructure/generated/sonarr-api-client';
 import loggerMain from '@/infrastructure/logger/logger';
 import { DownloaderEntity } from '@/resources/downloader/entity';
 import { DownloaderRepository } from '@/resources/downloader/repository';
@@ -14,11 +14,11 @@ const logger = loggerMain.child({ module: 'downloaders.sonarr' });
 export default class Sonarr {
   instance: DownloaderEntity;
 
-  client: ArrSonarrAPIClient;
+  client: SonarrV3ApiClient;
 
   constructor(instance: DownloaderEntity) {
     this.instance = instance;
-    this.client = new ArrSonarrAPIClient({
+    this.client = new SonarrV3ApiClient({
       BASE: instance.url,
       HEADERS: {
         'x-api-key': instance.token,
@@ -26,7 +26,7 @@ export default class Sonarr {
     });
   }
 
-  public getClient(): ArrSonarrAPIClient {
+  public getClient(): SonarrV3ApiClient {
     return this.client;
   }
 
@@ -36,7 +36,7 @@ export default class Sonarr {
       type: DownloaderType.SONARR,
     });
     for (const instance of instances) {
-      const api = new ArrSonarrAPIClient({
+      const api = new SonarrV3ApiClient({
         BASE: instance.url,
         HEADERS: {
           'x-api-key': instance.token,

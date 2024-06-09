@@ -1,53 +1,8 @@
 import loggerMain from '@/infrastructure/logger/logger';
-import { PlexClient } from '@/infrastructure/plex';
 import { MediaServerEntity } from '@/resources/media-server/entity';
 import { getPlexClient } from '@/services/plex/client';
 
 const logger = loggerMain.child({ module: 'plex.bandwidth' });
-
-export type GetBandwidthResource = {
-  MediaContainer: {
-    size: number;
-    Device: Array<{
-      id: number;
-      name: string;
-      platform: string;
-      clientIdentifier: string;
-      createdAt: number;
-    }>;
-    Account: Array<{
-      id: number;
-      key: string;
-      name: string;
-      defaultAudioLanguage: string;
-      autoSelectAudio: boolean;
-      defaultSubtitleLanguage: string;
-      subtitleMode: number;
-      thumb: string;
-    }>;
-    StatisticsBandwidth: Array<{
-      accountID: number;
-      deviceID: number;
-      timespan: number;
-      at: number;
-      lan: boolean;
-      bytes: number;
-    }>;
-  };
-};
-
-export const getBandwidthResource = (client: PlexClient) =>
-  client.request.request<GetBandwidthResource>({
-    method: 'GET',
-    url: '/statistics/bandwidth',
-    query: {
-      timespan: '6',
-    },
-    errors: {
-      400: 'Bad Request - A parameter was not specified, or was specified incorrectly.',
-      401: 'Unauthorized - Returned if the X-Plex-Token is missing from the header or query.',
-    },
-  });
 
 function timeDifference(prev) {
   let previous = prev;
@@ -74,7 +29,7 @@ function timeDifference(prev) {
 export default async (server: MediaServerEntity) => {
   try {
     const client = getPlexClient(server);
-    const res = await getBandwidthResource(client);
+    const res = await client.getStatisticsBandwidth({ timespan: 6 });
     const data: any = {};
     const bWidth: any = [];
     res.MediaContainer.StatisticsBandwidth.forEach((el) => {

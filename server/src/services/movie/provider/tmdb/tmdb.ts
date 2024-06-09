@@ -6,8 +6,9 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@/infrastructure/exceptions/exceptions';
+import { TheMovieDatabaseApiClient } from '@/infrastructure/generated/clients';
+import { ApiError } from '@/infrastructure/generated/tmdb-api-client';
 import { Logger } from '@/infrastructure/logger/logger';
-import { ApiError, TheMovieDatabaseClient } from '@/infrastructure/tmdb/client';
 import is from '@/infrastructure/utils/is';
 import { CacheProvider } from '@/services/cache/cache-provider';
 import {
@@ -33,7 +34,7 @@ export class TmdbMovieProvider implements MovieProvider, MovieTrendingProvider {
 
   constructor(
     logger: Logger,
-    private readonly client: TheMovieDatabaseClient,
+    private readonly client: TheMovieDatabaseApiClient,
     private readonly cache: CacheProvider,
   ) {
     this.logger = logger.child({

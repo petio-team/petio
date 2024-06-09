@@ -7,9 +7,9 @@ import { z } from 'zod';
 import { adminRequired } from '@/api/middleware/auth';
 import { validateRequest } from '@/api/middleware/validation';
 import { ArrInput, ArrInputSchema } from '@/api/schemas/downloaders';
-import { ArrRadarrAPIClient } from '@/infrastructure/arr/radarr-api';
-import { ArrSonarrAPIClient } from '@/infrastructure/arr/sonarr-api';
 import { getFromContainer } from '@/infrastructure/container/container';
+import { RadarrV3ApiClient } from '@/infrastructure/generated/radarr-api-client';
+import { SonarrV3ApiClient } from '@/infrastructure/generated/sonarr-api-client';
 import logger from '@/infrastructure/logger/logger';
 import { DownloaderEntity } from '@/resources/downloader/entity';
 import { DownloaderMapper } from '@/resources/downloader/mapper';
@@ -33,7 +33,7 @@ async function getInstances(type: DownloaderType) {
     type,
   });
   const Cls =
-    type === DownloaderType.SONARR ? ArrSonarrAPIClient : ArrRadarrAPIClient;
+    type === DownloaderType.SONARR ? SonarrV3ApiClient : RadarrV3ApiClient;
   return instances.map((i) => ({
     instance: i,
     client: new Cls({
@@ -48,11 +48,11 @@ async function getInstances(type: DownloaderType) {
 async function getInstance(
   id: string,
   type: DownloaderType.RADARR,
-): Promise<ArrRadarrAPIClient | undefined>;
+): Promise<RadarrV3ApiClient | undefined>;
 async function getInstance(
   id: string,
   type: DownloaderType.SONARR,
-): Promise<ArrSonarrAPIClient | undefined>;
+): Promise<SonarrV3ApiClient | undefined>;
 async function getInstance(id: string, type: DownloaderType) {
   const result = await getFromContainer(DownloaderRepository).findOne({
     id,
@@ -61,7 +61,7 @@ async function getInstance(id: string, type: DownloaderType) {
   if (result.isSome()) {
     const instance = result.unwrap();
     const Cls =
-      type === DownloaderType.SONARR ? ArrSonarrAPIClient : ArrRadarrAPIClient;
+      type === DownloaderType.SONARR ? SonarrV3ApiClient : RadarrV3ApiClient;
     return new Cls({
       BASE: instance.url.replace(/\/$/, ''),
       HEADERS: {
@@ -284,7 +284,7 @@ const updateSonarrConfig = async (ctx: Context) => {
       `${instance.protocol}://${instance.host}:${instance.port}/${instance.subpath}`,
     );
 
-    const api = new ArrSonarrAPIClient({
+    const api = new SonarrV3ApiClient({
       BASE: url.toString(),
       HEADERS: {
         'x-api-key': instance.token,
@@ -377,13 +377,13 @@ const getCalendarData = async (ctx: Context) => {
     const url = new URL(instance.url);
     const api =
       instance.type === DownloaderType.SONARR
-        ? new ArrSonarrAPIClient({
+        ? new SonarrV3ApiClient({
             BASE: url.toString(),
             HEADERS: {
               'x-api-key': instance.token,
             },
           })
-        : new ArrRadarrAPIClient({
+        : new RadarrV3ApiClient({
             BASE: url.toString(),
             HEADERS: {
               'x-api-key': instance.token,
@@ -599,7 +599,7 @@ const updateRadarrConfig = async (ctx: Context) => {
       `${instance.protocol}://${instance.host}:${instance.port}/${instance.subpath}`,
     );
 
-    const api = new ArrRadarrAPIClient({
+    const api = new RadarrV3ApiClient({
       BASE: url.toString(),
       HEADERS: {
         'x-api-key': instance.token,

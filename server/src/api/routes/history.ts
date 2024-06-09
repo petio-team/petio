@@ -8,7 +8,6 @@ import { MediaServerRepository } from '@/resources/media-server/repository';
 import getBandwidth from '@/services/plex/bandwidth';
 import { getPlexClient } from '@/services/plex/client';
 import getHistory from '@/services/plex/history';
-import getServerInfo from '@/services/plex/serverInfo';
 
 const listHistory = async (ctx: Context) => {
   let { id } = ctx.request.body;
@@ -46,7 +45,9 @@ const getServerData = async (ctx: Context) => {
     }
     const server = serverResult.unwrap();
     const client = getPlexClient(server);
-    const data = await getServerInfo(client);
+    const data = await client.getStatisticsResources({
+      timespan: 6,
+    });
     if (!data) {
       ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
       ctx.body = `failed to get server info`;

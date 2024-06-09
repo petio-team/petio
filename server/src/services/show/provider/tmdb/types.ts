@@ -9,7 +9,7 @@ import {
   TvSeriesRecommendationsResponse,
   TvSeriesSimilarResponse,
   TvSeriesVideosResponse,
-} from '@/infrastructure/tmdb/client';
+} from '@/infrastructure/generated/tmdb-api-client';
 
 export type ShowDetailsProviderResponse = TvSeriesDetailsResponse & {
   videos?: Omit<TvSeriesVideosResponse, 'id'>;

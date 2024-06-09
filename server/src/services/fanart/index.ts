@@ -1,5 +1,5 @@
 import { getFromContainer } from '@/infrastructure/container/container';
-import { FanartTVAPI } from '@/infrastructure/fanart/client';
+import { FanartTvApiClient } from '@/infrastructure/generated/clients';
 import loggerMain from '@/infrastructure/logger/logger';
 import { CacheProvider } from '@/services/cache/cache-provider';
 
@@ -9,7 +9,7 @@ export default async (id: string, type: any) => {
   let data: any = {};
   try {
     data = getFromContainer(CacheProvider).wrap(id, async () => {
-      const client = getFromContainer(FanartTVAPI);
+      const client = getFromContainer(FanartTvApiClient);
       switch (type) {
         case 'movie': {
           return client.movie.getMovieImages({ movieId: id });
