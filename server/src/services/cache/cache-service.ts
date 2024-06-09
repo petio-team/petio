@@ -16,7 +16,7 @@ import { CompanyService } from '@/services/company/company-service';
 import { MovieService } from '@/services/movie/movie';
 import { NetworkService } from '@/services/network/network-service';
 import { PersonService } from '@/services/person/person-service';
-import { ShowService } from '@/services/show/show';
+import { ShowService } from '@/services/show/show-service';
 
 @Service()
 export class CacheService {

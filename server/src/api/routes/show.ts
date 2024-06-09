@@ -4,7 +4,7 @@ import { Context } from 'koa';
 
 import { getFromContainer } from '@/infrastructure/container/container';
 import { ShowMapper } from '@/resources/show/mapper';
-import { ShowService } from '@/services/show/show';
+import { ShowService } from '@/services/show/show-service';
 import { discoverSeries, network } from '@/services/tmdb/show';
 
 const lookupById = async (ctx: Context) => {

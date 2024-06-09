@@ -39,7 +39,13 @@ export class NetworkService {
             .map((result) => result.unwrap());
         },
       );
-      return networks.map((network) => NetworkEntity.create(network));
+      return networks.map((network) => {
+        this.logger.debug(
+          { networkId: network.provider.tmdbId },
+          `got network details`,
+        );
+        return NetworkEntity.create(network);
+      });
     } catch (error) {
       this.logger.error({ error }, 'Error fetching networks');
       return [];

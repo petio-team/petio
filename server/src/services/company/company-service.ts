@@ -38,7 +38,13 @@ export class CompanyService {
             .map((result) => result.unwrap());
         },
       );
-      return companies.map((company) => CompanyEntity.create(company));
+      return companies.map((company) => {
+        this.logger.debug(
+          { companyId: company.provider.tmdbId },
+          `got company details`,
+        );
+        return CompanyEntity.create(company);
+      });
     } catch (error) {
       this.logger.error({ error }, 'Error fetching companies');
       return [];

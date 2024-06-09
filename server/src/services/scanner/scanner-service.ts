@@ -15,7 +15,7 @@ import { ShowRepository } from '@/resources/show/repository';
 import { MovieService } from '@/services/movie/movie';
 import { ScannerProvider } from '@/services/scanner/provider';
 import { scannerProviders } from '@/services/scanner/providers';
-import { ShowService } from '@/services/show/show';
+import { ShowService } from '@/services/show/show-service';
 import { UserService } from '@/services/user/user';
 
 @Service()

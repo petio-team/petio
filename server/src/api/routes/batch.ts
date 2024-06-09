@@ -8,7 +8,7 @@ import { getFromContainer } from '@/infrastructure/container/container';
 import { MovieMapper } from '@/resources/movie/mapper';
 import { ShowMapper } from '@/resources/show/mapper';
 import { MovieService } from '@/services/movie/movie';
-import { ShowService } from '@/services/show/show';
+import { ShowService } from '@/services/show/show-service';
 
 const handleTv = async (ctx: Context) => {
   const service = getFromContainer(ShowService);

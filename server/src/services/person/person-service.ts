@@ -12,7 +12,7 @@ import {
   PersonTrendingProvider,
 } from '@/services/person/provider/provider';
 import { GetDetailsOptions } from '@/services/person/types';
-import { ShowService } from '@/services/show/show';
+import { ShowService } from '@/services/show/show-service';
 
 @Service()
 export class PersonService {
@@ -67,6 +67,7 @@ export class PersonService {
           ),
         ]);
       }
+      this.logger.debug({ personId: id }, `got person details`);
       return Some(person);
     } catch (error) {
       this.logger.error({ error }, 'Error fetching person details');

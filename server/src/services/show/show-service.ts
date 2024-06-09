@@ -77,6 +77,10 @@ export class ShowService {
           const artwork = artworkResult?.isOk()
             ? artworkResult.unwrap()
             : undefined;
+          this.logger.debug(
+            { showId: id, seasons: details.seasons.length },
+            `got show details`,
+          );
           return {
             ...details,
             artwork: {

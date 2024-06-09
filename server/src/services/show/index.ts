@@ -7,7 +7,7 @@ import {
   ShowTrendingProvider,
 } from '@/services/show/provider/provider';
 import { TmdbShowProvider } from '@/services/show/provider/tmdb/tmdb';
-import { ShowService } from '@/services/show/show';
+import { ShowService } from '@/services/show/show-service';
 
 export default (builder: ContainerBuilder) => {
   builder.register(ShowProvider).use(TmdbShowProvider).asSingleton();
