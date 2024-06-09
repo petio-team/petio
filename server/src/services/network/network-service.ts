@@ -41,7 +41,7 @@ export class NetworkService {
       );
       return networks.map((network) => {
         this.logger.debug(
-          { networkId: network.provider.tmdbId },
+          { networkId: network.provider.tmdbId, name: network.name },
           `got network details`,
         );
         return NetworkEntity.create(network);

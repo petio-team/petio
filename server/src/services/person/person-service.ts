@@ -45,6 +45,7 @@ export class PersonService {
     options?: GetDetailsOptions,
   ): Promise<Option<PersonEntity>> {
     try {
+      const start = Date.now();
       const personResult = await this.personDetailsProvider.getDetails(id);
       if (!personResult.isOk()) {
         return None;
@@ -67,7 +68,11 @@ export class PersonService {
           ),
         ]);
       }
-      this.logger.debug({ personId: id }, `got person details`);
+      const end = Date.now();
+      this.logger.debug(
+        { personId: id, name: person.name },
+        `got person details in ${end - start}ms`,
+      );
       return Some(person);
     } catch (error) {
       this.logger.error({ error }, 'Error fetching person details');

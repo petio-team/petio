@@ -40,7 +40,7 @@ export class CompanyService {
       );
       return companies.map((company) => {
         this.logger.debug(
-          { companyId: company.provider.tmdbId },
+          { companyId: company.provider.tmdbId, name: company.name },
           `got company details`,
         );
         return CompanyEntity.create(company);

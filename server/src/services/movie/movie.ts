@@ -54,6 +54,7 @@ export class MovieService {
       options && Object.keys(options).length ? toQueryString(options) : '';
     const cacheName = `movie.${id}${optionsAsString}`;
     try {
+      const start = Date.now();
       const result = await this.cacheProvider.wrap(
         cacheName,
         async () => {
@@ -78,7 +79,6 @@ export class MovieService {
           const details = detailsResult.unwrap();
           const ratings = ratingProvider?.isOk() ? ratingProvider.unwrap() : {};
           const artwork = artworkResult?.isOk() ? artworkResult.unwrap() : {};
-          this.logger.debug({ movieId: id }, `got movie details`);
           return {
             ...details,
             artwork: {
@@ -109,6 +109,11 @@ export class MovieService {
         );
         return None;
       }
+      const end = Date.now();
+      this.logger.debug(
+        { movieId: id, name: result.title },
+        `got movie details in ${end - start}ms`,
+      );
       return Some(MovieEntity.create(result));
     } catch (error) {
       this.logger.error(
