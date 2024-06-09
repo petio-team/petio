@@ -118,7 +118,7 @@ export class TmdbShowProvider implements ShowProvider {
               })) || [],
           };
         },
-        this.defaultCacheTTL,
+        this.defaultCacheTTL * 7,
       );
       return Ok(season);
     } catch (error) {
@@ -378,7 +378,7 @@ export class TmdbShowProvider implements ShowProvider {
             source: 'tmdb',
           };
         },
-        this.defaultCacheTTL,
+        this.defaultCacheTTL * 7,
       );
       return Ok(details);
     } catch (error) {
