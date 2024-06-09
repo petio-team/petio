@@ -42,7 +42,7 @@ export class ClearCacheJob implements Jobber {
       },
       '1 day',
       {
-        lockLifetime: 1000 * 60 * 60 * 24,
+        lockLifetime: 1000 * 60 * 10,
       },
     );
   }

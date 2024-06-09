@@ -78,6 +78,7 @@ export class MovieService {
           const details = detailsResult.unwrap();
           const ratings = ratingProvider?.isOk() ? ratingProvider.unwrap() : {};
           const artwork = artworkResult?.isOk() ? artworkResult.unwrap() : {};
+          this.logger.debug(`got movie details for ${id}`);
           return {
             ...details,
             artwork: {

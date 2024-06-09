@@ -44,6 +44,20 @@ export class CacheService {
   }
 
   /**
+   * Builds the cache by fetching common resources and logs the time taken.
+   * @returns {Promise<void>} A promise that resolves when the cache is built.
+   */
+  async buildCache(): Promise<void> {
+    this.logger.info(
+      'Updating cache with common resources, this may take a while...',
+    );
+    const start = Date.now();
+    await this.getCommonResources();
+    const end = Date.now();
+    this.logger.info(`Finished building cache in ${end - start}ms`);
+  }
+
+  /**
    * Retrieves common resources from cache or fetches them from the respective services.
    * @returns A Promise that resolves to a TrendingResponse object containing the fetched resources.
    */

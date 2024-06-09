@@ -77,10 +77,7 @@ async function doPrimary() {
   logger.info(`Petio v${appConfig.version} [debug] [pid:${PUID},gid:${PGID}]`);
 
   // Create initial cache if it doesn't exist
-  logger.info('Updating cache with common resources');
-  const cacheService = getFromContainer(CacheService);
-  await cacheService.getCommonResources();
-  logger.info('Finished updating cache with common resources');
+  await getFromContainer(CacheService).buildCache();
 
   // run workers
   await getFromContainer(Master).runWorkers();
