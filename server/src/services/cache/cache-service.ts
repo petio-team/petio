@@ -13,7 +13,7 @@ import {
   CommonResourcesResponse,
 } from '@/services/cache/types';
 import { CompanyService } from '@/services/company/company-service';
-import { MovieService } from '@/services/movie/movie';
+import { MovieService } from '@/services/movie/movie-service';
 import { NetworkService } from '@/services/network/network-service';
 import { PersonService } from '@/services/person/person-service';
 import { ShowService } from '@/services/show/show-service';

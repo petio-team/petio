@@ -114,7 +114,7 @@ export class TmdbMovieProvider implements MovieProvider, MovieTrendingProvider {
           : undefined;
         const images = this.buildArtworkUrls(detailsResult.images);
         return {
-          title: detailsResult.title || '',
+          title: detailsResult.title || detailsResult.original_title || '',
           description: detailsResult.overview || '',
           certification:
             detailsResult.release_dates?.results.find(

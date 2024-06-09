@@ -12,7 +12,7 @@ import { MovieEntity } from '@/resources/movie/entity';
 import { MovieRepository } from '@/resources/movie/repository';
 import { ShowEntity } from '@/resources/show/entity';
 import { ShowRepository } from '@/resources/show/repository';
-import { MovieService } from '@/services/movie/movie';
+import { MovieService } from '@/services/movie/movie-service';
 import { ScannerProvider } from '@/services/scanner/provider';
 import { scannerProviders } from '@/services/scanner/providers';
 import { ShowService } from '@/services/show/show-service';

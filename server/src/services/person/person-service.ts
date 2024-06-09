@@ -6,7 +6,7 @@ import { Logger } from '@/infrastructure/logger/logger';
 import { PersonEntity } from '@/resources/person/entity';
 import { PersonProps } from '@/resources/person/types';
 import { CacheProvider } from '@/services/cache/cache-provider';
-import { MovieService } from '@/services/movie/movie';
+import { MovieService } from '@/services/movie/movie-service';
 import {
   PersonDetailsProvider,
   PersonTrendingProvider,

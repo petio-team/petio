@@ -4,7 +4,7 @@ import { Context } from 'koa';
 
 import { getFromContainer } from '@/infrastructure/container/container';
 import { MovieMapper } from '@/resources/movie/mapper';
-import { MovieService } from '@/services/movie/movie';
+import { MovieService } from '@/services/movie/movie-service';
 import { company, discoverMovie } from '@/services/tmdb/movie';
 
 const lookupById = async (ctx: Context) => {

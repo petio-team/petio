@@ -185,6 +185,7 @@ export class PlexScannerProvider implements ScannerProvider {
       if (
         !is.truthy(content.ratingKey) ||
         content.type !== 'show' ||
+        !is.truthy(content.title) ||
         !is.truthy(content.guid) ||
         !is.truthy(content.Guid)
       ) {
@@ -262,6 +263,7 @@ export class PlexScannerProvider implements ScannerProvider {
       if (
         !is.truthy(metadata.ratingKey) ||
         metadata.type !== 'movie' ||
+        !is.truthy(metadata.title) ||
         !is.truthy(metadata.guid) ||
         !is.truthy(metadata.Guid)
       ) {

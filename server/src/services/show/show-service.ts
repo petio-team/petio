@@ -68,7 +68,6 @@ export class ShowService {
             return undefined;
           }
           const details = detailsResult.unwrap();
-
           const artworkResult =
             options?.withArtwork && details.providers.tvdb
               ? await this.showArtworkProvider.getArtworkImages(

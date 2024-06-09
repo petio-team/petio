@@ -1,6 +1,6 @@
 import { ContainerBuilder } from 'diod';
 
-import { MovieService } from '@/services/movie/movie';
+import { MovieService } from '@/services/movie/movie-service';
 import { FanartMovieProvider } from '@/services/movie/provider/fanart/fanart';
 import {
   MovieArtworkProvider,

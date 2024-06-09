@@ -7,7 +7,7 @@ import { validateRequest } from '@/api/middleware/validation';
 import { getFromContainer } from '@/infrastructure/container/container';
 import { MovieMapper } from '@/resources/movie/mapper';
 import { ShowMapper } from '@/resources/show/mapper';
-import { MovieService } from '@/services/movie/movie';
+import { MovieService } from '@/services/movie/movie-service';
 import { ShowService } from '@/services/show/show-service';
 
 const handleTv = async (ctx: Context) => {
