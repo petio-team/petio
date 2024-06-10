@@ -54,7 +54,7 @@ export class ShowService {
       options && Object.keys(options).length ? toQueryString(options) : '';
     const cacheName = `show.${id}${optionsAsString}`;
     try {
-      const start = Date.now();
+      const start = performance.now();
       const result = await this.cacheProvider.wrap<ShowProps | undefined>(
         cacheName,
         async () => {
@@ -109,10 +109,10 @@ export class ShowService {
         this.logger.debug({ showId: id }, 'show not found');
         return None;
       }
-      const end = Date.now();
+      const end = performance.now();
       this.logger.debug(
         { showId: id, name: result.title, seasons: result.seasons.length },
-        `got show details in ${end - start}ms`,
+        `got show details in ${Math.round(end - start)}ms`,
       );
       return Some(ShowEntity.create(result));
     } catch (error) {

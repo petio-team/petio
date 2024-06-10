@@ -54,7 +54,7 @@ export class MovieService {
       options && Object.keys(options).length ? toQueryString(options) : '';
     const cacheName = `movie.${id}${optionsAsString}`;
     try {
-      const start = Date.now();
+      const start = performance.now();
       const result = await this.cacheProvider.wrap(
         cacheName,
         async () => {
@@ -109,10 +109,10 @@ export class MovieService {
         );
         return None;
       }
-      const end = Date.now();
+      const end = performance.now();
       this.logger.debug(
         { movieId: id, name: result.title },
-        `got movie details in ${end - start}ms`,
+        `got movie details in ${Math.round(end - start)}ms`,
       );
       return Some(MovieEntity.create(result));
     } catch (error) {

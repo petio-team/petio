@@ -45,7 +45,7 @@ export class PersonService {
     options?: GetDetailsOptions,
   ): Promise<Option<PersonEntity>> {
     try {
-      const start = Date.now();
+      const start =  performance.now();
       const personResult = await this.personDetailsProvider.getDetails(id);
       if (!personResult.isOk()) {
         return None;
@@ -68,10 +68,10 @@ export class PersonService {
           ),
         ]);
       }
-      const end = Date.now();
+      const end = performance.now();
       this.logger.debug(
         { personId: id, name: person.name },
-        `got person details in ${end - start}ms`,
+        `got person details in ${Math.round(end - start)}ms`,
       );
       return Some(person);
     } catch (error) {
