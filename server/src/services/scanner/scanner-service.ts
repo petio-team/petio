@@ -139,7 +139,10 @@ export class ScannerService {
         return undefined;
       }
       const details = detailsResult.unwrap();
-      this.logger.debug(`Syncing movie ${movie.title}`);
+      this.logger.debug(
+        { id: movie.id, providerId: movie.providers.tmdb, name: movie.title },
+        `Syncing movie`,
+      );
       return await this.movieRepository.updateOrCreate(
         MovieEntity.create({
           ...details.getProps(),
@@ -180,7 +183,10 @@ export class ScannerService {
         return undefined;
       }
       const details = detailsResult.unwrap();
-      this.logger.debug(`Syncing show '${show.title}'`);
+      this.logger.debug(
+        { id: show.id, providerId: show.providers.tmdb, name: show.title },
+        `Syncing show'`,
+      );
       return await this.showRepository.updateOrCreate(
         ShowEntity.create({
           ...details.getProps(),
