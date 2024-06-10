@@ -289,7 +289,8 @@ export class ScannerService {
             const users = await provider.getUsers();
             await Bluebird.map(users, async (user) => {
               this.logger.debug(
-                `Syncing user '${user.username}' from server '${server.name}' (${server.id})`,
+                { name: user.username, server: server.name },
+                `Syncing user`,
               );
               return this.userService.updateUser(user.getProps());
             });
