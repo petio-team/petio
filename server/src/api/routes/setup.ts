@@ -7,7 +7,7 @@ import { validateRequest } from '@/api/middleware/validation';
 import { SetupTestInput, SetupTestInputSchema } from '@/api/schemas/setup';
 import { getFromContainer } from '@/infrastructure/container/container';
 import logger from '@/infrastructure/logger/logger';
-import { SetupService } from '@/services/setup/setup';
+import { SetupService } from '@/services/setup/setup-service';
 
 const testServer = async (ctx: Context) => {
   const body = ctx.request.body as SetupTestInput;
