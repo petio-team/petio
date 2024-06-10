@@ -130,7 +130,7 @@ export class TmdbPersonProvider implements PersonDetailsProvider {
   async getTrending(): Promise<PersonProviderTrendingResponse> {
     try {
       const trendingResults = await this.client.default.trendingPeople({
-        timeWindow: 'week',
+        timeWindow: 'day',
       });
       return Ok(
         trendingResults.results

@@ -356,7 +356,7 @@ export class TmdbMovieProvider implements MovieProvider, MovieTrendingProvider {
     try {
       const results = await this.cache.wrap('tmdb.movie.trending', async () => {
         const data = await this.client.default.trendingMovies({
-          timeWindow: 'week',
+          timeWindow: 'day',
         });
         return (
           data.results

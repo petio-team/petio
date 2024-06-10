@@ -404,7 +404,7 @@ export class TmdbShowProvider implements ShowProvider {
         'tmdb.show.trending',
         async () => {
           const results = await this.client.default.trendingTv({
-            timeWindow: 'week',
+            timeWindow: 'day',
           });
           return (
             results.results
