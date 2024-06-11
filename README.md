@@ -1,4 +1,4 @@
-# Petio 0.5.5
+# Petio 0.5.6
 
 <p align="center">
   <img src="https://img.shields.io/github/package-json/v/petio-team/petio/master?label=Latest">
@@ -25,6 +25,7 @@ This application can be installed to run in docker or as a standalone binary tha
 
 Binary (executable file) guides
 **note:** this method requires a local mongodb instance to be installed
+
 <ul>
 <li><a target="_blank" href="https://docs.petio.tv/install-guides/windows">Windows</a> </li>
 <li><a target="_blank" href="https://docs.petio.tv/install-guides/linux">Linux</a> </li>
