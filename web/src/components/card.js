@@ -76,7 +76,11 @@ function Card({
       case 'movie':
         redux = redux_movies[id];
         setTitle(redux ? redux.title : '');
-        setPosterState(redux ? `https://image.tmdb.org/t/p/h632${redux.poster_path}` : false);
+        setPosterState(
+          redux && redux.poster_path
+            ? `https://image.tmdb.org/t/p/h632${redux.poster_path}`
+            : false,
+        );
         setOnServer(redux ? redux.on_server : false);
         setData(redux ? redux : false);
         if (redux) {
@@ -91,7 +95,11 @@ function Card({
       case 'show':
         redux = redux_tv[id];
         setTitle(redux ? redux.name : '');
-        setPosterState(redux ? `https://image.tmdb.org/t/p/h632${redux.poster_path}` : false);
+        setPosterState(
+          redux && redux.poster_path
+            ? `https://image.tmdb.org/t/p/h632${redux.poster_path}`
+            : false,
+        );
         setOnServer(redux ? redux.on_server : false);
         setData(redux ? redux : false);
         if (redux) {
@@ -104,7 +112,9 @@ function Card({
         break;
       case 'people':
         setTitle(title);
-        setPosterState(poster ? `https://image.tmdb.org/t/p/w342${poster}` : false);
+        setPosterState(
+          poster ? `https://image.tmdb.org/t/p/w342${poster}` : false,
+        );
         break;
       default:
         setTitle(false);
