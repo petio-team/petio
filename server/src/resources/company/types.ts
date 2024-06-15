@@ -11,7 +11,7 @@ export type CompanyProps = {
       source: string;
     };
   };
-  provider: {
+  providers: {
     tmdbId: number;
   };
   source: string;

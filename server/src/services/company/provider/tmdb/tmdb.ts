@@ -52,8 +52,8 @@ export class CompanyTmdbProvider implements CompanyDetailsProvider {
                   }
                 : undefined,
             },
-            provider: {
-              tmdbId: response.id!,
+            providers: {
+              tmdbId: response.id || id,
             },
             source: 'tmdb',
           };

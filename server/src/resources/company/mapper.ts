@@ -37,7 +37,7 @@ export class CompanyMapper
       props: {
         name: record.name,
         artwork: record.artwork,
-        provider: record.provider,
+        providers: record.provider,
         source: record.source,
       },
       createdAt: record.createdAt,
@@ -53,7 +53,7 @@ export class CompanyMapper
   toResponse(entity: CompanyEntity): CompanyResponseProps {
     const copy = entity.getProps();
     return {
-      id: copy.provider.tmdbId,
+      id: copy.providers.tmdbId,
       name: copy.name,
       logo_path: copy.artwork.logo?.url || '',
     };

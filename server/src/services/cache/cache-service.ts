@@ -79,31 +79,28 @@ export class CacheService {
                 this.networkService.getNetworks(),
                 this.companyService.getCompanies(),
               ]);
-            const [showDiscovery, movieDiscovery] = await Bluebird.all([
-              Bluebird.map(networks, async (network) =>
-                this.showService.getDiscover({
-                  filterByNetworkId: network.providers.tmdbId,
-                }),
+            await Bluebird.all([
+              Bluebird.all(
+                networks.map(async (network) =>
+                  this.showService.getDiscover({
+                    filterByNetworkId: network.providers.tmdbId,
+                  }),
+                ),
               ),
-              Bluebird.map(companies, async (company) =>
-                this.movieService.getDiscover({
-                  filterByCompanyId: parseInt(company.id, 10),
-                }),
+              Bluebird.all(
+                companies.map(async (company) =>
+                  this.movieService.getDiscover({
+                    filterByCompanyId: company.providers.tmdbId,
+                  }),
+                ),
               ),
             ]);
-
             return {
               movies: movies.map((movie) => movie.getProps()),
               shows: shows.map((show) => show.getProps()),
               people: people.map((person) => person.getProps()),
               networks: networks.map((network) => network.getProps()),
               companies: companies.map((company) => company.getProps()),
-              showDiscovery: showDiscovery
-                .flat()
-                .map((show) => show.getProps()),
-              movieDiscovery: movieDiscovery
-                .flat()
-                .map((movie) => movie.getProps()),
             };
           },
           this.defaultCacheTTL,
@@ -118,12 +115,6 @@ export class CacheService {
         companies: results.companies.map((company) =>
           CompanyEntity.create(company),
         ),
-        showDiscovery: results.showDiscovery.map((show) =>
-          ShowEntity.create(show),
-        ),
-        movieDiscovery: results.movieDiscovery.map((movie) =>
-          MovieEntity.create(movie),
-        ),
       };
     } catch (error) {
       this.logger.error({ error }, 'Error storing trending data');
@@ -133,8 +124,6 @@ export class CacheService {
         people: [],
         networks: [],
         companies: [],
-        showDiscovery: [],
-        movieDiscovery: [],
       };
     }
   }
