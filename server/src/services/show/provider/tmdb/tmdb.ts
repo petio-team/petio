@@ -439,6 +439,7 @@ export class TmdbShowProvider
           const data = await this.client.default.discoverTv({
             page: options?.page || 1,
             withNetworks: options?.withNetworkId,
+            withGenres: options?.withGenreId?.toString(),
           });
           return (
             data.results

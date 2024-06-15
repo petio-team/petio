@@ -13,4 +13,5 @@ export type DiscoverShowsOptions = {
   page?: number;
   limit?: number;
   filterByNetworkId?: number;
+  filterByGenreId?: number;
 };

@@ -196,6 +196,7 @@ export class MovieService {
           const discovery = await this.discoverProvider.getDiscover({
             page: options?.page || 1,
             withCompanyId: options?.filterByCompanyId,
+            withGenreId: options?.filterByGenreId,
           });
           if (discovery.isErr()) {
             return [];

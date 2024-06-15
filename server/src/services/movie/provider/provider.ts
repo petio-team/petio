@@ -42,6 +42,7 @@ export abstract class MovieTrendingProvider {
 export type MovieDiscoverOptions = {
   page?: number;
   withCompanyId?: number;
+  withGenreId?: number;
 };
 export type MovieDiscoverResponse = Result<number[], ExceptionBase>;
 export abstract class MovieDiscoverProvider {

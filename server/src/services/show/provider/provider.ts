@@ -43,6 +43,7 @@ export abstract class ShowTrendingProvider {
 export type ShowProviderDiscoverOptions = {
   page?: number;
   withNetworkId?: number;
+  withGenreId?: number;
 };
 export type ShowProviderDiscoverResponse = Result<number[], ExceptionBase>;
 export abstract class ShowDiscoverProvider {

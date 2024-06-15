@@ -193,6 +193,7 @@ export class ShowService {
           const discoverResults = await this.showDiscoverProvider.getDiscover({
             page: options?.page || 1,
             withNetworkId: options?.filterByNetworkId,
+            withGenreId: options?.filterByGenreId,
           });
           if (discoverResults.isErr()) {
             return [];

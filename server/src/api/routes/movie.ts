@@ -44,7 +44,7 @@ const getMovieDiscovery = async (ctx: Context) => {
   const mapper = getFromContainer(MovieMapper);
 
   const { page, params } = (ctx.request.body as any) || 1;
-  const { with_companies } = params;
+  const { with_companies, with_genres } = params;
 
   const results = await service.getDiscover({
     page,
@@ -52,6 +52,7 @@ const getMovieDiscovery = async (ctx: Context) => {
     filterByCompanyId: with_companies
       ? parseInt(with_companies as string)
       : undefined,
+    filterByGenreId: with_genres ? parseInt(with_genres as string) : undefined,
   });
 
   ctx.status = StatusCodes.OK;

@@ -7,7 +7,6 @@ import { NetworkMapper } from '@/resources/network/mapper';
 import { ShowMapper } from '@/resources/show/mapper';
 import { NetworkService } from '@/services/network/network-service';
 import { ShowService } from '@/services/show/show-service';
-import { discoverSeries, network } from '@/services/tmdb/show';
 
 const lookupById = async (ctx: Context) => {
   const service = getFromContainer(ShowService);
@@ -44,7 +43,7 @@ const discoverSeriesData = async (ctx: Context) => {
   const mapper = getFromContainer(ShowMapper);
 
   const { page, params } = (ctx.request.body as any) || 1;
-  const { with_networks } = params;
+  const { with_networks, with_genres } = params;
 
   const results = await service.getDiscover({
     page,
@@ -52,6 +51,7 @@ const discoverSeriesData = async (ctx: Context) => {
     filterByNetworkId: with_networks
       ? parseInt(with_networks as string)
       : undefined,
+    filterByGenreId: with_genres ? parseInt(with_genres as string) : undefined,
   });
 
   ctx.status = StatusCodes.OK;

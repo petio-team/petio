@@ -395,6 +395,7 @@ export class TmdbMovieProvider
           const data = await this.client.default.discoverMovie({
             page: options?.page || 1,
             withCompanies: options?.withCompanyId?.toString(),
+            withGenres: options?.withGenreId?.toString(),
           });
           return (
             data.results

@@ -19,4 +19,5 @@ export type MovieDiscoverOptions = {
   page?: number;
   limit?: number;
   filterByCompanyId?: number;
+  filterByGenreId?: number;
 };
