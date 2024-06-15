@@ -1,4 +1,5 @@
 import { Service } from 'diod';
+import { None, Ok, Option, Some } from 'oxide.ts';
 import pino from 'pino';
 
 import { Logger } from '@/infrastructure/logger/logger';
@@ -7,7 +8,6 @@ import { NetworkProps } from '@/resources/network/types';
 import { CacheProvider } from '@/services/cache/cache-provider';
 import { NetworkDetailsProvider } from '@/services/network/provider/provider';
 import { FixedNetworkIdsList } from '@/services/network/types';
-import { None, Ok, Option, Some } from 'oxide.ts';
 
 @Service()
 export class NetworkService {
@@ -29,20 +29,23 @@ export class NetworkService {
   async getNetworkDetails(id: number): Promise<Option<NetworkEntity>> {
     try {
       const start = Date.now();
-      const details = await this.cacheProvider.wrap<NetworkProps | undefined>(`network.${id}`, async () => {
-        const results = await this.networkDetailsProvider.getDetails(id);
-        if (!results.isOk()) {
-          return undefined;
-        }
-        const network = results.unwrap();
-        return {
-          ...network,
-          provider: {
-            ...network.provider,
-            tmdbId: id,
-          },
-        };
-      });
+      const details = await this.cacheProvider.wrap<NetworkProps | undefined>(
+        `network.${id}`,
+        async () => {
+          const results = await this.networkDetailsProvider.getDetails(id);
+          if (!results.isOk()) {
+            return undefined;
+          }
+          const network = results.unwrap();
+          return {
+            ...network,
+            provider: {
+              ...network.providers,
+              tmdbId: id,
+            },
+          };
+        },
+      );
       if (!details) {
         return None;
       }
@@ -79,7 +82,7 @@ export class NetworkService {
       );
       return networks.map((network) => {
         this.logger.debug(
-          { networkId: network.provider.tmdbId, name: network.name },
+          { networkId: network.providers.tmdbId, name: network.name },
           `got network details`,
         );
         return NetworkEntity.create(network);

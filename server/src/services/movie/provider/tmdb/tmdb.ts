@@ -395,6 +395,7 @@ export class TmdbMovieProvider
     try {
       const optionsAsString =
         options && Object.keys(options).length ? toQueryString(options) : '';
+      console.log(optionsAsString);
       const results = await this.cache.wrap(
         `tmdb.movie.discover${optionsAsString}`,
         async () => {

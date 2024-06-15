@@ -43,13 +43,13 @@ const getMovieDiscovery = async (ctx: Context) => {
   const service = getFromContainer(MovieService);
   const mapper = getFromContainer(MovieMapper);
 
-  const { page } = (ctx.request.body as any) || 1;
-  const { with_companies } = ctx.query;
+  const { page, params } = (ctx.request.body as any) || 1;
+  const { with_companies } = params;
 
   const results = await service.getDiscover({
     page,
     limit: 30,
-    withCompanies: with_companies
+    filterByCompanyId: with_companies
       ? parseInt(with_companies as string)
       : undefined,
   });
@@ -70,7 +70,7 @@ export default (app: Router) => {
   route.get('/lookup/:id', lookupById);
   route.get('/lookup/:id/minified', lookupByIdMinified);
   route.post('/discover', getMovieDiscovery);
-  route.get('/company/:id', getCompanyById);
+  route.get('/studio/:id', getCompanyById);
 
   app.use(route.routes());
 };

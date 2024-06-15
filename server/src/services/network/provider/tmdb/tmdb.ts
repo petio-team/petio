@@ -53,7 +53,7 @@ export class NetworkTmdbProvider implements NetworkDetailsProvider {
                   }
                 : undefined,
             },
-            provider: {
+            providers: {
               tmdbId: response.id!,
             },
             source: 'tmdb',

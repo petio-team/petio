@@ -43,8 +43,8 @@ const discoverSeriesData = async (ctx: Context) => {
   const service = getFromContainer(ShowService);
   const mapper = getFromContainer(ShowMapper);
 
-  const { page } = (ctx.request.body as any) || 1;
-  const { with_networks } = ctx.query;
+  const { page, params } = (ctx.request.body as any) || 1;
+  const { with_networks } = params;
 
   const results = await service.getDiscover({
     page,

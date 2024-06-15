@@ -42,7 +42,7 @@ export class NetworkMapper
             source: 'tmdb',
           },
         },
-        provider: {
+        providers: {
           tmdbId: record.id,
         },
         source: 'tmdb',
@@ -60,7 +60,7 @@ export class NetworkMapper
   toResponse(entity: NetworkEntity): NetworkResponseProps {
     const copy = entity.getProps();
     return {
-      id: copy.provider.tmdbId,
+      id: copy.providers.tmdbId,
       name: copy.name,
       logo_path: copy.artwork.logo?.url || '',
     };

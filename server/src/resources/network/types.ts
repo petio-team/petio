@@ -11,7 +11,7 @@ export type NetworkProps = {
       source: string;
     };
   };
-  provider: {
+  providers: {
     tmdbId: number;
   };
   source: string;

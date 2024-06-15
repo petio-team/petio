@@ -18,5 +18,5 @@ export type MovieLookupOptions = {
 export type MovieDiscoverOptions = {
   page?: number;
   limit?: number;
-  withCompanies?: number;
+  filterByCompanyId?: number;
 };

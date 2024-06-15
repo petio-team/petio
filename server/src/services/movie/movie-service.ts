@@ -188,12 +188,15 @@ export class MovieService {
    */
   async getDiscover(options?: MovieDiscoverOptions): Promise<MovieEntity[]> {
     try {
+      const optionsAsString =
+        options && Object.keys(options).length ? toQueryString(options) : '';
+      console.log(optionsAsString);
       const results = await this.cacheProvider.wrap(
-        `movie.discover`,
+        `movie.discover${optionsAsString}`,
         async () => {
           const discovery = await this.discoverProvider.getDiscover({
             page: options?.page || 1,
-            withCompanyId: options?.withCompanies,
+            withCompanyId: options?.filterByCompanyId,
           });
           if (discovery.isErr()) {
             return [];

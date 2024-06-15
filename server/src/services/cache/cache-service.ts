@@ -1,7 +1,9 @@
+import Bluebird from 'bluebird';
 import { Service } from 'diod';
 import pino from 'pino';
 
 import { Logger } from '@/infrastructure/logger/logger';
+import is from '@/infrastructure/utils/is';
 import { CompanyEntity } from '@/resources/company/entity';
 import { MovieEntity } from '@/resources/movie/entity';
 import { NetworkEntity } from '@/resources/network/entity';
@@ -17,6 +19,8 @@ import { MovieService } from '@/services/movie/movie-service';
 import { NetworkService } from '@/services/network/network-service';
 import { PersonService } from '@/services/person/person-service';
 import { ShowService } from '@/services/show/show-service';
+
+import { providers } from '../notifications/providers/index';
 
 @Service()
 export class CacheService {
@@ -67,37 +71,39 @@ export class CacheService {
         await this.cacheProvider.wrap<CommonResourcesCacheResponse>(
           'resources.common',
           async () => {
-            const [
-              movies,
-              shows,
-              people,
-              networks,
-              companies,
-              showDiscovery,
-              movieDiscovery,
-            ] = await Promise.all([
-              this.movieService.getTrending(30),
-              this.showService.getTrending(30),
-              this.personService.getTrending(30),
-              this.networkService.getNetworks(),
-              this.companyService.getCompanies(),
-              this.showService.getDiscover({
-                page: 1,
-                limit: 30,
-              }),
-              this.movieService.getDiscover({
-                page: 1,
-                limit: 30,
-              }),
+            const [movies, shows, people, networks, companies] =
+              await Promise.all([
+                this.movieService.getTrending(30),
+                this.showService.getTrending(30),
+                this.personService.getTrending(30),
+                this.networkService.getNetworks(),
+                this.companyService.getCompanies(),
+              ]);
+            const [showDiscovery, movieDiscovery] = await Bluebird.all([
+              Bluebird.map(networks, async (network) =>
+                this.showService.getDiscover({
+                  filterByNetworkId: network.providers.tmdbId,
+                }),
+              ),
+              Bluebird.map(companies, async (company) =>
+                this.movieService.getDiscover({
+                  filterByCompanyId: parseInt(company.id, 10),
+                }),
+              ),
             ]);
+
             return {
               movies: movies.map((movie) => movie.getProps()),
               shows: shows.map((show) => show.getProps()),
               people: people.map((person) => person.getProps()),
               networks: networks.map((network) => network.getProps()),
               companies: companies.map((company) => company.getProps()),
-              showDiscovery: showDiscovery.map((show) => show.getProps()),
-              movieDiscovery: movieDiscovery.map((movie) => movie.getProps()),
+              showDiscovery: showDiscovery
+                .flat()
+                .map((show) => show.getProps()),
+              movieDiscovery: movieDiscovery
+                .flat()
+                .map((movie) => movie.getProps()),
             };
           },
           this.defaultCacheTTL,

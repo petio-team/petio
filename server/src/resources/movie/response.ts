@@ -23,6 +23,11 @@ export type MovieResponseProps = {
   belongs_to_collection?: {
     name: string;
   };
+  studio?: {
+    id: string;
+    name: string;
+    logo_path: string;
+  };
   collection?: Array<{
     id: string;
     name: string;

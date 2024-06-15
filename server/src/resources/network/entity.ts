@@ -21,6 +21,22 @@ export class NetworkEntity extends BaseEntity<NetworkProps> {
     return new NetworkEntity({ id, props });
   }
 
+  get artwork(): { logo?: { url: string; source: string } } {
+    return this.props.artwork;
+  }
+
+  get name(): string {
+    return this.props.name;
+  }
+
+  get providers(): { tmdbId: number } {
+    return this.props.providers;
+  }
+
+  get source(): string {
+    return this.props.source;
+  }
+
   /**
    * Validates the Network entity.
    */
