@@ -40,7 +40,7 @@ export class NotificationMongooseRepository
    * @returns A promise that resolves to the found or created notification entity.
    */
   async findOneOrCreate(entity: NotificationEntity): Promise<NotificationEntity> {
-    const found = await this.findOne({ url: entity.url });
+    const found = await this.findOne({ name: entity.name });
     if (found.isNone()) {
       return this.create(entity);
     }

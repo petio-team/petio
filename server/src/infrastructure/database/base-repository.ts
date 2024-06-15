@@ -115,7 +115,7 @@ export abstract class MongooseBaseRepository<
     find?: Record<string, any>,
     options?: FindAllOptions<ClientSession>,
   ): Promise<Entity[]> {
-    const query = this.repository.distinct<Entity>(fieldDistinct, find ?? {});
+    const query = this.repository.distinct(fieldDistinct, find ?? {});
     const relationOptions: RelationOptions[] | undefined =
       typeof options?.relations === 'boolean'
         ? this.relations

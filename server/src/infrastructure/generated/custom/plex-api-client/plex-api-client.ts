@@ -45,6 +45,7 @@ export class PlexMediaServerApiClient extends PlexMediaServerV0ApiClient {
       url: '/library/metadata/{ratingKey}/children',
       path: {
         ratingKey: data.ratingKey,
+        includeElements: data.includeElements,
       },
       errors: {
         400: 'Bad Request - A parameter was not specified, or was specified incorrectly.',
