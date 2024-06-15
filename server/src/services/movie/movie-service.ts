@@ -190,7 +190,6 @@ export class MovieService {
     try {
       const optionsAsString =
         options && Object.keys(options).length ? toQueryString(options) : '';
-      console.log(optionsAsString);
       const results = await this.cacheProvider.wrap(
         `movie.discover${optionsAsString}`,
         async () => {

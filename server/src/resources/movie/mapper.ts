@@ -235,11 +235,6 @@ export class MovieMapper
             name: copy.collections.name,
           }
         : undefined,
-      studio: {
-        id: copy.studios[0]?.providers?.tmdb?.id?.toString() || '0',
-        name: copy.studios[0].name,
-        logo_path: copy.studios[0].logoPath,
-      },
       collection: copy.collections?.movies.map((movie) => ({
         id: `${movie.providers?.plex?.id || movie.providers?.tmdb?.id || 0}`,
         name: movie.name,
