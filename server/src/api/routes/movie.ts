@@ -40,13 +40,24 @@ const lookupByIdMinified = async (ctx: Context) => {
 };
 
 const getMovieDiscovery = async (ctx: Context) => {
-  const body = ctx.request.body as any;
+  const service = getFromContainer(MovieService);
+  const mapper = getFromContainer(MovieMapper);
 
-  const page = body.page ? body.page : 1;
-  const { params } = body;
+  const { page } = (ctx.request.body as any) || 1;
+  const { with_companies } = ctx.query;
+
+  const results = await service.getDiscover({
+    page,
+    limit: 30,
+    withCompanies: with_companies
+      ? parseInt(with_companies as string)
+      : undefined,
+  });
 
   ctx.status = StatusCodes.OK;
-  ctx.body = await discoverMovie(page, params);
+  ctx.body = {
+    results: results.map((movie) => mapper.toResponse(movie)),
+  };
 };
 
 const getCompanyById = async (ctx: Context) => {

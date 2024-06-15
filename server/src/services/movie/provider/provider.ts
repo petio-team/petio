@@ -34,7 +34,18 @@ export abstract class MovieRatingProvider {
   abstract getRatings(id: number): Promise<MovieProviderRatingResponse>;
 }
 
-export type MovieTrendingReponse = Result<number[], ExceptionBase>;
+export type MovieTrendingResponse = Result<number[], ExceptionBase>;
 export abstract class MovieTrendingProvider {
-  abstract getTrending(): Promise<MovieTrendingReponse>;
+  abstract getTrending(): Promise<MovieTrendingResponse>;
+}
+
+export type MovieDiscoverOptions = {
+  page?: number;
+  withCompanyId?: number;
+};
+export type MovieDiscoverResponse = Result<number[], ExceptionBase>;
+export abstract class MovieDiscoverProvider {
+  abstract getDiscover(
+    options?: MovieDiscoverOptions,
+  ): Promise<MovieDiscoverResponse>;
 }

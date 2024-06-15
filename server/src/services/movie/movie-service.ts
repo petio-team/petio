@@ -9,11 +9,15 @@ import { MovieRepository } from '@/resources/movie/repository';
 import { CacheProvider } from '@/services/cache/cache-provider';
 import {
   MovieArtworkProvider,
+  MovieDiscoverProvider,
   MovieProvider,
   MovieRatingProvider,
   MovieTrendingProvider,
 } from '@/services/movie/provider/provider';
-import { MovieLookupOptions } from '@/services/movie/types';
+import {
+  MovieDiscoverOptions,
+  MovieLookupOptions,
+} from '@/services/movie/types';
 
 @Service()
 export class MovieService {
@@ -36,6 +40,7 @@ export class MovieService {
     private artworkProvider: MovieArtworkProvider,
     private ratingProvider: MovieRatingProvider,
     private trendingProvider: MovieTrendingProvider,
+    private discoverProvider: MovieDiscoverProvider,
   ) {
     this.logger = logger.child({ module: 'services.movie' });
   }
@@ -128,7 +133,7 @@ export class MovieService {
    * Retrieves the trending movies.
    * @returns A Promise that resolves to an array of MovieEntity objects representing the trending movies.
    */
-  async getTrending() {
+  async getTrending(limit: number = 30): Promise<MovieEntity[]> {
     const results = await this.cacheProvider.wrap(
       `movie.trending`,
       async () => {
@@ -138,7 +143,7 @@ export class MovieService {
         }
         const trending = trendingResults.unwrap();
         const data = await Promise.all(
-          trending.map((movie) =>
+          trending.slice(0, limit).map((movie) =>
             this.getMovie(movie, {
               withArtwork: true,
               withRating: true,
@@ -173,5 +178,49 @@ export class MovieService {
       ),
     );
     return movieResult.filter((m) => m.isSome()).map((m) => m.unwrap());
+  }
+
+  /**
+   * Retrieves a list of discovered movies with additional details.
+   *
+   * @param limit - The maximum number of movies to retrieve. Defaults to 30.
+   * @returns A promise that resolves to an array of MovieEntity objects representing the discovered movies.
+   */
+  async getDiscover(options?: MovieDiscoverOptions): Promise<MovieEntity[]> {
+    try {
+      const results = await this.cacheProvider.wrap(
+        `movie.discover`,
+        async () => {
+          const discovery = await this.discoverProvider.getDiscover({
+            page: options?.page || 1,
+            withCompanyId: options?.withCompanies,
+          });
+          if (discovery.isErr()) {
+            return [];
+          }
+          const data = await Promise.all(
+            discovery
+              .unwrap()
+              .slice(0, options?.limit || 30)
+              .map((movie) =>
+                this.getMovie(movie, {
+                  withArtwork: true,
+                  withRating: true,
+                  withServer: true,
+                }),
+              ),
+          );
+          return data
+            .filter((m) => m.isSome())
+            .map((m) => m.unwrap())
+            .map((m) => m.getProps());
+        },
+        this.defaultCacheTTL,
+      );
+      return results.map((m) => MovieEntity.create(m));
+    } catch (error) {
+      this.logger.error({ error }, 'Error storing discovered data');
+      return [];
+    }
   }
 }

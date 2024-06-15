@@ -53,18 +53,22 @@ export class PersonService {
       const person = personResult.unwrap();
       if (options?.withMedia) {
         await Promise.all([
-          ...person.media.movies.map(async (media) =>
-            this.movieService.getMovie(media.provider.tmdbId, {
-              withArtwork: true,
-              withRating: true,
-              withServer: true,
-            }),
+          ...person.media.movies
+            .splice(0, options.withMediaLimit || 5)
+            .map(async (media) =>
+              this.movieService.getMovie(media.provider.tmdbId, {
+                withArtwork: true,
+                withRating: true,
+                withServer: true,
+              }),
           ),
-          ...person.media.shows.map(async (media) =>
-            this.showService.getShow(media.provider.tmdbId, {
-              withArtwork: true,
-              withServer: true,
-            }),
+          ...person.media.shows
+            .splice(0, options.withMediaLimit || 5)
+            .map(async (media) =>
+              this.showService.getShow(media.provider.tmdbId, {
+                withArtwork: true,
+                withServer: true,
+              }),
           ),
         ]);
       }
@@ -84,14 +88,17 @@ export class PersonService {
    * Retrieves the trending people.
    * @returns A Promise that resolves to an Option of PersonEntity array.
    */
-  async getTrending(): Promise<PersonEntity[]> {
+  async getTrending(limit: number = 30): Promise<PersonEntity[]> {
     try {
       const trending = await this.cacheProvider.wrap<PersonProps[]>(
         'person.trending',
         async () => {
           const ids = await this.personTrendingProvider.getTrending();
           const results = await Promise.all(
-            ids.unwrap().map((id) => this.getDetails(id, { withMedia: true })),
+            ids
+              .unwrap()
+              .slice(0, limit)
+              .map((id) => this.getDetails(id, { withMedia: true })),
           );
           return results
             .map((result) => result.unwrap())

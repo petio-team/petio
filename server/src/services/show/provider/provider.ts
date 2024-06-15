@@ -39,3 +39,14 @@ export type ShowProviderTrendingResponse = Result<number[], ExceptionBase>;
 export abstract class ShowTrendingProvider {
   abstract getTrending(): Promise<ShowProviderTrendingResponse>;
 }
+
+export type ShowProviderDiscoverOptions = {
+  page?: number;
+  withNetworkId?: number;
+};
+export type ShowProviderDiscoverResponse = Result<number[], ExceptionBase>;
+export abstract class ShowDiscoverProvider {
+  abstract getDiscover(
+    options?: ShowProviderDiscoverOptions,
+  ): Promise<ShowProviderDiscoverResponse>;
+}

@@ -15,6 +15,8 @@ export type CommonResourcesCacheResponse = {
   people: PersonProps[];
   networks: NetworkProps[];
   companies: CompanyProps[];
+  showDiscovery: ShowProps[];
+  movieDiscovery: MovieProps[];
 };
 
 /**
@@ -26,4 +28,6 @@ export type CommonResourcesResponse = {
   people: PersonEntity[];
   networks: NetworkEntity[];
   companies: CompanyEntity[];
+  showDiscovery: ShowEntity[];
+  movieDiscovery: MovieEntity[];
 };

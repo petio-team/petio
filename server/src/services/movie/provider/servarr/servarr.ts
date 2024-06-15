@@ -14,7 +14,7 @@ import {
 } from '@/services/movie/provider/provider';
 
 @Service()
-export class ServarrMovieRatingProvider implements MovieRatingProvider {
+export class ServarrMovieProvider implements MovieRatingProvider {
   /**
    * The default time-to-live (TTL) for caching movie ratings data.
    * The value is set to 1 day (86400000 milliseconds).

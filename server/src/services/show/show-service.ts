@@ -10,10 +10,11 @@ import { ShowProps } from '@/resources/show/types';
 import { CacheProvider } from '@/services/cache/cache-provider';
 import {
   ShowArtworkProvider,
+  ShowDiscoverProvider,
   ShowProvider,
   ShowTrendingProvider,
 } from '@/services/show/provider/provider';
-import { GetShowOptions } from '@/services/show/types';
+import { DiscoverShowsOptions, GetShowOptions } from '@/services/show/types';
 
 @Service()
 export class ShowService {
@@ -35,6 +36,7 @@ export class ShowService {
     private showProvider: ShowProvider,
     private showArtworkProvider: ShowArtworkProvider,
     private showTrendingProvider: ShowTrendingProvider,
+    private showDiscoverProvider: ShowDiscoverProvider,
   ) {
     this.logger = logger.child({ module: 'services.show' });
   }
@@ -54,7 +56,7 @@ export class ShowService {
       options && Object.keys(options).length ? toQueryString(options) : '';
     const cacheName = `show.${id}${optionsAsString}`;
     try {
-      const start = performance.now();
+      const start = Date.now();
       const result = await this.cacheProvider.wrap<ShowProps | undefined>(
         cacheName,
         async () => {
@@ -109,7 +111,7 @@ export class ShowService {
         this.logger.debug({ showId: id }, 'show not found');
         return None;
       }
-      const end = performance.now();
+      const end = Date.now();
       this.logger.debug(
         { showId: id, name: result.title, seasons: result.seasons.length },
         `got show details in ${Math.round(end - start)}ms`,
@@ -148,7 +150,7 @@ export class ShowService {
    * Retrieves the trending shows.
    * @returns A Promise that resolves to an Option of ShowEntity array.
    */
-  async getTrending(): Promise<ShowEntity[]> {
+  async getTrending(limit: number = 30): Promise<ShowEntity[]> {
     try {
       const trending = await this.cacheProvider.wrap<ShowProps[]>(
         'show.trending',
@@ -157,6 +159,7 @@ export class ShowService {
           const data = await Promise.all(
             ids
               .unwrap()
+              .slice(0, limit)
               .map((id) =>
                 this.getShow(id, { withArtwork: true, withServer: true }),
               ),
@@ -170,6 +173,47 @@ export class ShowService {
       return trending.map((props) => ShowEntity.create(props));
     } catch (error) {
       this.logger.error({ error }, 'Error fetching trending shows');
+      return [];
+    }
+  }
+
+  /**
+   * Retrieves a list of discover shows.
+   *
+   * @param limit - The maximum number of shows to retrieve. Defaults to 30.
+   * @returns A promise that resolves to an array of ShowEntity objects representing the discover shows.
+   */
+  async getDiscover(options?: DiscoverShowsOptions): Promise<ShowEntity[]> {
+    try {
+      const optionsAsString =
+        options && Object.keys(options).length ? toQueryString(options) : '';
+      const results = await this.cacheProvider.wrap<ShowProps[]>(
+        `show.discover${optionsAsString}`,
+        async () => {
+          const discoverResults = await this.showDiscoverProvider.getDiscover({
+            page: options?.page || 1,
+            withNetworkId: options?.filterByNetworkId,
+          });
+          if (discoverResults.isErr()) {
+            return [];
+          }
+          const details = await Promise.all(
+            discoverResults
+              .unwrap()
+              .slice(0, options?.limit || 30)
+              .map((id) =>
+                this.getShow(id, { withServer: true, withArtwork: true }),
+              ),
+          );
+          return details
+            .filter((show) => show.isSome())
+            .map((show) => show.unwrap().getProps());
+        },
+        this.defaultCacheTTL,
+      );
+      return results.map((props) => ShowEntity.create(props));
+    } catch (error) {
+      this.logger.error({ error }, 'Error fetching discovery shows');
       return [];
     }
   }

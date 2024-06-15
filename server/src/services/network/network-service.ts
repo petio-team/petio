@@ -7,6 +7,7 @@ import { NetworkProps } from '@/resources/network/types';
 import { CacheProvider } from '@/services/cache/cache-provider';
 import { NetworkDetailsProvider } from '@/services/network/provider/provider';
 import { FixedNetworkIdsList } from '@/services/network/types';
+import { None, Ok, Option, Some } from 'oxide.ts';
 
 @Service()
 export class NetworkService {
@@ -18,6 +19,43 @@ export class NetworkService {
     private readonly cacheProvider: CacheProvider,
   ) {
     this.logger = logger.child({ module: 'services.network' });
+  }
+
+  /**
+   * Retrieves the network details for a given ID.
+   * @param id - The ID of the network.
+   * @returns A Promise that resolves to an Option containing the network entity if found, or None if not found.
+   */
+  async getNetworkDetails(id: number): Promise<Option<NetworkEntity>> {
+    try {
+      const start = Date.now();
+      const details = await this.cacheProvider.wrap<NetworkProps | undefined>(`network.${id}`, async () => {
+        const results = await this.networkDetailsProvider.getDetails(id);
+        if (!results.isOk()) {
+          return undefined;
+        }
+        const network = results.unwrap();
+        return {
+          ...network,
+          provider: {
+            ...network.provider,
+            tmdbId: id,
+          },
+        };
+      });
+      if (!details) {
+        return None;
+      }
+      const end = Date.now();
+      this.logger.debug(
+        { networkId: id, name: details.name, time: end - start },
+        `got network details`,
+      );
+      return Some(NetworkEntity.create(details));
+    } catch (error) {
+      this.logger.error({ error }, 'Error fetching network');
+      return None;
+    }
   }
 
   /**

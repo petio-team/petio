@@ -11,3 +11,12 @@ export type MovieLookupOptions = {
   withArtwork?: boolean;
   withRating?: boolean;
 };
+
+/**
+ * Represents the options for discovering movies.
+ */
+export type MovieDiscoverOptions = {
+  page?: number;
+  limit?: number;
+  withCompanies?: number;
+};

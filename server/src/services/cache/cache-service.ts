@@ -65,23 +65,39 @@ export class CacheService {
     try {
       const results =
         await this.cacheProvider.wrap<CommonResourcesCacheResponse>(
-          'trending',
+          'resources.common',
           async () => {
-            const [movies, shows, people, networks, companies] =
-              await Promise.all([
-                this.movieService.getTrending(),
-                this.showService.getTrending(),
-                this.personService.getTrending(),
-                this.networkService.getNetworks(),
-                this.companyService.getCompanies(),
-              ]);
-
+            const [
+              movies,
+              shows,
+              people,
+              networks,
+              companies,
+              showDiscovery,
+              movieDiscovery,
+            ] = await Promise.all([
+              this.movieService.getTrending(30),
+              this.showService.getTrending(30),
+              this.personService.getTrending(30),
+              this.networkService.getNetworks(),
+              this.companyService.getCompanies(),
+              this.showService.getDiscover({
+                page: 1,
+                limit: 30,
+              }),
+              this.movieService.getDiscover({
+                page: 1,
+                limit: 30,
+              }),
+            ]);
             return {
               movies: movies.map((movie) => movie.getProps()),
               shows: shows.map((show) => show.getProps()),
               people: people.map((person) => person.getProps()),
               networks: networks.map((network) => network.getProps()),
               companies: companies.map((company) => company.getProps()),
+              showDiscovery: showDiscovery.map((show) => show.getProps()),
+              movieDiscovery: movieDiscovery.map((movie) => movie.getProps()),
             };
           },
           this.defaultCacheTTL,
@@ -96,6 +112,12 @@ export class CacheService {
         companies: results.companies.map((company) =>
           CompanyEntity.create(company),
         ),
+        showDiscovery: results.showDiscovery.map((show) =>
+          ShowEntity.create(show),
+        ),
+        movieDiscovery: results.movieDiscovery.map((movie) =>
+          MovieEntity.create(movie),
+        ),
       };
     } catch (error) {
       this.logger.error({ error }, 'Error storing trending data');
@@ -105,6 +127,8 @@ export class CacheService {
         people: [],
         networks: [],
         companies: [],
+        showDiscovery: [],
+        movieDiscovery: [],
       };
     }
   }

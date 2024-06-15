@@ -3,7 +3,9 @@ import { StatusCodes } from 'http-status-codes';
 import { Context } from 'koa';
 
 import { getFromContainer } from '@/infrastructure/container/container';
+import { NetworkMapper } from '@/resources/network/mapper';
 import { ShowMapper } from '@/resources/show/mapper';
+import { NetworkService } from '@/services/network/network-service';
 import { ShowService } from '@/services/show/show-service';
 import { discoverSeries, network } from '@/services/tmdb/show';
 
@@ -38,18 +40,38 @@ const lookupByIdMinified = async (ctx: Context) => {
 };
 
 const discoverSeriesData = async (ctx: Context) => {
-  const body = ctx.request.body as any;
+  const service = getFromContainer(ShowService);
+  const mapper = getFromContainer(ShowMapper);
 
-  const page = body.page ? body.page : 1;
-  const { params } = body;
+  const { page } = (ctx.request.body as any) || 1;
+  const { with_networks } = ctx.query;
+
+  const results = await service.getDiscover({
+    page,
+    limit: 30,
+    filterByNetworkId: with_networks
+      ? parseInt(with_networks as string)
+      : undefined,
+  });
 
   ctx.status = StatusCodes.OK;
-  ctx.body = await discoverSeries(page, params);
+  ctx.body = {
+    results: results.map((show) => mapper.toResponse(show)),
+  };
 };
 
 const getNetworkById = async (ctx: Context) => {
+  const networkResult = await getFromContainer(
+    NetworkService,
+  ).getNetworkDetails(ctx.params.id);
+  if (networkResult.isNone()) {
+    ctx.status = StatusCodes.NOT_FOUND;
+    return;
+  }
+  const network = networkResult.unwrap();
+
   ctx.status = StatusCodes.OK;
-  ctx.body = await network(ctx.params.id);
+  ctx.body = getFromContainer(NetworkMapper).toResponse(network);
 };
 
 const route = new Router({ prefix: '/show' });

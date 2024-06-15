@@ -8,19 +8,26 @@ import {
 import { TheMovieDatabaseApiClient } from '@/infrastructure/generated/clients';
 import { ApiError } from '@/infrastructure/generated/tmdb-api-client';
 import is from '@/infrastructure/utils/is';
+import { toQueryString } from '@/infrastructure/utils/object-to-query-string';
 import { ShowProps, ShowSeasonProps } from '@/resources/show/types';
 import { CacheProvider } from '@/services/cache/cache-provider';
 import {
   ShowArtworkImages,
+  ShowArtworkProvider,
+  ShowDiscoverProvider,
   ShowProvider,
   ShowProviderDetailsResponse,
+  ShowProviderDiscoverOptions,
   ShowProviderTrendingResponse,
   ShowSeasonProviderDetailsResponse,
+  ShowTrendingProvider,
 } from '@/services/show/provider/provider';
 import { ShowDetailsProviderResponse } from '@/services/show/provider/tmdb/types';
 
 @Service()
-export class TmdbShowProvider implements ShowProvider {
+export class TmdbShowProvider
+  implements ShowProvider, ShowTrendingProvider, ShowDiscoverProvider
+{
   /**
    * The default time-to-live (TTL) for caching movie data.
    * The value is set to 1 day (86400000 milliseconds).
@@ -418,6 +425,39 @@ export class TmdbShowProvider implements ShowProvider {
     } catch (error) {
       return Err(
         new InternalServerErrorException('Failed to fetch trending shows'),
+      );
+    }
+  }
+
+  /**
+   * Retrieves the discoverable TV shows from the TMDB API.
+   * @returns A Promise that resolves to a ShowProviderDiscoverResponse.
+   */
+  async getDiscover(
+    options?: ShowProviderDiscoverOptions,
+  ): Promise<ShowProviderTrendingResponse> {
+    try {
+      const optionsAsString =
+        options && Object.keys(options).length ? toQueryString(options) : '';
+      const discover = await this.cache.wrap<number[]>(
+        `tmdb.show.discover${optionsAsString}`,
+        async () => {
+          const data = await this.client.default.discoverTv({
+            page: options?.page || 1,
+            withNetworks: options?.withNetworkId,
+          });
+          return (
+            data.results
+              ?.filter((show) => is.truthy(show.id))
+              ?.map((show) => show.id!) || []
+          );
+        },
+        this.defaultCacheTTL,
+      );
+      return Ok(discover);
+    } catch (error) {
+      return Err(
+        new InternalServerErrorException('Failed to fetch discoverable shows'),
       );
     }
   }

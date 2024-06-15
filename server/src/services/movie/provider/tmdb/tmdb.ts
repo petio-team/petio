@@ -10,21 +10,27 @@ import { TheMovieDatabaseApiClient } from '@/infrastructure/generated/clients';
 import { ApiError } from '@/infrastructure/generated/tmdb-api-client';
 import { Logger } from '@/infrastructure/logger/logger';
 import is from '@/infrastructure/utils/is';
+import { toQueryString } from '@/infrastructure/utils/object-to-query-string';
 import { CacheProvider } from '@/services/cache/cache-provider';
 import {
   MovieArtworkImages,
+  MovieDiscoverOptions,
+  MovieDiscoverProvider,
+  MovieDiscoverResponse,
   MovieProvider,
   MovieProviderCollectionDetailsResponse,
   MovieProviderDetailsResponse,
   MovieTrendingProvider,
-  MovieTrendingReponse,
+  MovieTrendingResponse,
 } from '@/services/movie/provider/provider';
 import { MovieLookupProviderResponse } from '@/services/movie/provider/tmdb/types';
 
 import { MetadataSources } from '../../../../resources/movie/types';
 
 @Service()
-export class TmdbMovieProvider implements MovieProvider, MovieTrendingProvider {
+export class TmdbMovieProvider
+  implements MovieProvider, MovieTrendingProvider, MovieDiscoverProvider
+{
   /**
    * The base URL for retrieving original movie images from TMDB.
    */
@@ -352,7 +358,7 @@ export class TmdbMovieProvider implements MovieProvider, MovieTrendingProvider {
    * Retrieves the trending movies from the TMDB provider.
    * @returns A promise that resolves to the trending movies.
    */
-  async getTrending(): Promise<MovieTrendingReponse> {
+  async getTrending(): Promise<MovieTrendingResponse> {
     try {
       const results = await this.cache.wrap('tmdb.movie.trending', async () => {
         const data = await this.client.default.trendingMovies({
@@ -374,6 +380,39 @@ export class TmdbMovieProvider implements MovieProvider, MovieTrendingProvider {
       }
       return Err(
         new InternalServerErrorException('Failed to fetch trending movies'),
+      );
+    }
+  }
+
+  /**
+   * Retrieves a list of discoverable movies based on the provided options.
+   * @param options - The options to customize the movie discovery.
+   * @returns A promise that resolves to a MovieDiscoverResponse containing the list of discoverable movies.
+   */
+  async getDiscover(
+    options?: MovieDiscoverOptions,
+  ): Promise<MovieDiscoverResponse> {
+    try {
+      const optionsAsString =
+        options && Object.keys(options).length ? toQueryString(options) : '';
+      const results = await this.cache.wrap(
+        `tmdb.movie.discover${optionsAsString}`,
+        async () => {
+          const data = await this.client.default.discoverMovie({
+            page: options?.page || 1,
+            withCompanies: options?.withCompanyId?.toString(),
+          });
+          return (
+            data.results
+              ?.filter((movie) => is.truthy(movie.id))
+              ?.map((movie) => movie.id!) || []
+          );
+        },
+      );
+      return Ok(results);
+    } catch (error) {
+      return Err(
+        new InternalServerErrorException('Failed to fetch discoverable movies'),
       );
     }
   }
