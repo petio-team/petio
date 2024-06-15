@@ -1,4 +1,5 @@
 import cluster from 'cluster';
+import 'multer';
 import 'reflect-metadata';
 
 import { createKoaServer } from '@/api';

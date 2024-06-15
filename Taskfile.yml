@@ -17,9 +17,11 @@ tasks:
 
   build:prod:
     cmds:
+      - rm -rf ./dist
       - yarn workspaces focus --all
       - yarn workspace web run build:prod
       - yarn workspace server run build:prod
+      - yarn run pkg
 
   dev:binary:
     dir: ./dist/binaries
