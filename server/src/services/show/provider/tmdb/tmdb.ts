@@ -77,14 +77,8 @@ export class TmdbShowProvider
           }))[0]?.file_path ||
         images?.posters?.[0]?.file_path ||
         '',
-      background:
-        images?.backdrops
-          ?.filter((bg) => is.truthy(bg.file_path) && bg.iso_639_1 === 'en')
-          .map((logo) => ({
-            file_path: logo.file_path,
-          }))[0]?.file_path ||
-        images?.backdrops?.[0]?.file_path ||
-        '',
+      // we want to use the first backdrop image as the background as it has no text on it
+      background: images?.backdrops![0]?.file_path || '',
     };
   }
 
