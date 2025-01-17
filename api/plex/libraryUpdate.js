@@ -317,28 +317,28 @@ class LibraryUpdate {
             "warn",
             `LIB CRON: No content in library skipping - ${lib.title}`
           );
-          return;
-        }
-        await Promise.map(
-          Object.keys(libContent.Metadata),
-          async (item) => {
-            let obj = libContent.Metadata[item];
-            if (obj.type === "movie") {
-              await this.saveMovie(obj);
-            } else if (obj.type === "artist") {
-              music.push(obj);
-            } else if (obj.type === "show") {
-              await this.saveShow(obj);
-            } else {
-              logger.log("info", `LIB CRON: Unknown media type - ${obj.type}`);
-            }
-          },
-          { concurrency: 10 }
-        );
-        for (let i in music) {
-          let artist = music[i];
-          await this.saveMusic(artist);
-          await this.timeout(20);
+        } else {
+          await Promise.map(
+            Object.keys(libContent.Metadata),
+            async (item) => {
+              let obj = libContent.Metadata[item];
+              if (obj.type === "movie") {
+                await this.saveMovie(obj);
+              } else if (obj.type === "artist") {
+                music.push(obj);
+              } else if (obj.type === "show") {
+                await this.saveShow(obj);
+              } else {
+                logger.log("info", `LIB CRON: Unknown media type - ${obj.type}`);
+              }
+            },
+            { concurrency: 10 }
+          );
+          for (let i in music) {
+            let artist = music[i];
+            await this.saveMusic(artist);
+            await this.timeout(20);
+          }
         }
       } catch (err) {
         logger.log("error", `LIB CRON: Unable to get library content`);
