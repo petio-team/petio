@@ -40,8 +40,7 @@ class Radarr {
 
   async process(method, endpoint, params, body = false) {
     if (!this.config.hostname) {
-      reject("");
-      return;
+      throw 'no hostname';
     }
     if (!params) {
       params = {};
@@ -58,13 +57,13 @@ class Radarr {
       if (method === "post" && body) {
         let res = await axios.post(url, body);
         if (typeof res.data !== 'object') {
-          reject("not a valid object");
+          throw "not a valid object";
         }
         return res.data;
       } else {
         let res = await axios.get(url);
         if (typeof res.data !== 'object') {
-          reject("not a valid object");
+          throw "not a valid object";
         }
         return res.data;
       }
