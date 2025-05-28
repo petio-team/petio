@@ -212,9 +212,13 @@ class Sonarr {
     let servers = this.fullConfig;
     if (server) {
       servers = [this.findUuid(server.id, this.fullConfig)];
+    } else {
+      servers = this.fullConfig.filter(s => s.active);
     }
+
     for (let i = 0; i < servers.length; i++) {
       this.config = servers[i];
+
       let lookup = await this.lookup(request.tvdb_id);
       let showData = lookup[0];
       let rSeasons = request.seasons;
