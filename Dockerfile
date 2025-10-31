@@ -1,4 +1,4 @@
-FROM node:16.3.0-alpine3.13 as builder
+FROM node:16-alpine AS builder
 
 RUN apk add --no-cache git
 COPY ./ /source/
@@ -30,7 +30,7 @@ RUN mv /build/frontend/build /build/views/frontend && \
     rm -rf /build/admin && \
     chmod -R u=rwX,go=rX /build
 
-FROM alpine:3.13
+FROM node:16-alpine
 
 EXPOSE 7777
 VOLUME ["/app/api/config", "/app/logs"]
@@ -38,7 +38,7 @@ WORKDIR /app
 ENTRYPOINT ["/sbin/tini", "--"]
 CMD [ "node", "petio.js" ]
 
-RUN apk add --no-cache nodejs tzdata tini
+RUN apk add --no-cache tzdata tini
 
 COPY --from=builder /build/ /app/
 
